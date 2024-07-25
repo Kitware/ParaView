@@ -6,22 +6,66 @@
 #include "vtkArrowSource.h"
 #include "vtkCompositeDataDisplayAttributes.h"
 #include "vtkCompositePolyDataMapper.h"
+#include "vtkDataObject.h"
 #include "vtkDataObjectTree.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkGlyph3DMapper.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkLogger.h"
+#include "vtkMPIMoveData.h"
 #include "vtkMatrix4x4.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
-#include "vtkPassThrough.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTransform.h"
+
+namespace
+{
+
+//*****************************************************************************
+// This is used to trick MoveData into accepting a polymorphic dataset. We
+// don't know if the glyph source is going to be polydata or a
+// vtkDataObjectTree, and MoveData requires that all ranks have the same
+// dataset type. Since the client will be receiving the glyph source and doesn't
+// know what type of dataset is on the server, we wrap the real dataset in a
+// multiblock dataset.
+class vtkGlyphRepresentationMultiBlockMaker : public vtkMultiBlockDataSetAlgorithm
+{
+public:
+  static vtkGlyphRepresentationMultiBlockMaker* New();
+  vtkTypeMacro(vtkGlyphRepresentationMultiBlockMaker, vtkMultiBlockDataSetAlgorithm);
+
+protected:
+  int RequestData(
+    vtkInformation*, vtkInformationVector** inVec, vtkInformationVector* outVec) override
+  {
+    vtkDataObject* inputDO = vtkDataObject::GetData(inVec[0], 0);
+    vtkMultiBlockDataSet* outputMB = vtkMultiBlockDataSet::GetData(outVec, 0);
+
+    vtkDataObject* clone = inputDO->NewInstance();
+    clone->ShallowCopy(inputDO);
+    outputMB->SetBlock(0, clone);
+    clone->Delete();
+    return 1;
+  }
+
+  int FillInputPortInformation(int, vtkInformation* info) override
+  {
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");
+    return 1;
+  }
+};
+vtkStandardNewMacro(vtkGlyphRepresentationMultiBlockMaker);
+
+} // end anon namespace
 
 vtkStandardNewMacro(vtkGlyph3DRepresentation);
 //----------------------------------------------------------------------------
@@ -29,7 +73,7 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
 {
   this->SetNumberOfInputPorts(2);
 
-  this->PassThrough = vtkPassThrough::New();
+  this->GlyphMultiBlockMaker = vtkGlyphRepresentationMultiBlockMaker::New();
 
   this->GlyphMapper = vtkGlyph3DMapper::New();
   this->LODGlyphMapper = vtkGlyph3DMapper::New();
@@ -53,7 +97,7 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
 //----------------------------------------------------------------------------
 vtkGlyph3DRepresentation::~vtkGlyph3DRepresentation()
 {
-  this->PassThrough->Delete();
+  this->GlyphMultiBlockMaker->Delete();
   this->GlyphMapper->Delete();
   this->LODGlyphMapper->Delete();
   this->GlyphActor->Delete();
@@ -145,13 +189,14 @@ int vtkGlyph3DRepresentation::RequestData(
     ? this->GetInternalOutputPort(1)
     : this->DummySource->GetOutputPort();
 
-  this->PassThrough->SetInputConnection(glyphSourcePort);
+  this->GlyphMultiBlockMaker->SetInputConnection(glyphSourcePort);
 
-  // This is needed as for some reason when the input connection is changed, in client-server mode,
-  // the PassThrough decides not to re-execute on the client. That's throws of all logic to
-  // determine if data needs to be delivered etc.
-  this->PassThrough->Modified();
-  this->PassThrough->Update();
+  // This is needed as for some reason when the input connection is changed,
+  // in client-server mode, the GlyphMultiBlockMaker decides not to reexecute on
+  // the client. That's throws of all logic to determine if data needs to be
+  // delivered etc.
+  this->GlyphMultiBlockMaker->Modified();
+  this->GlyphMultiBlockMaker->Update();
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
@@ -209,11 +254,13 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
     vtkNew<vtkMatrix4x4> matrix;
     this->GlyphActor->GetMatrix(matrix.GetPointer());
     vtkPVRenderView::SetGeometryBounds(inInfo, this, bounds, matrix.GetPointer(), /*port=*/1);
-    vtkPVRenderView::SetPiece(inInfo, this, this->PassThrough->GetOutputDataObject(0), 0, 1);
+    vtkPVRenderView::SetPiece(
+      inInfo, this, this->GlyphMultiBlockMaker->GetOutputDataObject(0), 0, 1);
   }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
   {
-    vtkPVRenderView::SetPieceLOD(inInfo, this, this->PassThrough->GetOutputDataObject(0), 0, 1);
+    vtkPVRenderView::SetPieceLOD(
+      inInfo, this, this->GlyphMultiBlockMaker->GetOutputDataObject(0), 0, 1);
   }
 
   if (request_type == vtkPVView::REQUEST_RENDER())
@@ -230,16 +277,32 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
     // Extract the real glyph source from the MBDS wrapper (see note above
     // vtkGlyphRepresentationMultiBlockMaker)
     producerGlyphPort->GetProducer()->Update();
-    vtkDataObject* glyph =
-      producerGlyphPort->GetProducer()->GetOutputDataObject(producerGlyphPort->GetIndex());
-    this->GlyphMapper->SetInputDataObject(1, glyph);
+    vtkMultiBlockDataSet* glyphMBDS = vtkMultiBlockDataSet::SafeDownCast(
+      producerGlyphPort->GetProducer()->GetOutputDataObject(producerGlyphPort->GetIndex()));
+    if (glyphMBDS && glyphMBDS->GetNumberOfBlocks() == 1)
+    {
+      vtkDataObject* realGlyph = glyphMBDS->GetBlock(0);
+      this->GlyphMapper->SetInputDataObject(1, realGlyph);
+    }
+    else
+    {
+      this->GlyphMapper->SetInputDataObject(1, nullptr);
+    }
 
     producerGlyphPortLOD->GetProducer()->Update();
-    vtkDataObject* glyphLOD =
-      producerGlyphPortLOD->GetProducer()->GetOutputDataObject(producerGlyphPortLOD->GetIndex());
-    this->LODGlyphMapper->SetInputDataObject(1, glyphLOD);
+    vtkMultiBlockDataSet* glyphMBDSLOD = vtkMultiBlockDataSet::SafeDownCast(
+      producerGlyphPortLOD->GetProducer()->GetOutputDataObject(producerGlyphPortLOD->GetIndex()));
+    if (glyphMBDSLOD && glyphMBDSLOD->GetNumberOfBlocks() == 1)
+    {
+      vtkDataObject* realGlyphLOD = glyphMBDSLOD->GetBlock(0);
+      this->LODGlyphMapper->SetInputDataObject(1, realGlyphLOD);
+    }
+    else
+    {
+      this->LODGlyphMapper->SetInputDataObject(1, nullptr);
+    }
 
-    const bool lod = this->SuppressLOD ? false : (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
+    bool lod = this->SuppressLOD ? false : (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
     this->GlyphActor->SetEnableLOD(lod ? 1 : 0);
 
     // Figure out the range for source indexing, if enabled:
