@@ -17,6 +17,8 @@
 #include "vtkObject.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
 
+#include <memory> // For unique_ptr
+
 class vtkClientServerStream;
 class vtkDataObject;
 class vtkPVArrayInformation;
@@ -24,6 +26,28 @@ class vtkPVArrayInformation;
 class VTKREMOTINGCORE_EXPORT vtkPVDataSetAttributesInformation : public vtkObject
 {
 public:
+  /**
+   * @brief Iterator over a `vtkPVDataSetAttributesInformation`'s arrays; yielding their
+   * `vtkPVArrayInformation`. This iterator is slower thant looping over arrays using
+   * `GetNumberOfArrays()` and `GetArrayInformation(idx)` but returns the arrays ordered by name.
+   * Prefer the other approach unless you explicitely need the ordered arrays.
+   */
+  class VTKREMOTINGCORE_EXPORT AlphabeticalArrayInformationIterator
+  {
+  public:
+    AlphabeticalArrayInformationIterator(vtkPVDataSetAttributesInformation* source);
+    ~AlphabeticalArrayInformationIterator();
+
+    void GoToFirstItem();
+    void GoToNextItem();
+    bool IsDoneWithTraversal() const;
+    vtkPVArrayInformation* GetCurrentArrayInformation();
+
+  private:
+    struct vtkInternals;
+    std::unique_ptr<vtkInternals> Internals;
+  };
+
   static vtkPVDataSetAttributesInformation* New();
   vtkTypeMacro(vtkPVDataSetAttributesInformation, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
@@ -56,6 +80,7 @@ public:
   ///@{
   /**
    * Returns array information for the chosen array either by name or by index.
+   * Note that the index overload is significantly is faster.
    */
   vtkPVArrayInformation* GetArrayInformation(int idx) const;
   vtkPVArrayInformation* GetArrayInformation(const char* name) const;
@@ -72,6 +97,14 @@ public:
    * attribute.
    */
   int IsArrayAnAttribute(int arrayIndex);
+
+  /**
+   * @brief Returns a new iterator to traverse array informations alphabetically.
+   * This approach is noticeably slower than looping over array indices. Prefer doing so
+   * unless you explicitely need the ordered arrays.
+   * Caller is responsible for releasing the iterator memory.
+   */
+  AlphabeticalArrayInformationIterator* NewAlphabeticalArrayInformationIterator();
 
 protected:
   vtkPVDataSetAttributesInformation();

@@ -17,7 +17,6 @@
 #include "vtkSmartPointer.h"
 
 #include <algorithm>
-#include <iterator>
 #include <map>
 #include <string>
 #include <vector>
@@ -55,9 +54,23 @@ public:
     }
   };
 
-  typedef std::map<std::string, vtkSmartPointer<vtkPVArrayInformation>, comparator>
-    ArrayInformationType;
-  ArrayInformationType ArrayInformation;
+  vtkSmartPointer<vtkPVArrayInformation>& GetOrCreateArrayInformation(const std::string& name)
+  {
+    auto it = this->ArrayInformationLookupMap.find(name);
+    if (it == this->ArrayInformationLookupMap.end())
+    {
+      this->ArrayInformationLookupMap[name] = this->ArrayInformations.size();
+      this->ArrayInformations.emplace_back();
+      return this->ArrayInformations.back();
+    }
+
+    return this->ArrayInformations[it->second];
+  }
+
+  typedef std::map<std::string, size_t, comparator> lookupMap_t;
+  typedef std::vector<vtkSmartPointer<vtkPVArrayInformation>> storageVector_t;
+  storageVector_t ArrayInformations;
+  lookupMap_t ArrayInformationLookupMap;
   std::string AttributesInformation[vtkDataSetAttributes::NUM_ATTRIBUTES];
   bool ValuesPopulated = false;
 };
@@ -82,11 +95,10 @@ void vtkPVDataSetAttributesInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ArrayInformation, number of arrays: " << this->GetNumberOfArrays() << endl;
-  for (vtkInternals::ArrayInformationType::const_iterator iter =
-         this->Internals->ArrayInformation.begin();
-       iter != this->Internals->ArrayInformation.end(); ++iter)
+  for (auto iter = this->Internals->ArrayInformations.begin();
+       iter != this->Internals->ArrayInformations.end(); ++iter)
   {
-    iter->second->PrintSelf(os, indent.GetNextIndent());
+    iter->Get()->PrintSelf(os, indent.GetNextIndent());
     os << endl;
   }
 }
@@ -95,7 +107,8 @@ void vtkPVDataSetAttributesInformation::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVDataSetAttributesInformation::Initialize()
 {
   vtkInternals& internals = (*this->Internals);
-  internals.ArrayInformation.clear();
+  internals.ArrayInformations.clear();
+  internals.ArrayInformationLookupMap.clear();
   std::fill_n(internals.AttributesInformation,
     static_cast<int>(vtkDataSetAttributes::NUM_ATTRIBUTES), std::string());
   internals.ValuesPopulated = false;
@@ -114,12 +127,16 @@ void vtkPVDataSetAttributesInformation::DeepCopy(vtkPVDataSetAttributesInformati
     return;
   }
 
-  internals.ArrayInformation.clear();
-  for (const auto& pair : ointernals.ArrayInformation)
+  internals.ArrayInformations.clear();
+  internals.ArrayInformationLookupMap.clear();
+  Internals->ArrayInformations.reserve(ointernals.ArrayInformations.size());
+  for (const auto& oinfo : ointernals.ArrayInformations)
   {
     vtkNew<vtkPVArrayInformation> arrayInfo;
-    arrayInfo->DeepCopy(pair.second);
-    internals.ArrayInformation[pair.first] = arrayInfo.Get();
+    arrayInfo->DeepCopy(oinfo);
+
+    internals.ArrayInformationLookupMap[arrayInfo->GetName()] = internals.ArrayInformations.size();
+    internals.ArrayInformations.push_back(arrayInfo);
   }
 
   // Now the default attributes.
@@ -158,7 +175,7 @@ void vtkPVDataSetAttributesInformation::CopyFromDataObject(vtkDataObject* dobj)
         }
         auto ainfo = vtkPVArrayInformation::New();
         ainfo->CopyFromCellAttribute(cg, cellAtt);
-        internals.ArrayInformation[cellAtt->GetName().Data()].TakeReference(ainfo);
+        internals.GetOrCreateArrayInformation(cellAtt->GetName().Data()).TakeReference(ainfo);
       }
     }
     internals.ValuesPopulated = true;
@@ -180,7 +197,7 @@ void vtkPVDataSetAttributesInformation::CopyFromDataObject(vtkDataObject* dobj)
       {
         vtkPVArrayInformation* ainfo = vtkPVArrayInformation::New();
         ainfo->CopyFromArray(array, fd);
-        internals.ArrayInformation[array->GetName()].TakeReference(ainfo);
+        internals.GetOrCreateArrayInformation(array->GetName()).TakeReference(ainfo);
       }
     }
 
@@ -226,7 +243,7 @@ void vtkPVDataSetAttributesInformation::CopyFromDataObject(vtkDataObject* dobj)
       {
         auto ainfo = vtkPVArrayInformation::New();
         ainfo->CopyFromGenericAttribute(attr);
-        internals.ArrayInformation[attr->GetName()].TakeReference(ainfo);
+        internals.GetOrCreateArrayInformation(attr->GetName()).TakeReference(ainfo);
       }
     }
   }
@@ -249,31 +266,33 @@ void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInf
     return;
   }
 
+  std::vector<bool> duplicateArrays(this->Internals->ArrayInformations.size(), false);
+
   const auto& ointernals = (*other->Internals);
-  for (auto& pair : ointernals.ArrayInformation)
+  for (const auto& oinfo : ointernals.ArrayInformations)
   {
-    auto iter = internals.ArrayInformation.find(pair.first);
-    if (iter == internals.ArrayInformation.end())
+    auto iter = internals.ArrayInformationLookupMap.find(oinfo->GetName());
+    if (iter == internals.ArrayInformationLookupMap.end())
     {
       auto ainfo = vtkPVArrayInformation::New();
-      ainfo->DeepCopy(pair.second);
-      ainfo->SetIsPartial(1); // since only present in `other`.
-      internals.ArrayInformation[pair.first].TakeReference(ainfo);
+      ainfo->DeepCopy(oinfo);
+      ainfo->SetIsPartial(true); // since only present in `other`.
+      internals.GetOrCreateArrayInformation(oinfo->GetName()).TakeReference(ainfo);
     }
     else
     {
-      auto ainfo = iter->second.GetPointer();
-      ainfo->AddInformation(pair.second, this->FieldAssociation);
+      auto ainfo = internals.ArrayInformations[iter->second].GetPointer();
+      ainfo->AddInformation(oinfo, this->FieldAssociation);
+      duplicateArrays[iter->second] = true;
     }
   }
 
   // Mark partial arrays not present in `other`
-  for (auto& pair : internals.ArrayInformation)
+  for (size_t arrayIdx = 0; arrayIdx < duplicateArrays.size(); ++arrayIdx)
   {
-    auto iter = ointernals.ArrayInformation.find(pair.first);
-    if (iter == ointernals.ArrayInformation.end())
+    if (!duplicateArrays[arrayIdx])
     {
-      pair.second->SetIsPartial(1); // since only present in `this`.
+      internals.ArrayInformations[arrayIdx]->SetIsPartial(true); // since only present in `this`.
     }
   }
 
@@ -324,7 +343,7 @@ vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetAttributeInformatio
 //----------------------------------------------------------------------------
 int vtkPVDataSetAttributesInformation::GetNumberOfArrays() const
 {
-  return static_cast<int>(this->Internals->ArrayInformation.size());
+  return static_cast<int>(this->Internals->ArrayInformations.size());
 }
 
 //----------------------------------------------------------------------------
@@ -332,9 +351,9 @@ int vtkPVDataSetAttributesInformation::GetMaximumNumberOfTuples() const
 {
   const vtkInternals& internals = (*this->Internals);
   vtkTypeInt64 maxvalue = 0;
-  for (auto& pair : internals.ArrayInformation)
+  for (auto& arrayInfo : internals.ArrayInformations)
   {
-    maxvalue = std::max(maxvalue, pair.second->GetNumberOfTuples());
+    maxvalue = std::max(maxvalue, arrayInfo->GetNumberOfTuples());
   }
   return maxvalue;
 }
@@ -343,10 +362,9 @@ int vtkPVDataSetAttributesInformation::GetMaximumNumberOfTuples() const
 vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetArrayInformation(int idx) const
 {
   const auto& internals = (*this->Internals);
-  if (idx >= 0 && idx < static_cast<int>(internals.ArrayInformation.size()))
+  if (idx >= 0 && idx < static_cast<int>(internals.ArrayInformations.size()))
   {
-    auto iter = std::next(internals.ArrayInformation.begin(), idx);
-    return iter->second;
+    return internals.ArrayInformations[idx];
   }
   return nullptr;
 }
@@ -358,8 +376,10 @@ vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetArrayInformation(
   if (name)
   {
     const auto& internals = (*this->Internals);
-    auto iter = internals.ArrayInformation.find(name);
-    return iter != internals.ArrayInformation.end() ? iter->second : nullptr;
+    auto iter = internals.ArrayInformationLookupMap.find(name);
+    return iter != internals.ArrayInformationLookupMap.end()
+      ? internals.ArrayInformations[iter->second]
+      : nullptr;
   }
   return nullptr;
 }
@@ -373,13 +393,13 @@ void vtkPVDataSetAttributesInformation::CopyToStream(vtkClientServerStream* css)
   *css << vtkClientServerStream::Reply;
 
   // Number of arrays.
-  *css << internals.ValuesPopulated << static_cast<int>(internals.ArrayInformation.size());
+  *css << internals.ValuesPopulated << static_cast<int>(internals.ArrayInformations.size());
 
   // Serialize each array's information.
-  for (auto& pair : internals.ArrayInformation)
+  for (auto& arrayInfo : internals.ArrayInformations)
   {
     vtkClientServerStream temp;
-    pair.second->CopyToStream(&temp);
+    arrayInfo->CopyToStream(&temp);
     *css << temp;
   }
 
@@ -423,7 +443,7 @@ void vtkPVDataSetAttributesInformation::CopyFromStream(const vtkClientServerStre
       vtkErrorMacro("Error parsing stream");
       return;
     }
-    internals.ArrayInformation[ainfo->GetName()].TakeReference(ainfo);
+    internals.GetOrCreateArrayInformation(ainfo->GetName()).TakeReference(ainfo);
   }
 
   for (int cc = 0; cc < vtkDataSetAttributes::NUM_ATTRIBUTES; ++cc)
@@ -435,4 +455,59 @@ void vtkPVDataSetAttributesInformation::CopyFromStream(const vtkClientServerStre
       return;
     }
   }
+}
+
+//----------------------------------------------------------------------------
+struct vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::vtkInternals
+{
+  vtkPVDataSetAttributesInformation* DSAttributesInformation = nullptr;
+  vtkPVDataSetAttributesInformation::vtkInternals::lookupMap_t::iterator LookupMapIter;
+};
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::
+  AlphabeticalArrayInformationIterator(vtkPVDataSetAttributesInformation* dsAttributesInformation)
+{
+  this->Internals = std::unique_ptr<vtkInternals>(new vtkInternals());
+  this->Internals->DSAttributesInformation = dsAttributesInformation;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::
+  ~AlphabeticalArrayInformationIterator() = default;
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator*
+vtkPVDataSetAttributesInformation::NewAlphabeticalArrayInformationIterator()
+{
+  return new vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::GoToFirstItem()
+{
+  this->Internals->LookupMapIter =
+    this->Internals->DSAttributesInformation->Internals->ArrayInformationLookupMap.begin();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::GoToNextItem()
+{
+  this->Internals->LookupMapIter++;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::IsDoneWithTraversal()
+  const
+{
+  return this->Internals->LookupMapIter ==
+    this->Internals->DSAttributesInformation->Internals->ArrayInformationLookupMap.end();
+}
+
+//----------------------------------------------------------------------------
+vtkPVArrayInformation* vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::
+  GetCurrentArrayInformation()
+{
+  auto& infoStorage = this->Internals->DSAttributesInformation->Internals->ArrayInformations;
+  return infoStorage[this->Internals->LookupMapIter->second];
 }

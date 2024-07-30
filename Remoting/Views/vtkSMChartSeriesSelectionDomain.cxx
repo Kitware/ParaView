@@ -22,14 +22,14 @@
 #include "vtkStringList.h"
 
 #include <vtk_jsoncpp.h>
+#include <vtksys/RegularExpression.hxx>
 
-#include <algorithm>
 #include <cassert>
 #include <map>
+#include <memory>
 #include <set>
 #include <sstream>
 #include <vector>
-#include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(vtkSMChartSeriesSelectionDomain);
 namespace
@@ -246,11 +246,16 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(const std::string&
   std::set<std::string> uniquestrings;
 
   vtkPVDataSetAttributesInformation* dsa = dataInfo->GetAttributeInformation(fieldAssociation);
-  for (int cc = 0; dsa != nullptr && cc < dsa->GetNumberOfArrays(); cc++)
+  if (dsa != nullptr)
   {
-    vtkPVArrayInformation* arrayInfo = dsa->GetArrayInformation(cc);
-    this->PopulateArrayComponents(
-      chartRepr, blockName, strings, uniquestrings, arrayInfo, flattenTable);
+    std::unique_ptr<vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator> iter(
+      dsa->NewAlphabeticalArrayInformationIterator());
+    for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      vtkPVArrayInformation* arrayInfo = iter->GetCurrentArrayInformation();
+      this->PopulateArrayComponents(
+        chartRepr, blockName, strings, uniquestrings, arrayInfo, flattenTable);
+    }
   }
 
   if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
