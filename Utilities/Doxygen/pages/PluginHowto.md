@@ -1596,7 +1596,7 @@ Just remove the build directory content and configure from scratch.
 
 [ParaView Guide]: http://www.kitware.com/products/books/paraview.html
 [core readers]: https://gitlab.kitware.com/paraview/paraview/-/blob/87babdbeab6abe20aac6f8b2692788abc6bb20ac/ParaViewCore/ServerManager/SMApplication/Resources/readers.xml#L158-179
-[pqPropertyWidget]: https://kitware.github.io/paraview-docs/nightly/cxx/classpqPropertyWidget.html
-[pqPropertyWidgetDecorator]: https://kitware.github.io/paraview-docs/nightly/cxx/classpqPropertyWidgetDecorator.html
+[pqPropertyWidget]: https://www.paraview.org/paraview-docs/nightly/cxx/classpqPropertyWidget.html
+[pqPropertyWidgetDecorator]: https://www.paraview.org/paraview-docs/nightly/cxx/classpqPropertyWidgetDecorator.html
 [QActionGroup]: https://doc.qt.io/qt-5/qactiongroup.html
 [QAction]: https://doc.qt.io/qt-5/qaction.html
