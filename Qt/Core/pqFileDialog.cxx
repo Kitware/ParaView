@@ -237,12 +237,213 @@ protected:
 QMap<QPointer<pqServer>, QString> pqFileDialog::pqImplementation::FilePaths;
 
 /////////////////////////////////////////////////////////////////////////////
-// pqFileDialog
+void pqFileDialog::addImplementation(vtkTypeUInt32 location)
+{
+  pqServer* server = location == vtkPVSession::DATA_SERVER ? this->Server : nullptr;
+  this->Implementations[location] = new pqImplementation(this, server);
+  // the selected location is temporarily set here,
+  // so that some slots called by signals can be executed properly.
+  this->SelectedLocation = location;
+  auto& impl = *this->Implementations[location];
 
+  // set up ui for the file system
+  this->Implementations[location]->Ui.setupUi(this->Implementations[location]);
+
+  // set up ok and cancel signals/slots
+  QObject::connect(impl.Ui.OK, &QPushButton::clicked, this, &pqFileDialog::accept);
+  QObject::connect(impl.Ui.Cancel, &QPushButton::clicked, this, &pqFileDialog::reject);
+
+  // ensures that the favorites and the browser component are sized proportionately.
+  impl.Ui.mainSplitter->setStretchFactor(0, 1);
+  impl.Ui.mainSplitter->setStretchFactor(1, 4);
+
+  impl.Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);
+
+  // install the event filter
+  impl.Ui.Files->installEventFilter(this->Implementations[location]);
+
+  // install the autocompleter
+  impl.Ui.EntityName->setCompleter(impl.Completer);
+
+  // this is the Navigate button, which is only shown when needed
+  impl.Ui.Navigate->hide();
+
+  QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
+  impl.Ui.NavigateBack->setIcon(back);
+  impl.Ui.NavigateBack->setEnabled(false);
+  impl.Ui.NavigateBack->setShortcut(QKeySequence::Back);
+  impl.Ui.NavigateBack->setToolTip(
+    tr("Navigate Back (%1)").arg(impl.Ui.NavigateBack->shortcut().toString()));
+
+  QObject::connect(impl.Ui.NavigateBack, SIGNAL(clicked(bool)), this, SLOT(onNavigateBack()));
+  // just flip the back image to make a forward image
+  QPixmap forward = QPixmap::fromImage(back.toImage().mirrored(true, false));
+  impl.Ui.NavigateForward->setIcon(forward);
+  impl.Ui.NavigateForward->setDisabled(true);
+  impl.Ui.NavigateForward->setShortcut(QKeySequence::Forward);
+  impl.Ui.NavigateForward->setToolTip(
+    tr("Navigate Forward (%1)").arg(impl.Ui.NavigateForward->shortcut().toString()));
+  QObject::connect(impl.Ui.NavigateForward, SIGNAL(clicked(bool)), this, SLOT(onNavigateForward()));
+  impl.Ui.NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
+  impl.Ui.NavigateUp->setShortcut(Qt::ALT | Qt::Key_Up);
+  impl.Ui.NavigateUp->setToolTip(
+    tr("Navigate Up (%1)").arg(impl.Ui.NavigateUp->shortcut().toString()));
+  impl.Ui.CreateFolder->setIcon(style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
+  impl.Ui.CreateFolder->setShortcut(QKeySequence::New);
+  impl.Ui.CreateFolder->setToolTip(
+    tr("Create New Folder (%1)").arg(impl.Ui.CreateFolder->shortcut().toString()));
+
+  impl.Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
+
+  impl.Ui.Files->setModel(&impl.FileFilter);
+  impl.Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+  impl.Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
+  QObject::connect(impl.Ui.Files, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+    SLOT(onContextMenuRequested(const QPoint&)));
+
+  impl.Ui.Favorites->setContextMenuPolicy(Qt::CustomContextMenu);
+  QObject::connect(impl.Ui.Favorites, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+    SLOT(onFavoritesContextMenuRequested(const QPoint&)));
+
+  impl.Ui.Favorites->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
+
+  auto shortcutDel = new QShortcut(QKeySequence::Delete, this);
+  shortcutDel->setAutoRepeat(false);
+  QObject::connect(shortcutDel, &QShortcut::activated, this,
+    &pqFileDialog::onRemoveSelectedDirectoriesFromFavorites);
+
+  impl.Ui.AddCurrentDirectoryToFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
+  QObject::connect(impl.Ui.AddCurrentDirectoryToFavorites, SIGNAL(clicked()), this,
+    SLOT(onAddCurrentDirectoryToFavorites()));
+  impl.Ui.ResetFavortiesToSystemDefault->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
+  QObject::connect(impl.Ui.ResetFavortiesToSystemDefault, SIGNAL(clicked()), this,
+    SLOT(onResetFavoritesToSystemDefault()));
+
+  impl.proxyFavoriteModel = new QSortFilterProxyModel(impl.FavoriteModel);
+  impl.proxyFavoriteModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+  impl.proxyFavoriteModel->setSourceModel(impl.FavoriteModel);
+
+  impl.Ui.Favorites->setModel(impl.proxyFavoriteModel);
+  impl.Ui.Favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+  impl.Ui.Locations->setModel(impl.LocationModel);
+  impl.Ui.Recent->setModel(impl.RecentModel);
+
+  this->setFileMode(ExistingFile, location);
+
+  QObject::connect(impl.Model, SIGNAL(modelReset()), this, SLOT(onModelReset()));
+
+  QObject::connect(impl.Ui.NavigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
+
+  QObject::connect(impl.Ui.CreateFolder, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
+
+  QObject::connect(
+    impl.Ui.Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
+
+  QObject::connect(
+    impl.Ui.EntityType, &QComboBox::currentTextChanged, this, &pqFileDialog::onFilterChange);
+
+  QObject::connect(impl.Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
+    SLOT(onClickedFavorite(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.favoritesSearchBar, &QLineEdit::textChanged, this,
+    &pqFileDialog::FilterDirectoryFromFavorites);
+
+  QObject::connect(impl.Ui.Recent, SIGNAL(clicked(const QModelIndex&)), this,
+    SLOT(onClickedRecent(const QModelIndex&)));
+  QObject::connect(impl.Ui.Locations, SIGNAL(clicked(const QModelIndex&)), this,
+    SLOT(onClickedRecent(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.Files, SIGNAL(clicked(const QModelIndex&)), this,
+    SLOT(onClickedFile(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.Files->selectionModel(),
+    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+    SLOT(fileSelectionChanged()));
+
+  QObject::connect(impl.Ui.Favorites, SIGNAL(activated(const QModelIndex&)), this,
+    SLOT(onActivateFavorite(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.Locations, SIGNAL(activated(const QModelIndex&)), this,
+    SLOT(onActivateLocation(const QModelIndex&)));
+  QObject::connect(impl.Ui.Recent, SIGNAL(activated(const QModelIndex&)), this,
+    SLOT(onActivateRecent(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.Files, SIGNAL(doubleClicked(const QModelIndex&)), this,
+    SLOT(onDoubleClickFile(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.EntityName, SIGNAL(textChanged(const QString&)), this,
+    SLOT(onTextEdited(const QString&)));
+
+  impl.Completer->setCaseSensitivity(Qt::CaseInsensitive);
+
+  QStringList filterList = MakeFilterList(this->NameFilter);
+  if (filterList.empty())
+  {
+    impl.Ui.EntityType->addItem(tr("All Files") + " (*)");
+    impl.Filters << tr("All Files") + " (*)";
+  }
+  else
+  {
+    impl.Ui.EntityType->addItems(filterList);
+    impl.Filters = filterList;
+  }
+  this->onFilterChange(impl.Ui.EntityType->currentText());
+
+  QString startPath = this->StartDirectory;
+  if (startPath.isEmpty() || (!startPath.isEmpty() && location != this->DefaultLocation))
+  {
+    startPath = impl.getStartPath();
+  }
+  impl.addHistory(startPath);
+  impl.setCurrentPath(startPath);
+
+  impl.Ui.Files->resizeColumnToContents(0);
+  impl.Ui.Files->setTextElideMode(Qt::ElideMiddle);
+  QHeaderView* header = impl.Ui.Files->header();
+
+  // This code is similar to QFileDialog code
+  // It positions different columns and orders in a standard way
+  QFontMetrics fm(this->font());
+  header->resizeSection(0, fm.horizontalAdvance(QLatin1String("wwwwwwwwwwwwwwwwwwwwwwwwww")));
+  header->resizeSection(1, fm.horizontalAdvance(QLatin1String("mp3Folder")));
+  header->resizeSection(2, fm.horizontalAdvance(QLatin1String("128.88 GB")));
+  header->resizeSection(3, fm.horizontalAdvance(QLatin1String("10/29/81 02:02PM")));
+  impl.Ui.Files->setSortingEnabled(true);
+  impl.Ui.Files->header()->setSortIndicator(0, Qt::AscendingOrder);
+
+  bool showDetail = impl.Model->isShowingDetailedInfo();
+  impl.Ui.ShowDetail->setChecked(showDetail);
+  impl.Ui.Files->setColumnHidden(2, !showDetail);
+  impl.Ui.Files->setColumnHidden(3, !showDetail);
+
+  // Group files handling
+  impl.SupportsGroupFiles = this->SupportsGroupFiles;
+  impl.Ui.GroupFiles->setEnabled(impl.SupportsGroupFiles);
+  impl.Ui.GroupFiles->setVisible(impl.SupportsGroupFiles);
+  this->connect(impl.Ui.GroupFiles, SIGNAL(clicked(bool)), this, SLOT(onGroupFilesToggled(bool)));
+
+  // let's manage the default button.
+  impl.Ui.OK->setDefault(true);
+  impl.Ui.Navigate->setDefault(false);
+
+  this->connect(impl.Ui.Navigate, SIGNAL(clicked()), SLOT(onNavigate()));
+
+  // Use saved state if any
+  this->restoreState(location);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// pqFileDialog
 pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   const QString& startDirectory, const QString& nameFilter, bool supportsGroupFiles,
   bool onlyBrowseRemotely)
   : Superclass(p)
+  , Server(server)
+  , StartDirectory(startDirectory)
+  , NameFilter(nameFilter)
+  , SupportsGroupFiles(supportsGroupFiles)
 {
   // remove do-nothing "?" title bar button on Windows.
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
@@ -259,7 +460,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   // check if remote file system can be used
   const bool enableRemoteImplementation = !canOnlyUseLocalFileSystem;
   // compute default location
-  const vtkTypeUInt32 defaultLocation = !onlyBrowseRemotely || canOnlyUseLocalFileSystem
+  this->DefaultLocation = !onlyBrowseRemotely || canOnlyUseLocalFileSystem
     ? vtkPVSession::CLIENT
     : vtkPVSession::DATA_SERVER;
 
@@ -267,211 +468,26 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   if (enableLocalImplementation)
   {
     locationsNames.emplace_back(vtkPVSession::CLIENT, tr("Local File System"));
-    this->Implementations[vtkPVSession::CLIENT] = new pqImplementation(this, /*server=*/nullptr);
   }
   if (enableRemoteImplementation)
   {
     locationsNames.emplace_back(vtkPVSession::DATA_SERVER, tr("Remote File System"));
-    this->Implementations[vtkPVSession::DATA_SERVER] = new pqImplementation(this, server);
   }
   for (const auto& locationName : locationsNames)
   {
-    const auto location = locationName.first;
-    // the selected location is temporarily set here,
-    // so that some slots called by signals can be executed properly.
-    this->SelectedLocation = location;
-    auto& impl = *this->Implementations[location];
-
-    // set up ui for the file system
-    this->Implementations[location]->Ui.setupUi(this->Implementations[location]);
-
-    // set up ok and cancel signals/slots
-    QObject::connect(impl.Ui.OK, &QPushButton::clicked, this, &pqFileDialog::accept);
-    QObject::connect(impl.Ui.Cancel, &QPushButton::clicked, this, &pqFileDialog::reject);
-
-    // ensures that the favorites and the browser component are sized proportionately.
-    impl.Ui.mainSplitter->setStretchFactor(0, 1);
-    impl.Ui.mainSplitter->setStretchFactor(1, 4);
-
-    impl.Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);
-
-    // install the event filter
-    impl.Ui.Files->installEventFilter(this->Implementations[location]);
-
-    // install the autocompleter
-    impl.Ui.EntityName->setCompleter(impl.Completer);
-
-    // this is the Navigate button, which is only shown when needed
-    impl.Ui.Navigate->hide();
-
-    QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
-    impl.Ui.NavigateBack->setIcon(back);
-    impl.Ui.NavigateBack->setEnabled(false);
-    impl.Ui.NavigateBack->setShortcut(QKeySequence::Back);
-    impl.Ui.NavigateBack->setToolTip(
-      tr("Navigate Back (%1)").arg(impl.Ui.NavigateBack->shortcut().toString()));
-
-    QObject::connect(impl.Ui.NavigateBack, SIGNAL(clicked(bool)), this, SLOT(onNavigateBack()));
-    // just flip the back image to make a forward image
-    QPixmap forward = QPixmap::fromImage(back.toImage().mirrored(true, false));
-    impl.Ui.NavigateForward->setIcon(forward);
-    impl.Ui.NavigateForward->setDisabled(true);
-    impl.Ui.NavigateForward->setShortcut(QKeySequence::Forward);
-    impl.Ui.NavigateForward->setToolTip(
-      tr("Navigate Forward (%1)").arg(impl.Ui.NavigateForward->shortcut().toString()));
-    QObject::connect(
-      impl.Ui.NavigateForward, SIGNAL(clicked(bool)), this, SLOT(onNavigateForward()));
-    impl.Ui.NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
-    impl.Ui.NavigateUp->setShortcut(Qt::ALT | Qt::Key_Up);
-    impl.Ui.NavigateUp->setToolTip(
-      tr("Navigate Up (%1)").arg(impl.Ui.NavigateUp->shortcut().toString()));
-    impl.Ui.CreateFolder->setIcon(style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
-    impl.Ui.CreateFolder->setShortcut(QKeySequence::New);
-    impl.Ui.CreateFolder->setToolTip(
-      tr("Create New Folder (%1)").arg(impl.Ui.CreateFolder->shortcut().toString()));
-
-    impl.Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
-
-    impl.Ui.Files->setModel(&impl.FileFilter);
-    impl.Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    impl.Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(impl.Ui.Files, SIGNAL(customContextMenuRequested(const QPoint&)), this,
-      SLOT(onContextMenuRequested(const QPoint&)));
-
-    impl.Ui.Favorites->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(impl.Ui.Favorites, SIGNAL(customContextMenuRequested(const QPoint&)), this,
-      SLOT(onFavoritesContextMenuRequested(const QPoint&)));
-
-    impl.Ui.Favorites->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
-
-    auto shortcutDel = new QShortcut(QKeySequence::Delete, this);
-    shortcutDel->setAutoRepeat(false);
-    QObject::connect(shortcutDel, &QShortcut::activated, this,
-      &pqFileDialog::onRemoveSelectedDirectoriesFromFavorites);
-
-    impl.Ui.AddCurrentDirectoryToFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
-    QObject::connect(impl.Ui.AddCurrentDirectoryToFavorites, SIGNAL(clicked()), this,
-      SLOT(onAddCurrentDirectoryToFavorites()));
-    impl.Ui.ResetFavortiesToSystemDefault->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
-    QObject::connect(impl.Ui.ResetFavortiesToSystemDefault, SIGNAL(clicked()), this,
-      SLOT(onResetFavoritesToSystemDefault()));
-
-    impl.proxyFavoriteModel = new QSortFilterProxyModel(impl.FavoriteModel);
-    impl.proxyFavoriteModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    impl.proxyFavoriteModel->setSourceModel(impl.FavoriteModel);
-
-    impl.Ui.Favorites->setModel(impl.proxyFavoriteModel);
-    impl.Ui.Favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
-
-    impl.Ui.Locations->setModel(impl.LocationModel);
-    impl.Ui.Recent->setModel(impl.RecentModel);
-
-    this->setFileMode(ExistingFile, location);
-
-    QObject::connect(impl.Model, SIGNAL(modelReset()), this, SLOT(onModelReset()));
-
-    QObject::connect(impl.Ui.NavigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
-
-    QObject::connect(impl.Ui.CreateFolder, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
-
-    QObject::connect(
-      impl.Ui.Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
-
-    QObject::connect(
-      impl.Ui.EntityType, &QComboBox::currentTextChanged, this, &pqFileDialog::onFilterChange);
-
-    QObject::connect(impl.Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
-      SLOT(onClickedFavorite(const QModelIndex&)));
-
-    QObject::connect(impl.Ui.favoritesSearchBar, &QLineEdit::textChanged, this,
-      &pqFileDialog::FilterDirectoryFromFavorites);
-
-    QObject::connect(impl.Ui.Recent, SIGNAL(clicked(const QModelIndex&)), this,
-      SLOT(onClickedRecent(const QModelIndex&)));
-    QObject::connect(impl.Ui.Locations, SIGNAL(clicked(const QModelIndex&)), this,
-      SLOT(onClickedRecent(const QModelIndex&)));
-
-    QObject::connect(impl.Ui.Files, SIGNAL(clicked(const QModelIndex&)), this,
-      SLOT(onClickedFile(const QModelIndex&)));
-
-    QObject::connect(impl.Ui.Files->selectionModel(),
-      SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
-      SLOT(fileSelectionChanged()));
-
-    QObject::connect(impl.Ui.Favorites, SIGNAL(activated(const QModelIndex&)), this,
-      SLOT(onActivateFavorite(const QModelIndex&)));
-
-    QObject::connect(impl.Ui.Locations, SIGNAL(activated(const QModelIndex&)), this,
-      SLOT(onActivateLocation(const QModelIndex&)));
-    QObject::connect(impl.Ui.Recent, SIGNAL(activated(const QModelIndex&)), this,
-      SLOT(onActivateRecent(const QModelIndex&)));
-
-    QObject::connect(impl.Ui.Files, SIGNAL(doubleClicked(const QModelIndex&)), this,
-      SLOT(onDoubleClickFile(const QModelIndex&)));
-
-    QObject::connect(impl.Ui.EntityName, SIGNAL(textChanged(const QString&)), this,
-      SLOT(onTextEdited(const QString&)));
-
-    impl.Completer->setCaseSensitivity(Qt::CaseInsensitive);
-
-    QStringList filterList = MakeFilterList(nameFilter);
-    if (filterList.empty())
+    const vtkTypeUInt32& location = locationName.first;
+    const QString& name = locationName.second;
+    // only add the default location, and create a placeholder for the non-default one
+    if (location == this->DefaultLocation)
     {
-      impl.Ui.EntityType->addItem(tr("All Files") + " (*)");
-      impl.Filters << tr("All Files") + " (*)";
+      this->addImplementation(location);
+      tabWidget->addTab(this->Implementations[location], name);
     }
     else
     {
-      impl.Ui.EntityType->addItems(filterList);
-      impl.Filters = filterList;
+      QPointer<QWidget> tempWidget = new QWidget();
+      tabWidget->addTab(tempWidget, name);
     }
-    this->onFilterChange(impl.Ui.EntityType->currentText());
-
-    QString startPath = startDirectory;
-    if (startPath.isEmpty() || (!startPath.isEmpty() && location != defaultLocation))
-    {
-      startPath = impl.getStartPath();
-    }
-    impl.addHistory(startPath);
-    impl.setCurrentPath(startPath);
-
-    impl.Ui.Files->resizeColumnToContents(0);
-    impl.Ui.Files->setTextElideMode(Qt::ElideMiddle);
-    QHeaderView* header = impl.Ui.Files->header();
-
-    // This code is similar to QFileDialog code
-    // It positions different columns and orders in a standard way
-    QFontMetrics fm(this->font());
-    header->resizeSection(0, fm.horizontalAdvance(QLatin1String("wwwwwwwwwwwwwwwwwwwwwwwwww")));
-    header->resizeSection(1, fm.horizontalAdvance(QLatin1String("mp3Folder")));
-    header->resizeSection(2, fm.horizontalAdvance(QLatin1String("128.88 GB")));
-    header->resizeSection(3, fm.horizontalAdvance(QLatin1String("10/29/81 02:02PM")));
-    impl.Ui.Files->setSortingEnabled(true);
-    impl.Ui.Files->header()->setSortIndicator(0, Qt::AscendingOrder);
-
-    bool showDetail = impl.Model->isShowingDetailedInfo();
-    impl.Ui.ShowDetail->setChecked(showDetail);
-    impl.Ui.Files->setColumnHidden(2, !showDetail);
-    impl.Ui.Files->setColumnHidden(3, !showDetail);
-
-    // Group files handling
-    impl.SupportsGroupFiles = supportsGroupFiles;
-    impl.Ui.GroupFiles->setEnabled(impl.SupportsGroupFiles);
-    impl.Ui.GroupFiles->setVisible(impl.SupportsGroupFiles);
-    this->connect(impl.Ui.GroupFiles, SIGNAL(clicked(bool)), this, SLOT(onGroupFilesToggled(bool)));
-
-    // let's manage the default button.
-    impl.Ui.OK->setDefault(true);
-    impl.Ui.Navigate->setDefault(false);
-
-    this->connect(impl.Ui.Navigate, SIGNAL(clicked()), SLOT(onNavigate()));
-
-    // Use saved state if any
-    this->restoreState(location);
-
-    // add widget as different tabs
-    tabWidget->addTab(this->Implementations[location], locationName.second);
   }
 
   // set the QTabWidget as the central widget of the dialog
@@ -480,7 +496,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   this->setLayout(layout);
 
   // set default location
-  this->SelectedLocation = defaultLocation;
+  this->SelectedLocation = this->DefaultLocation;
 
   QObject::connect(tabWidget, &QTabWidget::currentChanged, this, &pqFileDialog::onLocationChanged);
 }
@@ -802,6 +818,7 @@ void pqFileDialog::setFileMode(FileMode mode)
 void pqFileDialog::setRecentlyUsedExtension(const QString& fileExtension, vtkTypeUInt32 location)
 {
   auto& impl = *this->Implementations[location];
+  this->RecentlyUsedExtension = fileExtension;
 
   if (fileExtension == QString())
   {
@@ -812,7 +829,7 @@ void pqFileDialog::setRecentlyUsedExtension(const QString& fileExtension, vtkTyp
   }
   else
   {
-    int index = impl.Ui.EntityType->findText(fileExtension, Qt::MatchContains);
+    int index = impl.Ui.EntityType->findText(this->RecentlyUsedExtension, Qt::MatchContains);
     // just in case the provided extension is not in the combobox list
     index = (index == -1) ? 0 : index;
     impl.Ui.EntityType->setCurrentIndex(index);
@@ -1010,11 +1027,31 @@ QStringList pqFileDialog::buildFileGroup(const QString& filename)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onLocationChanged(int location)
+void pqFileDialog::onLocationChanged(int index)
 {
-  if (this->Implementations.size() > 1)
+  QTabWidget* tabWidget = this->findChild<QTabWidget*>("tabWidget");
+  if (tabWidget->count() > 1)
   {
-    this->SelectedLocation = location == 0 ? vtkPVSession::CLIENT : vtkPVSession::DATA_SERVER;
+    const vtkTypeUInt32 prevLocation = this->SelectedLocation;
+    this->SelectedLocation = index == 0 ? vtkPVSession::CLIENT : vtkPVSession::DATA_SERVER;
+    // create the implementation if it does not exist
+    if (this->Implementations.find(this->SelectedLocation) == this->Implementations.end())
+    {
+      this->addImplementation(this->SelectedLocation);
+      const FileMode prevMode = this->Implementations[prevLocation]->Mode;
+      if (prevMode != this->Implementations[this->SelectedLocation]->Mode)
+      {
+        this->setFileMode(prevMode, this->SelectedLocation);
+      }
+      if (!this->RecentlyUsedExtension.isEmpty())
+      {
+        this->setRecentlyUsedExtension(this->RecentlyUsedExtension, this->SelectedLocation);
+      }
+      const QString tabTitle = tabWidget->tabText(index);
+      tabWidget->removeTab(index);
+      tabWidget->insertTab(index, this->Implementations[this->SelectedLocation], tabTitle);
+      tabWidget->setCurrentIndex(index);
+    }
   }
 }
 
