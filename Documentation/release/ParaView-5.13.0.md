@@ -271,14 +271,24 @@ The output of the reader is a Partitioned Dataset Collection composed of multipl
 
 The IOSS Reader now has a **Caching** property. When enabled, the reader will cache the mesh data in memory across multiple time steps. Previously, when the option was not present, the reader would always cache data, which could lead to excessive memory usage. Now, the default behavior is to not cache.
 
-## Fixing data layout issues for the **openPMD reader**
+## Fixes for the **openPMD reader**
+
+### Data layout issues fixed
 
 The openPMD format allows storage of multidimensional arrays (meshes) in either `Fortran` or `C` data orders with arbitrary axis labeling. Based on the data order, it may be necessary to transpose the data so that ParaView can correctly interpret the meshes.
 
 * For `C` data order, the VTK axis ordering is expected to be (x, y, z)
 * For `F` data order, the VTK axis ordering is expected to be (z, y, x)
 
-Transposes are necessary is there is a mismatch in the expected axis ordering. This also fixes problems with 1D/2D meshes that require handling the transposes differently than 3D meshes.
+Transposes are necessary if there is a mismatch in the expected axis ordering. This also fixes problems with 1D/2D meshes that require handling the transposes differently than 3D meshes.
+
+### Avoid scaling meshes and particle records when possible
+
+In files with `unitSI` equal to 1.0, avoid scaling meshes. This is often the case for non-floating point records and unintentionally casts their type to double when we mean to stay in integer or unsigned integer (e.g., particle `id`) scales. Thus, this fixes issues with the latter and avoids unnecessary operations on large data sets.
+
+## Cell-centered data support in FDS reader
+
+The FDS reader now correctly supports reading slice and boundaries files (.sf & .bf), for both point and cell-centered data. Before these changes, only point data for slices was correctly parsed.
 
 ## Option in the GLTFExporter to avoid saving NaN color in exported color map textures
 
@@ -620,3 +630,11 @@ The `vtkPVGeometryFilter` can now produce `vtkPartitionedDataSetCollection` as o
 ## Category XML has `hide_for_tests` option removed
 
 The `hide_for_tests` attribute in Category XML is no longer supported.
+
+## Fix the behavior of vtkCLIOptions::SetStopOnUnrecognizedArgument
+
+`SetStopOnUnrecognizedArgument` was behaving in an inverted way according to its name and documentation. This was fixed and documentation was clarified.
+
+Now, `vtkCLIOptions::SetStopOnUnrecognizedArgument(true)` will indeed stop the parsing on unrecognized arguments.
+
+See https://github.com/CLIUtils/CLI11/issues/1052 for more info.
