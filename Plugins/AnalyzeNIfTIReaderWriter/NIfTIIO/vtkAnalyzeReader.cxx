@@ -75,7 +75,7 @@ static std::string GetRootName(const std::string& filename)
 
   // Create a base filename
   // i.e Image.hdr --> Image
-  if (fileExt.length() > 0)
+  if (!fileExt.empty())
   {
     const std::string::size_type it = filename.find_last_of(fileExt);
     std::string baseName(filename, 0, it - fileExt.length());
@@ -646,7 +646,7 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
       for (inIndex[0] = 0; inIndex[0] < binaryOnDiskWidth; inIndex[0]++)
       {
         inSliceBitNumber = (inIndex[1] * binaryOnDiskWidth) + inIndex[0];
-        inSliceByteNumber = (int)(inSliceBitNumber / 8);
+        inSliceByteNumber = inSliceBitNumber / 8;
 
         inTotalBitNumber = inSliceBitOffset + inSliceBitNumber;
         inTotalByteNumber = inSliceByteOffset + inSliceByteNumber;
@@ -656,7 +656,7 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
         tempInByteValue = unsignedP[inTotalByteNumber];
         tempInBitValue = (tempInByteValue >> inByteBitNumber) & 0x01;
         byteBitCount = totalBitCount % 8;
-        byteCount = (int)(totalBitCount / 8);
+        byteCount = totalBitCount / 8;
 
         // set values
         shiftedBitValue = tempInBitValue << (byteBitCount); //(7 - byteBitCount)
@@ -669,7 +669,7 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
         tempInBitValue = 0x00;
 
         byteBitCount = totalBitCount % 8;
-        byteCount = (int)(totalBitCount / 8);
+        byteCount = totalBitCount / 8;
 
         // set values
         shiftedBitValue = tempInBitValue << (byteBitCount); //(7 - byteBitCount)
@@ -685,7 +685,7 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
         tempInBitValue = 0x00;
 
         byteBitCount = totalBitCount % 8;
-        byteCount = (int)(totalBitCount / 8);
+        byteCount = totalBitCount / 8;
 
         // set values
         shiftedBitValue = tempInBitValue << (byteBitCount); //(7 - byteBitCount)
@@ -704,7 +704,7 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
         tempInBitValue = 0x00;
 
         byteBitCount = totalBitCount % 8;
-        byteCount = (int)(totalBitCount / 8);
+        byteCount = totalBitCount / 8;
 
         // set values
         shiftedBitValue = tempInBitValue << (byteBitCount); //(7 - byteBitCount)

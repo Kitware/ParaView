@@ -33,8 +33,6 @@
 #include <sstream>
 #include <vector>
 
-#include <vector>
-
 bool vtkMPIMoveData::UseZLibCompression = false;
 
 namespace

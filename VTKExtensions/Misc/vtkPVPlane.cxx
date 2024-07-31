@@ -87,7 +87,7 @@ void vtkPVPlane::SetTransform(const double elements[16])
 //----------------------------------------------------------------------------
 void vtkPVPlane::EvaluateFunction(vtkDataArray* input, vtkDataArray* output)
 {
-  return this->Plane->EvaluateFunction(input, output);
+  this->Plane->EvaluateFunction(input, output);
 }
 //----------------------------------------------------------------------------
 double vtkPVPlane::EvaluateFunction(double x[3])

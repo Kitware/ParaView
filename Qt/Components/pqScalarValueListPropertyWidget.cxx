@@ -262,6 +262,7 @@ public:
   {
     QVector<QVector<QVariant>> rowRanges;
     this->splitSelectedIndexesToRowRanges(toRemove, rowRanges);
+    // NOLINTNEXTLINE(readability-redundant-casting): `qsizetype` in Qt6.
     int numGroups = static_cast<int>(rowRanges.size());
     for (int g = numGroups - 1; g > -1; --g)
     {

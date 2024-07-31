@@ -92,7 +92,7 @@ static std::string GetRootName(const std::string& filename)
 
   // Create a base filename
   // i.e Image.hdr --> Image
-  if (fileExt.length() > 0)
+  if (!fileExt.empty())
   {
     const std::string::size_type it = filename.find_last_of(fileExt);
     std::string baseName(filename, 0, it - fileExt.length());

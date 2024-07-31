@@ -99,6 +99,7 @@ void pqScalarSetModel::erase(double value)
 //-----------------------------------------------------------------------------
 void pqScalarSetModel::erase(int row)
 {
+  // NOLINTNEXTLINE(readability-redundant-casting): `qsizetype` in Qt6.
   if (row < 0 || row >= static_cast<int>(this->Implementation->Values.size()))
   {
     return;
@@ -128,6 +129,7 @@ QVariant pqScalarSetModel::data(const QModelIndex& i, int role) const
   if (!i.isValid())
     return QVariant();
 
+  // NOLINTNEXTLINE(readability-redundant-casting): `qsizetype` in Qt6.
   if (i.row() < 0 || i.row() >= static_cast<int>(this->Implementation->Values.size()))
     return QVariant();
 
@@ -164,6 +166,7 @@ bool pqScalarSetModel::setData(const QModelIndex& i, const QVariant& value, int 
   if (!i.isValid())
     return false;
 
+  // NOLINTNEXTLINE(readability-redundant-casting): `qsizetype` in Qt6.
   if (i.row() < 0 || i.row() >= static_cast<int>(this->Implementation->Values.size()))
     return false;
 

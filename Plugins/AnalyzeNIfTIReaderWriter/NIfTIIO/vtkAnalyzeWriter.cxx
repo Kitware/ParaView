@@ -122,7 +122,7 @@ static std::string GetRootName(const std::string& filename)
 
   // Create a base filename
   // i.e Image.hdr --> Image
-  if (fileExt.length() > 0)
+  if (!fileExt.empty())
   {
     const std::string::size_type it = filename.find_last_of(fileExt);
     std::string baseName(filename, 0, it - fileExt.length());
@@ -1339,11 +1339,11 @@ void vtkAnalyzeWriter::WriteFile(
           outSliceOffset = tempSliceSizeInt * idZ;
           outSliceBit = (idY * outDim[0]) + idX;
           outTotalBitNumber = outSliceBit + (outSliceOffset * 8);
-          outSliceByte = (int)(outSliceBit / 8);
+          outSliceByte = outSliceBit / 8;
           outOffsetByte = outSliceOffset + outSliceByte;
           outBitNumber = outSliceBit % 8;
           byteBitCount = totalBitCount % 8;
-          byteCount = (int)(totalBitCount / 8);
+          byteCount = totalBitCount / 8;
 
           tempByteValue = tempOutUnsignedCharData[byteCount];
           tempBitValue = (tempByteValue >> byteBitCount) & 0x01;

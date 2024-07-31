@@ -256,8 +256,7 @@ void ReadDataSet<int>(hid_t loc, const std::string& name, int* out)
 template <>
 void ReadDataSet<unsigned int>(hid_t loc, const std::string& name, unsigned int* out)
 {
-  return H5CFS::ReadDataSet(
-    loc, name, reinterpret_cast<int*>(out)); // no uint version in HL available :(
+  H5CFS::ReadDataSet(loc, name, reinterpret_cast<int*>(out)); // no uint version in HL available :(
 }
 
 //-----------------------------------------------------------------------------

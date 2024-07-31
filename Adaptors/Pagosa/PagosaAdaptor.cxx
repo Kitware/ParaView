@@ -340,7 +340,7 @@ void addmarkerscalarfield_(char* fname, int* len, int* numberAdded, float* data)
   // Fill with field data
   for (int i = 0; i < *numberAdded; i++)
   {
-    dataArray->InsertNextValue((float)data[i]);
+    dataArray->InsertNextValue(data[i]);
   }
 }
 
@@ -378,9 +378,9 @@ void addmarkervectorfield_(
   for (int i = 0; i < *numberAdded; i++)
   {
     float tuple[3];
-    tuple[0] = (float)data0[i];
-    tuple[1] = (float)data1[i];
-    tuple[2] = (float)data2[i];
+    tuple[0] = data0[i];
+    tuple[1] = data1[i];
+    tuple[2] = data2[i];
     dataArray->InsertNextTuple(tuple);
   }
 }
@@ -419,12 +419,12 @@ void addmarkertensorfield_(char* fname, int* len, int* numberAdded, float* data0
   for (int i = 0; i < *numberAdded; i++)
   {
     float tuple[6];
-    tuple[0] = (float)data0[i];
-    tuple[1] = (float)data1[i];
-    tuple[2] = (float)data2[i];
-    tuple[3] = (float)data3[i];
-    tuple[4] = (float)data4[i];
-    tuple[5] = (float)data5[i];
+    tuple[0] = data0[i];
+    tuple[1] = data1[i];
+    tuple[2] = data2[i];
+    tuple[3] = data3[i];
+    tuple[4] = data4[i];
+    tuple[5] = data5[i];
     dataArray->InsertNextTuple(tuple);
   }
 }

@@ -302,7 +302,7 @@ void pqPropertyCollectionWidget::propertyChanged(const char* pname)
   auto smprop = vtkSMVectorProperty::SafeDownCast(this->proxy()->GetProperty(pname));
   assert(smprop != nullptr);
 
-  const int numComponents = static_cast<int>(smprop->GetNumberOfElementsPerCommand());
+  const int numComponents = smprop->GetNumberOfElementsPerCommand();
   const int numTuples = listVariants.size() / numComponents;
 
   // ensure we have exactly as many tuples as the current property value. Note,

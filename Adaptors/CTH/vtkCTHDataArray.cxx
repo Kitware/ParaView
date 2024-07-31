@@ -223,7 +223,8 @@ void vtkCTHDataArray::ExportToVoidPointer(void* out_ptr)
 {
   if (this->Fallback)
   {
-    return this->Fallback->ExportToVoidPointer(out_ptr);
+    this->Fallback->ExportToVoidPointer(out_ptr);
+    return;
   }
   if (!out_ptr)
     return;

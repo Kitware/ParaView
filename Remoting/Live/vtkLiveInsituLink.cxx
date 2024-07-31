@@ -58,7 +58,7 @@ void TriggerRMI(vtkMultiProcessController* controller, int tag, double time, vtk
   unsigned char* data = nullptr;
   unsigned int dataSize;
   stream.GetRawData(data, dataSize);
-  controller->TriggerRMI(1, const_cast<unsigned char*>(data), dataSize, tag);
+  controller->TriggerRMI(1, data, dataSize, tag);
   delete[] data;
 }
 
@@ -70,7 +70,7 @@ void TriggerRMIOnAllChildren(
   unsigned char* data = nullptr;
   unsigned int dataSize;
   stream.GetRawData(data, dataSize);
-  controller->TriggerRMIOnAllChildren(const_cast<unsigned char*>(data), dataSize, tag);
+  controller->TriggerRMIOnAllChildren(data, dataSize, tag);
   delete[] data;
 }
 

@@ -6,7 +6,6 @@
 #include "pqApplicationCore.h"
 #include "pqInterfaceTracker.h"
 #include "pqPropertyWidget.h"
-#include "pqPropertyWidgetDecorator.h"
 #include "pqPropertyWidgetInterface.h"
 #include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"

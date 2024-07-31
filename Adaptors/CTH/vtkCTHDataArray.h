@@ -170,7 +170,7 @@ public:
   void InsertVariantValue(vtkIdType idx, vtkVariant value) override
   {
     this->BuildFallback();
-    return this->Fallback->InsertVariantValue(idx, value);
+    this->Fallback->InsertVariantValue(idx, value);
   }
 
   void RemoveTuple(vtkIdType id) override
@@ -198,20 +198,20 @@ public:
   void DeepCopy(vtkAbstractArray* aa) override
   {
     this->BuildFallback();
-    return this->Fallback->DeepCopy(aa);
+    this->Fallback->DeepCopy(aa);
   }
 
-  void DeepCopy(vtkDataArray* da) override { return this->DeepCopy((vtkAbstractArray*)da); }
+  void DeepCopy(vtkDataArray* da) override { this->DeepCopy((vtkAbstractArray*)da); }
 
   void SetVoidArray(void* p, vtkIdType id, int i, int j) override
   {
     this->BuildFallback();
-    return this->Fallback->SetVoidArray(p, id, i, j);
+    this->Fallback->SetVoidArray(p, id, i, j);
   }
   void SetVoidArray(void* p, vtkIdType id, int i) override
   {
     this->BuildFallback();
-    return this->Fallback->SetVoidArray(p, id, i);
+    this->Fallback->SetVoidArray(p, id, i);
   }
   void SetArrayFreeFunction(void (*)(void*)) override {}
 
@@ -238,13 +238,13 @@ public:
   void DataChanged() override
   {
     this->BuildFallback();
-    return this->Fallback->DataChanged();
+    this->Fallback->DataChanged();
   }
 
   void ClearLookup() override
   {
     this->BuildFallback();
-    return this->Fallback->ClearLookup();
+    this->Fallback->ClearLookup();
   }
 
 protected:

@@ -992,7 +992,6 @@ void pqRenderView::selectFrustumPoints(int rect[4], int selectionModifier)
 void pqRenderView::selectFrustumBlocks(int rect[4], int selectionModifier)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
-  const std::string modifier = GetSelectionModifierAsString(selectionModifier);
 
   vtkNew<vtkCollection> selectedRepresentations;
   vtkNew<vtkCollection> selectionSources;

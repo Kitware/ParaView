@@ -113,6 +113,7 @@ public:
    */
   unsigned long getMemorySize()
   {
+    // NOLINTNEXTLINE(readability-redundant-casting): `sizeof` is `size_t`.
     unsigned long bytes = static_cast<unsigned long>(sizeof(ValueType)) *
       this->GetNumberOfArrays() * this->GetNumberOfTuples() * this->GetNumberOfComponents();
     return std::ceil(bytes / 1024.0);

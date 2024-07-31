@@ -645,7 +645,7 @@ public:
   static void SetBlockInterpolateScalarsBeforeMapping(
     vtkSMProxy* proxy, const std::string& blockSelector, bool interpolate)
   {
-    return vtkSMColorMapEditorHelper::SetBlocksInterpolateScalarsBeforeMapping(
+    vtkSMColorMapEditorHelper::SetBlocksInterpolateScalarsBeforeMapping(
       proxy, { blockSelector }, interpolate);
   }
   static void SetBlocksInterpolateScalarsBeforeMapping(
@@ -653,7 +653,7 @@ public:
   static void RemoveBlockInterpolateScalarsBeforeMapping(
     vtkSMProxy* proxy, const std::string& blockSelector)
   {
-    return vtkSMColorMapEditorHelper::RemoveBlocksInterpolateScalarsBeforeMappings(
+    vtkSMColorMapEditorHelper::RemoveBlocksInterpolateScalarsBeforeMappings(
       proxy, { blockSelector });
   }
   static void RemoveBlocksInterpolateScalarsBeforeMappings(
@@ -683,13 +683,13 @@ public:
   static void SetOpacity(vtkSMProxy* proxy, double opacity);
   static void SetBlockOpacity(vtkSMProxy* proxy, const std::string& blockSelector, double opacity)
   {
-    return vtkSMColorMapEditorHelper::SetBlocksOpacity(proxy, { blockSelector }, opacity);
+    vtkSMColorMapEditorHelper::SetBlocksOpacity(proxy, { blockSelector }, opacity);
   }
   static void SetBlocksOpacity(
     vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, double opacity);
   static void RemoveBlockOpacity(vtkSMProxy* proxy, const std::string& blockSelector)
   {
-    return vtkSMColorMapEditorHelper::RemoveBlocksOpacities(proxy, { blockSelector });
+    vtkSMColorMapEditorHelper::RemoveBlocksOpacities(proxy, { blockSelector });
   }
   static void RemoveBlocksOpacities(
     vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors);

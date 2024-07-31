@@ -557,7 +557,7 @@ typedef struct nifti1_extension nifti1_extension ;
 /* @} */
 
                      /*-------- sample typedefs for complicated types ---*/
-#if 0
+#if 0 // NOLINT(readability-avoid-unconditional-preprocessor-if)
 typedef struct { float       r,i;     } complex_float ;
 typedef struct { double      r,i;     } complex_double ;
 typedef struct { long double r,i;     } complex_longdouble ;

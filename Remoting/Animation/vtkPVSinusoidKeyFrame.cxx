@@ -36,8 +36,7 @@ void vtkPVSinusoidKeyFrame::UpdateValue(
   }
 
   // Some computations: start + (end-start)*sin( 2*pi* (freq*t + phase/360) )
-  double t = sin(
-    8.0 * atan(static_cast<double>(1.0)) * (this->Frequency * currenttime + this->Phase / 360.0));
+  double t = sin(8.0 * atan(1.0) * (this->Frequency * currenttime + this->Phase / 360.0));
 
   // Apply changes
   cue->BeginUpdateAnimationValues();

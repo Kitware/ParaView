@@ -244,7 +244,7 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(const double view_plan
     {
       diagonal = 1e-10;
     }
-    double factor = item.Refinement == 0 ? 0 : this->DetailLevelToLoad / (double)item.Refinement;
+    double factor = item.Refinement == 0 ? 0 : this->DetailLevelToLoad / item.Refinement;
     bool detailMethodNeedsBlock =
       (item.Refinement <= 0 || (item.Distance / diagonal < factor && item.ScreenCoverage > 0));
     //        (item.Refinement <= 0 ||

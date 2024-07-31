@@ -37,7 +37,7 @@ class vtkSMSession;
 struct FileTypeDetailed
 {
   std::string Description;
-  std::vector<std::string> FilenamePatterns = {};
+  std::vector<std::string> FilenamePatterns;
   std::string Group;
   std::string Name;
 };

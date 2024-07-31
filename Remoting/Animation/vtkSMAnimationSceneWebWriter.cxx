@@ -197,8 +197,8 @@ bool vtkSMAnimationSceneWebWriter::SaveFinalize()
       throw 1;
     }
 
-    PyObject_CallMethod(module, const_cast<char*>("zipAllTimeSteps"), const_cast<char*>("(s)"),
-      const_cast<char*>(this->FileName));
+    PyObject_CallMethod(
+      module, const_cast<char*>("zipAllTimeSteps"), const_cast<char*>("(s)"), this->FileName);
     if (PyErr_Occurred())
     {
       vtkGenericWarningMacro("Failed to bundle vtkjs file");

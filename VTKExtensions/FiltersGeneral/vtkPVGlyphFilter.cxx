@@ -440,7 +440,7 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  inline bool IsPointVisible(
+  bool IsPointVisible(
     unsigned int index, vtkDataSet* ds, vtkIdType ptId, bool cellCenters, vtkPVGlyphFilter* self)
   {
     assert(ds != nullptr && self != nullptr);

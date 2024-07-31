@@ -122,7 +122,7 @@ char* pqPropertyWidget::panelVisibility() const
 //-----------------------------------------------------------------------------
 void pqPropertyWidget::setPanelVisibility(const char* vis)
 {
-  return this->Property->SetPanelVisibility(vis);
+  this->Property->SetPanelVisibility(vis);
 }
 
 //-----------------------------------------------------------------------------

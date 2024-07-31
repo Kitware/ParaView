@@ -83,7 +83,7 @@ QString pqSearchBox::text() const
 //-----------------------------------------------------------------------------
 void pqSearchBox::setText(const QString& text)
 {
-  return this->Internals->SearchLineEdit->setText(text);
+  this->Internals->SearchLineEdit->setText(text);
 }
 
 //-----------------------------------------------------------------------------

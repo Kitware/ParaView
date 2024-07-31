@@ -137,7 +137,7 @@ protected:
   bool InterpolateSpeedAndColor(
     std::array<double, 3>& position, std::array<double, 3>& velocity, vtkIdType particleId);
 
-  inline double Rand(double vmin = 0., double vmax = 1.)
+  double Rand(double vmin = 0., double vmax = 1.)
   {
     this->RandomNumberSequence->Next();
     return this->RandomNumberSequence->GetRangeValue(vmin, vmax);
@@ -439,9 +439,9 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
   bool useScalars = this->Scalars && this->Mapper->GetScalarVisibility();
   double* col = actor->GetProperty()->GetDiffuseColor();
   float color[3];
-  color[0] = static_cast<double>(col[0]);
-  color[1] = static_cast<double>(col[1]);
-  color[2] = static_cast<double>(col[2]);
+  color[0] = col[0];
+  color[1] = col[1];
+  color[2] = col[2];
   this->StreamLineSegmentProgram->SetUniform3f("color", color);
   this->StreamLineSegmentProgram->SetUniformi("scalarVisibility", useScalars);
 

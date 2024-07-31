@@ -384,6 +384,8 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
   if (this->UseSeparateOpacityArray)
   {
     // See AppendOpacityComponent() for the construction of this array.
+    // FIXME: `colorArrayName` might be `nullptr` here.
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.StringChecker)
     std::string combinedName(colorArrayName);
     combinedName += "_and_opacity";
     this->VolumeMapper->SelectScalarArray(combinedName.c_str());

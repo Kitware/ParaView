@@ -173,6 +173,7 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
       using FFTType = decltype(fftValueRange)::ValueType;
       vtkSMPTools::Transform(fftValueRange.cbegin(), fftValueRange.cend(), resValueRange.cbegin(),
         resValueRange.begin(),
+        // NOLINTNEXTLINE(readability-redundant-casting): `FFTType` might change.
         [](FFTType fft, double value) { return value + static_cast<double>(std::abs(fft)); });
     }
   }

@@ -3,7 +3,9 @@
 # we enable a single set of checks (because disabling all checks is an error).
 Checks: "-*,\
 bugprone-*,\
+-bugprone-assignment-in-if-condition,\
 -bugprone-easily-swappable-parameters,\
+-bugprone-empty-catch,\
 -bugprone-narrowing-conversions,\
 -bugprone-reserved-identifier,\
 "

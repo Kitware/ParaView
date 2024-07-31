@@ -178,8 +178,8 @@ void pqViewResolutionPropertyWidget::applyPreset()
   if (match.hasMatch())
   {
     Ui::ViewResolutionPropertyWidget& ui = this->Internals->Ui;
-    ui.width->setTextAndResetCursor(QString::number(static_cast<int>(match.captured(1).toInt())));
-    ui.height->setTextAndResetCursor(QString::number(static_cast<int>(match.captured(2).toInt())));
+    ui.width->setTextAndResetCursor(QString::number(match.captured(1).toInt()));
+    ui.height->setTextAndResetCursor(QString::number(match.captured(2).toInt()));
   }
 }
 
@@ -190,8 +190,8 @@ void pqViewResolutionPropertyWidget::applyRecent()
   if (!resolution.isEmpty())
   {
     Ui::ViewResolutionPropertyWidget& ui = this->Internals->Ui;
-    ui.width->setTextAndResetCursor(QString::number(static_cast<int>(resolution.width())));
-    ui.height->setTextAndResetCursor(QString::number(static_cast<int>(resolution.height())));
+    ui.width->setTextAndResetCursor(QString::number(resolution.width()));
+    ui.height->setTextAndResetCursor(QString::number(resolution.height()));
   }
 }
 

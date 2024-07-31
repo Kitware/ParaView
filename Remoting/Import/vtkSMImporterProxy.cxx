@@ -478,6 +478,7 @@ void vtkSMImporterProxy::Import(vtkSMRenderViewProxy* renderView)
     for (const auto& actor : scene["Actors"])
     {
       const auto name = actor["Name"].get<std::string>();
+      (void)name;
       internals.ImportDataSources(this, actor);
       internals.ImportActor(this, actor, renderView);
     }
@@ -495,6 +496,7 @@ void vtkSMImporterProxy::Import(vtkSMRenderViewProxy* renderView)
     for (const auto& light : scene["Lights"])
     {
       const auto name = light["Name"].get<std::string>();
+      (void)name;
       internals.ImportLight(light, renderView);
     }
   }

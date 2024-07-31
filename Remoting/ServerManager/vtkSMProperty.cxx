@@ -12,7 +12,6 @@
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMMessage.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
@@ -326,6 +325,8 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
   }
   else
   {
+    // FIXME: `xmlname` might be `nullptr` here.
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.StringChecker)
     this->SetXMLLabel(vtkSMObject::CreatePrettyLabel(xmlname).c_str());
   }
 

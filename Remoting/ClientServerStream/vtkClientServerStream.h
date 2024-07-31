@@ -491,13 +491,7 @@ public:
   }
 
   // Destructor frees data memory.
-  ~vtkClientServerStreamDataArg()
-  {
-    if (this->Data)
-    {
-      delete[] this->Data;
-    }
-  }
+  ~vtkClientServerStreamDataArg() { delete[] this->Data; }
 
   // Allow this object to be passed as if it were a pointer.
   operator T*() { return this->Data; }

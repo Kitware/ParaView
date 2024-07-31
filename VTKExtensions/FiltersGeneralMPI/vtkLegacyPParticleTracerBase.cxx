@@ -132,8 +132,9 @@ void vtkLegacyPParticleTracerBase::AssignSeedsToProcessors(double t, vtkDataSet*
 {
   if (!this->Controller)
   {
-    return Superclass::AssignSeedsToProcessors(
+    Superclass::AssignSeedsToProcessors(
       t, source, sourceID, ptId, localSeedPoints, localAssignedCount);
+    return;
   }
   ParticleVector candidates;
   //
@@ -213,7 +214,8 @@ void vtkLegacyPParticleTracerBase::AssignUniqueIds(
 {
   if (!this->Controller)
   {
-    return Superclass::AssignUniqueIds(localSeedPoints);
+    Superclass::AssignUniqueIds(localSeedPoints);
+    return;
   }
 
   vtkIdType particleCountOffset = 0;

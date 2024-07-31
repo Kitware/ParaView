@@ -18,6 +18,7 @@
 typedef enum { false, true } bool;
 #endif
 
+// NOLINTBEGIN(modernize-macro-to-enum)
 #define NBITS_IN_BYTE 8
 #define SIZE_OF_FLOAT 4
 #define SIZE_OF_WORD 4
@@ -26,6 +27,7 @@ typedef enum { false, true } bool;
 #define SIZE_OF_DOUBLE 8
 #define SIZE_OF_WORD64 8
 #define SIZE_OF_BUFF64 4096
+// NOLINTEND(modernize-macro-to-enum)
 
 // Define debugging constant to get info printed to console.
 //#define IAC_DEBUG

@@ -136,7 +136,6 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
     svol_subset_desc->get_subregion_scene_space();
 
   // Fetch shared memory details from host properties
-  std::string shm_memory_name;
   mi::math::Bbox<mi::Float32, 3> shm_bbox_flt;
 
   vtknvindex_host_properties* host_props = m_cluster_properties->get_host_properties(rankid);

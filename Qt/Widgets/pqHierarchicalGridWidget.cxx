@@ -196,7 +196,8 @@ void pqHierarchicalGridWidget::mouseMoveEvent(QMouseEvent* evt)
   auto& internals = (*this->Internals);
   if (!internals.UserResizability)
   {
-    return this->Superclass::mouseMoveEvent(evt);
+    this->Superclass::mouseMoveEvent(evt);
+    return;
   }
 
   if (internals.isMoving())
@@ -223,7 +224,8 @@ void pqHierarchicalGridWidget::mousePressEvent(QMouseEvent* evt)
   auto& internals = (*this->Internals);
   if (!internals.UserResizability)
   {
-    return this->Superclass::mouseMoveEvent(evt);
+    this->Superclass::mouseMoveEvent(evt);
+    return;
   }
 
   if (evt->button() == Qt::LeftButton)

@@ -172,10 +172,7 @@ public:
    * Returns the row count of the 2D array. This corresponds to the number of selections
    * hold by the data producer.
    */
-  int rowCount(const QModelIndex&) const override
-  {
-    return static_cast<int>(this->Conversions.size());
-  }
+  int rowCount(const QModelIndex&) const override { return this->Conversions.size(); }
 
   /**
    * Returns the number of columns (two in our case).
@@ -189,7 +186,7 @@ public:
   {
     int row = index.row();
     int col = index.column();
-    if (this->Conversions.empty() || row >= static_cast<int>(this->Conversions.size()))
+    if (this->Conversions.empty() || row >= this->Conversions.size())
     {
       return QVariant();
     }
@@ -227,7 +224,7 @@ public:
   {
     int row = index.row();
     int col = index.column();
-    if (this->Conversions.empty() || row >= static_cast<int>(this->Conversions.size()))
+    if (this->Conversions.empty() || row >= this->Conversions.size())
     {
       return false;
     }

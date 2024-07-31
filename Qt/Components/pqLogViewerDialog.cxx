@@ -405,7 +405,7 @@ void pqLogViewerDialog::initializeVerbosities(QComboBox* combobox)
 //----------------------------------------------------------------------------
 void pqLogViewerDialog::updateCategory(int category, bool promote)
 {
-  this->CategoryPromoted[static_cast<int>(category)] = promote;
+  this->CategoryPromoted[category] = promote;
 
   auto DoUpdate = [=](int proxyIndex, int categoryIndex) {
     // Reset log messages to TRACE
