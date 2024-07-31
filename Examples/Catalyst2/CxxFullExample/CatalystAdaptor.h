@@ -38,7 +38,7 @@ void Initialize(int argc, char* argv[])
   // script and pass the rest of the arguments as arguments of the script
   // itself. To retrieve these  arguments from the script  use the `get_args()`
   // method of the paraview catalyst module [2]
-  // [2] https://kitware.github.io/paraview-docs/latest/python/paraview.catalyst.html
+  // [2] https://www.paraview.org/paraview-docs/latest/python/paraview.catalyst.html
   node["catalyst/scripts/script/filename"].set_string(argv[1]);
   for (int cc = 2; cc < argc; ++cc)
   {
