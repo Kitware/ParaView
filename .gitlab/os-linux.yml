@@ -252,7 +252,7 @@
     stage: build
     environment:
       name: documentation
-      url: https://kitware.github.io/paraview-docs/latest/cxx/
+      url: https://www.paraview.org/paraview-docs/latest/cxx/
 
     needs: []
 
