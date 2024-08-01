@@ -85,6 +85,11 @@ paraview_add_client_server_render_tests(
   TEST_SCRIPTS GhostCellsGenerator.xml
   )
 
+# HTG Source has special features when used in an MPI setting
+paraview_add_client_server_tests(
+  TEST_SCRIPTS HyperTreeGridSourceDistributed.xml
+  )
+
 # GhostCellGeneratorSynchronize is only tested in non-built-in mode.
 paraview_add_client_server_tests(
   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
