@@ -91,6 +91,13 @@ public:
   static QString getParaViewApplicationDirectory();
 
   /**
+   * Return the AppData directory for Paraview.
+   * Relies on Qt QStandardPaths::AppLocalDataLocation to get platform specific values.
+   * The directory will created if needed.
+   */
+  static QString getParaViewApplicationDataDirectory();
+
+  /**
    * Return the list of full available path that exists inside the shared
    * application path and the user specific one
    */
