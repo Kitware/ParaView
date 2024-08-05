@@ -12,6 +12,7 @@
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
+#include "pqUndoStack.h"
 #include "vtkNew.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMLoadStateOptionsProxy.h"
@@ -45,6 +46,8 @@ void pqLoadStateReaction::updateEnableState()
 void pqLoadStateReaction::loadState(
   const QString& filename, bool dialogBlocked, pqServer* server, vtkTypeUInt32 location)
 {
+  SCOPED_UNDO_EXCLUDE();
+
   if (server == nullptr)
   {
     server = pqActiveObjects::instance().activeServer();

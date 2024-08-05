@@ -13,6 +13,7 @@
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqTestUtility.h"
+#include "pqUndoStack.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -103,6 +104,7 @@ bool pqSaveDataReaction::saveActiveData()
 //-----------------------------------------------------------------------------
 bool pqSaveDataReaction::saveActiveData(const QString& filename)
 {
+  SCOPED_UNDO_EXCLUDE();
   pqServer* server = pqActiveObjects::instance().activeServer();
   // TODO: also is there's a pending accept.
   pqOutputPort* port = pqActiveObjects::instance().activePort();

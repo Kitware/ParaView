@@ -10,6 +10,7 @@
 #include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
+#include "pqUndoStack.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
@@ -83,6 +84,7 @@ bool pqSaveStateReaction::saveState(pqServer* server)
 //-----------------------------------------------------------------------------
 bool pqSaveStateReaction::saveState(const QString& filename, vtkTypeUInt32 location)
 {
+  SCOPED_UNDO_EXCLUDE();
   if (!pqApplicationCore::instance()->saveState(filename, location))
   {
     qCritical() << tr("Failed to save %1").arg(filename);
@@ -100,6 +102,7 @@ bool pqSaveStateReaction::savePythonState(
   const QString& filename, vtkSMProxy* options, vtkTypeUInt32 location)
 {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
+  SCOPED_UNDO_EXCLUDE();
   if (strcmp(options->GetXMLName(), "PythonStateOptions") != 0)
   {
     qCritical() << tr("Unable to read python state options.");
