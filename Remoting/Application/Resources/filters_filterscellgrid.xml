@@ -245,5 +245,60 @@
       <!-- End of CellGridPointProbe -->
     </SourceProxy>
 
+    <SourceProxy
+      class="vtkCellGridCellCenters"
+      name="CellGridCenters"
+      label="CellGrid Centers">
+      <Documentation
+        long_help="Create a vertex at each cell center."
+        short_help="Create a vertex at each cell center.">
+        This filter adds a vertex cell at the center of each input cell.
+        The output will have all of the attributes defined on the cell
+        interpolated to the output vertices.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <Documentation>An input cell-grid.</Documentation>
+      </InputProperty>
+
+      <!-- End of CellGridCenters -->
+    </SourceProxy>
+
+    <SourceProxy
+      class="vtkCellGridToUnstructuredGrid"
+      name="CellGridToUnstructuredGrid"
+      label="Cell Grid To Unstructured Grid">
+      <Documentation
+        long_help="Convert a cell grid to an unstructured grid."
+        short_help="Convert a cell grid to an unstructured grid.">
+        This filter approximates a cell-grid with an unstructured grid
+        whose cells are linear approximations to cells in the cell grid.
+        All higher-order information is discarded.
+        All fields on the cell-grid are converted into point-data on the
+        unstructured grid; since points are shared by neighboring cells,
+        the values at points are averaged across all cells incident to
+        the point. Thus discontinuities at cell boundaries are eliminated
+        by averaging.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <Documentation>An input cell-grid.</Documentation>
+      </InputProperty>
+
+      <!-- End of CellGridToUnstructuredGrid -->
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
