@@ -251,7 +251,40 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation* other)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array, vtkFieldData* fd)
+struct vtkPVArrayInformation::GetRangeFunctor
+{
+  // Compute ranges using the appropriate method: if the containing field data is available, use its
+  // method which can handle caching ghost values. Fallback to the array's method.
+  void operator()(vtkDataArray* dataArray, int componentIdx, ComponentInfo& compInfo)
+  {
+    bool rangeFound = false, finiteRangeFound = false;
+    if (this->FieldData != nullptr && this->ArrayIdx >= 0)
+    {
+      rangeFound =
+        this->FieldData->GetRange(this->ArrayIdx, compInfo.Range.GetData(), componentIdx);
+      finiteRangeFound = this->FieldData->GetFiniteRange(
+        this->ArrayIdx, compInfo.FiniteRange.GetData(), componentIdx);
+    }
+
+    if (!rangeFound)
+    {
+      dataArray->GetRange(compInfo.Range.GetData(), componentIdx);
+    }
+
+    if (!finiteRangeFound)
+    {
+      dataArray->GetFiniteRange(compInfo.FiniteRange.GetData(), componentIdx);
+    }
+  };
+
+  vtkAbstractArray* Array = nullptr;
+  vtkFieldData* FieldData = nullptr;
+  int ArrayIdx = -1;
+};
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::CopyFromArrayInternal(
+  vtkAbstractArray* array, GetRangeFunctor& getRangeFn)
 {
   assert(array != nullptr);
   this->Name = array->GetName() ? array->GetName() : "";
@@ -287,13 +320,7 @@ void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array, vtkFieldData*
     for (int comp = -1; comp < numComponents; ++comp)
     {
       auto& compInfo = this->Components.at(comp + 1);
-      if (!fd || !array->GetName() ||
-        !fd->GetRange(dataArray->GetName(), compInfo.Range.GetData(), comp) ||
-        !fd->GetFiniteRange(dataArray->GetName(), compInfo.FiniteRange.GetData(), comp))
-      {
-        dataArray->GetRange(compInfo.Range.GetData(), comp);
-        dataArray->GetFiniteRange(compInfo.FiniteRange.GetData(), comp);
-      }
+      getRangeFn(dataArray, comp, compInfo);
     }
   }
   else if (auto sarray = vtkStringArray::SafeDownCast(array))
@@ -322,6 +349,43 @@ void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array, vtkFieldData*
     }
     it->Delete();
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array)
+{
+  GetRangeFunctor rangeFn;
+  rangeFn.Array = array;
+
+  this->CopyFromArrayInternal(array, rangeFn);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::CopyFromArray(vtkFieldData* fieldData, int fdArrayIdx)
+{
+  assert(fieldData != nullptr);
+  assert(fdArrayIdx >= 0 && fdArrayIdx < fieldData->GetNumberOfArrays());
+
+  auto array = fieldData->GetAbstractArray(fdArrayIdx);
+
+  GetRangeFunctor rangeFn;
+  rangeFn.Array = array;
+  rangeFn.ArrayIdx = fdArrayIdx;
+  rangeFn.FieldData = fieldData;
+
+  this->CopyFromArrayInternal(array, rangeFn);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array, vtkFieldData* fieldData)
+{
+  if (fieldData != nullptr)
+  {
+    int arrayIdx = -1;
+    fieldData->GetAbstractArray(array->GetName(), arrayIdx);
+    return this->CopyFromArray(fieldData, arrayIdx);
+  }
+  return this->CopyFromArray(array);
 }
 
 //----------------------------------------------------------------------------

@@ -26,10 +26,10 @@ int TestPVArrayInformation(int, char*[])
 
   vtkSmartPointer<vtkFloatArray> array = GetPolyData();
   vtkNew<vtkFieldData> fd;
-  fd->AddArray(array);
+  int fdArrayIdx = fd->AddArray(array);
 
   vtkNew<vtkPVArrayInformation> info;
-  info->CopyFromArray(array.Get(), fd);
+  info->CopyFromArray(fd, fdArrayIdx);
 
   // Verify minimum and maximum
   auto range = info->GetComponentRange(0);
@@ -82,7 +82,7 @@ int TestPVArrayInformation(int, char*[])
   // Add infinity and verify minimum and maximum values.
   array->SetComponent(50, 0, vtkMath::Inf());
   array->Modified();
-  info->CopyFromArray(array.Get(), fd);
+  info->CopyFromArray(fd, fdArrayIdx);
   range = info->GetComponentRange(0);
   if (!vtkMathUtilities::FuzzyCompare(range[0], 0.0))
   {
