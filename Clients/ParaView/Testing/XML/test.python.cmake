@@ -31,6 +31,7 @@ if (PARAVIEW_ENABLE_WEB)
 endif ()
 
 list(APPEND TESTS_WITH_BASELINES
+  AutoSaveState.xml
   ColorByComponentNames.xml # needs programmable filter
   LiveProgrammableSource.xml
   LinkRenderViews.xml
@@ -49,6 +50,8 @@ list(APPEND TESTS_WITH_BASELINES
   )
 # Surface selection unstable on CRS mode
 set(SaveLoadStateSelectionPython_DISABLE_CRS TRUE)
+
+set (AutoSaveState_FORCE_SERIAL TRUE) # since this modifies settings
 
 list(APPEND TESTS_WITH_INLINE_COMPARES
   RestoreArrayDefaultTransferFunction.xml

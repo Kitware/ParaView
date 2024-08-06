@@ -911,9 +911,9 @@ set(ZoomToData_TIMEOUT 150)
 list (APPEND TESTS_WITHOUT_BASELINES
   AboutDialog.xml
   AddFieldArrays.xml
+  AnimateProperty.xml
   ArrayBoundsScaleDomain.xml
   ArraySelectionWidget.xml
-  AnimateProperty.xml
   ComputeArrayMagnitudeSetting.xml
   CustomOutputFormat.xml
   DefaultReadersSetting.xml
