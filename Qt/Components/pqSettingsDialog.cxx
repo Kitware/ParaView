@@ -228,6 +228,8 @@ void pqSettingsDialog::onAccepted()
     }
   }
 
+  qSettings->alertSettingsModified();
+
   // Disable buttons
   Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
