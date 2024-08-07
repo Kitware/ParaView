@@ -13,6 +13,7 @@
 #define vtkPVArrayInformation_h
 
 #include "vtkObject.h"
+#include "vtkParaViewDeprecation.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
 #include "vtkTuple.h"              // for vtkTuple
 
@@ -134,7 +135,18 @@ public:
   const char* GetStringValue(int);
   ///@}
 
-  void CopyFromArray(vtkAbstractArray* array, vtkFieldData* fd = nullptr);
+  /// @{
+  /**
+   * Copy info from an array. Prefer the field data overload when copying from a field data array.
+   */
+  void CopyFromArray(vtkAbstractArray* array);
+  void CopyFromArray(vtkFieldData* fieldData, int fdArrayIdx);
+
+  PARAVIEW_DEPRECATED_IN_5_14_0("Please use the CopyFromArray(vtkAbstractArray*) or "
+                                "CopyFromArray(vtkFieldData*, int) overloads")
+  void CopyFromArray(vtkAbstractArray* array, vtkFieldData* fieldData);
+  /// @}
+
   void CopyFromCellAttribute(vtkCellGrid* grid, vtkCellAttribute* attribute);
   void CopyFromGenericAttribute(vtkGenericAttribute* array);
   void CopyToStream(vtkClientServerStream*) const;
@@ -177,6 +189,13 @@ private:
 
   // this array is used to store existing information keys (location/name pairs)
   std::set<std::pair<std::string, std::string>> InformationKeys;
+
+  struct GetRangeFunctor;
+  /**
+   * @brief Copy info from an array. Populate the functor struct with field array and index if
+   * available
+   */
+  void CopyFromArrayInternal(vtkAbstractArray* array, GetRangeFunctor& getRangeFn);
 
   vtkPVArrayInformation(const vtkPVArrayInformation&) = delete;
   void operator=(const vtkPVArrayInformation&) = delete;
