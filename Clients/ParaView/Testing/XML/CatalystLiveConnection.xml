@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Test that we can allow connection/disconnection to a catalyst server properly from the GUI -->
+  <!-- Connect to Catalyst2 -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConnect" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Try to disconnect with `Files > Disconnect` which should raise a warning saying to use `Catalyst > Disconnect` instead -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionServerDisconnect" />
+
+  <!-- Disconnect the catalyst server as expected -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConnect" />
+</pqevents>

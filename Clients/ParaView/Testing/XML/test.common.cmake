@@ -987,6 +987,12 @@ if (PARAVIEW_ENABLE_OPENVDB)
   )
 endif ()
 
+if (PARAVIEW_ENABLE_CATALYST)
+  list (APPEND TESTS_WITHOUT_BASELINES
+    CatalystLiveConnection.xml
+  )
+endif ()
+
 if (PARAVIEW_USE_QTHELP)
   list(APPEND TESTS_WITHOUT_BASELINES
     HelpWindowHistory.xml)
@@ -1237,8 +1243,8 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
   add_pv_test("pv" "_DISABLE_C"
     COMMAND
     --script-ignore-output-errors --script $<TARGET_FILE:ParaView::pvbatch> --sym
-    ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
-    ${INSITU_SCRIPT} "${duration}"
+      ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
+      ${INSITU_SCRIPT} "${duration}"
 
     --client ${CLIENT_EXECUTABLE}
     --enable-bt
