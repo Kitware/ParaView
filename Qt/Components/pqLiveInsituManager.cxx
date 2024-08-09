@@ -116,6 +116,10 @@ pqLiveInsituManager::pqLiveInsituManager()
 //-----------------------------------------------------------------------------
 bool pqLiveInsituManager::isInsituServer(pqServer* server)
 {
+  if (server)
+  {
+    return server->getResource().scheme() == "catalyst";
+  }
   return server ? (server->getResource().scheme() == "catalyst") : false;
 }
 
@@ -216,14 +220,7 @@ pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server,
       new pqLiveInsituVisualizationManager(portNumber, server);
     QObject::connect(mgr, SIGNAL(insituDisconnected()), this, SLOT(onCatalystDisconnected()));
     this->Managers[server] = mgr;
-    QMessageBox* mBox =
-      new QMessageBox(QMessageBox::Information, tr("Ready for Catalyst connections"),
-        QString(tr("Accepting connections from Catalyst Co-Processor\n"
-                   "for live-coprocessing on port %1"))
-          .arg(portNumber),
-        QMessageBox::Ok, pqCoreUtilities::mainWidget());
-    mBox->open();
-    QObject::connect(mgr, SIGNAL(insituConnected()), mBox, SLOT(close()));
+    QObject::connect(mgr, SIGNAL(insituConnected()), this, SLOT(close()));
     Q_EMIT connectionInitiated(server);
     return mgr;
   }

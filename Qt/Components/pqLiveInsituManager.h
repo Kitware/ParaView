@@ -78,6 +78,7 @@ public:
    * portNumber.
    */
   pqLiveInsituVisualizationManager* connect(pqServer* displaySession, int portNumber = -1);
+  pqLiveInsituVisualizationManager* disconnect(pqServer* displaySession, int portNumber = -1);
 
   double breakpointTime() const { return this->BreakpointTime; }
   double breakpointTimeStep() const { return this->BreakpointTimeStep; }
