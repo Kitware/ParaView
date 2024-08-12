@@ -557,6 +557,10 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
       }
       else
       {
+        // Merge modifiable booleans
+        iter->AutoLoad = iter->AutoLoad | autoLoad;
+
+        // Recover needed info for loading
         version = iter->Version;
         description = iter->Description;
         xmls = iter->XMLs;
