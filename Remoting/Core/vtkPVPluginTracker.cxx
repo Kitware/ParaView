@@ -630,7 +630,11 @@ void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
 {
   assert(plugin != nullptr);
 
-  vtkPluginsList::iterator iter = this->PluginsList->LocateUsingPluginName(plugin->GetPluginName());
+  vtkPluginsList::iterator iter = this->PluginsList->LocateUsingFileName(plugin->GetFileName());
+  if (iter == this->PluginsList->end())
+  {
+    iter = this->PluginsList->LocateUsingPluginName(plugin->GetPluginName());
+  }
   if (iter == this->PluginsList->end())
   {
     vtkItem item;
