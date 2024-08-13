@@ -42,13 +42,16 @@ Please remove this comment.
     - Make a commit for each of these `release` changes on a single topic
       (suggested branch name: `update-to-v@VERSION@`):
       - [ ] Assemble release notes into `Documentation/release/ParaView-@VERSION@.md`.
+<!-- if RC1 and patch == 0 -->
+      - [ ] Update `version.txt` to bump the minor version number.
+<!-- endif -->
+    - Make a commit for each of these `release`-only changes
       - [ ] Update `version.txt` and tag the commit (tag this commit below)
         ```
         git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@
         echo @VERSION@@RC@ > version.txt
         git commit -m 'Update version number to @VERSION@@RC@' version.txt
         ```
-    - Make a commit for each of these `release`-only changes
 <!-- if RC1 and patch == 0 -->
       - [ ] Update VTK's `paraview/release` branch. The
             [`release-mr`][release-mr]  script should be used to do this. Pass
