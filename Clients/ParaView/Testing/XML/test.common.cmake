@@ -922,6 +922,7 @@ set(SplitViewTrace_TIMEOUT 150)
 set(SpreadSheet3_TIMEOUT 150)
 set(TemporalParticleKeepDeadTrails_TIMEOUT 150)
 set(TraceExportAndSaveData_TIMEOUT 150)
+set(TraceMultiViews_TIMEOUT 150)
 set(TransferFunction2D_TIMEOUT 150)
 set(ZoomToData_TIMEOUT 150)
 
