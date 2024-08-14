@@ -252,13 +252,14 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(
 #else
       char splitChar = ':';
 #endif
+      std::string fileName = vtksys::SystemTools::GetFilenameName(path);
       std::vector<std::string> paths = vtksys::SystemTools::SplitString(pythonPath, splitChar);
       for (auto& p : paths)
       {
 #if defined(_WIN32) && !defined(__MINGW32__)
-        std::string testPath = p + "\\" + path;
+        std::string testPath = p + "\\" + fileName;
 #else
-        std::string testPath = p + "/" + path;
+        std::string testPath = p + "/" + fileName;
 #endif
         if (vtkPSystemTools::FileExists(testPath.c_str()))
         {
