@@ -1514,3 +1514,17 @@ bool vtkSMRenderViewProxy::IsInSelectionMode()
       return false;
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::SetEnableSynchronizableActors(bool enabled)
+{
+  vtkSMPropertyHelper(this, "EnableSynchronizableActors").Set(enabled ? 1 : 0);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetEnableSynchronizableActors()
+{
+  int propertyValue =
+    vtkSMPropertyHelper(this, "EnableSynchronizableActors", /*quiet*/ true).GetAsInt();
+  return propertyValue == 1 ? true : false;
+}

@@ -10,6 +10,7 @@
 #include "vtkCamera.h"
 #include "vtkCameraOrientationRepresentation.h"
 #include "vtkCameraOrientationWidget.h"
+#include "vtkCaveSynchronizedRenderers.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkCommunicator.h"
@@ -141,6 +142,44 @@ public:
   int OSPRayCount;
   vtkNew<vtkFloatArray> ArrayHolder;
   vtkNew<vtkWindowToImageFilter> ZGrabber;
+
+  bool actorSyncEnabled;
+
+  void EnableActorSync(vtkPVSynchronizedRenderer* syncRen, bool enable)
+  {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (!pm)
+    {
+      vtkGenericWarningMacro("Synchronizable actors cannot be used in the current setup.");
+      return;
+    }
+
+    vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+    auto serverInfo = activeSession->GetServerInformation();
+    bool tileMode = serverInfo->GetIsInTileDisplay();
+    bool caveMode = serverInfo->GetIsInCave();
+
+    // If we have a ParallelSynchronizer, and it's specifically the CAVE type,
+    // it needs synchronizable actors enabled.
+    vtkCaveSynchronizedRenderers* pSync =
+      vtkCaveSynchronizedRenderers::SafeDownCast(syncRen->GetParallelSynchronizer());
+    if (pSync)
+    {
+      pSync->EnableSynchronizableActors(enable);
+    }
+
+    // If we have a CSSynchronizer and we're in tile or cave mode, then that
+    // needs synchronizable actors enabled.
+    vtkSynchronizedRenderers* csSync = syncRen->GetCSSynchronizer();
+    if (csSync && (tileMode || caveMode))
+    {
+      csSync->EnableSynchronizableActors(enable);
+    }
+
+    this->actorSyncEnabled = enable;
+  }
+
+  bool GetActorSyncEnabled() { return this->actorSyncEnabled; }
 
   void RegisterSelectionProp(int id, vtkProp*, vtkPVDataRepresentation* rep)
   {
@@ -330,6 +369,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Internals->OSPRayShadows = false;
   this->Internals->OSPRayDenoise = true;
   this->Internals->OSPRayCount = 0;
+  this->Internals->actorSyncEnabled = false;
 
   this->RemoteRenderingAvailable = true;
 
@@ -3452,6 +3492,18 @@ void vtkPVRenderView::SetViewTime(double value)
   vtkOSPRayRendererNode::SetViewTime(value, ren);
 #endif
   this->Superclass::SetViewTime(value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetEnableSynchronizableActors(bool v)
+{
+  this->Internals->EnableActorSync(this->SynchronizedRenderers, v);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::GetEnableSynchronizableActors()
+{
+  return this->Internals->GetActorSyncEnabled();
 }
 
 //----------------------------------------------------------------------------

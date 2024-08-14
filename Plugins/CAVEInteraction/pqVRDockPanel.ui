@@ -15,18 +15,11 @@
   <property name="windowTitle">
    <string/>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout2">
    <item row="1" column="0">
     <widget class="QListWidget" name="connectionsTable"/>
    </item>
-   <item row="10" column="0">
-    <widget class="Line" name="line_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="0">
+   <item row="12" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QPushButton" name="saveState">
@@ -262,6 +255,9 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="11" column="0">
+    <layout class="QVBoxLayout" name="collaborationContainer"/>
    </item>
   </layout>
  </widget>
