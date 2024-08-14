@@ -446,11 +446,11 @@ void Hdf5Reader::GetMeshResult(unsigned int sequenceStep, unsigned int stepNum, 
   H5CFS::ReadArray(resGroup, "Real", realVals);
 
   std::vector<unsigned int> idx;
-  const unsigned int numDofs = static_cast<const unsigned int>(result->resultInfo->dofNames.size());
+  const unsigned int numDofs = static_cast<unsigned int>(result->resultInfo->dofNames.size());
   std::vector<unsigned int> entities =
     this->GetEntities(result->resultInfo->listType, result->resultInfo->listName);
-  const unsigned int numEntities = static_cast<const unsigned int>(entities.size());
-  const unsigned int resVecSize = static_cast<const unsigned int>(numEntities * numDofs);
+  const unsigned int numEntities = static_cast<unsigned int>(entities.size());
+  const unsigned int resVecSize = static_cast<unsigned int>(numEntities * numDofs);
 
   // copy data array to result object
   // REAL part

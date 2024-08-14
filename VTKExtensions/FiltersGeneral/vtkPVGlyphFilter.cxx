@@ -608,7 +608,7 @@ int vtkPVGlyphFilter::RequestDataObject(
       clone->FastDelete();
     }
   }
-  else if (auto inputAMR = vtkUniformGridAMR::GetData(inputVector[0], 0))
+  else if (vtkUniformGridAMR::GetData(inputVector[0], 0))
   {
     // eventually, this will be PDC.
     auto output = vtkMultiBlockDataSet::GetData(outputVector, 0);

@@ -204,17 +204,20 @@ public:
    */
   void DrawLines(float* f, int n, unsigned char* colors = nullptr, int nc_comps = 0) override;
 
+  using vtkContextDevice2D::DrawPoints;
   /**
    * Expand bounding rect to contain the given points.
    */
   void DrawPoints(float* points, int n, unsigned char* colors = nullptr, int nc_comps = 0) override;
 
+  using vtkContextDevice2D::DrawPointSprites;
   /**
    * Expand bounding rect to contain the point sprites.
    */
   void DrawPointSprites(vtkImageData* sprite, float* points, int n, unsigned char* colors = nullptr,
     int nc_comps = 0) override;
 
+  using vtkContextDevice2D::DrawMarkers;
   /**
    * Expand bounding rect to contain the markers.
    */

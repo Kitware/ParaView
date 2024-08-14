@@ -218,8 +218,8 @@ void vtkPlotlyJsonExporter::AddStyle(vtkPlot* plot, const char* plotName)
   auto& internals = *(this->Internals);
   auto& data = internals.Data["data"];
   auto iter = std::find_if(data.begin(), data.end(), [&plotName](const vtkNJson& object) {
-    auto iter = object.find("name");
-    return iter != object.end() && iter.value() == std::string(plotName);
+    auto localIter = object.find("name");
+    return localIter != object.end() && localIter.value() == std::string(plotName);
   });
 
   if (iter == data.end())

@@ -7,7 +7,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSelection.h"
-#include "vtkSelectionNode.h"
 #include "vtkSelectionSource.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
@@ -89,14 +88,7 @@ vtkStandardNewMacro(vtkPVSelectionSource);
 
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
-  : Mode(Modes::ID)
-  , FieldType(vtkSelectionNode::CELL)
-  , ContainingCells(0)
-  , Inverse(0)
-  , ArrayName(nullptr)
-  , NumberOfLayers(0)
-  , ProcessID(-1)
-  , Internal(new vtkInternal())
+  : Internal(new vtkInternal())
 {
   memset(this->Frustum, 0.0, sizeof(double) * 32);
   this->SetNumberOfInputPorts(0);

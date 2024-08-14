@@ -49,6 +49,7 @@ public:
    */
   vtkSmartPointer<vtkImageData> GetTexture() const;
 
+  using vtkControlPointsItem::SetValidBounds;
   /*
    * Override to rescale box corners when the valid bounds have changed.
    */

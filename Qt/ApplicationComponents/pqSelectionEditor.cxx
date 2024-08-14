@@ -394,7 +394,7 @@ public:
     }
 
     const int colorColumn = 2;
-    if (index.column() == colorColumn && index.row() < this->SavedColors.size())
+    if (index.column() == colorColumn && index.row() < static_cast<int>(this->SavedColors.size()))
     {
       QColor c = variant.value<QColor>();
       SavedColors[index.row()] = c;

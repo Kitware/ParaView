@@ -406,19 +406,6 @@ vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 //----------------------------------------------------------------------------
 namespace
 {
-
-/**
- * Converts pugixml to vtkPVXMLElement
- */
-vtkPVXMLElement* ConvertXML(vtkPVXMLParser* parser, pugi::xml_node& node)
-{
-  std::stringstream ss;
-  node.print(ss);
-
-  parser->Parse(ss.str().c_str());
-  return parser->GetRootElement();
-}
-
 // Replace all "$FOO" with environment variable values, if present. Otherwise
 // they are left unchanged.
 void ReplaceEnvironmentVariables(std::string& contents)

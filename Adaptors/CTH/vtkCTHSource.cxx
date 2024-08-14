@@ -107,7 +107,7 @@ void vtkCTHSource::SetMaterialFieldName(int field_id, char* field_name, char* co
       // strip off the trailing "!" from the comment
       char* end = strchr(comment, '!');
       std::string s(comment, end - comment);
-      char n[13];
+      char n[24];
       sprintf(n, " - %zu", i + 1);
       s.append(n);
       MFieldNames[i][field_id] = s;
