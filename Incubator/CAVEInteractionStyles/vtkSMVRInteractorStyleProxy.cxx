@@ -3,14 +3,21 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkSMVRInteractorStyleProxy.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
+#include "pqRenderView.h"
 #include "pqServerManagerModel.h"
+#include "pqView.h"
 
+#include "vtkCamera.h"
+#include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkStringList.h"
 #include "vtkVRQueue.h"
 
@@ -492,4 +499,65 @@ bool vtkSMVRInteractorStyleProxy::SetTrackerName(const std::string& role, const 
 std::string vtkSMVRInteractorStyleProxy::GetTrackerName(const std::string& role)
 {
   return this->GetValueInMap(this->Trackers, role);
+}
+
+// ----------------------------------------------------------------------------
+vtkSMRenderViewProxy* vtkSMVRInteractorStyleProxy::GetActiveViewProxy()
+{
+  pqActiveObjects& activeObjs = pqActiveObjects::instance();
+
+  if (pqView* pqview = activeObjs.activeView())
+  {
+    if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqview))
+    {
+      return vtkSMRenderViewProxy::SafeDownCast(rview->getProxy());
+    }
+  }
+
+  return nullptr;
+}
+
+// ----------------------------------------------------------------------------
+vtkCamera* vtkSMVRInteractorStyleProxy::GetActiveCamera()
+{
+  vtkSMRenderViewProxy* rvProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+
+  if (rvProxy)
+  {
+    return rvProxy->GetActiveCamera();
+  }
+
+  return nullptr;
+}
+
+// ----------------------------------------------------------------------------
+vtkMatrix4x4* vtkSMVRInteractorStyleProxy::GetNavigationMatrix()
+{
+  vtkCamera* activeCamera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
+  if (activeCamera)
+  {
+    return activeCamera->GetModelTransformMatrix();
+  }
+
+  return nullptr;
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRInteractorStyleProxy::SetNavigationMatrix(vtkMatrix4x4* matrix)
+{
+  vtkCamera* activeCamera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
+  if (activeCamera)
+  {
+    activeCamera->SetModelTransformMatrix(matrix);
+
+    vtkNew<vtkMatrix4x4> physicalToWorld;
+    physicalToWorld->DeepCopy(matrix);
+    physicalToWorld->Invert();
+    double matrixBuffer[16];
+    vtkMatrix4x4::DeepCopy(matrixBuffer, physicalToWorld);
+
+    vtkSMRenderViewProxy* viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+    vtkSMPropertyHelper(viewProxy, "PhysicalToWorldMatrix").Set(matrixBuffer, 16);
+    viewProxy->InvokeEvent(INTERACTOR_STYLE_NAVIGATION, physicalToWorld);
+  }
 }

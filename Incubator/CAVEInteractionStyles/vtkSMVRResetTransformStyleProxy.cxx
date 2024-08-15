@@ -10,13 +10,8 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkTransform.h"
 #include "vtkVRQueue.h"
-
-#include "pqActiveObjects.h"
-#include "pqRenderView.h"
-#include "pqView.h"
 
 #include <algorithm>
 #include <cmath>
@@ -48,38 +43,6 @@ void vtkSMVRResetTransformStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "EnableNavigate: " << this->EnableNavigate << endl;
   os << indent << "IsInitialRecorded: " << this->IsInitialRecorded << endl;
-}
-
-// ----------------------------------------------------------------------------
-// GetCamera() method
-//
-vtkCamera* vtkSMVRResetTransformStyleProxy::GetCamera()
-{
-  vtkCamera* camera = nullptr;
-  pqActiveObjects& activeObjs = pqActiveObjects::instance();
-
-  /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-   * (WRS: I assume) */
-  if (pqView* pqview = activeObjs.activeView())
-  {
-    /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-     * (WRS: I assume) */
-    if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqview))
-    {
-      /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-       * (WRS: I assume) */
-      if (vtkSMRenderViewProxy* rviewPxy = vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
-      {
-        camera = rviewPxy->GetActiveCamera();
-      }
-    }
-  }
-  if (!camera)
-  {
-    vtkWarningMacro(<< "Cannot grab active camera.");
-  }
-
-  return camera;
 }
 
 // ----------------------------------------------------------------------------
@@ -117,7 +80,7 @@ void vtkSMVRResetTransformStyleProxy::HandleTracker(const vtkVREvent& event)
     return;
   if (this->EnableNavigate)
   {
-    camera = vtkSMVRResetTransformStyleProxy::GetCamera();
+    camera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
     if (!camera)
     {
       vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");

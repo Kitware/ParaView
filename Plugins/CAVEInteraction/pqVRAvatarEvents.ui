@@ -91,7 +91,27 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="0" colspan="2">
+    <item row="3" column="0">
+     <widget class="QLabel" name="shareNavigationLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="toolTip">
+       <string>Share navigation with collaborators</string>
+      </property>
+      <property name="text">
+       <string>Share Navigation</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QCheckBox" name="cShareNavigation">
+    </widget>
+    </item>
+    <item row="4" column="0" colspan="2">
      <widget class="QDialogButtonBox" name="buttonBox">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>

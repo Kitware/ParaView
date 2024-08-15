@@ -10,13 +10,8 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkTransform.h"
 #include "vtkVRQueue.h"
-
-#include "pqActiveObjects.h"
-#include "pqRenderView.h"
-#include "pqView.h"
 
 #include <algorithm>
 #include <cmath>
@@ -57,41 +52,6 @@ void vtkSMVRGrabWorldStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "IsInitialRotRecorded: " << this->IsInitialRotRecorded << endl;
   os << indent << "InverseInitialTransMatrix:" << endl;
   this->InverseInitialTransMatrix->PrintSelf(os, indent.GetNextIndent());
-}
-
-// ----------------------------------------------------------------------------
-// GetCamera() method
-//
-// NOTE: in the vtkVRSpaceNavigatorGrabWorldStyle.cxx code, the multiple steps used to
-//   get the "rview->getProxy()" value is simply replaced with "this->ControlledProxy".
-//   I would like to get an explanation so we know if we can do the same here.
-vtkCamera* vtkSMVRGrabWorldStyleProxy::GetCamera()
-{
-  vtkCamera* camera = nullptr;
-  pqActiveObjects& activeObjs = pqActiveObjects::instance();
-
-  /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-   * (BS: I assume) */
-  if (pqView* pqview = activeObjs.activeView())
-  {
-    /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-     * (BS: I assume) */
-    if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqview))
-    {
-      /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-       * (BS: I assume) */
-      if (vtkSMRenderViewProxy* rviewPxy = vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
-      {
-        camera = rviewPxy->GetActiveCamera();
-      }
-    }
-  }
-  if (!camera)
-  {
-    vtkWarningMacro(<< "vtkSMVRGrabWorldStyleProxy: Cannot grab active camera.");
-  }
-
-  return camera;
 }
 
 // ----------------------------------------------------------------------------
@@ -145,7 +105,7 @@ void vtkSMVRGrabWorldStyleProxy::HandleTracker(const vtkVREvent& event)
       this->IsInitialRotRecorded = false; /* disable any current rotation event.   WRS: why? */
 
       /* get the active camera */
-      camera = vtkSMVRGrabWorldStyleProxy::GetCamera();
+      camera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
       if (!camera)
       {
         vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");
@@ -264,7 +224,7 @@ printf("loc 0 %f %f %f\n", transformMatrix->Element[0][3], transformMatrix->Elem
       this->IsInitialTransRecorded = false; /* disable any current translation event.   WRS: why? */
 
       /* get the active camera */
-      camera = vtkSMVRGrabWorldStyleProxy::GetCamera();
+      camera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
       if (!camera)
       {
         vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");

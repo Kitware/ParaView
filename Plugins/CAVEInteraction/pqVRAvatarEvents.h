@@ -27,6 +27,12 @@ public:
   void getEventName(AvatarEventType type /*in*/, QString& eventName /*out*/);
   void setEventName(AvatarEventType type /*in*/, QString& eventName /*in*/);
 
+  /*
+   * Get/Set whether navigation sharing is enabled
+   */
+  bool getNavigationSharing();
+  void setNavigationSharing(bool enabled);
+
   // overridden public slots
   void accept() Q_DECL_OVERRIDE;
   int exec() Q_DECL_OVERRIDE;

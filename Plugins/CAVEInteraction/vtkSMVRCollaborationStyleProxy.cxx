@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkSMVRCollaborationStyleProxy.h"
 
+#include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkEventData.h"
 #include "vtkMath.h"
+#include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
+#include "vtkVRCollaborationClient.h"
 
 #include <QString>
 
@@ -16,6 +19,59 @@ vtkStandardNewMacro(vtkSMVRCollaborationStyleProxy);
 class vtkSMVRCollaborationStyleProxy::vtkInternals
 {
 public:
+  /*
+   * Event handler which responds to navigation events by sending updated
+   * avatar torso up vector message to collaborators.
+   */
+  class vtkNavigationObserver : public vtkCommand
+  {
+  public:
+    static vtkNavigationObserver* New() { return new vtkNavigationObserver; }
+
+    void Execute(
+      vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(event), void* calldata) override
+    {
+      if (this->Sharing && this->CollaborationClient)
+      {
+        // Send a separate message to communicate to collaborators about
+        // our avatars new torso up vector. The torso up vector is derived
+        // only from our current navigation (nothing to do with our current
+        // head orientation, e.g.)
+        vtkMatrix4x4* mat = static_cast<vtkMatrix4x4*>(calldata);
+        if (mat)
+        {
+          // "mat" is given to us by the event invoker already inverted (i.e.
+          // equivalent to "invNavMatrix" in HandleTracker() below), so that
+          // we do not need to invert it here.
+          double avatarUp[4];
+          this->CollaborationClient->GetAvatarInitialUpVector(avatarUp);
+          avatarUp[3] = 0;
+          mat->MultiplyPoint(avatarUp, avatarUp);
+
+          std::vector<vtkVRCollaborationClient::Argument> args;
+          args.resize(1);
+          args[0].SetDoubleVector(&avatarUp[0], 3);
+
+          this->CollaborationClient->SendAMessage("AUV", args);
+        }
+      }
+    }
+
+    vtkVRCollaborationClient* CollaborationClient;
+    bool Sharing;
+
+  protected:
+    vtkNavigationObserver()
+      : CollaborationClient(nullptr)
+      , Sharing(false)
+    {
+    }
+    ~vtkNavigationObserver() override {}
+  };
+
+  vtkNew<vtkNavigationObserver> NavigationObserver;
+  bool ShareNavigation;
+  vtkVRCollaborationClient* CollaborationClient;
   QString* HeadEventName;
   QString* LeftHandEventName;
   QString* RightHandEventName;
@@ -26,10 +82,18 @@ vtkSMVRCollaborationStyleProxy::vtkSMVRCollaborationStyleProxy()
   : Superclass()
   , Internal(new vtkSMVRCollaborationStyleProxy::vtkInternals())
 {
+  this->SetNavigationSharing(false);
+  this->Internal->CollaborationClient = nullptr;
 }
 
 // ----------------------------------------------------------------------------
 vtkSMVRCollaborationStyleProxy::~vtkSMVRCollaborationStyleProxy() = default;
+
+// ----------------------------------------------------------------------------
+vtkCommand* vtkSMVRCollaborationStyleProxy::GetNavigationObserver()
+{
+  return this->Internal->NavigationObserver;
+}
 
 // ----------------------------------------------------------------------------
 void vtkSMVRCollaborationStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
@@ -39,6 +103,7 @@ void vtkSMVRCollaborationStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HeadEventName: (" << this->Internal->HeadEventName << "\n";
   os << indent << "LeftHandEventName: (" << this->Internal->LeftHandEventName << "\n";
   os << indent << "RightHandEventName: (" << this->Internal->RightHandEventName << "\n";
+  os << indent << "ShareNavigation: (" << this->Internal->ShareNavigation << "\n";
   os << indent << ")\n";
 }
 
@@ -58,6 +123,26 @@ void vtkSMVRCollaborationStyleProxy::SetLeftHandEventName(QString* eventName)
 void vtkSMVRCollaborationStyleProxy::SetRightHandEventName(QString* eventName)
 {
   this->Internal->RightHandEventName = eventName;
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRCollaborationStyleProxy::SetNavigationSharing(bool enabled)
+{
+  this->Internal->ShareNavigation = enabled;
+  this->Internal->NavigationObserver->Sharing = enabled;
+}
+
+// ----------------------------------------------------------------------------
+bool vtkSMVRCollaborationStyleProxy::GetNavigationSharing()
+{
+  return this->Internal->ShareNavigation;
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRCollaborationStyleProxy::SetCollaborationClient(vtkVRCollaborationClient* client)
+{
+  this->Internal->CollaborationClient = client;
+  this->Internal->NavigationObserver->CollaborationClient = client;
 }
 
 // ----------------------------------------------------------------------------
@@ -103,6 +188,41 @@ void vtkSMVRCollaborationStyleProxy::HandleTracker(const vtkVREvent& event)
   ortho[0][2] = event.data.tracker.matrix[2];
   ortho[1][2] = event.data.tracker.matrix[6];
   ortho[2][2] = event.data.tracker.matrix[10];
+
+  if (this->GetNavigationSharing())
+  {
+    vtkMatrix4x4* navMatrix = this->GetNavigationMatrix();
+    if (navMatrix)
+    {
+      // If we're sharing navigation (in addition to just tracker
+      // orientations), we need to multiply the navigation and
+      // and tracker matrices to get the position/orientation we
+      // share with collaborators.
+      vtkNew<vtkMatrix4x4> invNavMatrix;
+      invNavMatrix->DeepCopy(navMatrix);
+      invNavMatrix->Invert();
+      vtkNew<vtkMatrix4x4> trackerMatrix;
+      trackerMatrix->DeepCopy(event.data.tracker.matrix);
+      vtkMatrix4x4::Multiply4x4(invNavMatrix, trackerMatrix, trackerMatrix);
+
+      // Update position and orientation to include navigation
+      wpos[0] = trackerMatrix->GetElement(0, 3);
+      wpos[1] = trackerMatrix->GetElement(1, 3);
+      wpos[2] = trackerMatrix->GetElement(2, 3);
+
+      ortho[0][0] = trackerMatrix->GetElement(0, 0); // [0];
+      ortho[1][0] = trackerMatrix->GetElement(1, 0); // [4];
+      ortho[2][0] = trackerMatrix->GetElement(2, 0); // [8];
+
+      ortho[0][1] = trackerMatrix->GetElement(0, 1); // [1];
+      ortho[1][1] = trackerMatrix->GetElement(1, 1); // [5];
+      ortho[2][1] = trackerMatrix->GetElement(2, 1); // [9];
+
+      ortho[0][2] = trackerMatrix->GetElement(0, 2); // [2];
+      ortho[1][2] = trackerMatrix->GetElement(1, 2); // [6];
+      ortho[2][2] = trackerMatrix->GetElement(2, 2); // [10];
+    }
+  }
 
   double wxyz[4] = { 0.0, 0.0, 0.0, 1.0 };
 

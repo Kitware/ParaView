@@ -23,6 +23,8 @@
 #include <memory> // for std::unique_ptr
 
 class QString;
+class vtkCommand;
+class vtkVRCollaborationClient;
 
 class vtkSMVRCollaborationStyleProxy : public vtkSMVRInteractorStyleProxy
 {
@@ -40,6 +42,18 @@ public:
   void SetHeadEventName(QString* eventName);
   void SetLeftHandEventName(QString* eventName);
   void SetRightHandEventName(QString* eventName);
+
+  /*
+   * Enable/disable navigation sharing.  If true, broadcast pose events which
+   * include navigation (i.e. concatenate ModelTransformMatrix).  If false, only
+   * broadcast local pose without navigation.  Default is disabled.
+   */
+  void SetNavigationSharing(bool enabled);
+  bool GetNavigationSharing();
+
+  void SetCollaborationClient(vtkVRCollaborationClient* client);
+
+  vtkCommand* GetNavigationObserver();
 
 protected:
   vtkSMVRCollaborationStyleProxy();

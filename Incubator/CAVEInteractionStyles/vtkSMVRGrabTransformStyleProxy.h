@@ -41,7 +41,6 @@ private:
   void operator=(const vtkSMVRGrabTransformStyleProxy&) = delete;
 
   float GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix); /* WRS-TODO: what does this do? */
-  vtkCamera* GetCamera();                                       // WRS-TODO: how is this used?
 };
 
 #endif // vtkSMVRGrabTransformStyleProxy_h
