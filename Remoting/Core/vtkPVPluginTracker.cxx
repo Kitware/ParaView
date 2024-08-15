@@ -199,6 +199,11 @@ class vtkPVPluginTracker::vtkPluginsList : public std::vector<vtkItem>
 public:
   iterator LocateUsingPluginName(const char* pluginname)
   {
+    if (!pluginname)
+    {
+      return this->end();
+    }
+
     for (iterator iter = this->begin(); iter != this->end(); ++iter)
     {
       if (iter->PluginName == pluginname)
@@ -211,6 +216,11 @@ public:
 
   iterator LocateUsingFileName(const char* filename)
   {
+    if (!filename)
+    {
+      return this->end();
+    }
+
     for (iterator iter = this->begin(); iter != this->end(); ++iter)
     {
       if (iter->FileName == filename)
@@ -630,7 +640,11 @@ void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
 {
   assert(plugin != nullptr);
 
-  vtkPluginsList::iterator iter = this->PluginsList->LocateUsingPluginName(plugin->GetPluginName());
+  vtkPluginsList::iterator iter = this->PluginsList->LocateUsingFileName(plugin->GetFileName());
+  if (iter == this->PluginsList->end())
+  {
+    iter = this->PluginsList->LocateUsingPluginName(plugin->GetPluginName());
+  }
   if (iter == this->PluginsList->end())
   {
     vtkItem item;

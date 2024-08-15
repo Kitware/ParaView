@@ -595,15 +595,7 @@ bool vtkPVPluginLoader::IsLoaded(const char* file, bool acceptDelayed)
         alreadyLoaded = false;
       }
     }
-
-    if (alreadyLoaded)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    return alreadyLoaded;
   }
   return false;
 }
