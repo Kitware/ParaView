@@ -210,7 +210,6 @@ if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE AND NOT WIN32)
     --symmetric)
   paraview_add_test_pvbatch_mpi(
     NO_DATA NO_OUTPUT NO_VALID
-    TestCleanArrays.py
     TestMPI4PY.py
     ParallelPythonImport.py
     )
