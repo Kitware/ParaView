@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from paraview.modules.vtkPVVTKExtensionsMisc import vtkCleanArrays
+from vtkmodules.vtkFiltersParallel import vtkCleanArrays
 from vtkmodules.vtkParallelCore import vtkMultiProcessController
 from vtkmodules.vtkFiltersSources import vtkSphereSource
 from vtkmodules.vtkCommonDataModel import *
