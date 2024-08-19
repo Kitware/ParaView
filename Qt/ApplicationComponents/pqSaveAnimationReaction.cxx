@@ -17,6 +17,7 @@
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -54,6 +55,7 @@ void pqSaveAnimationReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqSaveAnimationReaction::saveAnimation()
 {
+  SCOPED_UNDO_EXCLUDE();
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
   {

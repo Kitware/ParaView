@@ -3,13 +3,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqProxy.h"
 
-#include "vtkEventQtSlotConnect.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
@@ -21,23 +17,20 @@
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
-#include "pqUndoStack.h"
 
 #include <QList>
 #include <QMap>
 #include <QString>
-#include <QStringList>
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
 class pqProxyInternal
 {
 public:
-  pqProxyInternal() { this->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New(); }
+  pqProxyInternal() = default;
   typedef QMap<QString, QList<vtkSmartPointer<vtkSMProxy>>> ProxyListsType;
   ProxyListsType ProxyLists;
   vtkSmartPointer<vtkSMProxy> Proxy;
-  vtkSmartPointer<vtkEventQtSlotConnect> Connection;
 
   /// Returns true if the ProxyLists (the collection of helper proxies)
   /// contains the given proxy.

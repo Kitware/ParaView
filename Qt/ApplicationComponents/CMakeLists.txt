@@ -15,6 +15,7 @@ set(classes
   pqApplyPropertiesReaction
   pqAutoApplyReaction
   pqAutoLoadPluginXMLBehavior
+  pqAutoSaveBehavior
   pqAxesToolbar
   pqBackgroundEditorWidget
   pqBlockContextMenu

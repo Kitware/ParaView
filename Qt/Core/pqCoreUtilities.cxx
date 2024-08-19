@@ -12,6 +12,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPalette>
+#include <QStandardPaths>
 #include <QString>
 #include <QStringList>
 
@@ -21,6 +22,7 @@
 #include "pqSettings.h"
 #include "vtkObject.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkPVLogger.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkWeakPointer.h"
 #include "vtksys/SystemTools.hxx"
@@ -73,6 +75,28 @@ QString pqCoreUtilities::getParaViewUserDirectory()
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
   return QFileInfo(settings->fileName()).path();
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::getParaViewApplicationDataDirectory()
+{
+  QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+  if (dirPath.isEmpty())
+  {
+    vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+      "Application Data Directory not found, fallback to Application Directory");
+    return pqCoreUtilities::getParaViewApplicationDirectory();
+  }
+
+  QDir dataDir(dirPath);
+  if (!dataDir.exists())
+  {
+    dataDir.mkpath(dirPath);
+    vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+      "Create ApplicationDataDirectory at " << dirPath.toStdString());
+  }
+
+  return dirPath;
 }
 
 //-----------------------------------------------------------------------------

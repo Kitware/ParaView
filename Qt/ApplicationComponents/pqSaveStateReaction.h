@@ -9,6 +9,8 @@
 
 class pqServer;
 
+class vtkSMProxy;
+
 /**
  * @ingroup Reactions
  * Reaction for saving state file.
@@ -49,14 +51,30 @@ public:
   static bool saveState(
     const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
+  ///@{
   /**
    * Saves the state file as a python state.
    * Note that this method is static. Applications can simply use this without
    * having to create a reaction instance.
    * Return true if the operation succeeded otherwise return false.
+   *
+   * When provided, `options` is expected to be a PythonStateOptions proxy to configure the export.
+   * The method without the `options` argument raises a configuration dialog to create it.
+   * See createPythonStateOptions
    */
   static bool savePythonState(
     const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
+  static bool savePythonState(const QString& filename, vtkSMProxy* options, vtkTypeUInt32 location);
+  ///@}
+
+  /**
+   * Create a PythonStateOptions proxy.
+   * If interactive is true, a proxy properties window is raised
+   * to configure the proxy.
+   *
+   * The caller is responsible of deletion.
+   */
+  static vtkSMProxy* createPythonStateOptions(bool interactive);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

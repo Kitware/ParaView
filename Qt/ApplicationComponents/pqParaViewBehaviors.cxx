@@ -7,6 +7,7 @@
 #include "pqApplicationCore.h"
 #include "pqApplyBehavior.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
+#include "pqAutoSaveBehavior.h"
 #include "pqBlockContextMenu.h"
 #include "pqCollaborationBehavior.h"
 #include "pqCommandLineOptionsBehavior.h"
@@ -116,6 +117,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(UndoRedoBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(AlwaysConnectedBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CrashRecoveryBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(AutoLoadPluginXMLBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(AutoSaveBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PluginDockWidgetsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(VerifyRequiredPluginBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PluginActionGroupBehavior, true);
@@ -205,6 +207,10 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   if (PQ_IS_BEHAVIOR_ENABLED(CrashRecoveryBehavior))
   {
     new pqCrashRecoveryBehavior(this);
+  }
+  if (PQ_IS_BEHAVIOR_ENABLED(AutoSaveBehavior))
+  {
+    new pqAutoSaveBehavior(this);
   }
   if (PQ_IS_BEHAVIOR_ENABLED(AutoLoadPluginXMLBehavior))
   {

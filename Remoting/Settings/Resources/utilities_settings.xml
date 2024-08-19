@@ -34,6 +34,59 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="AutoSave"
+        number_of_elements="1"
+        default_values="0" >
+        <Documentation>
+          Enable state file auto save. When on, a state file will
+          be saved after each modification of the pipeline or rendering.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AutoSaveStateFormat"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the state format for the auto save state.
+          `pvsm` is the standard xml-based statefile. `py` is the Python version.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="pvsm" />
+          <Entry value="1" text="py" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AutoSave" />
+          </PropertyWidgetDecorator>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="AutoSaveDirectory"
+                            number_of_elements="1"
+                            panel_visibility="advanced"
+                            default_values="">
+        <Documentation>
+          Choose directory under which to auto save state files.
+          If empty (default), a standard location depending on the system is used
+          (generally refered as the AppData directory)
+        </Documentation>
+        <FileListDomain name="directory"/>
+        <Hints>
+          <UseDirectoryName/>
+          <AcceptAnyFile/>
+          <SaveInQSettings />
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AutoSave" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
       <IntVectorProperty name="CrashRecovery"
         number_of_elements="1"
         default_values="0"
@@ -578,6 +631,9 @@
         <Property name="ShowSaveStateOnExit" />
         <Property name="CrashRecovery" />
         <Property name="ForceSingleColumnMenus" />
+        <Property name="AutoSave" />
+        <Property name="AutoSaveStateFormat" />
+        <Property name="AutoSaveDirectory" />
       </PropertyGroup>
 
       <PropertyGroup label="GUI Font">

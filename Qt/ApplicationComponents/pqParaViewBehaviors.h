@@ -66,6 +66,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(UndoRedoBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(AlwaysConnectedBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(CrashRecoveryBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(AutoSaveBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(AutoLoadPluginXMLBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(PluginDockWidgetsBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(VerifyRequiredPluginBehavior);
@@ -130,6 +131,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(UndoRedoBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(AlwaysConnectedBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(CrashRecoveryBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(AutoSaveBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(AutoLoadPluginXMLBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(PluginDockWidgetsBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(VerifyRequiredPluginBehavior);

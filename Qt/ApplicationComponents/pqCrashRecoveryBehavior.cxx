@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqCrashRecoveryBehavior.h"
 
-#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqProgressManager.h"
 #include "pqSaveStateReaction.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 
@@ -19,13 +19,23 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-#define CrashRecoveryStateFile ".PVCrashRecoveryState.pvsm"
 #include <cstdlib> /* EXIT_FAILURE */
 #if !defined(_WIN32)
 #include <unistd.h> /* _exit */
 #endif
 
 #include <cassert>
+
+namespace
+{
+static const QString PARAVIEW_RUN_FILE = ".paraview-recovery.pvsm";
+
+QString recoveryState()
+{
+  QDir dirPath = pqCoreUtilities::getParaViewApplicationDataDirectory();
+  return dirPath.filePath(::PARAVIEW_RUN_FILE);
+}
+};
 
 //-----------------------------------------------------------------------------
 pqCrashRecoveryBehavior::pqCrashRecoveryBehavior(QObject* parentObject)
@@ -34,7 +44,9 @@ pqCrashRecoveryBehavior::pqCrashRecoveryBehavior(QObject* parentObject)
   // Look for a crash recovery state file, nag user and load if desired.
   pqSettings* settings = pqApplicationCore::instance()->settings();
   bool recoveryEnabled = settings->value("GeneralSettings.CrashRecovery", false).toBool();
-  if (recoveryEnabled && QFile::exists(CrashRecoveryStateFile))
+
+  QString recoveryStatePath = ::recoveryState();
+  if (recoveryEnabled && QFile::exists(recoveryStatePath))
   {
     int recover = QMessageBox::question(pqCoreUtilities::mainWidget(), tr("ParaView"),
       tr("A crash recovery state file has been found.\n"
@@ -51,13 +63,13 @@ pqCrashRecoveryBehavior::pqCrashRecoveryBehavior(QObject* parentObject)
         {
           path += ".pvsm";
         }
-        QFile::copy(CrashRecoveryStateFile, path);
+        QFile::copy(recoveryStatePath, path);
       }
     }
   }
-  if (QFile::exists(CrashRecoveryStateFile))
+  if (QFile::exists(recoveryStatePath))
   {
-    QFile::remove(CrashRecoveryStateFile);
+    QFile::remove(recoveryStatePath);
   }
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(dataUpdated(pqPipelineSource*)), this, SLOT(delayedSaveRecoveryState()));
@@ -73,11 +85,12 @@ pqCrashRecoveryBehavior::pqCrashRecoveryBehavior(QObject* parentObject)
 //-----------------------------------------------------------------------------
 pqCrashRecoveryBehavior::~pqCrashRecoveryBehavior()
 {
+  QString recoveryStatePath = ::recoveryState();
   // Paraview is closing all is well, remove the crash
   // recovery file.
-  if (QFile::exists(CrashRecoveryStateFile))
+  if (QFile::exists(recoveryStatePath))
   {
-    QFile::remove(CrashRecoveryStateFile);
+    QFile::remove(recoveryStatePath);
   }
 }
 
@@ -94,7 +107,7 @@ void pqCrashRecoveryBehavior::saveRecoveryState()
   bool recoveryEnabled = settings->value("GeneralSettings.CrashRecovery", false).toBool();
   if (recoveryEnabled)
   {
-    pqApplicationCore::instance()->saveState(CrashRecoveryStateFile);
+    pqApplicationCore::instance()->saveState(::recoveryState());
   }
 }
 
