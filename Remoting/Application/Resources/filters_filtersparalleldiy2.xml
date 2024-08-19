@@ -242,5 +242,51 @@
       </IntVectorProperty>
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkProbeLineFilter"
+                 base_proxygroup="internal_filters"
+                 base_proxyname="ProbeLineGenericProxy"
+                 label="Plot Over Lines From Custom Source"
+                 name="ProbeCustomLines">
+      <Documentation>
+        The Plot Over Lines From Custom Source filter samples the dataset
+        attributes of the input data set at the points along multiple lines given by the source
+        dataset. The values of the point-centered variables along these lines will be
+        displayed in an XY Plot. This filter uses interpolation to determine the values
+        at the selected point, whether or not it lies at an input point. This filter
+        operates on any type of data and produces polygonal output (a polyline). One
+        can use different sampling patterns with this filter. "Sample At Cell Boundaries"
+        gives the most accurate plots, "Sample At Segment Centers" provides one sample
+        per probed cells, and "Sample Uniformly" samples uniformly along the input line.
+      </Documentation>
+      <InputProperty command="SetSourceConnection"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the dataset from which to obtain the probing lines locations.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetAggregateAsPolyData"
+                         default_values="0"
+                         name="AggregateAsPolyData"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>
+          If false then each result from an input line to probe results in a block in a
+          vtkMultiBlockDataSet. If true then each block is aggregated as a cell in a
+          single dataset and the output type of the filter becomes a vtkPolyData. Should
+          always be false for this filter.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+
   </ProxyGroup>
 </ServerManagerConfiguration>
