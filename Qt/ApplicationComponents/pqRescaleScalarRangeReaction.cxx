@@ -400,12 +400,11 @@ pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(
     // explicitly (BUG #14371).
     if (dialog->doLock())
     {
-      vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper;
-      colorMapEditorHelper->SetSelectedPropertiesType(selectedPropertiesType);
-      if (colorMapEditorHelper->GetAnySelectedUsingScalarColoring(repr->getProxy()))
+      vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper2;
+      colorMapEditorHelper2->SetSelectedPropertiesType(selectedPropertiesType);
+      if (colorMapEditorHelper2->GetAnySelectedUsingScalarColoring(repr->getProxy()))
       {
-        auto luts = colorMapEditorHelper->GetSelectedLookupTables(repr->getProxy());
-        for (auto& lut : luts)
+        for (auto& lut : colorMapEditorHelper2->GetSelectedLookupTables(repr->getProxy()))
         {
           if (lut)
           {

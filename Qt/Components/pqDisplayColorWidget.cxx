@@ -260,11 +260,11 @@ public:
 //-----------------------------------------------------------------------------
 pqDisplayColorWidget::pqDisplayColorWidget(QWidget* parentObject)
   : Superclass(parentObject)
-  , Internals(new pqDisplayColorWidget::pqInternals())
   , CellDataIcon(new QIcon(":/pqWidgets/Icons/pqCellData.svg"))
   , PointDataIcon(new QIcon(":/pqWidgets/Icons/pqPointData.svg"))
   , FieldDataIcon(new QIcon(":/pqWidgets/Icons/pqGlobalData.svg"))
   , SolidColorIcon(new QIcon(":/pqWidgets/Icons/pqSolidColor.svg"))
+  , Internals(new pqDisplayColorWidget::pqInternals())
 {
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->setContentsMargins(pqPropertiesPanel::suggestedMargins());

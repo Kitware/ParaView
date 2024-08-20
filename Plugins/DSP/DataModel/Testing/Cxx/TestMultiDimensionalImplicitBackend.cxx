@@ -21,7 +21,6 @@ DataContainerInt generateIntArrayVector(int nbOfArrays, int nbOfTuples, int nbOf
 {
   DataContainerInt arrays(nbOfArrays);
   const int nbOfValues = nbOfTuples * nbOfComp;
-  int value = 0;
   for (int arrayIdx = 0; arrayIdx < nbOfArrays; ++arrayIdx)
   {
     std::vector<int>& array = arrays[arrayIdx];

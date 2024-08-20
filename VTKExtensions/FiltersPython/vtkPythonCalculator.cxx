@@ -80,7 +80,7 @@ int vtkPythonCalculator::RequestData(
   timeIndex = 0;
   if (dataTimeValid && !timeSteps.empty())
   {
-    for (int i = 0; i < timeSteps.size(); ++i)
+    for (int i = 0; i < static_cast<int>(timeSteps.size()); ++i)
     {
       if (timeSteps[i] == dataTime)
       {

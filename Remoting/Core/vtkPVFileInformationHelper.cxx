@@ -14,15 +14,6 @@
 vtkStandardNewMacro(vtkPVFileInformationHelper);
 //-----------------------------------------------------------------------------
 vtkPVFileInformationHelper::vtkPVFileInformationHelper()
-  : Path(nullptr)
-  , WorkingDirectory(nullptr)
-  , DirectoryListing(0)
-  , SpecialDirectories(0)
-  , ExamplesInSpecialDirectories(true)
-  , FastFileTypeDetection(1)
-  , GroupFileSequences(true)
-  , ReadDetailedFileInformation(false)
-  , PathSeparator(nullptr)
 {
   this->SetPath(".");
 #if defined(_WIN32) && !defined(__CYGWIN__)

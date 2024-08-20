@@ -74,18 +74,6 @@ static VectorOfSearchFunctions RegisteredPluginSearchFunctions;
 using VectorOfListFunctions = std::vector<vtkPluginListFunction>;
 static VectorOfListFunctions RegisteredPluginListFunctions;
 
-std::vector<std::string> tokenize(const std::string& input, char delimiter)
-{
-  std::vector<std::string> tokens;
-  std::stringstream ss(input);
-  std::string item;
-  while (std::getline(ss, item, delimiter))
-  {
-    tokens.push_back(std::move(item));
-  }
-  return tokens;
-}
-
 /**
  * Locate a plugin library or a config file anchored at standard locations
  * for locating plugins.

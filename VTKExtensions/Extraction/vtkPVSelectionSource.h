@@ -13,8 +13,9 @@
 #ifndef vtkPVSelectionSource_h
 #define vtkPVSelectionSource_h
 
-#include "vtkPVVTKExtensionsExtractionModule.h" //needed for exports
+#include "vtkPVVTKExtensionsExtractionModule.h" // Needed for exports
 #include "vtkSelectionAlgorithm.h"
+#include "vtkSelectionNode.h" // Needed for initialization
 
 class VTKPVVTKEXTENSIONSEXTRACTION_EXPORT vtkPVSelectionSource : public vtkSelectionAlgorithm
 {
@@ -225,15 +226,15 @@ protected:
     VALUES,
   };
 
-  Modes Mode;
-  int ProcessID;
-  int FieldType;
-  int ContainingCells;
-  int Inverse;
+  Modes Mode = Modes::ID;
+  int ProcessID = -1;
+  int FieldType = vtkSelectionNode::CELL;
+  int ContainingCells = 0;
+  int Inverse = 0;
   double Frustum[32];
-  char* ArrayName;
-  char* QueryString;
-  int NumberOfLayers;
+  char* ArrayName = nullptr;
+  char* QueryString = nullptr;
+  int NumberOfLayers = 0;
   bool RemoveSeed = false;
   bool RemoveIntermediateLayers = false;
 

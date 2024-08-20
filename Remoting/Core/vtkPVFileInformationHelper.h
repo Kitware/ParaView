@@ -141,17 +141,18 @@ protected:
   vtkPVFileInformationHelper();
   ~vtkPVFileInformationHelper() override;
 
-  char* Path;
-  char* WorkingDirectory;
-  int DirectoryListing;
-  int SpecialDirectories;
-  int FastFileTypeDetection;
-  bool GroupFileSequences;
-  bool ExamplesInSpecialDirectories;
-
-  bool ReadDetailedFileInformation;
-  char* PathSeparator;
   vtkSetStringMacro(PathSeparator);
+
+  char* Path = nullptr;
+  char* WorkingDirectory = nullptr;
+  int DirectoryListing = 0;
+  int SpecialDirectories = 0;
+  int FastFileTypeDetection = 1;
+  bool GroupFileSequences = true;
+  bool ExamplesInSpecialDirectories = true;
+
+  bool ReadDetailedFileInformation = false;
+  char* PathSeparator = nullptr;
 
 private:
   vtkPVFileInformationHelper(const vtkPVFileInformationHelper&) = delete;

@@ -64,19 +64,14 @@ void Create(vtkImageData* sg, vtkIdType I, vtkIdType J, vtkIdType K)
   vertexVelocity->SetNumberOfComponents(3);
   vertexVelocity->Allocate(3 * I * J * K);
 
-  double xyz[3];
-
   for (i = 0; i < I; ++i)
   {
-    xyz[0] = 1.0 * i;
     const auto di = static_cast<double>(i);
     for (j = 0; j < J; ++j)
     {
-      xyz[1] = j / 2.0;
       const auto dj = static_cast<double>(j);
       for (k = 0; k < K; ++k)
       {
-        xyz[2] = k * 3.0;
         const auto dk = static_cast<double>(k);
 
         vertexPressure->InsertNextValue(di + dj + dk);

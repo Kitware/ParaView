@@ -184,7 +184,7 @@ vtkSMColorMapEditorHelper::HasBlocksProperties(vtkSMProxy* proxy,
     return { "/", BlockPropertyState::Disabled };
   }
   std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
-  for (const std::string blockSelector : blockSelectors)
+  for (const std::string& blockSelector : blockSelectors)
   {
     blockPropertyStates.push_back(
       vtkSMColorMapEditorHelper::HasBlockProperties(proxy, blockSelector, propertyNames));

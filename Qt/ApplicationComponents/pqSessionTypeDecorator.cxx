@@ -23,27 +23,27 @@ pqSessionTypeDecorator::pqSessionTypeDecorator(
   Q_ASSERT(session != nullptr);
 
   bool condition_met = false;
-  const char* requires = config->GetAttributeOrEmpty("requires");
-  if (strcmp(requires, "remote") == 0)
+  const char* requiresAttr = config->GetAttributeOrEmpty("requires");
+  if (strcmp(requiresAttr, "remote") == 0)
   {
     condition_met = vtkSMSessionClient::SafeDownCast(session) != nullptr;
   }
-  else if (strcmp(requires, "parallel") == 0)
+  else if (strcmp(requiresAttr, "parallel") == 0)
   {
     condition_met =
       session->GetNumberOfProcesses(vtkPVSession::DATA_SERVER | vtkPVSession::RENDER_SERVER) > 1;
   }
-  else if (strcmp(requires, "parallel_data_server") == 0)
+  else if (strcmp(requiresAttr, "parallel_data_server") == 0)
   {
     condition_met = session->GetNumberOfProcesses(vtkPVSession::DATA_SERVER) > 1;
   }
-  else if (strcmp(requires, "parallel_render_server") == 0)
+  else if (strcmp(requiresAttr, "parallel_render_server") == 0)
   {
     condition_met = session->GetNumberOfProcesses(vtkPVSession::RENDER_SERVER) > 1;
   }
   else
   {
-    vtkLogF(ERROR, "Invalid 'requires' attribute specified: '%s'", requires);
+    vtkLogF(ERROR, "Invalid 'requires' attribute specified: '%s'", requiresAttr);
   }
 
   const char* mode = config->GetAttributeOrEmpty("mode");

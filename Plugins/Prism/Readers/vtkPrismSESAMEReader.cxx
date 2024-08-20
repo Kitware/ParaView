@@ -1191,9 +1191,9 @@ void vtkPrismSESAMEReader::RequestCurvesData(
         {
           const double conversionValue = conversionValues->GetValue(i);
           vtkSMPTools::For(0, numberOfPoints, [&](vtkIdType begin, vtkIdType end) {
-            for (vtkIdType i = begin; i < end; ++i)
+            for (vtkIdType j = begin; j < end; ++j)
             {
-              array->SetValue(i, static_cast<float>(array->GetValue(i) * conversionValue));
+              array->SetValue(j, static_cast<float>(array->GetValue(j) * conversionValue));
             }
           });
         }
@@ -1397,9 +1397,9 @@ int vtkPrismSESAMEReader::RequestData(
       {
         const double conversionValue = this->VariableConversionValues->GetValue(i);
         vtkSMPTools::For(0, numberOfPoints, [&](vtkIdType begin, vtkIdType end) {
-          for (vtkIdType i = begin; i < end; ++i)
+          for (vtkIdType j = begin; j < end; ++j)
           {
-            array->SetValue(i, static_cast<float>(array->GetValue(i) * conversionValue));
+            array->SetValue(j, static_cast<float>(array->GetValue(j) * conversionValue));
           }
         });
       }
