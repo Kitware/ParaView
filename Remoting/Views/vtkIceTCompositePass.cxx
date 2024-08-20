@@ -81,7 +81,8 @@ void MergeCubeAxesBounds(double bounds[6], const vtkRenderState* rState)
     vtkProp* prop = rState->GetPropArray()[cc];
     if (prop->GetVisibility() && prop->GetUseBounds())
     {
-      if (prop->IsA("vtkGridAxes3DActor") || prop->IsA("vtkCubeAxesActor"))
+      if (prop->IsA("vtkGridAxes3DActor") || prop->IsA("vtkCubeAxesActor") ||
+        prop->IsA("vtkPolarAxesActor"))
       {
         vtkProp3D* prop3D = static_cast<vtkProp3D*>(prop);
         vtkBoundingBox box(prop3D->GetBounds());
