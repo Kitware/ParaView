@@ -124,8 +124,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # Timeouts https://gitlab.kitware.com/paraview/paraview/-/issues/20108
     "^ParaViewExample-Catalyst$"
-    )
 
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
+    "\\.UndoRedo1"
+    )
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
     list(APPEND test_exclusions
