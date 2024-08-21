@@ -426,6 +426,7 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
       // If not we look for default terminal names
       vtkPVXMLElement* sshTermXML = sshConfigXML->FindNestedElementByName("Terminal");
       QString termCommand;
+      QString termCommandOption;
       if (sshTermXML)
       {
         termCommand = sshTermXML->GetAttributeOrDefault("exec", "");
@@ -438,8 +439,9 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
         }
         if (!termCommand.isEmpty())
         {
+          termCommandOption = sshTermXML->GetAttributeOrDefault("command_option", "-e");
 #if defined(__linux__)
-          stream << termCommand << " -e ";
+          stream << termCommand << " " << termCommandOption << " ";
 #elif defined(_WIN32)
           stream << "cmd /C start \"SSH Terminal\" " << termCommand << " /C ";
 #endif
@@ -480,7 +482,7 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
         // MacOS support for standard terminal emulator like xterm
         if (sshTermXML && !termCommand.isEmpty())
         {
-          stream << termCommand << " -e ";
+          stream << termCommand << " " << termCommandOption << " ";
         }
 #else
       {
