@@ -81,6 +81,7 @@ bool pqCatalystConnectReaction::disconnect()
   }
 
   inSituManager->closeConnection();
+  this->updateEnableState();
   return true;
 }
 

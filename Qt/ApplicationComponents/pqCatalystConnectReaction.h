@@ -8,8 +8,6 @@
 
 #include "vtkSmartPointer.h"
 
-#include <QPointer>
-
 /**
  * Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
  * Visualization.

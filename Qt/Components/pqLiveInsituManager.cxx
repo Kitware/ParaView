@@ -116,10 +116,6 @@ pqLiveInsituManager::pqLiveInsituManager()
 //-----------------------------------------------------------------------------
 bool pqLiveInsituManager::isInsituServer(pqServer* server)
 {
-  if (server)
-  {
-    return server->getResource().scheme() == "catalyst";
-  }
   return server ? (server->getResource().scheme() == "catalyst") : false;
 }
 
@@ -261,6 +257,25 @@ void pqLiveInsituManager::onCatalystDisconnected()
        "The Catalyst session will now be cleaned up. "
        "You can start a new one if you want to monitor for additional Catalyst "
        "connection requests."));
+
+  this->closeConnection();
+}
+
+//-----------------------------------------------------------------------------
+void pqLiveInsituManager::closeConnection()
+{
+  pqServer* catalystServer = this->selectedInsituServer();
+  if (!catalystServer)
+  {
+    return;
+  }
+
+  pqLiveInsituVisualizationManager* mgr = pqLiveInsituManager::managerFromInsitu(catalystServer);
+  if (!mgr)
+  {
+    qWarning("Trying to close a connection where there is no LiveInsituManager, abort.");
+    return;
+  }
 
   mgr->deleteLater();
 
