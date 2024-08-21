@@ -663,6 +663,8 @@
            name="Sphere" />
     <Proxy group="implicit_functions"
            name="Cylinder" />
+    <Proxy goup="implicit_functions"
+           name="Cone"/>
   </ProxyGroup>
   <ProxyGroup name="slice_htg_amr_implicit_functions">
     <Proxy group="implicit_functions"
