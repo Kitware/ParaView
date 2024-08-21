@@ -208,7 +208,8 @@ QString pqServerConfiguration::termCommand()
   QStringList termNames = { qgetenv("TERMINAL"), "x-terminal-emulator", "urxvt", "rxvt", "termit",
     "terminator", "Eterm", "aterm", "uxterm", "xterm", "gnome-terminal", "roxterm",
     "xfce4-terminal", "termite", "lxterminal", "mate-terminal", "terminology", "st", "qterminal",
-    "lilyterm", "tilix", "terminix", "konsole", "kitty", "guake", "tilda", "alacritty", "hyper" };
+    "lilyterm", "tilix", "terminix", "konsole", "kitty", "guake", "tilda", "alacritty", "hyper",
+    "wezterm", "rio" };
 #elif defined(__APPLE__)
   QStringList termNames = {}; // No default term command on mac
 #elif defined(_WIN32)
