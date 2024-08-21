@@ -77,6 +77,7 @@ public:
    * \li \c InteractiveSpline: pqSplinePropertyWidget
    * \li \c InteractiveSphere: pqSpherePropertyWidget
    * \li \c InteractivePolyLine: pqSplinePropertyWidget (with mode==POLYLINE)
+   * \li \c InteractiveCone: pqConePropertyWidget
    * \li \c InteractiveCylinder: pqCylinderPropertyWidget
    * \li \c YoungsMaterial: pqYoungsMaterialPropertyWidget
    * \li \c OMETransferFunctions : pqOMETransferFunctionsPropertyWidget

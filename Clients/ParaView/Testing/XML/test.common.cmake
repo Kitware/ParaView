@@ -1131,6 +1131,7 @@ list(APPEND TESTS_WITH_BASELINES
   CameraOrientationWidget.xml
   ChartsClearSelection.xml
   CleanToGridRemovePoints.xml
+  ConeWidget.xml
   ConstantShadingPerObject.xml
   CONVERGECFDCGNSReader.xml
   DataAxesGrid.xml
