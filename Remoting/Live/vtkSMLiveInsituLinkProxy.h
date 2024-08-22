@@ -86,7 +86,6 @@ protected:
   vtkSmartPointer<vtkSMSessionProxyManager> InsituProxyManager;
   vtkWeakPointer<vtkPVCatalystSessionCore> CatalystSessionCore;
 
-  bool StateDirty;
   vtkIdType TimeStep;
 
 private:
@@ -95,6 +94,8 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+
+  unsigned long PropertyObserverId = 0;
 };
 
 #endif
