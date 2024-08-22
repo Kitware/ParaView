@@ -2768,7 +2768,7 @@ char * vtknifti1_io::nifti_findhdrname(const char* fname)
       make_uppercase(extzip);
    }
 
-   hdrname = (char *)calloc(sizeof(char),strlen(basename)+8);
+   hdrname = (char *)calloc(strlen(basename)+8,sizeof(char));
    if( !hdrname ){
       fprintf(stderr,"** nifti_findhdrname: failed to alloc hdrname\n");
       free(basename);
@@ -2831,7 +2831,7 @@ char * vtknifti1_io::nifti_findimgname(const char* fname , int nifti_type)
    if( !nifti_validfilename(fname) ) return NULL;
 
    basename =  nifti_makebasename(fname);
-   imgname = (char *)calloc(sizeof(char),strlen(basename)+8);
+   imgname = (char *)calloc(strlen(basename)+8,sizeof(char));
    if( !imgname ){
       fprintf(stderr,"** nifti_findimgname: failed to alloc imgname\n");
       free(basename);
@@ -2917,7 +2917,7 @@ char * vtknifti1_io::nifti_makehdrname(const char * prefix, int nifti_type, int 
    if( !nifti_validfilename(prefix) ) return NULL;
 
    /* add space for extension, optional ".gz", and null char */
-   iname = (char *)calloc(sizeof(char),strlen(prefix)+8);
+   iname = (char *)calloc(strlen(prefix)+8,sizeof(char));
    if( !iname ){ fprintf(stderr,"** small malloc failure!\n"); return NULL; }
    strcpy(iname, prefix);
 
@@ -2987,7 +2987,7 @@ char * vtknifti1_io::nifti_makeimgname(const char * prefix, int nifti_type, int 
    if( !nifti_validfilename(prefix) ) return NULL;
 
    /* add space for extension, optional ".gz", and null char */
-   iname = (char *)calloc(sizeof(char),strlen(prefix)+8);
+   iname = (char *)calloc(strlen(prefix)+8,sizeof(char));
    if( !iname ){ fprintf(stderr,"** small malloc failure!\n"); return NULL; }
    strcpy(iname, prefix);
 
@@ -4302,7 +4302,7 @@ nifti_image * vtknifti1_io::nifti_read_ascii_image(znzFile fp, char *fname, int 
       fprintf(stderr,"-d %s: have ASCII NIFTI file of size %d\n",fname,slen);
 
    if( slen > 65530 ) slen = 65530 ;
-   sbuf = (char *)calloc(sizeof(char),slen+1) ;
+   sbuf = (char *)calloc(slen+1,sizeof(char)) ;
    if( !sbuf ){
       fprintf(stderr,"** %s: failed to alloc %d bytes for sbuf",lfunc,65530);
       free(fname);  vtkznzlib::znzclose(fp);  return NULL;
