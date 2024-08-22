@@ -16,6 +16,7 @@
 #include "vtkCommand.h"
 #include "vtkMinimalStandardRandomSequence.h"
 #include "vtkNetworkAccessManager.h"
+#include "vtkPVLogger.h"
 #include "vtkPVVersion.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
@@ -759,6 +760,8 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     match = regex.match(command);
   }
 
+  vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "launching server using command: %s",
+    command.toUtf8().data());
   return this->processCommand(command, processWait, delay, &this->Internals->Options);
 }
 

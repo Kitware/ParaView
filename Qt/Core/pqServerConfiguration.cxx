@@ -208,7 +208,8 @@ QString pqServerConfiguration::termCommand()
   QStringList termNames = { qgetenv("TERMINAL"), "x-terminal-emulator", "urxvt", "rxvt", "termit",
     "terminator", "Eterm", "aterm", "uxterm", "xterm", "gnome-terminal", "roxterm",
     "xfce4-terminal", "termite", "lxterminal", "mate-terminal", "terminology", "st", "qterminal",
-    "lilyterm", "tilix", "terminix", "konsole", "kitty", "guake", "tilda", "alacritty", "hyper" };
+    "lilyterm", "tilix", "terminix", "konsole", "kitty", "guake", "tilda", "alacritty", "hyper",
+    "wezterm", "rio" };
 #elif defined(__APPLE__)
   QStringList termNames = {}; // No default term command on mac
 #elif defined(_WIN32)
@@ -426,6 +427,7 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
       // If not we look for default terminal names
       vtkPVXMLElement* sshTermXML = sshConfigXML->FindNestedElementByName("Terminal");
       QString termCommand;
+      QString termCommandOption;
       if (sshTermXML)
       {
         termCommand = sshTermXML->GetAttributeOrDefault("exec", "");
@@ -438,8 +440,9 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
         }
         if (!termCommand.isEmpty())
         {
+          termCommandOption = sshTermXML->GetAttributeOrDefault("command_option", "-e");
 #if defined(__linux__)
-          stream << termCommand << " -e ";
+          stream << termCommand << " " << termCommandOption << " ";
 #elif defined(_WIN32)
           stream << "cmd /C start \"SSH Terminal\" " << termCommand << " /C ";
 #endif
@@ -480,7 +483,7 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
         // MacOS support for standard terminal emulator like xterm
         if (sshTermXML && !termCommand.isEmpty())
         {
-          stream << termCommand << " -e ";
+          stream << termCommand << " " << termCommandOption << " ";
         }
 #else
       {
