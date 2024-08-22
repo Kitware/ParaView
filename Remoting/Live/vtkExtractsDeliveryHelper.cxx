@@ -142,13 +142,6 @@ bool vtkExtractsDeliveryHelper::Update()
   bool retVal = true;
   if (this->ProcessIsProducer)
   {
-    //    cout << "Push extracts for: " << endl;
-    //    for (ExtractProducersType::iterator iter = this->ExtractProducers.begin();
-    //      iter != this->ExtractProducers.end(); ++iter)
-    //      {
-    //      cout << "  " << iter->first.c_str() << endl;
-    //      }
-
     // update all inputs. We shouldn't call Update() here since that messes up
     // the time/piece requests that'd be set by paraview. The co-processing code
     // should ensure all pipelines are updated.
@@ -221,7 +214,6 @@ bool vtkExtractsDeliveryHelper::Update()
         {
           break;
         }
-        //        cout << "Received extract for: " << key.c_str() << endl;
         vtkDataObject* extract = comm->ReceiveDataObject(1, 12001);
         ExtractConsumersType::iterator iter;
         iter = this->ExtractConsumers.find(key);
