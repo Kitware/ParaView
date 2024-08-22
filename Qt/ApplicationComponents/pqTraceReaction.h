@@ -50,6 +50,8 @@ private:
   QString StopTraceLabel;
 
   void editTrace(const QString& txt, bool incremental);
+
+  bool AutoSavePythonEnabled = false;
 };
 
 #endif

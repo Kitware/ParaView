@@ -45,6 +45,21 @@ pqAutoSaveBehavior::pqAutoSaveBehavior(QObject* parentObject)
 pqAutoSaveBehavior::~pqAutoSaveBehavior() = default;
 
 //-----------------------------------------------------------------------------
+bool pqAutoSaveBehavior::autoSaveSettingEnabled()
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  return settings->value(::AUTOSAVE_KEY, false).toBool();
+}
+
+//-----------------------------------------------------------------------------
+void pqAutoSaveBehavior::setAutoSaveSetting(bool enable)
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue(::AUTOSAVE_KEY, enable ? 1 : 0);
+  settings->alertSettingsModified();
+}
+
+//-----------------------------------------------------------------------------
 QString pqAutoSaveBehavior::formatToExtension(StateFormat format)
 {
   switch (format)
@@ -66,8 +81,7 @@ void pqAutoSaveBehavior::updateConnections()
   }
   pqActiveObjects::instance().disconnect(this);
 
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  bool autoSaveEnabled = settings->value(::AUTOSAVE_KEY, false).toBool();
+  bool autoSaveEnabled = pqAutoSaveBehavior::autoSaveSettingEnabled();
 
   if (autoSaveEnabled)
   {
