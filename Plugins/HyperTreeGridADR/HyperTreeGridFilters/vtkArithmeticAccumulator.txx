@@ -97,7 +97,7 @@ void vtkArithmeticAccumulator<FunctorT>::ShallowCopy(vtkObject* accumulator)
   }
   else
   {
-    vtkWarningMacro(<< "Could not ShallowCopy " << arithmeticAccumulator->GetClassName() << " to "
+    vtkWarningMacro(<< "Could not ShallowCopy " << accumulator->GetClassName() << " to "
                     << this->GetClassName());
   }
 }
@@ -116,7 +116,7 @@ void vtkArithmeticAccumulator<FunctorT>::DeepCopy(vtkObject* accumulator)
   }
   else
   {
-    vtkWarningMacro(<< "Could not DeepCopy " << arithmeticAccumulator->GetClassName() << " to "
+    vtkWarningMacro(<< "Could not DeepCopy " << accumulator->GetClassName() << " to "
                     << this->GetClassName());
   }
 }

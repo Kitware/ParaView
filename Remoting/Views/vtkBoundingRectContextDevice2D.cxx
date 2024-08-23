@@ -329,7 +329,7 @@ void vtkBoundingRectContextDevice2D::DrawPoints(
 void vtkBoundingRectContextDevice2D::DrawPointSprites(vtkImageData* vtkNotUsed(sprite),
   float* points, int n, unsigned char* vtkNotUsed(colors), int vtkNotUsed(nc_comps))
 {
-  if (points == nullptr || this->DelegateDevice)
+  if (points == nullptr || !this->DelegateDevice)
   {
     return;
   }

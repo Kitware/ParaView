@@ -82,15 +82,14 @@ int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
   {
     // Use the real filter to process the input
     vtkAlgorithm* activeFilterToUse = this->GetActiveFilter();
-    vtkDebugMacro("Executing: " << activeFilterToUse->GetClassName());
     if (activeFilterToUse)
     {
+      vtkDebugMacro("Executing: " << activeFilterToUse->GetClassName());
       return activeFilterToUse->ProcessRequest(request, inputVector, outputVector);
     }
     else
     {
-      vtkErrorMacro(
-        "Algorithm of type " << activeFilterToUse->GetClassName() << " is not supported yet");
+      vtkErrorMacro("Provided algorithm is not supported yet");
     }
     return 1;
   }

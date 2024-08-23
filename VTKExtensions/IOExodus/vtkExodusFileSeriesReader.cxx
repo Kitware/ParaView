@@ -142,7 +142,7 @@ int vtkExodusFileSeriesReader::RequestInformationForInput(
     vtkExodusIIReader* reader = vtkExodusIIReader::SafeDownCast(this->Reader);
     if (!reader)
     {
-      vtkWarningMacro(<< "Using a non-exodus reader (" << reader->GetClassName()
+      vtkWarningMacro(<< "Using a non-exodus reader (" << this->Reader->GetClassName()
                       << ") with vtkExodusFileSeriesReader.");
       return this->Superclass::RequestInformationForInput(index, request, outputVector);
     }

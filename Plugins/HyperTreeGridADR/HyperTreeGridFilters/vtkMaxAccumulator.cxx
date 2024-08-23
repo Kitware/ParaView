@@ -66,7 +66,7 @@ void vtkMaxAccumulator::ShallowCopy(vtkObject* accumulator)
   }
   else
   {
-    vtkWarningMacro(<< "Could not ShallowCopy " << maxAccumulator->GetClassName() << " to "
+    vtkWarningMacro(<< "Could not ShallowCopy " << accumulator->GetClassName() << " to "
                     << this->GetClassName());
   }
 }
@@ -82,7 +82,7 @@ void vtkMaxAccumulator::DeepCopy(vtkObject* accumulator)
   }
   else
   {
-    vtkWarningMacro(<< "Could not DeepCopy " << maxAccumulator->GetClassName() << " to "
+    vtkWarningMacro(<< "Could not DeepCopy " << accumulator->GetClassName() << " to "
                     << this->GetClassName());
   }
 }
