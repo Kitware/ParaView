@@ -114,6 +114,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
     "\\.UndoRedo1"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22743
+    "^pv.SimpleSSHServerTermExec$"
     )
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
