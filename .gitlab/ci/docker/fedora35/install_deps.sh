@@ -33,6 +33,10 @@ dnf install -y --setopt=install_weak_deps=False \
     gcc gcc-c++ gcc-gfortran \
     ninja-build
 
+# Testing dependencies
+dnf install -y --setopt=install_weak_deps=False \
+    openssh-server
+
 # External dependencies
 dnf install -y --setopt=install_weak_deps=False \
     libXcursor-devel libharu-devel utf8cpp-devel pugixml-devel libtiff-devel \
