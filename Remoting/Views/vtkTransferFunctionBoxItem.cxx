@@ -20,7 +20,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkTransform2D.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 //-------------------------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTransferFunctionBoxItem)

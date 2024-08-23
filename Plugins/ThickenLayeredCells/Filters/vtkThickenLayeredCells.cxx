@@ -10,7 +10,6 @@
 #include "vtkPoints.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 #include <algorithm>
 #include <cassert>
 #include <map>

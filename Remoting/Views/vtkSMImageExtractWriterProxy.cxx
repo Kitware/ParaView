@@ -12,7 +12,6 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 #include <algorithm>
 #include <sstream>

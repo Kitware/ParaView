@@ -3,7 +3,7 @@
 #include "vtkTilesHelper.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 #include <algorithm>
 #include <cassert>

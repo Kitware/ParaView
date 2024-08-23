@@ -48,7 +48,7 @@
 #include "vtkVRPanelRepresentation.h"
 #include "vtkVRPanelWidget.h"
 #include "vtkVRRenderWindow.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 #include "vtkView.h"
 #include "vtkVolume.h"
 

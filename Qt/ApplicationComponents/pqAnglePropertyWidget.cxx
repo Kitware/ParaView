@@ -11,7 +11,7 @@
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 #include <QHeaderView>
 #include <QPointer>

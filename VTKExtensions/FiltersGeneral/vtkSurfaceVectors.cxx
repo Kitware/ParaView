@@ -15,7 +15,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTriangle.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 vtkStandardNewMacro(vtkSurfaceVectors);
 

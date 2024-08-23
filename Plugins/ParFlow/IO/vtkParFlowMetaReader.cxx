@@ -21,7 +21,6 @@
 #include "vtkSMPTools.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"

@@ -27,7 +27,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkTilesHelper.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 

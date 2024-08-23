@@ -11,7 +11,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 #include <algorithm>
 

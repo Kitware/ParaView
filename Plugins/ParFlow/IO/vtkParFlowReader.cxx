@@ -11,7 +11,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 #include "vtksys/FStream.hxx"
 

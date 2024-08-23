@@ -77,7 +77,7 @@
 #include "vtkVRRay.h"
 #include "vtkVRRenderWindowInteractor.h"
 #include "vtkVRRenderer.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXRInterfacePolyfill.h"
 #include "vtksys/FStream.hxx"

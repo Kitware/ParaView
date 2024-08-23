@@ -15,7 +15,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 #include "vtkWindow.h"
 
 #include <algorithm>
