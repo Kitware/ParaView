@@ -1182,7 +1182,7 @@ int TDMFile::GetRecVars(int crec, double* recvars, char* filename)
 {
   static FILE* in;
   static char buf[SIZE_OF_BUFF64];
-  static int np, ldrl, nrpp, nvars;
+  static int ldrl, nrpp, nvars;
   int rdsz, pgrecid;
   double dd;
   float df;
@@ -1195,7 +1195,6 @@ int TDMFile::GetRecVars(int crec, double* recvars, char* filename)
       return 0; // should never happen if we already read the header.
     }
     rdsz = (int)fread(buf, sizeof(char), BufferSize, in); // skip the header
-    np = this->GetNPhysicalPages() - 1;                   // number of pages minus the last
     ldrl = this->GetLogicalDataRecLen();                  // record length
     nrpp = 508 / ldrl;                                    // number of records per page
     if (nVars > 56)
@@ -1266,7 +1265,6 @@ bool TDMFile::Get64()
  **********************************************************************/
 int TDMFile::GetRecVars(int crec, Data* values)
 {
-  int rdsz = 0;
   int pgrecid = crec % recVars->nrpp;
   int currentPage = crec / recVars->nrpp;
 

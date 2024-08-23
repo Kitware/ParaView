@@ -971,8 +971,7 @@ void vtkNIfTIWriter::WriteFile(
     }
   }
 
-  delete tempUnsignedCharData;
-  tempUnsignedCharData = nullptr;
+  delete[] tempUnsignedCharData;
 
   write_data = 1;
   leave_open = 0;
@@ -1002,9 +1001,7 @@ void vtkNIfTIWriter::WriteFile(
   if (!leave_open)
     vtkznzlib::znzclose(fp);
 
-  delete tempOutUnsignedCharData;
-  tempOutUnsignedCharData = nullptr;
-  out_p = nullptr;
+  delete[] tempOutUnsignedCharData;
 }
 
 //----------------------------------------------------------------------------
