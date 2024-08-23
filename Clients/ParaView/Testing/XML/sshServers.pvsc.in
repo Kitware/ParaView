@@ -1,8 +1,8 @@
 <Servers>
   <Server name="SimpleSshServer" configuration="" resource="cs://127.0.0.1:11111">
     <CommandStartup>
-      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server.sh" timeout="0" delay="5">
-        <SSHConfig>
+      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server.sh" process_wait="0" delay="5">
+        <SSHConfig port="2222">
           <Terminal/>
         </SSHConfig>
         <Arguments>
@@ -13,8 +13,8 @@
   </Server>
   <Server name="SimpleSshServerAskpass" configuration="" resource="cs://127.0.0.1:11111">
     <CommandStartup>
-      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server.sh" timeout="0" delay="5">
-        <SSHConfig>
+      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server.sh" process_wait="0" delay="5">
+        <SSHConfig port="2222">
           <Askpass/>
         </SSHConfig>
         <Arguments>
@@ -25,8 +25,8 @@
   </Server>
   <Server name="SimpleSshServerTermExec" configuration="" resource="cs://127.0.0.1:11111">
     <CommandStartup>
-      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server.sh" timeout="0" delay="5">
-        <SSHConfig>
+      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server.sh" process_wait="0" delay="5">
+        <SSHConfig port="2222">
           <Terminal exec="/usr/bin/xterm"/>
           <SSH exec="/usr/bin/ssh"/>
         </SSHConfig>
@@ -38,8 +38,8 @@
   </Server>
   <Server name="SimpleRCSshServer" configuration="" resource="csrc://127.0.0.1:11111">
     <CommandStartup>
-      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server_rc.sh" timeout="0" delay="5">
-        <SSHConfig>
+      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server_rc.sh" process_wait="0" delay="5">
+        <SSHConfig port="2222">
           <Terminal/>
         </SSHConfig>
         <Arguments>
@@ -51,8 +51,8 @@
   </Server>
   <Server name="SSHPortForwardingServer" configuration="" resource="cs://127.0.0.1:11111">
     <CommandStartup>
-      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server.sh" timeout="0" delay="5">
-        <SSHConfig>
+      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server.sh" process_wait="0" delay="5">
+        <SSHConfig port="2222">
           <Terminal/>
           <PortForwarding local="8080"/>
         </SSHConfig>
@@ -64,8 +64,8 @@
   </Server>
   <Server name="SSHPortForwardingRCServer" configuration="" resource="csrc://127.0.0.1:11114">
     <CommandStartup>
-      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server_rc.sh" timeout="0" delay="5">
-        <SSHConfig>
+      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server_rc.sh" process_wait="0" delay="5">
+        <SSHConfig port="2222">
           <Terminal/>
           <PortForwarding local="8080"/>
         </SSHConfig>

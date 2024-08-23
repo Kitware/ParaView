@@ -6,6 +6,7 @@
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCheckState" arguments="0.0,0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/connect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="pause" arguments="1500"/>
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
