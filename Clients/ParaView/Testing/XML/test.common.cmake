@@ -2081,6 +2081,11 @@ if (TARGET ParaView::paraview)
     TEST_SCRIPTS CheckDataArgumentsWithFileSeries.xml
   )
 
+  paraview_add_client_tests(
+    ARGS " ${paraview_test_data_directory_output}/Testing/Data/FileSeries/blow..vtk"
+    TEST_SCRIPTS CheckPositionalArgumentsWithFileSeries.xml
+  )
+
   if (PARAVIEW_USE_PYTHON)
     # Test whether or not we can load a Python state file with the --state
     # command line option as well as loading a Python state file that was
