@@ -470,6 +470,53 @@
       <!-- End of ImplicitConeWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
 
+
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="ImplicitAnnulusWidgetRepresentation">
+      <Documentation>Representation proxy for the annulus widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="ImplicitAnnulusRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="ConstrainToWidgetBounds" />
+          <Property name="WidgetBounds" />
+          <Property name="PlaceFactor" />
+          <Property name="Center" />
+          <Property name="CenterInfo" />
+          <Property name="Axis" />
+          <Property name="AxisInfo" />
+          <Property name="InnerRadius" />
+          <Property name="InnerRadiusInfo" />
+          <Property name="OuterRadius" />
+          <Property name="OuterRadiusInfo" />
+          <Property name="DrawAnnulus" />
+          <Property name="Tubing" />
+          <Property name="OutlineTranslation" />
+          <Property name="OutsideBounds" />
+          <Property name="ScaleEnabled" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
+          <Property name="WidgetColor" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="ImplicitAnnulusWidget"></Proxy>
+      </SubProxy>
+      <!-- End of ImplicitAnnulusWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
+
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="SliderWidgetRepresentation">
@@ -1835,6 +1882,198 @@
     </Proxy>
     <!-- End of ImplicitConeRepresentation -->
     <!-- ================================================================== -->
+    <Proxy class="vtkPVImplicitAnnulusRepresentation"
+           name="ImplicitAnnulusRepresentation">
+      <Documentation>Proxy for vtkImplicitAnnulusWidget.
+      </Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the annulus widget.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetConstrainToWidgetBounds"
+                         default_values="0"
+                         name="ConstrainToWidgetBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turn on/off whether the annulus should be constrained to the widget bounds.
+          If on, the center will not be allowed to move outside the set widget bounds.
+          If off, the center can be freely moved. The widget outline will change accordingly.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetWidgetBounds"
+                            default_values="none"
+                            name="WidgetBounds"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Bounds bounds of the widget representation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.2"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            information_property="CenterInfo"
+                            name="Center"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The center of the annulus.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetCenter"
+                            information_only="1"
+                            name="CenterInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAxis"
+                            default_values="0.0 0.0 1.0"
+                            information_property="AxisInfo"
+                            name="Axis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The orientation axis of the annulus. If the axis is not
+          specified as a unit vector, it will be normalized.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetAxis"
+                            information_only="1"
+                            name="AxisInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetInnerRadius"
+                            default_values="0.25"
+                            information_property="InnerRadiusInfo"
+                            name="InnerRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.0"
+                           name="range" />
+        <Documentation>The inner radius of the annulus.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetInnerRadius"
+                            information_only="1"
+                            name="InnerRadiusInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOuterRadius"
+                            default_values="0.5"
+                            information_property="OuterRadiusInfo"
+                            name="OuterRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.0"
+                           name="range" />
+        <Documentation>The outer radius of the annulus.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetOuterRadius"
+                            information_only="1"
+                            name="OuterRadiusInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDrawAnnulus"
+                         default_values="1"
+                         name="DrawAnnulus"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the drawing of the annulus. In some cases
+          the annulus interferes with the object that it is operating on (e.g.,
+          the annulus interferes with the cut surface it produces resulting in
+          z-buffer artifacts.) By default it is on.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="128"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="8"
+                        max="2048"
+                        name="range" />
+        <Documentation>This is the number of polygonal facets used to approximate
+        the annulus surface (for rendering purposes). A vtkAnnulus
+        is used under the hood to provide an exact surface representation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTubing"
+                         default_values="1"
+                         name="Tubing"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable tubing of the wire outline of the annulus
+        intersection (against the bounding box). The tube thickens the
+        line by wrapping with a vtkTubeFilter.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutlineTranslation"
+                         default_values="0"
+                         name="OutlineTranslation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to translate the bounding box by
+        moving it with the mouse.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutsideBounds"
+                         default_values="1"
+                         name="OutsideBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to move the widget outside of
+        the bounds specified in the initial PlaceWidget() invocation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScaleEnabled"
+                            default_values="1"
+                            name="ScaleEnabled"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to scale the widget with the
+        mouse.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the outline</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 0.0"
+                            name="WidgetColor"
+                            command="SetHandleColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="WidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- End of ImplicitAnnulusRepresentation -->
+    <!-- ================================================================== -->
     <Proxy class="vtkDistanceRepresentation2D"
            name="DistanceRepresentation2D"
            post_creation="InstantiateHandleRepresentation">
@@ -3132,6 +3371,12 @@
            class="vtkSphereWidget2"
            name="SphereWidget2">
       <Documentation>Proxy for vtkSphereWidget2.</Documentation>
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkImplicitAnnulusWidget"
+           name="ImplicitAnnulusWidget">
+      <Documentation>Proxy for vtkImplicitAnnulusWidget.</Documentation>
     </Proxy>
     <Proxy base_proxygroup="3d_widgets"
            base_proxyname="WidgetBase"

@@ -5,6 +5,7 @@
 
 #include "pqAnglePropertyWidget.h"
 #include "pqAnimationShortcutDecorator.h"
+#include "pqAnnulusPropertyWidget.h"
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
 #include "pqBoxPropertyWidget.h"
@@ -320,6 +321,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "YoungsMaterial")
   {
     return new pqYoungsMaterialPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractiveAnnulus")
+  {
+    return new pqAnnulusPropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "InteractiveCone")
   {

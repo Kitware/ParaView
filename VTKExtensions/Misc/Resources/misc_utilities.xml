@@ -479,6 +479,65 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy class="vtkAnnulus" name="Annulus">
+      <InputProperty is_internal="1" name="Input" />
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="0 0 0"
+                            name="Center"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the center of the annulus.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAxis"
+                            default_values="0. 1. 0."
+                            name="Axis"
+                            number_of_elements="3">
+        <Documentation>
+          Set the axis of the annulus. The created annulus is infinite in both directions
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetInnerRadius"
+                            default_values="0.25"
+                            name="InnerRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0.0"/>
+        <Documentation>
+          Set the inner radius of the annulus.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOuterRadius"
+                            default_values="0.5"
+                            name="OuterRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0.0"/>
+        <Documentation>
+          Set the outer radius of the annulus.
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Annulus Parameters" panel_widget="InteractiveAnnulus">
+        <Property function="Center" name="Center" />
+        <Property function="Axis" name="Axis" />
+        <Property function="InnerRadius" name="InnerRadius" />
+        <Property function="OuterRadius" name="OuterRadius" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Annulus -->
+    </Proxy>
+
+    <!-- ================================================================== -->
     <Proxy class="vtkPVCone" name="Cone">
       <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty command="SetOrigin"
@@ -665,6 +724,8 @@
            name="Cylinder" />
     <Proxy goup="implicit_functions"
            name="Cone"/>
+    <Proxy group="implicit_functions"
+           name="Annulus" />
   </ProxyGroup>
   <ProxyGroup name="slice_htg_amr_implicit_functions">
     <Proxy group="implicit_functions"
@@ -693,6 +754,8 @@
            name="Scalar" />
     <Proxy group="implicit_functions"
            name="Cone" />
+    <Proxy group="implicit_functions"
+           name="Annulus" />
   </ProxyGroup>
   <ProxyGroup name="clip_htg_implicit_functions">
     <Proxy group="implicit_functions"

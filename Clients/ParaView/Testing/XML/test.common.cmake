@@ -1147,6 +1147,7 @@ if(NOT APPLE)
 endif()
 
 list(APPEND TESTS_WITH_BASELINES
+  AnnulusWidget.xml
   AxisAlignedCutterAMR.xml
   AxisAlignedCutterHTG.xml
   AxisAlignedCutterMBHierarchy.xml
