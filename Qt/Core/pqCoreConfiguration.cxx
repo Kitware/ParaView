@@ -32,6 +32,9 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
 {
   auto app = options->GetCLI11App();
 
+  // Clear DataFileNames to support parsing multiple times
+  app->preparse_callback([this](std::size_t) { this->DataFileNames.clear(); });
+
   auto groupTesting = app->add_option_group("Testing", qPrintable(tr("Testing specific options")));
 
   groupTesting
