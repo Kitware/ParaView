@@ -974,12 +974,12 @@ int vtkRectilinearGridConnectivity::RequestData(
   else if (pDataObj)
   {
     // the input dataset is neither vtkCompositeDataSet nor vtkRectilinearGrid
+    vtkErrorMacro(<< "Failed to handle dataset of type " << pDataObj->GetClassName() << endl);
     inputInf = nullptr;
     outInfor = nullptr;
     pDataObj = nullptr;
     cdsInput = nullptr;
     recInput = nullptr;
-    vtkErrorMacro(<< "Failed to handle dataset of type " << pDataObj->GetClassName() << endl);
     return 0;
   }
 
