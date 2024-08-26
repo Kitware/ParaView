@@ -95,6 +95,12 @@ public:
   void waitTimestep(vtkIdType timeStep);
   void waitBreakpointHit();
 
+  /**
+   * Close the catalyst server and remove it from the internal storage to make sure that we can
+   * connect to another catalyst server if it's needed.
+   */
+  void closeConnection();
+
 protected Q_SLOTS:
   /**
    * called when Catalyst disconnects. We clean up the Catalyst connection.

@@ -8,6 +8,7 @@
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqLiveInsituManager.h"
 #include "pqObjectBuilder.h"
 #include "pqPVApplicationCore.h"
 #include "pqPipelineSource.h"
@@ -43,6 +44,14 @@ bool pqServerDisconnectReaction::disconnectFromServerWithWarning()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
   pqServer* server = pqActiveObjects::instance().activeServer();
+
+  if (pqLiveInsituManager::isInsituServer(server))
+  {
+    vtkWarningWithObjectMacro(nullptr,
+      "The current active server is a catalyst server. To disconnect it, please "
+      "use Catalyst > Disconnect in the toolbar.");
+    return true;
+  }
 
   if (server && !smmodel->findItems<pqPipelineSource*>(server).empty())
   {

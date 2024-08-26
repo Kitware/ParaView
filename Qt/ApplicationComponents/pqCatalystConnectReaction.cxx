@@ -9,6 +9,7 @@
 #include "pqLiveInsituManager.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqServer.h"
+
 #include "vtkProcessModule.h"
 #include "vtkSMSession.h"
 
@@ -28,31 +29,88 @@ pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
 pqCatalystConnectReaction::~pqCatalystConnectReaction() = default;
 
 //-----------------------------------------------------------------------------
+void pqCatalystConnectReaction::onTriggered()
+{
+  if (this->IsEstablished)
+  {
+    this->disconnect();
+  }
+  else
+  {
+    this->connect();
+  }
+}
+
+//-----------------------------------------------------------------------------
 bool pqCatalystConnectReaction::connect()
 {
   pqLiveInsituManager* cs = pqLiveInsituManager::instance();
   pqServer* server = pqActiveObjects::instance().activeServer();
-  pqLiveInsituVisualizationManager* mgr = cs->connect(server);
-  if (mgr)
+  pqLiveInsituVisualizationManager* manager = cs->connect(server);
+
+  if (manager)
   {
     this->updateEnableState();
-    QObject::connect(mgr, SIGNAL(insituDisconnected()), this, SLOT(updateEnableState()));
+    QObject::connect(manager, SIGNAL(insituDisconnected()), this, SLOT(updateEnableState()));
+
+    return manager != nullptr;
   }
-  return mgr;
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqCatalystConnectReaction::disconnect()
+{
+  pqLiveInsituManager* inSituManager = pqLiveInsituManager::instance();
+  if (!inSituManager)
+  {
+    return false;
+  }
+
+  pqServer* catalystServer = inSituManager->selectedInsituServer();
+  if (!catalystServer)
+  {
+    return false;
+  }
+
+  pqLiveInsituVisualizationManager* mgr = pqLiveInsituManager::managerFromInsitu(catalystServer);
+  if (!mgr)
+  {
+    return false;
+  }
+
+  inSituManager->closeConnection();
+  this->updateEnableState();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
 void pqCatalystConnectReaction::updateEnableState()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
-  if (server && !pqLiveInsituManager::isInsituServer(server) &&
-    !server->session()->IsMultiClients() &&
-    !pqLiveInsituManager::instance()->isDisplayServer(server))
+
+  // disable the action in collaboration mode
+  bool inCollaborationMode = server && server->session()->IsMultiClients();
+  if (inCollaborationMode)
   {
-    this->parentAction()->setEnabled(true);
+    this->parentAction()->setEnabled(false);
+    return;
   }
   else
   {
-    this->parentAction()->setEnabled(false);
+    this->parentAction()->setEnabled(true);
+  }
+
+  if (server && !pqLiveInsituManager::isInsituServer(server) &&
+    !pqLiveInsituManager::instance()->isDisplayServer(server))
+  {
+    this->parentAction()->setText(tr("Connect..."));
+    this->IsEstablished = false;
+  }
+  else
+  {
+    this->parentAction()->setText(tr("Disconnect"));
+    this->IsEstablished = true;
   }
 }

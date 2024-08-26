@@ -216,14 +216,7 @@ pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server,
       new pqLiveInsituVisualizationManager(portNumber, server);
     QObject::connect(mgr, SIGNAL(insituDisconnected()), this, SLOT(onCatalystDisconnected()));
     this->Managers[server] = mgr;
-    QMessageBox* mBox =
-      new QMessageBox(QMessageBox::Information, tr("Ready for Catalyst connections"),
-        QString(tr("Accepting connections from Catalyst Co-Processor\n"
-                   "for live-coprocessing on port %1"))
-          .arg(portNumber),
-        QMessageBox::Ok, pqCoreUtilities::mainWidget());
-    mBox->open();
-    QObject::connect(mgr, SIGNAL(insituConnected()), mBox, SLOT(close()));
+    QObject::connect(mgr, SIGNAL(insituConnected()), this, SLOT(close()));
     Q_EMIT connectionInitiated(server);
     return mgr;
   }
@@ -264,6 +257,25 @@ void pqLiveInsituManager::onCatalystDisconnected()
        "The Catalyst session will now be cleaned up. "
        "You can start a new one if you want to monitor for additional Catalyst "
        "connection requests."));
+
+  this->closeConnection();
+}
+
+//-----------------------------------------------------------------------------
+void pqLiveInsituManager::closeConnection()
+{
+  pqServer* catalystServer = this->selectedInsituServer();
+  if (!catalystServer)
+  {
+    return;
+  }
+
+  pqLiveInsituVisualizationManager* mgr = pqLiveInsituManager::managerFromInsitu(catalystServer);
+  if (!mgr)
+  {
+    qWarning("Trying to close a connection where there is no LiveInsituManager, abort.");
+    return;
+  }
 
   mgr->deleteLater();
 

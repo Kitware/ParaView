@@ -5,9 +5,8 @@
 #define pqCatalystConnectReaction_h
 
 #include "pqReaction.h"
-#include <QPointer>
 
-class pqLiveInsituVisualizationManager;
+#include "vtkSmartPointer.h"
 
 /**
  * Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
@@ -29,20 +28,27 @@ public:
    */
   bool connect();
 
+  /**
+   * Disconnect to Catalyst
+   */
+  bool disconnect();
+
 protected:
   /**
    * Called when the action is triggered.
    */
-  void onTriggered() override { this->connect(); }
+  void onTriggered() override;
 
   /**
-   * reaction disabled when already connected to a catalyst server or in
-   * collaboration mode.
+   * reaction disabled when already in collaboration mode. Update the action named to
+   * Connect/Disconnect.
    */
   void updateEnableState() override;
 
 private:
   Q_DISABLE_COPY(pqCatalystConnectReaction)
+
+  bool IsEstablished = false;
 };
 
 #endif

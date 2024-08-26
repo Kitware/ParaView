@@ -28,6 +28,7 @@ class vtkSMLiveInsituLinkProxy::vtkInternals
 public:
   typedef std::map<std::string, vtkSmartPointer<vtkSMProxy>> ExtractProxiesType;
   ExtractProxiesType ExtractProxies;
+  bool StateDirty = false;
 };
 
 vtkStandardNewMacro(vtkSMLiveInsituLinkProxy);
@@ -35,12 +36,17 @@ vtkStandardNewMacro(vtkSMLiveInsituLinkProxy);
 vtkSMLiveInsituLinkProxy::vtkSMLiveInsituLinkProxy()
   : Internals(new vtkInternals())
 {
-  this->StateDirty = false;
 }
 
 //----------------------------------------------------------------------------
 vtkSMLiveInsituLinkProxy::~vtkSMLiveInsituLinkProxy()
 {
+  if (this->InsituProxyManager != nullptr && this->PropertyObserverId != 0)
+  {
+    this->InsituProxyManager->RemoveObserver(this->PropertyObserverId);
+    this->PropertyObserverId = 0;
+  }
+
   delete this->Internals;
   this->Internals = nullptr;
 }
@@ -54,13 +60,19 @@ vtkSMSessionProxyManager* vtkSMLiveInsituLinkProxy::GetInsituProxyManager()
 //----------------------------------------------------------------------------
 void vtkSMLiveInsituLinkProxy::SetInsituProxyManager(vtkSMSessionProxyManager* pxm)
 {
+  if (this->InsituProxyManager != nullptr && this->PropertyObserverId != 0)
+  {
+    this->InsituProxyManager->RemoveObserver(this->PropertyObserverId);
+    this->PropertyObserverId = 0;
+  }
+
   this->InsituProxyManager = pxm;
   if (pxm)
   {
     this->CatalystSessionCore =
       vtkPVCatalystSessionCore::SafeDownCast(pxm->GetSession()->GetSessionCore());
-    pxm->AddObserver(
-      vtkCommand::PropertyModifiedEvent, this, &vtkSMLiveInsituLinkProxy::MarkStateDirty);
+    this->PropertyObserverId = this->InsituProxyManager->AddObserver(
+      vtkCommand::ModifiedEvent, this, &vtkSMLiveInsituLinkProxy::MarkStateDirty);
   }
 }
 
@@ -190,7 +202,7 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
     this->CatalystSessionCore->ResetIdMap();
     this->CatalystSessionCore->UpdateIdMap(mapArray, size);
 
-    this->StateDirty = false;
+    this->Internals->StateDirty = false;
   }
 }
 
@@ -214,7 +226,7 @@ void vtkSMLiveInsituLinkProxy::NextTimestepAvailable(vtkIdType timeStep)
 //----------------------------------------------------------------------------
 void vtkSMLiveInsituLinkProxy::PushUpdatedState()
 {
-  if (this->StateDirty)
+  if (this->Internals->StateDirty)
   {
     vtkSMLiveInsituLinkProxyDebugMacro(<< "Push new state to server.");
     // push new state.
@@ -229,14 +241,14 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
     vtkSMLiveInsituLinkProxyDebugMacro(<< "Push new state to server--done");
     this->ExecuteStream(stream);
 
-    this->StateDirty = false;
+    this->Internals->StateDirty = false;
   }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMLiveInsituLinkProxy::MarkStateDirty()
 {
-  this->StateDirty = true;
+  this->Internals->StateDirty = true;
   vtkSMLiveInsituLinkProxyDebugMacro(<< "MarkStateDirty");
   if (!(vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt()))
   {
@@ -249,7 +261,7 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedStates()
 {
   // This method is called when the simulation is paused, once all of the
   // updates have been affected.
-  if (this->StateDirty == true)
+  if (this->Internals->StateDirty)
   {
     this->PushUpdatedState();
     this->LiveChanged();

@@ -10,6 +10,7 @@
 #include "pqColorChooserButton.h"
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
+#include "pqLiveInsituManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqSelectionManager.h"
@@ -588,15 +589,23 @@ pqSelectionEditor::~pqSelectionEditor()
 //-----------------------------------------------------------------------------
 void pqSelectionEditor::onActiveServerChanged(pqServer* server)
 {
+  if (!server)
+  {
+    return;
+  }
+
+  if (pqLiveInsituManager::isInsituServer(server))
+  {
+    // it doesn't make sense for the Selection Editor to handle catalyst server as we cannot
+    // perform a selection on this server.
+    return;
+  }
+
   if (server == this->Internal->Server)
   {
     return;
   }
   this->Internal->Server = server;
-  if (!server)
-  {
-    return;
-  }
 
   // From the server, find the default selection color in paraview settings
   double color[3] = { 0, 0, 0 };

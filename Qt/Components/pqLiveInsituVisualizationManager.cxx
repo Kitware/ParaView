@@ -191,10 +191,6 @@ bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
   source->setModifiedState(curState == pqProxy::MODIFIED ? pqProxy::UNMODIFIED : pqProxy::MODIFIED);
   source->setModifiedState(curState);
 
-  // pqActiveObjects::instance().setActiveServer(pqproxy->getServer());
-  // this->setRepresentationVisibility(
-  //  pqproxy->getOutputPort(0),
-  //  pqActiveObjects::instance().activeView(), true);
   return true;
 }
 
