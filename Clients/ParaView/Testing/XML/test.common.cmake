@@ -892,6 +892,7 @@ ExternalData_Expand_Arguments(ParaViewData _
 set(SeparateOpacityArray_TIMEOUT 300)
 set(TransferFunction2DYScalars_TIMEOUT 300)
 set(UndoRedo1_TIMEOUT 300)
+set(GhostFeatureEdgesAndWireframe_TIMEOUT 300)
 
 # Very long (200 seconds):
 set(EqualizeLayout_TIMEOUT 200)
