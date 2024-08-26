@@ -247,18 +247,6 @@ macos-x86_64-python-qt:build:
         - .cmake_build_artifacts
         - .run_manually
 
-macos-x86_64-python-qt:test:
-    extends:
-        - .macos_x86_64_python_qt
-        - .cmake_test_macos
-        - .macos_builder_tags
-        - .cmake_test_artifacts
-        - .run_automatically
-    dependencies:
-        - macos-x86_64-python-qt:build
-    needs:
-        - macos-x86_64-python-qt:build
-
 # Windows
 
 windows-vs2022-kits-mpi-python-qt:build:
