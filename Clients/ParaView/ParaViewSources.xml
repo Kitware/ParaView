@@ -39,6 +39,7 @@
     <Proxy group="sources" name="SphereSource" />
     <Proxy group="sources" name="SplineSource" />
     <Proxy group="sources" name="SuperquadricSource" />
+    <Proxy group="sources" name="CellGridSource" />
   </Category>
   <Category name="MeasurementTools" menu_label="M&amp;easurement Tools" preserve_order="1"
     show_in_toolbar="1">
@@ -51,6 +52,7 @@
   <Proxy group="sources" name="AMRGaussianPulseSource" />
   <Proxy group="sources" name="ArrowSource" />
   <Proxy group="sources" name="Axes" icon=":/pqWidgets/Icons/pqAxes.png"/>
+  <Proxy group="sources" name="CellGridSource" />
   <Proxy group="sources" name="ConeSource" />
   <Proxy group="sources" name="CubeSource" />
   <Proxy group="sources" name="CylinderSource" />

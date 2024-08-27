@@ -298,6 +298,8 @@
   <Proxy group="filters" name="CellGridCenters" />
   <Proxy group="filters" name="CellGridPointProbe" />
   <Proxy group="filters" name="CellGridToUnstructuredGrid" />
+  <Proxy group="filters" name="CellGridTransform" />
+  <Proxy group="filters" name="CellGridWarp" />
   <Proxy group="filters" name="CellSize" />
   <Proxy group="filters" name="CleanPolyData" />
   <Proxy group="filters" name="CleanUnstructuredGrid" />
