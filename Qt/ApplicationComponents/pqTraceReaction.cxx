@@ -4,6 +4,7 @@
 #include "pqTraceReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqAutoSaveBehavior.h"
 #include "pqCoreUtilities.h"
 #include "pqPVApplicationCore.h"
 #include "pqProxyWidgetDialog.h"
@@ -31,6 +32,7 @@ private:
 
 #include <QMainWindow>
 #include <QStatusBar>
+#include <QtDebug>
 
 //-----------------------------------------------------------------------------
 pqTraceReaction::pqTraceReaction(
@@ -97,6 +99,24 @@ void pqTraceReaction::start()
       return;
     }
   }
+
+  this->AutoSavePythonEnabled = pqAutoSaveBehavior::autoSaveSettingEnabled() &&
+    pqAutoSaveBehavior::getStateFormat() == pqAutoSaveBehavior::StateFormat::Python;
+  if (this->AutoSavePythonEnabled)
+  {
+    auto userAnswer = QMessageBox::warning(pqCoreUtilities::mainWidget(),
+      tr("Trace and Auto Save incompatibility."),
+      tr("Auto Save Python State setting can not work while Trace is active. Auto Save will be "
+         "disabled until the Trace is stopped."),
+      QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (userAnswer == QMessageBox::Cancel)
+    {
+      return;
+    }
+
+    pqAutoSaveBehavior::setAutoSaveSetting(false);
+  }
+
   vtkSMTrace* trace = vtkSMTrace::StartTrace();
   if (QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()))
   {
@@ -122,6 +142,12 @@ void pqTraceReaction::start()
 //-----------------------------------------------------------------------------
 void pqTraceReaction::stop()
 {
+  if (this->AutoSavePythonEnabled)
+  {
+    // re-enable Auto Save State
+    pqAutoSaveBehavior::setAutoSaveSetting(true);
+  }
+
   if (QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()))
   {
     mainWindow->statusBar()->clearMessage();

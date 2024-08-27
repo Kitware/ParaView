@@ -64,6 +64,22 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   static QString formatToExtension(StateFormat format);
 
+  /**
+   * Return true if the AutoSave settings is enabled.
+   */
+  static bool autoSaveSettingEnabled();
+
+  /**
+   * Set the AutoSave Setting to "enable".
+   */
+  static void setAutoSaveSetting(bool enable);
+
+  /**
+   * Return the file format for the statefile, as defined in the settings.
+   * Default to StateFormat::PVSM.
+   */
+  static StateFormat getStateFormat();
+
 private Q_SLOTS:
   /**
    * Enable or disable the connections depending on the AutoSave setting.
@@ -81,12 +97,6 @@ private: // NOLINT(readability-redundant-access-specifiers)
    * File may not exists.
    */
   static QString getStatePath(bool bak);
-
-  /**
-   * Return the file format for the statefile, as defined in the settings.
-   * Default to StateFormat::PVSM.
-   */
-  static StateFormat getStateFormat();
 
   /**
    * Returns the path for the last saved state.

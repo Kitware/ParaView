@@ -631,6 +631,8 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
     return nullptr;
   }
 
+  SCOPED_UNDO_EXCLUDE();
+
   pqObjectBuilderNS::ContinueWaiting = true;
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
@@ -726,6 +728,7 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::removeServer(pqServer* server)
 {
+  SCOPED_UNDO_EXCLUDE();
   if (!server)
   {
     qDebug() << "No server to remove.";

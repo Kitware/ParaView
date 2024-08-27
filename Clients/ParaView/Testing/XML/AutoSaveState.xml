@@ -35,6 +35,9 @@
   <pqevent object="pqClientMainWindow/menubar/menu_File/menuRecentFiles" command="activate" arguments="$PARAVIEW_TEST_ROOT/ParaView-autosave.py" />
 
   <!--reset session-->
+  <!--For some reason, MacOS seems to need some time between loading state and reset session.-->
+  <!--Segfault use to occur otherwise, only in automatic test. No issue when using ParaView interactively.-->
+  <pqevent object="pqClientMainWindow" command="pause" arguments="50" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionDelete" command="activate" arguments="" />
 
   <!--load auto save old state-->

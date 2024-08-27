@@ -54,6 +54,7 @@
         <Documentation>
           Set the state format for the auto save state.
           `pvsm` is the standard xml-based statefile. `py` is the Python version.
+          Note that the Python format cannot be written when a Python Trace is active.
         </Documentation>
         <EnumerationDomain name="enum">
           <Entry value="0" text="pvsm" />
