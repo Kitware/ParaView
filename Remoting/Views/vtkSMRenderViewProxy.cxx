@@ -19,6 +19,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVCAVEConfigInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVEncodeSelectionForServer.h"
 #include "vtkPVRenderView.h"
@@ -103,9 +104,145 @@ void RotateElevation(vtkCamera* camera, double angle)
 }
 }
 
+#define vtkCheckCAVEModeMacro(_obj, _err_result)                                                   \
+  if (!_obj->GetIsInCAVE())                                                                        \
+  {                                                                                                \
+    vtkErrorWithObjectMacro(_obj, "Must be in CAVE mode to get number of CAVE displays");          \
+    return _err_result;                                                                            \
+  }
+
+#define vtkCheckNumDisplaysMacro(_obj, _idx, _err_result)                                          \
+  int nDisplays = _obj->GetNumberOfDisplays();                                                     \
+                                                                                                   \
+  if (_idx < 0 || _idx >= nDisplays)                                                               \
+  {                                                                                                \
+    vtkErrorWithObjectMacro(_obj, << "Display index " << _idx << " out of range, there are "       \
+                                  << nDisplays << " displays.");                                   \
+    return _err_result;                                                                            \
+  }
+
+class vtkSMRenderViewProxy::vtkInternals
+{
+public:
+  bool GetIsInCAVE(vtkSMSession* session)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+    return info->GetIsInCAVE();
+  }
+
+  int GetNumberOfDisplays(vtkSMSession* session)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+
+    return info->GetNumberOfDisplays();
+  }
+
+  double GetEyeSeparation(vtkSMSession* session)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+
+    return info->GetEyeSeparation();
+  }
+
+  bool GetShowBorders(vtkSMSession* session)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+
+    return info->GetShowBorders();
+  }
+
+  bool GetFullScreen(vtkSMSession* session)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+
+    return info->GetFullScreen();
+  }
+
+  vtkTuple<int, 4> GetGeometry(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkTuple<int, 4> errorResult(-1);
+
+    vtkCheckCAVEModeMacro(info, errorResult);
+    vtkCheckNumDisplaysMacro(info, index, errorResult);
+
+    return info->GetGeometry(index);
+  }
+
+  bool GetHasCorners(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, false);
+    vtkCheckNumDisplaysMacro(info, index, false);
+
+    return info->GetHasCorners(index);
+  }
+
+  vtkTuple<double, 3> GetLowerLeft(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkTuple<double, 3> errorResult(-1);
+
+    vtkCheckCAVEModeMacro(info, errorResult);
+    vtkCheckNumDisplaysMacro(info, index, errorResult);
+
+    return info->GetLowerLeft(index);
+  }
+
+  vtkTuple<double, 3> GetLowerRight(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkTuple<double, 3> errorResult(-1);
+
+    vtkCheckCAVEModeMacro(info, errorResult);
+    vtkCheckNumDisplaysMacro(info, index, errorResult);
+
+    return info->GetLowerRight(index);
+  }
+
+  vtkTuple<double, 3> GetUpperRight(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkTuple<double, 3> errorResult(-1);
+
+    vtkCheckCAVEModeMacro(info, errorResult);
+    vtkCheckNumDisplaysMacro(info, index, errorResult);
+
+    return info->GetUpperRight(index);
+  }
+
+private:
+  vtkPVCAVEConfigInformation* GetOrCreateServerInfo(vtkSMSession* session)
+  {
+    if (!this->CaveConfigInformation)
+    {
+      this->CaveConfigInformation = vtkSmartPointer<vtkPVCAVEConfigInformation>::New();
+      session->GatherInformation(
+        vtkPVSession::RENDER_SERVER, this->CaveConfigInformation.GetPointer(), 0);
+    }
+    return this->CaveConfigInformation.GetPointer();
+  }
+
+  vtkSmartPointer<vtkPVCAVEConfigInformation> CaveConfigInformation;
+};
+
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
+  : Internal(new vtkSMRenderViewProxy::vtkInternals())
 {
   this->IsSelectionCached = false;
   this->NewMasterObserverId = 0;
@@ -1527,4 +1664,64 @@ bool vtkSMRenderViewProxy::GetEnableSynchronizableActors()
   int propertyValue =
     vtkSMPropertyHelper(this, "EnableSynchronizableActors", /*quiet*/ true).GetAsInt();
   return propertyValue == 1 ? true : false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetIsInCAVE()
+{
+  return this->Internal->GetIsInCAVE(this->GetSession());
+}
+
+//----------------------------------------------------------------------------
+int vtkSMRenderViewProxy::GetNumberOfDisplays()
+{
+  return this->Internal->GetNumberOfDisplays(this->GetSession());
+}
+
+//----------------------------------------------------------------------------
+double vtkSMRenderViewProxy::GetEyeSeparation()
+{
+  return this->Internal->GetEyeSeparation(this->GetSession());
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetShowBorders()
+{
+  return this->Internal->GetShowBorders(this->GetSession());
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetFullScreen()
+{
+  return this->Internal->GetFullScreen(this->GetSession());
+}
+
+//----------------------------------------------------------------------------
+vtkTuple<int, 4> vtkSMRenderViewProxy::GetGeometry(int index)
+{
+  return this->Internal->GetGeometry(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetHasCorners(int index)
+{
+  return this->Internal->GetHasCorners(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+vtkTuple<double, 3> vtkSMRenderViewProxy::GetLowerLeft(int index)
+{
+  return this->Internal->GetLowerLeft(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+vtkTuple<double, 3> vtkSMRenderViewProxy::GetLowerRight(int index)
+{
+  return this->Internal->GetLowerRight(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+vtkTuple<double, 3> vtkSMRenderViewProxy::GetUpperRight(int index)
+{
+  return this->Internal->GetUpperRight(this->GetSession(), index);
 }
