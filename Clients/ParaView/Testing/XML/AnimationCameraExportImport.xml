@@ -33,7 +33,7 @@
 
   <!-- save key frames state -->
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/widget/pbExportKeyFrames" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/animation-camera-export.pvkfc" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/animation-camera-export.pvkfc" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
 
   <!-- delete track and change point of view -->
@@ -50,7 +50,7 @@
 
   <!-- import key frames state -->
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/widget/pbImportKeyFrames" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/animation-camera-export.pvkfc" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/animation-camera-export.pvkfc" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
 
   <!-- play VCR -->

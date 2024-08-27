@@ -8,7 +8,7 @@
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AutoSave/CheckBoxLabel" command="mouseRelease" arguments="1,0,0,191,30" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AutoSaveStateFormat/ComboBox" command="activated" arguments="py" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AutoSaveDirectory/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AutoSaveDirectory/FileChooser/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AutoSaveDirectory/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
 
   <!--create some pipeline-->
