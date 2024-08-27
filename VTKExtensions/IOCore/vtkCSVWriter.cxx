@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkCSVWriter.h"
 
+#include "vtkAOSDataArrayTemplate.h"
 #include "vtkAlgorithm.h"
 #include "vtkArrayDispatch.h"
 #include "vtkArrayDispatchArrayList.h"
 #include "vtkArrayIteratorIncludes.h"
 #include "vtkAttributeDataToTableFilter.h"
 #include "vtkCellData.h"
-#include "vtkCharArray.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayRange.h"
 #include "vtkDoubleArray.h"
@@ -25,7 +25,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
-#include "vtkUnsignedCharArray.h"
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
@@ -254,9 +253,9 @@ struct DataToStreamWorker<vtkStringArray> : public AbstractStreamWorker
  * vtkCharArray specialization to enforce numeric values.
  */
 template <>
-struct DataToStreamWorker<vtkCharArray> : public AbstractStreamWorker
+struct DataToStreamWorker<vtkAOSDataArrayTemplate<char>> : public AbstractStreamWorker
 {
-  DataToStreamWorker(vtkCharArray* array)
+  DataToStreamWorker(vtkAOSDataArrayTemplate<char>* array)
     : AbstractStreamWorker(array)
   {
     this->Range = vtk::DataArrayValueRange(array);
@@ -268,8 +267,8 @@ struct DataToStreamWorker<vtkCharArray> : public AbstractStreamWorker
   }
 
 private:
-  using RangeType =
-    typename vtk::detail::SelectValueRange<vtkCharArray, vtk::detail::DynamicTupleSize>::type;
+  using RangeType = typename vtk::detail::SelectValueRange<vtkAOSDataArrayTemplate<char>,
+    vtk::detail::DynamicTupleSize>::type;
   RangeType Range;
 };
 
@@ -277,9 +276,9 @@ private:
  * vtkUnsignedCharArray specialization to enforce numeric values.
  */
 template <>
-struct DataToStreamWorker<vtkUnsignedCharArray> : public AbstractStreamWorker
+struct DataToStreamWorker<vtkAOSDataArrayTemplate<unsigned char>> : public AbstractStreamWorker
 {
-  DataToStreamWorker(vtkUnsignedCharArray* array)
+  DataToStreamWorker(vtkAOSDataArrayTemplate<unsigned char>* array)
     : AbstractStreamWorker(array)
   {
     this->Range = vtk::DataArrayValueRange(array);
@@ -291,7 +290,7 @@ struct DataToStreamWorker<vtkUnsignedCharArray> : public AbstractStreamWorker
   }
 
 private:
-  using RangeType = typename vtk::detail::SelectValueRange<vtkUnsignedCharArray,
+  using RangeType = typename vtk::detail::SelectValueRange<vtkAOSDataArrayTemplate<unsigned char>,
     vtk::detail::DynamicTupleSize>::type;
   RangeType Range;
 };
