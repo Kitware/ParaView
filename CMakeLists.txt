@@ -63,6 +63,9 @@ endif ()
 
 set(paraview_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
+# Use tighter baseline image comparison method in VTK
+set(DEFAULT_USE_SSIM_IMAGE_COMP ON)
+
 option(PARAVIEW_USE_EXTERNAL_VTK "Use an external VTK." OFF)
 mark_as_advanced(PARAVIEW_USE_EXTERNAL_VTK)
 

@@ -239,9 +239,36 @@ function (_paraview_add_tests function)
     set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
       PROPERTY
         LABELS ParaView)
+
+    # set default image compare method for all tests
+    if (DEFINED DEFAULT_USE_SSIM_IMAGE_COMP AND DEFAULT_USE_SSIM_IMAGE_COMP)
+      set(_paraview_default_image_compare_method "VTK_TESTING_IMAGE_COMPARE_METHOD=TIGHT_VALID")
+    else ()
+      set(_paraview_default_image_compare_method "VTK_TESTING_IMAGE_COMPARE_METHOD=LEGACY_VALID")
+    endif ()
+    # METHOD can have one of the following values:
+    # ``TIGHT_VALID``: Uses euclidian type metrics to compare baselines. Baseline
+    # comparison is sensitive to outliers in this setting.
+    #``LOOSE_VALID``: Uses L1 type metrics to compare baselines. Baseline comparison
+    # is somewhat more forgiving. Typical use cases involve rendering that is highly GPU
+    # dependent, and baselines with text.
+    # ``LEGACY_VALID``: Uses legacy image compare. This metric generates a lot of
+    # false negatives. It is recommended not to use it.
+    #
+    # If this variable is not set, a test will use the the default image compare method as defined above
+    set(_paraview_image_compare_method ${_paraview_default_image_compare_method})
+    if (DEFINED "${_paraview_add_tests_name}_METHOD")
+      if ("${${_paraview_add_tests_name}_METHOD}" STREQUAL "LEGACY_VALID")
+        set(_paraview_image_compare_method "VTK_TESTING_IMAGE_COMPARE_METHOD=LEGACY_VALID")
+      elseif ("${${_paraview_add_tests_name}_METHOD}" STREQUAL "LOOSE_VALID")
+        set(_paraview_image_compare_method "VTK_TESTING_IMAGE_COMPARE_METHOD=LOOSE_VALID")
+      elseif ("${${_paraview_add_tests_name}_METHOD}" STREQUAL "TIGHT_VALID")
+        set(_paraview_image_compare_method "VTK_TESTING_IMAGE_COMPARE_METHOD=TIGHT_VALID")
+      endif ()
+    endif ()
     set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
       PROPERTY
-        ENVIRONMENT "${_paraview_add_tests_ENVIRONMENT}")
+        ENVIRONMENT "${_paraview_add_tests_ENVIRONMENT};${_paraview_image_compare_method}")
     if (DEFINED "${_paraview_add_tests_name}_TIMEOUT")
       set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
         PROPERTY

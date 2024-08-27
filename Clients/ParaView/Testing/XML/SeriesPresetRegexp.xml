@@ -76,7 +76,7 @@
   <pqevent object="pqClientMainWindow/pqPresetDialog" command="key" arguments="16777299" />
   <pqevent object="pqClientMainWindow/pqPresetDialog" command="key" arguments="16777299" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget2/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SeriesPresetRegexpNoRegexp.png" threshold="5" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget2/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SeriesPresetRegexpNoRegexp.png" />
 
   <!-- apply preset with regex 'y\d', so every y1x and y2x will match the same preset (e.g. y11 and y13 should have same color and legend than y1 in preset) -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/ChoosePreset" command="activate" arguments="" />
@@ -87,7 +87,7 @@
   <pqevent object="pqClientMainWindow/pqPresetDialog/regexpLine" command="set_string" arguments="y\d" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget2/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SeriesPresetRegexpYD.png" threshold="5" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget2/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SeriesPresetRegexpYD.png" />
 
   <!-- apply preset with regex '.*' -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/ChoosePreset" command="activate" arguments="" />

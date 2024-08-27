@@ -4,7 +4,8 @@ if (BUILD_SHARED_LIBS)
     NonOrthographicOrthographicView.xml
   )
 
-  set (NonOrthogonalSliceView_FORCE_SERIAL TRUE)
+  set(NonOrthogonalSliceView_FORCE_SERIAL TRUE)
+  set(NonOrthographicOrthographicView_METHOD LOOSE_VALID)
 
   paraview_add_client_tests(
     LOAD_PLUGIN "NonOrthogonalSource"

@@ -146,7 +146,7 @@ fedora35-shared-mpi-python-qt-vtkmoverride:test:
         - fedora35-shared-mpi-python-qt-vtkmoverride:build
     needs:
         - fedora35-shared-mpi-python-qt-vtkmoverride:build
-    timeout: 120 minutes
+    timeout: 180 minutes
 
 # Translations
 
@@ -238,6 +238,7 @@ macos-arm64-python-qt:test:
         - macos-arm64-python-qt:build
     needs:
         - macos-arm64-python-qt:build
+    timeout: 180 minutes
 
 macos-x86_64-python-qt:build:
     extends:

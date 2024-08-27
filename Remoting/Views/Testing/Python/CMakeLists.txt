@@ -59,8 +59,6 @@ if (PARAVIEW_USE_MPI)
         --threshold 30
         --state ${CMAKE_BINARY_DIR}/ExternalData/Testing/Data/${tfile}.pvsm)
   endforeach()
-  set(SurfaceLIC-OfficeSlices_THRESHOLD 30)
-  set(SurfaceLIC-OfficeVSlice_THRESHOLD 30)
 else()
   # run the test serially
   foreach (tfile ${PVBATCH_TESTS})
