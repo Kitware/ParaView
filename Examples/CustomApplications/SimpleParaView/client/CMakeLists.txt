@@ -14,6 +14,7 @@ paraview_client_add(
   NAME simple_paraview
   VERSION "1.0.1"
   SOURCES ${sources} ${ui_files}
+  QCH_FILES ${ParaView_QCH_FILES}
   PLUGINS_TARGETS simple_paraview_plugins
   REQUIRED_PLUGINS SimpleParaViewCustomFilters
   APPLICATION_XMLS ${xml_files}
