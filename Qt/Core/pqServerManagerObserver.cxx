@@ -5,6 +5,7 @@
 #include "pqServerManagerObserver.h"
 
 #include "pqServer.h"
+#include "pqUndoStack.h"
 #include "pqXMLUtil.h"
 
 #include "vtkCommand.h"
@@ -57,6 +58,7 @@ pqServerManagerObserver::~pqServerManagerObserver()
 //-----------------------------------------------------------------------------
 void pqServerManagerObserver::connectionCreated(vtkObject*, unsigned long, void*, void* callData)
 {
+  SCOPED_UNDO_EXCLUDE();
   vtkIdType sessionId = *reinterpret_cast<vtkIdType*>(callData);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession(sessionId));

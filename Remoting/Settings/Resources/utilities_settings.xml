@@ -80,6 +80,7 @@
         <FileListDomain name="directory"/>
         <Hints>
           <UseDirectoryName/>
+          <BrowseLocalFileSystem/>
           <AcceptAnyFile/>
           <SaveInQSettings />
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
