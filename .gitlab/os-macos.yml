@@ -84,7 +84,7 @@
         - "sccache --start-server || :"
         - sccache --show-stats
         - ctest -VV -S .gitlab/ci/ctest_configure.cmake
-        - ctest -VV -S .gitlab/ci/ctest_build.cmake
+        - ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
         - sccache --show-stats
         - exec .gitlab/ci/check_warnings.sh .
 
