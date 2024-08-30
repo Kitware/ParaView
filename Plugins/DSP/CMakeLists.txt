@@ -45,6 +45,14 @@ paraview_add_plugin(DigitalSignalProcessing
     "${CMAKE_CURRENT_SOURCE_DIR}/DataModel/vtk.module"
     "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module")
 
+# XXX(cmake-3.13)
+if (COMMAND target_link_options)
+  # XXX(cmake-3.29): Suppress warnings with Xcode 15+ linkers; resolved with CMake 3.29.
+  target_link_options(DigitalSignalProcessing
+    PRIVATE
+      "$<$<PLATFORM_ID:Darwin>:LINKER:-no_warn_duplicate_libraries>")
+endif ()
+
 if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player)
   target_link_libraries(DigitalSignalProcessing
     PRIVATE
