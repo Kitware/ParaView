@@ -194,6 +194,14 @@ target_link_libraries(XRInterface
 )
 target_compile_definitions(XRInterface PRIVATE QT_NO_KEYWORDS)
 
+# XXX(cmake-3.13)
+if (COMMAND target_link_options)
+  # XXX(cmake-3.29): Suppress warnings with Xcode 15+ linkers; resolved with CMake 3.29.
+  target_link_options(XRInterface
+    PRIVATE
+      "$<$<PLATFORM_ID:Darwin>:LINKER:-no_warn_duplicate_libraries>")
+endif ()
+
 # if we have ffmpeg enabled then add in the dependency
 # and set a define for the exporter to handle exporting movies
 set(have_ffmpeg 0)
