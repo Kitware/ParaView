@@ -41,10 +41,6 @@ class SimpleFlyer(PythonInteractorBase):
         # Which column from tracker matrix determines flight direction
         self.flyDirectionColumn = 2    # Hint: 0, 1, or 2
 
-        # TODO: Remove this once the issue with valuator/role binding is fixed
-        # Which valuator channel should we use for speed control
-        self.speedControlChannel = 2
-
         # Initialize some internal state variables
         self.currentSpeed = 0.0
         self.speedUpdated = False
@@ -173,7 +169,7 @@ class SimpleFlyer(PythonInteractorBase):
             vtkSelf.SetNavigationMatrix(navMat)
             rvProxy.UpdateVTKObjects()
 
-    def HandleValuator(self, vtkSelf, role, numChannels, channelData):
+    def HandleValuator(self, vtkSelf, numChannels, channelData):
         """Handle an valuator event.
 
         Given the valuator event data in the method parameters, take
@@ -186,15 +182,11 @@ class SimpleFlyer(PythonInteractorBase):
                 vtkSMVRPythonInteractorStyle, and as such, can be used
                 to call any methods common to all interactor style
                 proxies (instances of vtkSMVRInteractorStyleProxy).
-            role: The role you assigned to events of this type in
-                your interactor style role bindings.  Named roles
-                can be defined for the different event types in your
-                Initialize() method.
             numChannels: The number of channels of valuator data present in
                 channelData parameter (i.e. the length of the array)
             channelData: The array of valuator data values.
 
         """
-        # TODO: Update this once the issue with valuator/role binding is fixed
-        self.currentSpeed = channelData[self.speedControlChannel]
+        fsIdx = vtkSelf.GetChannelIndexForValuatorRole("FlySpeed")
+        self.currentSpeed = channelData[fsIdx]
         self.speedUpdated = True

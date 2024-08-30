@@ -243,19 +243,16 @@ void vtkSMVRPythonInteractorStyleProxy::InvokeHandler(const char* mname, const v
     break;
     case VALUATOR_EVENT:
     {
-      role = this->GetValuatorRole(event.name);
       Py_ssize_t i = 0;
       unsigned int numElements = event.data.valuator.num_channels, j = 0;
-      vtkSmartPyObject pyrole(PyUnicode_FromString(role.c_str()));
       vtkSmartPyObject pynumchan(PyLong_FromLong(event.data.valuator.num_channels));
       PyObject* pychannels = PyList_New(numElements);
       for (; j < numElements; ++i, ++j)
       {
         PyList_SetItem(pychannels, i, PyFloat_FromDouble(event.data.valuator.channel[j]));
       }
-      vtkSmartPyObject retVal(
-        PyObject_CallMethodObjArgs(this->Internals->PythonObject.GetPointer(), fname.GetPointer(),
-          vtkself.GetPointer(), pyrole.GetPointer(), pynumchan.GetPointer(), pychannels, nullptr));
+      vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(this->Internals->PythonObject.GetPointer(),
+        fname.GetPointer(), vtkself.GetPointer(), pynumchan.GetPointer(), pychannels, nullptr));
     }
     break;
     case BUTTON_EVENT:

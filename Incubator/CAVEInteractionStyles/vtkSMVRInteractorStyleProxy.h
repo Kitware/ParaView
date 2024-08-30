@@ -9,6 +9,7 @@
 #include <vtkSMProxy.h>
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -75,9 +76,15 @@ public:
   // Description:
   // Get the role of the input with the given name. If the name is not
   // set or recognized, an empty string is returned.
-  std::string GetValuatorRole(const std::string& name);
   std::string GetButtonRole(const std::string& name);
   std::string GetTrackerRole(const std::string& name);
+
+  // Description:
+  // Valuators are special in that data from all channels is
+  // delivered in an array in a single event.  This method allows
+  // finding that index for any named role which the user has
+  // bound to an event
+  unsigned int GetChannelIndexForValuatorRole(const std::string& role);
 
   // Description:
   // Add a new input role to the interactor style.
@@ -118,6 +125,11 @@ public:
   vtkMatrix4x4* GetNavigationMatrix();
   void SetNavigationMatrix(vtkMatrix4x4*);
 
+  typedef std::map<std::string, std::string> StringMap;
+  typedef std::map<std::string, StringMap> StringMapMap;
+
+  void SetValuatorLookupTable(std::shared_ptr<StringMapMap>);
+
 protected:
   vtkSMVRInteractorStyleProxy();
   virtual ~vtkSMVRInteractorStyleProxy();
@@ -131,7 +143,6 @@ protected:
   vtkSMProxy* ControlledProxy;
   char* ControlledPropertyName;
 
-  typedef std::map<std::string, std::string> StringMap;
   StringMap Valuators;
   StringMap Buttons;
   StringMap Trackers;
@@ -141,6 +152,8 @@ protected:
   std::string GetKeyInMap(const StringMap& map_, const std::string& value);
 
   bool IsInternal;
+
+  std::shared_ptr<StringMapMap> valuatorLookupTable;
 
 private:
   vtkSMVRInteractorStyleProxy(const vtkSMVRInteractorStyleProxy&) = delete;
