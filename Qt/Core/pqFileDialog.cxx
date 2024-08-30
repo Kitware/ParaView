@@ -241,6 +241,8 @@ void pqFileDialog::addImplementation(vtkTypeUInt32 location)
 {
   pqServer* server = location == vtkPVSession::DATA_SERVER ? this->Server : nullptr;
   this->Implementations[location] = new pqImplementation(this, server);
+  this->Implementations[location]->setObjectName(
+    QString("Filesystem_%1").arg(this->Implementations.size() - 1));
   // the selected location is temporarily set here,
   // so that some slots called by signals can be executed properly.
   this->SelectedLocation = location;
@@ -448,6 +450,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   // remove do-nothing "?" title bar button on Windows.
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->setWindowTitle(title);
+  this->setObjectName("pqFileDialog");
 
   // create a tab widget for the vtkPVSession::CLIENT and vtkPVSession::DATA_SERVER locations
   QPointer<QTabWidget> tabWidget = new QTabWidget(this);

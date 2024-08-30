@@ -2,7 +2,7 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/pqWriterDockPanel/1pqProxyWidget0/FileName/FileChooser/FileButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqWriterDockPanel/1pqProxyWidget0/Text/Text" command="set_string" arguments="data&#xA;0&#xA;1&#xA;2&#xA;3" />
-  <pqevent object="pqClientMainWindow/pqWriterDockPanel/1pqProxyWidget0/FileName/FileChooser/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test.csv" />
+  <pqevent object="pqClientMainWindow/pqWriterDockPanel/1pqProxyWidget0/FileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test.csv" />
   <pqevent object="pqClientMainWindow/pqWriterDockPanel/1pqProxyWidget0/Write/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test.csv" />

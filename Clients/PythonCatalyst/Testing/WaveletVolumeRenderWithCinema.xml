@@ -37,10 +37,10 @@
   <!-- generate extracts now -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionGenerateExtracts" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/1pqFileDialog0" command="removeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/1pqFileDialog0" command="makeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="removeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="makeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
 
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
   <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/GenerateCinemaSpecification/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/ApplyButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
