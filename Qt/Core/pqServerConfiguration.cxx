@@ -502,7 +502,13 @@ QString pqServerConfiguration::sshFullCommand(
 {
   QString sshFullCommand;
   QTextStream sshStream(&sshFullCommand);
-  sshStream << sshCommand << " ";
+  sshStream << sshCommand;
+
+  QString sshPort = sshConfigXML->GetAttributeOrDefault("port", "");
+  if (!sshPort.isEmpty())
+  {
+    sshStream << " -p " << sshPort << " ";
+  }
 
   vtkPVXMLElement* sshForwardXML = sshConfigXML->FindNestedElementByName("PortForwarding");
   if (sshForwardXML)
