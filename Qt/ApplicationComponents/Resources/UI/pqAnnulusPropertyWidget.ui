@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: Copyright (c) Kitware Inc. -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+
+<ui version="4.0">
+ <class>AnnulusPropertyWidget</class>
+ <widget class="QWidget" name="AnnulusPropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>372</width>
+    <height>357</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="layout1">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="toolTip">
+      <string>Enable/disable showing the interactive annulus widget in the 3d render view.</string>
+     </property>
+     <property name="text">
+      <string>Show Annulus</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout1">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="outlineTranslation">
+       <property name="toolTip">
+        <string>Enable/disable the ability to translate the bounding box by moving it with the mouse.</string>
+       </property>
+       <property name="text">
+        <string>Outline Translation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="scaling">
+       <property name="toolTip">
+        <string>Enable/disable the ability to scale the widget with the mouse.</string>
+       </property>
+       <property name="text">
+        <string>Scaling</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout2">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item row="0" column="2">
+      <widget class="pqDoubleLineEdit" name="centerY"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="innerRadiusLabel">
+       <property name="text">
+        <string>Inner Radius</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+        <widget class="QLabel" name="outerRadiusLabel">
+            <property name="text">
+                <string>Outer Radius</string>
+            </property>
+        </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="pqDoubleLineEdit" name="axisY"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="axisLabel">
+       <property name="text">
+        <string>Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="pqDoubleLineEdit" name="axisX"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="pqDoubleLineEdit" name="innerRadius"/>
+     </item>
+     <item row="3" column="1">
+        <widget class="pqDoubleLineEdit" name="outerRadius"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="pqDoubleLineEdit" name="axisZ">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="centerLabel">
+       <property name="text">
+        <string>Center</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="pqDoubleLineEdit" name="centerX"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="pqDoubleLineEdit" name="centerZ"/>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout3">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="useXAxis">
+       <property name="toolTip">
+        <string>Use the X-axis as the annulus's axis.</string>
+       </property>
+       <property name="text">
+        <string>Along X Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="useYAxis">
+       <property name="toolTip">
+        <string>Use the Y-axis as the annulus's axis.</string>
+       </property>
+       <property name="text">
+        <string>Along Y Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="useZAxis">
+       <property name="toolTip">
+        <string>Use the Z-axis as the annulus's axis.</string>
+       </property>
+       <property name="text">
+        <string>Along Z Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="useCameraAxis">
+       <property name="toolTip">
+        <string>Use the camera's view direction as the axis of the annulus.</string>
+       </property>
+       <property name="text">
+        <string>Along Camera Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QPushButton" name="resetCameraToAxis">
+       <property name="toolTip">
+        <string>Reset the camera to look along the annulus's axis.</string>
+       </property>
+       <property name="text">
+        <string>Reset Camera to Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="QPushButton" name="resetBounds">
+       <property name="toolTip">
+        <string>Reset the annulus's properties based on the data bounds.</string>
+       </property>
+       <property name="text">
+        <string>Reset to Data Bounds</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>centerX</tabstop>
+  <tabstop>centerY</tabstop>
+  <tabstop>centerZ</tabstop>
+  <tabstop>axisX</tabstop>
+  <tabstop>axisY</tabstop>
+  <tabstop>axisZ</tabstop>
+  <tabstop>innerRadius</tabstop>
+  <tabstop>outerRadius</tabstop>
+  <tabstop>outlineTranslation</tabstop>
+  <tabstop>scaling</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

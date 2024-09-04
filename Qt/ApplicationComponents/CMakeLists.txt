@@ -9,6 +9,7 @@ set(classes
   pqAnimationShortcutDecorator
   pqAnimationShortcutWidget
   pqAnimationTimeToolbar
+  pqAnnulusPropertyWidget
   pqApplicationComponentsInit
   pqApplicationSettingsReaction
   pqApplyBehavior
@@ -222,6 +223,7 @@ set(headers
   )
 
 set(ui_files
+  Resources/UI/pqAnnulusPropertyWidget.ui
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqBackgroundEditorWidget.ui
   Resources/UI/pqBoxPropertyWidget.ui
