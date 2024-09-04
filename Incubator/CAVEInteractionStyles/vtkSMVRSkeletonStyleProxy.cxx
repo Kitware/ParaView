@@ -87,13 +87,8 @@ void vtkSMVRSkeletonStyleProxy::HandleButton(const vtkVREvent& event)
 // HandleValuator() method
 void vtkSMVRSkeletonStyleProxy::HandleValuator(const vtkVREvent& event)
 {
-  std::string role = this->GetValuatorRole(event.name);
-
-  if (role == "X")
-  {
-    cout << "Got a value for 'X' of " << event.data.valuator.num_channels << " : "
-         << event.data.valuator.channel[0] << " " << event.data.valuator.channel[1] << "\n";
-  }
+  unsigned int xIdx = this->GetChannelIndexForValuatorRole("X");
+  cout << "Got a value for 'X' of " << event.data.valuator.channel[xIdx] << std::endl;
 }
 
 // ----------------------------------------------------------------------------

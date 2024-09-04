@@ -9,7 +9,6 @@ set(classes
   vtkSMVRPythonInteractorStyleProxy
   vtkSMVRResetTransformStyleProxy
   vtkSMVRSkeletonStyleProxy
-  vtkSMVRSpaceNavigatorGrabWorldStyleProxy
   vtkSMVRStylusStyleProxy
   vtkSMVRTrackStyleProxy
   vtkSMVRVirtualHandStyleProxy

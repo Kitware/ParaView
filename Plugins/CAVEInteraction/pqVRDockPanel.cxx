@@ -46,6 +46,9 @@
 
 #include <cmath>
 
+typedef std::map<std::string, std::string> StringMap;
+typedef std::map<std::string, StringMap> StringMapMap;
+
 class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
 public:
@@ -56,6 +59,7 @@ public:
   pqVRCollaborationWidget* CollaborationWidget;
   vtkWeakPointer<vtkCamera> Camera;
   QMap<QString, vtkSMVRInteractorStyleProxy*> StyleNameMap;
+  std::shared_ptr<StringMapMap> valuatorLookupTable;
 };
 
 //-----------------------------------------------------------------------------
@@ -66,6 +70,8 @@ void pqVRDockPanel::constructor()
   this->Internals = new pqInternals();
   this->Internals->setupUi(container);
   this->setWidget(container);
+
+  this->Internals->valuatorLookupTable = std::make_shared<StringMapMap>();
 
   this->Internals->IsRunning = false;
   this->updateStartStopButtonStates();
@@ -181,9 +187,48 @@ void pqVRDockPanel::updateConnections()
 
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
   QList<QString> connectionNames = mgr->connectionNames();
+
+  this->Internals->valuatorLookupTable->clear();
+
   Q_FOREACH (const QString& name, connectionNames)
   {
     this->Internals->connectionsTable->addItem(name);
+
+    // Now update our valuator connection/event information
+    bool found = false;
+    std::map<std::string, std::string> valuatorMap;
+
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
+    if (pqVRPNConnection* vrpnConn = mgr->GetVRPNConnection(name))
+    {
+      found = true;
+      valuatorMap = vrpnConn->valuatorMap();
+    }
+#endif
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
+    if (!found)
+    {
+      if (pqVRUIConnection* vruiConn = mgr->GetVRUIConnection(name))
+      {
+        found = true;
+        valuatorMap = vruiConn->valuatorMap();
+      }
+    }
+#endif
+    if (found)
+    {
+      auto& table = *(this->Internals->valuatorLookupTable);
+      auto connMap = table[name.toStdString()];
+
+      for (std::map<std::string, std::string>::const_iterator iter = valuatorMap.begin(),
+                                                              itEnd = valuatorMap.end();
+           iter != itEnd; ++iter)
+      {
+        connMap[iter->second] = iter->first;
+      }
+
+      table[name.toStdString()] = connMap;
+    }
   }
 }
 
@@ -386,6 +431,8 @@ void pqVRDockPanel::updateStyles()
 
   Q_FOREACH (vtkSMVRInteractorStyleProxy* style, pqVRQueueHandler::instance()->styles())
   {
+    style->SetValuatorLookupTable(this->Internals->valuatorLookupTable);
+
     if (style->GetIsInternal())
     {
       continue;

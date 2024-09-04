@@ -394,6 +394,33 @@ std::string vtkSMVRInteractorStyleProxy::GetKeyInMap(
 }
 
 // ----------------------------------------------------------------------------
+unsigned int vtkSMVRInteractorStyleProxy::GetChannelIndexForValuatorRole(const std::string& role)
+{
+  StringMap::const_iterator iter = this->Valuators.find(role);
+
+  if (iter == this->Valuators.end())
+  {
+    vtkErrorMacro(<< "Unknown valuator role: " << role);
+    return 0;
+  }
+
+  std::vector<std::string> tokens = vtkSMVRInteractorStyleProxy::Tokenize(iter->second);
+  auto& table = *(this->valuatorLookupTable);
+  auto connMap = table[tokens[0]];
+  StringMap::const_iterator eventIter = connMap.find(tokens[1]);
+
+  if (eventIter == connMap.end())
+  {
+    vtkErrorMacro(<< "No known valuators for connection: " << tokens[0]);
+    return 0;
+  }
+
+  std::vector<std::string> eventTokens = vtkSMVRInteractorStyleProxy::Tokenize(eventIter->second);
+
+  return static_cast<unsigned int>(std::stoul(eventTokens[1]));
+}
+
+// ----------------------------------------------------------------------------
 bool vtkSMVRInteractorStyleProxy::HandleEvent(const vtkVREvent& event)
 {
   switch (event.eventType)
@@ -445,12 +472,6 @@ int vtkSMVRInteractorStyleProxy::GetNumberOfButtonRoles()
 int vtkSMVRInteractorStyleProxy::GetNumberOfTrackerRoles()
 {
   return static_cast<int>(this->Trackers.size());
-}
-
-// ----------------------------------------------------------------------------
-std::string vtkSMVRInteractorStyleProxy::GetValuatorRole(const std::string& name)
-{
-  return this->GetKeyInMap(this->Valuators, name);
 }
 
 // ----------------------------------------------------------------------------
@@ -560,4 +581,10 @@ void vtkSMVRInteractorStyleProxy::SetNavigationMatrix(vtkMatrix4x4* matrix)
     vtkSMPropertyHelper(viewProxy, "PhysicalToWorldMatrix").Set(matrixBuffer, 16);
     viewProxy->InvokeEvent(INTERACTOR_STYLE_NAVIGATION, physicalToWorld);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMVRInteractorStyleProxy::SetValuatorLookupTable(std::shared_ptr<StringMapMap> table)
+{
+  this->valuatorLookupTable = table;
 }

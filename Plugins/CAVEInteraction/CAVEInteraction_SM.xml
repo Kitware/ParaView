@@ -24,12 +24,6 @@
         Stylus
       </Documentation>
     </VRStylusStyleProxy>
-    <VRSpaceNavigatorGrabWorldStyleProxy name="SpaceNavigatorGrabWorld"
-                                         processes="client|renderserver|dataserver">
-      <Documentation>
-        Space Navigator GrabWorld
-      </Documentation>
-    </VRSpaceNavigatorGrabWorldStyleProxy>
     <VRGrabPointStyleProxy name="GrabPoint"
                            processes="client|renderserver|dataserver">
       <Documentation>
