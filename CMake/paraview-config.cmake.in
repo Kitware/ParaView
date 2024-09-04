@@ -30,6 +30,8 @@ The following variables are provided by this module:
     linked to using `target_link_libraries`.
   * `ParaView_CATALYST_DIR`: The directory to the ParaView Catalyst
     implementation (if present).
+  * `ParaView_QCH_FILES`: QCH help files for the documentation. For now, it contains only the
+    location of the paraview.qch.
 #]==]
 
 if (CMAKE_VERSION VERSION_LESS "3.12")
@@ -233,6 +235,8 @@ endif ()
 if (@PARAVIEW_USE_QT@) # PARAVIEW_USE_QT
   include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Client-targets.cmake")
   include("${CMAKE_CURRENT_LIST_DIR}/ParaView-client-xml.cmake")
+  # expose qch location via ParaView_QCH_FILES property
+  include("${CMAKE_CURRENT_LIST_DIR}/ParaView-client-qch.cmake")
 endif ()
 
 set(_paraview_components_to_check)
