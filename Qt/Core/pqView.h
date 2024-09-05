@@ -83,6 +83,7 @@ public:
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Request a StillRender on idle. Multiple calls are collapsed into one.
+   * Does nothing if application is closing.
    */
   virtual void render();
 

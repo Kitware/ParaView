@@ -19,6 +19,7 @@
 #include "vtkView.h"
 
 // Qt includes.
+#include <QCloseEvent>
 #include <QList>
 #include <QPointer>
 #include <QWidget>
@@ -27,6 +28,7 @@
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
+#include "pqMainWindowEventManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProgressManager.h"
@@ -103,6 +105,12 @@ pqView::pqView(const QString& type, const QString& group, const QString& name, v
     QObject::connect(this, SIGNAL(progress(const QString&, int)), pmManager,
       SLOT(setProgress(const QString&, int)));
   }
+
+  pqMainWindowEventManager* mainWindowEventManager =
+    pqApplicationCore::instance()->getMainWindowEventManager();
+
+  QObject::connect(mainWindowEventManager, &pqMainWindowEventManager::close, this,
+    [this](QCloseEvent*) { this->cancelPendingRenders(); });
 }
 
 //-----------------------------------------------------------------------------
@@ -173,6 +181,14 @@ void pqView::cancelPendingRenders()
 //-----------------------------------------------------------------------------
 void pqView::render()
 {
+  // avoid calling render if the application is in closing process.
+  pqMainWindowEventManager* mainWindowEventManager =
+    pqApplicationCore::instance()->getMainWindowEventManager();
+  if (mainWindowEventManager->closing())
+  {
+    return;
+  }
+
   this->Internal->RenderTimer.start();
 }
 

@@ -55,6 +55,8 @@ public:
    */
   void dropEvent(QDropEvent*);
 
+  bool closing() { return this->Closing; }
+
 Q_SIGNALS:
   /**
    * notification when a close event has been sent to the main window.
@@ -75,6 +77,9 @@ Q_SIGNALS:
    * notification when a drop event has been sent to the main window.
    */
   void drop(QDropEvent*);
+
+private:
+  bool Closing = false;
 };
 
 #endif
