@@ -35,6 +35,8 @@ list(APPEND test_exclusions
   "\\.ColorOpacityTableEditing$"
   # https://gitlab.kitware.com/paraview/paraview/-/issues/21656
   "\\.ShaderReplacements$"
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
+  "\\.ComparativeViewOverlay$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
@@ -84,6 +86,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # Some X sync issue causing the images to be capture with
     # incorrect size, ignore for now.
     "\\.MultiSliceMultiBlock$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
+    "\\.ComparativeViewOverlay$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22427
     "pqCoreKeySequences$"
