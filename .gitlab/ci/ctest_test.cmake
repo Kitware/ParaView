@@ -30,6 +30,9 @@ list(APPEND test_exclusions
   "\\.HyperTreeGridObliquePlaneCutter$"
   # https://gitlab.kitware.com/paraview/paraview/-/issues/21774
   "\\.CDISimpleRead$"
+  # Random segfault that would require deep investigation
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/21484
+  "\\.ColorOpacityTableEditing$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
@@ -79,10 +82,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # Some X sync issue causing the images to be capture with
     # incorrect size, ignore for now.
     "\\.MultiSliceMultiBlock$"
-
-    # Random segfault that would require deep investigation
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21484
-    "\\.ColorOpacityTableEditing$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21656
     "^pv\\.ShaderReplacements$"
