@@ -769,7 +769,9 @@
         <IntRangeDomain min="1"
                         name="range" />
         <Documentation>The value of this property specifies the maximum
-        number of levels in the hyper tree grid.</Documentation>
+        number of levels in the hyper tree grid. Cells specified as refined 'R'
+        in the descriptor will be considered leaves if they are at the maximum depth.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetDescriptor"
                             default_values="."
@@ -780,9 +782,45 @@
           <Widget type="multi_line" />
         </Hints>
         <Documentation>This property specifies the string used to describe
-        the hyper tree grid.</Documentation>
+        the hyper tree grid. Use '.' for leaves, 'R' for coarse cells, and '|'
+        to separate refinement levels. Prefix root-level trees with digits in
+        distributed server mode to select the rank where they should show up.
+        The number of cells must match the dimension and branch factor specified above.
+        </Documentation>
       </StringVectorProperty>
-      <!-- End Hyper Tree Grid -->
+      <IntVectorProperty name="UseMask"
+                         command="SetUseMask"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether the tree mask should be used.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetMask"
+                            default_values="1"
+                            name="Mask"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Hints>
+          <Widget type="multi_line" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseMask"
+                                   panel_visibility="advanced"
+                                   value="1" />
+        </Hints>
+        <Documentation>
+        This property specifies the string used to describe
+        the mask of the hyper tree grid. Use '0' for masked cells,
+        '1' for unmasked ones, and '|' to separate refinement levels.
+        The number of cells in the mask must match exactly the number
+        of cells in the descriptor for each level. Refined cells 'R' cannot be masked.
+      </Documentation>
+      </StringVectorProperty>
+
+      <!-- End Hyper Tree Grid Source -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
