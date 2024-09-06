@@ -722,7 +722,7 @@
            name="Sphere" />
     <Proxy group="implicit_functions"
            name="Cylinder" />
-    <Proxy goup="implicit_functions"
+    <Proxy group="implicit_functions"
            name="Cone"/>
     <Proxy group="implicit_functions"
            name="Annulus" />
