@@ -114,15 +114,19 @@ def validate_results(fname):
     rv = CreateRenderView()
     rv.ViewSize = [400, 400]
 
+    LoadPalette("BlueGrayBackground")
+
     source = OpenDataFile(fname)
     display = Show()
     display.Representation = 'Slice'
 
     # get color transfer function/color map for 'scalars'
     scalarsLUT = GetColorTransferFunction('scalars')
+    # scalarsLUT.ApplyPreset('Cool to Warm', True)
     scalarsLUT.RGBPoints = [37.50877380371094, 0.231373, 0.298039, 0.752941,
                             105.91077423095703, 0.865003, 0.865003, 0.865003,
                             174.31277465820312, 0.705882, 0.0156863, 0.14902]
+    scalarsLUT.NanColor = [1.0, 1.0, 0.0]
     scalarsLUT.ScalarRangeInitialized = 1.0
 
     display.ColorArrayName = ['POINTS', 'scalars']

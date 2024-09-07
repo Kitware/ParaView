@@ -1,5 +1,10 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Color Palette" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaColorPalette/qt_scrollarea_viewport/Container/ProxyWidget/LoadPalette/ComboBox" command="activated" arguments="Blue Gray Background" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+
   <!-- test to select a block from  partitioned dataset with multiple partitions
     ensures that all paritions get selected when user attempts to select a block since
     all partitions form the "block"

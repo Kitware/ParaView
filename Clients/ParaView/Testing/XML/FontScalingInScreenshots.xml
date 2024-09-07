@@ -1,5 +1,10 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Color Palette" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaColorPalette/qt_scrollarea_viewport/Container/ProxyWidget/LoadPalette/ComboBox" command="activated" arguments="Blue Gray Background" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+
   <!-- set up window -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
@@ -13,6 +18,9 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="RTData" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/DefaultPresetsComboBox" command="activated" arguments="Cool to Warm"/>
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_closebutton" command="activate" arguments=""/>
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface" />
 
   <!-- save screenshot #1 with no font scaling -->
@@ -23,7 +31,6 @@
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/scaleBy/2X" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontScaling/ComboBox" command="activated" arguments="Do not scale fonts" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
-
   <pqcompareimage image="$PARAVIEW_TEST_ROOT/WaveNoFontScale.png" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/WaveNoFontScale.png" />
 
   <!-- save screenshot #2 with font scaling -->
@@ -34,6 +41,5 @@
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/scaleBy/2X" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontScaling/ComboBox" command="activated" arguments="Scale fonts proportionally" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
-
   <pqcompareimage image="$PARAVIEW_TEST_ROOT/WaveFontScale.png" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/WaveFontScale.png" />
 </pqevents>

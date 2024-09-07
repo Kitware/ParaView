@@ -1371,6 +1371,9 @@ def LoadPalette(paletteName):
     if paraview.compatibility.GetVersion() <= (5, 11):
         if paletteName == "WarmGrayBackground":
             name = "DarkGrayBackground"
+    if paraview.compatibility.GetVersion() <= (5, 12):
+        if paletteName == "DefaultBackground":
+            name = "BlueGrayBackground"
 
     pxm = servermanager.ProxyManager()
     palette = pxm.GetProxy("settings", "ColorPalette")

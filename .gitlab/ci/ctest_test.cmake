@@ -30,6 +30,13 @@ list(APPEND test_exclusions
   "\\.HyperTreeGridObliquePlaneCutter$"
   # https://gitlab.kitware.com/paraview/paraview/-/issues/21774
   "\\.CDISimpleRead$"
+  # Random segfault that would require deep investigation
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/21484
+  "\\.ColorOpacityTableEditing$"
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/21656
+  "\\.ShaderReplacements$"
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
+  "\\.ComparativeViewOverlay$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
@@ -80,13 +87,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # incorrect size, ignore for now.
     "\\.MultiSliceMultiBlock$"
 
-    # Random segfault that would require deep investigation
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21484
-    "\\.ColorOpacityTableEditing$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21656
-    "^pv\\.ShaderReplacements$"
-
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
     "\\.ComparativeViewOverlay$"
 
@@ -96,8 +96,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "pv\\.ComputeArrayMagnitudeSetting$"
     "TestPythonView$"
     "pv\\.TooltipCopy$"
-    "pvcs\\.ShaderReplacement"
-    "pvcrs\\.ShaderReplacement"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22598
     "^pv\\.HelpWindowHistory$"

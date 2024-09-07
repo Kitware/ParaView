@@ -40,6 +40,12 @@ int pqPresetGroupsManager::numberOfPresetsInGroup(const QString& groupName)
 }
 
 //-----------------------------------------------------------------------------
+QList<QString> pqPresetGroupsManager::presetsInGroup(const QString& groupName)
+{
+  return this->Groups.value(groupName, QList<QString>());
+}
+
+//-----------------------------------------------------------------------------
 int pqPresetGroupsManager::presetRankInGroup(const QString& presetName, const QString& groupName)
 {
   const QList<QString>& group = this->Groups.value(groupName, QList<QString>());

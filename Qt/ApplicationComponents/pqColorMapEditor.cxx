@@ -573,9 +573,8 @@ void pqColorMapEditor::restoreDefaults()
       stdPresetsKey += arrayName;
       if (settings->HasSetting(stdPresetsKey.c_str()))
       {
-        vtkSMTransferFunctionProxy::ApplyPreset(lutProxy,
-          settings->GetSettingAsString(stdPresetsKey.c_str(), 0, "").c_str(),
-          /*rescale=*/false);
+        const auto stdPreset = settings->GetSettingAsString(stdPresetsKey.c_str(), 0, "");
+        vtkSMTransferFunctionProxy::ApplyPreset(lutProxy, stdPreset.c_str(), /*rescale=*/false);
 
         // Should probably support setting a standard preset for opacity function at some point. */
       }

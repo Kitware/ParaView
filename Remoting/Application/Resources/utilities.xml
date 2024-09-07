@@ -1074,7 +1074,7 @@
 
   <ProxyGroup name="palettes">
     <!-- ================================================================= -->
-    <Proxy label="Blue Gray Background (Default)" name="BlueGrayBackground">
+    <Proxy label="Blue Gray Background" name="BlueGrayBackground">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
@@ -1125,7 +1125,7 @@
     </Proxy>
 
     <!-- ================================================================= -->
-    <Proxy label="Warm Gray Background" name="WarmGrayBackground">
+    <Proxy label="Warm Gray Background (Default)" name="WarmGrayBackground">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
