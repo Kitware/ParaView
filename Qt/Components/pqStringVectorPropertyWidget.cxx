@@ -559,3 +559,18 @@ bool pqStringVectorPropertyWidget::widgetHintHasAttributeEqualTo(
   return (this->WidgetHint && this->WidgetHint->GetAttribute(attribute.c_str()) &&
     strcmp(this->WidgetHint->GetAttribute(attribute.c_str()), value.c_str()) == 0);
 }
+
+//-----------------------------------------------------------------------------
+void pqStringVectorPropertyWidget::setReadOnly(bool readOnly)
+{
+  pqTextEdit* text = this->findChild<pqTextEdit*>();
+  if (text)
+  {
+    // pqTextEdit is the lonely child when used. No need to look for others.
+    text->setReadOnly(readOnly);
+  }
+  else
+  {
+    this->Superclass::setReadOnly(readOnly);
+  }
+}

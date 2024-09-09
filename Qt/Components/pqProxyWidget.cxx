@@ -386,7 +386,8 @@ public:
     }
 
     this->PropertyWidget->updateWidget(show_advanced);
-    this->PropertyWidget->setEnabled(enabled);
+    this->PropertyWidget->setReadOnly(!enabled);
+
     if (this->InformationOnly)
     {
       QPalette palette = this->PropertyWidget->palette();

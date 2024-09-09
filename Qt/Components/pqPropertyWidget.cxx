@@ -253,3 +253,9 @@ bool pqPropertyWidget::isSingleRowItem() const
 {
   return false;
 }
+
+//-----------------------------------------------------------------------------
+void pqPropertyWidget::setReadOnly(bool readOnly)
+{
+  this->setEnabled(!readOnly);
+}

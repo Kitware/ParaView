@@ -12,6 +12,8 @@ class vtkSMStringVectorProperty;
 class PQCOMPONENTS_EXPORT pqStringVectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
+  using Superclass = pqPropertyWidget;
+
 public:
   pqStringVectorPropertyWidget(
     vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
@@ -29,6 +31,8 @@ public:
    */
   static void processFileChooserHints(vtkPVXMLElement* hints, bool& directoryMode, bool& anyFile,
     QString& filter, bool& browseLocalFileSystem);
+
+  void setReadOnly(bool readOnly) override;
 
 private Q_SLOTS:
   /**
