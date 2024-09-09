@@ -538,6 +538,81 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy class="vtkPVFrustum" name="Frustum">
+      <InputProperty is_internal="1" name="Input" />
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0 0 0"
+                            name="Origin"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the origin of the frustum.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            number_of_elements="3">
+        <Documentation>
+          Set the orientation of the frustum.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetHorizontalAngle"
+                            default_values="45"
+                            name="HorizontalAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0.0"
+                           max="89.0"/>
+        <Documentation>
+          Set the horizontal angle of the frustum, i.e. the angle between its forward axis
+          and its right and left planes.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetVerticalAngle"
+                            default_values="45"
+                            name="VerticalAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0.0"
+                           max="89.0"/>
+        <Documentation>
+          Set the vertical angle of the frustum, i.e. the angle between its forward axis
+          and its top and bottom planes.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNearPlaneDistance"
+                            default_values="0.5"
+                            name="NearPlaneDistance"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0.0"
+                           />
+        <Documentation>
+          The distance between the frustum origin and its near plane,
+          along the forward axis.
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Frustum Parameters" panel_widget="InteractiveFrustum">
+        <Property function="Origin" name="Origin" />
+        <Property function="Orientation" name="Orientation" />
+        <Property function="HorizontalAngle" name="HorizontalAngle" />
+        <Property function="VerticalAngle" name="VerticalAngle" />
+        <Property function="NearPlaneDistance" name="NearPlaneDistance"/>
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Frustum -->
+    </Proxy>
+    <!-- ================================================================== -->
     <Proxy class="vtkPVCone" name="Cone">
       <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty command="SetOrigin"
@@ -725,6 +800,8 @@
     <Proxy group="implicit_functions"
            name="Cone"/>
     <Proxy group="implicit_functions"
+           name="Frustum" />
+    <Proxy group="implicit_functions"
            name="Annulus" />
   </ProxyGroup>
   <ProxyGroup name="slice_htg_amr_implicit_functions">
@@ -754,6 +831,8 @@
            name="Scalar" />
     <Proxy group="implicit_functions"
            name="Cone" />
+    <Proxy group="implicit_functions"
+           name="Frustum" />
     <Proxy group="implicit_functions"
            name="Annulus" />
   </ProxyGroup>

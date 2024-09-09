@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: Copyright (c) Kitware Inc. -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+
+<ui version="4.0">
+ <class>FrustumPropertyWidget</class>
+ <widget class="QWidget" name="FrustumPropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>372</width>
+    <height>357</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="layout1">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="toolTip">
+      <string>Enable/disable showing the interactive frustum widget in the 3d render view.</string>
+     </property>
+     <property name="text">
+      <string>Show Frustum</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout2">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item row="0" column="2">
+      <widget class="pqDoubleLineEdit" name="originY"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="horizontalAngleLabel">
+       <property name="text">
+        <string>Horizontal Angle</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+        <widget class="QLabel" name="verticalAngleLabel">
+            <property name="text">
+                <string>Vertical Angle</string>
+            </property>
+        </widget>
+     </item>
+     <item row="4" column="0">
+        <widget class="QLabel" name="nearPlaneDistanceLabel">
+            <property name="text">
+                <string>Near Plane Distance</string>
+            </property>
+        </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="pqDoubleLineEdit" name="orientationY"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="orientationLabel">
+       <property name="text">
+        <string>Orientation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="pqDoubleLineEdit" name="orientationX"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="pqDoubleLineEdit" name="horizontalAngle"/>
+     </item>
+     <item row="3" column="1">
+        <widget class="pqDoubleLineEdit" name="verticalAngle"/>
+     </item>
+     <item row="4" column="1">
+        <widget class="pqDoubleLineEdit" name="nearPlaneDistance"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="pqDoubleLineEdit" name="orientationZ">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="originLabel">
+       <property name="text">
+        <string>Origin</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="pqDoubleLineEdit" name="originX"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="pqDoubleLineEdit" name="originZ"/>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout3">
+     <item row="0" column="0" colspan="2">
+      <widget class="QPushButton" name="resetBounds">
+       <property name="toolTip">
+        <string>Reset the frustum's properties based on the data bounds.</string>
+       </property>
+       <property name="text">
+        <string>Reset to Data Bounds</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>originX</tabstop>
+  <tabstop>originY</tabstop>
+  <tabstop>originZ</tabstop>
+  <tabstop>orientationX</tabstop>
+  <tabstop>orientationY</tabstop>
+  <tabstop>orientationZ</tabstop>
+  <tabstop>horizontalAngle</tabstop>
+  <tabstop>verticalAngle</tabstop>
+  <tabstop>nearPlaneDistance</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
