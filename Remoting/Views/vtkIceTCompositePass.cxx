@@ -8,8 +8,6 @@
 #include "vtkFrameBufferObjectBase.h"
 #include "vtkHardwareSelector.h"
 #include "vtkIceTContext.h"
-#include "vtkIntArray.h"
-#include "vtkMatrix3x3.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
