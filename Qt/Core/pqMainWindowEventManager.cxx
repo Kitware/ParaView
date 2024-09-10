@@ -20,6 +20,7 @@ pqMainWindowEventManager::~pqMainWindowEventManager() = default;
 //-----------------------------------------------------------------------------
 void pqMainWindowEventManager::closeEvent(QCloseEvent* event)
 {
+  this->Closing = true;
   Q_EMIT this->close(event);
 }
 

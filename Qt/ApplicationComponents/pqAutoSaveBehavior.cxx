@@ -5,6 +5,7 @@
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqMainWindowEventManager.h"
 #include "pqSaveStateReaction.h"
 #include "pqSettings.h"
 
@@ -13,6 +14,7 @@
 #include "vtkSmartPointer.h"
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QFile>
 #include <QtDebug>
 
@@ -39,10 +41,25 @@ pqAutoSaveBehavior::pqAutoSaveBehavior(QObject* parentObject)
   QObject::connect(settings, &pqSettings::modified, this, &pqAutoSaveBehavior::updateConnections);
   QObject::connect(pqApplicationCore::instance(), &pqApplicationCore::clientEnvironmentDone, this,
     &pqAutoSaveBehavior::updateConnections);
+
+  pqMainWindowEventManager* mainWindowEventManager =
+    pqApplicationCore::instance()->getMainWindowEventManager();
+  QObject::connect(mainWindowEventManager, &pqMainWindowEventManager::close, this,
+    &pqAutoSaveBehavior::clearConnections);
 }
 
 //-----------------------------------------------------------------------------
 pqAutoSaveBehavior::~pqAutoSaveBehavior() = default;
+
+//-----------------------------------------------------------------------------
+void pqAutoSaveBehavior::clearConnections()
+{
+  if (this->ObservedStack)
+  {
+    this->ObservedStack->disconnect(this);
+  }
+  pqActiveObjects::instance().disconnect(this);
+}
 
 //-----------------------------------------------------------------------------
 bool pqAutoSaveBehavior::autoSaveSettingEnabled()
@@ -75,14 +92,9 @@ QString pqAutoSaveBehavior::formatToExtension(StateFormat format)
 //-----------------------------------------------------------------------------
 void pqAutoSaveBehavior::updateConnections()
 {
-  if (this->ObservedStack)
-  {
-    this->ObservedStack->disconnect(this);
-  }
-  pqActiveObjects::instance().disconnect(this);
+  this->clearConnections();
 
   bool autoSaveEnabled = pqAutoSaveBehavior::autoSaveSettingEnabled();
-
   if (autoSaveEnabled)
   {
     this->ObservedStack = pqApplicationCore::instance()->getUndoStack();

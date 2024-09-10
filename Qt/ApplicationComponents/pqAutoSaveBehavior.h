@@ -87,6 +87,8 @@ private Q_SLOTS:
    */
   void updateConnections();
 
+  void clearConnections();
+
 private: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Return the path for the given state file.
