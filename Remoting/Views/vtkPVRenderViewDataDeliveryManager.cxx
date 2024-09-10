@@ -4,12 +4,9 @@
 #include "vtkPVDataDeliveryManagerInternals.h"
 
 #include "vtkDIYKdTreeUtilities.h"
-#include "vtkExtentTranslator.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationIntegerKey.h"
-#include "vtkInformationIntegerVectorKey.h"
-#include "vtkInformationObjectBaseKey.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
@@ -19,22 +16,19 @@
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPVLogger.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVStreamingMacros.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkWeakPointer.h"
 
+#include <algorithm>
 #include <cassert>
 #include <map>
-#include <numeric>
-#include <queue>
 #include <sstream>
 #include <utility>
+#include <vector>
 
 namespace
 {
 
-static const int STREAMING_DATA_KEY = 1024;
-static const int REDISTRIBUTED_DATA_KEY = 1025;
+const int STREAMING_DATA_KEY = 1024;
+const int REDISTRIBUTED_DATA_KEY = 1025;
 
 class vtkPVRVDMKeys : public vtkObject
 {
