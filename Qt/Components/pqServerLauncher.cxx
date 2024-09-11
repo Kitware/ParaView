@@ -775,7 +775,6 @@ bool pqServerLauncher::processCommand(
   {
     process->setProcessEnvironment(*options);
   }
-
   QObject::connect(process, SIGNAL(error(QProcess::ProcessError)), this,
     SLOT(processFailed(QProcess::ProcessError)));
   QObject::connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
