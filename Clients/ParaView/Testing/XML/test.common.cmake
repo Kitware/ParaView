@@ -218,6 +218,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/squareBend/constant/,RECURSE:,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/squareBend/50/,RECURSE:,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/squareBend/100/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/sphere.stl}"
   "DATA{${paraview_test_data_directory_input}/Data/tensors.pvti}"
   "DATA{${paraview_test_data_directory_input}/Data/test_fielddata.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/test_transient_poly_data.vtkhdf}"
@@ -980,6 +981,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   SpatioTemporalHarmonicsSource.xml
   SpreadSheetFieldData.xml
   SpreadSheetSelectedCellConnectivity.xml
+  STLReaderMerging.xml
   StringInLineChartView.xml
   TableHistogram.xml
   TensorPrincipalInvariants.xml
