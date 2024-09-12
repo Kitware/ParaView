@@ -90,6 +90,13 @@
         <Documentation>When set to true, the reader will include cell data
         describing which solid a cell belongs to.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetMerging"
+                         default_values="1"
+                         name="Merging"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn on/off merging of points/triangles.</Documentation>
+      </IntVectorProperty>
       <!-- End stlreader -->
     </Proxy>
 
@@ -305,6 +312,9 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="stlreadercore"></Proxy>
+        <ExposedProperties>
+          <Property name="Merging" />
+        </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
