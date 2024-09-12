@@ -71,7 +71,7 @@
         </SSHConfig>
         <Arguments>
           <Argument value="localhost"/>
-          <Argument value="$PV_SSH_PF_SERVER_PORT$"/>
+          <Argument value="$PV_SERVER_PORT$"/>
         </Arguments>
       </SSHCommand>
     </CommandStartup>
