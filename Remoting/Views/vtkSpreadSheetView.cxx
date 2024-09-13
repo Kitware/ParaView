@@ -464,14 +464,8 @@ public:
    */
   vtkTable* GetSomeBlock(vtkSpreadSheetView* self)
   {
-    if (auto table = this->GetAnExistingBlock(self))
-    {
-      return table;
-    }
-    else
-    {
-      return self->FetchBlock(this->GetMostRecentlyAccessedBlock(self));
-    }
+    vtkTable* table = this->GetAnExistingBlock(self);
+    return table ? table : self->FetchBlock(this->GetMostRecentlyAccessedBlock(self));
   }
 
   vtkIdType MostRecentlyAccessedBlock;
