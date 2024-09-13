@@ -811,7 +811,7 @@ void vtkSpreadSheetView::Update()
     if (auto pvrepr = vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc)))
     {
       // Pass the view time information to the representation
-      if (this->GetViewTime())
+      if (this->GetViewTimeValid())
       {
         pvrepr->SetUpdateTime(view_time);
       }
