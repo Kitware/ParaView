@@ -77,13 +77,14 @@
     variables:
         CMAKE_CONFIGURATION: el8_shared_icc_mpi_python
 
-.fedora35_static_mpi_offscreen_osmesa_python:
+.fedora35_shared_mpi_offscreen_osmesa_python_qt_vtkmoverride:
     extends:
         - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_static_mpi_offscreen_osmesa_python
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_offscreen_osmesa_python_qt_vtkmoverride
+        VTK_DEFAULT_OPENGL_WINDOW: vtkOSOpenGLRenderWindow
 
 .fedora35_shared_mpi_core:
     extends:
