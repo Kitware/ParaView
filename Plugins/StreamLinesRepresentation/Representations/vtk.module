@@ -22,4 +22,3 @@ PRIVATE_DEPENDS
   VTK::RenderingCore
   VTK::RenderingOpenGL2
   VTK::glad
-  VTK::opengl
