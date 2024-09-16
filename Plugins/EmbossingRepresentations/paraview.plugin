@@ -10,4 +10,4 @@ REQUIRES_MODULES
   VTK::ParallelCore
   VTK::RenderingCore
   VTK::RenderingOpenGL2
-  VTK::glew
+  VTK::glad

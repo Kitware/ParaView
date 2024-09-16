@@ -15,4 +15,4 @@ PRIVATE_DEPENDS
   VTK::FiltersCore
   VTK::ParallelCore
   VTK::RenderingCore
-  VTK::glew
+  VTK::glad

@@ -669,7 +669,7 @@ if (NOT PARAVIEW_ENABLE_RENDERING)
   # This ensures that we don't ever enable OpenGL
   # modules when PARAVIEW_ENABLE_RENDERING is OFF.
   set(rendering_modules
-    VTK::glew
+    VTK::glad
     VTK::opengl)
   list(APPEND paraview_rejected_modules
     ${rendering_modules})
