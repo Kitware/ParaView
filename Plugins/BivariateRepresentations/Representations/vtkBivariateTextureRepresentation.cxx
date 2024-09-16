@@ -11,6 +11,18 @@
 #include "vtkPointData.h"
 #include "vtkView.h"
 
+#include "vtkAlgorithmOutput.h"
+#include "vtkDataObjectTypes.h"
+#include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
+#include "vtkPVTrivialProducer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+
+#include "vtkCompositeDataSet.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeIterator.h"
+#include "vtkPolyData.h"
+
 #include <algorithm>
 
 vtkStandardNewMacro(vtkBivariateTextureRepresentation);
@@ -22,59 +34,8 @@ vtkBivariateTextureRepresentation::vtkBivariateTextureRepresentation() = default
 vtkBivariateTextureRepresentation::~vtkBivariateTextureRepresentation() = default;
 
 //----------------------------------------------------------------------------
-unsigned int vtkBivariateTextureRepresentation::Initialize(
-  unsigned int minIdAvailable, unsigned int maxIdAvailable)
-{
-  unsigned int minId = minIdAvailable;
-  if (this->LogoSourceRepresentation)
-  {
-    minId = this->LogoSourceRepresentation->Initialize(minId, maxIdAvailable);
-  }
-  return this->Superclass::Initialize(minId, maxIdAvailable);
-}
-
-//----------------------------------------------------------------------------
-void vtkBivariateTextureRepresentation::SetVisibility(bool visible)
-{
-  if (this->LogoSourceRepresentation)
-  {
-    this->LogoSourceRepresentation->SetVisibility(visible);
-  }
-  this->Superclass::SetVisibility(visible);
-}
-
-//----------------------------------------------------------------------------
-bool vtkBivariateTextureRepresentation::AddToView(vtkView* view)
-{
-  if (!this->Superclass::AddToView(view))
-  {
-    return false;
-  }
-  if (this->LogoSourceRepresentation)
-  {
-    view->AddRepresentation(this->LogoSourceRepresentation);
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkBivariateTextureRepresentation::RemoveFromView(vtkView* view)
-{
-  if (this->LogoSourceRepresentation)
-  {
-    view->RemoveRepresentation(this->LogoSourceRepresentation);
-  }
-  if (!this->Superclass::RemoveFromView(view))
-  {
-    return false;
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------------
 void vtkBivariateTextureRepresentation::SetTexture(vtkTexture* texture)
 {
-  this->LogoSource->SetTexture(texture);
   this->Superclass::SetTexture(texture);
   this->MarkModified(); // To force a new RequestData pass
 }
@@ -83,31 +44,43 @@ void vtkBivariateTextureRepresentation::SetTexture(vtkTexture* texture)
 int vtkBivariateTextureRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (this->LogoSourceRepresentation)
+  if (!this->Superclass::RequestData(request, inputVector, outputVector))
   {
-    // Setup the internal pipeline
-    this->LogoSourceRepresentation->SetInputConnection(this->LogoSource->GetOutputPort());
-    this->LogoSourceRepresentation->Update();
+    return false;
+  }
+
+  vtkDataObjectTree* inputDOT = vtkDataObjectTree::SafeDownCast(this->GetRenderedDataObject(0));
+  if (!inputDOT)
+  {
+    // Rendered data object is always composite. If null, we do not render anything yet.
+    return true;
   }
 
   // Retrieve input array names
-  vtkInformation* info = this->GetInputArrayInformation(1);
+  vtkInformation* info = this->GetInputArrayInformation(0);
   std::string arrayName1 =
     info->Has(vtkDataObject::FIELD_NAME()) ? info->Get(vtkDataObject::FIELD_NAME()) : "";
 
-  info = this->GetInputArrayInformation(2);
+  info = this->GetInputArrayInformation(1);
   std::string arrayName2 =
     info->Has(vtkDataObject::FIELD_NAME()) ? info->Get(vtkDataObject::FIELD_NAME()) : "";
 
-  if (!arrayName1.empty() && !arrayName2.empty())
+  auto iter = vtk::TakeSmartPointer(inputDOT->NewTreeIterator());
+  iter->SkipEmptyNodesOn();
+  iter->VisitOnlyLeavesOn();
+
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
-    vtkDataSet* inputDS = vtkDataSet::GetData(inputVector[0], 0);
+    vtkDataSet* inputDS = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
     if (!inputDS)
     {
       // This can happen in client/server mode : RequestData is called on both
       // processes but data is only retrieved on server.
-      return this->Superclass::RequestData(request, inputVector, outputVector);
+      return true;
     }
+
+    // Ensure we don't keep previous tcoords in case following conditions are not met
+    inputDS->GetAttributes(vtkDataObject::POINT)->SetTCoords(nullptr);
 
     // Retrieve input arrays
     auto* array1 =
@@ -120,7 +93,14 @@ int vtkBivariateTextureRepresentation::RequestData(
       // info->Get(vtkDataObject::FIELD_NAME()) can return non-empty
       // array names even if no array is available (e.g. "1 0 0 0 0")
       // In such case, we just call superclass RequestData
-      return this->Superclass::RequestData(request, inputVector, outputVector);
+      return true;
+    }
+
+    if (array1->GetNumberOfComponents() != 1 || array2->GetNumberOfComponents() != 1)
+    {
+      vtkWarningMacro(
+        "First and second arrays should only have one component to generate TCoords.");
+      return true;
     }
 
     // Compute texture coordinates from input array
@@ -129,8 +109,16 @@ int vtkBivariateTextureRepresentation::RequestData(
     this->TCoordsArray->SetNumberOfComponents(2);
     this->TCoordsArray->SetNumberOfTuples(array1->GetNumberOfTuples());
 
+    // Update arrays name & ranges
     auto* range1 = array1->GetRange();
+    this->FirstArrayRange[0] = range1[0];
+    this->FirstArrayRange[1] = range1[1];
+    this->FirstArrayName = arrayName1;
+
     auto* range2 = array2->GetRange();
+    this->SecondArrayRange[0] = range2[0];
+    this->SecondArrayRange[1] = range2[1];
+    this->SecondArrayName = arrayName2;
 
     for (int i = 0; i < this->TCoordsArray->GetNumberOfTuples(); i++)
     {
@@ -139,21 +127,17 @@ int vtkBivariateTextureRepresentation::RequestData(
       this->TCoordsArray->SetTuple2(i, firstValue, secondValue);
     }
 
-    // XXX: Modyfing the input point data is not clean.
-    // We should find a way to add the computed TCoords array
-    // to the list of available arrays without doing this in
-    // a future work.
-    inputDS->GetPointData()->SetTCoords(this->TCoordsArray);
+    inputDS->GetAttributes(vtkDataObject::POINT)->SetTCoords(this->TCoordsArray);
   }
 
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+  return true;
 }
 
 //----------------------------------------------------------------------------
 void vtkBivariateTextureRepresentation::SetInputArrayToProcess(
   int idx, int port, int connection, int fieldAssociation, const char* attributeTypeorName)
 {
-  if ((idx == 1 || idx == 2) &&
+  if ((idx == 0 || idx == 1) &&
     fieldAssociation == vtkDataObject::FieldAssociations::FIELD_ASSOCIATION_POINTS)
   {
     this->MarkModified(); // To force a new RequestData pass
@@ -167,26 +151,6 @@ void vtkBivariateTextureRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  if (this->LogoSource)
-  {
-    os << indent << "LogoSource:" << endl;
-    this->LogoSource->PrintSelf(os, indent.GetNextIndent());
-  }
-  else
-  {
-    os << indent << "LogoSource: (None)" << endl;
-  }
-
-  if (this->LogoSourceRepresentation)
-  {
-    os << indent << "LogoSourceRepresentation:" << endl;
-    this->LogoSourceRepresentation->PrintSelf(os, indent.GetNextIndent());
-  }
-  else
-  {
-    os << indent << "LogoSourceRepresentation: (None)" << endl;
-  }
-
   if (this->TCoordsArray)
   {
     os << indent << "TCoordsArray:" << endl;
@@ -196,4 +160,11 @@ void vtkBivariateTextureRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   {
     os << indent << "TCoordsArray: (None)" << endl;
   }
+
+  os << indent << "FirstArrayRange: [" << this->FirstArrayRange[0] << ", "
+     << this->FirstArrayRange[1] << "]" << endl;
+  os << indent << "SecondArrayRange: [" << this->SecondArrayRange[0] << ", "
+     << this->SecondArrayRange[1] << "]" << endl;
+  os << indent << "FirstArrayName: " << this->FirstArrayName << endl;
+  os << indent << "SecondArrayName: " << this->SecondArrayName << endl;
 }
