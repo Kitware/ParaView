@@ -10,10 +10,11 @@ ExternalData_Expand_Arguments("ParaViewData" _
   "DATA{Data/Baseline/BivariateNoise_C_3.png}"
   "DATA{Data/Baseline/BivariateNoise_C_4.png}"
   "DATA{Data/Baseline/BivariateNoise_D.png}"
-  "DATA{Data/Baseline/BivariateTexture_A.png}"
-  "DATA{Data/Baseline/BivariateTexture_B.png}"
-  "DATA{Data/Baseline/BivariateTexture_C.png}"
-  "DATA{Data/Baseline/BivariateTexture_D.png}")
+  "DATA{Data/Baseline/BivariateTexture_XX.png}"
+  "DATA{Data/Baseline/BivariateTexture_XY.png}"
+  "DATA{Data/Baseline/BivariateTexture_YX.png}"
+  "DATA{Data/Baseline/BivariateTexture_YY.png}"
+  "DATA{Data/Baseline/BivariateTexture_SurfaceRepr.png}")
 
 set(tests
   "BivariateNoiseRepresentation.xml"
