@@ -16,13 +16,13 @@ to an X server at all, in which case on-screen rendering is just not possible
 This page documents the onscreen, offscreen, and headless rendering support in
 ParaView.
 
-##Caveats##
+## Caveats
 
 In this page, we limit ourselves to a Linux-based system. On Windows and macOS,
 offscreen support is available, but true headless operation is currently not
 widely used and hence left out of this discussion.
 
-##Terminology##
+## Terminology
 
 A brief explanation of the terms:
 
@@ -39,9 +39,7 @@ A brief explanation of the terms:
   on-screen mode and hence needs an accessible X server.
 
 * **Offscreen**: Offscreen simply means that the rendering results are not presented
-  to the user in a window. On Linux, this does not automatically imply that an
-  accessible X server is not needed. X server may be needed, unless ParaView
-  was built with an OpenGL implementation that allows for headless operation.
+  to the user in a window.
   This mode is not applicable to the desktop Qt client and is only supported
   by the command line executables.
 
@@ -49,12 +47,11 @@ A brief explanation of the terms:
   In addition, on Linux, it implies that the rendering does not require an
   accessible X server nor will it make any X calls.
 
-**Onscreen** and **offscreen** support is built by default. Thus ParaView
-binaries available from paraview.org support these modes. **Headless** support
-requires special builds of ParaView which are not compatible with standard
-build options. Both version are available as a binary from our downloads page.
+**Onscreen**, **offscreen** and **headless** support is built by default.
+Thus ParaView binaries available from [paraview.org](https://paraview.org/download)
+support these modes.
 
-##OpenGL Implementations##
+## OpenGL Implementations
 
 ParaView uses OpenGL for rendering. OpenGL is an API specification for 2D/3D
 rendering. Many vendors provide implementations of this API, including those
@@ -65,11 +62,11 @@ For sake of simplicity, let's classify OpenGL implementations as **hardware
 NVIDIA, ATI, Intel, Apple and others which typically use the system hardware
 infrastructure for rendering. The runtime libraries needed for these are
 available on the system. **S/W** currently includes Mesa3D -- a software
-implementation of the OpenGL standard. Despite the names, H/W doesn't
-necessarily imply use of GPUs, nor does S/W imply exclusion of GPUs. Nonetheless
+implementation of the OpenGL standard. Despite the names, **H/W** doesn't
+necessarily imply use of GPUs, nor does **S/W** imply exclusion of GPUs. Nonetheless
 we use this naming scheme as it has been prevalent.
 
-###APIs for Headless Support###
+### APIs for Headless Support
 
 Traditionally, OpenGL implementations are coupled with the window system to
 provide an OpenGL context. Thus, they are designed for non-headless operation.
@@ -81,60 +78,42 @@ Currently, ParaView supports two distinct APIs that are available for headless
 operation: **EGL** and **OSMesa** (also called **Offscreen Mesa**). It must be
 noted that headless support is a rapidly evolving area and changes are expected
 in coming months. Modern H/W OpenGL implementations support EGL while S/W
-(or Mesa) supports OSMesa. One has to build ParaView with specific CMake flags
-changed to enable either of these APIs. Which headless API you choose in your
-build depends on which OpenGL implementation you plan to use.
+(or Mesa) supports OSMesa.
 
-##ParaView Builds##
+## ParaView Builds
 
 Before we look at the various ways you can build and use ParaView, let's
 summarize relevant CMake options available:
 
-* `VTK_USE_X`: When ON, implies that ParaView can link against X libraries.
+* `VTK_USE_X`: When `ON`, implies that ParaView can link against X libraries.
   This allows ParaView executables to create on-screen windows, if needed.
 
-  When `VTK_USE_X` is ON, these variables must be specified:
-  * `OPENGL_INCLUDE_DIR`: Path to directory containing `GL/gl.h`.
-  * `OPENGL_gl_LIBRARY`: Path to `libGL.so`.
-  * `OpengL_glu_LIBRARY`: not needed for ParaView; leave empty.
-  * `OPENGL_xmesa_INCLUDE_DIR`: not needed for ParaView; leave empty.
-
-* `VTK_OPENGL_HAS_OSMESA`: When ON, implies that ParaView can use OSMesa
-  to support headless modes of operation.
-
-  When `VTK_OPENGL_HAS_OSMESA` is ON, these variables must be specified:
-  * `OSMESA_INCLUDE_DIR`: Path to containing `GL/osmesa.h`.
-  * `OSMESA_LIBRARY`: Path to `libOSMesa.so`
-
-* `VTK_OPENGL_HAS_EGL`: When ON, implies that ParaView can use EGL to support
+* `VTK_OPENGL_HAS_EGL`: When `ON`, implies that ParaView can use EGL to support
   headless modes of operation.
-
-  When `VTK_OPENGL_HAS_EGL` is ON, these variables must be specified:
-  * `EGL_INCLUDE_DIR`: Path to directory containing `GL/egl.h`.
-  * `EGL_LIBRARY`: Path to `libEGL.so`.
-  * `EGL_opengl_LIBRARY`: Path to `libOpenGL.so`.
 
 * `PARAVIEW_USE_QT` indicates if the desktop Qt client should be built.
 
-`VTK_USE_X` and `VTK_OPENGL_HAS_OSMESA` are mutually exclusive i.e.
-only one of the two can be ON at the same time. This is due to the
-fact that  OSMesa does not support on-screen rendering and
-VTK's OpenGL selection is at build time.
-
-`VTK_OPENGL_HAS_EGL` and `VTK_OPENGL_HAS_OSMESA` are mutually exclusive i.e.
-only one of the two can be ON at the same time.
+Note that for binaries distributed on [paraview.org](https://paraview.org/download)
+the OpenGL selection is not frozen at build time. VTK is capable of
+detecting a suitable OpenGL context backend at runtime and fallback to pure software
+based rendering through OSMesa when none of the **H/W** implementations
+work. The **S/W** rendering path requires the presence of a `libOSMesa.so` or
+`osmesa.dll` in the system library directories because VTK dynamically loads OSMesa.
 
 A few things to note:
-* At least one of `VTK_OPENGL_HAS_EGL`, `VTK_OPENGL_HAS_OSMESA` and `VTK_USE_X` must be ON.
-* If `VTK_OPENGL_HAS_EGL` or `VTK_OPENGL_HAS_OSMESA` is ON, the build supports headless rendering, otherwise
-  `VTK_USE_X` must be ON and the build does not support headless, but can still support offscreen rendering.
+* At least one of `VTK_OPENGL_HAS_EGL`, and `VTK_USE_X` must be ON. By default, both options are ON.
+* If `VTK_OPENGL_HAS_EGL` is ON, the build supports **H/W** headless rendering, otherwise
+  `VTK_USE_X` must be ON and the build does not support headless rendering with GPU, but can still support
+  offscreen rendering or software based headless rendering. Since EGL is provided by driver packages, ParaView
+  turns on EGL by default for convenience.
+* For testing purpose, you can set the environment variable `VTK_DEFAULT_OPENGL_WINDOW` to create a
+  `vtkOSOpenGLRenderWindow` with OSMesa or `vtkEGLRenderWindow` or `vtkXOpenGLRenderWindow`, and in windows,
+  `vtkWin32OpenGLRenderWindow`.
 * `PARAVIEW_USE_QT=ON` and `VTK_USE_X=OFF` has limited support.
    In this configuration, the command-line tools like `pvserver`, `pvrenderserver` will not depend on X.
    The `paraview` Qt client, however, is not built.
-* If `VTK_OPENGL_HAS_EGL` is ON and `VTK_USE_X` is ON, then all the OpenGL and EGL variables should point
-  to the system libraries providing both, typically the NVidia libraries.
 
-##Default Rendering Modes##
+## Default Rendering Modes
 
 Depending of the enabled build options, which type of render window the ParaView
 executable creates by default also needs some explanation.
