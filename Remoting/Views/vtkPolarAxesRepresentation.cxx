@@ -350,10 +350,20 @@ void vtkPolarAxesRepresentation::InitializeDataBoundsFromData(vtkDataObject* dat
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      htg = vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject());
       if (ds)
       {
         double bds[6];
         ds->GetBounds(bds);
+        if (vtkMath::AreBoundsInitialized(bds))
+        {
+          bbox.AddBounds(bds);
+        }
+      }
+      else if (htg)
+      {
+        double bds[6];
+        htg->GetBounds(bds);
         if (vtkMath::AreBoundsInitialized(bds))
         {
           bbox.AddBounds(bds);
