@@ -464,14 +464,8 @@ public:
    */
   vtkTable* GetSomeBlock(vtkSpreadSheetView* self)
   {
-    if (auto table = this->GetAnExistingBlock(self))
-    {
-      return table;
-    }
-    else
-    {
-      return self->FetchBlock(this->GetMostRecentlyAccessedBlock(self));
-    }
+    vtkTable* table = this->GetAnExistingBlock(self);
+    return table ? table : self->FetchBlock(this->GetMostRecentlyAccessedBlock(self));
   }
 
   vtkIdType MostRecentlyAccessedBlock;
@@ -817,7 +811,7 @@ void vtkSpreadSheetView::Update()
     if (auto pvrepr = vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc)))
     {
       // Pass the view time information to the representation
-      if (this->GetViewTime())
+      if (this->GetViewTimeValid())
       {
         pvrepr->SetUpdateTime(view_time);
       }
