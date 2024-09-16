@@ -22,10 +22,6 @@
 #include "vtkEGLRenderWindow.h"
 #endif
 
-#if defined(VTK_OPENGL_HAS_OSMESA)
-#include "vtkOSOpenGLRenderWindow.h"
-#endif
-
 namespace
 {
 bool SkipDisplayTest()
@@ -89,9 +85,7 @@ vtkTypeUInt32 vtkPVRenderingCapabilitiesInformation::GetLocalCapabilities()
   }
 #endif
 
-#if defined(VTK_OPENGL_HAS_OSMESA)
   capabilities |= HEADLESS_RENDERING_USES_OSMESA;
-#endif
 
 #if defined(VTK_OPENGL_HAS_EGL)
   capabilities |= HEADLESS_RENDERING_USES_EGL;
@@ -121,15 +115,14 @@ vtkTypeUInt32 vtkPVRenderingCapabilitiesInformation::GetLocalCapabilities()
 //----------------------------------------------------------------------------
 vtkSmartPointer<vtkRenderWindow> vtkPVRenderingCapabilitiesInformation::NewOffscreenRenderWindow()
 {
-  vtkSmartPointer<vtkRenderWindow> window;
+  auto window = vtk::TakeSmartPointer(vtkRenderWindow::New());
 
 // if headless rendering is supported, let's create the headless render
 // window.
 #if defined(VTK_OPENGL_HAS_EGL)
-  window.TakeReference(vtkEGLRenderWindow::New());
   // vtkEGLRenderWindow gets initialized with `VTK_DEFAULT_EGL_DEVICE_INDEX`
   // CMake variable. If the command line options overrode it, change it.
-  if (window)
+  if (auto* eglWindow = vtkEGLRenderWindow::SafeDownCast(window))
   {
     int deviceIndex = GetEGLDeviceIndex();
     if (deviceIndex >= 0)
@@ -137,14 +130,7 @@ vtkSmartPointer<vtkRenderWindow> vtkPVRenderingCapabilitiesInformation::NewOffsc
       window->SetDeviceIndex(deviceIndex);
     }
   }
-#elif defined(VTK_OPENGL_HAS_OSMESA)
-  window.TakeReference(vtkOSOpenGLRenderWindow::New());
 #endif
-  if (!window)
-  {
-    // if not, let VTK create a default based on CMake flags specified.
-    window = vtkSmartPointer<vtkRenderWindow>::New();
-  }
 
   window->SetOffScreenRendering(1); // we want to keep the window unmapped.
   // this should be largely unnecessary, but vtkRenderWindow subclasses
