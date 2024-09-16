@@ -10,11 +10,11 @@
 #define vtkPVXRInterfaceCollaborationClient_h
 
 #if defined(VTK_USE_X)
-// There are compile errors in vtkPVXRInterfaceCollaborationClient.cxx if Qt, X, and glew
+// There are compile errors in vtkPVXRInterfaceCollaborationClient.cxx if Qt, X, and glad
 // are not included here and in just this order.  We have to prevent clang-format from
 // "fixing" this for us or compilation will fail.
 // clang-format off
-#include "vtk_glew.h"
+#include "vtk_glad.h"
 #include "QVTKOpenGLWindow.h"
 // clang-format on
 #endif

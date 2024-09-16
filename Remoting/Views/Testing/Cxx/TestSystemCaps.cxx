@@ -4,7 +4,7 @@
 #include "vtkMPI.h"
 #endif
 
-#include "vtk_glew.h"
+#include "vtk_glad.h"
 
 #include "vtkNew.h"
 #include "vtkRenderWindow.h"
