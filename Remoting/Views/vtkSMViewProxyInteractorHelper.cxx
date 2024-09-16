@@ -6,6 +6,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 
 #include <cassert>
@@ -123,7 +124,9 @@ void vtkSMViewProxyInteractorHelper::Execute(vtkObject* caller, unsigned long ev
       double delay = vtkSMPropertyHelper(
         this->ViewProxy, "WindowResizeNonInteractiveRenderDelay", /*quiet*/ true)
                        .GetAsDouble();
-      if (delay > 0.0)
+      // While loading a state, make sure that no delay is performed that incurs an UpdateLOD.
+      // This seems to be detrimental when volume rendering is performed for the delivery manager.
+      if (!this->ViewProxy->GetSessionProxyManager()->GetInLoadXMLState() && delay > 0.0)
       {
         this->Interacting = true;
         this->EndWindowResizeTimerId = iren->CreateOneShotTimer(delay * 1000);

@@ -4,12 +4,9 @@
 #include "vtkPVDataDeliveryManagerInternals.h"
 
 #include "vtkDIYKdTreeUtilities.h"
-#include "vtkExtentTranslator.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationIntegerKey.h"
-#include "vtkInformationIntegerVectorKey.h"
-#include "vtkInformationObjectBaseKey.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
@@ -19,22 +16,19 @@
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPVLogger.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVStreamingMacros.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkWeakPointer.h"
 
+#include <algorithm>
 #include <cassert>
 #include <map>
-#include <numeric>
-#include <queue>
 #include <sstream>
 #include <utility>
+#include <vector>
 
 namespace
 {
 
-static const int STREAMING_DATA_KEY = 1024;
-static const int REDISTRIBUTED_DATA_KEY = 1025;
+const int STREAMING_DATA_KEY = 1024;
+const int REDISTRIBUTED_DATA_KEY = 1025;
 
 class vtkPVRVDMKeys : public vtkObject
 {
@@ -274,25 +268,25 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
     std::vector<vtkDataObject*> data_for_loadbalacing;
     bool use_explicit_bounds = false;
     vtkBoundingBox local_bounds;
-    for (auto iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end();
-         ++iter)
+    for (auto& itemPair : this->Internals->ItemsMap)
     {
-      auto repr = this->GetRepresentation(iter->first.first);
+      const unsigned int& itemId = itemPair.first.first;
+      auto repr = this->GetRepresentation(itemId);
       const auto cacheKey = this->GetCacheKey(repr);
-      vtkInternals::vtkItem& item = iter->second.first;
+      vtkInternals::vtkItem& item = itemPair.second.first;
       auto info = item.GetPieceInformation(cacheKey);
       const int mode = this->GetViewDataDistributionMode(low_res);
-      if (this->Internals->IsRepresentationVisible(iter->first.first))
+      if (this->Internals->IsRepresentationVisible(itemId))
       {
         const int config = vtkPVRVDMKeys::GetOrderedCompositingConfiguration(info);
         if ((config & vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING) != 0)
         {
-          token_stream << ";a" << iter->first.first << "=" << item.GetTimeStamp(cacheKey);
+          token_stream << ";a" << itemId << "=" << item.GetTimeStamp(cacheKey);
           data_for_loadbalacing.push_back(item.GetDeliveredDataObject(mode, cacheKey));
         }
         else if ((config & vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION) != 0)
         {
-          token_stream << ";b" << iter->first.first << "=" << item.GetTimeStamp(cacheKey);
+          token_stream << ";b" << itemId << "=" << item.GetTimeStamp(cacheKey);
           if (info->Has(vtkPVRVDMKeys::ORDERED_COMPOSITING_BOUNDS()))
           {
             double gbds[6];

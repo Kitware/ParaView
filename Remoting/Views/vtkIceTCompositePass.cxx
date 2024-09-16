@@ -8,8 +8,6 @@
 #include "vtkFrameBufferObjectBase.h"
 #include "vtkHardwareSelector.h"
 #include "vtkIceTContext.h"
-#include "vtkIntArray.h"
-#include "vtkMatrix3x3.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -213,6 +211,17 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   const bool use_ordered_compositing =
     (this->OrderedCompositingHelper && this->UseOrderedCompositing);
 
+  if (use_ordered_compositing)
+  {
+    // sanity check: number of rendering ranks must match number of boxes
+    if (static_cast<int>(this->OrderedCompositingHelper->GetBoundingBoxes().size()) !=
+      this->IceTContext->GetController()->GetNumberOfProcesses())
+    {
+      vtkErrorMacro("Number of rendering ranks does not match number of boxes.");
+      return;
+    }
+  }
+
   IceTEnum const format =
     this->EnableFloatValuePass ? ICET_IMAGE_COLOR_RGBA_FLOAT : ICET_IMAGE_COLOR_RGBA_UBYTE;
 
@@ -233,30 +242,24 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   }
 
   icetEnable(ICET_FLOATING_VIEWPORT);
-  if (use_ordered_compositing)
+  if (use_ordered_compositing) // if ordered compositing is enabled
   {
-    // if ordered compositing is enabled, pass the process order from the partition ordering
-    // to icet.
-
-    // sanity check: number of rendering ranks must match number of boxes
-    assert(static_cast<int>(this->OrderedCompositingHelper->GetBoundingBoxes().size()) ==
-      this->IceTContext->GetController()->GetNumberOfProcesses());
-
     // Setup IceT context for correct sorting.
     icetEnable(ICET_ORDERED_COMPOSITE);
 
     // Order all the regions.
     vtkCamera* camera = render_state->GetRenderer()->GetActiveCamera();
     const auto orderedProcessIds = this->OrderedCompositingHelper->ComputeSortOrder(camera);
+    // Pass the process order from the partition ordering to icet.
     if (sizeof(int) == sizeof(IceTInt))
     {
-      icetCompositeOrder(reinterpret_cast<const IceTInt*>(&orderedProcessIds[0]));
+      icetCompositeOrder(reinterpret_cast<const IceTInt*>(orderedProcessIds.data()));
     }
     else
     {
       std::vector<IceTInt> tmparray(orderedProcessIds.size());
       std::copy(orderedProcessIds.begin(), orderedProcessIds.end(), tmparray.begin());
-      icetCompositeOrder(&tmparray[0]);
+      icetCompositeOrder(tmparray.data());
     }
   }
   else
