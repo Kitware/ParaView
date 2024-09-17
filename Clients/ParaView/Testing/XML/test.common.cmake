@@ -981,7 +981,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   SpatioTemporalHarmonicsSource.xml
   SpreadSheetFieldData.xml
   SpreadSheetSelectedCellConnectivity.xml
-  STLReaderMerging.xml
+  STLReaderMergePoints.xml
   StringInLineChartView.xml
   TableHistogram.xml
   TensorPrincipalInvariants.xml
