@@ -92,10 +92,10 @@
       </IntVectorProperty>
       <IntVectorProperty command="SetMerging"
                          default_values="1"
-                         name="Merging"
+                         name="Merge Points"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Turn on/off merging of points/triangles.</Documentation>
+        <Documentation>Turn on/off the merging of coincident points to restore neighborhood information.</Documentation>
       </IntVectorProperty>
       <!-- End stlreader -->
     </Proxy>
@@ -313,7 +313,7 @@
                proxygroup="internal_sources"
                proxyname="stlreadercore"></Proxy>
         <ExposedProperties>
-          <Property name="Merging" />
+          <Property name="Merge Points" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
