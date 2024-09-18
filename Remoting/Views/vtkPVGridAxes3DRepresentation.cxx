@@ -224,14 +224,21 @@ int vtkPVGridAxes3DRepresentation::RequestData(
     {
       vtkCompositeDataIterator* iter = cds->NewIterator();
       vtkBoundingBox bbox;
-      double dsBounds[6];
       for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
         ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+        htg = vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject());
         if (ds)
         {
+          double dsBounds[6];
           ds->GetBounds(dsBounds);
           bbox.AddBounds(dsBounds);
+        }
+        else if (htg)
+        {
+          double htgBounds[6];
+          htg->GetBounds(htgBounds);
+          bbox.AddBounds(htgBounds);
         }
       }
       iter->Delete();

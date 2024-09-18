@@ -474,6 +474,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridContourStrategyA_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridContourStrategyB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridContourStrategyB_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridDataAndPolarAxes_Data.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridDataAndPolarAxes_Polar.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridDepthLimiter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridEvaluateCoarse.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridEvaluateCoarse_1.png}"
@@ -1061,6 +1063,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   HyperTreeGridCellCenters.xml
   HyperTreeGridContour.xml
   HyperTreeGridContourStrategy.xml
+  HyperTreeGridDataAndPolarAxes.xml
   HyperTreeGridDepthLimiter.xml
   HyperTreeGridEvaluateCoarse.xml
   HyperTreeGridExtractGhostCells.xml
