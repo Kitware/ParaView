@@ -8,18 +8,18 @@ class FrameLogEntry:
     '''A basic container for holding timing information for a given filter'''
 
     import re
-    _timere = '([-+]?\d*\.?\d+([eE][-+]?\d+)?) +seconds'
-    _match_filter = re.compile('Execute (\w+) id: +(\d+), +' + _timere)
-    _match_vfilter = re.compile('Execute (\w+) *, +' + _timere)
+    _timere = '([-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?) +seconds'
+    _match_filter = re.compile('Execute (\\w+) id: +(\\d+), +' + _timere)
+    _match_vfilter = re.compile('Execute (\\w+) *, +' + _timere)
     _match_comp_comp = re.compile('TreeComp composite, *' + _timere)
     _match_comp_xmit = re.compile(
-        'TreeComp (Send|Receive) (\d+) (to|from) (\d+) uchar (\d+), +' + _timere)
+        'TreeComp (Send|Receive) (\\d+) (to|from) (\\d+) uchar (\\d+), +' + _timere)
     _match_composite = re.compile('Compositing, +' + _timere)
     _match_send = re.compile('Sending, +' + _timere)
     _match_receive = re.compile('Receiving, +' + _timere)
     _match_still_render = re.compile('(Still) Render, +' + _timere)
     _match_interactive_render = re.compile('(Interactive) Render, +' + _timere)
-    _match_render = re.compile('(\w+|\w+ Dev) Render, +' + _timere)
+    _match_render = re.compile('(\\w+|\\w+ Dev) Render, +' + _timere)
     _match_timeonly = re.compile('([^,]*), +' + _timere)
 
     def __init__(self, log_msg):
