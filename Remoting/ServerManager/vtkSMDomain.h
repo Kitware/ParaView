@@ -123,6 +123,8 @@ public:
     const char* function, unsigned int index = 0);
   virtual vtkPVDataInformation* GetInputSubsetDataInformation(
     unsigned int compositeIndex, const char* function, unsigned int index = 0);
+  virtual vtkPVDataInformation* GetInputSubsetDataInformation(
+    const char* selector, const char* assemblyName, const char* function, unsigned int index = 0);
   ///@}
 
   /**
