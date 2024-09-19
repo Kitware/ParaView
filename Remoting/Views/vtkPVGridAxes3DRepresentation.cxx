@@ -228,18 +228,18 @@ int vtkPVGridAxes3DRepresentation::RequestData(
       {
         ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
         htg = vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject());
+
+        double dsBounds[6];
         if (ds)
         {
-          double dsBounds[6];
           ds->GetBounds(dsBounds);
-          bbox.AddBounds(dsBounds);
         }
         else if (htg)
         {
-          double htgBounds[6];
-          htg->GetBounds(htgBounds);
-          bbox.AddBounds(htgBounds);
+          htg->GetBounds(dsBounds);
         }
+
+        bbox.AddBounds(dsBounds);
       }
       iter->Delete();
       bbox.GetBounds(bounds);
