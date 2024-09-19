@@ -406,14 +406,14 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
   if (activeAssemblyProp && activeAssemblyProp->GetNumberOfElements() == 1 && selectors &&
     inputProxy)
   {
-    vtkNew<vtkPVDataInformation> subsetInfo;
-    subsetInfo->SetPortNumber(dataInfo->GetPortNumber());
-    subsetInfo->SetSubsetAssemblyName(activeAssemblyProp->GetElement(0));
     for (unsigned int i = 0; i < selectors->GetNumberOfElements(); ++i)
     {
-      subsetInfo->SetSubsetSelector(selectors->GetElement(i));
-      inputProxy->GatherInformation(subsetInfo);
-      this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, subsetInfo);
+      vtkPVDataInformation* selectorInfo = this->GetInputSubsetDataInformation(
+        selectors->GetElement(i), activeAssemblyProp->GetElement(0), "Input");
+      if (selectorInfo)
+      {
+        this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, selectorInfo);
+      }
     }
   }
   else
