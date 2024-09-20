@@ -216,6 +216,29 @@ vtkPVDataInformation* vtkSMDomain::GetInputSubsetDataInformation(
 }
 
 //---------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMDomain::GetInputSubsetDataInformation(
+  const char* selector, const char* assemblyName, const char* function, unsigned int index)
+{
+  vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
+  if (!inputProperty)
+  {
+    return nullptr;
+  }
+
+  vtkSMUncheckedPropertyHelper helper(inputProperty);
+  if (helper.GetNumberOfElements() > index)
+  {
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(index));
+    if (sp)
+    {
+      return sp->GetSubsetDataInformation(helper.GetOutputPort(), selector, assemblyName);
+    }
+  }
+
+  return nullptr;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDomain::AddRequiredProperty(vtkSMProperty* prop, const char* function)
 {
   if (!prop)
