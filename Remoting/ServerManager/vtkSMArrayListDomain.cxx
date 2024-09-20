@@ -374,6 +374,32 @@ int vtkSMArrayListDomain::GetFieldAssociation(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
+namespace
+{
+vtkPVDataInformation* GetInputSubsetDataInformation(vtkSMDomain* domain, const char* selector,
+  const char* assemblyName, const char* function, unsigned int index = 0)
+{
+  vtkSMProperty* inputProperty = domain->GetRequiredProperty(function);
+  if (!inputProperty)
+  {
+    return nullptr;
+  }
+
+  vtkSMUncheckedPropertyHelper helper(inputProperty);
+  if (helper.GetNumberOfElements() > index)
+  {
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(index));
+    if (sp)
+    {
+      return sp->GetSubsetDataInformation(helper.GetOutputPort(), selector, assemblyName);
+    }
+  }
+
+  return nullptr;
+}
+}
+
+//---------------------------------------------------------------------------
 void vtkSMArrayListDomain::Update(vtkSMProperty*)
 {
   vtkSMProperty* input = this->GetRequiredProperty("Input");
@@ -406,14 +432,14 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
   if (activeAssemblyProp && activeAssemblyProp->GetNumberOfElements() == 1 && selectors &&
     inputProxy)
   {
-    vtkNew<vtkPVDataInformation> subsetInfo;
-    subsetInfo->SetPortNumber(dataInfo->GetPortNumber());
-    subsetInfo->SetSubsetAssemblyName(activeAssemblyProp->GetElement(0));
     for (unsigned int i = 0; i < selectors->GetNumberOfElements(); ++i)
     {
-      subsetInfo->SetSubsetSelector(selectors->GetElement(i));
-      inputProxy->GatherInformation(subsetInfo);
-      this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, subsetInfo);
+      vtkPVDataInformation* selectorInfo = ::GetInputSubsetDataInformation(
+        this, selectors->GetElement(i), activeAssemblyProp->GetElement(0), "Input");
+      if (selectorInfo)
+      {
+        this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, selectorInfo);
+      }
     }
   }
   else
