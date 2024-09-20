@@ -44,41 +44,12 @@
                   show="0" />
         <Property name="IgnoreMetaDataWarning"
                   show="0" />
-        <WriterFactory extensions="g e ex2 ex2v2 gen exoII exoii"
-                       file_description="Exodus II File" />
+<!--        <WriterFactory extensions="g e ex2 ex2v2 gen exoII exoii"-->
+<!--                       file_description="Exodus II File" />-->
       </Hints>
       <!-- End of ExodusIIWriter -->
     </PWriterProxy>
     <!-- end of  "writers" -->
-  </ProxyGroup>
-
-  <!-- =================================================================== -->
-  <ProxyGroup name="extract_writers">
-    <DataExtractWriterProxy name="Exodus">
-      <Documentation>
-        Extract writer to write data using the Exodus file format.
-      </Documentation>
-      <StringVectorProperty name="FileName"
-                            number_of_elements="1"
-                            default_values="dataset_{timestep:06d}.ex2">
-        <Documentation>
-          Specify the filename to use.
-        </Documentation>
-      </StringVectorProperty>
-      <SubProxy>
-        <Proxy name="Writer" proxygroup="writers" proxyname="ExodusIIWriter" />
-        <ExposedProperties>
-          <Property name="Input" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <Hints>
-        <ShowInMenu category="Data" />
-      </Hints>
-      <!-- end of Exodus -->
-    </DataExtractWriterProxy>
-
-    <!-- end of "extract_writers" -->
   </ProxyGroup>
 
 </ServerManagerConfiguration>
