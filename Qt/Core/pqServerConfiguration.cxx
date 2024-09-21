@@ -340,15 +340,9 @@ void pqServerConfiguration::parseSshPortForwardingXML()
             this->PortForwarding = true;
             this->PortForwardingLocalPort = QString(sshForwardXML->GetAttributeOrDefault(
               "local", QString::number(this->resource().port()).toUtf8().data()));
-
-            // rc connection do not need to set the actual URI
-            // as connection is managed server side with pvserver arguments
-            if (!resource.isReverse())
-            {
-              resource.setHost("localhost");
-              resource.setPort(this->PortForwardingLocalPort.toInt());
-              this->ActualURI = resource.schemeHostsPorts().toURI();
-            }
+            resource.setHost("localhost");
+            resource.setPort(this->PortForwardingLocalPort.toInt());
+            this->ActualURI = resource.schemeHostsPorts().toURI();
           }
         }
       }
@@ -502,24 +496,29 @@ QString pqServerConfiguration::sshFullCommand(
 {
   QString sshFullCommand;
   QTextStream sshStream(&sshFullCommand);
-  sshStream << sshCommand;
+  sshStream << sshCommand << " ";
 
   QString sshPort = sshConfigXML->GetAttributeOrDefault("port", "");
   if (!sshPort.isEmpty())
   {
-    sshStream << " -p " << sshPort << " ";
+    sshStream << "-p " << sshPort << " ";
   }
 
   vtkPVXMLElement* sshForwardXML = sshConfigXML->FindNestedElementByName("PortForwarding");
   if (sshForwardXML)
   {
-    QString sshFlag = "-L ";
     if (this->resource().isReverse())
     {
-      sshFlag = "-R ";
+      // Reverse tunnelling
+      sshStream << "-R " << QString::number(this->resource().port())
+                << ":localhost:" << this->PortForwardingLocalPort << " ";
     }
-    sshStream << sshFlag << this->PortForwardingLocalPort
-              << ":localhost:" << QString::number(this->resource().port()) << " ";
+    else
+    {
+      // Forward tunnelling
+      sshStream << "-L " << this->PortForwardingLocalPort
+                << ":localhost:" << QString::number(this->resource().port()) << " ";
+    }
   }
 
   QString sshUser = sshConfigXML->GetAttributeOrDefault("user", "");
@@ -527,7 +526,7 @@ QString pqServerConfiguration::sshFullCommand(
   {
     sshStream << sshUser << "@";
   }
-  sshStream << this->resource().host();
+  sshStream << this->resource().host() << " ";
   return sshFullCommand;
 }
 
