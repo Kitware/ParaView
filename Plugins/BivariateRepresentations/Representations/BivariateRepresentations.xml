@@ -191,7 +191,7 @@
     <!-- End of UniformGridRepresentation Extension -->
     </Extension>
 
-    <RepresentationProxy name="BivariateTextureRepresentation"
+    <BivariateTextureRepresentationProxy name="BivariateTextureRepresentation"
       class="vtkBivariateTextureRepresentation"
       processes="client|renderserver|dataserver"
       base_proxygroup="representations"
@@ -200,7 +200,7 @@
         This representation generates 2D texture coordinates from 2 choosen point data arrays
         and provide default textures to visualize bi-variate data.
       </Documentation>
-      <StringVectorProperty name="FirstArray"
+      <StringVectorProperty name="SecondArray"
                             command="SetInputArrayToProcess"
                             number_of_elements="5"
                             element_types="int int int int str"
@@ -213,36 +213,51 @@
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>
-          This property specifies the name of the first point data array used to compute texture
-          coordinates (first component).
-        </Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty name="SecondArray"
-                            command="SetInputArrayToProcess"
-                            number_of_elements="5"
-                            element_types="int int int int str"
-                            default_values="2 0 0 0 0">
-        <ArrayListDomain name="array_list"
-                         attribute_type="Scalars"
-                         input_domain_name="input_array_point_1">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>
           This property specifies the name of the second point data array used to compute texture
           coordinates (second component).
         </Documentation>
       </StringVectorProperty>
-
-      <SubProxy command="SetLogoSourceRepresentation">
-        <Proxy name="LogoSourceRepresentation"
-               proxygroup="representations"
-               proxyname="LogoSourceRepresentation">
-        </Proxy>
-      </SubProxy>
+      <ProxyProperty command="SetTexture"
+                     name="BivariateTexture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <Documentation>
+          Set the diffuse color texture.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <DoubleVectorProperty
+         name="FirstArrayRange"
+         command="GetFirstArrayRange"
+         number_of_elements="2"
+         default_values="0 0"
+         information_only="1">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+         name="SecondArrayRange"
+         command="GetSecondArrayRange"
+         number_of_elements="2"
+         default_values="0 0"
+         information_only="1">
+      </DoubleVectorProperty>
+      <StringVectorProperty
+         name="FirstArrayName"
+         command="GetFirstArrayName"
+         number_of_elements="1"
+         default_values=""
+         information_only="1">
+      </StringVectorProperty>
+      <StringVectorProperty
+         name="SecondArrayName"
+         command="GetSecondArrayName"
+         number_of_elements="1"
+         default_values=""
+         information_only="1">
+      </StringVectorProperty>
     <!-- End of BivariateTextureRepresentation -->
-    </RepresentationProxy>
+    </BivariateTextureRepresentationProxy>
 
     <Extension name="GeometryRepresentation">
       <Documentation>
@@ -266,8 +281,8 @@
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Bivariate representation">
-            <Property name="FirstArray"/>
             <Property name="SecondArray"/>
+            <Property name="BivariateTexture"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -302,8 +317,8 @@
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Bivariate representation">
-            <Property name="FirstArray"/>
             <Property name="SecondArray"/>
+            <Property name="BivariateTexture"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -338,8 +353,8 @@
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Bivariate representation">
-            <Property name="FirstArray"/>
             <Property name="SecondArray"/>
+            <Property name="BivariateTexture"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -351,5 +366,618 @@
       </SubProxy>
     <!-- End of UniformGridRepresentation Extension -->
     </Extension>
+  </ProxyGroup>
+
+  <ProxyGroup name="annotations">
+    <Proxy class="vtkContext2DTexturedScalarBarActor"
+           name="TexturedScalarBarActor">
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable"
+                     number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty command="GetEstimatedNumberOfAnnotations"
+                         information_only="1"
+                         name="EstimatedNumberOfAnnotations">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetTitle"
+                            default_values="Name"
+                            no_custom_default="1"
+                            name="FirstTitle"
+                            label="First Title (vertical)"
+                            number_of_elements="1">
+        <Documentation>
+          Set the first title text with respect to the color legend.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetTitle2"
+                            default_values="Name"
+                            no_custom_default="1"
+                            name="SecondTitle"
+                            label="Second Title (horizontal)"
+                            number_of_elements="1">
+        <Documentation>
+          Set the second title text with respect to the color legend.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetFirstRange"
+                            name="FirstRange"
+                            number_of_elements="2"
+                            default_values="0 0">
+        <Documentation>Test</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSecondRange"
+                            name="SecondRange"
+                            number_of_elements="2"
+                            default_values="0 0">
+        <Documentation>Test</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetComponentTitle"
+                            default_values=""
+                            no_custom_default="1"
+                            name="ComponentTitle"
+                            number_of_elements="1">
+        <Documentation>
+          Set the component title text with respect to the color legend.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetTitleJustification"
+                         default_values="1"
+                         name="TitleJustification"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Left"
+                 value="0"/>
+          <Entry text="Centered"
+                 value="1"/>
+          <Entry text="Right"
+                 value="2"/>
+        </EnumerationDomain>
+        <Documentation>
+          Set the justification of the title text with respect to the color legend.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDrawBackground"
+                         name="DrawBackground"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enable drawing a background behind the color legend.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetBackgroundColor"
+                            default_values="1 1 1 0.5"
+                            name="BackgroundColor"
+                            panel_widget="color_selector"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range"/>
+        <Documentation>
+          Set the color and opacity of the background behind the color legend.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawBackground" function="boolean" index="0"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackgroundPadding"
+                            default_values="2.0"
+                            name="BackgroundPadding"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"/>
+        <Documentation>
+          Set the amount of padding around the outermost elements of the color legend when the background is drawn.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawBackground" function="boolean" index="0"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScalarBarLength"
+                            default_values="0.15"
+                            name="ScalarBarLength"
+                            label="Color Bar Size"
+                            number_of_elements="1">
+        <Documentation>
+          Sets the size of the 2D scalar bar. This correspond to the size of the side of the texture square
+          (in the viewport space). Value is clamped between 0 and 1.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDrawScalarBarOutline"
+                         default_values="1"
+                         name="DrawScalarBarOutline"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Draws an outline around the scalar bar.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetScalarBarOutlineColor"
+                            default_values="1 1 1"
+                            name="ScalarBarOutlineColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <Documentation>
+          Color of the outline drawn around the scalar bar if it is shown.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawScalarBarOutline" function="boolean" index="0"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetScalarBarOutlineThickness"
+                         default_values="1"
+                         name="ScalarBarOutlineThickness"
+                         number_of_elements="1">
+        <Documentation>
+          Set the thickness, in pixels, of the outline drawn around the scalar bar.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawScalarBarOutline" function="boolean" index="0"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAutomaticLabelFormat"
+                         default_values="1"
+                         name="AutomaticLabelFormat"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if the number format used for the labels (specified as a C-style printf format string) will be
+          automatically generated to make
+          the numbers best fit within the widget. When off, the Label Format property will be used.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetLabelFormat"
+                            default_values="%-#6.3g"
+                            name="LabelFormat"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="AutomaticLabelFormat" function="boolean_invert" index="0"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Set the number format (specified as a C-style printf format string) with which to print the labels on the
+          color legend.
+          Can be used only if Automatic Label Format is off.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetAddRangeLabels"
+                         number_of_elements="1"
+                         default_values="1"
+                         name="AddRangeLabels"
+                         label="Add Range Labels">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether to add range labels or not. These are labels that have
+          the minimum/maximum values of the color legend range.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetRangeLabelFormat"
+                            number_of_elements="1"
+                            default_values="%-#6.1e"
+                            name="RangeLabelFormat"
+                            label="Range Label Format">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="AddRangeLabels" function="boolean" index="0"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Set number format for range labels (specified as a C-style printf format string). Can be used only if Add
+          Range Labels is enabled.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetDrawTickMarks"
+                         default_values="1"
+                         name="DrawTickMarks"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enable/disable drawing the color legend tick marks.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetDrawTickLabels"
+                         default_values="1"
+                         name="DrawTickLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enable/disable drawing the color legend labels for tick marks.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetUseCustomLabels"
+                         name="UseCustomLabels"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enable the use of custom label values.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomLabel"
+                            name="CustomLabels"
+                            set_number_command="SetNumberOfCustomLabels"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomLabels" function="boolean"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetTextPosition"
+                         default_values="1"
+                         name="TextPosition"
+                         label="Annotations Position"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Right and top"
+                 value="1"/>
+          <Entry text="Left and bottom"
+                 value="0"/>
+        </EnumerationDomain>
+        <Documentation>
+          Determines where the ticks, titles and labels are drawn.
+        </Documentation>
+      </IntVectorProperty>
+      <ProxyProperty command="SetTexture"
+                      name="Texture"
+                      panel_widget="texture_selector"
+                      null_on_empty="1" >
+        <Documentation>
+          Set the texture displayed in the scalar bar.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                    mode="visibility"
+                                    property="Interpolation"
+                                    value="3"
+                                    inverse="1" />
+          <TextureSelectorWidget check_tcoords="1" />
+          <!-- enable the texture selector only when tcoords is available. -->
+        </Hints>
+      </ProxyProperty>
+      <!--label text property -->
+      <SubProxy command="SetLabelTextProperty">
+        <Proxy name="LabelTextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <Property exposed_name="LabelColor"
+                    name="Color"/>
+          <Property exposed_name="LabelOpacity"
+                    name="Opacity"/>
+          <Property exposed_name="LabelFontFamily"
+                    name="FontFamily"/>
+          <Property exposed_name="LabelFontFile"
+                    name="FontFile"/>
+          <Property exposed_name="LabelBold"
+                    name="Bold"/>
+          <Property exposed_name="LabelItalic"
+                    name="Italic"/>
+          <Property exposed_name="LabelShadow"
+                    name="Shadow"/>
+          <Property exposed_name="LabelFontSize"
+                    name="FontSize"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!--title text property -->
+      <SubProxy command="SetTitleTextProperty">
+        <Proxy name="TitleTextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <Property exposed_name="TitleColor"
+                    name="Color"/>
+          <Property exposed_name="TitleOpacity"
+                    name="Opacity"/>
+          <Property exposed_name="TitleFontFamily"
+                    name="FontFamily"/>
+          <Property exposed_name="TitleFontFile"
+                    name="FontFile"/>
+          <Property exposed_name="TitleBold"
+                    name="Bold"/>
+          <Property exposed_name="TitleItalic"
+                    name="Italic"/>
+          <Property exposed_name="TitleShadow"
+                    name="Shadow"/>
+          <Property exposed_name="TitleFontSize"
+                    name="FontSize"/>
+        </ExposedProperties>
+      </SubProxy>
+    <!-- End of TexturedScalarBarActor -->
+    </Proxy>
+  </ProxyGroup>
+
+  <!-- ProxyGroup should be different from "representations" since this ScalarBarWidgetRepresentationProxy name -->
+  <!-- Has to be the same than the one defined in ParaView. This proxy name is used to retrieve the scalar bar -->
+  <!-- proxy and is not parametrable yet (see vtkSMTransferFunctionProxy::FindScalarBarRepresentation) -->
+  <ProxyGroup name="CustomScalarBarWidgetRepresentation">
+    <Proxy class="vtkContext2DTexturedScalarBarRepresentation"
+           name="ScalarBarRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0.89 0.02"
+                            information_property="PositionInfo"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+        <Documentation>
+          Specify the anchor position (bottom-left corner of the scalar bar) in normalized
+          viewport coordinates in range [0, 1]. This is used only when **Window Location**
+          is set to **AnyLocation**.
+        </Documentation>
+        <Hints>
+          <!-- Enable "Position" widget only when WindowLocation == AnyLocation -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="WindowLocation"
+            value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetAutoOrient"
+                         default_values="0"
+                         name="AutoOrient"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>
+          Set if color legend's orientation will be updated based on its position.
+          This parameter as no effect in the case of this scalar bar representation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetAutoOrient"
+                         information_only="1"
+                         name="AutoOrientInfo">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOrientation"
+                         default_values="1"
+                         information_property="OrientationInfo"
+                         name="Orientation"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="AutoOrient" function="boolean_invert" index="0" />
+          </PropertyWidgetDecorator>
+          <NoDefault />
+        </Hints>
+        <EnumerationDomain name="enum">
+          <Entry text="Horizontal"
+                 value="0" />
+          <Entry text="Vertical"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify orientation of the color legend. Can be used only if Auto Orient is disabled.
+          This parameter as no effect in the case of this scalar bar representation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetOrientation"
+                         information_only="1"
+                         name="OrientationInfo">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWindowLocation"
+                         default_values="2"
+                         name="WindowLocation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Any Location"
+                 value="0" />
+          <Entry text="Lower Left Corner"
+                 value="1" />
+          <Entry text="Lower Right Corner"
+                 value="2" />
+          <Entry text="Lower Center"
+                 value="3" />
+          <Entry text="Upper Left Corner"
+                 value="4" />
+          <Entry text="Upper Right Corner"
+                 value="5" />
+          <Entry text="Upper Center"
+                 value="6" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify placement of the color legend.
+        </Documentation>
+      </IntVectorProperty>
+      <ProxyProperty command="SetScalarBarActor"
+                     name="ScalarBarActor">
+        <ProxyGroupDomain name="groups">
+          <Group name="annotations" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- End of ScalarBarRepresentation -->
+    </Proxy>
+
+    <ScalarBarWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                        name="ScalarBarWidgetRepresentation">
+      <Documentation>
+        This custom ScalarBarWidgetRepresentation is used for displaying the textured 2D
+        scalar bar including a widget to control the position and the size of the scalar bar.
+      </Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/Disable widget interaction.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseNonCompositedRenderer"
+                         default_values="1"
+                         name="UseNonCompositedRenderer"
+                         number_of_elements="1"
+                         panel_visibility="never"></IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="LockPosition"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set this to 1 if you don't want the application to change the scalar bar position
+          when placing automatically.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="StickyVisible"
+                         default_values="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If the user manually toggles the scalar bar visibility, we keep that information
+          in the scalar bar representation, and will never / always show it until the
+          scalar bar button is toggled again on this array.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop2D"
+               proxygroup="CustomScalarBarWidgetRepresentation"
+               proxyname="ScalarBarRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" panel_visibility="never"/>
+          <Property name="ScalarBarActor" panel_visibility="never"/>
+          <PropertyGroup label="Layout">
+            <Property name="AutoOrient" panel_visibility="never"/>
+            <Property name="AutoOrientInfo" />
+            <Property name="Orientation" panel_visibility="never"/>
+            <Property name="OrientationInfo" />
+            <Property name="WindowLocation" />
+            <Property name="Position" />
+            <Property name="PositionInfo" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Prop2DActor"
+               proxygroup="annotations"
+               proxyname="TexturedScalarBarActor"></Proxy>
+
+        <ExposedProperties>
+          <Property name="EstimatedNumberOfAnnotations" panel_visibility="never"/>
+          <Property name="LookupTable" panel_visibility="never" />
+          <Property name="FirstRange" panel_visibility="never" />
+          <Property name="SecondRange" panel_visibility="never" />
+          <!-- Appearance -->
+          <PropertyGroup label="General Appearance">
+            <Property name="Texture" />
+            <Property name="ScalarBarLength" />
+            <Property name="TextPosition" />
+            <Property name="DrawBackground" panel_visibility="advanced" />
+            <Property name="BackgroundColor" panel_visibility="advanced" />
+            <Property name="BackgroundPadding" panel_visibility="advanced" />
+            <Property name="DrawScalarBarOutline" panel_visibility="advanced" />
+            <Property name="ScalarBarOutlineColor" panel_visibility="advanced" />
+            <Property name="ScalarBarOutlineThickness" panel_visibility="advanced" />
+          </PropertyGroup>
+          <!-- Axis titles -->
+          <PropertyGroup label="Axis Titles">
+            <Property name="FirstTitle" />
+            <Property name="SecondTitle" />
+            <Property name="ComponentTitle" />
+            <Property name="TitleJustification" />
+          </PropertyGroup>
+          <!-- Properties for Title -->
+          <PropertyGroup label="Axis Titles Font Properties"
+                         panel_widget="FontEditor">
+            <Property name="TitleColor" function="Color"/>
+            <Property name="TitleOpacity" function="Opacity"/>
+            <Property name="TitleFontFamily" function="Family"/>
+            <Property name="TitleFontFile" function="File"/>
+            <Property name="TitleBold" function="Bold" />
+            <Property name="TitleItalic" function="Italics"/>
+            <Property name="TitleShadow" function="Shadow" />
+            <Property name="TitleFontSize" function="Size"
+                      number_of_elements="1" default_values="16" />
+          </PropertyGroup>
+          <!-- Ticks and Labels -->
+          <PropertyGroup label="Ticks and Labels">
+            <Property name="AutomaticLabelFormat" panel_visibility="advanced" />
+            <Property name="LabelFormat" panel_visibility="advanced" />
+            <Property name="DrawTickMarks" panel_visibility="advanced" />
+            <Property name="DrawTickLabels" panel_visibility="advanced" />
+            <Property name="UseCustomLabels" panel_visibility="advanced" />
+            <Property name="CustomLabels" panel_visibility="advanced" />
+            <Property name="AddRangeLabels" panel_visibility="advanced" />
+            <Property name="RangeLabelFormat" panel_visibility="advanced" />
+          </PropertyGroup>
+          <!-- Properties for Label -->
+          <PropertyGroup label="Labels Font Properties"
+                         panel_widget="FontEditor">
+            <Property name="LabelColor" function="Color"/>
+            <Property name="LabelOpacity" function="Opacity" />
+            <Property name="LabelFontFamily" function="Family"/>
+            <Property name="LabelFontFile" function="File"/>
+            <Property name="LabelBold" function="Bold" />
+            <Property name="LabelItalic" function="Italics" />
+            <Property name="LabelShadow" function="Shadow" />
+            <Property name="LabelFontSize" function="Size"
+                      number_of_elements="1" default_values="16"/>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="ScalarBarWidget"></Proxy>
+        <ExposedProperties>
+          <Property name="Selectable" panel_visibility="never"/>
+          <Property name="Resizable" panel_visibility="never"/>
+          <Property name="Repositionable" panel_visibility="never"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of ScalarBarWidgetRepresentation -->
+    </ScalarBarWidgetRepresentationProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
