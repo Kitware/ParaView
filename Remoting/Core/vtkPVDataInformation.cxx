@@ -313,6 +313,13 @@ void vtkPVDataInformation::Initialize()
 }
 
 //----------------------------------------------------------------------------
+vtkSmartPointer<vtkCompositeDataSet> vtkPVDataInformation::SimplifyCompositeDataSet(
+  vtkCompositeDataSet* cd)
+{
+  return cd;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 {
   this->Initialize();
@@ -392,9 +399,10 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   vtkPVDataInformationAccumulator accumulator;
   if (auto cd = vtkCompositeDataSet::SafeDownCast(subset))
   {
+    vtkSmartPointer<vtkCompositeDataSet> simpleCD = this->SimplifyCompositeDataSet(cd);
     decltype(this->FirstLeafCompositeIndex) leaf_index = 0;
     using Opts = vtk::CompositeDataSetOptions;
-    for (const auto& item : vtk::Range(cd, Opts::None))
+    for (const auto& item : vtk::Range(simpleCD, Opts::None))
     {
       if (leaf_index == 0)
       {
@@ -413,7 +421,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 
     // if cd is a data-object tree, the iteration also misses non-leaf nodes and their
     // field data; so process that too.
-    if (auto dtree = vtkDataObjectTree::SafeDownCast(cd))
+    if (auto dtree = vtkDataObjectTree::SafeDownCast(simpleCD))
     {
       using DTOpts = vtk::DataObjectTreeOptions;
       for (const auto& item : vtk::Range(dtree, DTOpts::TraverseSubTree))

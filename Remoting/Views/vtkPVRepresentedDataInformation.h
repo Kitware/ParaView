@@ -29,6 +29,11 @@ protected:
   vtkPVRepresentedDataInformation();
   ~vtkPVRepresentedDataInformation() override;
 
+  /**
+   * Simplifies a composite dataset by merging leafs of partitioned datasets for faster processing.
+   */
+  vtkSmartPointer<vtkCompositeDataSet> SimplifyCompositeDataSet(vtkCompositeDataSet* cd) override;
+
 private:
   vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&) = delete;
   void operator=(const vtkPVRepresentedDataInformation&) = delete;
