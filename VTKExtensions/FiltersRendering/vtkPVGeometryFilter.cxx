@@ -472,14 +472,9 @@ void vtkPVGeometryFilter::UpdateCache(vtkDataObject* output)
 bool vtkPVGeometryFilter::UseCacheIfPossible(vtkDataObject* input, vtkDataObject* output)
 {
   details::AddTemporaryOriginalIdsArrays(input);
-  if (!this->MeshCache->IsSupportedData(input))
-  {
-    return false;
-  }
-
   this->MeshCache->SetOriginalDataObject(input);
-  auto status = this->MeshCache->GetStatus();
 
+  vtkDataObjectMeshCache::Status status = this->MeshCache->GetStatus();
   if (status.enabled())
   {
     this->MeshCache->CopyCacheToDataObject(output);
@@ -497,13 +492,17 @@ int vtkPVGeometryFilter::RequestData(
   auto input = vtkDataObject::GetData(inputVector[0], 0);
   auto dataObjectOutput = vtkDataObject::GetData(outputVector, 0);
 
-  // create a copy as we add some temporary array.
-  vtkSmartPointer<vtkDataObject> modifiedInput;
-  modifiedInput.TakeReference(input->NewInstance());
-  modifiedInput->ShallowCopy(input);
-  if (this->UseCacheIfPossible(modifiedInput, dataObjectOutput))
+  vtkSmartPointer<vtkDataObject> modifiedInput = input;
+  const bool isCachingSupported = this->MeshCache->IsSupportedData(input);
+  if (isCachingSupported)
   {
-    return 1;
+    // create a copy as we add some temporary array.
+    modifiedInput.TakeReference(input->NewInstance());
+    modifiedInput->ShallowCopy(input);
+    if (this->UseCacheIfPossible(modifiedInput, dataObjectOutput))
+    {
+      return 1;
+    }
   }
 
   if (input->IsA("vtkCompositeDataSet"))
@@ -550,7 +549,10 @@ int vtkPVGeometryFilter::RequestData(
     }
   }
 
-  this->UpdateCache(dataObjectOutput);
+  if (isCachingSupported)
+  {
+    this->UpdateCache(dataObjectOutput);
+  }
   return 1;
 }
 
