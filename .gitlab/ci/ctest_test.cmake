@@ -28,8 +28,6 @@ list(APPEND test_exclusions
   "\\.BivariateTextureRepresentation$"
   # see https://gitlab.kitware.com/paraview/paraview/-/issues/22694
   "\\.HyperTreeGridObliquePlaneCutter$"
-  # https://gitlab.kitware.com/paraview/paraview/-/issues/21774
-  "\\.CDISimpleRead$"
   # Random segfault that would require deep investigation
   # https://gitlab.kitware.com/paraview/paraview/-/issues/21484
   "\\.ColorOpacityTableEditing$"

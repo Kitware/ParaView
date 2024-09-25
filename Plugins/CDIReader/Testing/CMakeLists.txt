@@ -28,7 +28,9 @@ set (xml_tests
   CDISimpleRead.xml
   CDIUseMask.xml
   CDIDimensionsTest.xml
-  )
+)
+
+set(CDISimpleRead_METHOD LOOSE_VALID)
 
 paraview_add_client_tests(
   LOAD_PLUGIN CDIReader
