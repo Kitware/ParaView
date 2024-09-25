@@ -472,14 +472,9 @@ void vtkPVGeometryFilter::UpdateCache(vtkDataObject* output)
 bool vtkPVGeometryFilter::UseCacheIfPossible(vtkDataObject* input, vtkDataObject* output)
 {
   details::AddTemporaryOriginalIdsArrays(input);
-  if (!this->MeshCache->IsSupportedData(input))
-  {
-    return false;
-  }
-
   this->MeshCache->SetOriginalDataObject(input);
-  auto status = this->MeshCache->GetStatus();
 
+  vtkDataObjectMeshCache::Status status = this->MeshCache->GetStatus();
   if (status.enabled())
   {
     this->MeshCache->CopyCacheToDataObject(output);
@@ -497,13 +492,17 @@ int vtkPVGeometryFilter::RequestData(
   auto input = vtkDataObject::GetData(inputVector[0], 0);
   auto dataObjectOutput = vtkDataObject::GetData(outputVector, 0);
 
-  // create a copy as we add some temporary array.
-  vtkSmartPointer<vtkDataObject> modifiedInput;
-  modifiedInput.TakeReference(input->NewInstance());
-  modifiedInput->ShallowCopy(input);
-  if (this->UseCacheIfPossible(modifiedInput, dataObjectOutput))
+  vtkSmartPointer<vtkDataObject> modifiedInput = input;
+  const bool isCachingSupported = this->MeshCache->IsSupportedData(input);
+  if (isCachingSupported)
   {
-    return 1;
+    // create a copy as we add some temporary array.
+    modifiedInput.TakeReference(input->NewInstance());
+    modifiedInput->ShallowCopy(input);
+    if (this->UseCacheIfPossible(modifiedInput, dataObjectOutput))
+    {
+      return 1;
+    }
   }
 
   if (input->IsA("vtkCompositeDataSet"))
@@ -550,7 +549,10 @@ int vtkPVGeometryFilter::RequestData(
     }
   }
 
-  this->UpdateCache(dataObjectOutput);
+  if (isCachingSupported)
+  {
+    this->UpdateCache(dataObjectOutput);
+  }
   return 1;
 }
 
@@ -580,7 +582,7 @@ void vtkPVGeometryFilter::GenerateProcessIdsArrays(vtkPolyData* output)
   if (numPoints > 0)
   {
     vtkNew<vtkConstantArray<unsigned int>> pointsProcArray;
-    pointsProcArray->SetNumberOfTuples(numPoints);
+    pointsProcArray->SetNumberOfValues(numPoints);
     pointsProcArray->ConstructBackend(procId);
     pointsProcArray->SetName("vtkProcessId");
     output->GetPointData()->AddArray(pointsProcArray);
@@ -590,7 +592,7 @@ void vtkPVGeometryFilter::GenerateProcessIdsArrays(vtkPolyData* output)
   if (numCells > 0)
   {
     vtkNew<vtkConstantArray<unsigned int>> cellsProcArray;
-    cellsProcArray->SetNumberOfTuples(numCells);
+    cellsProcArray->SetNumberOfValues(numCells);
     cellsProcArray->ConstructBackend(procId);
     cellsProcArray->SetName("vtkProcessId");
     output->GetCellData()->AddArray(cellsProcArray);
@@ -620,15 +622,15 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output)
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
 {
-  vtkNew<vtkUnsignedIntArray> pointsCIArray;
+  vtkNew<vtkConstantArray<unsigned int>> pointsCIArray;
   pointsCIArray->SetNumberOfValues(pd->GetNumberOfPoints());
-  pointsCIArray->FillValue(index);
+  pointsCIArray->ConstructBackend(index);
   pointsCIArray->SetName("vtkCompositeIndex");
   pd->GetPointData()->AddArray(pointsCIArray);
 
-  vtkNew<vtkUnsignedIntArray> cellsCIArray;
+  vtkNew<vtkConstantArray<unsigned int>> cellsCIArray;
   cellsCIArray->SetNumberOfValues(pd->GetNumberOfCells());
-  cellsCIArray->Fill(index);
+  cellsCIArray->ConstructBackend(index);
   cellsCIArray->SetName("vtkCompositeIndex");
   pd->GetCellData()->AddArray(cellsCIArray);
 }
@@ -647,15 +649,15 @@ void vtkPVGeometryFilter::AddBlockColors(vtkDataObject* pd, unsigned int index)
 void vtkPVGeometryFilter::AddHierarchicalIndex(
   vtkPolyData* pd, unsigned int level, unsigned int index)
 {
-  vtkNew<vtkUnsignedIntArray> dslevel;
+  vtkNew<vtkConstantArray<unsigned int>> dslevel;
   dslevel->SetNumberOfValues(pd->GetNumberOfCells());
-  dslevel->FillValue(level);
+  dslevel->ConstructBackend(level);
   dslevel->SetName("vtkAMRLevel");
   pd->GetCellData()->AddArray(dslevel);
 
-  vtkNew<vtkUnsignedIntArray> dsindex;
+  vtkNew<vtkConstantArray<unsigned int>> dsindex;
   dsindex->SetNumberOfValues(pd->GetNumberOfCells());
-  dsindex->FillValue(index);
+  dsindex->ConstructBackend(index);
   dsindex->SetName("vtkAMRIndex");
   pd->GetCellData()->AddArray(dsindex);
 }
@@ -775,15 +777,12 @@ int vtkPVGeometryFilter::RequestAMRData(
       if (this->UseOutline)
       {
         this->ExecuteAMRBlockOutline(data_bounds, outputPartition, extractface);
+        // don't process attribute arrays when generating outlines.
       }
       else
       {
         this->ExecuteAMRBlock(ug, outputPartition, extractface);
-      }
-      if (!this->UseOutline)
-      {
-        // don't process attribute arrays when generating outlines.
-
+        // add atttribute arrays when not generating outlines
         this->CleanupOutputData(outputPartition);
         this->AddCompositeIndex(outputPartition, amr->GetCompositeIndex(level, partitionIdx));
         this->AddHierarchicalIndex(outputPartition, level, partitionIdx);

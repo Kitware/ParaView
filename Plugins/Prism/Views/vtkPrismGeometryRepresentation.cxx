@@ -204,14 +204,15 @@ int vtkPrismGeometryRepresentation::RequestData(
     if (inputVector[0]->GetNumberOfInformationObjects() == 1)
     {
       vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-      auto prod = vtkPVTrivialProducer::SafeDownCast(this->GetInternalOutputPort()->GetProducer());
+      vtkAlgorithmOutput* internalOutputPort = this->GetInternalOutputPort();
+      auto prod = vtkPVTrivialProducer::SafeDownCast(internalOutputPort->GetProducer());
       if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) && prod)
       {
         prod->SetWholeExtent(inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()));
       }
       if (this->IsSimulationData)
       {
-        this->SimulationPointCloudFilter->SetInputConnection(this->GetInternalOutputPort());
+        this->SimulationPointCloudFilter->SetInputConnection(internalOutputPort);
         this->SimulationToPrismFilter->SetInputConnection(
           this->SimulationPointCloudFilter->GetOutputPort());
         this->GeometryFilter->SetInputConnection(this->SimulationToPrismFilter->GetOutputPort());
