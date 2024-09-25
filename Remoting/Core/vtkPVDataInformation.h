@@ -475,6 +475,11 @@ protected:
   friend class vtkPVDataInformationHelper;
 
   /**
+   * Simplifies a composite dataset for faster processing when accumulating data-information.
+   */
+  virtual vtkSmartPointer<vtkCompositeDataSet> SimplifyCompositeDataSet(vtkCompositeDataSet* cd);
+
+  /**
    * Extracts selected blocks. Use SubsetSelector and SubsetAssemblyName to extract
    * chosen part of the composite dataset and returns that.
    */
