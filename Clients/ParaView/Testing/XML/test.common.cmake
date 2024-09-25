@@ -657,6 +657,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderViewContextMenuArrayColoring.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderViewContextMenuSolidColoring.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGridBranching_3.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleImageToHyperTreeGrid.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DX.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DY.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DZ.png}"
@@ -2035,7 +2036,7 @@ set(TESTS_WITH_MULTI_SERVERS_3
 
 # ResampleToHyperTreeGrid only works in client mode
 paraview_add_client_tests(
-  TEST_SCRIPTS ResampleToHyperTreeGrid.xml
+  TEST_SCRIPTS ResampleToHyperTreeGrid.xml ResampleImageToHyperTreeGrid.xml
 )
 
 # RandomAttributes generate different results depending on the data
