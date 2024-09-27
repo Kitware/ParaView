@@ -18,9 +18,7 @@
 #include "vtkBivariateRepresentationsModule.h" // for export macro
 #include "vtkDoubleArray.h"                    // for vtkDoubleArray
 #include "vtkGeometryRepresentationWithFaces.h"
-#include "vtkNew.h"          // for vtkNew
-#include "vtkPVLogoSource.h" // for vtkPVLogoSource
-#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include "vtkNew.h" // for vtkNew
 
 class vtkView;
 

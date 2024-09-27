@@ -28,7 +28,7 @@
 #include "vtkSmartPointer.h"                   // for API
 #include "vtkWeakPointer.h"                    // for API
 
-#include <list> // for API
+#include <vector> // for API
 
 class vtkSMLink;
 
