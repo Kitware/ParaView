@@ -416,13 +416,17 @@
                             name="FirstRange"
                             number_of_elements="2"
                             default_values="0 0">
-        <Documentation>Test</Documentation>
+        <Documentation>
+          Set the first (vertical) axis range of the color legend.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSecondRange"
                             name="SecondRange"
                             number_of_elements="2"
                             default_values="0 0">
-        <Documentation>Test</Documentation>
+        <Documentation>
+          Set the second (horizontal) axis range of the color legend.
+        </Documentation>
       </DoubleVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetComponentTitle"
