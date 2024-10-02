@@ -55,6 +55,9 @@
       </item>
       <item>
        <widget class="QWidget" name="nbOfFrames" native="true">
+        <property name="toolTip">
+         <string>Number of frames to use when no "Time Sources" are checked.</string>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <property name="spacing">
           <number>6</number>
