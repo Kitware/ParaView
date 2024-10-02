@@ -47,7 +47,11 @@ public:
 
   ///@{
   /**
-   * Returns information about each display specified.
+   * Returns information about each display specified.  The `Coverable`
+   * field is only used on X windows systems, and indicates that the
+   * window should be manageable by the window manager.  This means it
+   * can be covered by other windows, and a taskbar item is available
+   * to bring it back to the front.
    */
   const char* GetEnvironment(int index) const;
   vtkTuple<int, 4> GetGeometry(int index) const;
@@ -55,6 +59,7 @@ public:
   vtkTuple<double, 3> GetLowerRight(int index) const;
   vtkTuple<double, 3> GetUpperRight(int index) const;
   bool GetHasCorners(int index) const;
+  bool GetCoverable(int index) const;
   ///@}
 
   /**
@@ -71,6 +76,7 @@ private:
   void operator=(const vtkDisplayConfiguration&) = delete;
 
   bool ShowBorders = false;
+  bool Coverable = false;
   bool FullScreen = false;
   double EyeSeparation = 0.0;
 
