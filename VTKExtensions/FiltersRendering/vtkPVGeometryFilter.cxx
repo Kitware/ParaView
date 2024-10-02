@@ -799,6 +799,45 @@ int vtkPVGeometryFilter::RequestAMRData(
 }
 
 //----------------------------------------------------------------------------
+vtkSmartPointer<vtkDataObjectTree> vtkPVGeometryFilter::GetDataObjectTreeInput(
+  vtkInformationVector** inputVector)
+{
+  auto realInput = vtkDataObjectTree::GetData(inputVector[0], 0);
+  if (!realInput)
+  {
+    return nullptr;
+  }
+
+  // create a copy as we add some temporary array that should not be added upstream.
+  vtkSmartPointer<vtkDataObjectTree> tempInput;
+  tempInput.TakeReference(realInput->NewInstance());
+
+  if (realInput->IsA("vtkPartitionedDataSetCollection") || realInput->IsA("vtkMultiBlockDataSet"))
+  {
+    tempInput->ShallowCopy(realInput);
+  }
+  else
+  {
+    vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
+    converter->SetInputDataObject(realInput);
+    converter->SetContainerAlgorithm(this);
+    converter->Update();
+    tempInput->ShallowCopy(converter->GetOutput());
+  }
+
+  details::AddTemporaryOriginalIdsArrays(tempInput);
+
+  vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::CheckAttributes");
+  if (this->CheckAttributes(tempInput))
+  {
+    return nullptr;
+  }
+  vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::CheckAttributes");
+
+  return tempInput;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVGeometryFilter::RequestDataObjectTree(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -811,42 +850,18 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     return 0;
   }
 
-  auto realInput = vtkDataObjectTree::GetData(inputVector[0], 0);
-  if (!realInput)
+  vtkSmartPointer<vtkDataObjectTree> input = this->GetDataObjectTreeInput(inputVector);
+  if (!input)
   {
-    vtkErrorMacro("Input vtkDataObjectTree is nullptr.");
+    vtkErrorMacro("Input is not a vtkDataObjectTree.");
     return 0;
   }
-  vtkSmartPointer<vtkDataObjectTree> tempInput;
-  if (realInput->IsA("vtkPartitionedDataSetCollection") || realInput->IsA("vtkMultiBlockDataSet"))
-  {
-    tempInput = realInput;
-  }
-  else
-  {
-    vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
-    converter->SetInputDataObject(realInput);
-    converter->SetContainerAlgorithm(this);
-    converter->Update();
-    tempInput = converter->GetOutput();
-  }
-  output->CopyStructure(tempInput);
 
-  vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::CheckAttributes");
-  if (this->CheckAttributes(tempInput))
-  {
-    return 0;
-  }
-  vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::CheckAttributes");
-
-  // create a copy as we add some temporary array.
-  vtkSmartPointer<vtkDataObjectTree> input;
-  input.TakeReference(realInput->NewInstance());
-  input->ShallowCopy(realInput);
+  output->CopyStructure(input);
 
   vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::ExecuteCompositeDataSet");
 
-  auto inIter = vtk::TakeSmartPointer(tempInput->NewTreeIterator());
+  auto inIter = vtk::TakeSmartPointer(input->NewTreeIterator());
   inIter->VisitOnlyLeavesOn();
   inIter->SkipEmptyNodesOn();
 
