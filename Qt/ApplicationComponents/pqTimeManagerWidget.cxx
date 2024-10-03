@@ -69,7 +69,7 @@ void pqTimeManagerWidget::updateWidgetsVisibility()
     auto sceneProxy = scene->getProxy();
     vtkSMPropertyHelper playModeProp(sceneProxy->GetProperty("PlayMode"));
     int playMode = playModeProp.GetAsInt();
-    this->Internals->Ui.nbOfFrames->setVisible(playMode == vtkCompositeAnimationPlayer::SEQUENCE);
+    this->Internals->Ui.nbOfFrames->setEnabled(playMode == vtkCompositeAnimationPlayer::SEQUENCE);
   }
 }
 
