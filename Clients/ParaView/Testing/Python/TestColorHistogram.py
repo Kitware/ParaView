@@ -83,5 +83,5 @@ baseline_file = os.path.join(baselinePath, "TestColorHistogram.png")
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(histogramView1.GetRenderWindow(), baseline_file, threshold=40)
+Testing.compareImage(histogramView1.GetRenderWindow(), baseline_file)
 Testing.interact()

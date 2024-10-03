@@ -14,5 +14,5 @@ baseline_file = os.path.join(baselinePath, "TestPV_PLUGIN_PATH.png")
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(rv.GetRenderWindow(), baseline_file, threshold=40)
+Testing.compareImage(rv.GetRenderWindow(), baseline_file)
 Testing.interact()

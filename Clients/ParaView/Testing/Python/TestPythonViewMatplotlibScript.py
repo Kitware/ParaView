@@ -63,7 +63,7 @@ baseline_file = os.path.join(baselinePath, "TestPythonViewMatplotlibScript.png")
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(view.GetRenderWindow(), baseline_file, threshold=25)
+Testing.compareImage(view.GetRenderWindow(), baseline_file)
 Testing.interact()
 
 Delete(cone)

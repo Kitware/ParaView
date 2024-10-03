@@ -53,5 +53,5 @@ except:
 baseline_file = os.path.join(baselinePath, "ExportGLTF.png")
 from paraview.vtk.test import Testing
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(renderView2.GetRenderWindow(), baseline_file, threshold=10)
+Testing.compareImage(renderView2.GetRenderWindow(), baseline_file)
 Testing.interact()

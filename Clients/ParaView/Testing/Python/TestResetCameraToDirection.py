@@ -24,6 +24,5 @@ baseline_file = os.path.join(baselinePath, "TestResetCameraToDirection.png")
 
 from paraview.vtk.test import Testing
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(GetActiveView().GetRenderWindow(), baseline_file,
-                     threshold=25)
+Testing.compareImage(GetActiveView().GetRenderWindow(), baseline_file)
 Testing.interact()
