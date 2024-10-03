@@ -45,7 +45,7 @@
 #include "vtkTextureObjectVS.h" // a pass through shader
 #include "vtkUnsignedCharArray.h"
 
-#include "vtk_glew.h"
+#include "vtk_glad.h"
 
 #include <algorithm>
 #include <vector>

@@ -8,5 +8,5 @@ GROUPS
   PARAVIEW_CORE
 PRIVATE_DEPENDS
   VTK::mpi
-  VTK::opengl
+  VTK::glad
 THIRD_PARTY

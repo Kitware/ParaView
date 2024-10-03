@@ -17,9 +17,9 @@ REQUIRES_MODULES
   VTK::FiltersCore
   VTK::FiltersParallel
   VTK::FiltersSources
+  VTK::glad
   VTK::IOXML
   VTK::IOXMLParser
-  VTK::opengl
   VTK::ParallelCore
   VTK::RenderingCore
   VTK::RenderingOpenGL2

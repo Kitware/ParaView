@@ -78,6 +78,13 @@ public:
   void SetUseOffScreenBuffers(bool) override {}
   void SetShowWindow(bool) override {}
 
+  void OpenGLInitContext() override
+  {
+    this->Context->OpenGLInitContext();
+    this->Initialized = this->Context->GetInitialized();
+    this->MaximumHardwareLineWidth = this->Context->GetMaximumHardwareLineWidth();
+  }
+
   void Render() override
   {
     if (this->Context && this->GetReadyForRendering())

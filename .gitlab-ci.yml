@@ -66,26 +66,6 @@ el7-mindeps-shared-mpi-python:build:
 #     needs:
 #         - el7-mindeps-shared-mpi-python:build
 
-fedora35-static-mpi-offscreen-osmesa-python:build:
-    extends:
-        - .fedora35_static_mpi_offscreen_osmesa_python
-        - .cmake_build_linux
-        - .linux_builder_tags
-        - .cmake_build_artifacts
-        - .run_manually
-
-fedora35-static-mpi-offscreen-osmesa-python:test:
-    extends:
-        - .fedora35_static_mpi_offscreen_osmesa_python
-        - .cmake_test_linux
-        - .linux_builder_tags
-        - .cmake_test_artifacts
-        - .run_automatically
-    dependencies:
-        - fedora35-static-mpi-offscreen-osmesa-python:build
-    needs:
-        - fedora35-static-mpi-offscreen-osmesa-python:build
-
 el8-shared-icc-mpi-python:build:
     extends:
         - .el8_shared_icc_mpi_python
@@ -138,6 +118,19 @@ fedora35-shared-mpi-python-qt-vtkmoverride:build:
 fedora35-shared-mpi-python-qt-vtkmoverride:test:
     extends:
         - .fedora35_shared_mpi_python_qt_vtkmoverride
+        - .cmake_test_linux
+        - .linux_tester_tags
+        - .cmake_test_artifacts
+        - .run_automatically
+    dependencies:
+        - fedora35-shared-mpi-python-qt-vtkmoverride:build
+    needs:
+        - fedora35-shared-mpi-python-qt-vtkmoverride:build
+    timeout: 180 minutes
+
+fedora35-shared-mpi-offscreen-osmesa-python-qt-vtkmoverride:test:
+    extends:
+        - .fedora35_shared_mpi_offscreen_osmesa_python_qt_vtkmoverride
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
