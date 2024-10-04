@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class   vtkPVGridAxes3DActor
- * @brief   ParaView extensions for vtkGridAxes3DActor.
+ * @brief   ParaView extensions for vtkGridAxesActor3D.
  *
  * vtkPVGridAxes3DActor adds support for ParaView-specific use-cases to
- * vtkGridAxes3DActor.
+ * vtkGridAxesActor3D.
  * The special use-cases are:
  * \li Showing original data bounds when data has been transformed by
  * specifying a transform on the \c Display properties: To support this, we add
@@ -26,16 +26,16 @@
 #ifndef vtkPVGridAxes3DActor_h
 #define vtkPVGridAxes3DActor_h
 
-#include "vtkGridAxes3DActor.h"
+#include "vtkGridAxesActor3D.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 
 class vtkMatrix4x4;
 
-class VTKREMOTINGVIEWS_EXPORT vtkPVGridAxes3DActor : public vtkGridAxes3DActor
+class VTKREMOTINGVIEWS_EXPORT vtkPVGridAxes3DActor : public vtkGridAxesActor3D
 {
 public:
   static vtkPVGridAxes3DActor* New();
-  vtkTypeMacro(vtkPVGridAxes3DActor, vtkGridAxes3DActor);
+  vtkTypeMacro(vtkPVGridAxes3DActor, vtkGridAxesActor3D);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**

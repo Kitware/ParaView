@@ -24,10 +24,6 @@ set(classes
   vtkGeometryRepresentationWithFaces
   vtkGeometrySliceRepresentation
   vtkGlyph3DRepresentation
-  vtkGridAxes2DActor
-  vtkGridAxes3DActor
-  vtkGridAxesHelper
-  vtkGridAxesPlane2DActor
   vtkHyperTreeGridRepresentation
   vtkImageSliceRepresentation
   vtkImageVolumeRepresentation
