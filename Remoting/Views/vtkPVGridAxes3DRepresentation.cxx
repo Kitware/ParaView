@@ -6,6 +6,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
+#include "vtkCellGrid.h"
 #include "vtkCommunicator.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
@@ -192,6 +193,7 @@ vtkPVGridAxes3DRepresentation::~vtkPVGridAxes3DRepresentation()
 //------------------------------------------------------------------------------
 int vtkPVGridAxes3DRepresentation::FillInputPortInformation(int, vtkInformation* info)
 {
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCellGrid");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMolecule");
@@ -209,6 +211,7 @@ int vtkPVGridAxes3DRepresentation::RequestData(
   if (inInfoVec[0]->GetNumberOfInformationObjects() == 1)
   {
     double bounds[6];
+    vtkCellGrid* cg = vtkCellGrid::GetData(inInfoVec[0], 0);
     vtkDataSet* ds = vtkDataSet::GetData(inInfoVec[0], 0);
     vtkCompositeDataSet* cds = vtkCompositeDataSet::GetData(inInfoVec[0], 0);
     vtkMolecule* mol = vtkMolecule::SafeDownCast(
@@ -219,6 +222,10 @@ int vtkPVGridAxes3DRepresentation::RequestData(
     if (ds)
     {
       ds->GetBounds(bounds);
+    }
+    else if (cg)
+    {
+      cg->GetBounds(bounds);
     }
     else if (cds)
     {

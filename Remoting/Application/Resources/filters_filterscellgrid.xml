@@ -1,4 +1,38 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+
+    <SourceProxy
+      class="vtkCellGridCellSource"
+      name="CellGridSource"
+      label="Cell Grid Source">
+      <Documentation
+        long_help="Create a cell grid with one type of cell."
+        short_help="Create a cell grid with one type of cell.">
+        This source creates a cell grid populated with a single cell
+        of the specified type. If the cell's type uses a
+        reference-element formulation, the cell should have an identity
+        map from reference space to world-coordinates space.
+      </Documentation>
+
+      <StringVectorProperty name="CellType" label="Cell Type"
+        command="SetCellType" default_values="vtkDGHex" number_of_elements="1">
+        <Documentation>The type of cell to insert into the generated cell grid.</Documentation>
+        <StringListDomain name="enum">
+          <String text="Hexahedron"    value="vtkDGHex"  />
+          <String text="Tetrahedron"   value="vtkDGTet"  />
+          <String text="Pyramid"       value="vtkDGPyr"  />
+          <String text="Wedge"         value="vtkDGWdg"  />
+          <String text="Quadrilateral" value="vtkDGQuad" />
+          <String text="Triangle"      value="vtkDGTri"  />
+          <String text="Edge"          value="vtkDGEdge" />
+          <String text="Vertex"        value="vtkDGVert" />
+        </StringListDomain>
+      </StringVectorProperty>
+      <!-- End of CellGridSource -->
+    </SourceProxy>
+
+  </ProxyGroup>
+
   <ProxyGroup name="filters">
 
     <SourceProxy
@@ -15,7 +49,7 @@
         are grouped by the type of cells whose sides they refer to as well
         as the shape of the side. (For example, a group of wedge cells will
         have one array listing quadrilateral sides and another array listing
-        triangular sides.) These arrays can be used to render the cell-grid
+        triangular sides.) These arrays can be used to render the cell grid
         efficiently.</Documentation>
       <InputProperty command="SetInputConnection" name="Input">
         <ProxyGroupDomain name="groups">
@@ -98,7 +132,7 @@
         short_help="Convert unstructured grids into cell grids.">
         This filter turns an unstructured grid or partitioned dataset collection whose
         leaf nodes are unstructured grids with linear cells into a partitioned dataset
-        collection of cell-grids.
+        collection of cell grids.
 
         Additionally, it uses annotations added to the field data by the IOSS reader to
         promote certain cell-data arrays into spatially-varying discontinuous Galerkin
@@ -142,7 +176,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkCellGrid" />
         </DataTypeDomain>
-        <Documentation>An input cell-grid.</Documentation>
+        <Documentation>An input cell grid.</Documentation>
       </InputProperty>
 
       <StringVectorProperty name="AttributeName" label="Attribute Name"
@@ -204,7 +238,7 @@
         long_help="Sample input polydata points with a cell grid."
         short_help="Sample input polydata points with a cell grid.">
         This filter copies the input polydata and adds information about
-        how its points are related to cells of an input cell-grid.
+        how its points are related to cells of an input cell grid.
       </Documentation>
       <InputProperty command="SetInputConnection" name="Input">
         <ProxyGroupDomain name="groups">
@@ -226,7 +260,7 @@
           <DataType value="vtkCellGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
-        <Documentation>An input cell-grid to probe.</Documentation>
+        <Documentation>An input cell grid to probe.</Documentation>
       </InputProperty>
 
       <StringVectorProperty name="CellGridAttribute" label="CellGrid Attribute"
@@ -243,6 +277,154 @@
       </StringVectorProperty>
 
       <!-- End of CellGridPointProbe -->
+    </SourceProxy>
+
+    <SourceProxy
+      class="vtkCellGridCellCenters"
+      name="CellGridCenters"
+      label="CellGrid Centers">
+      <Documentation
+        long_help="Create a vertex at each cell center."
+        short_help="Create a vertex at each cell center.">
+        This filter adds a vertex cell at the center of each input cell.
+        The output will have all of the attributes defined on the cell
+        interpolated to the output vertices.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <Documentation>An input cell grid.</Documentation>
+      </InputProperty>
+
+      <!-- End of CellGridCenters -->
+    </SourceProxy>
+
+    <SourceProxy
+      class="vtkCellGridToUnstructuredGrid"
+      name="CellGridToUnstructuredGrid"
+      label="Cell Grid To Unstructured Grid">
+      <Documentation
+        long_help="Convert a cell grid to an unstructured grid."
+        short_help="Convert a cell grid to an unstructured grid.">
+        This filter approximates a cell grid with an unstructured grid
+        whose cells are linear approximations to cells in the cell grid.
+        All higher-order information is discarded.
+        All fields on the cell grid are converted into point-data on the
+        unstructured grid; since points are shared by neighboring cells,
+        the values at points are averaged across all cells incident to
+        the point. Thus discontinuities at cell boundaries are eliminated
+        by averaging.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <Documentation>An input cell grid.</Documentation>
+      </InputProperty>
+
+      <!-- End of CellGridToUnstructuredGrid -->
+    </SourceProxy>
+
+    <SourceProxy
+      class="vtkCellGridTransform"
+      name="CellGridTransform"
+      label="Cell Grid Transform">
+      <Documentation
+        long_help="Apply a geometric transform to a cell grid."
+        short_help="Apply a geometric transform to a cell grid.">
+        This filter allows you to translate, rotate, and scale
+        cell-grid data.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <Documentation>An input cell grid.</Documentation>
+      </InputProperty>
+
+      <ProxyProperty command="SetTransform"
+                     name="Transform"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="transforms" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources"
+                 name="Transform3" />
+          <Proxy group="extended_sources"
+                 name="RotateAroundOriginTransform" />
+          <Proxy group="transforms" name="GeoTransform" />
+        </ProxyListDomain>
+        <Documentation>The values in this property allow you to specify the
+        transform (translation, rotation, and scaling) to apply to the input
+        dataset.</Documentation>
+      </ProxyProperty>
+
+      <!-- End of CellGridTransform -->
+    </SourceProxy>
+
+    <SourceProxy
+      class="vtkCellGridWarp"
+      name="CellGridWarp"
+      label="Cell Grid Warp">
+      <Documentation
+        long_help="Deform a cell-grid's shape by a vector-valued cell-attribute."
+        short_help="Deform a cell-grid's shape by a vector-valued cell-attribute.">
+        This filter allows you to deform a cell grid.
+        Responders currently require interpolation schemes for the shape and
+        deformation attribute to match.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array1" attribute_type="cell" number_of_components="2,3" />
+        <Documentation>An input cell grid.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="DeformationAttribute" label="Deformation Attribute"
+          command="SetInputArrayToProcess"
+          default_values="0"
+          element_types="0 0 0 0 2"
+          number_of_elements="5">
+        <ArrayListDomain input_domain_name="input_array1" attribute_type="Vectors" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property chooses a cell-grid attribute to use for warping.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="DeformationScale" label="Deformation Scale"
+        command="SetScaleFactor" default_values="1.0" number_of_elements="1">
+        <Documentation
+          short_help="Set a scale factor to apply to the deformation."
+          long_help="Set a scale factor to apply to the deformation.">
+          Set a scale factor to apply to the deformation.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- End of CellGridWarp -->
     </SourceProxy>
 
   </ProxyGroup>

@@ -168,6 +168,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/MultiPiece/Piece6.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/non_convex_polygon.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/office.binary.vtk}"
+  "DATA{${paraview_test_data_directory_input}/Data/owave-hole.exdg}"
   "DATA{${paraview_test_data_directory_input}/Data/OMF/test_file.omf}"
   "DATA{${paraview_test_data_directory_input}/Data/OSPRayMaterials/materials.json}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheres.vtp}"
@@ -1170,6 +1171,8 @@ list(APPEND TESTS_WITH_BASELINES
   EmptyInitialCompositeReader.xml # Issue #21293
   FeatureEdgesFilterHTG.xml
   FeatureEdgesRepresentationHTG.xml
+  IOSSCellGridHCurl.xml
+  IOSSCellGridHDiv.xml
   IOSSMergeExodusEntityBlocks.xml
   ImageChartView.xml
   IntegrateVariablesPDC.xml
