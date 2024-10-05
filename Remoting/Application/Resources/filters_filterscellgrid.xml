@@ -6,9 +6,9 @@
       name="CellGridSource"
       label="Cell Grid Source">
       <Documentation
-        long_help="Create a cell-grid with one type of cell."
-        short_help="Create a cell-grid with one type of cell.">
-        This source creates a cell-grid populated with a single cell
+        long_help="Create a cell grid with one type of cell."
+        short_help="Create a cell grid with one type of cell.">
+        This source creates a cell grid populated with a single cell
         of the specified type. If the cell's type uses a
         reference-element formulation, the cell should have an identity
         map from reference space to world-coordinates space.
@@ -16,7 +16,7 @@
 
       <StringVectorProperty name="CellType" label="Cell Type"
         command="SetCellType" default_values="vtkDGHex" number_of_elements="1">
-        <Documentation>The type of cell to insert into the generated cell-grid.</Documentation>
+        <Documentation>The type of cell to insert into the generated cell grid.</Documentation>
         <StringListDomain name="enum">
           <String text="Hexahedron"    value="vtkDGHex"  />
           <String text="Tetrahedron"   value="vtkDGTet"  />
@@ -49,7 +49,7 @@
         are grouped by the type of cells whose sides they refer to as well
         as the shape of the side. (For example, a group of wedge cells will
         have one array listing quadrilateral sides and another array listing
-        triangular sides.) These arrays can be used to render the cell-grid
+        triangular sides.) These arrays can be used to render the cell grid
         efficiently.</Documentation>
       <InputProperty command="SetInputConnection" name="Input">
         <ProxyGroupDomain name="groups">
@@ -132,7 +132,7 @@
         short_help="Convert unstructured grids into cell grids.">
         This filter turns an unstructured grid or partitioned dataset collection whose
         leaf nodes are unstructured grids with linear cells into a partitioned dataset
-        collection of cell-grids.
+        collection of cell grids.
 
         Additionally, it uses annotations added to the field data by the IOSS reader to
         promote certain cell-data arrays into spatially-varying discontinuous Galerkin
@@ -176,7 +176,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkCellGrid" />
         </DataTypeDomain>
-        <Documentation>An input cell-grid.</Documentation>
+        <Documentation>An input cell grid.</Documentation>
       </InputProperty>
 
       <StringVectorProperty name="AttributeName" label="Attribute Name"
@@ -238,7 +238,7 @@
         long_help="Sample input polydata points with a cell grid."
         short_help="Sample input polydata points with a cell grid.">
         This filter copies the input polydata and adds information about
-        how its points are related to cells of an input cell-grid.
+        how its points are related to cells of an input cell grid.
       </Documentation>
       <InputProperty command="SetInputConnection" name="Input">
         <ProxyGroupDomain name="groups">
@@ -260,7 +260,7 @@
           <DataType value="vtkCellGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
-        <Documentation>An input cell-grid to probe.</Documentation>
+        <Documentation>An input cell grid to probe.</Documentation>
       </InputProperty>
 
       <StringVectorProperty name="CellGridAttribute" label="CellGrid Attribute"
@@ -298,7 +298,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkCellGrid" />
         </DataTypeDomain>
-        <Documentation>An input cell-grid.</Documentation>
+        <Documentation>An input cell grid.</Documentation>
       </InputProperty>
 
       <!-- End of CellGridCenters -->
@@ -311,10 +311,10 @@
       <Documentation
         long_help="Convert a cell grid to an unstructured grid."
         short_help="Convert a cell grid to an unstructured grid.">
-        This filter approximates a cell-grid with an unstructured grid
+        This filter approximates a cell grid with an unstructured grid
         whose cells are linear approximations to cells in the cell grid.
         All higher-order information is discarded.
-        All fields on the cell-grid are converted into point-data on the
+        All fields on the cell grid are converted into point-data on the
         unstructured grid; since points are shared by neighboring cells,
         the values at points are averaged across all cells incident to
         the point. Thus discontinuities at cell boundaries are eliminated
@@ -328,7 +328,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkCellGrid" />
         </DataTypeDomain>
-        <Documentation>An input cell-grid.</Documentation>
+        <Documentation>An input cell grid.</Documentation>
       </InputProperty>
 
       <!-- End of CellGridToUnstructuredGrid -->
@@ -352,7 +352,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkCellGrid" />
         </DataTypeDomain>
-        <Documentation>An input cell-grid.</Documentation>
+        <Documentation>An input cell grid.</Documentation>
       </InputProperty>
 
       <ProxyProperty command="SetTransform"
@@ -383,7 +383,7 @@
       <Documentation
         long_help="Deform a cell-grid's shape by a vector-valued cell-attribute."
         short_help="Deform a cell-grid's shape by a vector-valued cell-attribute.">
-        This filter allows you to deform a cell-grid.
+        This filter allows you to deform a cell grid.
         Responders currently require interpolation schemes for the shape and
         deformation attribute to match.
       </Documentation>
@@ -396,7 +396,7 @@
           <DataType value="vtkCellGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array1" attribute_type="cell" number_of_components="2,3" />
-        <Documentation>An input cell-grid.</Documentation>
+        <Documentation>An input cell grid.</Documentation>
       </InputProperty>
 
       <StringVectorProperty name="DeformationAttribute" label="Deformation Attribute"
