@@ -1217,6 +1217,8 @@ if(PARAVIEW_ENABLE_VISITBRIDGE)
     VisItBridgeChombo.xml
     VisItBridgeLAMMPSDump.xml
     VisItBridgeLAMMPSDump2.xml
+    VisItBridgeLAMMPSDumpMultiTime.xml
+    VisItBridgeLAMMPSDumpTimeSeries.xml
     VisItBridgeNas.xml
     VisItBridgeNek.xml
     VisItBridgeMoleculeColoring.xml
