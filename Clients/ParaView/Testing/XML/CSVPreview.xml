@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/vehicle_data.csv" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Preview/Preview" property="plainText" arguments="&quot;Cylinders&quot;,&quot;Displacement&quot;,&quot;HP&quot;,&quot;Weight&quot;,&quot;Year&quot;,&quot;Acceleration&quot;,&quot;MPG&quot;&#xA;8,307,130,3504,70,12,18&#xA;8,350,165,3693,70,11.5,15&#xA;8,318,150,3436,70,11,18&#xA;8,304,150,3433,70,12,16&#xA;8,302,140,3449,70,10.5,17&#xA;8,429,198,4341,70,10,15&#xA;8,454,220,4354,70,9,14&#xA;8,440,215,4312,70,8.5,14&#xA;8,455,225,4425,70,10,14&#xA;" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Preview/Preview" property="readOnly" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+</pqevents>

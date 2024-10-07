@@ -939,6 +939,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ArrayBoundsScaleDomain.xml
   ArraySelectionWidget.xml
   ComputeArrayMagnitudeSetting.xml
+  CSVPreview.xml
   CustomOutputFormat.xml
   DefaultReadersSetting.xml
   DelimitedTextReader.xml
