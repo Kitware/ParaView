@@ -10,7 +10,6 @@
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 #include <QAbstractTableModel>
 #include <QHeaderView>

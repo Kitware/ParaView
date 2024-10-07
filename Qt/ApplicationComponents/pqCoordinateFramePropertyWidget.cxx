@@ -18,7 +18,6 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 #include <QComboBox>
 #include <QMenu>

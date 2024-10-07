@@ -16,7 +16,7 @@
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkTextProperty.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 #include "vtkObjectFactory.h"
 

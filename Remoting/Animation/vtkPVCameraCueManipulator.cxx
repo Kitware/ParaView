@@ -12,7 +12,6 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 vtkStandardNewMacro(vtkPVCameraCueManipulator);
 //------------------------------------------------------------------------------

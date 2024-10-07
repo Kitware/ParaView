@@ -9,7 +9,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 vtkStandardNewMacro(vtkBoundedVolumeSource);
 //----------------------------------------------------------------------------

@@ -27,7 +27,7 @@
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 #include <algorithm>
 #include <cmath>

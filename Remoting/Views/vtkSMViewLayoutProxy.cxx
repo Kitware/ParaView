@@ -23,7 +23,6 @@
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 #include "vtkViewLayout.h"
 #include "vtkWeakPointer.h"
 

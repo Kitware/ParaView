@@ -5,7 +5,7 @@
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 #include <vector>
 

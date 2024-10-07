@@ -15,7 +15,7 @@
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 #include <QObject>
 

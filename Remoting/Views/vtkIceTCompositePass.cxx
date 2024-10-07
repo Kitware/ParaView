@@ -27,7 +27,6 @@
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 #include <IceT.h>
 #include <IceTGL.h>
