@@ -137,6 +137,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/HTG/binary_3D_333_mask.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/ghost.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGCellCentersBackwardCompat.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTGGhostCellsGeneratorBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_0_0.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_1_0.htg}"
@@ -957,6 +958,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ForceStaticMesh.xml
   GradientBackwardsCompatibility.xml
   HTGCellCentersBackwardCompat.xml
+  HTGGhostCellsGeneratorBackwardCompat.xml
   ImportCustomPresets.xml
   InformationPanel.xml
   LogViewer.xml

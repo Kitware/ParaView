@@ -683,6 +683,10 @@
     <SourceProxy class="vtkHyperTreeGridGhostCellsGenerator"
                  label="HyperTreeGrid Ghost Cells Generator"
                  name="HyperTreeGridGhostCellsGenerator">
+      <Deprecated deprecated_in="5.14" to_remove_in="5.16">
+        This filter has been replaced by 'Ghost Cells', that supports HyperTree Grids.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation long_help="Generate Ghost Cells for HyperTreeGrid."
                      short_help="Generate Ghost Cells for HyperTreeGrid.">
         This filter generates ghost cells for hyper tree grid for multi processing purposes.

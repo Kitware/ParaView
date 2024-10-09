@@ -2130,7 +2130,8 @@ struct Process_5_13_to_5_14
   bool HandleRenamedProxies(xml_document& document)
   {
     std::map<std::string, std::string> renamedProxies = { { "HyperTreeGridCellCenters",
-      "CellCenters" } };
+                                                            "CellCenters" },
+      { "HyperTreeGridGhostCellsGenerator", "GhostCells" } };
 
     for (const auto& proxy : renamedProxies)
     {
