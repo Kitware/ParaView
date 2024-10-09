@@ -39,11 +39,7 @@
 #include <windows.h>
 #endif // _WIN32
 
-#if defined(__APPLE__)
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
+#include "vtk_glad.h"
 
 #include "vtkCellData.h"
 #include "vtkCommand.h"

@@ -36,11 +36,7 @@
 #include "vtkOpenGLState.h"
 #include "vtkRenderWindow.h"
 
-#if defined(__APPLE__)
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
+#include "vtk_glad.h"
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_opengl_canvas::vtknvindex_opengl_canvas()
