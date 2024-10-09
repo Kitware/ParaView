@@ -81,6 +81,7 @@ set(classes
   vtkSMFileListDomain
   vtkSMFileUtilities
   vtkSMFixedTypeDomain
+  vtkSMFrameStrideQueryDomain
   vtkSMIdTypeVectorProperty
   vtkSMIndexSelectionDomain
   vtkSMInputArrayDomain
