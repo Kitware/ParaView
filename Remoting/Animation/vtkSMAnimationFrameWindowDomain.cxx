@@ -4,7 +4,11 @@
 
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+
+#include <vector>
 
 vtkStandardNewMacro(vtkSMAnimationFrameWindowDomain);
 //----------------------------------------------------------------------------
@@ -32,28 +36,23 @@ void vtkSMAnimationFrameWindowDomain::Update(vtkSMProperty*)
   std::vector<vtkEntry> values;
   if (vtkSMProxy* scene = vtkSMUncheckedPropertyHelper(sceneProperty).GetAsProxy())
   {
-    int playMode = vtkSMUncheckedPropertyHelper(scene, "PlayMode").GetAsInt();
+    const int playMode = vtkSMUncheckedPropertyHelper(scene, "PlayMode").GetAsInt();
     switch (playMode)
     {
       case vtkCompositeAnimationPlayer::SEQUENCE:
       {
-        int numFrames = vtkSMUncheckedPropertyHelper(scene, "NumberOfFrames").GetAsInt();
-        vtkSMProxy* timeKeeper = vtkSMUncheckedPropertyHelper(scene, "TimeKeeper").GetAsProxy();
-        if (vtkSMUncheckedPropertyHelper(timeKeeper, "TimestepValues").GetNumberOfElements() == 0)
-        {
-          numFrames = 1;
-        }
+        const int numFrames = vtkSMUncheckedPropertyHelper(scene, "NumberOfFrames").GetAsInt();
         values.push_back(vtkEntry(0, numFrames - 1));
+        break;
       }
-      break;
       case vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS:
       {
         vtkSMProxy* timeKeeper = vtkSMUncheckedPropertyHelper(scene, "TimeKeeper").GetAsProxy();
-        int numTS =
+        const int numTS =
           vtkSMUncheckedPropertyHelper(timeKeeper, "TimestepValues").GetNumberOfElements();
         values.push_back(vtkEntry(0, numTS - 1));
+        break;
       }
-      break;
     }
   }
   else
