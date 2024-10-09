@@ -160,7 +160,7 @@ bool vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps()
 
   bool using_snap_to_timesteps_mode = false;
   vtkSMPropertyHelper timestepsHelper(timeKeeper, "TimestepValues");
-  if (timestepsHelper.GetNumberOfElements() > 1)
+  if (timestepsHelper.GetNumberOfElements() >= 1)
   {
     vtkSMPropertyHelper(this, "PlayMode").Set(vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS);
     using_snap_to_timesteps_mode = true;

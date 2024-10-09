@@ -424,7 +424,7 @@ void pqTimelineWidget::updateTimeTrackFromScene()
   auto nbOfFrames = vtkSMPropertyHelper(sceneProxy->GetProperty("NumberOfFrames")).GetAsInt();
 
   auto timeRow = this->Internals->TimeModel->rows(pqTimelineTrack::TIME).first();
-  if (!snapToTimestep && nbOfFrames > 1)
+  if (!snapToTimestep && nbOfFrames >= 1)
   {
     auto start = scene->getClockTimeRange().first;
     auto end = scene->getClockTimeRange().second;
