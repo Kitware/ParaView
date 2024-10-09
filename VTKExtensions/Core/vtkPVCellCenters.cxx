@@ -27,38 +27,33 @@ int vtkPVCellCenters::RequestData(vtkInformation* vtkNotUsed(request),
 
   vtkPolyData* output = vtkPolyData::GetData(outInfo);
 
-  vtkDataSet* inputDS = vtkDataSet::GetData(inInfo);
-  if (inputDS && output)
+  if (output)
   {
-    vtkNew<vtkCellCenters> cellCenters;
-    cellCenters->SetInputData(inputDS);
-    cellCenters->SetVertexCells(this->GetVertexCells());
-
-    if (cellCenters->GetExecutive()->Update())
+    if (auto inputDS = vtkDataSet::GetData(inInfo))
     {
-      output->ShallowCopy(cellCenters->GetOutput(0));
-      return 1;
+      vtkNew<vtkCellCenters> cellCenters;
+      cellCenters->SetInputData(inputDS);
+      cellCenters->SetVertexCells(this->GetVertexCells());
+
+      if (cellCenters->GetExecutive()->Update())
+      {
+        output->ShallowCopy(cellCenters->GetOutput(0));
+        return 1;
+      }
     }
-
-    return 0;
-  }
-
-  vtkHyperTreeGrid* inputHTG = vtkHyperTreeGrid::GetData(inInfo);
-  if (inputHTG && output)
-  {
-    vtkNew<vtkHyperTreeGridCellCenters> htgCellCenters;
-    htgCellCenters->SetInputData(inputHTG);
-    htgCellCenters->SetVertexCells(this->GetVertexCells());
-
-    if (htgCellCenters->GetExecutive()->Update())
+    else if (auto inputHTG = vtkHyperTreeGrid::GetData(inInfo))
     {
-      output->ShallowCopy(htgCellCenters->GetOutput(0));
-      return 1;
+      vtkNew<vtkHyperTreeGridCellCenters> htgCellCenters;
+      htgCellCenters->SetInputData(inputHTG);
+      htgCellCenters->SetVertexCells(this->GetVertexCells());
+
+      if (htgCellCenters->GetExecutive()->Update())
+      {
+        output->ShallowCopy(htgCellCenters->GetOutput(0));
+        return 1;
+      }
     }
-
-    return 0;
   }
-
   vtkErrorMacro(<< "Unable to retrieve input / output as supported type.");
   return 0;
 }

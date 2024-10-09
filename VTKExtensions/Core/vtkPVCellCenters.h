@@ -5,7 +5,7 @@
  * @brief Cell centers filter that delegates to typen specific implementations.
  *
  * This is a meta filter of vtkCellCenters that allows selection of
- * input vtkHyperTreeGrid
+ * input vtkHyperTreeGrid or vtkDataSet
  */
 
 #ifndef vtkPVCellCenters_h

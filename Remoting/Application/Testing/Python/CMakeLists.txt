@@ -28,6 +28,7 @@ set(PY_TESTS
   GenerateIdScalarsBackwardsCompatibility.py,NO_VALID
   GetActiveCamera.py,NO_VALID
   GhostCellsInMergeBlocks.py
+  HTGCellCentersBackwardsCompatibilityTest.py,NO_VALID
   IntegrateAttributes.py,NO_VALID
   LocatorNonMergingBackwardsCompatibilityTest.py,NO_VALID
   LookupTable.py,NO_VALID
