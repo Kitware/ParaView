@@ -4,11 +4,13 @@
 
 #include "vtkObjectFactory.h"
 
+#include <algorithm>
+
 vtkStandardNewMacro(vtkSequenceAnimationPlayer);
 //----------------------------------------------------------------------------
 vtkSequenceAnimationPlayer::vtkSequenceAnimationPlayer()
 {
-  this->NumberOfFrames = 10;
+  this->NumberOfFrames = 1;
   this->FrameNo = 0;
 }
 
@@ -99,7 +101,7 @@ int vtkSequenceAnimationPlayer::GetTimestep(double start, double end, double cur
 //----------------------------------------------------------------------------
 double vtkSequenceAnimationPlayer::GetTimeFromTimestep(double start, double end, int timestep)
 {
-  double delta = (end - start) / (this->NumberOfFrames - 1);
+  double delta = (end - start) / std::max(this->NumberOfFrames - 1, 1);
   return start + timestep * delta;
 }
 

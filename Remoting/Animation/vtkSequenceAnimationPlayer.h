@@ -19,7 +19,7 @@ public:
   vtkTypeMacro(vtkSequenceAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  vtkSetClampMacro(NumberOfFrames, int, 2, VTK_INT_MAX);
+  vtkSetClampMacro(NumberOfFrames, int, 1, VTK_INT_MAX);
   vtkGetMacro(NumberOfFrames, int);
 
 protected:

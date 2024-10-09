@@ -280,7 +280,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfFrames"
-                         default_values="10"
+                         default_values="1"
                          name="NumberOfFrames"
                          number_of_elements="1">
         <IntRangeDomain min="1"
