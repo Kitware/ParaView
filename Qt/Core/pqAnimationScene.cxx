@@ -7,7 +7,6 @@
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqSMAdaptor.h"
-#include "pqSMProxy.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
@@ -18,21 +17,19 @@
 #include "vtkPVCameraCueManipulator.h"
 #include "vtkPoints.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMSession.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 
 #include <QPointer>
 #include <QSet>
-#include <QSize>
 #include <QtDebug>
+
+#include <algorithm>
 
 template <class T>
 static uint qHash(QPointer<T> p)
@@ -510,8 +507,23 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
   {
     return;
   }
-  int progress = static_cast<int>(
-    (cueInfo->AnimationTime - cueInfo->StartTime) * 100 / (cueInfo->EndTime - cueInfo->StartTime));
+
+  vtkSMProxy* timeKeeper = vtkSMPropertyHelper(this->getProxy(), "TimeKeeper").GetAsProxy();
+  auto timestepValues = vtkSMPropertyHelper(timeKeeper, "TimestepValues").GetArray<double>();
+  int progress;
+  if (!timestepValues.empty())
+  {
+    // find index of current time value
+    auto iter =
+      std::lower_bound(timestepValues.begin(), timestepValues.end(), cueInfo->AnimationTime);
+    const int index = static_cast<int>(iter - timestepValues.begin());
+    progress = static_cast<int>(100.0 * index / (timestepValues.size() - 1));
+  }
+  else
+  {
+    progress = static_cast<int>((cueInfo->AnimationTime - cueInfo->StartTime) * 100 /
+      (cueInfo->EndTime - cueInfo->StartTime));
+  }
 
   this->setAnimationTime(cueInfo->AnimationTime);
   Q_EMIT this->tick(progress);
