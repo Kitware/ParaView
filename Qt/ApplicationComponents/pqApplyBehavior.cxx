@@ -266,6 +266,12 @@ void pqApplyBehavior::applied(pqPropertiesPanel* panel)
     Q_FOREACH (const pqInternals::PairType& pair, this->Internals->NewlyCreatedRepresentations)
     {
       vtkSMRepresentationProxy* reprProxy = pair.first;
+      // if there is no representation proxy - skip it
+      if (!reprProxy)
+      {
+        continue;
+      }
+
       vtkSMViewProxy* viewProxy = pair.second;
 
       // If not scalar coloring, we make an attempt to color using
