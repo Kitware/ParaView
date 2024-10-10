@@ -137,6 +137,12 @@ public:
   static std::vector<std::string> parseComponentLabels(
     vtkPVXMLElement* hints, unsigned int elemCount = 0);
 
+  /**
+   * Set widget in read-only mode.
+   * By default, this call setEnabled(!readOnly)
+   */
+  virtual void setReadOnly(bool readOnly);
+
 Q_SIGNALS:
   /**
    * This signal is emitted when the current view changes.

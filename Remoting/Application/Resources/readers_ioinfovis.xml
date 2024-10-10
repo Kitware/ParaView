@@ -21,6 +21,25 @@
         <Documentation>This property specifies the file name for the CSV
         (Command Separated Values) reader.</Documentation>
       </StringVectorProperty>
+
+      <IdTypeVectorProperty name="PreviewSize"
+        command="SetPreviewNumberOfLines"
+        number_of_elements="1"
+        default_values="10"
+        panel_visibility="never">
+      </IdTypeVectorProperty>
+      <StringVectorProperty name="Preview"
+                            command="GetPreview"
+                            panel_visibility="default"
+                            information_only="1" >
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+      </StringVectorProperty>
+      <PropertyGroup name="PreviewContents" >
+        <Property name="Preview" />
+      </PropertyGroup>
+
       <IntVectorProperty command="SetDetectNumericColumns"
                          default_values="1"
                          name="DetectNumericColumns"
@@ -132,6 +151,7 @@
           <Property name="FieldDelimiterCharacters" />
           <Property name="AddTabFieldDelimiter" />
           <Property name="MergeConsecutiveDelimiters" />
+          <Property name="Preview" />
         </ExposedProperties>
       </SubProxy>
       <Hints>

@@ -58,6 +58,15 @@ class PythonSuperquadricSource(VTKPythonAlgorithmBase):
         self._realAlgorithm.SetThetaResolution(x)
         self.Modified()
 
+    @smproperty.stringvector(name="ReadOnly", panel_visibility="default", information_only="1", repeatable="1", number_of_elements_per_command="2")
+    def GetSomeTable(self):
+        return [["x", "y"], ["42", "43"], ["44", "45"]]
+    @smproperty.xml("""<PropertyGroup name="Preview" >
+    <Property name="ReadOnly" />
+    </PropertyGroup>""")
+    def Handler(self):
+        pass
+
     @smproperty.intvector(name="PhiResolution", default_values="16")
     @smdomain.intrange(min=0, max=1000)
     def SetPhiResolution(self, x):
