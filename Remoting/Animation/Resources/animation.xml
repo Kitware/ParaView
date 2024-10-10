@@ -628,6 +628,20 @@
         <Documentation>
           Frame rate in frames-per-second (FPS).
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Format" value="PNG"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Format" value="JPEG"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Format" value="TIFF"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Format" value="BMP"
+                                       inverse="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="FrameStride"
@@ -731,6 +745,20 @@
         <Documentation>
           Frame rate in frames-per-second (FPS).
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Format" value="PNG"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Format" value="JPEG"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Format" value="TIFF"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Format" value="BMP"
+                                       inverse="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="FrameStride"
