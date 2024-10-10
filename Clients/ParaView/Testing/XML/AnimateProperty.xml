@@ -8,6 +8,7 @@
   <!-- animate Start Theta -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="10" />
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/proxiesBox" command="activated" arguments="Sphere1" />
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/propertiesBox" command="activated" arguments="Start Theta" />
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" command="activate" arguments="" />

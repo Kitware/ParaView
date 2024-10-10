@@ -13,6 +13,7 @@
   <!-- open time manager -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="10" />
 
   <!-- add track interpolate cameras -->
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/proxiesBox" command="activated" arguments="Camera" />

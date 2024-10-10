@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="10"/>
   <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox/1pqDoubleLineEdit0" property="text" arguments="1" />
 </pqevents>

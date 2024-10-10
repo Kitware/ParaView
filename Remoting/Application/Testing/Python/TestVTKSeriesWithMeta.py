@@ -1,8 +1,10 @@
 from paraview.simple import *
 from paraview import smtesting
 
-import sys
-import os
+# import paraview
+# paraview.compatibility.major = 5
+# paraview.compatibility.minor = 13
+
 import os.path
 
 smtesting.ProcessCommandLineArguments()
@@ -16,6 +18,7 @@ warpByVector1.Vectors = ['POINTS', 'displacement']
 Show()
 
 animationScene1 = GetAnimationScene()
+animationScene1.NumberOfFrames = 10
 animationScene1.GoToNext()
 
 tk=GetTimeKeeper()

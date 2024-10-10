@@ -7,6 +7,7 @@
 
   <!-- default values -->
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="0.0.,Time Sources" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="10" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" property="value" arguments="10" />
   <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="0" />
   <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" property="currentText" arguments="0" />

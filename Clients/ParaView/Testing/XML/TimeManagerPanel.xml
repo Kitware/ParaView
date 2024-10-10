@@ -30,6 +30,7 @@
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="43" />
   <!-- check / uncheck time tracks -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="10"/>
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCheckState" arguments="0.0.0.0,2" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="86" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" property="currentText" arguments="0.00859998" />
@@ -68,6 +69,7 @@
   <!-- reset session -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionDelete_All" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="10"/>
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" property="value" arguments="10" />
 
   <!-- animation -->
