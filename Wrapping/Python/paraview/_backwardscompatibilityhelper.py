@@ -1102,10 +1102,7 @@ def getattr(proxy, pname):
 # label and not its name.
 def GetProxy(module, key, **kwargs):
     compatibility_version = get_paraview_compatibility_version()
-    print("compatibility_version: ", compatibility_version)
-    print("key: ", key)
-    print("kwargs: ", kwargs)
-    print("module: ", module)
+
     if compatibility_version < (5, 5):
         if key == "Clip":
             # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
