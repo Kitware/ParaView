@@ -221,6 +221,10 @@
     <SourceProxy class="vtkHyperTreeGridFeatureEdges"
                  name="HyperTreeGridFeatureEdges"
                  label="HyperTreeGrid Feature Edges Filter">
+      <Deprecated deprecated_in="5.14" to_remove_in="5.16">
+        This filter has been replaced by 'Feature Edges', which now supports HyperTree Grids.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation short_help="Generate feature edges of an HTG.">
         Generate a vtkPolyData representing the feature edges of an HTG.
       </Documentation>

@@ -29,6 +29,7 @@ set(PY_TESTS
   GetActiveCamera.py,NO_VALID
   GhostCellsInMergeBlocks.py
   HTGCellCentersBackwardsCompatibilityTest.py,NO_VALID
+  HTGFeatureEdgesBackwardsCompatibilityTest.py,NO_VALID
   HTGGhostCellsGeneratorBackwardsCompatibilityTest.py,NO_VALID
   IntegrateAttributes.py,NO_VALID
   LocatorNonMergingBackwardsCompatibilityTest.py,NO_VALID

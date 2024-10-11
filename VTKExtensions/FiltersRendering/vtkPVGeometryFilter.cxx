@@ -25,7 +25,6 @@
 #include "vtkGenericGeometryFilter.h"
 #include "vtkGeometryFilter.h"
 #include "vtkHyperTreeGrid.h"
-#include "vtkHyperTreeGridFeatureEdges.h"
 #include "vtkHyperTreeGridGeometry.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -38,6 +37,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkOverlappingAMR.h"
+#include "vtkPVFeatureEdges.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
@@ -559,7 +559,7 @@ int vtkPVGeometryFilter::RequestData(
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::GenerateFeatureEdgesHTG(vtkHyperTreeGrid* input, vtkPolyData* output)
 {
-  vtkNew<vtkHyperTreeGridFeatureEdges> featureEdgesFilter;
+  vtkNew<vtkPVFeatureEdges> featureEdgesFilter;
   vtkNew<vtkHyperTreeGrid> htgCopy;
   htgCopy->ShallowCopy(input);
   featureEdgesFilter->SetInputData(htgCopy);

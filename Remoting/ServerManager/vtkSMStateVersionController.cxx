@@ -2131,6 +2131,7 @@ struct Process_5_13_to_5_14
   {
     std::map<std::string, std::string> renamedProxies = { { "HyperTreeGridCellCenters",
                                                             "CellCenters" },
+      { "HyperTreeGridFeatureEdges", "FeatureEdges" },
       { "HyperTreeGridGhostCellsGenerator", "GhostCells" } };
 
     for (const auto& proxy : renamedProxies)
