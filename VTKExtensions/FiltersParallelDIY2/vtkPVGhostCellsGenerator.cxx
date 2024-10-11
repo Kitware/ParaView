@@ -68,8 +68,13 @@ int vtkPVGhostCellsGenerator::RequestData(
     ghostCellsGenerator->SetInputData(input);
     ghostCellsGenerator->Update();
 
-    output->ShallowCopy(ghostCellsGenerator->GetOutput(0));
-    return 1;
+    if (ghostCellsGenerator->GetExecutive()->Update())
+    {
+      output->ShallowCopy(ghostCellsGenerator->GetOutput(0));
+      return 1;
+    }
+
+    return 0;
   }
 
   return this->GhostCellsGeneratorUsingSuperclassInstance(request, inputVector, outputVector);
