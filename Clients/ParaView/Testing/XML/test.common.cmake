@@ -622,6 +622,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PythonShellRunScript.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PropertyContextMenu1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PropertyContextMenu2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PVCellCentersHyperTreeGrid.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotLines.png}"
@@ -1101,6 +1102,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   Preview.xml
   PreviewFontScaling.xml
   PropertyContextMenu.xml
+  PVCellCentersHyperTreeGrid.xml
   QuartilePlot.xml
   RandomHyperTreeGridSource.xml
   ReadPartitionedCGNS.xml
