@@ -1,6 +1,8 @@
 from paraview.simple import *
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 sphere1 = Sphere(registrationName='Sphere1')
 renderView1 = GetActiveViewOrCreate('RenderView')
 sphere1Display = Show(sphere1, renderView1, 'GeometryRepresentation')

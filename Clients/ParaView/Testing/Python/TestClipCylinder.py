@@ -1,6 +1,8 @@
 #### import the simple module from the paraview
 from paraview.simple import *
 
+LoadPalette("BlueGrayBackground")
+
 # Create a wavelet and clip it with a Cylinder.
 wavelet = Wavelet()
 Show()
@@ -16,6 +18,9 @@ cylinder.Radius = 3
 Show()
 
 Render()
+
+lut = GetColorTransferFunction('RTData')
+lut.ApplyPreset('Cool to Warm', True)
 
 # compare with baseline image
 import os

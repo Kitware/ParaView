@@ -4,6 +4,8 @@ from paraview.vtk.util.misc import vtkGetTempDir
 import os
 import sys
 
+LoadPalette("BlueGrayBackground")
+
 wavelet = Wavelet()
 SetActiveSource(wavelet)
 view = GetActiveViewOrCreate('RenderView')

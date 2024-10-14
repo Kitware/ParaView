@@ -3,6 +3,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 # create a new 'Wavelet'
 wavelet1 = Wavelet()
 
@@ -98,6 +100,8 @@ calculator1Display.SetScalarBarVisibility(renderView1, False)
 
 # Update a scalar bar component title.
 UpdateScalarBarsComponentTitle(ResultLUT, calculator1Display)
+
+ResultLUT.ApplyPreset("Cool to Warm", True)
 
 #### saving camera placements for all active views
 

@@ -3,6 +3,8 @@
 
 from paraview.simple import *
 
+LoadPalette("BlueGrayBackground")
+
 r = CreateRenderView()
 r.ViewSize = [300, 300]
 r.AxesGrid.Visibility = 1

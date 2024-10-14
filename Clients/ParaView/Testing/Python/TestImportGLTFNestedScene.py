@@ -8,6 +8,8 @@ from paraview.simple import *
 from paraview.vtk.util.misc import vtkGetDataRoot
 import os.path
 
+LoadPalette("BlueGrayBackground")
+
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 

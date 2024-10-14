@@ -41,6 +41,8 @@ rTDataLUT = GetColorTransferFunction('RTData')
 # get opacity transfer function/opacity map for 'RTData'
 rTDataPWF = GetOpacityTransferFunction('RTData')
 
+rTDataLUT.ApplyPreset('Cool to Warm', True)
+
 # get layout
 viewLayout1 = GetLayout()
 
