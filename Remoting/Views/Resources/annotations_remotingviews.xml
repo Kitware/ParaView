@@ -1496,8 +1496,22 @@
                          label="Use 2D Mode"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Set the use of 2D Mode for all axes.</Documentation>
+        <Documentation>Print text in overlay. Default is off (text in 3D scene)</Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetRasterizeText"
+                         default_values="0"
+                         name="RasterizeText"
+                         label="Rasterize Text"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Rasterize the text for display. This enables full font configuration. This is forced to ON in 2DMode.
+          Default is false (text is vectorized)</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="Use2DMode" value="0" />
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetLog"
                          default_values="0"
                          name="UseLogAxis"
@@ -1508,6 +1522,7 @@
 
       <PropertyGroup label="Miscellaneous">
         <Property name="Use2DMode" />
+        <Property name="RasterizeText" />
         <Property name="UseLogAxis" />
       </PropertyGroup>
       <!-- End of PolarAxesRepresentation -->
