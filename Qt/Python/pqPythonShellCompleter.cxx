@@ -25,14 +25,21 @@ QStringList pqPythonShellCompleter::getPythonCompletions(const QString& pythonOb
     reinterpret_cast<PyObject*>(this->Interpreter->GetInteractiveConsoleLocalsPyObject());
   Py_INCREF(object);
 
+  QStringList results;
+
   // Unless we try to complete an object attribute,
   // in which case we can only complete with object's attributes
   if (!pythonObjectName.isEmpty())
   {
     object = this->derivePyObject(pythonObjectName, object);
+    if (object && PyFunction_Check(object))
+    {
+      this->appendFunctionKeywordArguments(object, results);
+      return results;
+    }
   }
 
-  QStringList results;
   this->appendPyObjectAttributes(object, results);
+
   return results;
 }

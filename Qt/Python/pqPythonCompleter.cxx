@@ -2,6 +2,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqPythonCompleter.h"
 
+#include "vtkSmartPyObject.h"
+
+#include <QDebug>
+
+#include <iostream>
+
 QString pqPythonCompleter::getVariableToComplete(const QString& prompt)
 {
   // Search backward through the string for usable characters
@@ -9,7 +15,8 @@ QString pqPythonCompleter::getVariableToComplete(const QString& prompt)
   for (int i = prompt.length() - 1; i >= 0; --i)
   {
     QChar c = prompt.at(i);
-    if (c.isLetterOrNumber() || c == '.' || c == '_' || c == '[' || c == ']')
+    if (c.isLetterOrNumber() || c == '.' || c == '_' || c == '[' || c == ']' || c == '(' ||
+      c == ')' || c == ' ' || c == ',' || c == '=' || c == '\'' || c == '"')
     {
       textToComplete.prepend(c);
     }
@@ -26,12 +33,18 @@ QStringList pqPythonCompleter::getCompletions(const QString& prompt)
 {
   QString textToComplete = this->getVariableToComplete(prompt);
 
-  // Variable to lookup is the name before the last dot if there is one.
+  // Variable to lookup is the name before the last dot or paren if there is one.
   QString lookup{};
   int dot = textToComplete.lastIndexOf('.');
-  if (dot != -1)
+  int paren = textToComplete.lastIndexOf('(');
+  // look the first equal sign to extract the name in case a contructor is used
+  // i.e. with prompt " s = Sphere( Radius=1,End<TAB> " we want to get "Sphere"
+  int equal = textToComplete.indexOf('=') + 1;
+  int maxPos = std::max<int>(dot, paren);
+  if (maxPos != -1)
   {
-    lookup = textToComplete.mid(0, dot);
+    lookup = textToComplete.mid(equal, maxPos - equal);
+    lookup = lookup.trimmed();
   }
 
   // Lookup python names
@@ -50,9 +63,13 @@ QString pqPythonCompleter::getCompletionPrefix(const QString& prompt)
   // Search backward through the string for usable characters
   QString compareText = this->getVariableToComplete(prompt);
   int dot = compareText.lastIndexOf('.');
-  if (dot != -1)
+  int paren = compareText.lastIndexOf('(');
+  int comma = compareText.lastIndexOf(',');
+  int space = compareText.lastIndexOf(' ');
+  int maxPos = std::max<int>({ dot, paren, comma, space });
+  if (maxPos != -1)
   {
-    compareText = compareText.mid(dot + 1);
+    compareText = compareText.mid(maxPos + 1);
   }
 
   return compareText;
@@ -110,15 +127,80 @@ void pqPythonCompleter::appendPyObjectAttributes(PyObject* object, QStringList& 
 }
 
 //-----------------------------------------------------------------------------
+void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStringList& results)
+{
+  // Check if we have a function from paraview.simple
+  PyObject* pvtag = PyObject_GetAttrString(function, "__paraview_create_object_tag");
+  vtkSmartPyObject simpleModule;
+  simpleModule.TakeReference(PyImport_ImportModule("paraview.simple"));
+  if (!simpleModule)
+  {
+    qWarning() << "Failed to import 'paraview.simple'";
+    if (PyErr_Occurred())
+    {
+      PyErr_Print();
+      PyErr_Clear();
+      return;
+    }
+  }
+  std::string argumentExtractorUtility;
+  if (pvtag && PyBool_Check(pvtag))
+  {
+    // Hard-code this non-property default argument
+    results.append("registrationName");
+    argumentExtractorUtility = "ListProperties";
+  }
+  else
+  {
+    argumentExtractorUtility = "_get_function_arguments";
+  }
+
+  vtkSmartPyObject getArguments(PyUnicode_FromString(argumentExtractorUtility.c_str()));
+  vtkSmartPyObject retList(
+    PyObject_CallMethodObjArgs(simpleModule.GetPointer(), getArguments, function, nullptr));
+  if (!retList)
+  {
+    qWarning() << "Could not invoke 'paraview.simple.'" << argumentExtractorUtility.c_str();
+    if (PyErr_Occurred())
+    {
+      PyErr_Print();
+      PyErr_Clear();
+    }
+  }
+
+  if (PyList_Check(retList))
+  {
+    const auto len = PyList_Size(retList);
+    for (Py_ssize_t cc = 0; cc < len; ++cc)
+    {
+      PyObject* attributeItem = PyList_GetItem(retList, cc);
+      Py_ssize_t size;
+      const char* attributeName = PyUnicode_AsUTF8AndSize(attributeItem, &size);
+      if (attributeName)
+      {
+        results.append(attributeName);
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 PyObject* pqPythonCompleter::derivePyObject(const QString& pythonObjectName, PyObject* locals)
 {
   PyObject* derivedObject = locals;
   QStringList tmpNames = pythonObjectName.split('.');
+  int lastElement = tmpNames.size();
+  if (lastElement > 0)
+  {
+    lastElement--;
+  }
+
   for (int i = 0; i < tmpNames.size() && derivedObject; ++i)
   {
     QByteArray tmpName = tmpNames.at(i).toUtf8();
     PyObject* prevObj = derivedObject;
-    if (PyDict_Check(derivedObject))
+    // PyObject_Print(derivedObject, stdout, Py_PRINT_RAW);
+    if (derivedObject && PyDict_Check(derivedObject))
     {
       derivedObject = PyDict_GetItemString(derivedObject, tmpName.data());
       Py_XINCREF(derivedObject);
