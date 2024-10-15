@@ -11,7 +11,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProgressHandler.h"
-#include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRemoteWriterHelper.h"
 #include "vtkRenderWindow.h"
@@ -19,7 +18,6 @@
 #include "vtkSMAnimationSceneWriter.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyIterator.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -27,6 +25,7 @@
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 
+#include <algorithm>
 #include <sstream>
 #include <vtksys/SystemTools.hxx>
 
@@ -535,10 +534,6 @@ bool vtkSMSaveAnimationProxy::WriteAnimationInternal(const char* filename, vtkTy
   writer->SetFileName(filename);
   writer->SetStride(vtkSMPropertyHelper(this, "FrameStride").GetAsInt());
 
-  // FIXME: we should consider cleaning up this API on vtkSMAnimationSceneWriter. For now,
-  //        keeping it unchanged. This largely lifted from old code in
-  //        pqAnimationManager.
-  //
   // Convert frame window to PlaybackTimeWindow; FrameWindow is an integral
   // value indicating the frame number of timestep; PlaybackTimeWindow is double
   // values as animation time.
@@ -552,25 +547,24 @@ bool vtkSMSaveAnimationProxy::WriteAnimationInternal(const char* filename, vtkTy
       const int numFrames = vtkSMPropertyHelper(sceneProxy, "NumberOfFrames").GetAsInt();
       const double startTime = vtkSMPropertyHelper(sceneProxy, "StartTime").GetAsDouble();
       const double endTime = vtkSMPropertyHelper(sceneProxy, "EndTime").GetAsDouble();
-      frameWindow[0] = frameWindow[0] < 0 ? 0 : frameWindow[0];
-      frameWindow[1] = frameWindow[1] >= numFrames ? numFrames - 1 : frameWindow[1];
-      playbackTimeWindow[0] =
-        startTime + ((endTime - startTime) * frameWindow[0]) / (numFrames - 1);
-      playbackTimeWindow[1] =
-        startTime + ((endTime - startTime) * frameWindow[1]) / (numFrames - 1);
+      frameWindow[0] = std::max(frameWindow[0], 0);
+      frameWindow[1] = std::min(frameWindow[1], numFrames - 1);
+      const int denominator = std::max(numFrames - 1, 1);
+      playbackTimeWindow[0] = startTime + ((endTime - startTime) * frameWindow[0]) / denominator;
+      playbackTimeWindow[1] = startTime + ((endTime - startTime) * frameWindow[1]) / denominator;
+      break;
     }
-    break;
     case vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS:
     {
       vtkSMProxy* timeKeeper = vtkSMPropertyHelper(sceneProxy, "TimeKeeper").GetAsProxy();
-      vtkSMPropertyHelper tsValuesHelper(timeKeeper, "TimestepValues");
+      const vtkSMPropertyHelper tsValuesHelper(timeKeeper, "TimestepValues");
       const int numTS = tsValuesHelper.GetNumberOfElements();
-      frameWindow[0] = frameWindow[0] < 0 ? 0 : frameWindow[0];
-      frameWindow[1] = frameWindow[1] >= numTS ? numTS - 1 : frameWindow[1];
+      frameWindow[0] = std::max(frameWindow[0], 0);
+      frameWindow[1] = std::min(frameWindow[1], numTS - 1);
       playbackTimeWindow[0] = tsValuesHelper.GetAsDouble(frameWindow[0]);
       playbackTimeWindow[1] = tsValuesHelper.GetAsDouble(frameWindow[1]);
+      break;
     }
-    break;
   }
   writer->SetStartFileCount(frameWindow[0]);
   writer->SetPlaybackTimeWindow(playbackTimeWindow);

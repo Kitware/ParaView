@@ -7,7 +7,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkSMAnimationScene.h"
-#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMAnimationSceneWriter.h"
 #include "vtkSMExtractsController.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -15,7 +14,8 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
-#include "vtkWeakPointer.h"
+
+#include <algorithm>
 
 namespace
 {
@@ -119,29 +119,27 @@ bool vtkSMSaveAnimationExtractsProxy::SaveExtracts()
   {
     case vtkCompositeAnimationPlayer::SEQUENCE:
     {
-      int numFrames = vtkSMPropertyHelper(scene, "NumberOfFrames").GetAsInt();
-      double startTime = vtkSMPropertyHelper(scene, "StartTime").GetAsDouble();
-      double endTime = vtkSMPropertyHelper(scene, "EndTime").GetAsDouble();
-      frameWindow[0] = frameWindow[0] < 0 ? 0 : frameWindow[0];
-      frameWindow[1] = frameWindow[1] >= numFrames ? numFrames - 1 : frameWindow[1];
-      playbackTimeWindow[0] =
-        startTime + ((endTime - startTime) * frameWindow[0]) / (numFrames - 1);
-      playbackTimeWindow[1] =
-        startTime + ((endTime - startTime) * frameWindow[1]) / (numFrames - 1);
+      const int numFrames = vtkSMPropertyHelper(scene, "NumberOfFrames").GetAsInt();
+      const double startTime = vtkSMPropertyHelper(scene, "StartTime").GetAsDouble();
+      const double endTime = vtkSMPropertyHelper(scene, "EndTime").GetAsDouble();
+      frameWindow[0] = std::max(frameWindow[0], 0);
+      frameWindow[1] = std::min(frameWindow[1], numFrames - 1);
+      const int denominator = std::max(numFrames - 1, 1);
+      playbackTimeWindow[0] = startTime + ((endTime - startTime) * frameWindow[0]) / denominator;
+      playbackTimeWindow[1] = startTime + ((endTime - startTime) * frameWindow[1]) / denominator;
+      break;
     }
-    break;
     case vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS:
     {
       vtkSMProxy* timeKeeper = vtkSMPropertyHelper(scene, "TimeKeeper").GetAsProxy();
-      vtkSMPropertyHelper tsValuesHelper(timeKeeper, "TimestepValues");
-      int numTS = tsValuesHelper.GetNumberOfElements();
-      frameWindow[0] = frameWindow[0] < 0 ? 0 : frameWindow[0];
-      frameWindow[1] = frameWindow[1] >= numTS ? numTS - 1 : frameWindow[1];
+      const vtkSMPropertyHelper tsValuesHelper(timeKeeper, "TimestepValues");
+      const int numTS = tsValuesHelper.GetNumberOfElements();
+      frameWindow[0] = std::max(frameWindow[0], 0);
+      frameWindow[1] = std::min(frameWindow[1], numTS - 1);
       playbackTimeWindow[0] = tsValuesHelper.GetAsDouble(frameWindow[0]);
       playbackTimeWindow[1] = tsValuesHelper.GetAsDouble(frameWindow[1]);
+      break;
     }
-
-    break;
   }
   writer->SetStartFileCount(frameWindow[0]);
   writer->SetPlaybackTimeWindow(playbackTimeWindow);

@@ -87,7 +87,7 @@
          <item>
           <widget class="pqSpinBox" name="nbOfFramesValue">
            <property name="minimum">
-            <number>2</number>
+            <number>1</number>
            </property>
            <property name="maximum">
             <number>9999</number>
