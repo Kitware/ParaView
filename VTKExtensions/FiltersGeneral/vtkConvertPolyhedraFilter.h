@@ -20,6 +20,7 @@
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkUnstructuredGridBase;
+class vtkCellArray;
 class vtkIdList;
 class TestConvertPolyhedra; // for testing purposes
 
@@ -46,7 +47,7 @@ private:
   // the two functions below without having to expose them as public
   friend class TestConvertPolyhedra;
 
-  void InsertNextPolyhedralCell(vtkUnstructuredGridBase*, vtkIdList*) const;
+  void InsertNextPolyhedralCell(vtkUnstructuredGridBase*, vtkIdList*, vtkCellArray*) const;
   void InsertNextPolygonalCell(vtkUnstructuredGridBase*, vtkIdList*) const;
 };
 
