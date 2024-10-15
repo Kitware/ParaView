@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "vtkSMSaveScreenshotProxy.h"
-#include "vtkVectorOperators.h"
+#include "vtkVector.h"
 
 #include <cassert>
 

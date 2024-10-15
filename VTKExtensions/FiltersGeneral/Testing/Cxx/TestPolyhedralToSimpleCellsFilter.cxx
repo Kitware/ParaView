@@ -39,6 +39,7 @@ public:
     vtkNew<vtkConvertPolyhedraFilter> r;
     vtkNew<vtkUnstructuredGrid> ug;
     vtkNew<vtkIdList> ids;
+    vtkNew<vtkCellArray> faces;
 
     vtkNew<vtkErrorObserver> obs;
     r->AddObserver(vtkCommand::ErrorEvent, obs);
@@ -89,35 +90,38 @@ public:
 
     // === VTK_TETRA === //
     ug->Reset();
-    auto arr = new vtkIdType[17]{
-      4,          // nr faces
-      3, 0, 1, 2, // side
-      3, 1, 2, 3, // side
-      3, 1, 3, 0, // side
-      3, 0, 2, 3  // side
-    };
+    ids->Reset();
+    ids->InsertNextId(0);
+    ids->InsertNextId(1);
+    ids->InsertNextId(2);
+    ids->InsertNextId(3);
+    faces->Reset();
+    faces->InsertNextCell({ 0, 1, 2 }); // side
+    faces->InsertNextCell({ 1, 2, 3 }); // side
+    faces->InsertNextCell({ 1, 3, 0 }); // side
+    faces->InsertNextCell({ 0, 2, 3 }); // side
 
-    ids->SetArray(arr, 17);
-    r->InsertNextPolyhedralCell(ug, ids);
+    r->InsertNextPolyhedralCell(ug, ids, faces);
     vtk_observe_has_no_error(obs);
     vtk_assert(ug->GetNumberOfCells() == 1);
     vtk_assert(ug->GetCellType(0) == VTK_TETRA);
 
     // === VTK_PYRAMID === //
     ug->Reset();
-    arr = new vtkIdType[22]{
-      5,            // nr faces
-      3, 0, 1, 4,   // side
-      3, 4, 1, 2,   // side
-      3, 2, 3, 4,   // side
-      3, 3, 4, 0,   // side
-      4, 0, 1, 2, 3 // bottom
-    };
-
     ids->Reset();
-    ids->SetArray(arr, 22);
+    ids->InsertNextId(0);
+    ids->InsertNextId(1);
+    ids->InsertNextId(2);
+    ids->InsertNextId(3);
+    ids->InsertNextId(4);
+    faces->Reset();
+    faces->InsertNextCell({ 0, 1, 4 });    // side
+    faces->InsertNextCell({ 4, 1, 2 });    // side
+    faces->InsertNextCell({ 2, 3, 4 });    // side
+    faces->InsertNextCell({ 3, 4, 0 });    // side
+    faces->InsertNextCell({ 0, 1, 2, 3 }); // bottom
 
-    r->InsertNextPolyhedralCell(ug, ids);
+    r->InsertNextPolyhedralCell(ug, ids, faces);
     vtk_observe_has_no_error(obs);
     vtk_assert(ug->GetNumberOfCells() == 1);
     int ct = ug->GetCellType(0);
@@ -125,19 +129,21 @@ public:
 
     // === VTK_WEDGE === //
     ug->Reset();
-    arr = new vtkIdType[24]{
-      5,             // nr faces
-      3, 0, 1, 2,    // top
-      4, 0, 3, 4, 1, // side
-      4, 3, 5, 2, 0, // side
-      4, 2, 5, 4, 1, // side
-      3, 3, 5, 4     // bottom
-    };
-
     ids->Reset();
-    ids->SetArray(arr, 24);
+    ids->InsertNextId(0);
+    ids->InsertNextId(1);
+    ids->InsertNextId(2);
+    ids->InsertNextId(3);
+    ids->InsertNextId(4);
+    ids->InsertNextId(5);
+    faces->Reset();
+    faces->InsertNextCell({ 0, 1, 2 });    // top
+    faces->InsertNextCell({ 0, 3, 4, 1 }); // side
+    faces->InsertNextCell({ 3, 5, 2, 0 }); // side
+    faces->InsertNextCell({ 2, 5, 4, 1 }); // side
+    faces->InsertNextCell({ 3, 5, 4 });    // bottom
 
-    r->InsertNextPolyhedralCell(ug, ids);
+    r->InsertNextPolyhedralCell(ug, ids, faces);
     vtk_observe_has_no_error(obs);
     vtk_assert(ug->GetNumberOfCells() == 1);
     ct = ug->GetCellType(0);
@@ -145,18 +151,24 @@ public:
 
     // === VTK_HEXAHEDRON === //
     ug->Reset();
-    arr = new vtkIdType[31]{ 6, // nr faces
-      4, 0, 1, 2, 3,            // bottom
-      4, 2, 6, 5, 1,            // side
-      4, 5, 4, 0, 1,            // side
-      4, 4, 5, 6, 7,            // top
-      4, 3, 7, 6, 2,            // side
-      4, 7, 3, 0, 4 };
-
     ids->Reset();
-    ids->SetArray(arr, 31);
+    ids->InsertNextId(0);
+    ids->InsertNextId(1);
+    ids->InsertNextId(2);
+    ids->InsertNextId(3);
+    ids->InsertNextId(4);
+    ids->InsertNextId(5);
+    ids->InsertNextId(6);
+    ids->InsertNextId(7);
+    faces->Reset();
+    faces->InsertNextCell({ 0, 1, 2, 3 }); // bottom
+    faces->InsertNextCell({ 2, 6, 5, 1 }); // side
+    faces->InsertNextCell({ 5, 4, 0, 1 }); // side
+    faces->InsertNextCell({ 4, 5, 6, 7 }); // top
+    faces->InsertNextCell({ 3, 7, 6, 2 }); // side
+    faces->InsertNextCell({ 7, 3, 0, 4 }); // side
 
-    r->InsertNextPolyhedralCell(ug, ids);
+    r->InsertNextPolyhedralCell(ug, ids, faces);
     vtk_observe_has_no_error(obs);
     vtk_assert(ug->GetNumberOfCells() == 1);
     ct = ug->GetCellType(0);

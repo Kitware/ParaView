@@ -99,7 +99,7 @@ void vtkVRMLSource::InitializeImporter()
   }
   this->Importer = vtkVRMLImporter::New();
   this->Importer->SetFileName(this->FileName);
-  this->Importer->Read();
+  this->Importer->Update();
 }
 
 //------------------------------------------------------------------------------

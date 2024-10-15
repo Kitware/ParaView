@@ -492,7 +492,7 @@ void vtkMetaImporter::UpdateInformation()
   }
   else
   {
-    internals.Importer->Read();
+    internals.Importer->Update();
     internals.Serialize();
     this->AssemblyTag = internals.Importer->GetSceneHierarchy()->GetMTime();
   }
