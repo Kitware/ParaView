@@ -26,6 +26,7 @@ protected:
   vtkPVGhostCellsGenerator() = default;
   ~vtkPVGhostCellsGenerator() override = default;
 
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int, vtkInformation*) override;
 
@@ -35,6 +36,8 @@ protected:
 private:
   vtkPVGhostCellsGenerator(const vtkPVGhostCellsGenerator&) = delete;
   void operator=(const vtkPVGhostCellsGenerator&) = delete;
+
+  bool HasCompositeHTG = false;
 };
 
 #endif
