@@ -61,7 +61,7 @@ void pqXMLEventObserver::onRecordEvent(
         *this->Stream << "  <pqcompareview "
                       << "object=\"" << textToXML(widget).toUtf8().data() << "\" "
                       << "baseline=\"" << textToXML(arguments).toUtf8().data() << "\" "
-                      << "threshold=\"5\" "
+                      << "threshold=\"0.05\" "
                       << "/>\n";
       }
       else
