@@ -1201,6 +1201,7 @@ list(APPEND TESTS_WITH_BASELINES
   PointAndCellIdsHTG.xml
   Protractor.xml
   PVCellCentersHyperTreeGrid.xml
+  RegionIds.xml
   RemoveGhostInformationHTG.xml
   ResampleToLine.xml
   ReverseSense.xml
@@ -2011,6 +2012,10 @@ set(ReadCGNSBCDataset_DISABLE_CS TRUE)
 set(ReadCGNSBCDataset_DISABLE_CRS TRUE)
 set(CONVERGECFDCGNSReader_DISABLE_CS TRUE)
 set(CONVERGECFDCGNSReader_DISABLE_CRS TRUE)
+
+# RegionIds is not implemented for Distributed context
+set (RegionIds_DISABLE_CS TRUE)
+set (RegionIds_DISABLE_CRS TRUE)
 
 # Add image method overrides for tests.
 
