@@ -1047,6 +1047,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   CalculatorQuotedVariable.xml
   CameraLink.xml
   CGNSReaderDataLocation.xml
+  CGNSReaderSurfacePatches.xml
   ChartDefaultSettings.xml
   ChartLoadNoVariables.xml
   ClampAndUpdateColorMap.xml
@@ -2007,11 +2008,13 @@ set (PlotOverLine_htg_DISABLE_CRS TRUE)
 set (PlotOverLine_surface_DISABLE_CS TRUE)
 set (PlotOverLine_surface_DISABLE_CRS TRUE)
 
-# CGNS BC patches not supported in parallel
+# CGNS BC and Surface patches not supported in parallel
 set(ReadCGNSBCDataset_DISABLE_CS TRUE)
 set(ReadCGNSBCDataset_DISABLE_CRS TRUE)
 set(CONVERGECFDCGNSReader_DISABLE_CS TRUE)
 set(CONVERGECFDCGNSReader_DISABLE_CRS TRUE)
+set(CGNSReaderSurfacePatches_DISABLE_CS TRUE)
+set(CGNSReaderSurfacePatches_DISABLE_CRS TRUE)
 
 # RegionIds is not implemented for Distributed context
 set (RegionIds_DISABLE_CS TRUE)
