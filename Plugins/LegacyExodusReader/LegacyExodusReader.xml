@@ -10,7 +10,7 @@
        <Hints>
         <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii frq"
                        file_description="ExodusII"
-                       filename_patterns="*e-s*" />
+                       filename_patterns="*.e.*.* *.exo.*.* *.ex2.*.* *.e-s* *.exo-s* *.ex2-s*" />
       </Hints>
     </SourceProxy>
     <SourceProxy class="vtkExodusFileSeriesReader"
