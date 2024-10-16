@@ -174,6 +174,17 @@
        </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="LoadSurfaces"
+                         command="SetLoadSurfacePatch"
+                         number_of_elements="1"
+                         default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+          Toggle whether surfaces with no associated boundary conditions must be read for selected
+          bases/families.
+       </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="DoublePrecisionMesh"
                          command="SetDoublePrecisionMesh"
                          number_of_elements="1"
@@ -452,6 +463,7 @@
           <Property name="DataLocation" />
           <Property name="LoadMesh" />
           <Property name="LoadPatches" />
+          <Property name="LoadSurfaces" />
           <Property name="DoublePrecisionMesh" />
           <Property name="CacheMesh" />
           <Property name="CacheConnectivity" />
