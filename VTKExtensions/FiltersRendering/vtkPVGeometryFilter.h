@@ -18,7 +18,6 @@
 
 #include "vtkNew.h" // for vtkNew
 
-class vtkCallbackCommand;
 class vtkCellGrid;
 class vtkDataSet;
 class vtkDataObjectMeshCache;
@@ -42,8 +41,6 @@ class vtkRectilinearGrid;
 class vtkStructuredGrid;
 class vtkUnstructuredGridBase;
 class vtkUnstructuredGridGeometryFilter;
-class vtkAMRBox;
-class vtkOverlappingAMR;
 
 class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
 {
@@ -406,6 +403,16 @@ private:
    * Update cache content with given data object.
    */
   void UpdateCache(vtkDataObject* output);
+
+  /**
+   * Get the input as a vtkDataObjectTree.
+   *
+   * In fact, only vtkMultiBlockDataSet and vtkPartionedDataSetCollection are supported.
+   * Other vtkDataObjectTree subclasses are converted to vtkPartitionedDataSetCollection.
+   *
+   * Temporary OriginalIds are added (for caching purpose)
+   */
+  vtkSmartPointer<vtkDataObjectTree> GetDataObjectTreeInput(vtkInformationVector** inputVector);
 
   vtkNew<vtkDataObjectMeshCache> MeshCache;
 };
