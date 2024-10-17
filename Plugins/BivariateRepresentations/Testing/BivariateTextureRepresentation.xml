@@ -51,5 +51,5 @@
   <!-- Switch back to SurfaceRepresentation, standard scalar bar should be back -->
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="true" /> <!-- XXX: Current limitation, we have to set it to "true" manually -->
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Plugins/BivariateRepresentations/Testing/Data/Baseline/BivariateTexture_SurfaceRepr.png" threshold="5" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Plugins/BivariateRepresentations/Testing/Data/Baseline/BivariateTexture_SurfaceRepr.png" />
 </pqevents>

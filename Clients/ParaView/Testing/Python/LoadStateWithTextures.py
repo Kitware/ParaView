@@ -23,5 +23,5 @@ except:
 baseline_file = os.path.join(baselinePath, "LoadStateWithTextures.png")
 from paraview.vtk.test import Testing
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(view.GetRenderWindow(), baseline_file, threshold=10)
+Testing.compareImage(view.GetRenderWindow(), baseline_file)
 Testing.interact()

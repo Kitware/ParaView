@@ -1,6 +1,8 @@
 #### import the simple module from the paraview
 from paraview.simple import *
 
+LoadPalette("BlueGrayBackground")
+
 # Create a wavelet and clip it with a Cylinder.
 wavelet = Wavelet()
 Show()
@@ -17,6 +19,9 @@ Show()
 
 Render()
 
+lut = GetColorTransferFunction('RTData')
+lut.ApplyPreset('Cool to Warm', True)
+
 # compare with baseline image
 import os
 import sys
@@ -31,6 +36,5 @@ baseline_file = os.path.join(baselinePath, "TestClipCylinder.png")
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(GetActiveView().GetRenderWindow(), baseline_file,
-                     threshold=25)
+Testing.compareImage(GetActiveView().GetRenderWindow(), baseline_file)
 Testing.interact()

@@ -35,6 +35,8 @@ list(APPEND test_exclusions
   "\\.ShaderReplacements$"
   # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
   "\\.ComparativeViewOverlay$"
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/17941
+  "^paraviewPython-TestGeometryBoundsClobber$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")

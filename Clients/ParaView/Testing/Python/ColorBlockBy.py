@@ -4,6 +4,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 # create a new 'IOSS Reader'
 from paraview.vtk.util.misc import vtkGetDataRoot
 import os.path
@@ -58,6 +60,8 @@ blockACCLLUT = GetBlockColorTransferFunction('/IOSS/element_blocks/block_2', 'AC
 # show block color bar/color legend
 canex2Display.SetBlocksScalarBarVisibility(renderView1, ['/IOSS/element_blocks/block_2'], True)
 
+blockACCLLUT.ApplyPreset("Cool to Warm", True)
+
 # reset active camera to negative y
 renderView1.ResetActiveCameraToNegativeY()
 
@@ -77,5 +81,5 @@ from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(renderView1.GetRenderWindow(), baseline_file, threshold=40)
+Testing.compareImage(renderView1.GetRenderWindow(), baseline_file)
 Testing.interact()

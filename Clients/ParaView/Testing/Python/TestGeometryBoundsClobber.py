@@ -3,6 +3,8 @@
 
 from paraview.simple import *
 
+LoadPalette("BlueGrayBackground")
+
 r = CreateRenderView()
 r.ViewSize = [300, 300]
 r.AxesGrid.Visibility = 1
@@ -26,5 +28,5 @@ baseline_file = os.path.join(baselinePath, "TestGeometryBoundsClobber.png")
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(r.GetRenderWindow(), baseline_file, threshold=40)
+Testing.compareImage(r.GetRenderWindow(), baseline_file)
 Testing.interact()

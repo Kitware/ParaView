@@ -5,6 +5,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 # create a new 'Cone'
 cone1 = Cone()
 
@@ -136,6 +138,5 @@ baseline_file = os.path.join(baselinePath, "ResetSession.png")
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(GetActiveView().GetRenderWindow(), baseline_file,
-                     threshold=25)
+Testing.compareImage(GetActiveView().GetRenderWindow(), baseline_file)
 Testing.interact()

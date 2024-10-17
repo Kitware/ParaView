@@ -63,7 +63,7 @@ if (numpy_found)
     # add Matplotlib tests only if matplotlib was found at configure time.
     paraview_add_test_python(
       NO_DATA NO_RT
-      TestPythonViewMatplotlibScript.py
+      TestPythonViewMatplotlibScript.py,LOOSE_VALID
       )
   endif()
 endif()

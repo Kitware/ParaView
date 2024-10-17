@@ -1,6 +1,8 @@
 from paraview.simple import *
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 sphere1 = Sphere(registrationName='Sphere1')
 renderView1 = GetActiveViewOrCreate('RenderView')
 sphere1Display = Show(sphere1, renderView1, 'GeometryRepresentation')
@@ -53,5 +55,5 @@ baseline_file = os.path.join(baselinePath, "PolarAxesAutoPoleOffTranslation.png"
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(renderView1.GetRenderWindow(), baseline_file, threshold=40)
+Testing.compareImage(renderView1.GetRenderWindow(), baseline_file)
 Testing.interact()

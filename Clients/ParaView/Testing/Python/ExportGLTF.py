@@ -6,6 +6,8 @@ import sys, os.path
 # This test tests that exporting of a paraview scene correctly exports
 # a GLTF object when the GLTF extension is selected.
 
+LoadPalette("BlueGrayBackground")
+
 filename = os.path.join(vtkGetTempDir(), "ExportedGLTF.gltf")
 paraview.simple._DisableFirstRenderCameraReset()
 
@@ -40,6 +42,9 @@ renderView2.OrientationAxesVisibility = 0
 renderView2.ResetCamera(False, 0.9)
 renderView2.Update()
 
+lut = GetColorTransferFunction('TEXCOORD_0')
+lut.ApplyPreset('Cool to Warm', True)
+
 # compare baseline with data read
 # It is mostly useful to ensure the texture coordinates
 # correctly exported.
@@ -53,5 +58,5 @@ except:
 baseline_file = os.path.join(baselinePath, "ExportGLTF.png")
 from paraview.vtk.test import Testing
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(renderView2.GetRenderWindow(), baseline_file, threshold=10)
+Testing.compareImage(renderView2.GetRenderWindow(), baseline_file)
 Testing.interact()

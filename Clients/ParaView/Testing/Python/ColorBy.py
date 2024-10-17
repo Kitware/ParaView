@@ -3,6 +3,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 # create a new 'Wavelet'
 wavelet1 = Wavelet()
 
@@ -99,6 +101,8 @@ calculator1Display.SetScalarBarVisibility(renderView1, False)
 # Update a scalar bar component title.
 UpdateScalarBarsComponentTitle(ResultLUT, calculator1Display)
 
+ResultLUT.ApplyPreset("Cool to Warm", True)
+
 #### saving camera placements for all active views
 
 # current camera placement for renderView1
@@ -118,5 +122,5 @@ baseline_file = os.path.join(baselinePath, "ColorBy.png")
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir
 Testing.VTK_TEMP_DIR = vtkGetTempDir()
-Testing.compareImage(renderView1.GetRenderWindow(), baseline_file, threshold=40)
+Testing.compareImage(renderView1.GetRenderWindow(), baseline_file)
 Testing.interact()

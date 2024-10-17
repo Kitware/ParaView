@@ -1,8 +1,8 @@
-## ParaView's new imaging testing framework
+## ParaView's new image testing framework
 
 ### Overview
 
-The ParaView's imaging testing framework has been enhanced to incorporate the Structural Similarity Index (SSIM) metric
+The ParaView's image testing framework has been enhanced to incorporate the Structural Similarity Index (SSIM) metric
 on the Lab color space. This contribution provides an opt-in feature to ensure that as a project that is using VTK,
 it does encounter broken tests when updating.
 
@@ -53,12 +53,28 @@ Default threshold is recommended.
 Uses the old metric (not recommended).
 For compatibility with previous testing methods.
 
-##### Example:
+##### XML Example:
 
 ```cmake
 set(Test1_METHOD TIGHT_VALID) # Default
-set(Test1_METHOD LOOSE_VALID)
-set(Test2_METHOD LEGACY_VALID)
+set(Test2_METHOD LOOSE_VALID)
+set(Test3_METHOD LEGACY_VALID)
+```
+
+##### CXX Example:
+
+```cmake
+vtk_add_test_cxx(Test1.cxx,TIGHT_VALID) # Default
+vtk_add_test_cxx(Test2.cxx,LOOSE_VALID)
+vtk_add_test_cxx(Test3.cxx,LEGACY_VALID)
+```
+
+##### Python Example:
+
+```cmake
+paraview_add_test_python(Test1.py,TIGHT_VALID) # Default
+paraview_add_test_python(Test2.py,LOOSE_VALID)
+paraview_add_test_python(Test3.py,LEGACY_VALID)
 ```
 
 #### Manual Configuration

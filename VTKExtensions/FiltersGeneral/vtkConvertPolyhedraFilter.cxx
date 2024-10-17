@@ -5,6 +5,7 @@
 
 #include "vtkConvertPolyhedraFilter.h"
 
+#include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCellIterator.h"
 #include "vtkInformation.h"
@@ -23,7 +24,7 @@ vtkStandardNewMacro(vtkConvertPolyhedraFilter);
 
 //------------------------------------------------------------------------------
 void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
-  vtkUnstructuredGridBase* grid, vtkIdList* faces) const
+  vtkUnstructuredGridBase* grid, vtkIdList* pointIds, vtkCellArray* faces) const
 {
   if (grid == nullptr || faces == nullptr)
   {
@@ -31,7 +32,9 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
     return;
   }
 
-  const vtkIdType nFaces = faces->GetId(0);
+  const vtkIdType nFaces = faces->GetNumberOfCells();
+  vtkIdType npts;
+  const vtkIdType* pts;
   switch (nFaces)
   {
     case 1:
@@ -44,31 +47,19 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
     case 4:
     {
       // VTK_TETRAHEDRON OR VTK_POLYHEDRON
-      bool allTri(true);
-      for (vtkIdType n = 1; n < faces->GetNumberOfIds(); n += 4)
-      {
-        const vtkIdType numberOfFaceVertices = faces->GetId(n);
-        if (numberOfFaceVertices != 3)
-        {
-          allTri = false;
-          break;
-        }
-      }
+      const bool allTri = faces->GetNumberOfConnectivityIds() == 4 /*faces*/ * 3 /*points*/;
       if (!allTri)
       {
-        grid->InsertNextCell(VTK_POLYHEDRON, faces);
+        grid->InsertNextCell(
+          VTK_POLYHEDRON, pointIds->GetNumberOfIds(), pointIds->GetPointer(0), faces);
       }
       else
       {
         std::set<vtkIdType> ids;
-        vtkIdType offset(2);
-        for (vtkIdType fi = 0; fi < 3; ++fi)
+        for (vtkIdType fi = 0; fi < nFaces; ++fi)
         {
-          for (vtkIdType vi = 0; vi < 3; ++vi)
-          {
-            ids.insert(faces->GetId(offset + vi));
-          }
-          offset += 4; // 1 counter + 3 indices
+          faces->GetCellAtId(fi, npts, pts);
+          ids.insert(pts, pts + npts);
         }
         if (ids.size() != 4)
         {
@@ -91,41 +82,39 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
       std::set<vtkIdType> cellVertices;
       std::map<vtkIdType, int> vertexFaceConnectivity;
 
-      vtkIdType offset(1);
       for (vtkIdType fi = 0; fi < nFaces; ++fi)
       {
-        const vtkIdType nVertices = faces->GetId(offset);
-        if (nVertices == 3)
+        faces->GetCellAtId(fi, npts, pts);
+        if (npts == 3)
         {
           triFaces.push_back(fi);
         }
-        else if (nVertices == 4)
+        else if (npts == 4)
         {
           quadFaces.push_back(fi);
         }
-        else if (nVertices > 4)
+        else if (npts > 4)
         {
           polyFaces.push_back(fi);
           break; // for-loop.
         }
 
         std::vector<vtkIdType> face;
-        ++offset; // first vertex index
-        for (vtkIdType vi = 0; vi < nVertices; ++vi)
+        for (vtkIdType vi = 0; vi < npts; ++vi)
         {
-          vtkIdType vertex = faces->GetId(offset + vi);
+          const vtkIdType& vertex = pts[vi];
           cellVertices.emplace(vertex);
           vertexFaceConnectivity[vertex]++;
           face.emplace_back(vertex);
         }
 
         faceVertices.emplace_back(face);
-        offset += nVertices;
       }
 
       if (!polyFaces.empty())
       {
-        grid->InsertNextCell(VTK_POLYHEDRON, faces);
+        grid->InsertNextCell(
+          VTK_POLYHEDRON, pointIds->GetNumberOfIds(), pointIds->GetPointer(0), faces);
         break; // outer-switch
       }
 
@@ -151,7 +140,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
               std::array<std::array<vtkIdType, 4>, 3> sides = { { { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
                 { 0, 0, 0, 0 } } };
 
-              for (offset = 0; offset < 3 && !ok; ++offset)
+              for (vtkIdType offset = 0; offset < 3 && !ok; ++offset)
               {
                 topFaceCandidate[0] = topFace[(0 + offset) % 3];
                 topFaceCandidate[1] = topFace[(1 + offset) % 3];
@@ -219,7 +208,8 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
             }
           }
 
-          grid->InsertNextCell(VTK_POLYHEDRON, faces);
+          grid->InsertNextCell(
+            VTK_POLYHEDRON, pointIds->GetNumberOfIds(), pointIds->GetPointer(0), faces);
           break;
         }
 
@@ -284,7 +274,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
                 bool ok(false);
                 for (int twoTimes = 0; twoTimes < 2 && !ok; ++twoTimes)
                 {
-                  for (offset = 0; offset < 4 && !ok; ++offset)
+                  for (vtkIdType offset = 0; offset < 4 && !ok; ++offset)
                   {
                     topFaceCandidate[0] = topFace[(0 + offset) % 4];
                     topFaceCandidate[1] = topFace[(1 + offset) % 4];
@@ -335,7 +325,8 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
             }
           }
 
-          grid->InsertNextCell(VTK_POLYHEDRON, faces);
+          grid->InsertNextCell(
+            VTK_POLYHEDRON, pointIds->GetNumberOfIds(), pointIds->GetPointer(0), faces);
           break; // inner switch
         }
         default:
@@ -351,7 +342,8 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
 
     default:
     {
-      grid->InsertNextCell(VTK_POLYHEDRON, faces);
+      grid->InsertNextCell(
+        VTK_POLYHEDRON, pointIds->GetNumberOfIds(), pointIds->GetPointer(0), faces);
       break;
     }
   }
@@ -431,7 +423,7 @@ int vtkConvertPolyhedraFilter::RequestData(vtkInformation* vtkNotUsed(request),
 
     if (cellType == VTK_POLYHEDRON)
     {
-      InsertNextPolyhedralCell(output, it->GetFaces());
+      InsertNextPolyhedralCell(output, it->GetPointIds(), it->GetCellFaces());
     }
     else if (cellType == VTK_POLYGON)
     {
