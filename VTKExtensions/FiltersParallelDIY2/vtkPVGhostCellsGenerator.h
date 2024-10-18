@@ -4,8 +4,10 @@
  * @class vtkPVGhostCellsGenerator
  * @brief Ghost Cells Generator that add support for vtkHyperTreeGrid.
  *
- * This is a subclass of vtkGhostCellsGenerator that allows selection of
- * input vtkHyperTreeGrid
+ * This is a subclass of vtkGhostCellsGenerator that can process HyperTreeGrids and their composite
+ * derivates. In the case of a composite dataset containing HTG, the output will always be a
+ * vtkPartitionedDataSetCollection. Ghost Cells are computed separately for each individual
+ * partition/block of the composite structure.
  */
 
 #ifndef vtkPVGhostCellsGenerator_h

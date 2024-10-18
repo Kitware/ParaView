@@ -12,6 +12,7 @@
 #include "vtkHyperTreeGridGhostCellsGenerator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPartitionedDataSet.h"
@@ -48,6 +49,7 @@ int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
   return 0;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVGhostCellsGenerator::RequestDataObject(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -159,11 +161,22 @@ int vtkPVGhostCellsGenerator::RequestData(
     for (unsigned int pdsIdx = 0; pdsIdx < inputPDC->GetNumberOfPartitionedDataSets(); pdsIdx++)
     {
       auto currentPDS = inputPDC->GetPartitionedDataSet(pdsIdx);
-      if (vtkHyperTreeGrid::SafeDownCast(currentPDS->GetPartitionAsDataObject(0)))
+
+      auto pdsHTG = vtkHyperTreeGrid::SafeDownCast(currentPDS->GetPartitionAsDataObject(0));
+      int pdsIsHTG = pdsHTG != nullptr; // Needs to be int to be reduced
+      int allPartitionedDSAreHTG = true;
+      int somePartitionedDSAreHTG = false;
+
+      vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+      controller->AllReduce(&pdsIsHTG, &allPartitionedDSAreHTG, 1, vtkCommunicator::LOGICAL_AND_OP);
+      controller->AllReduce(&pdsIsHTG, &somePartitionedDSAreHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
+
+      if (allPartitionedDSAreHTG)
       {
         // HTG GCG cannot handle PDS input, so we apply the filter to each individual partition
         vtkNew<vtkPartitionedDataSet> outputPDS;
         outputPDS->SetNumberOfPartitions(currentPDS->GetNumberOfPartitions());
+
         for (unsigned int partId = 0; partId < currentPDS->GetNumberOfPartitions(); partId++)
         {
           vtkNew<vtkHyperTreeGridGhostCellsGenerator> ghostCellsGenerator;
@@ -171,6 +184,19 @@ int vtkPVGhostCellsGenerator::RequestData(
           ghostCellsGenerator->Update();
 
           outputPDS->SetPartition(partId, ghostCellsGenerator->GetOutput(0));
+        }
+        outputPDC->SetPartitionedDataSet(pdsIdx, outputPDS);
+      }
+      else if (somePartitionedDSAreHTG)
+      {
+        // Some ranks have PartitionedDatasets that are not HTG. In this case, ghost cells cannot be
+        // computed, so simply copy the input.
+        vtkWarningMacro("Cannot generate ghost cells for partitioned dataset #"
+          << pdsIdx << ", because some MPI ranks do not contain any data.");
+        vtkNew<vtkPartitionedDataSet> outputPDS;
+        if (currentPDS)
+        {
+          outputPDS->ShallowCopy(currentPDS);
         }
         outputPDC->SetPartitionedDataSet(pdsIdx, outputPDS);
       }
