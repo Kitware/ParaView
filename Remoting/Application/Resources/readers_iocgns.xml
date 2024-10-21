@@ -487,7 +487,8 @@
 
       <Hints>
         <ReaderFactory extensions="cgns"
-           file_description="CGNS Files" />
+                       file_description="CGNS Files"
+                       filename_patterns="*.cgns.*.*"/>
       </Hints>
 
       <!-- End of CGNSSeriesReader -->
@@ -546,7 +547,8 @@
 
       <Hints>
         <ReaderFactory extensions="cgns"
-                       file_description="CONVERGE CGNS Files" />
+                       file_description="CONVERGE CGNS Files"
+                       filename_patterns="*.cgns.*.*"/>
       </Hints>
     </SourceProxy>
     <!-- ==================================================================== -->
