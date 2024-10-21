@@ -28,6 +28,8 @@
       "Linear Green (Gr4L)",
       "Viridis (matplotlib)",
       "Inferno (matplotlib)",
+      "Fast (Reds)",
+      "Fast (Blues)",
       "Grayscale",
       "bone_Matlab",
       "gray_Matlab",
