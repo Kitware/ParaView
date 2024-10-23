@@ -314,6 +314,7 @@ int vtkPolarAxesRepresentation::RequestData(
   {
     vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
     this->InitializeDataBoundsFromData(input);
+    this->UpdateBounds();
   }
 
   if (vtkMath::AreBoundsInitialized(this->DataBounds))
