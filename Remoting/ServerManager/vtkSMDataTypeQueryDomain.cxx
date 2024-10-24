@@ -87,7 +87,7 @@ int vtkSMDataTypeQueryDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unc
 void vtkSMDataTypeQueryDomain::OnDomainModified()
 {
   vtkSMProperty* prop = this->GetProperty();
-  this->SetDefaultValues(prop, true);
+  this->SetDefaultValues(prop, false);
   if (prop->GetParent())
   {
     prop->GetParent()->UpdateProperty(prop->GetXMLName());

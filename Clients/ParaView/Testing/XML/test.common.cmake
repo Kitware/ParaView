@@ -550,6 +550,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-Liquorice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockChartSelectionPlotView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockChartSelectionRenderView.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorMultiBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorProperties.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorProperties_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorProperties_B.png}"
@@ -1090,6 +1091,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   LogoSourcesInChartViews.xml
   MemoryInspectorPanel.xml
   Molecule.xml
+  MultiBlockInspectorMultiBlock.xml
   MultiBlockInspectorProperties.xml
   MultiBlockInspectorSelection.xml
   MultiBlockChartSelection.xml
