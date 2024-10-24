@@ -165,7 +165,7 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkCellCenters"
+    <SourceProxy class="vtkPVCellCenters"
                  label="Cell Centers"
                  name="CellCenters">
       <Documentation long_help="Create a point (no geometry) at the center of each input cell."
@@ -179,9 +179,9 @@
                      point in the output. This is useful because vertex cells
                      are rendered, but points are not. The points themselves
                      could be used for placing glyphs (using the Glyph filter).
-                     The Cell Centers filter takes any type of dataset as
-                     input and produces a polygonal dataset as
-                     output.</Documentation>
+                     The Cell Centers filter takes any type of dataset or a
+                     HyperTree Grid as input and produces a polygonal dataset
+                     as output.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -190,6 +190,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Cell Centers
         filter.</Documentation>

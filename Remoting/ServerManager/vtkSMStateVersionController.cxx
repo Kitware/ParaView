@@ -2068,7 +2068,10 @@ struct Process_5_12_to_5_13
 //===========================================================================
 struct Process_5_13_to_5_14
 {
-  bool operator()(xml_document& document) { return HandlePolarAxesRenaming(document); }
+  bool operator()(xml_document& document)
+  {
+    return HandlePolarAxesRenaming(document) && HandleRenamedProxies(document);
+  }
 
   bool HandlePolarAxesRenaming(xml_document& document)
   {
@@ -2118,6 +2121,28 @@ struct Process_5_13_to_5_14
       if (auto polarTicksNode = node.find_child_by_attribute("name", "PolarTicksVisibility"))
       {
         polarTicksNode.attribute("name").set_value("AllTicksVisibility");
+      }
+    }
+
+    return true;
+  }
+
+  bool HandleRenamedProxies(xml_document& document)
+  {
+    std::map<std::string, std::string> renamedProxies = { { "HyperTreeGridCellCenters",
+      "CellCenters" } };
+
+    for (const auto& proxy : renamedProxies)
+    {
+      std::string request =
+        "//ServerManagerState/Proxy[@group='filters' and @type='" + proxy.first + "']";
+      pugi::xpath_node_set xpath_set = document.select_nodes(request.c_str());
+
+      for (auto xpath_node : xpath_set)
+      {
+        auto node = xpath_node.node();
+        // Change filter type
+        node.attribute("type").set_value(proxy.second.c_str());
       }
     }
 

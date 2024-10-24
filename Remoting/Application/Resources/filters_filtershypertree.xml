@@ -42,6 +42,10 @@
     <SourceProxy class="vtkHyperTreeGridCellCenters"
                  name="HyperTreeGridCellCenters"
                  label="HyperTreeGrid Cell Centers">
+      <Deprecated deprecated_in="5.14" to_remove_in="5.16">
+        This filter has been replaced by 'Cell Centers', which now supports HyperTree Grids.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation short_help="Cell Centers an HTG">
         This filter produces a cloud of points corresponding to the centers of the leaf cells.
       </Documentation>

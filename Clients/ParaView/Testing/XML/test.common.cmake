@@ -136,6 +136,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/glTF/WaterBottle/WaterBottle.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/binary_3D_333_mask.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/ghost.htg}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTGCellCentersBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_0_0.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_1_0.htg}"
@@ -622,6 +623,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PythonShellRunScript.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PropertyContextMenu1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PropertyContextMenu2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PVCellCentersHyperTreeGrid.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotLines.png}"
@@ -954,6 +956,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   FileDialogOpenInteractClose.xml
   ForceStaticMesh.xml
   GradientBackwardsCompatibility.xml
+  HTGCellCentersBackwardCompat.xml
   ImportCustomPresets.xml
   InformationPanel.xml
   LogViewer.xml
@@ -1191,6 +1194,7 @@ list(APPEND TESTS_WITH_BASELINES
   PickCenter.xml
   PointAndCellIdsHTG.xml
   Protractor.xml
+  PVCellCentersHyperTreeGrid.xml
   RemoveGhostInformationHTG.xml
   ResampleToLine.xml
   ReverseSense.xml

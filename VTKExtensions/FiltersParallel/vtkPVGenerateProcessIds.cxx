@@ -39,10 +39,14 @@ int vtkPVGenerateProcessIds::RequestData(vtkInformation* vtkNotUsed(request),
     generateProcessIds->SetInputData(inputDS);
     generateProcessIds->SetGeneratePointData(this->GetGeneratePointData());
     generateProcessIds->SetGenerateCellData(this->GetGenerateCellData());
-    generateProcessIds->Update();
 
-    outputDS->ShallowCopy(generateProcessIds->GetOutput(0));
-    return 1;
+    if (generateProcessIds->GetExecutive()->Update())
+    {
+      outputDS->ShallowCopy(generateProcessIds->GetOutput(0));
+      return 1;
+    }
+
+    return 0;
   }
 
   vtkHyperTreeGrid* inputHTG = vtkHyperTreeGrid::GetData(inInfo);
@@ -52,10 +56,14 @@ int vtkPVGenerateProcessIds::RequestData(vtkInformation* vtkNotUsed(request),
   {
     vtkNew<vtkHyperTreeGridGenerateProcessIds> htgGenerateProcessIds;
     htgGenerateProcessIds->SetInputData(inputHTG);
-    htgGenerateProcessIds->Update();
 
-    outputHTG->ShallowCopy(htgGenerateProcessIds->GetOutput(0));
-    return 1;
+    if (htgGenerateProcessIds->GetExecutive()->Update())
+    {
+      outputHTG->ShallowCopy(htgGenerateProcessIds->GetOutput(0));
+      return 1;
+    }
+
+    return 0;
   }
 
   vtkErrorMacro(<< "Unable to retrieve input / output as supported type.");

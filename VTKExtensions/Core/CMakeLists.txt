@@ -8,6 +8,7 @@ set(classes
   vtkEmulatedTimeAlgorithm
   vtkFileSequenceParser
   vtkLogRecorder
+  vtkPVCellCenters
   vtkPVCompositeDataPipeline
   vtkPVDataUtilities
   vtkPVInformationKeys

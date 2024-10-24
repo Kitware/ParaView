@@ -21,6 +21,7 @@ DEPENDS
 OPTIONAL_DEPENDS
   VTK::FiltersCore
 PRIVATE_DEPENDS
+  VTK::FiltersHyperTree
   VTK::IOCore
   VTK::loguru
   VTK::ParallelCore
