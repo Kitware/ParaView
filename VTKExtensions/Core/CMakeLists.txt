@@ -11,6 +11,7 @@ set(classes
   vtkPVCellCenters
   vtkPVCompositeDataPipeline
   vtkPVDataUtilities
+  vtkPVFeatureEdges
   vtkPVInformationKeys
   vtkPVLogger
   vtkPVNullSource

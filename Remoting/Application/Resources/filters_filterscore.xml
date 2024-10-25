@@ -876,14 +876,14 @@ found and the point will be rejected.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkFeatureEdges"
+    <SourceProxy class="vtkPVFeatureEdges"
                  label="Feature Edges"
                  name="FeatureEdges">
       <Documentation long_help="This filter will extract edges along sharp edges of surfaces or boundaries of surfaces."
                      short_help="Extract edges that meet the feature criteria.">
                      The Feature Edges filter extracts various subsets of edges
                      from the input data set. This filter operates on polygonal
-                     data and produces polygonal output.</Documentation>
+                     data or hyper tree grids and produces polygonal output.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -892,6 +892,7 @@ found and the point will be rejected.</Documentation>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
+          <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Feature Edges
         filter.</Documentation>
@@ -904,6 +905,12 @@ found and the point will be rejected.</Documentation>
         <Documentation>If the value of this property is set to 1, boundary
         edges will be extracted. Boundary edges are defined as lines cells or
         edges that are used by only one polygon.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetFeatureEdges"
                          default_values="1"
@@ -915,6 +922,12 @@ found and the point will be rejected.</Documentation>
         two polygons whose dihedral angle is greater than the feature angle.
         (See the FeatureAngle property.) Toggle whether to extract feature
         edges.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetNonManifoldEdges"
                          default_values="1"
@@ -925,6 +938,12 @@ found and the point will be rejected.</Documentation>
         <Documentation>If the value of this property is set to 1, non-manifold
         edges will be extracted. Non-manifold edges are defined as edges that
         are use by three or more polygons.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetManifoldEdges"
                          default_values="0"
@@ -934,6 +953,12 @@ found and the point will be rejected.</Documentation>
         <Documentation>If the value of this property is set to 1, manifold
         edges will be extracted. Manifold edges are defined as edges that are
         used by exactly two polygons.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetColoring"
                          default_values="0"
@@ -943,6 +968,12 @@ found and the point will be rejected.</Documentation>
         <Documentation>If the value of this property is set to 1, then the
         extracted edges are assigned a scalar value based on the type of the
         edge.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetFeatureAngle"
                             default_values="30.0"
@@ -955,7 +986,26 @@ found and the point will be rejected.</Documentation>
         edge. If the surface normal between two adjacent triangles is at least
         as large as this Feature Angle, a feature edge exists. (See the
         FeatureEdges property.)</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetMergePoints"
+                         default_values="0"
+                         name="MergePoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Select whether to merge duplicated points.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility" />
+        </Hints>
+      </IntVectorProperty>
       <Hints>
         <Visibility replace_input="0" />
       </Hints>

@@ -21,7 +21,7 @@
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/FeatureEdgesHTGNoMask.png" />
   <!-- Check feature edges filter, should be the same result -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="HyperTreeGridFeatureEdges" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="FeatureEdges" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/FeatureEdgesHTGNoMask.png" />
   <!-- Activate merge points, should be the same result again -->
