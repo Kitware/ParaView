@@ -115,8 +115,8 @@ set(PARAVIEW_PLUGIN_LOADER_PATHS ""
   CACHE STRING "Extra paths to search for plugins")
 mark_as_advanced(PARAVIEW_PLUGIN_LOADER_PATHS)
 if (PARAVIEW_PLUGIN_LOADER_PATHS)
-  set_source_files_properties(vtkPVPluginLoader.cxx
-    PROPERTIES
+  set_property(SOURCE vtkPVPluginLoader.cxx APPEND
+    PROPERTY
       COMPILE_DEFINITIONS PARAVIEW_PLUGIN_LOADER_PATHS=\"${PARAVIEW_PLUGIN_LOADER_PATHS}\")
 endif ()
 
