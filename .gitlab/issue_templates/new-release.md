@@ -240,9 +240,10 @@ Check that
 
   - Help -> About shows reasonable and accurate information
   - Check that plugins are present and load properly. Select Tools -> Manage Plugins menu item and load each plugin in the list.
-  - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
+  - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel). With Samples Per Pixel set to 4, leave the Denoise option on.
   - OptiX pathtracing runs (not macOS)
     - ref. !22372 for current expected results
+  -
   - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representation to NVIDIA IndeX)
   - Open can.ex2 example. Split screen horizontally. Switch to Volume rendering in one view, ray tracing in the other. Save screenshot (.png). Save Animation (.avi).
   -
