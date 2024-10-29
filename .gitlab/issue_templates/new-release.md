@@ -223,9 +223,9 @@ ColorBy(s, ('POINTS', 'Normals', 'X'))
 Show(Text(Text="$A^2$"))
 ```
 
-  Check that
-  - Check that Help -> Getting Started with ParaView menu opens PDF document
-  - Check that Help -> Reader, Filter, and Writer lists filter information properly
+Check that
+  - Help -> Getting Started with ParaView menu opens PDF document
+  - Help -> Reader, Filter, and Writer lists filter information properly
   - Run remote server with 8 ranks. Connect the client to it and check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog:
 
 ```
@@ -237,8 +237,8 @@ Show(Text(Text="$A^2$"))
   - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
   - OptiX pathtracing runs (not macOS)
     - ref. !22372 for current expected results
-  - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representaiton to NVIDIA IndeX)
-  - (All binaries) Open can.ex2 example. Split screen horizontally. Switch to Volume rendering in one view, ray tracing in the other. Save screenshot (.png). Save Animation (.avi).
+  - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representation to NVIDIA IndeX)
+  - Open can.ex2 example. Split screen horizontally. Switch to Volume rendering in one view, ray tracing in the other. Save screenshot (.png). Save Animation (.avi).
 
 Binary checklist
   - [ ] macOS arm64
