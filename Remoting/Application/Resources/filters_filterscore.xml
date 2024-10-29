@@ -2501,5 +2501,50 @@ found and the point will be rejected.</Documentation>
       </StringVectorProperty>
 
     </SourceProxy>
+
+    <SourceProxy name="RegionIds"
+      class="vtkGenerateRegionIds"
+      label="Region Ids">
+      <Documentation short_help="Generate Region Ids" long_help="Add a Region Ids cell array.">
+        Generates a region ids cell array. A region is defined as a collection of connected cells
+        with a maximal angle between their normals.
+
+        Grouping cells into regions is similar to Connectivity filter, while the Normal criteria
+        is similar to Feature Edges computation.
+
+        Note: Duplicated points may create unexpected regions. It is advised to run a Clean filter to remove them.
+
+        Warning: RegionIds is not implemented for Distributed environment.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty name="MaxAngle"
+        command="SetMaxAngle"
+        default_values="30"
+        number_of_elements="1" >
+        <Documentation>The maximum angle between two adjacent cell of a same face.
+        </Documentation>
+        <DoubleRangeDomain min="0" max="90" name="range" />
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="RegionIdsName"
+        command="SetRegionIdsArrayName"
+        default_values="vtkRegionIds"
+        number_of_elements="1"
+        panel_visibility="advanced" >
+       <Documentation>The generated region ids array name.
+       </Documentation>
+      </StringVectorProperty>
+
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
