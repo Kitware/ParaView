@@ -207,7 +207,10 @@ git submodule update --recursive --init
 
 Run in client-server configuration with 4 server ranks. Run through the [Classroom Tutorials][classroom-tutorials]. Try a few sources and filters in each section. Be sure to try the **Ghost Cells** filter as well.
 
-## All other binaries
+```
+> mpirun -n 4 pvserver --mpi --hostname=localhost -p 11111 &
+> paraview --server localhost:11111
+```
 
 Open the Python shell and run the following:
 
