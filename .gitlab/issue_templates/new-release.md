@@ -212,9 +212,9 @@ Run in client-server configuration with 4 server ranks. Run through the [Classro
 > paraview --server localhost:11111
 ```
 
-Open the Python shell and run the following:
+## All other binaries
 
-For each binary, open the Python shell and run the following:
+Open ParaView's _Python Shell_ and run the following:
 
 ```python
 import numpy
