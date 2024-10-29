@@ -205,12 +205,16 @@ git submodule update --recursive --init
 
 ## Linux
 
-Run in client-server configuration with 4 server ranks. Run through the [Classroom Tutorials][classroom-tutorials]. Try a few sources and filters in each section. Be sure to try the **Ghost Cells** filter as well.
+- Run in client-server configuration with 4 server ranks.
 
 ```
 > mpirun -n 4 pvserver --mpi --hostname=localhost -p 11111 &
 > paraview --server localhost:11111
 ```
+
+- Start trace. Open disk_out_ref. Clip.Create Screenshot. Create Animation. Stop trace. Save macro. Reset Session. Delete screenshot and animation. Run macro. Check generate screenshots and animations are correct.
+- Open View -> Memory Inspector.
+- Change opacity to 0.3 and ensure rendering looks correct.
 
 ## All other binaries
 
@@ -226,6 +230,7 @@ Show(Text(Text="$A^2$"))
 Check that
   - Help -> Getting Started with ParaView menu opens PDF document
   - Help -> Reader, Filter, and Writer lists filter information properly
+  - Help -> try every other item in the menu. Note that the Release Notes link will bring you to a missing page until the release notes are published, which may not be until the very end of the release cycle. Check that the URL is the expected one, though.
   - Run remote server with 8 ranks. Connect the client to it and check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog:
 
 ```
@@ -233,12 +238,14 @@ Check that
 > paraview --server localhost:11111
 ```
 
+  - Help -> About shows reasonable and accurate information
   - Check that plugins are present and load properly. Select Tools -> Manage Plugins menu item and load each plugin in the list.
   - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
   - OptiX pathtracing runs (not macOS)
     - ref. !22372 for current expected results
   - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representation to NVIDIA IndeX)
   - Open can.ex2 example. Split screen horizontally. Switch to Volume rendering in one view, ray tracing in the other. Save screenshot (.png). Save Animation (.avi).
+  -
 
 Binary checklist
   - [ ] macOS arm64
