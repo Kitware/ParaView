@@ -256,8 +256,8 @@ Binary checklist
   - [ ] Ask @cory.quammen to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website from within the directory corresponding to www.paraview.org/files/
 
 ```
-buildListing.sh
 updateMD5sum.sh v@MAJOR@.@MINOR@
+buildListing.sh
 ```
 
   - [ ] Test download links on https://www.paraview.org/download
