@@ -205,7 +205,7 @@ git submodule update --recursive --init
 
 ## Linux
 
-Run in client-server configuration with 4 server ranks. Run through the [Classroom Tutorials][classroom-tutorials]. Try a few sources and filters in each section. Be sure to try the **Ghost Cell Generator** as well.
+Run in client-server configuration with 4 server ranks. Run through the [Classroom Tutorials][classroom-tutorials]. Try a few sources and filters in each section. Be sure to try the **Ghost Cells** filter as well.
 
 ## All other binaries
 
