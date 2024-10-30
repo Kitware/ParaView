@@ -66,6 +66,7 @@ set(classes
   vtkPVImplicitAnnulusRepresentation
   vtkPVImplicitConeRepresentation
   vtkPVImplicitCylinderRepresentation
+  vtkPVImplicitFrustumRepresentation
   vtkPVImplicitPlaneRepresentation
   vtkPVInteractiveViewLinkRepresentation
   vtkPVIOSettings

@@ -13,6 +13,7 @@ set(classes
   vtkPVChangeOfBasisHelper
   vtkPVCone
   vtkPVCylinder
+  vtkPVFrustum
   vtkPVMergeTables
   vtkPVMergeTablesMultiBlock
   vtkPVPlane

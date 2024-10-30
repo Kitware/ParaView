@@ -32,6 +32,7 @@
 #include "pqFileListPropertyWidget.h"
 #include "pqFileNamePropertyWidget.h"
 #include "pqFontPropertyWidget.h"
+#include "pqFrustumPropertyWidget.h"
 #include "pqGenericPropertyWidgetDecorator.h"
 #include "pqGlyphScaleFactorPropertyWidget.h"
 #include "pqHandlePropertyWidget.h"
@@ -333,6 +334,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "InteractiveCylinder")
   {
     return new pqCylinderPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractiveFrustum")
+  {
+    return new pqFrustumPropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "InteractiveLight")
   {

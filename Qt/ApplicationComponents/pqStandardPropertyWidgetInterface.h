@@ -70,6 +70,7 @@ public:
    * \li \c FontEditor : pqFontPropertyWidget
    * \li \c SeriesEditor : pqSeriesEditorPropertyWidget
    * \li \c InteractiveAnnulus: pqAnnulusPropertyWidget
+   * \li \c InteractiveFrustum: pqFrustumPropertyWidget
    * \li \c InteractivePlane : pqDisplaySizedImplicitPlanePropertyWidget
    * \li \c InteractivePlane2 : pqImplicitPlanePropertyWidget
    * \li \c InteractiveBox: pqBoxPropertyWidget

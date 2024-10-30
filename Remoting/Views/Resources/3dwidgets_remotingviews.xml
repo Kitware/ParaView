@@ -519,6 +519,49 @@
 
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="ImplicitFrustumWidgetRepresentation">
+      <Documentation>Representation proxy for the frustum widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="ImplicitFrustumRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="WidgetBounds" />
+          <Property name="PlaceFactor" />
+          <Property name="Origin" />
+          <Property name="OriginInfo" />
+          <Property name="Orientation" />
+          <Property name="OrientationInfo" />
+          <Property name="HorizontalAngle" />
+          <Property name="HorizontalAngleInfo" />
+          <Property name="VerticalAngle" />
+          <Property name="VerticalAngleInfo" />
+          <Property name="NearPlaneDistance" />
+          <Property name="NearPlaneDistanceInfo" />
+          <Property name="DrawFrustum" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
+          <Property name="WidgetColor" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="ImplicitFrustumWidget"></Proxy>
+      </SubProxy>
+      <!-- End of ImplicitFrustumWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="SliderWidgetRepresentation">
       <IntVectorProperty command="SetEnabled"
                          default_values="0"
@@ -1881,6 +1924,166 @@
       </DoubleVectorProperty>
     </Proxy>
     <!-- End of ImplicitConeRepresentation -->
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVImplicitFrustumRepresentation"
+           name="ImplicitFrustumRepresentation">
+      <Documentation>Proxy for vtkImplicitFrustumWidget.
+      </Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the frustum widget.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetWidgetBounds"
+                            default_values="none"
+                            name="WidgetBounds"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Bounds of the widget representation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.2"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            information_property="OriginInfo"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The origin of the frustum.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetOrigin"
+                            information_only="1"
+                            name="OriginInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0.0 0.0 0.0"
+                            information_property="OrientationInfo"
+                            name="Orientation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The orientation of the frustum.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetOrientation"
+                            information_only="1"
+                            name="OrientationInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetHorizontalAngle"
+                            default_values="45"
+                            information_property="HorizontalAngleInfo"
+                            name="HorizontalAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.0"
+                           max="89.0"
+                           name="range" />
+        <Documentation>
+          The horizontal angle of the frustum, i.e. the angle between its forward axis
+          and its right and left planes.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetHorizontalAngle"
+                            information_only="1"
+                            name="HorizontalAngleInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetVerticalAngle"
+                            default_values="45"
+                            information_property="VerticalAngleInfo"
+                            name="VerticalAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.0"
+                           max="89.0"
+                           name="range" />
+        <Documentation>
+          The vertical angle of the frustum, i.e. the angle between its forward axis
+          and its top and bottom planes.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetVerticalAngle"
+                            information_only="1"
+                            name="VerticalAngleInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNearPlaneDistance"
+                            default_values="0.5"
+                            information_property="NearPlaneDistanceInfo"
+                            name="NearPlaneDistance"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.0"
+                           max="89.0"
+                           name="range" />
+        <Documentation>
+          The distance between the frustum origin and its near plane,
+          along the forward axis.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetNearPlaneDistance"
+                            information_only="1"
+                            name="NearPlaneDistanceInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDrawFrustum"
+                         default_values="1"
+                         name="DrawFrustum"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the drawing of the frustum. In some cases
+          the frustum interferes with the object that it is operating on (e.g.,
+          the frustum interferes with the cut surface it produces resulting in
+          z-buffer artifacts.) By default it is on.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the outline</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 0.0"
+                            name="WidgetColor"
+                            command="SetHandleColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="WidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- End of ImplicitFrustumRepresentation -->
     <!-- ================================================================== -->
     <Proxy class="vtkPVImplicitAnnulusRepresentation"
            name="ImplicitAnnulusRepresentation">
@@ -3389,6 +3592,12 @@
            class="vtkImplicitConeWidget"
            name="ImplicitConeWidget">
       <Documentation>Proxy for vtkImplicitConeWidget.</Documentation>
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkImplicitFrustumWidget"
+           name="ImplicitFrustumWidget">
+      <Documentation>Proxy for vtkImplicitFrustumWidget.</Documentation>
     </Proxy>
 
     <!-- End of ProxyGroup 3d_widgets -->

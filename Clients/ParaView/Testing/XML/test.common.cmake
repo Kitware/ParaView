@@ -1181,6 +1181,7 @@ list(APPEND TESTS_WITH_BASELINES
   EmptyInitialCompositeReader.xml # Issue #21293
   FeatureEdgesFilterHTG.xml
   FeatureEdgesRepresentationHTG.xml
+  FrustumWidget.xml
   IOSSCellGridHCurl.xml
   IOSSCellGridHDiv.xml
   IOSSMergeExodusEntityBlocks.xml
