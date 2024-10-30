@@ -229,7 +229,7 @@ Show(Text(Text="$A^2$"))
 
 Check that
   - Help -> Getting Started with ParaView menu opens PDF document
-  - Help -> Reader, Filter, and Writer lists filter information properly
+  - Help -> Reader, Filter, and Writer lists information about selected sources properly
   - Help -> try every other item in the menu. Note that the Release Notes link will bring you to a missing page until the release notes are published, which may not be until the very end of the release cycle. Check that the URL is the expected one, though.
   - Run remote server with 8 ranks. Connect the client to it and check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog:
 
@@ -246,7 +246,6 @@ Check that
   -
   - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representation to NVIDIA IndeX)
   - Open can.ex2 example. Split screen horizontally. Switch to Volume rendering in one view, ray tracing in the other. Save screenshot (.png). Save Animation (.avi).
-  -
 
 Binary checklist
   - [ ] macOS arm64
