@@ -27,7 +27,7 @@ stages:
 # Additionally, jobs may also contain:
 #
 #   - artifacts
-#   - dependency/needs jobs for required jobs
+#   - needs jobs for required jobs
 ################################################################################
 
 # Linux
@@ -61,8 +61,6 @@ el7-mindeps-shared-mpi-python:build:
 #         - .linux_tester_tags
 #         - .cmake_test_artifacts
 #         - .run_automatically
-#     dependencies:
-#         - el7-mindeps-shared-mpi-python:build
 #     needs:
 #         - el7-mindeps-shared-mpi-python:build
 
@@ -81,8 +79,6 @@ fedora35-static-mpi-offscreen-osmesa-python:test:
         - .linux_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - fedora35-static-mpi-offscreen-osmesa-python:build
     needs:
         - fedora35-static-mpi-offscreen-osmesa-python:build
 
@@ -101,8 +97,6 @@ el8-shared-icc-mpi-python:test:
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - el8-shared-icc-mpi-python:build
     needs:
         - el8-shared-icc-mpi-python:build
 
@@ -121,8 +115,6 @@ fedora35-shared-debug-mpi-python-qt:test:
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - fedora35-shared-debug-mpi-python-qt:build
     needs:
         - fedora35-shared-debug-mpi-python-qt:build
     timeout: 180 minutes
@@ -142,8 +134,6 @@ fedora35-shared-mpi-python-qt-vtkmoverride:test:
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - fedora35-shared-mpi-python-qt-vtkmoverride:build
     needs:
         - fedora35-shared-mpi-python-qt-vtkmoverride:build
     timeout: 120 minutes
@@ -157,8 +147,6 @@ translations:test:
         - .linux_tester_tags
         - .cmake_translations_artifacts
         - .merged_only
-    dependencies:
-        - fedora35-shared-debug-mpi-python-qt:build
     needs:
         - fedora35-shared-debug-mpi-python-qt:build
     timeout: 15 minutes
@@ -180,8 +168,6 @@ fedora35-shared-mpi-core:test:
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - fedora35-shared-mpi-core:build
     needs:
         - fedora35-shared-mpi-core:build
 
@@ -200,8 +186,6 @@ fedora35-shared-mpi-python-core:test:
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - fedora35-shared-mpi-python-core:build
     needs:
         - fedora35-shared-mpi-python-core:build
 
@@ -234,8 +218,6 @@ macos-arm64-python-qt:test:
         - .macos_arm64_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - macos-arm64-python-qt:build
     needs:
         - macos-arm64-python-qt:build
 
@@ -254,8 +236,6 @@ macos-x86_64-python-qt:test:
         - .macos_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - macos-x86_64-python-qt:build
     needs:
         - macos-x86_64-python-qt:build
 
@@ -277,8 +257,6 @@ windows-vs2022-kits-mpi-python-qt:test:
         - .windows_test_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - windows-vs2022-kits-mpi-python-qt:build
     needs:
         - windows-vs2022-kits-mpi-python-qt:build
     timeout: 90 minutes
@@ -299,8 +277,6 @@ windows-vs2022-qt:test:
         - .windows_test_tags
         - .cmake_test_artifacts
         - .run_automatically
-    dependencies:
-        - windows-vs2022-qt:build
     needs:
         - windows-vs2022-qt:build
     timeout: 90 minutes
