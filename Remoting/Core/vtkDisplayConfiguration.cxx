@@ -20,12 +20,14 @@ public:
     vtkTuple<double, 3> UpperRight{ 0.0 };
     std::string Environment;
     bool HasCorners = false;
+    bool Coverable = false;
 
     void Print(ostream& os, vtkIndent indent) const
     {
       os << indent << "Geometry: " << this->Geometry[0] << ", " << this->Geometry[1] << ", "
          << this->Geometry[2] << ", " << this->Geometry[3] << endl;
       os << indent << "HasCorners: " << this->HasCorners << endl;
+      os << indent << "Coverable: " << this->Coverable << endl;
       os << indent << "LoweLeft: " << this->LowerLeft[0] << ", " << this->LowerLeft[1] << ", "
          << this->LowerLeft[2] << endl;
       os << indent << "LowerRight: " << this->LowerRight[0] << ", " << this->LowerRight[1] << ", "
@@ -118,6 +120,14 @@ bool vtkDisplayConfiguration::GetHasCorners(int index) const
 }
 
 //----------------------------------------------------------------------------
+bool vtkDisplayConfiguration::GetCoverable(int index) const
+{
+  const auto& internals = (*this->Internals);
+  auto& config = internals.Displays.at(index);
+  return config.Coverable;
+}
+
+//----------------------------------------------------------------------------
 vtkTuple<double, 3> vtkDisplayConfiguration::GetLowerLeft(int index) const
 {
   const auto& internals = (*this->Internals);
@@ -192,6 +202,8 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
 
     info.SetCorners(display.attribute("LowerLeft").as_string(),
       display.attribute("LowerRight").as_string(), display.attribute("UpperRight").as_string());
+
+    info.Coverable = display.attribute("Coverable").as_bool();
 
     internals.Displays.push_back(std::move(info));
   }

@@ -256,6 +256,9 @@ vtkRenderWindow* vtkPVProcessWindow::NewCAVEWindow()
   const int idx = pm->GetPartitionId();
   const bool fullscreen = caveConfig->GetFullScreen();
   const bool showborders = caveConfig->GetShowBorders();
+  const bool coverable = caveConfig->GetCoverable(idx);
+  window->SetCoverable(coverable ? 1 : 0);
+
   if (!fullscreen)
   {
     geometry = caveConfig->GetGeometry(idx);
