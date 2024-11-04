@@ -12,9 +12,9 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
-#include "vtkPVPlane.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
+#include "vtkPlane.h"
 #include "vtkSmartPointer.h"
 #include "vtkType.h"
 
@@ -149,7 +149,7 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->CutFunction);
+  vtkPlane* plane = vtkPlane::SafeDownCast(this->CutFunction);
   if (plane && plane->GetAxisAligned())
   {
     vtkOverlappingAMR* inputAMR = vtkOverlappingAMR::GetData(inInfo);
@@ -298,7 +298,7 @@ int vtkAxisAlignedCutter::FillInputPortInformation(int port, vtkInformation* inf
 }
 
 //----------------------------------------------------------------------------
-bool vtkAxisAlignedCutter::ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPVPlane* plane,
+bool vtkAxisAlignedCutter::ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPlane* plane,
   vtkPartitionedDataSetCollection* outputPDC, vtkDataAssembly* outputHierarchy, int nodeId)
 {
   if (!inputPDS)
@@ -354,7 +354,7 @@ bool vtkAxisAlignedCutter::ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPVPlan
 
 //----------------------------------------------------------------------------
 void vtkAxisAlignedCutter::ProcessHTG(
-  vtkHyperTreeGrid* inputHTG, vtkPVPlane* plane, vtkPartitionedDataSetCollection* outputSlices)
+  vtkHyperTreeGrid* inputHTG, vtkPlane* plane, vtkPartitionedDataSetCollection* outputSlices)
 {
   for (int offsetIdx = 0, nbInserted = 0; offsetIdx < this->GetNumberOfOffsetValues(); offsetIdx++)
   {
@@ -381,7 +381,7 @@ void vtkAxisAlignedCutter::ProcessHTG(
 
 //----------------------------------------------------------------------------
 void vtkAxisAlignedCutter::CutHTGWithAAPlane(
-  vtkHyperTreeGrid* input, vtkHyperTreeGrid* output, vtkPVPlane* plane, double offset)
+  vtkHyperTreeGrid* input, vtkHyperTreeGrid* output, vtkPlane* plane, double offset)
 {
   double normal[3] = { 0., 0., 0. };
   plane->GetNormal(normal);
@@ -396,9 +396,8 @@ void vtkAxisAlignedCutter::CutHTGWithAAPlane(
     planeNormalAxis = 2;
   }
 
-  vtkNew<vtkPVPlane> newPlane;
-  newPlane->SetNormal(plane->GetNormal());
-  newPlane->SetOrigin(plane->GetOrigin());
+  vtkNew<vtkPlane> newPlane;
+  newPlane->DeepCopy(plane);
   // We should not use `Push` here since it does not apply on
   // the internal plane of vtkPVPlane
   newPlane->SetOffset(plane->GetOffset() + offset);
@@ -413,7 +412,7 @@ void vtkAxisAlignedCutter::CutHTGWithAAPlane(
 
 //----------------------------------------------------------------------------
 void vtkAxisAlignedCutter::CutAMRWithAAPlane(
-  vtkOverlappingAMR* input, vtkOverlappingAMR* output, vtkPVPlane* plane)
+  vtkOverlappingAMR* input, vtkOverlappingAMR* output, vtkPlane* plane)
 {
   double* normal = plane->GetNormal();
   double* origin = plane->GetOrigin();

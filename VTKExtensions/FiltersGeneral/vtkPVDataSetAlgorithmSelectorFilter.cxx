@@ -4,30 +4,18 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkCallbackCommand.h"
-#include "vtkCutter.h"
-#include "vtkDataSet.h"
 #include "vtkHyperTreeGrid.h"
-#include "vtkHyperTreeGridAxisClip.h"
-#include "vtkHyperTreeGridAxisCut.h"
-#include "vtkHyperTreeGridPlaneCutter.h"
 #include "vtkImplicitFunction.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVBox.h"
 #include "vtkPVClipDataSet.h"
-#include "vtkPVMetaSliceDataSet.h"
-#include "vtkPVPlane.h"
 #include "vtkPolyDataAlgorithm.h"
-#include "vtkQuadric.h"
 #include "vtkSmartPointer.h"
-#include "vtkSphere.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkUnstructuredGridAlgorithm.h"
 
 #include <cassert>
-#include <map>
 #include <set>
 #include <vector>
 

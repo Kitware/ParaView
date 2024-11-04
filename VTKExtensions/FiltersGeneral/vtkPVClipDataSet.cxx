@@ -15,14 +15,13 @@
 #include "vtkInformationVector.h"
 #include "vtkMassProperties.h"
 #include "vtkMathUtilities.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkNonMergingPointLocator.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVBox.h"
 #include "vtkPVCylinder.h"
-#include "vtkPVPlane.h"
 #include "vtkPVThreshold.h"
+#include "vtkPlane.h"
 #include "vtkPointData.h"
 #include "vtkQuadric.h"
 #include "vtkSmartPointer.h"
@@ -122,7 +121,7 @@ int vtkPVClipDataSet::RequestData(
     {
       return this->ClipUsingThreshold(request, inputVector, outputVector);
     }
-    vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->ClipFunction);
+    vtkPlane* plane = vtkPlane::SafeDownCast(this->ClipFunction);
     vtkPVBox* box = vtkPVBox::SafeDownCast(this->ClipFunction);
     vtkSphere* sphere = vtkSphere::SafeDownCast(this->ClipFunction);
     vtkQuadric* quadric = vtkQuadric::SafeDownCast(this->ClipFunction);
