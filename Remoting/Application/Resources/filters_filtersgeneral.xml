@@ -90,11 +90,11 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkAxisAlignedReflectionFilter"
-                 label="Axis-Aligned Reflect"
+                 label="Axis-Aligned Reflection Filter"
                  name="AxisAlignedReflectionFilter">
       <Documentation long_help="This filter reflects the input over an axis-aligned plane."
                      short_help="Reflect input over an axis aligned plane.">
-        The Axis Aligned Reflect filter reflects the input dataset across the
+        The Axis Aligned Reflection filter reflects the input dataset across the
         specified plane. This filter operates on any type of data
         set or hyper tree grid and produces a Partitioned DataSet Collection
         containing partitions of the same type as the input (the reflection
@@ -112,7 +112,7 @@
           <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <Documentation>
-          This property specifies the input to the Axis Aligned Reflect filter.
+          This property specifies the input to the Axis Aligned Reflection filter.
         </Documentation>
       </InputProperty>
       <IntVectorProperty command="SetPlaneMode"

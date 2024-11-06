@@ -519,6 +519,28 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                 "'FlipTextures' is obsolete.  Use 'TextureTransform' property of representation instead.")
 
+
+    # 5.13 -> 5.14 HyperTreeGridAxisReflection replaced by AxisAlignedReflectionFilter
+    # PlaneNormal and PlanePosition have been replaced by a vtkPlane 'ReflectionPlane'
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() in ("HyperTreeGridAxisReflection", "AxisAlignedReflectionFilter"):
+        if pname == "PlaneNormal":
+            if compatibility_version < (5, 14):
+                if value == 6:
+                    proxy.GetProperty("ReflectionPlane").GetData().Normal = [1, 0, 0]
+                elif value == 7:
+                    proxy.GetProperty("ReflectionPlane").GetData().Normal = [0, 1, 0]
+                elif value == 8:
+                    proxy.GetProperty("ReflectionPlane").GetData().Normal = [0, 0, 1]
+                raise Continue()
+            else:
+                raise NotSupportedException("'PlaneNormal' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+        if pname == "PlanePosition":
+            if compatibility_version < (5, 14):
+                proxy.GetProperty("ReflectionPlane").GetData().Origin = [value, value, value]
+            else:
+                raise NotSupportedException("'PlanePosition' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -1094,6 +1116,33 @@ def getattr(proxy, pname):
             else:
                 raise NotSupportedException("'PolarTicksVisibility' was renamed in 'AllTicksVisibility' since ParaView 5.14")
 
+    # 5.13 -> 5.14 HyperTreeGridAxisReflection replaced by AxisAlignedReflectionFilter
+    # PlaneNormal and PlanePosition have been replaced by a vtkPlane 'ReflectionPlane'
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() in ("HyperTreeGridAxisReflection", "AxisAlignedReflectionFilter"):
+        if pname == "PlaneNormal":
+            if compatibility_version < (5, 14):
+                normal = proxy.GetProperty("ReflectionPlane").GetData().Normal
+                if normal[0] == 1:
+                    return 6
+                if normal[1] == 1:
+                    return 7
+                if normal[2] == 1:
+                    return 8
+            else:
+                raise NotSupportedException("'PlaneNormal' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+        if pname == "PlanePosition":
+            if compatibility_version < (5, 14):
+                normal = proxy.GetProperty("ReflectionPlane").GetData().Normal
+                origin = proxy.GetProperty("ReflectionPlane").GetData().Origin
+                if normal[0] == 1:
+                    return origin[0]
+                if normal[1] == 1:
+                    return origin[1]
+                if normal[2] == 1:
+                    return origin[2]
+            else:
+                raise NotSupportedException("'PlanePosition' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+
     raise Continue()
 
 
@@ -1194,6 +1243,7 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("HyperTreeGridCellCenters", "CellCenters")]
         proxies[proxiesNS.filters] += [("HyperTreeGridFeatureEdges", "FeatureEdges")]
         proxies[proxiesNS.filters] += [("HyperTreeGridGhostCellsGenerator", "GhostCells")]
+        proxies[proxiesNS.filters] += [("HyperTreeGridAxisReflection", "AxisAlignedReflectionFilter")]
 
     return proxies
 
