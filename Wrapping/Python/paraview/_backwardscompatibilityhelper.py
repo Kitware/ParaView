@@ -540,6 +540,30 @@ def setattr(proxy, pname, value):
             else:
                 raise NotSupportedException("'PlanePosition' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
 
+    # 5.13 -> 5.14 Reflect replaced by AxisAlignedReflectionFilter
+    # Plane and Center have been replaced by a vtkPlane 'ReflectionPlane'
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() in ("ReflectionFilter", "AxisAlignedReflectionFilter"):
+        if pname == "Plane":
+            if compatibility_version < (5, 14):
+                if value < 6:
+                    proxy.PlaneMode = value + 1
+                else:
+                    proxy.PlaneMode = 0
+                    if value == 6:
+                        proxy.GetProperty("ReflectionPlane").GetData().Normal = [1, 0, 0]
+                    elif value == 7:
+                        proxy.GetProperty("ReflectionPlane").GetData().Normal = [0, 1, 0]
+                    elif value == 8:
+                        proxy.GetProperty("ReflectionPlane").GetData().Normal = [0, 0, 1]
+                raise Continue()
+            else:
+                raise NotSupportedException("'Plane' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+        if pname == "Center":
+            if compatibility_version < (5, 14):
+                proxy.GetProperty("ReflectionPlane").GetData().Origin = [value, value, value]
+            else:
+                raise NotSupportedException("'Center' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -1143,6 +1167,38 @@ def getattr(proxy, pname):
             else:
                 raise NotSupportedException("'PlanePosition' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
 
+    # 5.13 -> 5.14 Reflect replaced by AxisAlignedReflectionFilter
+    # Plane and Center have been replaced by a vtkPlane 'ReflectionPlane'
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() in ("ReflectionFilter", "AxisAlignedReflectionFilter"):
+        if pname == "Plane":
+            if compatibility_version < (5, 14):
+                planeMode = proxy.PlaneMode
+                if planeMode == 'Interactive':
+                    normal = proxy.GetProperty("ReflectionPlane").GetData().Normal
+                    if normal[0] == 1:
+                        return 6
+                    if normal[1] == 1:
+                        return 7
+                    if normal[2] == 1:
+                        return 8
+                    return 1
+                else:
+                    return planeMode
+            else:
+                raise NotSupportedException("'Plane' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+        if pname == "Center":
+            if compatibility_version < (5, 14):
+                normal = proxy.GetProperty("ReflectionPlane").GetData().Normal
+                origin = proxy.GetProperty("ReflectionPlane").GetData().Origin
+                if normal[0] == 1:
+                    return origin[0]
+                if normal[1] == 1:
+                    return origin[1]
+                if normal[2] == 1:
+                    return origin[2]
+            else:
+                raise NotSupportedException("'Center' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+
     raise Continue()
 
 
@@ -1244,6 +1300,7 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("HyperTreeGridFeatureEdges", "FeatureEdges")]
         proxies[proxiesNS.filters] += [("HyperTreeGridGhostCellsGenerator", "GhostCells")]
         proxies[proxiesNS.filters] += [("HyperTreeGridAxisReflection", "AxisAlignedReflectionFilter")]
+        proxies[proxiesNS.filters] += [("Reflect", "AxisAlignedReflectionFilter")]
 
     return proxies
 

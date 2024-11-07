@@ -143,6 +143,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_0_0.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_1_0.htg}"
+  "DATA{${paraview_test_data_directory_input}/Data/ReflectBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/WaveletGradientLegacy.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/img1.png}"
   "DATA{${paraview_test_data_directory_input}/Data/img1.mypng}"
@@ -988,6 +989,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   QuickLaunchRequest.xml
   ReadIOHDFAMRMaxLevels.xml
   ReaderRegistrationName.xml
+  ReflectBackwardCompat.xml
   ReloadCGNSFile.xml
   SearchBox.xml
   ServerConnectDialog.xml

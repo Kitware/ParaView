@@ -52,6 +52,7 @@ set(PY_TESTS
   PythonTestBenchmark.py,NO_VALID
   ReaderReload.py,NO_VALID
   RecolorableImageExtractor.py
+  ReflectBackwardsCompatibilityTest.py,NO_VALID
   RepresentationTypeHint.py,NO_VALID
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
