@@ -30,23 +30,32 @@ void vtkPVGhostCellsGenerator::PrintSelf(ostream& os, vtkIndent indent)
 int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  return this->GhostCellsGeneratorUsingSuperclassInstance(
+    vtkDataObject::GetData(inputVector[0]), vtkDataObject::GetData(outputVector));
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
+  vtkDataObject* inputDO, vtkDataObject* outputDO)
+{
+  if (!outputDO)
+  {
+    return 0;
+  }
   vtkNew<Superclass> instance;
-
-  instance->SetBuildIfRequired(this->GetBuildIfRequired());
   instance->SetController(this->GetController());
+  instance->SetBuildIfRequired(this->GetBuildIfRequired());
   instance->SetNumberOfGhostLayers(this->GetNumberOfGhostLayers());
-
-  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
-  vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
-
+  instance->SetGenerateGlobalIds(this->GetGenerateGlobalIds());
+  instance->SetGenerateProcessIds(this->GetGenerateProcessIds());
+  instance->SetSynchronizeOnly(this->GetSynchronizeOnly());
   instance->SetInputDataObject(inputDO);
-  if (instance->GetExecutive()->Update())
+  const int result = instance->GetExecutive()->Update();
+  if (result == 1)
   {
     outputDO->ShallowCopy(instance->GetOutput());
-    return 1;
   }
-
-  return 0;
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -70,7 +79,7 @@ int vtkPVGhostCellsGenerator::RequestDataObject(
         (pds && pds->GetNumberOfPartitions() > 0 &&
           vtkHyperTreeGrid::SafeDownCast(pds->GetPartitionAsDataObject(0))))
       {
-        bool outputAlreadyCreated = vtkPartitionedDataSetCollection::GetData(outInfo);
+        const bool outputAlreadyCreated = vtkPartitionedDataSetCollection::GetData(outInfo);
         if (!outputAlreadyCreated)
         {
           vtkNew<vtkPartitionedDataSetCollection> outputPDC;
@@ -88,14 +97,11 @@ int vtkPVGhostCellsGenerator::RequestDataObject(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGhostCellsGenerator::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkPVGhostCellsGenerator::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  vtkDataObject* input = vtkDataObject::GetData(inInfo);
-  vtkDataObject* output = vtkDataObject::GetData(outInfo);
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
+  vtkDataObject* output = vtkDataObject::GetData(outputVector);
 
   if (!input)
   {
@@ -124,10 +130,10 @@ int vtkPVGhostCellsGenerator::RequestData(
 
   // Check if our composite input contains HTG.
   // If it does, dispatch the blocks to the right implementation of the filter.
-  vtkDataObjectTree* inputComposite = vtkDataObjectTree::GetData(inInfo);
+  auto inputComposite = vtkDataObjectTree::SafeDownCast(input);
   if (inputComposite && this->HasCompositeHTG)
   {
-    vtkPartitionedDataSetCollection* outputPDC = vtkPartitionedDataSetCollection::GetData(outInfo);
+    auto outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(output);
     if (!outputPDC)
     {
       vtkErrorMacro(<< "Unable to retrieve output as vtkPartitionedDataSetCollection.");
@@ -161,9 +167,13 @@ int vtkPVGhostCellsGenerator::RequestData(
     for (unsigned int pdsIdx = 0; pdsIdx < inputPDC->GetNumberOfPartitionedDataSets(); pdsIdx++)
     {
       auto currentPDS = inputPDC->GetPartitionedDataSet(pdsIdx);
+      if (!currentPDS)
+      {
+        continue;
+      }
 
       auto pdsHTG = vtkHyperTreeGrid::SafeDownCast(currentPDS->GetPartitionAsDataObject(0));
-      int pdsIsHTG = pdsHTG != nullptr; // Needs to be int to be reduced
+      const int pdsIsHTG = pdsHTG != nullptr; // Needs to be int to be reduced
       int allPartitionedDSAreHTG = true;
       int somePartitionedDSAreHTG = false;
 
@@ -203,24 +213,20 @@ int vtkPVGhostCellsGenerator::RequestData(
       else
       {
         // Forward the whole PDS to non-HTG GCG.
-        vtkNew<vtkGhostCellsGenerator> ghostCellsGenerator;
-        ghostCellsGenerator->SetInputData(currentPDS);
-        ghostCellsGenerator->Update();
-        auto outputPDS = vtkPartitionedDataSet::SafeDownCast(ghostCellsGenerator->GetOutput(0));
-        if (!outputPDS)
+        vtkNew<vtkPartitionedDataSet> outputPDS;
+        const int result = this->GhostCellsGeneratorUsingSuperclassInstance(currentPDS, outputPDS);
+        if (result != 1)
         {
-          vtkErrorMacro(<< "Unable to retrieve output vtDataAssembly dataset " << pdsIdx
-                        << " as vtkPartitionedDataSet.");
+          vtkErrorMacro(<< "Failed to generate ghost cells for partitioned dataset #" << pdsIdx);
           return 0;
         }
-
         outputPDC->SetPartitionedDataSet(pdsIdx, outputPDS);
       }
     }
     return 1;
   }
 
-  return this->GhostCellsGeneratorUsingSuperclassInstance(request, inputVector, outputVector);
+  return this->GhostCellsGeneratorUsingSuperclassInstance(input, output);
 }
 
 //----------------------------------------------------------------------------
