@@ -2502,9 +2502,9 @@ found and the point will be rejected.</Documentation>
 
     </SourceProxy>
 
-    <SourceProxy name="RegionIds"
+    <SourceProxy name="FeatureEdgesRegionIds"
       class="vtkGenerateRegionIds"
-      label="Region Ids">
+      label="Feature Edges Region Ids">
       <Documentation short_help="Generate Region Ids" long_help="Add a Region Ids cell array.">
         Generates a region ids cell array. A region is defined as a collection of connected cells
         with a maximal angle between their normals.
@@ -2514,7 +2514,7 @@ found and the point will be rejected.</Documentation>
 
         Note: Duplicated points may create unexpected regions. It is advised to run a Clean filter to remove them.
 
-        Warning: RegionIds is not implemented for Distributed environment.
+        Warning: FeatureEdgesRegionIds is not implemented for Distributed environment.
       </Documentation>
 
       <InputProperty command="SetInputConnection" name="Input">
