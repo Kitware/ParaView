@@ -144,10 +144,12 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
     if source_set:
         start_set = source_set
     else:
-        # if nothing is specified, we save all views and sources.
-        start_set = [x for x in simple.GetSources().values()] + simple.GetViews()
+        # if nothing is specified, we save all views, sources and animation scene
+        start_set = [x for x in simple.GetSources().values()]
+        start_set += simple.GetViews()
+        start_set += [simple.GetAnimationScene()]
+
     start_set = [x for x in start_set if filter(x)]
-    start_set += [simple.GetAnimationScene()]
 
     # now, locate dependencies for the start_set, pruning irrelevant branches
     consumers = set(start_set)
