@@ -84,6 +84,12 @@ public:
   void ComputeSurfaceDefaultValues(
     const char* arrayName, vtkDataSet* dataset, int nComponents, double* defaultValues) override;
 
+  /**
+   * Method used by the model to modify the position of the particle when it is received
+   * This implementation shift the particle on the X axis
+   */
+  void ParallelManualShift(vtkLagrangianParticle* particle) override;
+
 protected:
   vtkLagrangianIntegrationModelExample();
   ~vtkLagrangianIntegrationModelExample() override = default;

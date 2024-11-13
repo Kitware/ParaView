@@ -321,3 +321,10 @@ void vtkLagrangianIntegrationModelExample::ComputeSurfaceDefaultValues(
     this->Superclass::ComputeSurfaceDefaultValues(arrayName, dataset, nComponents, defaultValues);
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkLagrangianIntegrationModelExample::ParallelManualShift(vtkLagrangianParticle* particle)
+{
+  double* pos = particle->GetPosition();
+  pos[0] += 1;
+}
