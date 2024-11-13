@@ -561,6 +561,16 @@
         <Documentation>If GenerateParticlePathsOutput is true, the tracker will generate the particle paths output.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetForcePManualShift"
+                         default_values="0"
+                         name="ForcePManualShift"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>If ForcePManualShift is true, the tracker will always use manual shifting on the particle when exchanging particles between nodes,
+        even if the particle was not flagged as requiring manual shifting.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End LagrangianParticleTracker -->
     </SourceProxy>
     <SourceProxy name="LagrangianSurfaceHelper"
