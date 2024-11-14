@@ -193,7 +193,7 @@
         </Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="iges" file_description="IGES File Reader"/>
+        <ReaderFactory extensions="iges igs" file_description="IGES File Reader"/>
       </Hints>
     </SourceProxy>
   </ProxyGroup>
