@@ -132,7 +132,14 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  void Reduce(vtkDataObject* input, vtkDataObject* output);
+  /**
+   * Core function of the filter.
+   * Performs the actual reduction by running the PreGatherHelper
+   * and PostGatherHelper algorithms.
+   * Must be virtual to allow behavior changes by specialized subclasses.
+   */
+  virtual void Reduce(vtkDataObject* input, vtkDataObject* output);
+
   vtkDataObject* PreProcess(vtkDataObject* input);
   void PostProcess(
     vtkDataObject* output, vtkSmartPointer<vtkDataObject> inputs[], unsigned int num_inputs);
