@@ -1,11 +1,13 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkAxisAlignedCutter.h"
+#include "vtkCommunicator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataObjectTree.h"
 #include "vtkDataObjectTreeIterator.h"
+#include "vtkDummyController.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridAxisCut.h"
 #include "vtkInformation.h"
@@ -26,16 +28,45 @@ VTK_ABI_NAMESPACE_BEGIN
 vtkStandardNewMacro(vtkAxisAlignedCutter);
 
 //----------------------------------------------------------------------------
-vtkAxisAlignedCutter::vtkAxisAlignedCutter() = default;
-
-//----------------------------------------------------------------------------
-vtkAxisAlignedCutter::~vtkAxisAlignedCutter() = default;
+vtkAxisAlignedCutter::vtkAxisAlignedCutter()
+{
+  this->SetController(vtkMultiProcessController::GetGlobalController());
+}
 
 //----------------------------------------------------------------------------
 void vtkAxisAlignedCutter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  this->CutFunction->PrintSelf(os, indent.GetNextIndent());
+  if (this->CutFunction != nullptr)
+  {
+    os << indent << "CutFunction: " << endl;
+    this->CutFunction->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "CutFunction: (nullptr)" << endl;
+  }
+
+  os << indent << "OffsetValues: " << endl;
+  this->OffsetValues->PrintSelf(os, indent.GetNextIndent());
+
+  os << indent << "LevelOfResolution: " << LevelOfResolution << endl;
+
+  os << indent << "HTGCutter: " << endl;
+  this->HTGCutter->PrintSelf(os, indent.GetNextIndent());
+
+  os << indent << "AMRCutter: " << endl;
+  this->AMRCutter->PrintSelf(os, indent.GetNextIndent());
+
+  if (this->Controller != nullptr)
+  {
+    os << indent << "Controller: " << endl;
+    this->Controller->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "Controller: (nullptr)" << endl;
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -49,6 +80,18 @@ vtkMTimeType vtkAxisAlignedCutter::GetMTime()
   }
 
   return mTime;
+}
+
+//------------------------------------------------------------------------------
+void vtkAxisAlignedCutter::SetCutFunction(vtkImplicitFunction* function)
+{
+  vtkSetSmartPointerBodyMacro(CutFunction, vtkImplicitFunction, function);
+}
+
+//------------------------------------------------------------------------------
+vtkImplicitFunction* vtkAxisAlignedCutter::GetCutFunction()
+{
+  return this->CutFunction;
 }
 
 //----------------------------------------------------------------------------
@@ -75,6 +118,22 @@ void vtkAxisAlignedCutter::SetNumberOfOffsetValues(int number)
 int vtkAxisAlignedCutter::GetNumberOfOffsetValues()
 {
   return this->OffsetValues->GetNumberOfContours();
+}
+
+//----------------------------------------------------------------------------
+void vtkAxisAlignedCutter::SetController(vtkMultiProcessController* controller)
+{
+  vtkSetSmartPointerBodyMacro(Controller, vtkMultiProcessController, controller);
+  if (!this->Controller)
+  {
+    this->Controller = vtkSmartPointer<vtkDummyController>::New();
+  }
+}
+
+//------------------------------------------------------------------------------
+vtkMultiProcessController* vtkAxisAlignedCutter::GetController()
+{
+  return this->Controller;
 }
 
 //----------------------------------------------------------------------------
@@ -217,7 +276,11 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
           for (auto index : indices)
           {
             auto inputPDS = inputPDC->GetPartitionedDataSet(index);
-            this->ProcessPDS(inputPDS, plane, outputPDC, outputHierarchy, nodeId);
+            if (!this->ProcessPDS(inputPDS, plane, outputPDC, outputHierarchy, nodeId))
+            {
+              vtkErrorMacro(
+                "Unable to process partitioned dataset at index " + std::to_string(index));
+            }
           }
         }
 
@@ -249,7 +312,6 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
           {
             vtkErrorMacro(
               "Unable to process partitioned dataset at index " + std::to_string(pdsIdx));
-            continue;
           }
         }
         outputPDC->SetDataAssembly(outputHierarchy);
@@ -270,7 +332,11 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
         return 0;
       }
 
-      this->ProcessHTG(inputHTG, plane, pdcOutput);
+      if (!this->ProcessHTG(inputHTG, plane, pdcOutput))
+      {
+        vtkErrorMacro(<< "Unable to process the input HTG.");
+        return 0;
+      }
 
       return 1;
     }
@@ -309,40 +375,60 @@ bool vtkAxisAlignedCutter::ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPlane*
 
   for (int offsetIdx = 0, nbInserted = 0; offsetIdx < this->GetNumberOfOffsetValues(); offsetIdx++)
   {
+    double offset = this->GetOffsetValue(offsetIdx);
+
     vtkNew<vtkPartitionedDataSet> pds;
     pds->SetNumberOfPartitions(inputPDS->GetNumberOfPartitions());
 
-    double offset = this->GetOffsetValue(offsetIdx);
-    unsigned int nbOfNonEmptyPartitions = 0;
+    // Using integer for MPI communication
+    int intersects = 0;
 
     for (unsigned int partIdx = 0; partIdx < inputPDS->GetNumberOfPartitions(); partIdx++)
     {
-      vtkNew<vtkHyperTreeGrid> outputHTG;
-      auto htgInput = vtkHyperTreeGrid::SafeDownCast(inputPDS->GetPartitionAsDataObject(partIdx));
-      if (!htgInput)
+      vtkDataObject* partition = inputPDS->GetPartitionAsDataObject(partIdx);
+      if (!partition)
+      {
+        // Some partitions can be empty in a distributed environment.
+        continue;
+      }
+
+      auto inputHTG = vtkHyperTreeGrid::SafeDownCast(partition);
+      if (!inputHTG)
       {
         vtkErrorMacro("Partition "
           << partIdx << " of input partitioned dataset should contain a HTG instance.");
         return false;
       }
 
-      this->CutHTGWithAAPlane(htgInput, outputHTG, plane, offset);
+      vtkNew<vtkHyperTreeGrid> outputHTG;
+      this->CutHTGWithAAPlane(inputHTG, outputHTG, plane, offset);
       pds->SetPartition(partIdx, outputHTG);
 
       if (outputHTG && outputHTG->GetNumberOfCells() != 0)
       {
-        nbOfNonEmptyPartitions++;
+        intersects = 1;
       }
     }
 
-    // Only add partitioned dataset if it contain at least one non-empty partition
-    if (nbOfNonEmptyPartitions == 0)
+    // If the plane does not intersect the PDS (HTG) on any process,
+    // no need to add the slice to the output.
+    int atLeastOneIntersects = 0;
+    if (!this->Controller->AllReduce(
+          &intersects, &atLeastOneIntersects, 1, vtkCommunicator::LOGICAL_OR_OP))
+    {
+      vtkErrorMacro(<< "An error ocurred during the parallel reduction operation checking that "
+                       "axis-aligned plane intersection occured or not for each rank.");
+      return false;
+    }
+
+    if (!atLeastOneIntersects)
     {
       continue;
     }
 
     auto nextDataSetId = outputPDC->GetNumberOfPartitionedDataSets();
     outputPDC->SetPartitionedDataSet(nextDataSetId, pds);
+
     const std::string sliceNodeName = "Slice" + std::to_string(nbInserted + 1);
     int sliceNodeId = outputHierarchy->AddNode(sliceNodeName.c_str(), nodeId);
     outputHierarchy->AddDataSetIndex(sliceNodeId, nextDataSetId);
@@ -353,7 +439,7 @@ bool vtkAxisAlignedCutter::ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPlane*
 }
 
 //----------------------------------------------------------------------------
-void vtkAxisAlignedCutter::ProcessHTG(
+bool vtkAxisAlignedCutter::ProcessHTG(
   vtkHyperTreeGrid* inputHTG, vtkPlane* plane, vtkPartitionedDataSetCollection* outputSlices)
 {
   for (int offsetIdx = 0, nbInserted = 0; offsetIdx < this->GetNumberOfOffsetValues(); offsetIdx++)
@@ -363,8 +449,25 @@ void vtkAxisAlignedCutter::ProcessHTG(
 
     this->CutHTGWithAAPlane(inputHTG, outputHTG, plane, offset);
 
-    // Only add non-empty slices
-    if (!outputHTG || outputHTG->GetNumberOfCells() == 0)
+    // Using integer for MPI communication
+    int intersects = 0;
+    if (outputHTG && outputHTG->GetNumberOfCells() != 0)
+    {
+      intersects = 1;
+    }
+
+    // If the plane does not intersect the HTG on any process, no need to add the slice to the
+    // output.
+    int atLeastOneIntersects = 0;
+    if (!this->Controller->AllReduce(
+          &intersects, &atLeastOneIntersects, 1, vtkCommunicator::LOGICAL_OR_OP))
+    {
+      vtkErrorMacro(<< "An error ocurred during the parallel reduction operation checking that "
+                       "axis-aligned plane intersection occured or not for each rank.");
+      return false;
+    }
+
+    if (!atLeastOneIntersects)
     {
       continue;
     }
@@ -377,6 +480,8 @@ void vtkAxisAlignedCutter::ProcessHTG(
     outputSlices->GetMetaData(nbInserted)->Set(vtkCompositeDataSet::NAME(), sliceName);
     nbInserted++;
   }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
