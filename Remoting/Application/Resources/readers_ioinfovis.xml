@@ -93,6 +93,26 @@
         example) your fields are separated by spaces but you don't know exactly
         how many.</Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty name="SkippedLines"
+                        command="SetSkippedRecords"
+                        default_values="0"
+                        number_of_elements="1"
+                        panel_visiblity="advanced">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>Number of leading lines to skip.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CommentCharacters"
+        command="SetCommentCharacters"
+        default_values="#"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <Documentation>List of characters used to start a comment section. Comment ends at the end of the line.
+        </Documentation>
+      </StringVectorProperty>
+
       <!-- End of CSVReaderCore -->
     </Proxy>
     <!-- end of "internal_sources" -->
@@ -152,6 +172,8 @@
           <Property name="AddTabFieldDelimiter" />
           <Property name="MergeConsecutiveDelimiters" />
           <Property name="Preview" />
+          <Property name="SkippedLines" />
+          <Property name="CommentCharacters" />
         </ExposedProperties>
       </SubProxy>
       <Hints>
