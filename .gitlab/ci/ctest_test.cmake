@@ -166,6 +166,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21786
     "^pv\\.MultipleColorOnSelection"
     "^pvcs\\.MultipleColorOnSelection"
+    # https://gitlab.kitware.com/paraview/paraview/-/merge_requests/7083
+    "^pvcs\\.GroupDataSetOutputType$"
+    "^pvcrs\\.GroupDataSetOutputType$"
     )
 endif ()
 
@@ -214,6 +217,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     # Flaky for some reasons
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
     "\\.PythonEditorRun$"
+
+    # Fails on windows-vs2022-qt
+    # https://gitlab.kitware.com/paraview/paraview/-/merge_requests/7083
+    "^pvcs\\.GroupDataSetOutputType$"
+    "^pvcrs\\.GroupDataSetOutputType$"
     )
 endif ()
 
