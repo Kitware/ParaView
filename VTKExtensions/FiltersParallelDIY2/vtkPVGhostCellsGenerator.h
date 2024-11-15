@@ -14,7 +14,10 @@
 #define vtkPVGhostCellsGenerator_h
 
 #include "vtkGhostCellsGenerator.h"
-#include "vtkPVVTKExtensionsFiltersParallelDIY2Module.h" //needed for exports
+#include "vtkPVVTKExtensionsFiltersParallelDIY2Module.h" // needed for exports
+#include "vtkParaViewDeprecation.h"                      // for PARAVIEW_DEPRECATED_IN_5_14_0
+
+class vtkDataObject;
 
 class VTKPVVTKEXTENSIONSFILTERSPARALLELDIY2_EXPORT vtkPVGhostCellsGenerator
   : public vtkGhostCellsGenerator
@@ -32,8 +35,11 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int, vtkInformation*) override;
 
+  PARAVIEW_DEPRECATED_IN_5_14_0(
+    "Use int GhostCellsGeneratorUsingSuperclassInstance(vtkDataObject*, vtkDataObject*)")
   int GhostCellsGeneratorUsingSuperclassInstance(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int GhostCellsGeneratorUsingSuperclassInstance(vtkDataObject* inputDO, vtkDataObject* outputDO);
 
 private:
   vtkPVGhostCellsGenerator(const vtkPVGhostCellsGenerator&) = delete;
