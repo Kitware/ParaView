@@ -967,6 +967,16 @@ const char* vtkFileSeriesReader::GetCurrentFileName()
 }
 
 //-----------------------------------------------------------------------------
+unsigned long vtkFileSeriesReader::GetErrorCode()
+{
+  if (this->Reader)
+  {
+    return this->Reader->GetErrorCode();
+  }
+  return this->ErrorCode;
+}
+
+//-----------------------------------------------------------------------------
 void vtkFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
