@@ -97,11 +97,13 @@ int vtkPVGhostCellsGenerator::RequestDataObject(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGhostCellsGenerator::RequestData(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkPVGhostCellsGenerator::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
   vtkDataObject* output = vtkDataObject::GetData(outputVector);
+
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
 
   if (!input)
   {
@@ -112,7 +114,12 @@ int vtkPVGhostCellsGenerator::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro(<< "Failed to get output data object.");
   }
 
-  if (vtkHyperTreeGrid::SafeDownCast(input))
+  int isHTG = vtkHyperTreeGrid::SafeDownCast(input) != nullptr;
+  int allAreHTG = false;
+  int someAreHTG = false;
+  controller->AllReduce(&isHTG, &allAreHTG, 1, vtkCommunicator::LOGICAL_AND_OP);
+  controller->AllReduce(&isHTG, &someAreHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
+  if (allAreHTG)
   {
     // Match behavior from vtkGhostCellsGenerator
     vtkNew<vtkHyperTreeGridGhostCellsGenerator> ghostCellsGenerator;
@@ -127,11 +134,29 @@ int vtkPVGhostCellsGenerator::RequestData(vtkInformation* vtkNotUsed(request),
 
     return 0;
   }
+  else if (someAreHTG && !allAreHTG)
+  {
+    vtkWarningMacro(
+      "All ranks need to contain a HyperTreeGrid piece in order to generate Ghost Cells. One "
+      "or more ranks do not contain HyperTreeGrid while some do.");
+    if (isHTG)
+    {
+      vtkHyperTreeGrid* outputHTG = vtkHyperTreeGrid::SafeDownCast(output);
+      outputHTG->ShallowCopy(input);
+    }
+    return 1;
+  }
 
   // Check if our composite input contains HTG.
   // If it does, dispatch the blocks to the right implementation of the filter.
   auto inputComposite = vtkDataObjectTree::SafeDownCast(input);
-  if (inputComposite && this->HasCompositeHTG)
+  int isCompositeHTG = inputComposite && this->HasCompositeHTG;
+  int allAreCompositeHTG = false;
+  int someAreCompositeHTG = false;
+  controller->AllReduce(&isCompositeHTG, &allAreCompositeHTG, 1, vtkCommunicator::LOGICAL_AND_OP);
+  controller->AllReduce(&isCompositeHTG, &someAreCompositeHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
+
+  if (allAreCompositeHTG)
   {
     auto outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(output);
     if (!outputPDC)
@@ -177,7 +202,6 @@ int vtkPVGhostCellsGenerator::RequestData(vtkInformation* vtkNotUsed(request),
       int allPartitionedDSAreHTG = true;
       int somePartitionedDSAreHTG = false;
 
-      vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
       controller->AllReduce(&pdsIsHTG, &allPartitionedDSAreHTG, 1, vtkCommunicator::LOGICAL_AND_OP);
       controller->AllReduce(&pdsIsHTG, &somePartitionedDSAreHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
 
@@ -224,6 +248,13 @@ int vtkPVGhostCellsGenerator::RequestData(vtkInformation* vtkNotUsed(request),
       }
     }
     return 1;
+  }
+  else if (someAreCompositeHTG && !allAreCompositeHTG)
+  {
+    vtkWarningMacro(
+      "All ranks need to contain composite HyperTreeGrids in order to generate Ghost Cells. One "
+      "or more ranks do not contain composite HyperTreeGrid while some do.");
+    return Superclass::RequestData(request, inputVector, outputVector);
   }
 
   return this->GhostCellsGeneratorUsingSuperclassInstance(input, output);
