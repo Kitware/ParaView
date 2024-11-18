@@ -4,11 +4,8 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
-#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStreamInstantiator.h"
 #include "vtkCommand.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -16,12 +13,10 @@
 #include "vtkPVLogger.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPolyData.h"
 #include "vtkProcessModule.h"
-#include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkUnstructuredGrid.h"
 
 #include <cassert>
 #include <sstream>
