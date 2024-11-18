@@ -51,7 +51,7 @@ class vtkDataAssembly;
 class vtkHyperTreeGridAxisCut;
 class vtkPartitionedDataSet;
 class vtkPartitionedDataSetCollection;
-class vtkPVPlane;
+class vtkPlane;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkAxisAlignedCutter : public vtkDataObjectAlgorithm
 {
@@ -122,26 +122,26 @@ private:
    * Helper methods that perform slicing on input HTG with given plane and fill outputSlices
    */
   void ProcessHTG(
-    vtkHyperTreeGrid* inputHTG, vtkPVPlane* plane, vtkPartitionedDataSetCollection* outputSlices);
+    vtkHyperTreeGrid* inputHTG, vtkPlane* plane, vtkPartitionedDataSetCollection* outputSlices);
 
   /**
    * Helper methods that perform slicing on input PDS with given plane. Add produced slices to the
    * output PDC. Slices indices are added in a new layer of nodes in the output hierarchy at given
    * node ID.
    */
-  bool ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPVPlane* plane,
+  bool ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPlane* plane,
     vtkPartitionedDataSetCollection* outputPDC, vtkDataAssembly* outputHierarchy, int nodeId);
 
   /**
    * Cut HTG with axis-aligned plane, applying additional plane offset if needed
    */
   void CutHTGWithAAPlane(
-    vtkHyperTreeGrid* input, vtkHyperTreeGrid* output, vtkPVPlane* plane, double offset);
+    vtkHyperTreeGrid* input, vtkHyperTreeGrid* output, vtkPlane* plane, double offset);
 
   /**
    * Cut AMR with axis-aligned plane
    */
-  void CutAMRWithAAPlane(vtkOverlappingAMR* input, vtkOverlappingAMR* output, vtkPVPlane* plane);
+  void CutAMRWithAAPlane(vtkOverlappingAMR* input, vtkOverlappingAMR* output, vtkPlane* plane);
 
   vtkSmartPointer<vtkImplicitFunction> CutFunction;
   vtkNew<vtkHyperTreeGridAxisCut> HTGCutter;

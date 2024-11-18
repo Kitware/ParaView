@@ -13,8 +13,8 @@
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVPlane.h"
 #include "vtkPVPlaneCutter.h"
+#include "vtkPlane.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredGridBase.h"
@@ -44,18 +44,14 @@ int vtkPVCutter::RequestData(
   vtkDataObject* input = vtkDataObject::GetData(inInfo);
   vtkDataObject* output = vtkDataObject::GetData(outInfo);
 
-  vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->CutFunction);
+  vtkPlane* plane = vtkPlane::SafeDownCast(this->CutFunction);
 
   auto executePlaneCutter = [&](double offset) {
     // Create a copy of the original plane and apply the offsets value
     // (global offset + "contours")
-    vtkNew<vtkPVPlane> newPlane;
-    newPlane->SetNormal(plane->GetNormal());
-    newPlane->SetOrigin(plane->GetOrigin());
-    // We should not use `Push` here since it does not apply on
-    // the internal plane of vtkPVPlane
+    vtkNew<vtkPlane> newPlane;
+    newPlane->DeepCopy(plane);
     newPlane->SetOffset(plane->GetOffset() + offset);
-    newPlane->SetAxisAligned(plane->GetAxisAligned());
 
     this->PlaneCutter->SetInputData(input);
     this->PlaneCutter->SetPlane(newPlane);
@@ -211,7 +207,7 @@ int vtkPVCutter::RequestDataObject(vtkInformation* vtkNotUsed(request),
 
   if (vtkHyperTreeGrid::SafeDownCast(inputDO))
   {
-    vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->GetCutFunction());
+    vtkPlane* plane = vtkPlane::SafeDownCast(this->GetCutFunction());
     if (!plane)
     {
       vtkErrorMacro(<< "Cut function not supported for vtkHyperTreeGrid");

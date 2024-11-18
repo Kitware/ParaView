@@ -12,7 +12,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVClipDataSet.h"
-#include "vtkPVPlane.h"
 #include "vtkSmartPointer.h"
 
 class vtkPVMetaClipDataSet::vtkInternals

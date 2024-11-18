@@ -140,7 +140,7 @@
   <ProxyGroup name="implicit_functions">
 
     <!-- ================================================================== -->
-    <Proxy class="vtkPVPlane" name="Plane" processes="dataserver|renderserver|client">
+    <Proxy class="vtkPlane" name="Plane" processes="dataserver|renderserver|client">
       <InputProperty is_internal="1"
                      name="Input"></InputProperty>
       <DoubleVectorProperty command="SetOrigin"
@@ -211,7 +211,7 @@
     </Proxy>
 
     <!-- ================================================================== -->
-    <Proxy class="vtkPVPlane"
+    <Proxy class="vtkPlane"
            name="Axis Aligned Plane">
       <InputProperty is_internal="1"
                      name="Input"></InputProperty>

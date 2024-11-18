@@ -15,6 +15,7 @@ GROUPS
 KIT
   ParaView::CoreKit
 DEPENDS
+  ParaView::Versioning
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::CommonMath

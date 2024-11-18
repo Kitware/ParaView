@@ -15,7 +15,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
-#include "vtkPVPlane.h"
+#include "vtkPlane.h"
 #include "vtkPlaneCutter.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
@@ -48,7 +48,7 @@ int vtkPVPlaneCutter::RequestData(
   vtkDataObject* input = vtkDataObject::GetData(inInfo);
   vtkDataObject* output = vtkDataObject::GetData(outInfo);
 
-  vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->Plane);
+  vtkPlane* plane = vtkPlane::SafeDownCast(this->Plane);
   if (!plane)
   {
     vtkErrorMacro(<< "Failed to get plane.");
@@ -185,7 +185,7 @@ int vtkPVPlaneCutter::RequestDataObject(
   auto inputDO = vtkDataObject::GetData(inputVector[0], 0);
   int outputType = -1;
 
-  vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->GetPlane());
+  vtkPlane* plane = vtkPlane::SafeDownCast(this->GetPlane());
   if (!plane)
   {
     vtkErrorMacro(<< "No plane function");
