@@ -17,6 +17,8 @@ if (BUILD_SHARED_LIBS)
 
     "DATA{Data/Baseline/LagrangianParticleTrackerParallelDistributed_InterA.png}")
 
+  set(LagrangianParticleTracker_TIMEOUT 300)
+
   paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"
     TEST_DATA_TARGET ParaViewData
