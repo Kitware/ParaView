@@ -861,6 +861,12 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
 
   vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::ExecuteCompositeDataSet");
 
+  // An iterator to traverse the real input data is needed to get the correct flat index
+  // when the real input has been converted to a vtkPartitionedDataSetCollection.
+  auto realInput = vtkDataObjectTree::GetData(inputVector[0], 0);
+  auto realInIter = vtk::TakeSmartPointer(realInput->NewTreeIterator());
+  realInIter->VisitOnlyLeavesOn();
+  realInIter->SkipEmptyNodesOn();
   auto inIter = vtk::TakeSmartPointer(input->NewTreeIterator());
   inIter->VisitOnlyLeavesOn();
   inIter->SkipEmptyNodesOn();
@@ -875,7 +881,9 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
   int* wholeExtent =
     vtkStreamingDemandDrivenPipeline::GetWholeExtent(inputVector[0]->GetInformationObject(0));
   int numInputs = 0;
-  for (inIter->InitTraversal(); !inIter->IsDoneWithTraversal(); inIter->GoToNextItem())
+  for (inIter->InitTraversal(), realInIter->InitTraversal();
+       !inIter->IsDoneWithTraversal() && !realInIter->IsDoneWithTraversal();
+       inIter->GoToNextItem(), realInIter->GoToNextItem())
   {
     vtkDataObject* block = inIter->GetCurrentDataObject();
     if (!block)
@@ -898,7 +906,7 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     if (tmpOut->GetNumberOfPoints() > 0)
     {
       output->SetDataSet(inIter, tmpOut);
-      this->AddCompositeIndex(tmpOut, inIter->GetCurrentFlatIndex());
+      this->AddCompositeIndex(tmpOut, realInIter->GetCurrentFlatIndex());
     }
     this->UpdateProgress(static_cast<float>(++numInputs) / totalNumberOfBlocks);
   }
