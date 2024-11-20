@@ -4,11 +4,9 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
-#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStreamInstantiator.h"
 #include "vtkCommand.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkCompositeDataSet.h"
+#include "vtkErrorCode.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -16,12 +14,10 @@
 #include "vtkPVLogger.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPolyData.h"
 #include "vtkProcessModule.h"
-#include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkUnstructuredGrid.h"
 
 #include <cassert>
 #include <sstream>
@@ -203,8 +199,9 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
     return;
   }
 
-  int processid = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
-  int numprocs = vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  const int processid = controller->GetLocalProcessId();
+  const int numprocs = controller->GetNumberOfProcesses();
 
   // This will create the output ports if needed.
   vtkAlgorithmOutput* output_port = this->GetOutputPort(port);
@@ -219,12 +216,11 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   vtkAlgorithm* algo = output_port->GetProducer();
   assert(algo);
 
-  vtkStreamingDemandDrivenPipeline* sddp =
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(algo->GetExecutive());
+  auto sddp = vtkStreamingDemandDrivenPipeline::SafeDownCast(algo->GetExecutive());
 
   sddp->UpdateInformation();
 
-  int real_port = output_port->GetIndex();
+  const int real_port = output_port->GetIndex();
 
   // Refer to BUG #11811 and BUG #12546. vtkGeometryRepresentation needs
   // ghost-cells if available (11811), but not asking for ghost-cells earlier than the
@@ -240,7 +236,31 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   {
     outInfo->Set(sddp->UPDATE_TIME_STEP(), time);
   }
-  sddp->Update(real_port);
+  // get the pipeline result
+  bool result = sddp->Update(real_port) == 1;
+  if (auto actualAlgo = vtkAlgorithm::SafeDownCast(this->GetVTKObject()))
+  {
+    // also check if the algorithm set any error codes
+    result &= actualAlgo->GetErrorCode() == vtkErrorCode::NoError;
+  }
+  if (numprocs > 1)
+  {
+    // Reduce the result to all processes.
+    unsigned char sendResult = result, reducedResult;
+    controller->Reduce(&sendResult, &reducedResult, 1, vtkCommunicator::LOGICAL_AND_OP, 0);
+    // If it's the server root process and the result is not the same as the reduced result,
+    // print an error message. If there was an error in all processes, the server root will
+    // print the error message, so we don't need to print anything here.
+    if (processid == 0 && reducedResult != sendResult)
+    {
+      auto actualAlgo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+      std::ostringstream message;
+      message << (actualAlgo ? actualAlgo->GetObjectDescription() + ": " : "")
+              << "There was an error on a server process. Please check the server console or log "
+                 "output for details.";
+      vtkErrorMacro(<< message.str());
+    }
+  }
 }
 
 //----------------------------------------------------------------------------

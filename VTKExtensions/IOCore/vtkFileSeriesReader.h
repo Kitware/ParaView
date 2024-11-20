@@ -139,6 +139,11 @@ public:
   static vtkInformationIntegerKey* FILE_SERIES_CURRENT_FILE_NUMBER();
   static vtkInformationStringKey* FILE_SERIES_FIRST_FILENAME();
 
+  /**
+   * Return the error code of the reader
+   */
+  unsigned long GetErrorCode() override;
+
 protected:
   vtkFileSeriesReader();
   ~vtkFileSeriesReader() override;
