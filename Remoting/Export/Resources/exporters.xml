@@ -654,6 +654,44 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <InputProperty command="SetSelectedSource" name="InputSource">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+      </InputProperty>
+
+      <StringVectorProperty name="PointArrays"
+                            command="GetNodeBlockFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="point_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the node block arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="point"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetProp"
+                            name="Prop"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <PropDomain name="prop" />
+        <Documentation>Choose the selected prop associated to a dataset</Documentation>
+      </StringVectorProperty>
+
+
       <Hints>
         <ExporterFactory extensions="vtkjs" />
       </Hints>

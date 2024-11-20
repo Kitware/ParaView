@@ -14,6 +14,8 @@
 #include "vtkJSONSceneExporter.h"
 #include "vtkRemotingExportModule.h" // needed for exports
 
+class vtkDataArraySelection;
+
 class VTKREMOTINGEXPORT_EXPORT vtkPVWebExporter : public vtkJSONSceneExporter
 {
 public:
@@ -27,6 +29,14 @@ public:
    */
   vtkSetMacro(ParaViewGlanceHTML, std::string);
   vtkGetMacro(ParaViewGlanceHTML, std::string);
+  ///@}
+
+  ///@{
+  /**
+   * Select the prop associated to a dataset we want to edit selected arrays
+   */
+  vtkSetMacro(Prop, std::string);
+  vtkGetMacro(Prop, std::string);
   ///@}
 
   ///@{
@@ -74,6 +84,7 @@ private:
 
   // Exporter properties
   std::string ParaViewGlanceHTML;
+  std::string Prop;
   bool AutomaticGlanceHTML = true;
   bool ExportToGlance = false;
   bool DisableNetwork = true;

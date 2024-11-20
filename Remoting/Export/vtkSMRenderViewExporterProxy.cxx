@@ -6,6 +6,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
+#include "vtkSMPropDomain.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
@@ -21,6 +23,24 @@ vtkSMRenderViewExporterProxy::~vtkSMRenderViewExporterProxy() = default;
 bool vtkSMRenderViewExporterProxy::CanExport(vtkSMProxy* view)
 {
   return (view && view->IsA("vtkSMRenderViewProxy"));
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewExporterProxy::SetView(vtkSMViewProxy* view)
+{
+  this->vtkSMExporterProxy::SetView(view);
+
+  // TODO: iterate over props to get every domain instead
+  vtkSMProperty* prop = this->GetProperty("Prop");
+  vtkSMProperty* prop2 = this->GetProperty("DisableNetwork");
+  if (prop)
+  {
+    vtkSMPropDomain* domain = prop->FindDomain<vtkSMPropDomain>();
+    if (domain)
+    {
+      domain->Update(prop);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------

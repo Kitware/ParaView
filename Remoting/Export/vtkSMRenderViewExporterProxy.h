@@ -27,6 +27,8 @@ public:
    */
   void Write() override;
 
+  void SetView(vtkSMViewProxy* view) override;
+
   /**
    * Returns if the view can be exported.
    * Default implementation return true if the view is a render view.
