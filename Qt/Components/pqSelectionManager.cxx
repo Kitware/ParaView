@@ -18,6 +18,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSelectionHelper.h"
 #include "vtkSMSelectionLink.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -134,12 +135,8 @@ void pqSelectionManager::expandSelection(int layers, bool removeSeed, bool remov
       {
         auto selectionSource =
           vtkSMPropertyHelper(appendSelections->GetProperty("Input")).GetAsProxy(i);
-        vtkSMPropertyHelper numberOfLayersHelper(selectionSource, "NumberOfLayers");
-        numberOfLayersHelper.Set(numberOfLayersHelper.GetAsInt() + layers);
-        vtkSMPropertyHelper(selectionSource, "RemoveSeed").Set(removeSeed);
-        vtkSMPropertyHelper(selectionSource, "RemoveIntermediateLayers")
-          .Set(removeIntermediateLayers);
-        selectionSource->UpdateVTKObjects();
+        vtkSMSelectionHelper::ExpandSelection(
+          selectionSource, layers, removeSeed, removeIntermediateLayers);
 
         SM_SCOPED_TRACE(CallFunction)
           .arg(layers > 0 ? "GrowSelection" : "ShrinkSelection")
