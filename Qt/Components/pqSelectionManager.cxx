@@ -140,6 +140,12 @@ void pqSelectionManager::expandSelection(int layers, bool removeSeed, bool remov
         vtkSMPropertyHelper(selectionSource, "RemoveIntermediateLayers")
           .Set(removeIntermediateLayers);
         selectionSource->UpdateVTKObjects();
+
+        SM_SCOPED_TRACE(CallFunction)
+          .arg(layers > 0 ? "GrowSelection" : "ShrinkSelection")
+          .arg("source", port->getSource()->getProxy())
+          .arg("layers", layers > 0 ? layers : -layers)
+          .arg("comment", "Grow selection");
       }
     }
     port->renderAllViews();
