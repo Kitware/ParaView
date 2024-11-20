@@ -124,6 +124,12 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
       "^ParaViewExample-Catalyst2/PythonSteeringExample$")
   endif ()
 
+  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "vtkmoverride")
+    list(APPEND test_exclusions
+      # https://gitlab.kitware.com/paraview/paraview/-/issues/22801
+      "^paraviewPython-TestCatalystClient$")
+  endif ()
+
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
@@ -140,6 +146,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22674 
     "^paraviewPython-Batch-TestStereoSaveScreenshot$"
+    "^paraviewPython-TestStereoSaveScreenshot$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22800
+    "^paraviewPython-SaveTransparentImages$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22676
     "^paraviewPython-TestHTGContourMonoHT$"
