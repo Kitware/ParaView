@@ -4,6 +4,10 @@
     <SourceProxy class="vtkHyperTreeGridAxisReflection"
                  name="HyperTreeGridAxisReflection"
                  label="HyperTreeGrid Axis Reflection">
+      <Deprecated deprecated_in="5.14" to_remove_in="5.16">
+        This filter has been replaced by 'Axis-Aligned Reflect', that supports HyperTree Grids.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation short_help="Reflect an HTG across an axis-aligned plane.">
         This filter reflect the cells of a hyper tree grid with respect to
         one of the planes parallel to the bounding box of the data set.

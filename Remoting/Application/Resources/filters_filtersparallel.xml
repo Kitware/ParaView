@@ -1290,6 +1290,10 @@
     <SourceProxy class="vtkPReflectionFilter"
                  label="Reflect"
                  name="ReflectionFilter">
+      <Deprecated deprecated_in="5.14" to_remove_in="5.16">
+        This filter has been replaced by 'Axis-Aligned Reflect'.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation long_help="This filter takes the union of the input and its reflection over an axis-aligned plane."
                      short_help="Reflect input over an axis aligned plane.">
         The Reflect filter reflects the input dataset across the

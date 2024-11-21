@@ -140,9 +140,11 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/HTGCellCentersBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGFeatureEdgesBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGGhostCellsGeneratorBackwardCompat.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTGReflectionBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_0_0.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_1_0.htg}"
+  "DATA{${paraview_test_data_directory_input}/Data/ReflectBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/WaveletGradientLegacy.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/img1.png}"
   "DATA{${paraview_test_data_directory_input}/Data/img1.mypng}"
@@ -268,6 +270,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid8.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid9.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid10.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxisAlignedReflect.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BatchAxesGrid.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-bake-HideOneBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-bake-HideTwoBlocks.png}"
@@ -963,6 +966,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   HTGCellCentersBackwardCompat.xml
   HTGFeatureEdgesBackwardCompat.xml
   HTGGhostCellsGeneratorBackwardCompat.xml
+  HTGReflectionBackwardCompat.xml
   ImportCustomPresets.xml
   InformationPanel.xml
   LogViewer.xml
@@ -987,6 +991,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   QuickLaunchRequest.xml
   ReadIOHDFAMRMaxLevels.xml
   ReaderRegistrationName.xml
+  ReflectBackwardCompat.xml
   ReloadCGNSFile.xml
   SearchBox.xml
   ServerConnectDialog.xml
@@ -1041,6 +1046,7 @@ endif()
 
 list (APPEND TESTS_WITH_INLINE_COMPARES
   AxesGrid.xml
+  AxisAlignedReflect.xml
   BoundingRuler.xml
   BoxWidget.xml
   BlockContextMenu.xml

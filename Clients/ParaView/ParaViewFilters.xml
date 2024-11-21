@@ -287,6 +287,7 @@
   <Proxy group="filters" name="AppendPolyData" />
   <Proxy group="filters" name="AppendReductionFilter" />
   <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
+  <Proxy group="filters" name="AxisAlignedReflectionFilter" />
   <Proxy group="filters" name="BlockIdScalars" />
   <Proxy group="filters" name="BlockIds" />
   <Proxy group="filters" name="BoundaryMeshQuality"/>

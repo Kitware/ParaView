@@ -31,6 +31,7 @@ set(PY_TESTS
   HTGCellCentersBackwardsCompatibilityTest.py,NO_VALID
   HTGFeatureEdgesBackwardsCompatibilityTest.py,NO_VALID
   HTGGhostCellsGeneratorBackwardsCompatibilityTest.py,NO_VALID
+  HTGReflectionFilterBackwardsCompatibilityTest.py,NO_VALID
   IntegrateAttributes.py,NO_VALID
   LocatorNonMergingBackwardsCompatibilityTest.py,NO_VALID
   LookupTable.py,NO_VALID
@@ -51,6 +52,7 @@ set(PY_TESTS
   PythonTestBenchmark.py,NO_VALID
   ReaderReload.py,NO_VALID
   RecolorableImageExtractor.py
+  ReflectBackwardsCompatibilityTest.py,NO_VALID
   RepresentationTypeHint.py,NO_VALID
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
