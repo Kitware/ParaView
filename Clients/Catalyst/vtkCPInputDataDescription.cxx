@@ -95,7 +95,7 @@ const char* vtkCPInputDataDescription::GetFieldName(unsigned int fieldIndex)
     return nullptr;
   }
   size_t count = 0;
-  for (auto iter : this->Internals->Fields)
+  for (auto& iter : this->Internals->Fields)
   {
     size_t size = iter.second.size();
     if (size + count > static_cast<size_t>(fieldIndex))
