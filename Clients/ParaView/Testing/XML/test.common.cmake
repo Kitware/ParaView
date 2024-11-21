@@ -1693,8 +1693,8 @@ list(APPEND TESTS_WITH_BASELINES
   # This test makes use of "Point Gaussian" representation, only available with OpenGL2
   BackgroundColorCheck.xml
 
-  # PlotMatrixView is bugging in OpenGL1
   PlotMatrixViewArraySelection.xml
+  PlotMatrixViewParameters.xml
 
   # Composite Glyph Trees are only implemented in OpenGL2
   CompositeGlyphTree.xml
