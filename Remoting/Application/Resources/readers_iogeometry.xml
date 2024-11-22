@@ -102,6 +102,15 @@
 
     <!-- ================================================================== -->
     <Proxy class="vtkFLUENTReader" name="FLUENTReaderCore">
+      <IntVectorProperty command="SetCacheData"
+                         default_values="1"
+                         name="CacheData"
+                         label="Cache Data"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Select whether the filter should cache the data (i.e. keep the intermediate structures in memory to avoid re-parsing the file.</Documentation>
+      </IntVectorProperty>
       <StringVectorProperty information_only="1"
                             name="CellArrayInfo">
         <ArraySelectionInformationHelper attribute_name="Cell" />
@@ -122,6 +131,27 @@
         </ArraySelectionDomain>
         <Documentation>Select which cell-centered arrays to
         read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="ZoneSectionInfo"
+                            command="GetZoneSectionSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+              name="ZoneSections"
+              label="Zone Sections"
+              command="GetZoneSectionSelection"
+              information_property="ZoneSectionInfo"
+              number_of_elements_per_command="2"
+              element_types="2 0"
+              repeat_command="1"
+              si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="ZoneSectionInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which zone sections to read.</Documentation>
       </StringVectorProperty>
       <!-- FLUENTReaderCore -->
     </Proxy>
@@ -531,8 +561,10 @@
                proxygroup="internal_sources"
                proxyname="FLUENTReaderCore"></Proxy>
         <ExposedProperties>
+          <Property name="CacheData" />
           <Property name="CellArrayInfo" />
           <Property name="CellArrayStatus" />
+          <Property name="ZoneSections" />
         </ExposedProperties>
       </SubProxy>
       <Hints>
