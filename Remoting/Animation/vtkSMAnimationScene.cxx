@@ -597,3 +597,9 @@ void vtkSMAnimationScene::SetStride(int val)
 {
   this->AnimationPlayer->SetStride(val);
 }
+
+//----------------------------------------------------------------------------
+bool vtkSMAnimationScene::GetInPlay()
+{
+  return this->AnimationPlayer->GetInPlay();
+}
