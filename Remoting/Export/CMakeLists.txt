@@ -10,6 +10,7 @@ set(classes
   vtkSMExporterProxy
   vtkSMGL2PSExporterProxy
   vtkSMPropDomain
+  vtkSMPropArrayListDomain
   vtkSMRenderViewExporterProxy
   vtkSMViewExportHelper)
 

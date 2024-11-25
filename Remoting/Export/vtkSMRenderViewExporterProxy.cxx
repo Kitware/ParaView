@@ -3,6 +3,7 @@
 #include "vtkSMRenderViewExporterProxy.h"
 
 #include "vtkExporter.h"
+#include "vtkJSONSceneExporter.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
@@ -11,6 +12,10 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
+
+#include <map>
+#include <set>
+#include <string>
 
 vtkStandardNewMacro(vtkSMRenderViewExporterProxy);
 //----------------------------------------------------------------------------
@@ -65,6 +70,13 @@ void vtkSMRenderViewExporterProxy::Write()
     vtkRenderWindow* renWin = rv->GetRenderWindow();
     exporter->SetRenderWindow(renWin);
     exporter->SetActiveRenderer(renWin->GetRenderers()->GetFirstRenderer());
+    auto exportJSON = vtkJSONSceneExporter::SafeDownCast(exporter);
+    if (exportJSON)
+    {
+      // Create prop <-> name association map
+      std::map<std::string, vtkActor*> map;
+      exportJSON->SetPropMap(map);
+    }
     exporter->Write();
     exporter->SetRenderWindow(nullptr);
     if (rv->GetProperty("RemoteRenderThreshold"))

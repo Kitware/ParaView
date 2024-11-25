@@ -33,14 +33,6 @@ public:
 
   ///@{
   /**
-   * Select the prop associated to a dataset we want to edit selected arrays
-   */
-  vtkSetMacro(Prop, std::string);
-  vtkGetMacro(Prop, std::string);
-  ///@}
-
-  ///@{
-  /**
    * In addition to writing the scene as a .vtkjs file, bundle its content encoded in base64 into a
    * Kitware Glance viewer standalone HTML file.
    * Defaults to true.
@@ -84,7 +76,6 @@ private:
 
   // Exporter properties
   std::string ParaViewGlanceHTML;
-  std::string Prop;
   bool AutomaticGlanceHTML = true;
   bool ExportToGlance = false;
   bool DisableNetwork = true;

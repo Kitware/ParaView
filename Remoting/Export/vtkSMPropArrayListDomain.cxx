@@ -1,12 +1,14 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
-#include "vtkSMPropDomain.h"
+#include "vtkSMPropArrayListDomain.h"
 
 #include "vtkCompositeRepresentation.h"
+#include "vtkDataSet.h"
 #include "vtkMapper.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkPVDataRepresentation.h"
+#include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
@@ -22,25 +24,26 @@
 
 #include <vector>
 
-vtkStandardNewMacro(vtkSMPropDomain);
+vtkStandardNewMacro(vtkSMPropArrayListDomain);
 
 //---------------------------------------------------------------------------
-vtkSMPropDomain::vtkSMPropDomain()
+vtkSMPropArrayListDomain::vtkSMPropArrayListDomain()
 {
   vtkWarningMacro("Create prop domain");
 }
 
 //---------------------------------------------------------------------------
-vtkSMPropDomain::~vtkSMPropDomain() {}
+vtkSMPropArrayListDomain::~vtkSMPropArrayListDomain() {}
 
 //---------------------------------------------------------------------------
-void vtkSMPropDomain::Update(vtkSMProperty* prop)
+void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
 {
   // ensures that we fire DomainModifiedEvent only once.
   DeferDomainModifiedEvents defer(this);
-  std::vector<std::string> propNames;
 
-  // vtkSMProxy* parentProxy = this->GetProperty()->GetParent();
+  vtkSMProperty* input = this->GetRequiredProperty("InputProp");
+  std::string inputName = vtkSMPropertyHelper(input).GetAsString();
+
   vtkSMProxy* parentProxy = prop->GetParent();
   vtkSMRenderViewExporterProxy* exporterProxy =
     vtkSMRenderViewExporterProxy::SafeDownCast(parentProxy);
@@ -53,6 +56,7 @@ void vtkSMPropDomain::Update(vtkSMProperty* prop)
   vtkSMViewProxy* activeView = exporterProxy->GetView();
   vtkSMRenderViewProxy* rv = vtkSMRenderViewProxy::SafeDownCast(activeView);
 
+  std::vector<std::string> arrayNames;
   vtkSMPropertyHelper helper(activeView, "Representations");
   std::map<vtkDataObject*, std::string> objectNames;
   for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
@@ -66,24 +70,40 @@ void vtkSMPropDomain::Update(vtkSMProperty* prop)
 
     vtkSMPropertyHelper inputHelper(repr, "Input");
     vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+    std::string reprInputName = input->GetLogName();
 
     vtkCompositeRepresentation* compInstance =
       vtkCompositeRepresentation::SafeDownCast(repr->GetClientSideObject());
-    if (compInstance->GetVisibility())
+    if (!compInstance || !compInstance->GetVisibility() || reprInputName != inputName)
     {
-      // Unused
-      objectNames.insert({ compInstance->GetRenderedDataObject(0), input->GetLogName() });
-
-      propNames.emplace_back(input->GetLogName());
+      continue;
     }
+
+    auto obj = compInstance->GetRenderedDataObject(0);
+    if (!obj)
+    {
+      break;
+    }
+
+    vtkDataSetAttributes* pd = obj->GetAttributes(vtkDataObject::AttributeTypes::POINT);
+    if (!pd)
+    {
+      break;
+    }
+    for (int i = 0; i < pd->GetNumberOfArrays(); i++)
+    {
+      arrayNames.emplace_back(pd->GetArrayName(i));
+    }
+
+    break;
   }
 
-  this->SetStrings(propNames);
+  this->SetStrings(arrayNames);
   this->DomainModified();
 }
 
 //---------------------------------------------------------------------------
-int vtkSMPropDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
+int vtkSMPropArrayListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(prop, element))
   {
@@ -94,20 +114,14 @@ int vtkSMPropDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* ele
 }
 
 //---------------------------------------------------------------------------
-int vtkSMPropDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
+int vtkSMPropArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
-  // vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
-  // if (!svp)
-  // {
-  //   return 0;
-  // }
-
   // TODO
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPropDomain::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMPropArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

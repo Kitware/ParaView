@@ -45,6 +45,7 @@
 #include "pqTreeView.h"
 #include "pqTreeViewSelectionHelper.h"
 #include "pqTreeWidget.h"
+#include "vtkSMPropArrayListDomain.h"
 
 #include <QComboBox>
 #include <QCoreApplication>
@@ -109,7 +110,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vtkSMArrayListDomain* arrayListDomain = nullptr;
   vtkSMStringListDomain* stringListDomain = nullptr;
   vtkSMArraySelectionDomain* arraySelectionDomain = nullptr;
-
+  vtkSMPropArrayListDomain* propArrayListDomain = nullptr;
   vtkSMDomainIterator* domainIter = svp->NewDomainIterator();
   for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
   {
@@ -119,6 +120,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     fileListDomain = fileListDomain ? fileListDomain : vtkSMFileListDomain::SafeDownCast(domain);
     arrayListDomain =
       arrayListDomain ? arrayListDomain : vtkSMArrayListDomain::SafeDownCast(domain);
+    propArrayListDomain =
+      propArrayListDomain ? propArrayListDomain : vtkSMPropArrayListDomain::SafeDownCast(domain);
     arraySelectionDomain =
       arraySelectionDomain ? arraySelectionDomain : vtkSMArraySelectionDomain::SafeDownCast(domain);
     stringListDomain =
@@ -179,7 +182,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     vbox->addWidget(chooser);
   }
-  else if (arrayListDomain)
+  else if (arrayListDomain || propArrayListDomain)
   {
     assert(smProperty->GetRepeatable());
 
@@ -236,8 +239,16 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     // on other property values e.g. when one switches from point-data to
     // cell-data, the available arrays change. Hence we "reset" the widget
     // every time the domain changes.
-    new pqArrayListDomain(
-      listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
+    if (arrayListDomain)
+    {
+      new pqArrayListDomain(
+        listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
+    }
+    else if (propArrayListDomain)
+    {
+      new pqArrayListDomain(
+        listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, propArrayListDomain);
+    }
 
     this->addPropertyLink(listWidget, property_name, SIGNAL(widgetModified()), smProperty);
     this->setChangeAvailableAsChangeFinished(true);

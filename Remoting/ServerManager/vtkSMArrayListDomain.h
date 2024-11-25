@@ -95,7 +95,7 @@ public:
    * Returns true if the array with the given idx is partial
    * false otherwise. See vtkPVArrayInformation for more information.
    */
-  int IsArrayPartial(unsigned int idx);
+  virtual int IsArrayPartial(unsigned int idx);
 
   /**
    * Get field association for the array. When
@@ -104,7 +104,7 @@ public:
    * expecting. Thus use this to set the value on the property.
    * To correctly show icons in UI, use GetDomainAssociation().
    */
-  int GetFieldAssociation(unsigned int idx);
+  virtual int GetFieldAssociation(unsigned int idx);
 
   /**
    * Get the true field association for the array. This is same as
@@ -123,7 +123,7 @@ public:
    * GetFieldAssociation() for setting the property value, but use
    * GetDomainAssociation() for the icon.
    */
-  int GetDomainAssociation(unsigned int idx);
+  virtual int GetDomainAssociation(unsigned int idx);
 
   ///@{
   /**
