@@ -98,6 +98,11 @@ protected Q_SLOTS:
 private:
   Q_DISABLE_COPY(pqVCRController)
 
+  void onPlayInternal();
+  void onReverseInternal();
+
+  QMetaObject::Connection LamdaPlayConnection;
+  QMetaObject::Connection LamdaReverseConnection;
   QPointer<pqAnimationScene> Scene;
 };
 

@@ -4,7 +4,6 @@
 #include "pqVCRController.h"
 
 // ParaView Server Manager includes.
-#include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMTrace.h"
@@ -16,8 +15,6 @@
 // ParaView includes.
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
-#include "pqEventDispatcher.h"
-#include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 //-----------------------------------------------------------------------------
@@ -85,6 +82,31 @@ void pqVCRController::onPlay()
     return;
   }
 
+  auto inPlayProp =
+    vtkSMIntVectorProperty::SafeDownCast(this->Scene->getProxy()->GetProperty("InPlay"));
+  this->Scene->getProxy()->UpdatePropertyInformation(inPlayProp);
+  if (inPlayProp && inPlayProp->GetElement(0) == 1)
+  {
+    // If the animation is already playing, pause it first.
+    this->onPause();
+    // Wait for the animation to stop before starting it again.
+    this->LamdaPlayConnection = QObject::connect(this->Scene, &pqAnimationScene::endPlay, this,
+      [this](vtkObject*, unsigned long, void*, void*) -> void {
+        // First, disconnect this specific connection, so that it does not trigger itself again.
+        QObject::disconnect(this->LamdaPlayConnection);
+        // Then, start the forward animation.
+        this->onPlayInternal();
+      });
+  }
+  else
+  {
+    this->onPlayInternal();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onPlayInternal()
+{
   CLEAR_UNDO_STACK();
   BEGIN_UNDO_EXCLUDE();
 
@@ -108,6 +130,31 @@ void pqVCRController::onReverse()
     return;
   }
 
+  auto inPlayProp =
+    vtkSMIntVectorProperty::SafeDownCast(this->Scene->getProxy()->GetProperty("InPlay"));
+  this->Scene->getProxy()->UpdatePropertyInformation(inPlayProp);
+  if (inPlayProp && inPlayProp->GetElement(0) == 1)
+  {
+    // If the animation is already playing, pause it first.
+    this->onPause();
+    // Wait for the animation to stop before starting it again.
+    this->LamdaReverseConnection = QObject::connect(this->Scene, &pqAnimationScene::endPlay, this,
+      [this](vtkObject*, unsigned long, void*, void*) -> void {
+        // First, disconnect this specific connection, so that it does not trigger itself again.
+        QObject::disconnect(this->LamdaReverseConnection);
+        // Then, start the reverse animation.
+        this->onReverseInternal();
+      });
+  }
+  else
+  {
+    this->onReverseInternal();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onReverseInternal()
+{
   CLEAR_UNDO_STACK();
   BEGIN_UNDO_EXCLUDE();
 
