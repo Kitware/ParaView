@@ -1240,6 +1240,7 @@ list(APPEND TESTS_WITH_BASELINES
   ZoomToBox.xml
   ZoomToData.xml
   ZoomToEmptyData.xml
+  PCANormalEstimation.xml
 )
 
 if(PARAVIEW_ENABLE_VISITBRIDGE)
