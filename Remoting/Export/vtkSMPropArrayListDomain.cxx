@@ -6,8 +6,11 @@
 #include "vtkDataSet.h"
 #include "vtkMapper.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVCompositeRepresentation.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVDataRepresentation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -29,7 +32,7 @@ vtkStandardNewMacro(vtkSMPropArrayListDomain);
 //---------------------------------------------------------------------------
 vtkSMPropArrayListDomain::vtkSMPropArrayListDomain()
 {
-  vtkWarningMacro("Create prop domain");
+  // vtkWarningMacro("Create prop domain");
 }
 
 //---------------------------------------------------------------------------
@@ -79,24 +82,25 @@ void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
       continue;
     }
 
-    auto obj = compInstance->GetRenderedDataObject(0);
-    if (!obj)
+    vtkPVDataInformation* info = input->GetDataInformation(0);
+    vtkPVDataSetAttributesInformation* attrInfo =
+      info->GetAttributeInformation(vtkDataObject::AttributeTypes::POINT);
+    if (!attrInfo)
     {
-      break;
+      continue;
     }
 
-    vtkDataSetAttributes* pd = obj->GetAttributes(vtkDataObject::AttributeTypes::POINT);
-    if (!pd)
+    for (int i = 0; i < attrInfo->GetNumberOfArrays(); i++)
     {
-      break;
-    }
-    for (int i = 0; i < pd->GetNumberOfArrays(); i++)
-    {
-      arrayNames.emplace_back(pd->GetArrayName(i));
+      vtkWarningMacro(<< attrInfo->GetArrayInformation(i)->GetName());
+      arrayNames.emplace_back(attrInfo->GetArrayInformation(i)->GetName());
     }
 
     break;
   }
+
+  // arrayNames.emplace_back("test1");
+  // arrayNames.emplace_back("test321");
 
   this->SetStrings(arrayNames);
   this->DomainModified();

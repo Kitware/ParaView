@@ -664,11 +664,13 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="PointArrays"
-                            command="GetNodeBlockFieldSelection"
+                            command="SetProp2"
+
+                            panel_visibility="advanced">
+                            <!-- command="GetNodeBlockFieldSelection"
                             number_of_elements_per_command="1"
                             repeat_command="1"
-                            si_class="vtkSIDataArraySelectionProperty"
-                            panel_visibility="advanced">
+                            si_class="vtkSIDataArraySelectionProperty" -->
         <PropArrayListDomain name="array_list" >
           <RequiredProperties>
             <Property name="Prop" function="InputProp"/>
@@ -678,7 +680,7 @@
           Select the node block arrays to pass through.
         </Documentation>
         <Hints>
-          <ArraySelectionWidget icon_type="point"/>
+          <!-- <ArraySelectionWidget icon_type="point"/> -->
         </Hints>
       </StringVectorProperty>
 

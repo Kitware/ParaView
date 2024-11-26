@@ -27,7 +27,7 @@ vtkStandardNewMacro(vtkSMPropDomain);
 //---------------------------------------------------------------------------
 vtkSMPropDomain::vtkSMPropDomain()
 {
-  vtkWarningMacro("Create prop domain");
+  // vtkWarningMacro("Create prop domain");
 }
 
 //---------------------------------------------------------------------------

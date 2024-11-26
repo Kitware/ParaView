@@ -23,7 +23,7 @@ class vtkPVArrayInformation;
 
 class vtkSMPropArrayListDomainInternals;
 
-class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMPropArrayListDomain : public vtkSMArrayListDomain
+class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMPropArrayListDomain : public vtkSMStringListDomain
 {
 public:
   static vtkSMPropArrayListDomain* New();
@@ -38,11 +38,11 @@ public:
    */
   void Update(vtkSMProperty* prop) override;
 
-  int IsArrayPartial(unsigned int idx) override { return false; };
+  // int IsArrayPartial(unsigned int idx) override { return false; };
 
-  int GetFieldAssociation(unsigned int idx) override { return 0; };
+  // int GetFieldAssociation(unsigned int idx) override { return 0; };
 
-  int GetDomainAssociation(unsigned int idx) override { return 0; };
+  // int GetDomainAssociation(unsigned int idx) override { return 0;};
 
   int GetAttributeType() { return 0; }
 
