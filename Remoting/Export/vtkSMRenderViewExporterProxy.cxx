@@ -2,15 +2,21 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkSMRenderViewExporterProxy.h"
 
+#include "vtkCompositeRepresentation.h"
+#include "vtkDataSet.h"
 #include "vtkExporter.h"
+#include "vtkGeometryRepresentation.h"
 #include "vtkJSONSceneExporter.h"
+#include "vtkMapper.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLODActor.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 #include "vtkSMPropDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 
 #include <map>
@@ -67,14 +73,74 @@ void vtkSMRenderViewExporterProxy::Write()
       rv->StillRender();
     }
 
-    vtkRenderWindow* renWin = rv->GetRenderWindow();
+    vtkRenderWindow* renWin = rv->GetRenderWindow(); // Uses get client-side object
+    rv->GetRenderer();
+
+    vtkRenderer* renderer = renWin->GetRenderers()->GetFirstRenderer();
     exporter->SetRenderWindow(renWin);
-    exporter->SetActiveRenderer(renWin->GetRenderers()->GetFirstRenderer());
+    exporter->SetActiveRenderer(renderer);
     auto exportJSON = vtkJSONSceneExporter::SafeDownCast(exporter);
     if (exportJSON)
     {
-      // Create prop <-> name association map
+      //   vtkPropCollection* props = renderer->GetViewProps();
+      //   vtkIdType nbProps = props->GetNumberOfItems();
+      //   for (vtkIdType rpIdx = 0; rpIdx < nbProps; rpIdx++)
+      //   {
+      //     vtkProp* prop = vtkProp::SafeDownCast(props->GetItemAsObject(rpIdx));
+      //     // Skip non-visible actors
+      //     if (!prop || !prop->GetVisibility())
+      //     {
+      //       continue;
+      //     }
+
+      //     // Skip actors with no geometry
+      //     vtkActor* actor = vtkActor::SafeDownCast(prop);
+      //     if (actor)
+      //     {
+      //       vtkMapper* mapper = actor->GetMapper();
+      //       vtkDataObject* dataObject = mapper->GetInputDataObject(0, 0);
+      //       vtkWarningMacro(<< dataObject);
+      //       // map.insert({ vtkDataSet::SafeDownCast(dataObject), name });
+      //     }
+      //   }
+
       std::map<std::string, vtkActor*> map;
+
+      vtkSMPropertyHelper helper(rv, "Representations");
+      std::map<vtkDataObject*, std::string> objectNames;
+      for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
+      {
+        vtkSMRepresentationProxy* repr =
+          vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(cc));
+
+        if (!repr)
+        {
+          continue;
+        }
+
+        vtkSMPropertyHelper inputHelper(repr, "Input");
+        vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+
+        vtkCompositeRepresentation* compInstance =
+          vtkCompositeRepresentation::SafeDownCast(repr->GetClientSideObject());
+        if (compInstance->GetVisibility())
+        {
+          auto dataObj = compInstance->GetRenderedDataObject(0);
+          if (!dataObj)
+          {
+            continue;
+          }
+          vtkPVDataRepresentation* repr2 = compInstance->GetActiveRepresentation();
+
+          if (vtkGeometryRepresentation::SafeDownCast(repr2))
+          {
+            vtkActor* actor =
+              vtkActor::SafeDownCast(vtkGeometryRepresentation::SafeDownCast(repr2)->GetActor());
+            vtkWarningMacro(<< dataObj << " " << input->GetLogName());
+            map.insert({ input->GetLogName(), actor });
+          }
+        }
+      }
       exportJSON->SetPropMap(map);
     }
     exporter->Write();

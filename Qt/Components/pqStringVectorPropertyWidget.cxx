@@ -182,7 +182,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     vbox->addWidget(chooser);
   }
-  else if (arrayListDomain) // || propArrayListDomain)
+  else if (arrayListDomain || propArrayListDomain)
   {
     assert(smProperty->GetRepeatable());
 
@@ -244,12 +244,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       new pqArrayListDomain(
         listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
     }
-    // else if (propArrayListDomain)
-    // {
-    //   new pqArrayListDomain(
-    //     listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty,
-    //     propArrayListDomain);
-    // }
+    else if (propArrayListDomain)
+    {
+      new pqArrayListDomain(
+        listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, propArrayListDomain);
+    }
 
     this->addPropertyLink(listWidget, property_name, SIGNAL(widgetModified()), smProperty);
     this->setChangeAvailableAsChangeFinished(true);
