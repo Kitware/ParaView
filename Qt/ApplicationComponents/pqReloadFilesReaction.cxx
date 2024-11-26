@@ -9,14 +9,18 @@
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
+
 #include "vtkNew.h"
 #include "vtkSMReaderReloadHelper.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QAbstractButton>
 #include <QCoreApplication>
+#include <QList>
 #include <QMessageBox>
 #include <QtDebug>
+
+#include <vector>
 
 namespace
 {
@@ -45,7 +49,7 @@ bool PromptForNewFiles(vtkSMSourceProxy* reader)
     ->setText(QCoreApplication::translate("pqReloadFilesReaction", "Reload existing file(s)"));
   mbox.exec();
 
-  bool retval = mbox.clickedButton() == mbox.button(QMessageBox::Yes);
+  const bool retval = mbox.clickedButton() == mbox.button(QMessageBox::Yes);
   // cache response for future use.
   if (pqreader)
   {
@@ -56,11 +60,12 @@ bool PromptForNewFiles(vtkSMSourceProxy* reader)
 }
 
 //-----------------------------------------------------------------------------
-pqReloadFilesReaction::pqReloadFilesReaction(QAction* parentObject)
+pqReloadFilesReaction::pqReloadFilesReaction(QAction* parentObject, ReloadModes reloadMode)
   : Superclass(parentObject)
+  , ReloadMode(reloadMode)
 {
-  this->connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
-    SLOT(updateEnableState()));
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::sourceChanged, this,
+    &pqReloadFilesReaction::updateEnableState);
   this->updateEnableState();
 }
 
@@ -70,12 +75,33 @@ pqReloadFilesReaction::~pqReloadFilesReaction() = default;
 //-----------------------------------------------------------------------------
 void pqReloadFilesReaction::updateEnableState()
 {
-  vtkSMProxy* source = pqActiveObjects::instance().activeSource()
-    ? pqActiveObjects::instance().activeSource()->getProxy()
-    : nullptr;
+  std::vector<vtkSMSourceProxy*> sources;
+  if (this->ReloadMode == ReloadModes::ActiveSource)
+  {
+    pqPipelineSource* source = pqActiveObjects::instance().activeSource();
+    sources.push_back(source ? vtkSMSourceProxy::SafeDownCast(source->getProxy()) : nullptr);
+  }
+  else // ReloadMode == ReloadModes::AllSources
+  {
+    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+    QList<pqPipelineSource*> allSources = smmodel->findItems<pqPipelineSource*>();
+    for (int cc = 0; cc < allSources.size(); cc++)
+    {
+      sources.push_back(vtkSMSourceProxy::SafeDownCast(allSources[cc]->getProxy()));
+    }
+  }
 
+  bool enabled = false;
   vtkNew<vtkSMReaderReloadHelper> helper;
-  this->parentAction()->setEnabled(helper->SupportsReload(vtkSMSourceProxy::SafeDownCast(source)));
+  for (const auto& source : sources)
+  {
+    if (helper->SupportsReload(source))
+    {
+      enabled = true;
+      break;
+    }
+  }
+  this->parentAction()->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -85,6 +111,32 @@ bool pqReloadFilesReaction::reload()
     ? pqActiveObjects::instance().activeSource()->getProxy()
     : nullptr;
   return pqReloadFilesReaction::reload(vtkSMSourceProxy::SafeDownCast(source));
+}
+
+//-----------------------------------------------------------------------------
+bool pqReloadFilesReaction::reloadSources()
+{
+  std::vector<vtkSMSourceProxy*> sources;
+  if (this->ReloadMode == ReloadModes::ActiveSource)
+  {
+    pqPipelineSource* source = pqActiveObjects::instance().activeSource();
+    sources.push_back(source ? vtkSMSourceProxy::SafeDownCast(source->getProxy()) : nullptr);
+  }
+  else // ReloadMode == ReloadModes::AllSources
+  {
+    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+    QList<pqPipelineSource*> allSources = smmodel->findItems<pqPipelineSource*>();
+    for (int cc = 0; cc < allSources.size(); cc++)
+    {
+      sources.push_back(vtkSMSourceProxy::SafeDownCast(allSources[cc]->getProxy()));
+    }
+  }
+  bool success = false;
+  for (const auto& source : sources)
+  {
+    success |= pqReloadFilesReaction::reload(source);
+  }
+  return success;
 }
 
 //-----------------------------------------------------------------------------
