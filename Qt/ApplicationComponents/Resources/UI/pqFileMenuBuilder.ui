@@ -120,7 +120,7 @@
      <normaloff>:/pqWidgets/Icons/pqReloadFile.svg</normaloff>:/pqWidgets/Icons/pqReloadFile.svg</iconset>
    </property>
    <property name="text">
-     <string>Reload Files</string>
+    <string>Reload Files</string>
    </property>
    <property name="iconText">
     <string>Reload Files</string>
@@ -184,7 +184,7 @@
    </property>
   </action>
   <action name="actionAnimatedExport">
-  <property name="icon">
+   <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
      <normaloff>:/pqWidgets/Icons/pqExportAnimatedScene.svg</normaloff>:/pqWidgets/Icons/pqExportAnimatedScene.svg</iconset>
    </property>
