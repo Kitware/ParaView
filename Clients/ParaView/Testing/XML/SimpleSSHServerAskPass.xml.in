@@ -3,8 +3,8 @@
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/load" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/LoadServerConfigurationDialog" command="filesSelected" arguments="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/sshServers.pvsc" />
-  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCurrent" arguments="4.0" />
-  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCheckState" arguments="4.0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCurrent" arguments="5.0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCheckState" arguments="5.0,0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/connect" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow" command="pause" arguments="1500"/>
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
