@@ -96,6 +96,7 @@
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 
   <!-- Color by depth, also show outline of input PDC for baseline comparison -->
+  <!-- XXX: once https://gitlab.kitware.com/paraview/paraview/-/issues/22776 is fixed, alternate baseline AxisAlignedCutterMBHierarchy_1.png will need to be replaced. -->
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Depth" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/DefaultPresetsComboBox" command="activated" arguments="Cool to Warm"/>
@@ -105,4 +106,34 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,13,8,/0:0/4:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,13,8,/0:0/4:1" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/AxisAlignedCutterMBHierarchy.png" threshold="0.05" />
+
+  <!-- Change the plane normal to y. Now the first HTG should be cut 4 times and the second 5 times. -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,56,7,/0:0/4:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseMove" arguments="1,0,0,56,8,/0:0/4:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,56,8,/0:0/4:0/0:0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/useYNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Check the generated hierarchy again. -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="MultiBlock Inspector" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0,vtkMultiBlockDataSet" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.0.0,GroupDatasets1" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.0.0.0.0,Slice1" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.0.0.1.0,Slice2" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.0.0.2.0,Slice3" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.0.0.3.0,Slice4" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.1.0,HyperTreeGridRandom3" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.1.0.0.0,Slice1" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.1.0.1.0,Slice2" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.1.0.2.0,Slice3" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.1.0.3.0,Slice4" />
+  <pqcheck object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" property="modelItemData" arguments="0.0.1.0.4.0,Slice5" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+
+  <!-- Second baseline comparison -->
+  <!-- XXX: once https://gitlab.kitware.com/paraview/paraview/-/issues/22776 is fixed, alternate baseline AxisAlignedCutterPDCNoHierarchyYAxis_1.png will need to be replaced. -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/show3DWidget" command="set_boolean" arguments="false" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/AxisAlignedCutterMBHierarchyYAxis.png" threshold="0.05" />
 </pqevents>
