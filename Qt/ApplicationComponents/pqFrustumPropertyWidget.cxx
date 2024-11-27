@@ -118,6 +118,7 @@ pqFrustumPropertyWidget::pqFrustumPropertyWidget(
   {
     QObject::connect(
       ui.resetBounds, &QPushButton::clicked, this, &pqFrustumPropertyWidget::resetBounds);
+    this->resetBounds();
   }
   else
   {
@@ -157,9 +158,6 @@ void pqFrustumPropertyWidget::placeWidget()
 
   vtkVector<double, 6> bounds;
   bbox.GetBounds(bounds.GetData());
-  double nearPlaneDistance = bbox.GetDiagonalLength() * 0.1;
-
-  vtkSMPropertyHelper(wdgProxy, "NearPlaneDistance").Set(nearPlaneDistance);
   vtkSMPropertyHelper(wdgProxy, "WidgetBounds").Set(bounds.GetData(), 6);
   wdgProxy->UpdateVTKObjects();
 }
@@ -185,7 +183,7 @@ void pqFrustumPropertyWidget::resetBounds()
     bbox.GetCenter(center.GetData());
     vtkVector<double, 6> bnds;
     bbox.GetBounds(bnds.GetData());
-    double nearPlaneDistance = bbox.GetDiagonalLength() * 0.1;
+    double nearPlaneDistance = bbox.GetLength(1) * 0.1;
 
     vtkSMPropertyHelper(wdgProxy, "Origin").Set(center.GetData(), 3);
     vtkSMPropertyHelper(wdgProxy, "NearPlaneDistance").Set(nearPlaneDistance);
