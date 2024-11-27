@@ -6,8 +6,10 @@
 
 #include "pqCoreModule.h"
 #include "pqServerResource.h"
-#include "vtkPVXMLElement.h" // needed for ivar
+#include "vtkPVXMLElement.h"        // needed for ivar
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_14_0
 #include "vtkSmartPointer.h"
+
 #include <QObject>
 
 class vtkPVXMLElement;
@@ -180,7 +182,23 @@ public:
    * Initialized by the server xml if port forwarding is used.
    * Equal to the resource port if port forwarding is not used.
    */
+  PARAVIEW_DEPRECATED_IN_5_14_0("Use int localPortForwardingPort() const instead")
   QString portForwardingLocalPort() const;
+
+  /**
+   * Get the port local port using forwarding.
+   * This value will only be computed when calling pqServerConfiguration::ressource()
+   * It will be overriden as follows:
+   *   - "local" attribute of PortForwarding XML attribute
+   *   - The default value if set
+   *   - The current port for the ressource
+   */
+  int localPortForwardingPort() const;
+
+  /**
+   * Set the default value to use for local port forwarding
+   */
+  void setDefaultLocalPortForwardingPort(int port);
 
 protected:
   vtkPVXMLElement* startupXML() const;
@@ -199,7 +217,8 @@ private:
   vtkSmartPointer<vtkPVXMLElement> XML;
   bool PortForwarding = false;
   bool SSHCommand = false;
-  QString PortForwardingLocalPort;
+  int LocalPortForwardingPort = -1;
+  int DefaultLocalPortForwardingPort = -1;
   QString ActualURI;
 };
 

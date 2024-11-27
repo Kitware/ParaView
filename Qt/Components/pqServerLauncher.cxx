@@ -184,7 +184,7 @@ QProcessEnvironment getDefaultEnvironment(const pqServerConfiguration& configura
   options.insert("PV_VERSION_FULL", PARAVIEW_VERSION_FULL);
   options.insert("PV_SERVER_HOST", resource.host());
   options.insert("PV_SERVER_PORT", QString::number(resource.port(11111)));
-  options.insert("PV_SSH_PF_SERVER_PORT", configuration.portForwardingLocalPort());
+  options.insert("PV_SSH_PF_SERVER_PORT", QString::number(configuration.localPortForwardingPort()));
   options.insert("PV_DATA_SERVER_HOST", resource.dataServerHost());
   options.insert("PV_DATA_SERVER_PORT", QString::number(resource.dataServerPort(11111)));
   options.insert("PV_RENDER_SERVER_HOST", resource.renderServerHost());
@@ -428,6 +428,10 @@ void updateEnvironment(const QMap<QString, pqWidget*>& widgets,
     {
       resource.setRenderServerPort(chosen_value.toInt());
       configuration.setResource(resource);
+    }
+    else if (name == "PV_SSH_PF_SERVER_PORT")
+    {
+      configuration.setDefaultLocalPortForwardingPort(chosen_value.toInt());
     }
   }
 }
