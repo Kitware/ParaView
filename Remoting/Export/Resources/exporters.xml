@@ -656,8 +656,7 @@
 
       <StringVectorProperty command="SetProp"
                             name="Prop"
-                            number_of_elements="1"
-                            panel_visibility="advanced">
+                            number_of_elements="1">
         <PropDomain name="prop" />
         <Documentation>Choose the selected prop associated to a dataset</Documentation>
         <!-- <PropInputArrayDomain name="point_arrays" attribute_type="point" optional="1" /> -->
@@ -667,8 +666,7 @@
                             command="GetPointArraySelection"
                             number_of_elements_per_command="1"
                             repeat_command="1"
-                            si_class="vtkSIDataArraySelectionProperty"
-                            panel_visibility="advanced">
+                            si_class="vtkSIDataArraySelectionProperty">
         <PropArrayListDomain name="array_list" >
           <RequiredProperties>
             <Property name="Prop" function="InputProp"/>
@@ -678,9 +676,14 @@
           Select the node block arrays to pass through.
         </Documentation>
         <Hints>
-          <ArraySelectionWidget icon_type="point"/>
+          <!-- <ArraySelectionWidget icon_type="point"/> -->
         </Hints>
       </StringVectorProperty>
+
+      <PropertyGroup panel_widget="PropArraySelection">
+        <Property name="Prop" function="prop"/>
+        <Property name="PointArrays" function="point_arrays"/>
+      </PropertyGroup>
 
       <Hints>
         <ExporterFactory extensions="vtkjs" />

@@ -53,6 +53,7 @@
 #include "pqOMETransferFunctionsPropertyWidget.h"
 #include "pqOSPRayHidingDecorator.h"
 #include "pqPauseLiveSourcePropertyWidget.h"
+#include "pqPropArraySelectionWidget.h"
 #include "pqPropertyCollectionWidget.h"
 #include "pqProxyEditorPropertyWidget.h"
 #include "pqReaderSelectionPropertyWidget.h"
@@ -350,6 +351,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "PropertyCollection")
   {
     return new pqPropertyCollectionWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "PropArraySelection")
+  {
+    return new pqPropArraySelectionWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "DataAssemblyEditor")
   {

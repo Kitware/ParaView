@@ -146,6 +146,7 @@ set(classes
   pqPluginToolBarBehavior
   pqPointPickingHelper
   pqPreviewMenuManager
+  pqPropArraySelectionWidget
   pqPropertyCollectionWidget
   pqProxyCategory
   pqProxyGroupMenuManager

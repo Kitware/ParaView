@@ -92,7 +92,7 @@ void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
 
     for (int i = 0; i < attrInfo->GetNumberOfArrays(); i++)
     {
-      vtkWarningMacro(<< attrInfo->GetArrayInformation(i)->GetName());
+      // vtkWarningMacro(<< attrInfo->GetArrayInformation(i)->GetName());
       arrayNames.emplace_back(attrInfo->GetArrayInformation(i)->GetName());
     }
 
