@@ -192,7 +192,7 @@ fedora35-tidy:build:
         - .cmake_tidy_artifacts
         - .run_manually
     # clang-tidy is *really* slow because it isn't cached.
-    timeout: 3 hours
+    timeout: 4 hours
 
 # macOS
 
