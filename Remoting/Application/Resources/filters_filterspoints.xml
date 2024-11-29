@@ -166,6 +166,24 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetCellGenerationMode"
+                         default_values="2"
+                         number_of_elements="1"
+                         name="CellGenerationMode"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry text="No cells"
+                 value="0" />
+          <Entry text="Polyvertex cell"
+                 value="1" />
+          <Entry text="Vertex cells"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation> Choose if the output should contain either no cells (output may not appear in a render view in that case),
+        a single poly vertex cell and as many vertex cells as there is points.
+        </Documentation>
+      </IntVectorProperty>
+
     <!-- End PCANormalEstimation -->
     </SourceProxy>
   </ProxyGroup>
