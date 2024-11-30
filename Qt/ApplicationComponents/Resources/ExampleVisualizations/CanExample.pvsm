@@ -2295,7 +2295,7 @@
         <Domain name="range" id="10578.AntiAlias.range"/>
       </Property>
       <Property name="Assembly" id="10578.Assembly" number_of_elements="1">
-        <Element index="0" value=""/>
+        <Element index="0" value="Hierarchy"/>
         <Domain name="data_assembly" id="10578.Assembly.data_assembly">
           <String text="Hierarchy"/>
         </Domain>
@@ -3406,7 +3406,7 @@
         <Domain name="range" id="10802.AntiAlias.range"/>
       </Property>
       <Property name="Assembly" id="10802.Assembly" number_of_elements="1">
-        <Element index="0" value=""/>
+        <Element index="0" value="Hierarchy"/>
         <Domain name="data_assembly" id="10802.Assembly.data_assembly">
           <String text="Hierarchy"/>
         </Domain>
@@ -4496,7 +4496,7 @@
         <Domain name="range" id="11014.AntiAlias.range"/>
       </Property>
       <Property name="Assembly" id="11014.Assembly" number_of_elements="1">
-        <Element index="0" value=""/>
+        <Element index="0" value="Hierarchy"/>
         <Domain name="data_assembly" id="11014.Assembly.data_assembly">
           <String text="Hierarchy"/>
         </Domain>
