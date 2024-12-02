@@ -654,8 +654,8 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <StringVectorProperty command="SetProp"
-                            name="Prop"
+      <StringVectorProperty command="SetSelectedSourceName"
+                            name="SelectedSource"
                             number_of_elements="1">
         <PropDomain name="prop" />
         <Documentation>Choose the dataset associated to an element in the view,
@@ -670,7 +670,7 @@
                             si_class="vtkSIDataArraySelectionProperty">
         <PropArrayListDomain name="array_list" array_type="point">
           <RequiredProperties>
-            <Property name="Prop" function="InputProp"/>
+            <Property name="SelectedSource" function="InputProp"/>
           </RequiredProperties>
         </PropArrayListDomain>
         <Documentation>
@@ -685,7 +685,7 @@
                             si_class="vtkSIDataArraySelectionProperty">
         <PropArrayListDomain name="array_list" array_type="cell">
           <RequiredProperties>
-            <Property name="Prop" function="InputProp"/>
+            <Property name="SelectedSource" function="InputProp"/>
           </RequiredProperties>
         </PropArrayListDomain>
         <Documentation>
@@ -694,7 +694,7 @@
       </StringVectorProperty>
 
       <PropertyGroup panel_widget="PropArraySelection">
-        <Property name="Prop" function="prop"/>
+        <Property name="SelectedSource" function="prop"/>
         <Property name="PointArrays" function="point_arrays"/>
         <Property name="CellArrays" function="cell_arrays"/>
       </PropertyGroup>

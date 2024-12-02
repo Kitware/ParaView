@@ -79,70 +79,8 @@ void vtkSMRenderViewExporterProxy::Write()
     vtkRenderer* renderer = renWin->GetRenderers()->GetFirstRenderer();
     exporter->SetRenderWindow(renWin);
     exporter->SetActiveRenderer(renderer);
-    auto exportJSON = vtkJSONSceneExporter::SafeDownCast(exporter);
-    if (exportJSON)
-    {
-      //   vtkPropCollection* props = renderer->GetViewProps();
-      //   vtkIdType nbProps = props->GetNumberOfItems();
-      //   for (vtkIdType rpIdx = 0; rpIdx < nbProps; rpIdx++)
-      //   {
-      //     vtkProp* prop = vtkProp::SafeDownCast(props->GetItemAsObject(rpIdx));
-      //     // Skip non-visible actors
-      //     if (!prop || !prop->GetVisibility())
-      //     {
-      //       continue;
-      //     }
-
-      //     // Skip actors with no geometry
-      //     vtkActor* actor = vtkActor::SafeDownCast(prop);
-      //     if (actor)
-      //     {
-      //       vtkMapper* mapper = actor->GetMapper();
-      //       vtkDataObject* dataObject = mapper->GetInputDataObject(0, 0);
-      //       vtkWarningMacro(<< dataObject);
-      //       // map.insert({ vtkDataSet::SafeDownCast(dataObject), name });
-      //     }
-      //   }
-
-      std::map<std::string, vtkActor*> map;
-
-      vtkSMPropertyHelper helper(rv, "Representations");
-      std::map<vtkDataObject*, std::string> objectNames;
-      for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
-      {
-        vtkSMRepresentationProxy* repr =
-          vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(cc));
-
-        if (!repr)
-        {
-          continue;
-        }
-
-        vtkSMPropertyHelper inputHelper(repr, "Input");
-        vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
-
-        vtkCompositeRepresentation* compInstance =
-          vtkCompositeRepresentation::SafeDownCast(repr->GetClientSideObject());
-        if (compInstance->GetVisibility())
-        {
-          auto dataObj = compInstance->GetRenderedDataObject(0);
-          if (!dataObj)
-          {
-            continue;
-          }
-          vtkPVDataRepresentation* repr2 = compInstance->GetActiveRepresentation();
-
-          if (vtkGeometryRepresentation::SafeDownCast(repr2))
-          {
-            vtkActor* actor =
-              vtkActor::SafeDownCast(vtkGeometryRepresentation::SafeDownCast(repr2)->GetActor());
-            vtkWarningMacro(<< dataObj << " " << input->GetLogName());
-            map.insert({ input->GetLogName(), actor });
-          }
-        }
-      }
-      exportJSON->SetPropMap(map);
-    }
+    auto namedActorMap = this->GetNamedActorMap(rv);
+    exporter->SetNamedActorsMap(namedActorMap);
     exporter->Write();
     exporter->SetRenderWindow(nullptr);
     if (rv->GetProperty("RemoteRenderThreshold"))
@@ -151,6 +89,50 @@ void vtkSMRenderViewExporterProxy::Write()
     }
   }
   this->View->GetSession()->CleanupPendingProgress();
+}
+
+//----------------------------------------------------------------------------
+std::map<std::string, vtkActor*> vtkSMRenderViewExporterProxy::GetNamedActorMap(
+  vtkSMRenderViewProxy* rv)
+{
+  std::map<std::string, vtkActor*> map;
+
+  vtkSMPropertyHelper helper(rv, "Representations");
+  std::map<vtkDataObject*, std::string> objectNames;
+  for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
+  {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(cc));
+
+    if (!repr)
+    {
+      continue;
+    }
+
+    vtkSMPropertyHelper inputHelper(repr, "Input");
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+
+    vtkCompositeRepresentation* compInstance =
+      vtkCompositeRepresentation::SafeDownCast(repr->GetClientSideObject());
+    if (compInstance->GetVisibility())
+    {
+      auto dataObj = compInstance->GetRenderedDataObject(0);
+      if (!dataObj)
+      {
+        continue;
+      }
+      vtkPVDataRepresentation* repr2 = compInstance->GetActiveRepresentation();
+
+      if (vtkGeometryRepresentation::SafeDownCast(repr2))
+      {
+        vtkActor* actor =
+          vtkActor::SafeDownCast(vtkGeometryRepresentation::SafeDownCast(repr2)->GetActor());
+        vtkWarningMacro(<< dataObj << " " << input->GetLogName());
+        map.insert({ input->GetLogName(), actor });
+      }
+    }
+  }
+
+  return map;
 }
 
 //----------------------------------------------------------------------------
