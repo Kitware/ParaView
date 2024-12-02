@@ -78,8 +78,12 @@ void vtkSMRenderViewExporterProxy::Write()
     vtkRenderer* renderer = renWin->GetRenderers()->GetFirstRenderer();
     exporter->SetRenderWindow(renWin);
     exporter->SetActiveRenderer(renderer);
-    auto namedActorMap = this->GetNamedActorMap(rv);
-    exporter->SetNamedActorsMap(namedActorMap);
+    if (vtkJSONSceneExporter::SafeDownCast(exporter))
+    {
+      auto jsonExporter = vtkJSONSceneExporter::SafeDownCast(exporter);
+      auto namedActorMap = this->GetNamedActorMap(rv);
+      jsonExporter->SetNamedActorsMap(namedActorMap);
+    }
     exporter->Write();
     exporter->SetRenderWindow(nullptr);
     if (rv->GetProperty("RemoteRenderThreshold"))
