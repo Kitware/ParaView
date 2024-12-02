@@ -3,26 +3,16 @@
 #include "vtkSMPropArrayListDomain.h"
 
 #include "vtkCompositeRepresentation.h"
-#include "vtkDataSet.h"
-#include "vtkMapper.h"
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVCompositeRepresentation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVDataRepresentation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPointData.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkRendererCollection.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyIterator.h"
 #include "vtkSMRenderViewExporterProxy.h"
 #include "vtkSMRenderViewProxy.h"
-
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 
@@ -31,10 +21,7 @@
 vtkStandardNewMacro(vtkSMPropArrayListDomain);
 
 //---------------------------------------------------------------------------
-vtkSMPropArrayListDomain::vtkSMPropArrayListDomain()
-{
-  // vtkWarningMacro("Create prop domain");
-}
+vtkSMPropArrayListDomain::vtkSMPropArrayListDomain() {}
 
 //---------------------------------------------------------------------------
 vtkSMPropArrayListDomain::~vtkSMPropArrayListDomain() {}
@@ -53,7 +40,7 @@ void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
     vtkSMRenderViewExporterProxy::SafeDownCast(parentProxy);
   if (!exporterProxy)
   {
-    // error
+    vtkErrorMacro("Could not find exporter proxy");
     return;
   }
 
@@ -92,15 +79,11 @@ void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
 
     for (int i = 0; i < attrInfo->GetNumberOfArrays(); i++)
     {
-      // vtkWarningMacro(<< attrInfo->GetArrayInformation(i)->GetName());
       arrayNames.emplace_back(attrInfo->GetArrayInformation(i)->GetName());
     }
 
     break;
   }
-
-  // arrayNames.emplace_back("test1");
-  // arrayNames.emplace_back("test321");
 
   this->SetStrings(arrayNames);
   this->DomainModified();
@@ -134,13 +117,6 @@ int vtkSMPropArrayListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEle
 
   vtkWarningMacro("ArrayType is " << this->ArrayType);
   return 1;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMPropArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
-{
-  // TODO
-  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

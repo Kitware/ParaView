@@ -30,34 +30,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Updates the string list based on the available arrays. Requires
-   * a property of class vtkSMProxyProperty which points to a
-   * vtkSMSourceProxy and contains a vtkSMInputArrayDomain. Only
-   * the first proxy and domain are used.
+   * Updates the string list based on source names of props currently displayed in the view.
    */
   void Update(vtkSMProperty* prop) override;
-
-  /**
-   * A vtkSMProperty is often defined with a default value in the
-   * XML itself. However, many times, the default value must be determined
-   * at run time. To facilitate this, domains can override this method
-   * to compute and set the default value for the property.
-   * Note that unlike the compile-time default values, the
-   * application must explicitly call this method to initialize the
-   * property.
-   * Returns 1 if the domain updated the property.
-   */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
 protected:
   vtkSMPropDomain();
   ~vtkSMPropDomain() override;
-
-  /**
-   * Set the appropriate ivars from the xml element. Should
-   * be overwritten by subclass if adding ivars.
-   */
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
 private:
   vtkSMPropDomain(const vtkSMPropDomain&) = delete;

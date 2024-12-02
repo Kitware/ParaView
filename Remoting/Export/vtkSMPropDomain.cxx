@@ -40,13 +40,12 @@ void vtkSMPropDomain::Update(vtkSMProperty* prop)
   DeferDomainModifiedEvents defer(this);
   std::vector<std::string> propNames;
 
-  // vtkSMProxy* parentProxy = this->GetProperty()->GetParent();
   vtkSMProxy* parentProxy = prop->GetParent();
   vtkSMRenderViewExporterProxy* exporterProxy =
     vtkSMRenderViewExporterProxy::SafeDownCast(parentProxy);
   if (!exporterProxy)
   {
-    // error
+    vtkErrorMacro("Could not find exporter proxy");
     return;
   }
 
@@ -54,7 +53,6 @@ void vtkSMPropDomain::Update(vtkSMProperty* prop)
   vtkSMRenderViewProxy* rv = vtkSMRenderViewProxy::SafeDownCast(activeView);
 
   vtkSMPropertyHelper helper(activeView, "Representations");
-  std::map<vtkDataObject*, std::string> objectNames;
   for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
   {
     vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(cc));
@@ -71,39 +69,12 @@ void vtkSMPropDomain::Update(vtkSMProperty* prop)
       vtkCompositeRepresentation::SafeDownCast(repr->GetClientSideObject());
     if (compInstance->GetVisibility())
     {
-      // Unused
-      objectNames.insert({ compInstance->GetRenderedDataObject(0), input->GetLogName() });
-
       propNames.emplace_back(input->GetLogName());
     }
   }
 
   this->SetStrings(propNames);
   this->DomainModified();
-}
-
-//---------------------------------------------------------------------------
-int vtkSMPropDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
-{
-  if (!this->Superclass::ReadXMLAttributes(prop, element))
-  {
-    return 0;
-  }
-
-  return 1;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMPropDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
-{
-  // vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
-  // if (!svp)
-  // {
-  //   return 0;
-  // }
-
-  // TODO
-  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

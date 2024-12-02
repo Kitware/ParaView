@@ -4,15 +4,15 @@
  * @class   vtkSMPropArrayListDomain
  * @brief   list of arrays obtained from input prop
  *
- * Can only be used inside of a vtkSMRenderViewExporterProxy
- *
+ * This domain can only be used inside of a vtkSMRenderViewExporterProxy
+ * It allows selecting arrays for all props in the view. The exporter needs to be able to handle
+ * array selection for props in the form "propName:arrayName".
  */
 
 #ifndef vtkSMPropArrayListDomain_h
 #define vtkSMPropArrayListDomain_h
 
 #include "vtkRemotingServerManagerModule.h" //needed for exports
-#include "vtkSMArrayListDomain.h"
 #include "vtkSMStringListDomain.h"
 
 #include <string>
@@ -33,40 +33,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Updates the string list based on the available arrays. Requires
-   * a property of class vtkSMProxyProperty which points to a
-   * vtkSMSourceProxy and contains a vtkSMInputArrayDomain. Only
-   * the first proxy and domain are used.
+   * Updates the string list based on the available arrays for each prop.
    */
   void Update(vtkSMProperty* prop) override;
 
-  // int IsArrayPartial(unsigned int idx) override { return false; };
-
-  // int GetFieldAssociation(unsigned int idx) override { return 0; };
-
-  // int GetDomainAssociation(unsigned int idx) override { return 0;};
-
-  int GetAttributeType() { return 0; }
-
-  /**
-   * A vtkSMProperty is often defined with a default value in the
-   * XML itself. However, many times, the default value must be determined
-   * at run time. To facilitate this, domains can override this method
-   * to compute and set the default value for the property.
-   * Note that unlike the compile-time default values, the
-   * application must explicitly call this method to initialize the
-   * property.
-   * Returns 1 if the domain updated the property.
-   */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
-
 protected:
-  vtkSMPropArrayListDomain();
-  ~vtkSMPropArrayListDomain() override;
+  vtkSMPropArrayListDomain() = default;
+  ~vtkSMPropArrayListDomain() override = default;
 
   /**
-   * Set the appropriate ivars from the xml element. Should
-   * be overwritten by subclass if adding ivars.
+   * Read the mandatory array_type attribute for the domain, which must be either "point" or "cell"
    */
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
