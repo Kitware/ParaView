@@ -14,8 +14,6 @@
 #include "vtkJSONSceneExporter.h"
 #include "vtkRemotingExportModule.h" // needed for exports
 
-class vtkDataArraySelection;
-
 class VTKREMOTINGEXPORT_EXPORT vtkPVWebExporter : public vtkJSONSceneExporter
 {
 public:

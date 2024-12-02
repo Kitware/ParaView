@@ -33,6 +33,9 @@ public:
    */
   void Write() override;
 
+  /**
+   * Set the view used for export, and update all domains based on prop extraction using the view.
+   */
   void SetView(vtkSMViewProxy* view) override;
 
   /**

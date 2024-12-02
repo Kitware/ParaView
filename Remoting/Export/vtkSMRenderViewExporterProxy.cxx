@@ -15,6 +15,7 @@
 #include "vtkSMPropDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
@@ -41,15 +42,14 @@ void vtkSMRenderViewExporterProxy::SetView(vtkSMViewProxy* view)
 {
   this->vtkSMExporterProxy::SetView(view);
 
-  // TODO: iterate over props to get every domain instead
-  vtkSMProperty* prop = this->GetProperty("Prop");
-  vtkSMProperty* prop2 = this->GetProperty("DisableNetwork");
-  if (prop)
+  vtkSmartPointer<vtkSMPropertyIterator> iter;
+  iter.TakeReference(this->NewPropertyIterator());
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
-    vtkSMPropDomain* domain = prop->FindDomain<vtkSMPropDomain>();
+    vtkSMPropDomain* domain = iter->GetProperty()->FindDomain<vtkSMPropDomain>();
     if (domain)
     {
-      domain->Update(prop);
+      domain->Update(iter->GetProperty());
     }
   }
 }
@@ -74,7 +74,6 @@ void vtkSMRenderViewExporterProxy::Write()
     }
 
     vtkRenderWindow* renWin = rv->GetRenderWindow(); // Uses get client-side object
-    rv->GetRenderer();
 
     vtkRenderer* renderer = renWin->GetRenderers()->GetFirstRenderer();
     exporter->SetRenderWindow(renWin);
