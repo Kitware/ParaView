@@ -76,4 +76,23 @@
       </SSHCommand>
     </CommandStartup>
   </Server>
+  <Server name="SSHPortForwardingRCServerOption" configuration="" resource="csrc://127.0.0.1:11114">
+    <CommandStartup>
+      <Options>
+        <Option name="PV_SSH_PF_SERVER_PORT" label="Forwarding Port: ">
+          <Range type="int" min="8080" max="8080" step="1" default="8080" />
+        </Option>
+      </Options>
+      <SSHCommand exec="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/server_rc.sh" process_wait="0" delay="5">
+        <SSHConfig port="2222">
+          <Terminal/>
+          <PortForwarding/>
+        </SSHConfig>
+        <Arguments>
+          <Argument value="localhost"/>
+          <Argument value="$PV_SERVER_PORT$"/>
+        </Arguments>
+      </SSHCommand>
+    </CommandStartup>
+  </Server>
 </Servers>

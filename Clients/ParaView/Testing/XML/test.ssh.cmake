@@ -32,6 +32,7 @@ set(ssh_server_tests
   SimpleRCSSHServer
   SSHServerPortForwarding
   RCSSHServerPortForwarding
+  RCSSHServerPortForwardingOption
   )
 
 foreach(tname IN LISTS ssh_server_tests)
