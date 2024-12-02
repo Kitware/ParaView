@@ -22,7 +22,9 @@
 #include "vtkSmartPointer.h"
 
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QEvent>
+#include <QLabel>
 #include <QPointer>
 #include <QScopedValueRollback>
 #include <QVBoxLayout>
@@ -39,27 +41,43 @@ class pqPropArraySelectionWidget::pqInternals
 public:
   QComboBox* ComboBox;
 
-  QString QProperty;
-  QWidget* SelectorWidget;
+  QString PointArraysName;
+  QString CellArraysName;
+  QWidget* PointSelectorWidget;
+  QWidget* CellSelectorWidget;
+
   vtkWeakPointer<vtkSMProxy> SMProxy;
-  vtkWeakPointer<vtkSMProperty> SMArrayProperty;
-  vtkWeakPointer<vtkSMStringVectorProperty> SPropProperty;
-  vtkWeakPointer<vtkSMDomain> SMDomain;
-  QMap<QString, QVariant> SavedLists;
-  bool changed = false;
-  unsigned long ObserverId;
+
+  vtkWeakPointer<vtkSMStringVectorProperty> SMPointArrayProperty;
+  vtkWeakPointer<vtkSMStringVectorProperty> SMCellArrayProperty;
+  vtkWeakPointer<vtkSMStringVectorProperty> SelectedInputProperty;
+
+  vtkWeakPointer<vtkSMDomain> SMPointDomain;
+  vtkWeakPointer<vtkSMDomain> SMCellDomain;
+
+  QMap<QString, QVariant> SavedPointLists;
+  QMap<QString, QVariant> SavedCellLists;
+
+  unsigned long PointObserverId;
+  unsigned long CellObserverId;
 
   pqInternals()
-    : ObserverId(0)
+    : PointObserverId(0)
   {
   }
   ~pqInternals()
   {
-    if (this->SMDomain && this->ObserverId)
+    if (this->SMPointDomain && this->PointObserverId)
     {
-      this->SMDomain->RemoveObserver(this->ObserverId);
+      this->SMPointDomain->RemoveObserver(this->PointObserverId);
     }
-    this->ObserverId = 0;
+    this->PointObserverId = 0;
+
+    if (this->SMCellDomain && this->CellObserverId)
+    {
+      this->SMCellDomain->RemoveObserver(this->CellObserverId);
+    }
+    this->CellObserverId = 0;
   }
 };
 
@@ -71,20 +89,24 @@ pqPropArraySelectionWidget::pqPropArraySelectionWidget(
 {
   this->setShowLabel(false);
 
-  auto l = new QVBoxLayout(this);
-  l->setSpacing(0);
-  l->setContentsMargins(0, 0, 0, 0);
+  auto layout = new QVBoxLayout(this);
+  layout->setSpacing(0);
+  layout->setContentsMargins(0, 0, 0, 0);
 
   auto& internals = (*this->Internals);
 
+  auto label = new QLabel(tr("Select arrays to export"), this);
+  layout->addWidget(label);
+
   // Create combobox for prop selection
-  auto combobox = new QComboBox(this);
+  QComboBox* combobox = new QComboBox(this);
   combobox->setObjectName("ComboBox");
-  l->addWidget(combobox);
+  layout->addWidget(combobox);
   internals.ComboBox = combobox;
 
   auto propProp = smgroup->GetProperty("prop");
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(propProp);
+  vtkSMStringVectorProperty* selectedInputProperty =
+    vtkSMStringVectorProperty::SafeDownCast(propProp);
 
   // Populate combobox with its domain values
   auto domain = vtkSMStringListDomain::SafeDownCast(propProp->GetDomain("prop"));
@@ -97,40 +119,67 @@ pqPropArraySelectionWidget::pqPropArraySelectionWidget(
 
   pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(combobox);
   new pqComboBoxDomain(combobox, propProp);
-  this->addPropertyLink(adaptor, "currentText", SIGNAL(currentTextChanged(QString)), svp);
+  this->addPropertyLink(
+    adaptor, "currentText", SIGNAL(currentTextChanged(QString)), selectedInputProperty);
   this->setChangeAvailableAsChangeFinished(true);
 
-  // Create array selector widget, associate a domain widget with it
-  auto propArrayProperty = smgroup->GetProperty("point_arrays");
-  auto propArrayListDomain =
-    vtkSMPropArrayListDomain::SafeDownCast(propArrayProperty->GetDomain("array_list"));
-  this->PropArrayProperty = propArrayProperty;
-  assert(propArrayListDomain != nullptr);
-  QWidget* arraySelectorWidget = new pqArraySelectionWidget(this);
-  l->addWidget(arraySelectorWidget);
-  this->ArraySelectorWidget = arraySelectorWidget;
+  // Create array selector widget for points
+  auto propPointArrayProperty =
+    vtkSMStringVectorProperty::SafeDownCast(smgroup->GetProperty("point_arrays"));
+  auto pointArrayListDomain =
+    vtkSMPropArrayListDomain::SafeDownCast(propPointArrayProperty->GetDomain("array_list"));
+  assert(pointArrayListDomain != nullptr);
+  pqArraySelectionWidget* pointArraySelectorWidget = new pqArraySelectionWidget(this);
+  pointArraySelectorWidget->setIconType("point_arrays", "point");
+  pointArraySelectorWidget->setObjectName("PointSelectionWidget");
+  pointArraySelectorWidget->setHeaderLabel(
+    QCoreApplication::translate("ServerManagerXML", propPointArrayProperty->GetXMLLabel()));
+  layout->addWidget(pointArraySelectorWidget);
 
-  this->Internals->SelectorWidget = arraySelectorWidget;
-  this->Internals->QProperty = QString("point_arrays");
+  // Create array selector widget for cells
+  auto propCellArrayProperty =
+    vtkSMStringVectorProperty::SafeDownCast(smgroup->GetProperty("cell_arrays"));
+  auto cellArrayListDomain =
+    vtkSMPropArrayListDomain::SafeDownCast(propCellArrayProperty->GetDomain("array_list"));
+  assert(cellArrayListDomain != nullptr);
+  pqArraySelectionWidget* cellArraySelectorWidget = new pqArraySelectionWidget(this);
+  cellArraySelectorWidget->setIconType("cell_arrays", "cell");
+  cellArraySelectorWidget->setObjectName("CellSelectionWidget");
+  cellArraySelectorWidget->setHeaderLabel(
+    QCoreApplication::translate("ServerManagerXML", propCellArrayProperty->GetXMLLabel()));
+  layout->addWidget(cellArraySelectorWidget);
+
+  this->Internals->PointSelectorWidget = pointArraySelectorWidget;
+  this->Internals->CellSelectorWidget = cellArraySelectorWidget;
+  this->Internals->PointArraysName = QString("point_arrays");
+  this->Internals->CellArraysName = QString("cell_arrays");
   this->Internals->SMProxy = smproxy;
-  this->Internals->SMArrayProperty = propArrayProperty;
-  this->Internals->SPropProperty = svp;
-  this->Internals->SMDomain = propArrayListDomain;
+  this->Internals->SMPointArrayProperty = propPointArrayProperty;
+  this->Internals->SMCellArrayProperty = propCellArrayProperty;
+  this->Internals->SelectedInputProperty = selectedInputProperty;
+  this->Internals->SMPointDomain = pointArrayListDomain;
 
   QObject::connect(combobox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int i) {
     vtkWarningWithObjectMacro(nullptr,
-      "prop changed to " << this->Internals->SPropProperty->GetElement(0) << " index " << i);
-    QString currentProp = this->Internals->SPropProperty->GetElement(0);
-    this->Internals->SavedLists[currentProp] =
-      this->Internals->SelectorWidget->property("point_arrays");
+      "prop changed to " << this->Internals->SelectedInputProperty->GetElement(0) << " index "
+                         << i);
+
+    QString currentProp = this->Internals->SelectedInputProperty->GetElement(0);
+    this->Internals->SavedPointLists[currentProp] =
+      this->Internals->PointSelectorWidget->property("point_arrays");
+    this->Internals->SavedCellLists[currentProp] =
+      this->Internals->CellSelectorWidget->property("cell_arrays");
   });
 
-  // TODO: remove observer on destruction
-  this->Internals->ObserverId = propArrayListDomain->AddObserver(
-    vtkCommand::DomainModifiedEvent, this, &pqPropArraySelectionWidget::domainChanged);
+  this->Internals->PointObserverId = pointArrayListDomain->AddObserver(
+    vtkCommand::DomainModifiedEvent, this, &pqPropArraySelectionWidget::pointDomainChanged);
+  this->Internals->CellObserverId = cellArrayListDomain->AddObserver(
+    vtkCommand::DomainModifiedEvent, this, &pqPropArraySelectionWidget::cellDomainChanged);
 
   this->addPropertyLink(
-    arraySelectorWidget, "point_arrays", SIGNAL(widgetModified()), propArrayProperty);
+    pointArraySelectorWidget, "point_arrays", SIGNAL(widgetModified()), propPointArrayProperty);
+  this->addPropertyLink(
+    cellArraySelectorWidget, "cell_arrays", SIGNAL(widgetModified()), propCellArrayProperty);
   this->setChangeAvailableAsChangeFinished(true);
 
   // Change array selection when domain is updated
@@ -156,27 +205,30 @@ bool pqPropArraySelectionWidget::event(QEvent* evt)
   return this->Superclass::event(evt);
 }
 
-void pqPropArraySelectionWidget::domainChanged()
+void pqPropArraySelectionWidget::pointDomainChanged()
 {
   // reset the widget's value using the domain.
   QVariant variantVal;
   vtkSMStringVectorProperty* prop =
-    vtkSMStringVectorProperty::SafeDownCast(this->Internals->SMArrayProperty);
+    vtkSMStringVectorProperty::SafeDownCast(this->Internals->SMPointArrayProperty);
 
-  vtkWarningWithObjectMacro(
-    nullptr, "domain changed, retrieving prop " << this->Internals->SPropProperty->GetElement(0));
+  vtkWarningWithObjectMacro(nullptr,
+    "point domain changed, retrieving prop "
+      << this->Internals->SelectedInputProperty->GetElement(0));
 
-  this->Internals->SMProxy->UpdateProperty(this->Internals->SPropProperty->GetXMLName());
+  this->Internals->SMProxy->UpdateProperty(this->Internals->SelectedInputProperty->GetXMLName());
 
-  QString currentProp = this->Internals->SPropProperty->GetElement(0);
-  if (this->Internals->SavedLists.contains(currentProp))
+  QString currentProp = this->Internals->SelectedInputProperty->GetElement(0);
+  if (this->Internals->SavedPointLists.contains(currentProp))
   {
-    this->Internals->SelectorWidget->setProperty(
-      this->Internals->QProperty.toUtf8().data(), this->Internals->SavedLists[currentProp]);
+    this->Internals->PointSelectorWidget->setProperty(
+      this->Internals->PointArraysName.toUtf8().data(),
+      this->Internals->SavedPointLists[currentProp]);
     return;
   }
 
-  vtkWarningWithObjectMacro(nullptr, "prop is " << this->Internals->SPropProperty->GetElement(0));
+  vtkWarningWithObjectMacro(
+    nullptr, "prop is " << this->Internals->SelectedInputProperty->GetElement(0));
 
   unsigned int nbPerCommand = prop->GetNumberOfElementsPerCommand();
 
@@ -184,20 +236,66 @@ void pqPropArraySelectionWidget::domainChanged()
   if (prop && nbPerCommand > 1 && prop->GetElementType(1) == vtkSMStringVectorProperty::STRING)
   {
     QList<QVariant> newPropList =
-      pqSMAdaptor::getStringListProperty(this->Internals->SMArrayProperty);
+      pqSMAdaptor::getStringListProperty(this->Internals->SMPointArrayProperty);
     variantVal.setValue(newPropList);
   }
   else
   {
-    QList<QList<QVariant>> newPropList =
-      pqSMAdaptor::getSelectionProperty(this->Internals->SMArrayProperty, pqSMAdaptor::UNCHECKED);
-    vtkWarningWithObjectMacro(nullptr, "new prop list is size " << newPropList.size());
+    QList<QList<QVariant>> newPropList = pqSMAdaptor::getSelectionProperty(
+      this->Internals->SMPointArrayProperty, pqSMAdaptor::UNCHECKED);
+    vtkWarningWithObjectMacro(nullptr, "new point prop list is size " << newPropList.size());
 
     variantVal.setValue(newPropList);
   }
 
-  this->Internals->SelectorWidget->setProperty(
-    this->Internals->QProperty.toUtf8().data(), variantVal);
+  this->Internals->PointSelectorWidget->setProperty(
+    this->Internals->PointArraysName.toUtf8().data(), variantVal);
+}
+
+void pqPropArraySelectionWidget::cellDomainChanged()
+{
+  // reset the widget's value using the domain.
+  QVariant variantVal;
+  vtkSMStringVectorProperty* prop = this->Internals->SMCellArrayProperty;
+
+  vtkWarningWithObjectMacro(nullptr,
+    "cell domain changed, retrieving prop "
+      << this->Internals->SelectedInputProperty->GetElement(0));
+
+  this->Internals->SMProxy->UpdateProperty(this->Internals->SelectedInputProperty->GetXMLName());
+
+  QString currentProp = this->Internals->SelectedInputProperty->GetElement(0);
+  if (this->Internals->SavedCellLists.contains(currentProp))
+  {
+    this->Internals->CellSelectorWidget->setProperty(
+      this->Internals->CellArraysName.toUtf8().data(),
+      this->Internals->SavedCellLists[currentProp]);
+    return;
+  }
+
+  vtkWarningWithObjectMacro(
+    nullptr, "prop is " << this->Internals->SelectedInputProperty->GetElement(0));
+
+  unsigned int nbPerCommand = prop->GetNumberOfElementsPerCommand();
+
+  // if property has multiple string elements
+  if (prop && nbPerCommand > 1 && prop->GetElementType(1) == vtkSMStringVectorProperty::STRING)
+  {
+    QList<QVariant> newPropList =
+      pqSMAdaptor::getStringListProperty(this->Internals->SMCellArrayProperty);
+    variantVal.setValue(newPropList);
+  }
+  else
+  {
+    QList<QList<QVariant>> newPropList = pqSMAdaptor::getSelectionProperty(
+      this->Internals->SMCellArrayProperty, pqSMAdaptor::UNCHECKED);
+    vtkWarningWithObjectMacro(nullptr, "new cell prop list is size " << newPropList.size());
+
+    variantVal.setValue(newPropList);
+  }
+
+  this->Internals->CellSelectorWidget->setProperty(
+    this->Internals->CellArraysName.toUtf8().data(), variantVal);
 }
 
 //-----------------------------------------------------------------------------
@@ -221,9 +319,5 @@ void pqPropArraySelectionWidget::propertyChanged(const char* pname)
 //-----------------------------------------------------------------------------
 void pqPropArraySelectionWidget::updateProperties()
 {
-  auto& internals = (*this->Internals);
-
-  // U
-
   Q_EMIT this->widgetModified();
 }

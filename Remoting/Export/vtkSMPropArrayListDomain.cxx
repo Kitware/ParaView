@@ -11,6 +11,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -83,8 +84,7 @@ void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
     }
 
     vtkPVDataInformation* info = input->GetDataInformation(0);
-    vtkPVDataSetAttributesInformation* attrInfo =
-      info->GetAttributeInformation(vtkDataObject::AttributeTypes::POINT);
+    vtkPVDataSetAttributesInformation* attrInfo = info->GetAttributeInformation(this->ArrayType);
     if (!attrInfo)
     {
       continue;
@@ -114,6 +114,25 @@ int vtkSMPropArrayListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEle
     return 0;
   }
 
+  const char* arrayName = element->GetAttribute("array_type");
+  if (!arrayName)
+  {
+    vtkErrorMacro("Missing array_type attribute");
+    return 0;
+  }
+  if (arrayName)
+  {
+    if (!strcmp(arrayName, "point"))
+    {
+      this->ArrayType = vtkDataObject::AttributeTypes::POINT;
+    }
+    if (!strcmp(arrayName, "cell"))
+    {
+      this->ArrayType = vtkDataObject::AttributeTypes::CELL;
+    }
+  }
+
+  vtkWarningMacro("ArrayType is " << this->ArrayType);
   return 1;
 }
 

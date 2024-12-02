@@ -44,13 +44,12 @@ private:
   /**
    *
    */
-  void domainChanged();
+  void pointDomainChanged();
+
+  void cellDomainChanged();
 
   class pqInternals;
   pqInternals* Internals;
-
-  vtkSMProperty* PropArrayProperty = nullptr;
-  QWidget* ArraySelectorWidget = nullptr;
 };
 
 #endif

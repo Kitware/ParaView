@@ -658,8 +658,9 @@
                             name="Prop"
                             number_of_elements="1">
         <PropDomain name="prop" />
-        <Documentation>Choose the selected prop associated to a dataset</Documentation>
-        <!-- <PropInputArrayDomain name="point_arrays" attribute_type="point" optional="1" /> -->
+        <Documentation>Choose the dataset associated to an element in the view,
+        from which you want to select arrays to export.
+        </Documentation>
       </StringVectorProperty>
 
       <StringVectorProperty name="PointArrays"
@@ -667,22 +668,35 @@
                             number_of_elements_per_command="1"
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
-        <PropArrayListDomain name="array_list" >
+        <PropArrayListDomain name="array_list" array_type="point">
           <RequiredProperties>
             <Property name="Prop" function="InputProp"/>
           </RequiredProperties>
         </PropArrayListDomain>
         <Documentation>
-          Select the node block arrays to pass through.
+          Select the point arrays to export.
         </Documentation>
-        <Hints>
-          <!-- <ArraySelectionWidget icon_type="point"/> -->
-        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrays"
+                            command="GetCellArraySelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <PropArrayListDomain name="array_list" array_type="cell">
+          <RequiredProperties>
+            <Property name="Prop" function="InputProp"/>
+          </RequiredProperties>
+        </PropArrayListDomain>
+        <Documentation>
+          Select the cell arrays to export.
+        </Documentation>
       </StringVectorProperty>
 
       <PropertyGroup panel_widget="PropArraySelection">
         <Property name="Prop" function="prop"/>
         <Property name="PointArrays" function="point_arrays"/>
+        <Property name="CellArrays" function="cell_arrays"/>
       </PropertyGroup>
 
       <Hints>

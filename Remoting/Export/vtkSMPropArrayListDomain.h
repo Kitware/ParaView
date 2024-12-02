@@ -15,6 +15,8 @@
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMStringListDomain.h"
 
+#include <string>
+
 class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
 class vtkSMProxyProperty;
@@ -74,6 +76,8 @@ private:
 
   friend class vtkSMPropArrayListDomainInternals;
   vtkSMPropArrayListDomainInternals* ALDInternals;
+
+  int ArrayType = 0;
 };
 
 #endif
