@@ -50,9 +50,6 @@ private:
   vtkSMPropArrayListDomain(const vtkSMPropArrayListDomain&) = delete;
   void operator=(const vtkSMPropArrayListDomain&) = delete;
 
-  friend class vtkSMPropArrayListDomainInternals;
-  vtkSMPropArrayListDomainInternals* ALDInternals;
-
   int ArrayType = 0;
 };
 

@@ -40,7 +40,7 @@ bool vtkSMRenderViewExporterProxy::CanExport(vtkSMProxy* view)
 //----------------------------------------------------------------------------
 void vtkSMRenderViewExporterProxy::SetView(vtkSMViewProxy* view)
 {
-  this->vtkSMExporterProxy::SetView(view);
+  this->Superclass::SetView(view);
 
   vtkSmartPointer<vtkSMPropertyIterator> iter;
   iter.TakeReference(this->NewPropertyIterator());
@@ -116,22 +116,23 @@ std::map<std::string, vtkActor*> vtkSMRenderViewExporterProxy::GetNamedActorMap(
 
     vtkCompositeRepresentation* compInstance =
       vtkCompositeRepresentation::SafeDownCast(repr->GetClientSideObject());
-    if (compInstance->GetVisibility())
+    if (!compInstance->GetVisibility())
     {
-      auto dataObj = compInstance->GetRenderedDataObject(0);
-      if (!dataObj)
-      {
-        continue;
-      }
-      vtkPVDataRepresentation* repr2 = compInstance->GetActiveRepresentation();
+      continue;
+    }
 
-      if (vtkGeometryRepresentation::SafeDownCast(repr2))
-      {
-        vtkActor* actor =
-          vtkActor::SafeDownCast(vtkGeometryRepresentation::SafeDownCast(repr2)->GetActor());
-        vtkWarningMacro(<< dataObj << " " << input->GetLogName());
-        map.insert({ input->GetLogName(), actor });
-      }
+    auto dataObj = compInstance->GetRenderedDataObject(0);
+    if (!dataObj)
+    {
+      continue;
+    }
+    vtkPVDataRepresentation* dataRepr = compInstance->GetActiveRepresentation();
+
+    if (vtkGeometryRepresentation::SafeDownCast(dataRepr))
+    {
+      vtkActor* actor =
+        vtkActor::SafeDownCast(vtkGeometryRepresentation::SafeDownCast(dataRepr)->GetActor());
+      map.insert({ input->GetLogName(), actor });
     }
   }
 

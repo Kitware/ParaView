@@ -13,6 +13,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMFileListDomain.h"
+#include "vtkSMPropArrayListDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"

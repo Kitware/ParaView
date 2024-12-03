@@ -23,7 +23,6 @@ vtkStandardNewMacro(vtkSMPropArrayListDomain);
 //---------------------------------------------------------------------------
 void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
 {
-  // vtkWarningMacro("Update domain with source" << inputName);
   // ensures that we fire DomainModifiedEvent only once.
   DeferDomainModifiedEvents defer(this);
 
@@ -106,7 +105,6 @@ int vtkSMPropArrayListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEle
     }
   }
 
-  vtkWarningMacro("ArrayType is " << this->ArrayType);
   return 1;
 }
 
