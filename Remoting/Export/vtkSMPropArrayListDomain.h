@@ -15,8 +15,6 @@
 #include "vtkRemotingExportModule.h" //needed for exports
 #include "vtkSMArrayListDomain.h"
 
-#include <string>
-
 class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
 class vtkSMProxyProperty;
