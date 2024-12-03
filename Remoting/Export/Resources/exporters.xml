@@ -660,7 +660,6 @@
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
         <PropArrayListDomain name="array_list" array_type="point" />
-        <PropDomain name="prop" />
         <Documentation>
           Select the point arrays to export.
         </Documentation>
@@ -672,16 +671,10 @@
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
         <PropArrayListDomain name="array_list" array_type="cell" />
-        <PropDomain name="prop" />
         <Documentation>
           Select the cell arrays to export.
         </Documentation>
       </StringVectorProperty>
-
-      <PropertyGroup panel_widget="PropArraySelection">
-        <Property name="PointArrays" function="point_arrays"/>
-        <Property name="CellArrays" function="cell_arrays"/>
-      </PropertyGroup>
 
       <Hints>
         <ExporterFactory extensions="vtkjs" />

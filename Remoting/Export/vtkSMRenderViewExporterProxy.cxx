@@ -12,7 +12,7 @@
 #include "vtkPVLODActor.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
-#include "vtkSMPropDomain.h"
+#include "vtkSMPropArrayListDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -46,7 +46,7 @@ void vtkSMRenderViewExporterProxy::SetView(vtkSMViewProxy* view)
   iter.TakeReference(this->NewPropertyIterator());
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
-    vtkSMPropDomain* domain = iter->GetProperty()->FindDomain<vtkSMPropDomain>();
+    vtkSMPropArrayListDomain* domain = iter->GetProperty()->FindDomain<vtkSMPropArrayListDomain>();
     if (domain)
     {
       domain->Update(iter->GetProperty());

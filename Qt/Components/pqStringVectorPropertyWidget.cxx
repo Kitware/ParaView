@@ -109,6 +109,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vtkSMArrayListDomain* arrayListDomain = nullptr;
   vtkSMStringListDomain* stringListDomain = nullptr;
   vtkSMArraySelectionDomain* arraySelectionDomain = nullptr;
+  vtkSMPropArrayListDomain* propArrayListDomain = nullptr;
   vtkSMDomainIterator* domainIter = svp->NewDomainIterator();
   for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
   {
@@ -118,6 +119,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     fileListDomain = fileListDomain ? fileListDomain : vtkSMFileListDomain::SafeDownCast(domain);
     arrayListDomain =
       arrayListDomain ? arrayListDomain : vtkSMArrayListDomain::SafeDownCast(domain);
+    propArrayListDomain =
+      propArrayListDomain ? propArrayListDomain : vtkSMPropArrayListDomain::SafeDownCast(domain);
     arraySelectionDomain =
       arraySelectionDomain ? arraySelectionDomain : vtkSMArraySelectionDomain::SafeDownCast(domain);
     stringListDomain =
@@ -178,7 +181,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     vbox->addWidget(chooser);
   }
-  else if (arrayListDomain)
+  else if (arrayListDomain || propArrayListDomain)
   {
     assert(smProperty->GetRepeatable());
 
@@ -239,6 +242,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     {
       new pqArrayListDomain(
         listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
+    }
+    else if (propArrayListDomain)
+    {
+      new pqArrayListDomain(
+        listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, propArrayListDomain);
     }
 
     this->addPropertyLink(listWidget, property_name, SIGNAL(widgetModified()), smProperty);

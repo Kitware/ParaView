@@ -5,7 +5,6 @@
 
 #include "pqArrayListDomain.h"
 #include "pqArraySelectionWidget.h"
-#include "pqComboBoxDomain.h"
 #include "pqProxyWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqSignalAdaptors.h"
@@ -22,7 +21,6 @@
 #include "vtkSMVectorProperty.h"
 #include "vtkSmartPointer.h"
 
-#include <QComboBox>
 #include <QCoreApplication>
 #include <QEvent>
 #include <QLabel>
@@ -45,7 +43,6 @@ public:
   QString PreviouslySelectedProp;
   QWidget* PointSelectorWidget;
   QWidget* CellSelectorWidget;
-  QComboBox* ComboBox;
 
   vtkWeakPointer<vtkSMProxy> SMProxy;
 
@@ -54,9 +51,6 @@ public:
 
   vtkWeakPointer<vtkSMPropArrayListDomain> PointArrayListDomain;
   vtkWeakPointer<vtkSMPropArrayListDomain> CellArrayListDomain;
-
-  QMap<QString, QVariant> SavedPointLists;
-  QMap<QString, QVariant> SavedCellLists;
 
   unsigned long PointObserverId;
   unsigned long CellObserverId;
@@ -79,8 +73,6 @@ public:
     }
     this->CellObserverId = 0;
   }
-
-  QString getCurrentSource() { return this->ComboBox->currentText(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -99,26 +91,6 @@ pqPropArraySelectionWidget::pqPropArraySelectionWidget(
 
   auto label = new QLabel(tr("Select arrays to export"), this);
   layout->addWidget(label);
-
-  // Create combobox for prop selection
-  QComboBox* combobox = new QComboBox(this);
-  combobox->setObjectName("ComboBox");
-  combobox->setStyleSheet("combobox-popup: 0;");
-  layout->addWidget(combobox);
-  internals.ComboBox = combobox;
-
-  // Populate combobox with its domain values
-  auto propPointArrayProperty =
-    vtkSMStringVectorProperty::SafeDownCast(smgroup->GetProperty("point_arrays"));
-  auto propDomain = vtkSMStringListDomain::SafeDownCast(propPointArrayProperty->GetDomain("prop"));
-  int nbProps = propDomain->GetNumberOfStrings();
-  for (int propId = 0; propId < nbProps; propId++)
-  {
-    combobox->insertItem(propId, QString(propDomain->GetString(propId)));
-  }
-
-  QObject::connect(
-    combobox, &QComboBox::currentTextChanged, this, &pqPropArraySelectionWidget::propChanged);
 
   // Create array selector widget for points
   auto pointArrayListDomain =
@@ -154,7 +126,6 @@ pqPropArraySelectionWidget::pqPropArraySelectionWidget(
   this->Internals->SMProxy = smproxy;
   this->Internals->SMPointArrayProperty = propPointArrayProperty;
   this->Internals->SMCellArrayProperty = propCellArrayProperty;
-  this->Internals->ComboBox = combobox;
 
   this->Internals->PointObserverId = pointArrayListDomain->AddObserver(
     vtkCommand::DomainModifiedEvent, this, &pqPropArraySelectionWidget::pointDomainChanged);
@@ -166,8 +137,6 @@ pqPropArraySelectionWidget::pqPropArraySelectionWidget(
   this->addPropertyLink(
     cellArraySelectorWidget, "cell_arrays", SIGNAL(widgetModified()), propCellArrayProperty);
   this->setChangeAvailableAsChangeFinished(true);
-
-  combobox->setCurrentText(propDomain->GetString(0));
 }
 
 //-----------------------------------------------------------------------------
@@ -178,25 +147,8 @@ pqPropArraySelectionWidget::~pqPropArraySelectionWidget()
 
 void pqPropArraySelectionWidget::pointDomainChanged()
 {
-  // This prop/source has been selected before: retrieve checked arrays from internal memory
-  if (this->Internals->SavedPointLists.contains(this->Internals->getCurrentSource()))
-  {
-    this->Internals->PointSelectorWidget->setProperty(
-      this->Internals->PointArraysName.toUtf8().data(),
-      this->Internals->SavedPointLists[this->Internals->getCurrentSource()]);
-    return;
-  }
-
-  // Otherwise, get arrays from domain
   QList<QList<QVariant>> newPropList = pqSMAdaptor::getSelectionProperty(
     this->Internals->SMPointArrayProperty, pqSMAdaptor::UNCHECKED);
-
-  // Append source name before the name of the array. Default value to true.
-  for (auto& entry : newPropList)
-  {
-    entry[0].setValue(QString(this->Internals->getCurrentSource() + ":" + entry[0].toString()));
-    entry[1].setValue(true);
-  }
 
   QVariant variantVal = QVariant::fromValue(newPropList);
   this->Internals->PointSelectorWidget->setProperty(
@@ -206,45 +158,12 @@ void pqPropArraySelectionWidget::pointDomainChanged()
 //-----------------------------------------------------------------------------
 void pqPropArraySelectionWidget::cellDomainChanged()
 {
-  if (this->Internals->SavedPointLists.contains(this->Internals->getCurrentSource()))
-  {
-    this->Internals->CellSelectorWidget->setProperty(
-      this->Internals->CellArraysName.toUtf8().data(),
-      this->Internals->SavedCellLists[this->Internals->getCurrentSource()]);
-    return;
-  }
-
   QList<QList<QVariant>> newPropList =
     pqSMAdaptor::getSelectionProperty(this->Internals->SMCellArrayProperty, pqSMAdaptor::UNCHECKED);
 
   QVariant variantVal = QVariant::fromValue(newPropList);
   this->Internals->CellSelectorWidget->setProperty(
     this->Internals->CellArraysName.toUtf8().data(), variantVal);
-}
-
-//-----------------------------------------------------------------------------
-void pqPropArraySelectionWidget::propChanged()
-{
-  QString currentProp = this->Internals->getCurrentSource();
-  vtkWarningWithObjectMacro(nullptr, << "source changed to " << currentProp.toStdString()
-                                     << " previous is "
-                                     << this->Internals->PreviouslySelectedProp.toStdString());
-
-  if (!this->Internals->PreviouslySelectedProp.isEmpty())
-  {
-    this->Internals->SavedPointLists[this->Internals->PreviouslySelectedProp] =
-      this->Internals->PointSelectorWidget->property("point_arrays");
-    this->Internals->SavedCellLists[this->Internals->PreviouslySelectedProp] =
-      this->Internals->CellSelectorWidget->property("cell_arrays");
-  }
-
-  this->Internals->CellArrayListDomain->Update(
-    this->Internals->SMPointArrayProperty, currentProp.toStdString());
-  this->Internals->PointArrayListDomain->Update(
-    this->Internals->SMCellArrayProperty, currentProp.toStdString());
-
-  this->Internals->PreviouslySelectedProp = currentProp;
-  vtkWarningWithObjectMacro(nullptr, << "done updating source");
 }
 
 //-----------------------------------------------------------------------------

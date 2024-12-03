@@ -21,15 +21,9 @@
 vtkStandardNewMacro(vtkSMPropArrayListDomain);
 
 //---------------------------------------------------------------------------
-vtkSMPropArrayListDomain::vtkSMPropArrayListDomain() {}
-
-//---------------------------------------------------------------------------
-vtkSMPropArrayListDomain::~vtkSMPropArrayListDomain() {}
-
-//---------------------------------------------------------------------------
-void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop, std::string inputName)
+void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
 {
-  vtkWarningMacro("Update domain with source" << inputName);
+  // vtkWarningMacro("Update domain with source" << inputName);
   // ensures that we fire DomainModifiedEvent only once.
   DeferDomainModifiedEvents defer(this);
 
@@ -63,7 +57,7 @@ void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop, std::string inputName
 
     vtkCompositeRepresentation* compInstance =
       vtkCompositeRepresentation::SafeDownCast(repr->GetClientSideObject());
-    if (!compInstance || !compInstance->GetVisibility() || reprInputName != inputName)
+    if (!compInstance || !compInstance->GetVisibility())
     {
       continue;
     }
@@ -77,10 +71,9 @@ void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop, std::string inputName
 
     for (int i = 0; i < attrInfo->GetNumberOfArrays(); i++)
     {
-      arrayNames.emplace_back(attrInfo->GetArrayInformation(i)->GetName());
+      arrayNames.emplace_back(
+        reprInputName + ":" + std::string(attrInfo->GetArrayInformation(i)->GetName()));
     }
-
-    break;
   }
 
   this->SetStrings(arrayNames);
