@@ -27,13 +27,11 @@ vtkSMPropArrayListDomain::vtkSMPropArrayListDomain() {}
 vtkSMPropArrayListDomain::~vtkSMPropArrayListDomain() {}
 
 //---------------------------------------------------------------------------
-void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop)
+void vtkSMPropArrayListDomain::Update(vtkSMProperty* prop, std::string inputName)
 {
+  vtkWarningMacro("Update domain with source" << inputName);
   // ensures that we fire DomainModifiedEvent only once.
   DeferDomainModifiedEvents defer(this);
-
-  vtkSMProperty* input = this->GetRequiredProperty("InputProp");
-  std::string inputName = vtkSMPropertyHelper(input).GetAsString();
 
   vtkSMProxy* parentProxy = prop->GetParent();
   vtkSMRenderViewExporterProxy* exporterProxy =

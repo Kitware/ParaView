@@ -654,25 +654,13 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <StringVectorProperty command="SetSelectedSourceName"
-                            name="SelectedSource"
-                            number_of_elements="1">
-        <PropDomain name="prop" />
-        <Documentation>Choose the dataset associated to an element in the view,
-        from which you want to select arrays to export.
-        </Documentation>
-      </StringVectorProperty>
-
       <StringVectorProperty name="PointArrays"
                             command="GetPointArraySelection"
                             number_of_elements_per_command="1"
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
-        <PropArrayListDomain name="array_list" array_type="point">
-          <RequiredProperties>
-            <Property name="SelectedSource" function="InputProp"/>
-          </RequiredProperties>
-        </PropArrayListDomain>
+        <PropArrayListDomain name="array_list" array_type="point" />
+        <PropDomain name="prop" />
         <Documentation>
           Select the point arrays to export.
         </Documentation>
@@ -683,18 +671,14 @@
                             number_of_elements_per_command="1"
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
-        <PropArrayListDomain name="array_list" array_type="cell">
-          <RequiredProperties>
-            <Property name="SelectedSource" function="InputProp"/>
-          </RequiredProperties>
-        </PropArrayListDomain>
+        <PropArrayListDomain name="array_list" array_type="cell" />
+        <PropDomain name="prop" />
         <Documentation>
           Select the cell arrays to export.
         </Documentation>
       </StringVectorProperty>
 
       <PropertyGroup panel_widget="PropArraySelection">
-        <Property name="SelectedSource" function="prop"/>
         <Property name="PointArrays" function="point_arrays"/>
         <Property name="CellArrays" function="cell_arrays"/>
       </PropertyGroup>

@@ -30,7 +30,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
   /**
-   * When point domain changed,
+   * When point domain changed, update the list of
    */
   void pointDomainChanged();
 
@@ -38,6 +38,11 @@ private Q_SLOTS:
    *
    */
   void cellDomainChanged();
+
+  /**
+   *
+   */
+  void propChanged();
 
 private:
   Q_DISABLE_COPY(pqPropArraySelectionWidget);

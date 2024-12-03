@@ -35,7 +35,7 @@ public:
   /**
    * Updates the string list based on the available arrays for each prop.
    */
-  void Update(vtkSMProperty* prop) override;
+  void Update(vtkSMProperty* prop, std::string propName);
 
 protected:
   vtkSMPropArrayListDomain() = default;
