@@ -2821,5 +2821,48 @@
       </Hints>
 
     </SourceProxy>
+
+    <SourceProxy name="ExplodeDataSet"
+      class="vtkExplodeDataSet">
+      <Documentation short_help="Explode DataSet into a Composite structure, based on data value.">
+        Explode the input DataSet into a composite (PartitionedDataSetCollection) by extracting
+        cells based on a cell scalar iso-value criteria.
+        This is typically useful when the input has some material (or region) ids set on cells.
+        Then the output is a composite, where each partition corresponds to one id.
+        See Connectivity and FeatureEdgesRegionIds filters.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>Expects a DataSet with cell scalars as input.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="Scalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property contains the name of the scalar array to use.
+        </Documentation>
+      </StringVectorProperty>
+
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
