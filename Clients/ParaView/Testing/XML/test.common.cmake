@@ -202,6 +202,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/PolarAxesDeprecation.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/porphyrin.cml}"
+  "DATA{${paraview_test_data_directory_input}/Data/ProcessIdScalarsBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/quadraticTetra01.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells.pvtu}"
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_0.vtu}"
@@ -988,6 +989,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
   PolarAxesBackwardsCompatibility.xml
+  ProcessIdScalarsBackwardCompat.xml
   ProxyCategoriesConfiguration.xml
   ProxyCategoriesDialog.xml
   ProxyCategoriesDialogDefault.xml

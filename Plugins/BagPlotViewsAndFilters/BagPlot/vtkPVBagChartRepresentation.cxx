@@ -12,7 +12,6 @@
 #include "vtkCommand.h"
 #include "vtkContextView.h"
 #include "vtkContourFilter.h"
-#include "vtkDataObjectToTable.h"
 #include "vtkDoubleArray.h"
 #include "vtkExtractBlock.h"
 #include "vtkIdList.h"

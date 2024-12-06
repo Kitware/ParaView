@@ -1399,60 +1399,6 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkProcessIdScalars"
-                 label="Process Id Scalars"
-                 name="ProcessIdScalars">
-      <Deprecated deprecated_in="5.12" to_remove_in="5.14">
-        This has been replaced by 'ProcessIds'. Please consider
-        using that instead.
-      </Deprecated>
-      <Documentation long_help="This filter uses colors to show how data is partitioned across processes."
-                     short_help="Generate point scalars from process id.">
-        The Process Id Scalars filter assigns a unique scalar value to
-        each piece of the input according to which processor it
-        resides on. This filter operates on any type of data when
-        ParaView is run in parallel. It is useful for determining
-        whether your data is load-balanced across the processors
-        being used. The output data set type is the same as that of the input.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet"/>
-        </DataTypeDomain>
-        <Documentation>
-          This property specifies the input to the Process Id Scalars filter.
-        </Documentation>
-      </InputProperty>
-      <IntVectorProperty command="SetRandomMode"
-                         default_values="0"
-                         name="RandomMode"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          The value of this property determines whether to use
-          random id values for the various pieces. If set to 1, the unique value
-          per piece will be chosen at random; otherwise the unique value will
-          match the id of the process.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetCellScalarsFlag"
-                         default_values="0"
-                         name="CellScalars"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          The value of this property determines whether to output the array as point data or cell data.
-        </Documentation>
-      </IntVectorProperty>
-      <!-- End ProcessIdScalars -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkPTextureMapToSphere"
                  label="Texture Map to Sphere"
                  name="TextureMapToSphere">

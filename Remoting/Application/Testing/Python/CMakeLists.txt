@@ -37,6 +37,7 @@ set(PY_TESTS
   LookupTable.py,NO_VALID
   MultiServer.py,NO_VALID
   PointGaussianProperties.py
+  ProcessIdScalarsBackwardsCompatibilityTest.py,NO_VALID
   ProgrammableFilterProperties.py,NO_VALID
   ProgrammableFilter.py,NO_VALID
   ProxyManager.py,NO_VALID
