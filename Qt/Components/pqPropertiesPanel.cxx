@@ -459,8 +459,10 @@ void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)
   {
     auto sourceWidgets = this->Internals->SourceWidgets[source];
 
-    this->Internals->Ui.PropertiesButton->setText(
-      tr("Properties") + QString(" (%1)").arg(source->getSMName()));
+    this->Internals->Ui.PropertiesButton->setText(tr("Properties") +
+      QString(" ('%1' / %2)")
+        .arg(source->getSMName())
+        .arg(QCoreApplication::translate("ServerManagerXML", source->getProxy()->GetXMLLabel())));
     sourceWidgets->showWidgets(this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
       this->Internals->Ui.SearchBox->text());
 

@@ -25,5 +25,5 @@
 
   <!-- verify that Clip exists in pipeline and is applied -->
   <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" property="checked" arguments="false" />
-  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButtons/PropertiesButton/label" property="text" arguments="Properties (Clip1)" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButtons/PropertiesButton/label" property="text" arguments="Properties ('Clip1' / Clip)" />
 </pqevents>
