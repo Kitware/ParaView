@@ -216,6 +216,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/Udirectory/simpleScript.py}"
   "DATA{${paraview_test_data_directory_input}/Data/Udirectory/LinkRenderViewsCheckSize.py}"
   "DATA{${paraview_test_data_directory_input}/Data/Udirectory/resetSession.py}"
+  "DATA{${paraview_test_data_directory_input}/Data/rectilinear_grid_of_pixel.vtr}"
   "DATA{${paraview_test_data_directory_input}/Data/sineWaves.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation/,REGEX:.*}"
@@ -959,6 +960,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ArraySelectionWidget.xml
   ComputeArrayMagnitudeSetting.xml
   CSVPreview.xml
+  CellQualityForPixel.xml
   CustomOutputFormat.xml
   DefaultReadersSetting.xml
   DelimitedTextReader.xml

@@ -1,6 +1,107 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkCellQuality"
+                 label="Cell Quality"
+                 name="CellQuality">
+      <Documentation long_help="This filter creates a new cell array containing a geometric measure of each cell
+                     of a mesh. Different quality measures can be chosen for different cell shapes."
+                     short_help="Evaluate geometric cell quality.">
+        This filter creates a new cell array containing a geometric measure of each cell's shape.
+        It supports more shapes than Mesh Quality such as pixels and triangle stripes. It has
+        few differences with MeshQuality: it computes the same metric for all type of cell
+        and provides an API to specify unsupported value for unsupported metric or cell type.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the Cell Quality filter.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetQualityMeasure"
+                         default_values="0"
+                         name="QualityMeasure"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Area"
+                 value="28" />
+          <Entry text="Aspect Ratio"
+                 value="1" />
+          <Entry text="Condition"
+                 value="9" />
+          <Entry text="Distortion"
+                 value="15" />
+          <Entry text="Edge Ratio"
+                 value="0" />
+          <Entry text="Equiangle Skew"
+                 value="29" />
+          <Entry text="Jacobian"
+                 value="25" />
+          <Entry text="Maximum Aspect Frobenius"
+                 value="5" />
+          <Entry text="Maximum Aspect Frobenius"
+                 value="5" />
+          <Entry text="Maximum Edge Ratio"
+                 value="16" />
+          <Entry text="Mean Aspect Frobenius"
+                 value="4" />
+          <Entry text="Minimum Angle"
+                 value="6" />
+          <Entry text="Oddy"
+                 value="23" />
+          <Entry text="Radius Ratio"
+                 value="2" />
+          <Entry text="Relative Size Squared"
+                 value="12" />
+          <Entry text="Scaled Jacobian"
+                 value="10" />
+          <Entry text="Shape"
+                 value="13" />
+          <Entry text="Shape and Size"
+                 value="14" />
+          <Entry text="Shear"
+                 value="11" />
+          <Entry text="Shear and Size"
+                 value="24" />
+          <Entry text="Skew"
+                 value="17" />
+          <Entry text="Stretch"
+                 value="20" />
+          <Entry text="Taper"
+                 value="18" />
+          <Entry text="Warpage"
+                 value="26" />
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates which quality measure will be used to evaluate cell quality.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetUndefinedQuality"
+                         default_values="-1"
+                         name="UndefinedQuality"
+                         number_of_elements="1">
+        <Documentation>
+          This property indicates the value used for undefined quality for a cell type.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetUnsupportedGeometry"
+                         default_values="-2"
+                         name="UnsupportedGeometry"
+                         number_of_elements="1">
+        <Documentation>
+          This property indicates the value used for unsupported cell.
+        </Documentation>
+      </DoubleVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkMeshQuality"
                  label="Mesh Quality"
                  name="MeshQuality">

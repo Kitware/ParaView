@@ -189,6 +189,7 @@
 
   <Category name="Mesh" menu_label="Mesh">
     <Category name="MeshAnalysis" menu_label="Analysis">
+      <Proxy group="filters" name="CellQuality" />
       <Proxy group="filters" name="CellSize" />
       <Proxy group="filters" name="ConnectedSurfaceProperties" />
       <Proxy group="filters" name="Coordinates" />
