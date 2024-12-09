@@ -1939,6 +1939,12 @@
           Show/hide the frustum widget.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetConstrainToWidgetBounds"
+                         default_values="0"
+                         name="ConstrainToWidgetBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <DoubleVectorProperty argument_is_array="1"
                             command="SetWidgetBounds"
                             default_values="none"
@@ -1983,7 +1989,7 @@
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetHorizontalAngle"
-                            default_values="45"
+                            default_values="30"
                             information_property="HorizontalAngleInfo"
                             name="HorizontalAngle"
                             number_of_elements="1">
@@ -2001,7 +2007,7 @@
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetVerticalAngle"
-                            default_values="45"
+                            default_values="30"
                             information_property="VerticalAngleInfo"
                             name="VerticalAngle"
                             number_of_elements="1">
