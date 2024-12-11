@@ -52,7 +52,30 @@ set(python_files
   paraview/python_view.py
   paraview/selection.py
   paraview/servermanager.py
-  paraview/simple.py
+  paraview/simple/__init__.py
+  paraview/simple/animation.py
+  paraview/simple/camera.py
+  paraview/simple/catalyst.py
+  paraview/simple/color.py
+  paraview/simple/compatibility.py
+  paraview/simple/deprecated.py
+  paraview/simple/example/__init__.py
+  paraview/simple/example/demo1.py
+  paraview/simple/example/demo2.py
+  paraview/simple/io.py
+  paraview/simple/layout.py
+  paraview/simple/light.py
+  paraview/simple/link.py
+  paraview/simple/plugin.py
+  paraview/simple/proxy.py
+  paraview/simple/rendering.py
+  paraview/simple/selection.py
+  paraview/simple/session.py
+  paraview/simple/setting.py
+  paraview/simple/texture.py
+  paraview/simple/version.py
+  paraview/simple/view.py
+  paraview/simple/widget.py
   paraview/smstate.py
   paraview/smtesting.py
   paraview/smtrace.py
@@ -67,6 +90,7 @@ set(python_files
   paraview/tpl/__init__.py
   paraview/util/__init__.py
   paraview/util/vtkAlgorithm.py
+  paraview/util/proxy.py
   paraview/variant.py
   paraview/vtkConstants.py
   paraview/vtk.py)
