@@ -66,6 +66,9 @@ void pqEditColorMapReaction::setRepresentation(
 void pqEditColorMapReaction::updateEnableState()
 {
   this->parentAction()->setEnabled(this->Representation != nullptr);
+  auto colorMapEditorDock =
+    qobject_cast<QDockWidget*>(pqApplicationCore::instance()->manager("COLOR_EDITOR_PANEL"));
+  this->parentAction()->setChecked(colorMapEditorDock && colorMapEditorDock->isVisible());
 }
 
 //-----------------------------------------------------------------------------
@@ -122,6 +125,8 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
         END_UNDO_SET();
       }
     }
+    // Update the checked state of the toolbar action
+    this->parentAction()->setChecked(false);
   }
   else
   {
@@ -133,9 +138,10 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
       auto colorMapEditor = qobject_cast<pqColorMapEditor*>(colorMapEditorDock->widget());
       colorMapEditor->setSelectedPropertiesType(
         this->ColorMapEditorHelper->GetSelectedPropertiesType());
-      colorMapEditorDock->setVisible(true);
-      // colorMapEditorDock->setFloating(true);
+      colorMapEditorDock->setVisible(this->parentAction()->isChecked());
       colorMapEditorDock->raise();
+      QObject::connect(colorMapEditorDock, &QDockWidget::visibilityChanged, this->parentAction(),
+        &QAction::setChecked, Qt::UniqueConnection);
     }
     else
     {
