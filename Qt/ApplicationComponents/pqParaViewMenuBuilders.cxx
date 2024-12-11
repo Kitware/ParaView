@@ -145,7 +145,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   ui.actionFileLoadMaterials->setEnabled(false);
 #endif
   new pqRecentFilesMenu(*ui.menuRecentFiles, ui.menuRecentFiles);
-  new pqReloadFilesReaction(ui.actionReloadFiles);
+  new pqReloadFilesReaction(ui.actionReloadFiles, pqReloadFilesReaction::ReloadModes::AllSources);
 
   new pqLoadStateReaction(ui.actionFileLoadServerState);
   new pqSaveStateReaction(ui.actionFileSaveServerState);
@@ -628,7 +628,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   new pqCopyReaction(actionPBCopyPipeline, false, true);
   new pqCopyReaction(actionPBPastePipeline, true, true);
   new pqChangePipelineInputReaction(actionPBChangeInput);
-  new pqReloadFilesReaction(actionPBReloadFiles);
+  new pqReloadFilesReaction(actionPBReloadFiles, pqReloadFilesReaction::ReloadModes::ActiveSource);
   new pqIgnoreSourceTimeReaction(actionPBIgnoreTime);
   new pqDeleteReaction(actionPBDelete);
   new pqDeleteReaction(actionPBDeleteTree, pqDeleteReaction::DeleteModes::TREE);
