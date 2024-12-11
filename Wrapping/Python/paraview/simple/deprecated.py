@@ -1,5 +1,26 @@
-# TODO: Change this to take the array name and number of components. Register
-# the lt under the name ncomp.array_name
+from paraview.util import proxy as proxy_util
+
+# ==============================================================================================
+# Helpers
+# ==============================================================================================
+
+
+class DeprecationWarning(Warning):
+    """Non-supressed Deprecation Warning."""
+
+
+class DeprecationError(RuntimeError):
+    """Used for deprecated methods and functions."""
+
+    def __init__(self, message="This feature has been deprecated") -> None:
+        RuntimeError.__init__(self, message)
+
+
+# ==============================================================================================
+# Warning
+# ==============================================================================================
+
+
 def MakeBlueToRedLT(min, max):
     """
     Create a LookupTable that go from blue to red using the scalar range
@@ -12,7 +33,307 @@ def MakeBlueToRedLT(min, max):
     :return: the blue-to-red lookup table
     :rtype: Lookup table proxy.
     """
+    from paraview.simple.color import CreateLookupTable
+
     # Define RGB points. These are tuples of 4 values. First one is
     # the scalar values, the other 3 the RGB values.
+    DeprecationWarning("ParaView will remove this helper method in version 6.1")
+
     rgbPoints = [min, 0, 0, 1, max, 1, 0, 0]
+
     return CreateLookupTable(RGBPoints=rgbPoints, ColorSpace="HSV")
+
+
+# -----------------------------------------------------------------------------
+
+
+def SetProperties(proxy=None, **params):
+    """
+    Sets one or more properties of the given pipeline source. If an argument
+    is not provided, the active source is used. Pass in arguments of the form
+    `property_name=value` to this function to set property values. For example::
+
+        SetProperties(Center=[1, 2, 3], Radius=3.5)
+
+    :param proxy: The pipeline source whose properties should be set. Optional,
+        defaultst to the active source.
+    :type proxy: Source proxy
+    :param params: A variadic list of `key=value` pairs giving values of
+        specific named properties in the pipeline source. For a list of available
+        properties, call `help(proxy)`.
+    """
+
+    from paraview.simple.session import GetActiveSource
+
+    DeprecationWarning(
+        "ParaView will remove this helper method in version 6.1."
+        "You should call proxy.Set(Radius=5, Center=[0,0,0]) instead."
+    )
+
+    if not proxy:
+        proxy = GetActiveSource()
+
+    proxy_util.set(proxy, params)
+
+
+# -----------------------------------------------------------------------------
+
+
+def GetProperty(*arguments, **keywords):
+    """Get one property of the given pipeline object. If keywords are used,
+    you can set the proxy and the name of the property that you want to get
+    as shown in the following example::
+
+        GetProperty({proxy=sphere, name="Radius"})
+
+    If arguments are used, then you have two cases:
+
+    - if only one argument is used that argument will be
+      the property name.
+
+    - if two arguments are used then the first one will be
+      the proxy and the second one the property name.
+
+    Several example are given below::
+
+        GetProperty({name="Radius"})
+        GetProperty({proxy=sphereProxy, name="Radius"})
+        GetProperty( sphereProxy, "Radius" )
+        GetProperty( "Radius" )
+    """
+    from paraview.simple.session import GetActiveSource
+
+    DeprecationWarning(
+        "ParaView will remove this helper method in version 6.1."
+        "You should use Property as attribute like `radius = proxy.Radius` instead."
+    )
+
+    name = None
+    proxy = None
+    for key in keywords:
+        if key == "name":
+            name = keywords[key]
+        if key == "proxy":
+            proxy = keywords[key]
+    if len(arguments) == 1:
+        name = arguments[0]
+    if len(arguments) == 2:
+        proxy = arguments[0]
+        name = arguments[1]
+    if not name:
+        raise RuntimeError(
+            "Expecting at least a property name as input. Otherwise keyword could be used to set 'proxy' and property 'name'"
+        )
+    if not proxy:
+        proxy = GetActiveSource()
+    return proxy.GetProperty(name)
+
+
+# -----------------------------------------------------------------------------
+
+
+def GetRepresentationProperty(*arguments, **keywords):
+    """
+    Same as :func:`GetProperty()`, except that if no `proxy` parameter is passed,
+    it will use the active representation, rather than the active source.
+    """
+    from paraview.simple.rendering import GetRepresentation
+
+    DeprecationWarning(
+        "ParaView will remove this helper method in version 6.1."
+        "You should use Property as attribute like `visibility = simple.GetRepresentation().Visibility` instead."
+    )
+
+    proxy = None
+    name = None
+    for key in keywords:
+        if key == "name":
+            name = keywords[key]
+        if key == "proxy":
+            proxy = keywords[key]
+    if len(arguments) == 1:
+        name = arguments[0]
+    if len(arguments) == 2:
+        proxy = arguments[0]
+        name = arguments[1]
+    if not proxy:
+        proxy = GetRepresentation()
+    return GetProperty(proxy, name)
+
+
+# -----------------------------------------------------------------------------
+
+
+def GetDisplayProperty(*arguments, **keywords):
+    """DEPRECATED: Should use `GetRepresentationProperty()`"""
+    return GetRepresentationProperty(*arguments, **keywords)
+
+
+# -----------------------------------------------------------------------------
+
+
+def GetViewProperties(view=None):
+    """
+    Same as :func:`GetActiveView()`. this API is provided just for consistency with
+    :func:`GetDisplayProperties()`.
+    """
+    from paraview.simple.session import GetActiveView
+
+    DeprecationWarning(
+        "ParaView will remove this helper method in version 6.1."
+        "You should use simple.GetActiveView() instead"
+    )
+
+    return GetActiveView()
+
+
+# -----------------------------------------------------------------------------
+
+
+def GetViewProperty(*arguments, **keywords):
+    """Same as :func:`GetProperty()`, except that if no 'proxy' parameter is passed,
+    it will use the active view properties, rather than the active source."""
+
+    DeprecationWarning(
+        "ParaView will remove this helper method in version 6.1."
+        "You should use Property as attribute like `orientation = simple.GetActiveView().OrientationAxesVisibility` instead."
+    )
+
+    proxy = None
+    name = None
+    for key in keywords:
+        if key == "name":
+            name = keywords[key]
+        if key == "proxy":
+            proxy = keywords[key]
+    if len(arguments) == 1:
+        name = arguments[0]
+    if len(arguments) == 2:
+        proxy = arguments[0]
+        name = arguments[1]
+    if not proxy:
+        proxy = GetViewProperties()
+    return GetProperty(proxy, name)
+
+
+# -----------------------------------------------------------------------------
+
+
+def GetSources():
+    """Get all available pipeline sources.
+
+    :return: dictionary of pipeline sources. Keys are tuples consisting of the registration
+             name and integer ID of the proxy, and values are the pipeline sources themselves.
+    :rtype: dictionary
+
+    """
+    from paraview.simple.proxy import ListSources
+
+    DeprecationWarning(
+        "ParaView will remove this function in version 6.1."
+        "You should use `simple.ListSources()` instead."
+    )
+
+    return ListSources()
+
+
+# -----------------------------------------------------------------------------
+
+
+def GetRepresentations():
+    """Returns all available representation proxies (display properties) in all views.
+
+    :return: dictionary of representations. Keys are tuples consisting of the
+             registration name and integer ID of the representation proxy, and values
+             are the representation proxies themselves.
+    :rtype: dict
+
+    """
+    from paraview.simple.proxy import ListRepresentations
+
+    DeprecationWarning(
+        "ParaView will remove this function in version 6.1."
+        "You should use `simple.ListRepresentations()` instead."
+    )
+
+    return ListRepresentations()
+
+
+# -----------------------------------------------------------------------------
+
+
+def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
+    """Assign a lookup table to an array by lookup table name.
+
+    Example usage::
+
+        track = GetAnimationTrack("Center", 0, sphere) or
+        arrayInfo = source.PointData["Temperature"]
+        AssignLookupTable(arrayInfo, "Cool to Warm")
+
+    :param arrayInfo: The information object for the array. The array name and its
+        range is determined using the info object provided.
+    :type arrayInfo: `paraview.modules.vtkRemotingCore.vtkPVArrayInformation`
+    :param lutName: The name for the transfer function preset.
+    :type lutName: str
+    :param rangeOveride: The range to use instead of the range of the
+        array determined using the `arrayInfo` parameter. Defaults to `[]`,
+        meaning the array info range will be used.
+    :type rangeOveride: 2-element tuple or list of floats
+    :return: `True` on success, `False` otherwise.
+    :rtype: bool"""
+    from paraview.simple.color import AssignFieldToColorPreset
+
+    DeprecationWarning(
+        "ParaView will remove this function in version 6.1."
+        "You should use `simple.AssignFieldToColorPreset('Temperature', 'Cool To Warm', [-5, 10])` instead."
+    )
+
+    return AssignFieldToColorPreset(arrayInfo.Name, lutName, rangeOveride)
+
+
+# -----------------------------------------------------------------------------
+
+
+def GetLookupTableNames():
+    """Returns a list containing the currently available transfer function
+    preset names.
+
+    :return: List of currently availabe transfer function preset names.
+    :rtype: List of str"""
+    from paraview.simple.color import ListColorPresetNames
+
+    DeprecationWarning(
+        "ParaView will remove this function in version 6.1."
+        "You should use `simple.ListColorPresetNames()` instead."
+    )
+
+    return ListColorPresetNames()
+
+
+# -----------------------------------------------------------------------------
+
+
+def LoadLookupTable(fileName):
+    """Load transfer function preset from a file. Both JSON (new) and XML (legacy)
+    preset formats are supported.
+
+    :param fileName: If the filename ends with a .xml, it's assumed to be a legacy color
+        map XML and will be converted to the new format before processing.
+    :type fileName: str
+    :return: `True` if successful, `False` otherwise.
+    :rtype: bool
+    """
+    from paraview.simple.color import ImportPresets
+
+    DeprecationWarning(
+        "ParaView will remove this function in version 6.1."
+        "You should use `simple.ImportColorPreset()` instead."
+    )
+
+    return ImportPresets(fileName)
+
+
+# ==============================================================================================
+# Error
+# ==============================================================================================
