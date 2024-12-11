@@ -158,6 +158,7 @@ public:
 
   void SetFramesPerTimestep(int val);
   void SetStride(int val);
+  bool GetInPlay();
   ///@}
 
   enum

@@ -305,6 +305,15 @@
         <Documentation>Set the frame stride when playing the animation
         and going to the next/previous step.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="GetInPlay"
+                         name="InPlay"
+                         information_only="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Get the current state of the animation scene. 1 if the animation is
+          playing, 0 otherwise.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End of AnimationScene -->
     </AnimationSceneProxy>
     <!-- End of animation -->
