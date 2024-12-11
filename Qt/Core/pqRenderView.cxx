@@ -12,14 +12,17 @@
 #include "vtkPVRenderViewSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkSMCameraLink.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
+#include "vtkSMLink.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUndoStack.h"
@@ -41,6 +44,7 @@
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqLinkViewWidget.h"
+#include "pqLinksModel.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqQVTKWidget.h"
@@ -379,6 +383,25 @@ void pqRenderView::linkToOtherView()
   QPoint pos = this->widget()->mapToGlobal(QPoint(2, 2));
   linkWidget->move(pos);
   linkWidget->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::removeViewLinks()
+{
+  pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
+  vtkNew<vtkCollection> cameraLinks;
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
+  model->FindLinksFromProxy(this->getViewProxy(), vtkSMLink::NONE, cameraLinks.Get());
+
+  for (int idx = 0; idx < cameraLinks->GetNumberOfItems(); idx++)
+  {
+    vtkSMCameraLink* cameraLink = vtkSMCameraLink::SafeDownCast(cameraLinks->GetItemAsObject(idx));
+    if (cameraLink != nullptr)
+    {
+      const char* linkName = pxm->GetRegisteredLinkName(cameraLink);
+      model->removeLink(linkName);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
