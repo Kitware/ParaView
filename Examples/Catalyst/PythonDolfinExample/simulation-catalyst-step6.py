@@ -72,7 +72,7 @@ def Mesh2VTKUGrid(mesh):
     geom=mesh.geometry()
     pts=vtk.vtkPoints()
     pts.SetNumberOfPoints(npoints)
-    for i in xrange(npoints):
+    for i in range(npoints):
         p=geom.point(i)
         pts.SetPoint(i,p.x(),p.y(),p.z())
     dim = mesh.topology().dim()
@@ -83,7 +83,7 @@ def Mesh2VTKUGrid(mesh):
     cellLocations=vtk.vtkIdTypeArray()
     cellLocations.SetNumberOfTuples(ncells)
     loc=0
-    for (cell,i) in zip(mesh.cells(),xrange(ncells)) :
+    for (cell,i) in zip(mesh.cells(),range(ncells)) :
         ncellpoints=len(cell)
         cells.InsertNextCell(ncellpoints)
         for cpoint in cell:

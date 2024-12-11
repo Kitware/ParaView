@@ -246,7 +246,7 @@ class _State(object):
         # Add RGB points to lookup table.  These are tuples of 4 values.  First
         # one is the scalar values, the other 3 the RGB values.
         rgbpoints = []
-        for i in xrange(self.numBlocks):
+        for i in range(self.numBlocks):
             rgbpoints.append(i + self._block_id_offset)
             rgbpoints.extend(STANDARD_COLORS[i % self.numBlockColors])
         lt.RGBPoints = rgbpoints
@@ -284,7 +284,7 @@ class _State(object):
         # Add RGB points to lookup table.  These are tuples of 4 values.  First
         # one is the scalar values, the other 3 the RGB values.
         rgbpoints = []
-        for i in xrange(self.numSpectrumColors+1):
+        for i in range(self.numSpectrumColors+1):
             # Add two colors for a constant range.
             color = paraview.vtk.vtkMath.HSVToRGB(2.0/3.0 - i*hueStep, 1, 1)
             rgbpoints.append(range[0]+i*rangeStep)
@@ -754,7 +754,7 @@ def vector(variable=None):
                       bounds[5]-bounds[4])
     scalefactor = scalefactor/20
     divisor = 0
-    for i in xrange(info.GetNumberOfComponents()):
+    for i in range(info.GetNumberOfComponents()):
         range = info.GetRange(i)
         divisor = max(divisor, abs(range[0]), abs(range[1]))
     if divisor > 1:
@@ -791,7 +791,7 @@ def _tplot_plot(io_helper=None):
 
     interactive = state.interactive
     nCurves = state.tplot.get_number_of_curves()
-    for i in xrange(nCurves):
+    for i in range(nCurves):
         state.tplot.plot(i)
 
         if state.diskwrite:
@@ -924,7 +924,7 @@ def _detour_plot(io_helper=None):
     plotTimes = state.time_selection.selected_times
     nSteps = len(plotTimes)
     view = state.renderview
-    for stepIdx in xrange(nSteps):
+    for stepIdx in range(nSteps):
         t = plotTimes[stepIdx]
         view.ViewTime = t
         paraview.simple.Render(view)

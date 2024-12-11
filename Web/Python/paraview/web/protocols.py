@@ -55,9 +55,6 @@ from wslink import schedule_callback
 # import RPC annotation
 from wslink import register as exportRpc
 
-if sys.version_info >= (3,):
-    xrange = range
-
 # =============================================================================
 # Helper methods
 # =============================================================================
@@ -1163,7 +1160,7 @@ class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
         animationScene.GoToFirst()
 
         # Iterate over all the timesteps, building up a list of unique shas
-        for i in xrange(len(tsVals)):
+        for i in range(len(tsVals)):
             simple.Render()
 
             mdString = self.getApplication().GetWebGLSceneMetaData(view.SMProxy)
@@ -1185,7 +1182,7 @@ class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
                         partData = []
 
                         # Ask for the binary data for each part of this object
-                        for part in xrange(numParts):
+                        for part in range(numParts):
                             partNumber = part
                             data = self.getApplication().GetWebGLBinaryData(
                                 view.SMProxy, str(objId), partNumber
@@ -1705,7 +1702,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
                 nextValue = categoricalInfo["scalars"][-1] + 1
 
-                for i in xrange((numColors - numScalars) - 1):
+                for i in range((numColors - numScalars) - 1):
                     categoricalInfo["scalars"].append(nextValue)
                     categoricalInfo["annotations"].append("")
                     nextValue += 1
@@ -1717,7 +1714,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
                 newScalars = categoricalInfo["scalars"][0:numColors]
                 newAnnotations = categoricalInfo["annotations"][0:numColors]
 
-                for i in xrange(numColors, numScalars):
+                for i in range(numColors, numScalars):
                     if categoricalInfo["annotations"][i] != "":
                         newScalars.append(categoricalInfo["scalars"][i])
                         newAnnotations.append(categoricalInfo["annotations"][i])
@@ -1733,7 +1730,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             idxColorsProperty = []
             annotationsProperty = []
 
-            for aIdx in xrange(len(categoricalInfo["scalars"])):
+            for aIdx in range(len(categoricalInfo["scalars"])):
                 annotationsProperty.append(str(categoricalInfo["scalars"][aIdx]))
                 annotationsProperty.append(str(categoricalInfo["annotations"][aIdx]))
                 idxColorsProperty.extend(categoricalInfo["colors"][aIdx])
@@ -1761,7 +1758,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         continuousColors = continuousInfo["colors"]
 
         rgbPoints = []
-        for idx in xrange(len(continuousScalars)):
+        for idx in range(len(continuousScalars)):
             scalar = continuousScalars[idx]
             rgb = continuousColors[idx]
             rgbPoints.append(float(scalar))
@@ -1775,7 +1772,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         annotationsProperty = []
         idxColorsProperty = []
-        for aIdx in xrange(len(annotations)):
+        for aIdx in range(len(annotations)):
             annotationsProperty.append(str(categoricalScalars[aIdx]))
             annotationsProperty.append(str(annotations[aIdx]))
             idxColorsProperty.extend(categoricalColors[aIdx])
@@ -2667,7 +2664,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                     if len(prop.Available) and prop.GetNumberOfProxies() == 1:
                         listdomain = prop.FindDomain("vtkSMProxyListDomain")
                         if listdomain:
-                            for i in xrange(listdomain.GetNumberOfProxies()):
+                            for i in range(listdomain.GetNumberOfProxies()):
                                 internal_proxy = listdomain.GetProxy(i)
                                 self.applyDomains(
                                     parentProxy, internal_proxy.GetGlobalIDAsString()
@@ -2735,7 +2732,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # Get information about point data arrays
         pdInfo = proxy.GetPointDataInformation()
         numberOfPointArrays = pdInfo.GetNumberOfArrays()
-        for idx in xrange(numberOfPointArrays):
+        for idx in range(numberOfPointArrays):
             array = pdInfo.GetArray(idx)
             numComps = array.GetNumberOfComponents()
             typeStr = ParaViewWebProxyManager.VTK_DATA_TYPES[array.GetDataType()]
@@ -2769,7 +2766,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # Get information about cell data arrays
         cdInfo = proxy.GetCellDataInformation()
         numberOfCellArrays = cdInfo.GetNumberOfArrays()
-        for idx in xrange(numberOfCellArrays):
+        for idx in range(numberOfCellArrays):
             array = cdInfo.GetArray(idx)
             numComps = array.GetNumberOfComponents()
             typeStr = ParaViewWebProxyManager.VTK_DATA_TYPES[array.GetDataType()]
@@ -2803,7 +2800,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # Get field data information
         fdInfo = dataInfo.DataInformation.GetFieldDataInformation()
         numFieldDataArrays = fdInfo.GetNumberOfArrays()
-        for idx in xrange(numFieldDataArrays):
+        for idx in range(numFieldDataArrays):
             array = fdInfo.GetArrayInformation(idx)
             numComps = array.GetNumberOfComponents()
             typeStr = ParaViewWebProxyManager.VTK_DATA_TYPES[array.GetDataType()]

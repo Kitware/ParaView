@@ -47,6 +47,7 @@ from paraview.simple.session import (
     SetActiveSource,
     SetActiveView,
     _add_functions,
+    _DisableFirstRenderCameraReset,
 )
 from paraview.simple.proxy import (
     RenameProxy,
@@ -60,6 +61,7 @@ from paraview.simple.proxy import (
     ListSources,
     Delete,
     ResetProperty,
+    UpdatePipeline,
 )
 from paraview.simple.plugin import (
     LoadXML,
@@ -256,6 +258,7 @@ __all__ = [
     "ResetSession",
     "ReverseConnect",
     "SetActiveConnection",
+    "_DisableFirstRenderCameraReset",
     # -- active
     "GetActiveView",
     "GetActiveSource",
@@ -274,6 +277,7 @@ __all__ = [
     "ListSources",
     "Delete",
     "ResetProperty",
+    "UpdatePipeline",
     # -- plugin
     "LoadXML",
     "LoadPlugins",

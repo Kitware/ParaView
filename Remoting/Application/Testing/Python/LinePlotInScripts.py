@@ -3,10 +3,6 @@
 # -- an attempt to simulate use of such plots in Catalyst, when this script is
 # run with pvbatch --sym.
 
-import sys
-if sys.version_info >= (3,):
-    xrange = range
-
 from paraview.simple import *
 from paraview import smtesting
 smtesting.ProcessCommandLineArguments()
@@ -23,7 +19,7 @@ d = Show()
 d.SeriesVisibility = ['RTData']
 Render()
 
-for i in xrange(5):
+for i in range(5):
     w.Maximum = 2**i
     SaveScreenshot(smtesting.TempDir + "/LinePlotInScripts_%d.png" % i, magnification=2)
 print("Done")

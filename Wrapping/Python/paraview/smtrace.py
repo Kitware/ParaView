@@ -67,12 +67,8 @@ from __future__ import absolute_import, division, print_function
 import weakref
 import paraview.servermanager as sm
 import paraview.simple as simple
-import sys
 from paraview.vtk import vtkTimeStamp
 from paraview.modules.vtkRemotingCore import vtkPVSession
-
-if sys.version_info >= (3,):
-    xrange = range
 
 
 def _get_skip_rendering():
@@ -679,7 +675,7 @@ class PropertyTraceHelper(object):
             # This is cheating. Since there's no accessor for a proxy in the domain
             # unless the proxy is "active" in the property. However, since ParaView
             # UI never modifies the other properties, we cheat
-            for i in xrange(pld_domain.GetNumberOfProxies()):
+            for i in range(pld_domain.GetNumberOfProxies()):
                 domain_proxy = pld_domain.GetProxy(i)
                 plda = ProxyAccessor(self.get_varname(), sm._getPyProxy(domain_proxy))
                 self.ProxyListDomainProxyAccessors.append(plda)

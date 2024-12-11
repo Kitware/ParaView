@@ -1,12 +1,7 @@
-
-import os, sys
 from paraview import simple
 from paraview.modules.vtkRemotingViews import *
 from vtk import *
 from paraview import smtesting
-
-if sys.version_info > (3,):
-    xrange = range
 
 NUM_POINTS = 5
 
@@ -14,13 +9,13 @@ NUM_POINTS = 5
 points = vtkPoints()
 points.SetNumberOfPoints(NUM_POINTS)
 
-for i in xrange(NUM_POINTS):
+for i in range(NUM_POINTS):
     points.SetPoint(i, i, 0.0, 0.0)
 
 verts = vtkCellArray()
 verts.InsertNextCell(NUM_POINTS)
 
-for i in xrange(NUM_POINTS):
+for i in range(NUM_POINTS):
     verts.InsertCellPoint(i)
 
 polyData = vtkPolyData()
@@ -38,7 +33,7 @@ ordinalArray.SetName(ordinalArrayName);
 ordinalArray.SetNumberOfComponents(1);
 ordinalArray.SetNumberOfTuples(NUM_POINTS);
 
-for i in xrange(NUM_POINTS):
+for i in range(NUM_POINTS):
     ordinalArray.SetTuple1(i, i)
 
 pointData.AddArray(ordinalArray)
