@@ -498,6 +498,7 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
         "provides the configuration for screens in a CAVE.")
       ->take_first();
 
+#if CLI11_VERSION_MAJOR < 2 || (CLI11_VERSION_MAJOR == 2 && CLI11_VERSION_MINOR < 4)
     auto pvx = caveGroup
                  ->add_option(
                    "'.pvx' file",
@@ -508,6 +509,7 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
                  ->excludes("--pvx")
                  ->take_first();
     CLI::deprecate_option(pvx, "--pvx");
+#endif
   }
 
   return true;
