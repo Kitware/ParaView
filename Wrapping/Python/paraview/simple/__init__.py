@@ -248,6 +248,7 @@ from paraview.simple.deprecated import (
 __all__ = [
     # -- servermanager
     "paraview", # needed to do `from paraview.simple import *;paraview.simple._DisableFirstRenderCameraReset()`
+    "servermanager", # needed for legacy import usage
     "OutputPort",
     # -- version
     "GetOpenGLInformation",
