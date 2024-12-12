@@ -1300,6 +1300,7 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("HyperTreeGridFeatureEdges", "FeatureEdges")]
         proxies[proxiesNS.filters] += [("HyperTreeGridGhostCellsGenerator", "GhostCells")]
         proxies[proxiesNS.filters] += [("HyperTreeGridAxisReflection", "AxisAlignedReflectionFilter")]
+        proxies[proxiesNS.filters] += [("ProcessIdScalars", "ProcessIds")]
         proxies[proxiesNS.filters] += [("Reflect", "AxisAlignedReflectionFilter")]
 
     return proxies

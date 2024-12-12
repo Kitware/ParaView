@@ -115,7 +115,6 @@
   <Proxy group="filters" name="PointDataToCellData" />
   <Proxy group="filters" name="ProbeLine" />
   <Proxy group="filters" name="ProbePoint" />
-  <Proxy group="filters" name="ProcessIdScalars" />
   <Proxy group="filters" name="ProgrammableFilter" />
   <Proxy group="filters" name="PVConnectivityFilter" />
   <Proxy group="filters" name="PythonCalculator" />
