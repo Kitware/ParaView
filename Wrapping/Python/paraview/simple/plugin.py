@@ -1,5 +1,5 @@
 from paraview import servermanager
-from paraview.simple.session import _add_functions
+
 
 # ==============================================================================
 # Plugin Management
@@ -22,10 +22,12 @@ def LoadXML(xmlstring, ns=None):
     :type ns: dict
 
     """
+    from paraview.simple import _extend_simple
+
     if not ns:
         ns = globals()
     servermanager.LoadXML(xmlstring)
-    _add_functions(ns)
+    _extend_simple(ns)
 
 
 # -----------------------------------------------------------------------------
@@ -82,6 +84,7 @@ def LoadPlugins(*args, **kwargs):
 
     Note, `remote=True` has no effect when the connection is not remote.
     """
+    from paraview.simple import _extend_simple
 
     remote = True
     if "remote" in kwargs:
@@ -100,7 +103,8 @@ def LoadPlugins(*args, **kwargs):
         False
     )
     servermanager.vtkSMProxyManager.GetProxyManager().UpdateProxyDefinitions()
-    _add_functions(ns)
+
+    _extend_simple(ns)
 
 
 # -----------------------------------------------------------------------------
@@ -155,7 +159,10 @@ def LoadCustomFilters(filename, ns=None):
         defaults to `None`.
     :type ns: dict
     """
+    from paraview.simple import _extend_simple
+
     servermanager.ProxyManager().SMProxyManager.LoadCustomProxyDefinitions(filename)
     if not ns:
         ns = globals()
-    _add_functions(ns)
+
+    _extend_simple(ns)

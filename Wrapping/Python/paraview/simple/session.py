@@ -578,13 +578,15 @@ def Connect(
         the default 60s
 
     """
+    from paraview.simple import _extend_simple
+
     if ns is None:
         ns = globals()
     Disconnect(ns, False)
     connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port, timeout)
     if not (connection is None):
         _initializeSession(connection)
-        _add_functions(ns)
+        _extend_simple(ns)
     return connection
 
 
@@ -600,12 +602,14 @@ def ReverseConnect(port=11111, ns=None):
     :return: Connection object
     :rtype:
     """
+    from paraview.simple import _extend_simple
+
     if ns is None:
         ns = globals()
     Disconnect(ns, False)
     connection = servermanager.ReverseConnect(port)
     _initializeSession(connection)
-    _add_functions(ns)
+    _extend_simple(ns)
     return connection
 
 
@@ -637,12 +641,14 @@ def SetActiveConnection(connection=None, ns=None):
     :raises RuntimeError: If called when ParaView is not running in multi-server
         mode, a `RuntimeError` will be raised.
     """
+    from paraview.simple import _extend_simple
+
     if not ns:
         ns = globals()
     if servermanager.ActiveConnection != connection:
         _remove_functions(ns)
         servermanager.SetActiveConnection(connection)
-        _add_functions(ns)
+        _extend_simple(ns)
 
 
 # -----------------------------------------------------------------------------

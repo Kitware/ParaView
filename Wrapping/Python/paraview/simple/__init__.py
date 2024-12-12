@@ -246,9 +246,10 @@ from paraview.simple.deprecated import (
 )
 
 __all__ = [
+    "_extend_simple",
     # -- servermanager
-    "paraview", # needed to do `from paraview.simple import *;paraview.simple._DisableFirstRenderCameraReset()`
-    "servermanager", # needed for legacy import usage
+    "paraview",  # needed to do `from paraview.simple import *;paraview.simple._DisableFirstRenderCameraReset()`
+    "servermanager",  # needed for legacy import usage
     "OutputPort",
     # -- version
     "GetOpenGLInformation",
@@ -445,6 +446,23 @@ __all__ = [
     "LoadLookupTable",
 ]
 
+# ==============================================================================
+# Namespace extension handling
+# ==============================================================================
+
+
+def _extend_simple(*namespaces):
+    local_ns = globals()
+    for name in _add_functions(local_ns):
+        if name not in __all__:
+            __all__.append(name)
+
+    for ns in namespaces:
+        if ns is not local_ns:
+            for name in _add_functions(ns):
+                if name not in __all__:
+                    __all__.append(name)
+
 
 # ==============================================================================
 # Start the session and initialize the ServerManager
@@ -453,7 +471,3 @@ __all__ = [
 if not paraview.options.satelite:
     if not servermanager.ActiveConnection:
         Connect()
-
-
-# Update __all__ and globals() with proxy classes
-__all__.extend(_add_functions(globals()))
