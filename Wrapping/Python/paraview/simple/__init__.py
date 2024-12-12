@@ -471,3 +471,6 @@ def _extend_simple(*namespaces):
 if not paraview.options.satelite:
     if not servermanager.ActiveConnection:
         Connect()
+    else:
+        # needed for catalyst pvbatch mpi
+        _extend_simple()
