@@ -1,13 +1,9 @@
 from paraview.util import proxy as proxy_util
+from paraview import print_warning
 
 # ==============================================================================================
 # Helpers
 # ==============================================================================================
-
-
-class DeprecationWarning(Warning):
-    """Non-supressed Deprecation Warning."""
-
 
 class DeprecationError(RuntimeError):
     """Used for deprecated methods and functions."""
@@ -37,7 +33,7 @@ def MakeBlueToRedLT(min, max):
 
     # Define RGB points. These are tuples of 4 values. First one is
     # the scalar values, the other 3 the RGB values.
-    DeprecationWarning("ParaView will remove this helper method in version 6.1")
+    print_warning("ParaView will remove this helper method in version 6.1")
 
     rgbPoints = [min, 0, 0, 1, max, 1, 0, 0]
 
@@ -65,7 +61,7 @@ def SetProperties(proxy=None, **params):
 
     from paraview.simple.session import GetActiveSource
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this helper method in version 6.1."
         "You should call proxy.Set(Radius=5, Center=[0,0,0]) instead."
     )
@@ -73,7 +69,7 @@ def SetProperties(proxy=None, **params):
     if not proxy:
         proxy = GetActiveSource()
 
-    proxy_util.set(proxy, params)
+    proxy_util.set(proxy, **params)
 
 
 # -----------------------------------------------------------------------------
@@ -103,7 +99,7 @@ def GetProperty(*arguments, **keywords):
     """
     from paraview.simple.session import GetActiveSource
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this helper method in version 6.1."
         "You should use Property as attribute like `radius = proxy.Radius` instead."
     )
@@ -139,7 +135,7 @@ def GetRepresentationProperty(*arguments, **keywords):
     """
     from paraview.simple.rendering import GetRepresentation
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this helper method in version 6.1."
         "You should use Property as attribute like `visibility = simple.GetRepresentation().Visibility` instead."
     )
@@ -179,7 +175,7 @@ def GetViewProperties(view=None):
     """
     from paraview.simple.session import GetActiveView
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this helper method in version 6.1."
         "You should use simple.GetActiveView() instead"
     )
@@ -194,7 +190,7 @@ def GetViewProperty(*arguments, **keywords):
     """Same as :func:`GetProperty()`, except that if no 'proxy' parameter is passed,
     it will use the active view properties, rather than the active source."""
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this helper method in version 6.1."
         "You should use Property as attribute like `orientation = simple.GetActiveView().OrientationAxesVisibility` instead."
     )
@@ -229,7 +225,7 @@ def GetSources():
     """
     from paraview.simple.proxy import ListSources
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this function in version 6.1."
         "You should use `simple.ListSources()` instead."
     )
@@ -251,7 +247,7 @@ def GetRepresentations():
     """
     from paraview.simple.proxy import ListRepresentations
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this function in version 6.1."
         "You should use `simple.ListRepresentations()` instead."
     )
@@ -284,7 +280,7 @@ def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
     :rtype: bool"""
     from paraview.simple.color import AssignFieldToColorPreset
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this function in version 6.1."
         "You should use `simple.AssignFieldToColorPreset('Temperature', 'Cool To Warm', [-5, 10])` instead."
     )
@@ -303,7 +299,7 @@ def GetLookupTableNames():
     :rtype: List of str"""
     from paraview.simple.color import ListColorPresetNames
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this function in version 6.1."
         "You should use `simple.ListColorPresetNames()` instead."
     )
@@ -326,7 +322,7 @@ def LoadLookupTable(fileName):
     """
     from paraview.simple.color import ImportPresets
 
-    DeprecationWarning(
+    print_warning(
         "ParaView will remove this function in version 6.1."
         "You should use `simple.ImportColorPreset()` instead."
     )
