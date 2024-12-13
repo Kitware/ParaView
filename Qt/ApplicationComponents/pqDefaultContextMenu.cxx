@@ -143,6 +143,7 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
   // Even when nothing was picked, show the "link camera" and
   // possibly the frame decoration menu items.
   menu->addAction(tr("Link Camera..."), viewContext, SLOT(linkToOtherView()));
+  menu->addAction(tr("Unlink Camera"), viewContext, SLOT(removeViewLinks()));
 
   if (auto tmvwidget = qobject_cast<pqTabbedMultiViewWidget*>(
         pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET")))

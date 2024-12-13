@@ -1237,6 +1237,7 @@ list(APPEND TESTS_WITH_BASELINES
   TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
   TransferFunction2DYScalars.xml
+  UnlinkCameraView.xml
   VolumeOfRevolution.xml
   ZoomClosestOffsetRatio.xml
   ZoomToBox.xml

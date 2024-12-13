@@ -285,6 +285,11 @@ public Q_SLOTS:
   virtual void linkToOtherView();
 
   /**
+   * Remove all camera link connected to this view.
+   */
+  void removeViewLinks();
+
+  /**
    * Called to undo interaction.
    * View modules supporting interaction undo must override this method.
    */
