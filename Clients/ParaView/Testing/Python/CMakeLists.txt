@@ -79,6 +79,7 @@ paraview_add_test_pvbatch(
 
 paraview_add_test_python(
   NO_RT
+  Deprecation.py
   ColorBy.py
   ColorBlockBy.py
   GroupDataSets.py

@@ -5,6 +5,7 @@ from paraview import print_warning
 # Helpers
 # ==============================================================================================
 
+
 class DeprecationError(RuntimeError):
     """Used for deprecated methods and functions."""
 
@@ -92,8 +93,8 @@ def GetProperty(*arguments, **keywords):
 
     Several example are given below::
 
-        GetProperty({name="Radius"})
-        GetProperty({proxy=sphereProxy, name="Radius"})
+        GetProperty(name="Radius")
+        GetProperty(proxy=sphereProxy, name="Radius")
         GetProperty( sphereProxy, "Radius" )
         GetProperty( "Radius" )
     """
@@ -333,3 +334,9 @@ def LoadLookupTable(fileName):
 # ==============================================================================================
 # Error
 # ==============================================================================================
+
+
+def TestDeprecationError():
+    raise DeprecationError(
+        "replace `print_warning` by `raise DeprecationError` when the version bump happen"
+    )
