@@ -130,7 +130,7 @@ def SaveExtracts(**kwargs):
     # calling UpdateAnimationUsingDataTimeSteps.
     scene = GetAnimationScene()
     if not scene:
-        from . import print_warning
+        from paraview import print_warning
 
         print_warning("This Edition does not support animations. Cannot save extracts.")
         return False
