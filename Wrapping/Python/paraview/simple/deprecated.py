@@ -1,9 +1,11 @@
+import os
 from paraview.util import proxy as proxy_util
-from paraview import print_warning
+from paraview import print_warning as pw
 
 # ==============================================================================================
 # Helpers
 # ==============================================================================================
+WARNING_THROUGH_EXCEPTION = "PARAVIEW_DEPRECATION_EXCEPTION" in os.environ
 
 
 class DeprecationError(RuntimeError):
@@ -11,6 +13,14 @@ class DeprecationError(RuntimeError):
 
     def __init__(self, message="This feature has been deprecated") -> None:
         RuntimeError.__init__(self, message)
+
+
+def print_warning(msg):
+
+    if WARNING_THROUGH_EXCEPTION:
+        raise DeprecationError(msg)
+
+    pw(msg)
 
 
 # ==============================================================================================
