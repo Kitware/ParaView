@@ -141,7 +141,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         start_set = source_set
     else:
         # if nothing is specified, we save all views, sources and animation scene
-        start_set = [x for x in simple.GetSources().values()]
+        start_set = [x for x in simple.ListSources().values()]
         start_set += simple.GetViews()
         start_set += [simple.GetAnimationScene()]
 
