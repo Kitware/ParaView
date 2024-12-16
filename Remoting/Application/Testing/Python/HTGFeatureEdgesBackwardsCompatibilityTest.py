@@ -6,6 +6,6 @@ from paraview.simple import *
 
 hyperTreeGridRandom = HyperTreeGridRandom()
 
-hyperTreeGridFeatureEdges = HyperTreeGridFeatureEdges(Input=hyperTreeGridRandom)
+hyperTreeGridFeatureEdges = HyperTreeGridFeatureEdgesFilter(Input=hyperTreeGridRandom)
 print('------------', hyperTreeGridFeatureEdges)
 assert(type(hyperTreeGridFeatureEdges).__name__ == "FeatureEdges")
