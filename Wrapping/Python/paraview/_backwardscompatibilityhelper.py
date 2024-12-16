@@ -1297,7 +1297,7 @@ def get_deprecated_proxies(proxiesNS):
 
     if compatibility_version <= (5, 14):
         proxies[proxiesNS.filters] += [("HyperTreeGridCellCenters", "CellCenters")]
-        proxies[proxiesNS.filters] += [("HyperTreeGridFeatureEdges", "FeatureEdges")]
+        proxies[proxiesNS.filters] += [("HyperTreeGridFeatureEdgesFilter", "FeatureEdges")]
         proxies[proxiesNS.filters] += [("HyperTreeGridGhostCellsGenerator", "GhostCells")]
         proxies[proxiesNS.filters] += [("HyperTreeGridAxisReflection", "AxisAlignedReflectionFilter")]
         proxies[proxiesNS.filters] += [("ProcessIdScalars", "ProcessIds")]
