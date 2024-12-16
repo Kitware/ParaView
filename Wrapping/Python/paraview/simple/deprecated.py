@@ -4,8 +4,12 @@ from paraview import print_warning as pw
 
 # ==============================================================================================
 # Helpers
-# ==============================================================================================
-WARNING_THROUGH_EXCEPTION = "PARAVIEW_DEPRECATION_EXCEPTION" in os.environ
+# =============================================================================================
+
+REMOVE_DEPRECATION_CALLS = True  # Toggle to True only during validation.
+WARNING_THROUGH_EXCEPTION = (
+    REMOVE_DEPRECATION_CALLS or "PARAVIEW_DEPRECATION_EXCEPTION" in os.environ
+)
 
 
 class DeprecationError(RuntimeError):
