@@ -19,8 +19,6 @@ else ()
     "Unknown ABI to use for cdi")
 endif ()
 
-message(WARNING "${cdi_url}/${filename}")
-
 # Download the file.
 file(DOWNLOAD
   "${cdi_url}/${filename}"
