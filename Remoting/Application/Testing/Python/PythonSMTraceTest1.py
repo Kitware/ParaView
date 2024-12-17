@@ -28,28 +28,29 @@ ren = CreateRenderView()
 # Start trace
 config = smtrace.start_trace()
 
+
 ########################################################
 # Begin build pipeline
 def create_pipeline():
-  w = Wavelet()
-  Show()
-  Render()
+    w = Wavelet()
+    Show()
+    Render()
 
-  # note property changes won't be recorded directly so don't do any outside the
-  # constructor and expect that to work.
-  contour = Contour(ComputeScalars=1,
-      Isosurfaces=[100, 150, 200])
-  Show()
-  #Hide(w)
-  Render()
-  ColorBy(value=("POINTS", "RTData"))
-  GetDisplayProperties().SetScalarBarVisibility(ren, True)
-  Render()
+    # note property changes won't be recorded directly so don't do any outside the
+    # constructor and expect that to work.
+    contour = Contour(ComputeScalars=1, Isosurfaces=[100, 150, 200])
+    Show()
+    # Hide(w)
+    Render()
+    ColorBy(value=("POINTS", "RTData"))
+    GetDisplayProperties().SetScalarBarVisibility(ren, True)
+    Render()
 
-  clip = Clip()
-  Show()
-  Hide(contour)
-  Render()
+    clip = Clip()
+    Show()
+    Hide(contour)
+    Render()
+
 
 create_pipeline()
 
@@ -61,10 +62,10 @@ trace_string = smtrace.stop_trace()
 print(trace_string)
 # Uncomment these lines to print the trace string or save it to a file
 print(trace_string)
-#smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
+# smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
 
 # Clear all the sources
-for source in GetSources().values():
+for source in ListSources().values():
     Delete(source)
 
 
@@ -82,7 +83,7 @@ if len(ren.Representations) != 0:
     sys.exit(1)
 
 # Confirm that the clip filter has been removed
-if GetSources():
+if ListSources():
     print("All sources should have be removed.")
     sys.exit(1)
 
@@ -95,7 +96,7 @@ code = compile(trace_string, "<string>", "exec")
 exec(code)
 
 # Confirm that the clip filter has been recreated
-clip = [x for x in GetSources().values() if x.GetXMLLabel() == "Clip"]
+clip = [x for x in ListSources().values() if x.GetXMLLabel() == "Clip"]
 if not clip:
     print("After replaying trace, could not find Clip filter.")
     sys.exit(1)
@@ -104,4 +105,4 @@ clip[0].Invert = 0
 
 # Do a screenshot regression test
 if not smtesting.DoRegressionTesting(ren.SMProxy):
-    raise smtesting.TestError('Image comparison failed.')
+    raise smtesting.TestError("Image comparison failed.")
