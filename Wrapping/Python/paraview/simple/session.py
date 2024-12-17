@@ -233,8 +233,6 @@ def _DisableFirstRenderCameraReset():
 
 def _create_doc(new, old):
     "Internal function."
-    import string
-
     res = new + "\n"
     ts = []
     strpd = old.split("\n")
@@ -250,12 +248,11 @@ def _create_doc(new, old):
 
 def _func_name_valid(name):
     "Internal function."
-    valid = True
     for c in name:
         if c == "(" or c == ")":
-            valid = False
-            break
-    return valid
+            return False
+
+    return True
 
 
 # -----------------------------------------------------------------------------
