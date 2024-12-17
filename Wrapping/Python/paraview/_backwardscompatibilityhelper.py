@@ -50,7 +50,7 @@ def get_paraview_compatibility_version():
     current_version = (sm.vtkSMProxyManager.GetVersionMajor(), sm.vtkSMProxyManager.GetVersionMinor())
     # Check if compatibility version is set.
     if compatibility_version == ():
-        return compatibility_version
+        return current_version
     # Check if compatibility version is greater or less than current version.
     if compatibility_version < current_version and (
             _Cache.LastCompatibilityVersion is None or _Cache.LastCompatibilityVersion != compatibility_version):
@@ -1297,7 +1297,7 @@ def get_deprecated_proxies(proxiesNS):
 
     if compatibility_version <= (5, 14):
         proxies[proxiesNS.filters] += [("HyperTreeGridCellCenters", "CellCenters")]
-        proxies[proxiesNS.filters] += [("HyperTreeGridFeatureEdges", "FeatureEdges")]
+        proxies[proxiesNS.filters] += [("HyperTreeGridFeatureEdgesFilter", "FeatureEdges")]
         proxies[proxiesNS.filters] += [("HyperTreeGridGhostCellsGenerator", "GhostCells")]
         proxies[proxiesNS.filters] += [("HyperTreeGridAxisReflection", "AxisAlignedReflectionFilter")]
         proxies[proxiesNS.filters] += [("ProcessIdScalars", "ProcessIds")]
