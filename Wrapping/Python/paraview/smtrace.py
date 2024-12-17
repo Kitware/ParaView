@@ -240,7 +240,7 @@ class Trace(object):
                     accessor = ProxyAccessor(cls.get_varname(varname), obj)
                     cls.Output.append_separated([ \
                         "# get display properties",
-                        "%s = GetDisplayProperties(%s, view=%s)" % \
+                        "%s = GetRepresentation(%s, view=%s)" % \
                         (accessor, inputAccsr, viewAccessor)])
                     return True
         if not skip_rendering and cls.get_registered_name(obj, "lookup_tables"):
@@ -369,7 +369,7 @@ class Trace(object):
             regex = re.compile(r"(^Separate_)([0-9]*)_(.*)_(.*$)")
         if re.match(regex, arrayName):
             gid = re.sub(regex, "\\g<2>", arrayName)
-            representation = next((value for key, value in simple.GetRepresentations().items() if key[1] == gid), None)
+            representation = next((value for key, value in simple.ListRepresentations().items() if key[1] == gid), None)
             if representation:
                 repAccessor = Trace.get_accessor(representation)
                 if selector is None:
