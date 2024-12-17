@@ -4,7 +4,7 @@
 #  Trace is enabled and the following actions are captured and then replayed:
 #
 #  A sphere source is created then a PythonAnnotation filter is created.
-#  Its expression contains a '\n'.
+#  Its expression contains a '\n'.
 #
 
 from paraview.simple import *
@@ -25,19 +25,23 @@ ren = CreateRenderView()
 # Start trace
 config = smtrace.start_trace()
 
+
 ########################################################
 # Begin build pipeline
 def create_pipeline():
-  w = Sphere()
-  Show()
-  Render()
+    w = Sphere()
+    Show()
+    Render()
 
-  # note property changes won't be recorded directly so don't do any outside the
-  # constructor and expect that to work.
-  python_annotation = PythonAnnotation(registrationName='PythonAnnotation1', Input=w, Expression='"Foo\\nBar"')
-  Show()
-  #Hide(w)
-  Render()
+    # note property changes won't be recorded directly so don't do any outside the
+    # constructor and expect that to work.
+    python_annotation = PythonAnnotation(
+        registrationName="PythonAnnotation1", Input=w, Expression='"Foo\\nBar"'
+    )
+    Show()
+    # Hide(w)
+    Render()
+
 
 create_pipeline()
 
@@ -53,10 +57,10 @@ print(trace_string)
 assert r"""pythonAnnotation1.Expression = '"Foo\\nBar"'""" in trace_string
 
 # Uncomment these lines to print the trace string or save it to a file
-#smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
+# smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
 
 # Clear all the sources
-for source in GetSources().values():
+for source in ListSources().values():
     Delete(source)
 
 if len(ren.Representations) != 0:
@@ -64,7 +68,7 @@ if len(ren.Representations) != 0:
     sys.exit(1)
 
 # Confirm that the clip filter has been removed
-if GetSources():
+if ListSources():
     print("All sources should have be removed.")
     sys.exit(1)
 
@@ -78,4 +82,4 @@ exec(code)
 
 # Do a screenshot regression test
 if not smtesting.DoRegressionTesting(ren.SMProxy):
-    raise smtesting.TestError('Image comparison failed.')
+    raise smtesting.TestError("Image comparison failed.")
