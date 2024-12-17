@@ -144,7 +144,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
     "\\.PythonEditorRun$"
 
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22674 
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22674
     "^paraviewPython-Batch-TestStereoSaveScreenshot$"
     "^paraviewPython-TestStereoSaveScreenshot$"
 
