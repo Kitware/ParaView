@@ -39,8 +39,9 @@ import paraview, re, os, os.path, types, sys
 
 # prefer `vtk` from `paraview` since it doesn't import all
 # vtk modules.
-from paraview import vtk
+from paraview import vtk, print_warning
 from paraview import _backwardscompatibilityhelper as _bc
+from paraview.util import proxy as proxy_util
 
 from paraview.modules.vtkPVVTKExtensionsCore import *
 from paraview.modules.vtkRemotingCore import *
@@ -413,6 +414,22 @@ class Proxy(object):
                 property_list.append(name)
         return property_list
 
+    def Set(self, **properties):
+        """Update a set of properties using a keyword argument notation"""
+        available_props = set(self.ListProperties())
+        props_to_set = set(properties.keys())
+        if props_to_set <= available_props:
+            proxy_util.set(self, **properties)
+        else:
+            valid_props = {}
+            for k, v in properties.items():
+                if k not in available_props:
+                    print_warning(f"Property \"{k}={v}\" is not available on {self.GetXMLLabel()}")
+                else:
+                    valid_props[k] = v
+
+            proxy_util.set(self, **valid_props)
+
     def __ConvertArgumentsAndCall(self, *args):
         """ Internal function.
         Used to call a function on SMProxy. Converts input and
@@ -541,6 +558,10 @@ class SourceProxy(Proxy):
     or
     > op = source['some name'].
     """
+
+    def Rename(self, new_name):
+        """Rename proxy in GUI"""
+        proxy_util.rename(self, "sources", new_name)
 
     def UpdatePipeline(self, time=None):
         """This method updates the server-side VTK pipeline and the associated
@@ -2370,8 +2391,7 @@ def CreateRepresentation(aProxy, view, **extraArgs):
         return None
     proxy = _getPyProxy(display)
     proxy.Input = aProxy
-    for param in extraArgs.items():
-        setattr(proxy, items[0], items[1])
+    proxy.Set(**extraArgs)
     proxy.UpdateVTKObjects()
     view.Representations.append(proxy)
     return proxy
