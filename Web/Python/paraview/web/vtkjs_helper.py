@@ -6,7 +6,7 @@ import os, json
 
 def getAllNames():
     actorNameMapping = {}
-    srcs = simple.ListSources()
+    srcs = simple.GetSources()
     duplicates = {}
     for key, val in srcs.items():
         # Prevent name duplication

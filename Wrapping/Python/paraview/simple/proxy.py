@@ -163,7 +163,7 @@ def LocateView(displayProperties=None):
 # -----------------------------------------------------------------------------
 
 
-def ListSources():
+def GetSources():
     """Get all available pipeline sources.
 
     :return: dictionary of pipeline sources. Keys are tuples consisting of the registration
@@ -177,7 +177,7 @@ def ListSources():
 # -----------------------------------------------------------------------------
 
 
-def ListRepresentations():
+def GetRepresentations():
     """Returns all available representation proxies (display properties) in all views.
 
     :return: dictionary of representations. Keys are tuples consisting of the

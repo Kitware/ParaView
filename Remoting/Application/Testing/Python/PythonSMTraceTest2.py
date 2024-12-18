@@ -69,7 +69,7 @@ print(state)
 clear_proxies()
 
 # Confirm that all the representations have been removed from the view
-if len(ListRepresentations()) or len(GetRenderViews()) or len(ListSources()):
+if len(GetRepresentations()) or len(GetRenderViews()) or len(GetSources()):
     fail("Not all proxies were cleaned up.")
 
 # Compile the trace code and run it

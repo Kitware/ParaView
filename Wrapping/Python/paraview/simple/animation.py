@@ -1,7 +1,7 @@
 from paraview import servermanager
 
 from paraview.simple.session import GetActiveSource, GetActiveView
-from paraview.simple.proxy import ListSources
+from paraview.simple.proxy import GetSources
 
 # ==============================================================================
 # Animation methods
@@ -65,7 +65,7 @@ def GetRepresentationAnimationHelper(sourceproxy):
     """Method that returns the representation animation helper for a
     source proxy. It creates a new one if none exists."""
     # ascertain that proxy is a source proxy
-    if not sourceproxy in ListSources().values():
+    if not sourceproxy in GetSources().values():
         return None
     for proxy in servermanager.ProxyManager():
         if proxy.GetXMLName() == "RepresentationAnimationHelper" and proxy.GetProperty(

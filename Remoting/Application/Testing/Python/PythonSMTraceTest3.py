@@ -60,7 +60,7 @@ assert r"""pythonAnnotation1.Expression = '"Foo\\nBar"'""" in trace_string
 # smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
 
 # Clear all the sources
-for source in ListSources().values():
+for source in GetSources().values():
     Delete(source)
 
 if len(ren.Representations) != 0:
@@ -68,7 +68,7 @@ if len(ren.Representations) != 0:
     sys.exit(1)
 
 # Confirm that the clip filter has been removed
-if ListSources():
+if GetSources():
     print("All sources should have be removed.")
     sys.exit(1)
 

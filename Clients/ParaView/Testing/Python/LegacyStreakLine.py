@@ -14,7 +14,7 @@ def CheckPVSM():
     LoadState(
         smtesting.DataDir + "/Testing/Data/BackwardCompatibility/LegacyStreakLine.pvsm"
     )
-    sources = ListSources()
+    sources = GetSources()
     for proxy_name, proxy in sources.items():
         if proxy.GetXMLName() == "LegacyStreakLine":
             return True

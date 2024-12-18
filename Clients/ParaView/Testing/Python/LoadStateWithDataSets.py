@@ -113,7 +113,7 @@ LoadState(
     ],
 )
 
-names = set([x[0] for x in ListSources().keys()])
+names = set([x[0] for x in GetSources().keys()])
 # the 'can.ex2' is renamed, but others which have been manually change in the state file
 # should remain unchanged.
 assert names == set(["dataset", "disk_out_ref.ex2", "timeseries"])

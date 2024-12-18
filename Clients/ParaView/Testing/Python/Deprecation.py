@@ -55,16 +55,6 @@ pv3 = GetViewProperty("Visibility")
 pv4 = GetViewProperty(name="Visibility")
 assert pv1 is pv2 and pv3 is pv4 and pv1 is pv4
 
-# GetSources
-old_way = GetSources()
-new_way = ListSources()
-assert old_way == new_way
-
-# GetRepresentations
-old_way = GetRepresentations()
-new_way = ListRepresentations()
-assert old_way == new_way
-
 # AssignLookupTable
 # TODO
 

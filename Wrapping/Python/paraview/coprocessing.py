@@ -414,7 +414,7 @@ class CoProcessor(object):
             # code. vtkLiveInsituLink never updates the pipeline, it
             # simply uses the data available at the end of the
             # pipeline, if any.
-            for source in simple.ListSources().values():
+            for source in simple.GetSources().values():
                 source.UpdatePipeline(time)
 
             # push extracts to the visualization process.

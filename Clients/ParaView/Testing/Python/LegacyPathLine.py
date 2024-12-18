@@ -14,7 +14,7 @@ def CheckPVSM():
     LoadState(
         smtesting.DataDir + "/Testing/Data/BackwardCompatibility/LegacyPathLine.pvsm"
     )
-    sources = ListSources()
+    sources = GetSources()
     for proxy_name, proxy in sources.items():
         if proxy.GetXMLName() == "LegacyParticlePath":
             return True

@@ -237,45 +237,6 @@ def GetViewProperty(*arguments, **keywords):
 # -----------------------------------------------------------------------------
 
 
-def GetSources():
-    """Get all available pipeline sources.
-
-    :return: dictionary of pipeline sources. Keys are tuples consisting of the registration
-             name and integer ID of the proxy, and values are the pipeline sources themselves.
-    :rtype: dictionary
-
-    """
-    from paraview.simple.proxy import ListSources
-
-    print_warning(MSG_REMOVE_6_1 + "You should use `simple.ListSources()` instead.")
-
-    return ListSources()
-
-
-# -----------------------------------------------------------------------------
-
-
-def GetRepresentations():
-    """Returns all available representation proxies (display properties) in all views.
-
-    :return: dictionary of representations. Keys are tuples consisting of the
-             registration name and integer ID of the representation proxy, and values
-             are the representation proxies themselves.
-    :rtype: dict
-
-    """
-    from paraview.simple.proxy import ListRepresentations
-
-    print_warning(
-        MSG_REMOVE_6_1 + "You should use `simple.ListRepresentations()` instead."
-    )
-
-    return ListRepresentations()
-
-
-# -----------------------------------------------------------------------------
-
-
 def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
     """Assign a lookup table to an array by lookup table name.
 

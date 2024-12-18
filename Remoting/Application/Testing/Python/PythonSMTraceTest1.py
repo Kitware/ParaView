@@ -65,7 +65,7 @@ print(trace_string)
 # smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
 
 # Clear all the sources
-for source in ListSources().values():
+for source in GetSources().values():
     Delete(source)
 
 
@@ -83,7 +83,7 @@ if len(ren.Representations) != 0:
     sys.exit(1)
 
 # Confirm that the clip filter has been removed
-if ListSources():
+if GetSources():
     print("All sources should have be removed.")
     sys.exit(1)
 
@@ -96,7 +96,7 @@ code = compile(trace_string, "<string>", "exec")
 exec(code)
 
 # Confirm that the clip filter has been recreated
-clip = [x for x in ListSources().values() if x.GetXMLLabel() == "Clip"]
+clip = [x for x in GetSources().values() if x.GetXMLLabel() == "Clip"]
 if not clip:
     print("After replaying trace, could not find Clip filter.")
     sys.exit(1)
