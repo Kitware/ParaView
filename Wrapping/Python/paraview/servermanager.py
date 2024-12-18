@@ -261,6 +261,9 @@ class Proxy(object):
         self.add_attribute('_Proxy__LastAttrName', None)
         self.add_attribute('SMProxy', None)
         self.add_attribute('IgnoreUnknownSetRequests', False)
+        self.add_attribute('pxm', ProxyManager())
+        self.add_attribute('_prev_active', None)
+
         if 'port' in args:
             self.add_attribute('Port', args['port'])
             del args['port']
@@ -278,6 +281,7 @@ class Proxy(object):
             del args['proxy']
         else:
             self.Initialize(None, update)
+
         if 'registrationGroup' in args:
             registrationGroup = args['registrationGroup']
             del args['registrationGroup']
@@ -285,12 +289,13 @@ class Proxy(object):
             if 'registrationName' in args:
                 registrationName = args['registrationName']
                 del args['registrationName']
-            pxm = ProxyManager()
-            pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
+            self.pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
+
         if update:
             self.UpdateVTKObjects()
-        for key in args.keys():
-            setattr(self, key, args[key])
+
+        proxy_util.set(self, **args)
+
         # Visit all properties so that they are created
         for prop in self:
             pass
@@ -548,6 +553,34 @@ class Proxy(object):
         except:
             pass
         return getattr(self.SMProxy, name)
+
+    @property
+    def _active_model(self):
+        model_name = None
+        if self.GetXMLGroup() == "views":
+            model_name = "ActiveView"
+        if self.GetXMLGroup() == "sources":
+            model_name = "ActiveSources"
+
+        if model_name:
+            return self.pxm._get_active_model(model_name)
+
+        return None
+
+    def __enter__(self):
+        """Activate proxy if possible"""
+        active_model = self._active_model
+        if active_model:
+            self._prev_active = active_model.GetCurrentProxy()
+            active_model.SetCurrentProxy(self.SMProxy, active_model.CLEAR_AND_SELECT)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Revert previously activated proxy"""
+        active_model = self._active_model
+        if active_model:
+            active_model.SetCurrentProxy(self._prev_active, active_model.CLEAR_AND_SELECT)
+        self._prev_active = None
 
 
 class SourceProxy(Proxy):
@@ -1815,6 +1848,13 @@ class ProxyManager(object):
             self.SMProxyManager.RegisterProxy(group, name, aProxy.SMProxy)
         else:
             self.SMProxyManager.RegisterProxy(group, name, aProxy)
+
+    def _get_active_model(self, name):
+        model = self.GetSelectionModel(name)
+        if not model:
+            model = vtkSMProxySelectionModel()
+            self.RegisterSelectionModel(name, model)
+        return model
 
     def NewProxy(self, group, name):
         """Creates a new proxy of given group and name and returns an SMProxy.
