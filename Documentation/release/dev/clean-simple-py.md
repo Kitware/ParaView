@@ -1,9 +1,30 @@
 ## Refactoring of simple.py
 
-The paraview.simple is the core of ParaView for creating [trame](https://kitware.github.io/trame/) applications, catalyst scripts, Python states and traces.
+Over time this module grew to contain many functions. It was time to rework its structure to promote clarity and enable a deprecation path while empowering developers to create new and better helpers.
 
-It was time to rework its structure to promote clarity and enable a deprecation path while empowering developers to create new and better helpers.
+The new structure breaks the single simple.py file into a package split into a set of submodules with common responsibilities.
+Deprecated methods are centralized within their own file for easy eventual removal.
 
-The new structure convert the single simple.py file into a package split up with common responsability and where deprecation methods get centrelized within their own file.
+This change also exposes a new set of methods (Set, Rename) on proxy directly to streamline their usage.
 
-During that restructuration, we are also exposing a new set of methods on proxy directly to streamline their usage. A blog post will capture the add-on with some concreate example for Catalyst and Trame.
+The code block below capture the usage of those new methods:
+
+```python
+from paraview.simple import *
+
+cone_proxy = Cone()
+
+# Update several properties at once
+cone_proxy.Set(
+    Radius=2,
+    Center=(0,1,2),
+    Height=5,
+    # Below kwarg will print a warning
+    # as the `Hello` property does not exist
+    # for the `Cone` proxy
+    Hello="World",
+)
+
+# Update source name in the GUI pipeline
+cone_proxy.Rename("My Super Cone")
+```
