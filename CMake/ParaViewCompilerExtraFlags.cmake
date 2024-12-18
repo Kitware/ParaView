@@ -37,7 +37,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
       set_target_properties(paraviewbuild
         PROPERTIES
         INTERFACE_LINK_OPTIONS
-        "LINKER:SHELL:${PARAVIEW_EXTRA_SHARED_LINKER_FLAGS} -lc ${CMAKE_SHARED_LINKER_FLAGS}")
+        "LINKER:SHELL:${PARAVIEW_EXTRA_SHARED_LINKER_FLAGS} -lc")
     endif()
   endif()
 
