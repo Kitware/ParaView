@@ -54,7 +54,7 @@ print(trace_string)
 
 # The multiline expression in the PythonAnnotation should not be processed
 # but taken 'as is'
-assert r"""pythonAnnotation1.Expression = '"Foo\\nBar"'""" in trace_string
+assert r"""Expression='"Foo\\nBar"'""" in trace_string
 
 # Uncomment these lines to print the trace string or save it to a file
 # smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
