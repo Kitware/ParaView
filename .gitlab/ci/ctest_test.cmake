@@ -144,7 +144,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
     "\\.PythonEditorRun$"
 
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22674 
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22674
     "^paraviewPython-Batch-TestStereoSaveScreenshot$"
     "^paraviewPython-TestStereoSaveScreenshot$"
 
@@ -157,6 +157,79 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22696
     "^pv\\.LagrangianSurfaceHelperComposite$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22827
+    # Unclassified
+    "^pv\\.BivariateNoiseRepresentation$"
+    "^pv\\.DecimatePolyline$"
+    "^pvcrs\\.DecimatePolyline$"
+    "^pvcs\\.DecimatePolyline$"
+    "^pv\\.ExtrusionRepresentationCellData$"
+    "^pvcrs\\.GroupDataSetOutputType$"
+    "^pvcs\\.GroupDataSetOutputType$"
+    "^pv\\.UndoRedo1$"
+    "^pvcrs\\.UndoRedo1$"
+    "^pvcs\\.UndoRedo1$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22823
+    # Floating point subtleties
+    "^pv\\.AnimateProperty$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22824
+    # Shading differences
+    "^pv\\.PointGaussianMultiBlockDataSet$"
+    "^pvcrs\\.PointGaussianMultiBlockDataSet$"
+    "^pvcs\\.PointGaussianMultiBlockDataSet$"
+    "^pv\\.PointGaussianNoScaleTransferFunction$"
+    "^pvcrs\\.PointGaussianNoScaleTransferFunction$"
+    "^pvcs\\.PointGaussianNoScaleTransferFunction$"
+    "^pv\\.UniformInverseTransformSamplingGlyph$"
+    "^pvcrs\\.UniformInverseTransformSamplingGlyph$"
+    "^pvcs\\.UniformInverseTransformSamplingGlyph$"
+    "^pv\\.CONVERGECFDReader$"
+    "^pvcrs\\.CONVERGECFDReader$"
+    "^pvcs\\.CONVERGECFDReader$"
+    # The following tests seem to have some geometry differences too
+    "^pv\\.AxisAlignedCutterMBHierarchy$"
+    "^pvcrs\\.AxisAlignedCutterMBHierarchy$"
+    "^pvcs\\.AxisAlignedCutterMBHierarchy$"
+    "^pv\\.AxisAlignedCutterPDCNoHierarchy$"
+    "^pvcrs\\.AxisAlignedCutterPDCNoHierarchy$"
+    "^pvcs\\.AxisAlignedCutterPDCNoHierarchy$"
+    "^pv\\.AxisAlignedPDCNoHierarchy$"
+    "^pvcrs\\.AxisAlignedPDCNoHierarchy$"
+    "^pvcs\\.AxisAlignedPDCNoHierarchy$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22825
+    # M4 geometry filter
+    "^pvcs-tile-display\\.LinkCameraFromView-1x1$"
+    "^pv\\.FeatureEdgesFilterHTG$"
+    "^pvcrs\\.FeatureEdgesFilterHTG$"
+    "^pvcs\\.FeatureEdgesFilterHTG$"
+    "^pv\\.FeatureEdgesRepresentationHTG$"
+    "^pvcrs\\.FeatureEdgesRepresentationHTG$"
+    "^pvcs\\.FeatureEdgesRepresentationHTG$"
+    "^pv\\.MultipleColorOnSelection$"
+    "^pvcs\\.MultipleColorOnSelection$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22826
+    # SpyPlotUniReader error messages
+    "^pv\\.CTHAMRBaseline$"
+    "^pvcrs\\.CTHAMRBaseline$"
+    "^pvcs\\.CTHAMRBaseline$"
+    "^pv\\.CTHAMRClip$"
+    "^pv\\.CTHAMRContour$"
+    "^pv\\.CTHAMRDualClip$"
+    "^pv\\.CTHAMRMaterialInterfaceFilter$"
+    "^pv\\.CTHDerivedDensity2DCylinder$"
+    "^pvcrs\\.CTHDerivedDensity2DCylinder$"
+    "^pvcs\\.CTHDerivedDensity2DCylinder$"
+    "^pv\\.SPTimeseries$"
+    "^pvcrs\\.SPTimeseries$"
+    "^pvcs\\.SPTimeseries$"
+    "^pv\\.TestIsoVolume$"
+    "^pvcrs\\.TestIsoVolume$"
+    "^pvcs\\.TestIsoVolume$"
     )
 endif ()
 

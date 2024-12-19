@@ -219,9 +219,19 @@ macos-x86_64-python-qt:build:
     extends:
         - .macos_x86_64_python_qt
         - .cmake_build_macos
-        - .macos_builder_tags
+        - .macos_x86_64_builder_tags
         - .cmake_build_artifacts
         - .run_manually
+
+macos-x86_64-python-qt:test:
+    extends:
+        - .macos_x86_64_python_qt
+        - .cmake_test_macos
+        - .macos_x86_64_builder_tags
+        - .cmake_test_artifacts
+        - .run_automatically
+    needs:
+        - macos-x86_64-python-qt:build
 
 # Windows
 
