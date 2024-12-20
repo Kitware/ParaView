@@ -1307,7 +1307,7 @@ list(APPEND TESTS_WITH_BASELINES
   CTHAMRContour.xml
   CTHAMRDualClip.xml
   CTHAMRMaterialInterfaceFilter.xml
-  CTHDerivedDensity2DClyinder.xml
+  CTHDerivedDensity2DCylinder.xml
   AddActiveValuesFromVisibleObjects.xml
   AnimatePipelineTime.xml
   AngularPeriodicFilter.xml
@@ -1747,7 +1747,7 @@ set (CTHAMRBaseline_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRContour_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRDualClip_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRMaterialInterfaceFilter_FORCE_SERIAL TRUE)  # since this uses popup-menu
-set (CTHDerivedDensity2DClyinder_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (CTHDerivedDensity2DCylinder_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
