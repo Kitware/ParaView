@@ -12,6 +12,7 @@ view_2 = CreateRenderView()
 view_3 = CreateRenderView()
 
 source_1 = Sphere()
+filter_1 = Shrink()
 source_2 = Cone()
 source_3 = Box()
 
@@ -25,6 +26,11 @@ check_active(None, None)
 
 with source_1, view_1:
     check_active(source_1, view_1)
+    rep_1 = Show()
+    check_active(source_1, view_1)
+
+    with rep_1:
+        check_active(source_1, view_1)
 
     with source_2:
         check_active(source_2, view_1)

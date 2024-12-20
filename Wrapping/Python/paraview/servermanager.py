@@ -557,10 +557,13 @@ class Proxy(object):
     @property
     def _active_model(self):
         model_name = None
-        if self.GetXMLGroup() == "views":
-            model_name = "ActiveView"
-        if self.GetXMLGroup() == "sources":
+        # /!\ vtkSMRepresentationProxy are vtkSMSourceProxy
+        if self.IsA("vtkSMRepresentationProxy"):
+            pass # no active group for representation
+        elif self.IsA("vtkSMSourceProxy"):
             model_name = "ActiveSources"
+        elif self.GetXMLGroup() == "views":
+            model_name = "ActiveView"
 
         if model_name:
             return self.pxm._get_active_model(model_name)
@@ -581,6 +584,65 @@ class Proxy(object):
         if active_model:
             active_model.SetCurrentProxy(self._prev_active, active_model.CLEAR_AND_SELECT)
         self._prev_active = None
+
+def _extract_array_info(array):
+    name = array.GetName()
+    type = array.GetDataType() # need to convert that to a string
+    components = array.GetNumberOfComponents()
+    ranges = []
+    for c_idx in range(components):
+        data_range = array.GetRange(c_idx)
+        ranges.append({
+            "name": array.GetComponentName(c_idx),
+            "min": data_range[0],
+            "max": data_range[1],
+        })
+        if components > 1:
+            data_range = array.GetRange(-1)
+            ranges.append({
+                "name": "Magnitude",
+                "min": data_range[0],
+                "max": data_range[1],
+            })
+    return name, dict(name=name, type=type, components=components, ranges=ranges)
+
+
+class SourceInformation:
+    def __init__(self, source_proxy):
+        data_info = source_proxy.GetDataInformation()
+
+        self.bounds = data_info.DataInformation.GetBounds()
+        self.number_of_points = data_info.DataInformation.GetNumberOfPoints()
+        self.number_of_cells = data_info.DataInformation.GetNumberOfCells()
+        self.data_type = data_info.DataInformation.GetPrettyDataTypeString()
+        self.memory = data_info.DataInformation.GetMemorySize()
+
+        # points
+        self.point_data = {}
+        pd_info = source_proxy.GetPointDataInformation()
+        nb_arrays = pd_info.GetNumberOfArrays()
+        for array_idx in range(nb_arrays):
+            array_info = pd_info.GetArray(array_idx)
+            k, v = _extract_array_info(array_info)
+            self.point_data[k] = v
+
+        # cells
+        self.cell_data = {}
+        cd_info = source_proxy.GetCellDataInformation()
+        nb_arrays = cd_info.GetNumberOfArrays()
+        for array_idx in range(nb_arrays):
+            array_info = cd_info.GetArray(array_idx)
+            k, v = _extract_array_info(array_info)
+            self.cell_data[k] = v
+
+        # fields
+        self.field_data = {}
+        fd_info = source_proxy.GetFieldDataInformation()
+        nb_arrays = fd_info.GetNumberOfArrays()
+        for array_idx in range(nb_arrays):
+            array_info = fd_info.GetArray(array_idx)
+            k, v = _extract_array_info(array_info)
+            self.field_data[k] = v
 
 
 class SourceProxy(Proxy):
@@ -659,9 +721,13 @@ class SourceProxy(Proxy):
         self.UpdatePipeline()
         return FieldDataInformation(self.SMProxy, self.Port, "FieldData")
 
+    def GetInformation(self):
+        return SourceInformation(self)
+
     PointData = property(GetPointDataInformation, None, None, "Returns point data information")
     CellData = property(GetCellDataInformation, None, None, "Returns cell data information")
     FieldData = property(GetFieldDataInformation, None, None, "Returns field data information")
+    Information = property(GetInformation, None, None, "Returns a data information summary")
 
 
 class ExodusIIReaderProxy(SourceProxy):
@@ -699,6 +765,160 @@ class MultiplexerSourceProxy(SourceProxy):
         for key, val in cdict.items():
             self.add_attribute(key, val)
 
+
+class RepresentationProxy(SourceProxy):
+    """Proxy for a representation object. This class adds a few methods to Proxy
+    that are specific to representations (ColorBy, ColorBlocksBy).
+    """
+    def GetView(self):
+        for view in self.pxm.GetProxiesInGroup("views").values():
+            try:
+                if self in view.Representations:
+                    return view
+            except AttributeError:
+                continue
+
+        return None
+
+    def ColorBy(self, value=None, separate=False):
+        """Set data array to color a representation by. This will automatically set
+        up the color maps and others necessary state for the representations.
+
+        :param value: Name of the array to color by.
+        :type value: str
+        :param separate: Set to `True` to create a color map unique to this
+            representation. Optional, defaults to the global color map ParaView uses
+            for any object colored by an array of the same name.
+        :type separate: bool"""
+
+        self.UseSeparateColorMap = separate
+        association = self.ColorArrayName.GetAssociation()
+        arrayname = self.ColorArrayName.GetArrayName()
+        component = None
+        if value == None:
+            self.SetScalarColoring(None, GetAssociationFromString(association))
+            return
+        if not isinstance(value, tuple) and not isinstance(value, list):
+            value = (value,)
+        if len(value) == 1:
+            arrayname = value[0]
+        elif len(value) >= 2:
+            association = value[0]
+            arrayname = value[1]
+        if len(value) == 3:
+            # component name provided
+            componentName = value[2]
+            if componentName == "Magnitude":
+                component = -1
+            else:
+                if association == "POINTS":
+                    array = self.Input.PointData.GetArray(arrayname)
+                if association == "CELLS":
+                    array = self.Input.CellData.GetArray(arrayname)
+                if array:
+                    # looking for corresponding component name
+                    for i in range(0, array.GetNumberOfComponents()):
+                        if componentName == array.GetComponentName(i):
+                            component = i
+                            break
+                        # none have been found, try to use the name as an int
+                        if i == array.GetNumberOfComponents() - 1:
+                            try:
+                                component = int(componentName)
+                            except ValueError:
+                                pass
+        if component is None:
+            self.SetScalarColoring(
+                arrayname, GetAssociationFromString(association)
+            )
+        else:
+            self.SetScalarColoring(
+                arrayname, GetAssociationFromString(association), component
+            )
+        self.RescaleTransferFunctionToDataRange()
+
+    def ColorBlocksBy(self, selectors=None, value=None, separate=False):
+        """Like :func:`ColorBy`, set data array by which to color selected blocks within a
+        representation, but color only selected blocks with the specified properties.
+        This will automatically set up the color maps and others necessary state
+        for the representations.
+
+        :param rep: Must be a representation proxy i.e. the value returned by
+            the :func:`GetRepresentation`. Optional, defaults to the display properties
+            for the active source, if possible.
+        :type rep: Representation proxy
+        :param selectors: List of block selectors that choose which blocks to modify
+            with this call.
+        :type selectors: list of str
+        :param value: Name of the array to color by.
+        :type value: str
+        :param separate: Set to `True` to create a color map unique to this
+            representation. Optional, default is that the color map used will be the global
+            color map ParaView uses for any object colored by an array of the same name.
+        :type separate: bool"""
+        if selectors is None or len(selectors) == 0:
+            raise ValueError("No selector can be determined.")
+
+        self.SetBlocksUseSeparateColorMap(selectors, separate)
+
+        firstSelector = selectors[0]
+        associationInt = self.GetBlockColorArrayAssociation(firstSelector)
+        association = (
+            GetAssociationAsString(associationInt)
+            if associationInt != -1
+            else None
+        )
+        arrayname = self.GetBlockColorArrayName(firstSelector)
+        component = None
+        if value is None:
+            if association is not None:
+                self.SetBlocksScalarColoring(
+                    selectors, None, GetAssociationFromString(association)
+                )
+            else:
+                self.SetBlocksScalarColoring(selectors, None, 0)
+            return
+        if not isinstance(value, tuple) and not isinstance(value, list):
+            value = (value,)
+        if len(value) == 1:
+            arrayname = value[0]
+        elif len(value) >= 2:
+            association = value[0]
+            arrayname = value[1]
+        if len(value) == 3:
+            # component name provided
+            componentName = value[2]
+            if componentName == "Magnitude":
+                component = -1
+            else:
+                if association == "POINTS":
+                    array = self.Input.PointData.GetArray(arrayname)
+                if association == "CELLS":
+                    array = self.Input.CellData.GetArray(arrayname)
+                if array:
+                    # looking for corresponding component name
+                    for i in range(0, array.GetNumberOfComponents()):
+                        if componentName == array.GetComponentName(i):
+                            component = i
+                            break
+                        # none have been found, try to use the name as an int
+                        if i == array.GetNumberOfComponents() - 1:
+                            try:
+                                component = int(componentName)
+                            except ValueError:
+                                pass
+        if component is None:
+            self.SetBlocksScalarColoring(
+                selectors, arrayname, GetAssociationFromString(association)
+            )
+        else:
+            self.SetBlocksScalarColoring(
+                selectors,
+                arrayname,
+                GetAssociationFromString(association),
+                component,
+            )
+        self.RescaleBlocksTransferFunctionToDataRange(selectors)
 
 class ViewLayoutProxy(Proxy):
     """Special class to define convenience methods for View Layout"""
@@ -3011,6 +3231,8 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
     # Create the new type
     if proto.GetXMLName() == "ExodusIIReader":
         superclasses = (ExodusIIReaderProxy,)
+    elif proto.IsA("vtkSMRepresentationProxy"):
+        superclasses = (RepresentationProxy,)
     elif proto.IsA("vtkSMMultiplexerSourceProxy"):
         superclasses = (MultiplexerSourceProxy,)
     elif proto.IsA("vtkSMSourceProxy"):
