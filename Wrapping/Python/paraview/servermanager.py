@@ -458,7 +458,7 @@ class Proxy(object):
     def __GetActiveCamera(self):
         """ This method handles GetActiveCamera specially.
             We return a decorated vtkCamera object so that whenever
-            the Camera is directly modified using Python API,
+            the Camera is directly modified using the Python API,
             we ensure that the Camera properties on the corresponding
             view proxy are synchronized with the underlying vtkCamera.
         """

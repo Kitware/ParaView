@@ -1,5 +1,5 @@
 """
-This example assume a venv with the following dependencies:
+This example assumes a venv with the following dependencies:
 
    $ pip install trame trame-vuetify trame-vtk
 
@@ -7,7 +7,7 @@ This can be executed as follow:
 
    $ pvpython --venv .venv -m paraview.simple.example.trame
 
-This is an adaptation of what was produce in that blog [1] for VTK 9.4 [2]
+This is an adaptation of what was produced in [this blog][1] for [VTK 9.4][2]
 
    [1] https://www.kitware.com/vtk-9-4-a-step-closer-to-the-ways-of-python/
    [2] https://github.com/Kitware/trame/blob/master/examples/blogs/vtk-9.4/pipeline.py
@@ -16,10 +16,31 @@ This is an adaptation of what was produce in that blog [1] for VTK 9.4 [2]
 
 from paraview import simple
 
-from trame.app import get_server
-from trame.ui.vuetify3 import VAppLayout
-from trame.widgets import html, paraview as pv_widgets, vuetify3 as v3
-from trame.decorators import TrameApp, change
+try:
+    from trame.app import get_server
+    from trame.ui.vuetify3 import VAppLayout
+    from trame.widgets import html, paraview as pv_widgets, vuetify3 as v3
+    from trame.decorators import TrameApp, change
+except ImportError:
+    import sys
+
+    print(
+        "\nThis example requires a virtual environment compatible with your ParaView Python"
+        "\nwhich contains the trame dependencies."
+        "\n"
+        "\nTo setup such environment, you can do the following:"
+        "\n"
+        "\n  $ python3.x -m venv .venv"
+        "\n  $ source .venv/bin/activate"
+        "\n  $ pip install trame trame-vuetify trame-vtk"
+        "\n"
+        "\nThen run it like"
+        "\n"
+        "\n  $ pvpython --venv .venv -m paraview.simple.example.trame"
+        "\n"
+    )
+
+    sys.exit(1)
 
 
 def setup_pv():
