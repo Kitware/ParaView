@@ -17,7 +17,7 @@ def equal(a, b):
    size = len(aList)
    if size != len(bList):
       return False
-   for i in xrange(size):
+   for i in range(size):
       if len(aList[i]) > 0:
          af = float(aList[i])
          bf = float(bList[i])

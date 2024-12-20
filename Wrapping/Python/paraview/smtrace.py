@@ -67,12 +67,8 @@ from __future__ import absolute_import, division, print_function
 import weakref
 import paraview.servermanager as sm
 import paraview.simple as simple
-import sys
 from paraview.vtk import vtkTimeStamp
 from paraview.modules.vtkRemotingCore import vtkPVSession
-
-if sys.version_info >= (3,):
-    xrange = range
 
 
 def _get_skip_rendering():
@@ -244,7 +240,7 @@ class Trace(object):
                     accessor = ProxyAccessor(cls.get_varname(varname), obj)
                     cls.Output.append_separated([ \
                         "# get display properties",
-                        "%s = GetDisplayProperties(%s, view=%s)" % \
+                        "%s = GetRepresentation(%s, view=%s)" % \
                         (accessor, inputAccsr, viewAccessor)])
                     return True
         if not skip_rendering and cls.get_registered_name(obj, "lookup_tables"):
@@ -585,8 +581,18 @@ class RealProxyAccessor(Accessor):
             prop.get_object().FindDomain("vtkSMFileListDomain") != None
 
     def trace_properties(self, props, in_ctor):
-        joiner = ",\n    " if in_ctor else "\n"
-        return joiner.join([x.get_property_trace(in_ctor) for x in props])
+        if in_ctor:
+            return ",\n    ".join([x.get_property_trace(in_ctor) for x in props])
+
+        lines = []
+        if len(props):
+            proxy_name = props[0].ProxyAccessor
+            lines.append(f"{proxy_name}.Set(")
+            for prop in props:
+                lines.append(f"    {prop.get_property_trace(True)},")
+            lines.append(f")")
+
+        return "\n".join(lines)
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False,
                    ctor_var=None, ctor_extra_args=None):
@@ -594,7 +600,7 @@ class RealProxyAccessor(Accessor):
         # trace any properties that the 'filter' tells us should be traced
         # in ctor.
         # when ctor is null, add them to the other props to trace in creation
-        other_props = [];
+        other_props = []
         ctor_props = [x for x in self.OrderedProperties if filter.should_trace_in_ctor(x)]
         if not ctor is None:
           ctor_props_trace = self.trace_properties(ctor_props, in_ctor=True)
@@ -625,7 +631,8 @@ class RealProxyAccessor(Accessor):
         # FIXME: would like trace_properties() to return a list instead of
         # a string.
         txt = self.trace_properties(other_props, in_ctor=False)
-        if txt: trace.append(txt)
+        if txt:
+            trace.append(txt)
 
         # Now, if any of the props has ProxyListDomain, we should trace their
         # "ctors" as well. Tracing ctors for ProxyListDomain proxies simply
@@ -679,7 +686,7 @@ class PropertyTraceHelper(object):
             # This is cheating. Since there's no accessor for a proxy in the domain
             # unless the proxy is "active" in the property. However, since ParaView
             # UI never modifies the other properties, we cheat
-            for i in xrange(pld_domain.GetNumberOfProxies()):
+            for i in range(pld_domain.GetNumberOfProxies()):
                 domain_proxy = pld_domain.GetProxy(i)
                 plda = ProxyAccessor(self.get_varname(), sm._getPyProxy(domain_proxy))
                 self.ProxyListDomainProxyAccessors.append(plda)

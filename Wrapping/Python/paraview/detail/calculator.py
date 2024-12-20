@@ -16,11 +16,7 @@ from vtkmodules.numpy_interface.algorithms import *
 from paraview.vtk import vtkDataObject, vtkDoubleArray, vtkSelectionNode, vtkSelection, vtkStreamingDemandDrivenPipeline
 from paraview.modules import vtkPVVTKExtensionsFiltersPython
 from paraview.vtk.util.numpy_support import get_numpy_array_type
-import sys
 import textwrap
-
-if sys.version_info >= (3,):
-    xrange = range
 
 
 def get_arrays(attribs, controller=None):

@@ -425,7 +425,7 @@ class CoProcessor(object):
                 # and then it continues the loop. Returns != 0 if LIVE side
                 # disconnects
                 if (self.__LiveVisualizationLink.WaitForLiveChange()):
-                    break;
+                    break
             else:
                 break
 

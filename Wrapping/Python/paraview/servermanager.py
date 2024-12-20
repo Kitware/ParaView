@@ -39,8 +39,9 @@ import paraview, re, os, os.path, types, sys
 
 # prefer `vtk` from `paraview` since it doesn't import all
 # vtk modules.
-from paraview import vtk
+from paraview import vtk, print_warning
 from paraview import _backwardscompatibilityhelper as _bc
+from paraview.util import proxy as proxy_util
 
 from paraview.modules.vtkPVVTKExtensionsCore import *
 from paraview.modules.vtkRemotingCore import *
@@ -260,6 +261,9 @@ class Proxy(object):
         self.add_attribute('_Proxy__LastAttrName', None)
         self.add_attribute('SMProxy', None)
         self.add_attribute('IgnoreUnknownSetRequests', False)
+        self.add_attribute('pxm', ProxyManager())
+        self.add_attribute('_prev_active', None)
+
         if 'port' in args:
             self.add_attribute('Port', args['port'])
             del args['port']
@@ -277,6 +281,7 @@ class Proxy(object):
             del args['proxy']
         else:
             self.Initialize(None, update)
+
         if 'registrationGroup' in args:
             registrationGroup = args['registrationGroup']
             del args['registrationGroup']
@@ -284,12 +289,13 @@ class Proxy(object):
             if 'registrationName' in args:
                 registrationName = args['registrationName']
                 del args['registrationName']
-            pxm = ProxyManager()
-            pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
+            self.pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
+
         if update:
             self.UpdateVTKObjects()
-        for key in args.keys():
-            setattr(self, key, args[key])
+
+        proxy_util.set(self, **args)
+
         # Visit all properties so that they are created
         for prop in self:
             pass
@@ -413,6 +419,22 @@ class Proxy(object):
                 property_list.append(name)
         return property_list
 
+    def Set(self, **properties):
+        """Update a set of properties using a keyword argument notation"""
+        available_props = set(self.ListProperties())
+        props_to_set = set(properties.keys())
+        if props_to_set <= available_props:
+            proxy_util.set(self, **properties)
+        else:
+            valid_props = {}
+            for k, v in properties.items():
+                if k not in available_props:
+                    print_warning(f"Property \"{k}={v}\" is not available on {self.GetXMLLabel()}")
+                else:
+                    valid_props[k] = v
+
+            proxy_util.set(self, **valid_props)
+
     def __ConvertArgumentsAndCall(self, *args):
         """ Internal function.
         Used to call a function on SMProxy. Converts input and
@@ -532,6 +554,34 @@ class Proxy(object):
             pass
         return getattr(self.SMProxy, name)
 
+    @property
+    def _active_model(self):
+        model_name = None
+        if self.GetXMLGroup() == "views":
+            model_name = "ActiveView"
+        if self.GetXMLGroup() == "sources":
+            model_name = "ActiveSources"
+
+        if model_name:
+            return self.pxm._get_active_model(model_name)
+
+        return None
+
+    def __enter__(self):
+        """Activate proxy if possible"""
+        active_model = self._active_model
+        if active_model:
+            self._prev_active = active_model.GetCurrentProxy()
+            active_model.SetCurrentProxy(self.SMProxy, active_model.CLEAR_AND_SELECT)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Revert previously activated proxy"""
+        active_model = self._active_model
+        if active_model:
+            active_model.SetCurrentProxy(self._prev_active, active_model.CLEAR_AND_SELECT)
+        self._prev_active = None
+
 
 class SourceProxy(Proxy):
     """Proxy for a source object. This class adds a few methods to Proxy
@@ -541,6 +591,10 @@ class SourceProxy(Proxy):
     or
     > op = source['some name'].
     """
+
+    def Rename(self, new_name):
+        """Rename proxy in GUI"""
+        proxy_util.rename(self, "sources", new_name)
 
     def UpdatePipeline(self, time=None):
         """This method updates the server-side VTK pipeline and the associated
@@ -1795,6 +1849,13 @@ class ProxyManager(object):
         else:
             self.SMProxyManager.RegisterProxy(group, name, aProxy)
 
+    def _get_active_model(self, name):
+        model = self.GetSelectionModel(name)
+        if not model:
+            model = vtkSMProxySelectionModel()
+            self.RegisterSelectionModel(name, model)
+        return model
+
     def NewProxy(self, group, name):
         """Creates a new proxy of given group and name and returns an SMProxy.
         Note that this is a server manager object. You should normally create
@@ -2370,8 +2431,7 @@ def CreateRepresentation(aProxy, view, **extraArgs):
         return None
     proxy = _getPyProxy(display)
     proxy.Input = aProxy
-    for param in extraArgs.items():
-        setattr(proxy, items[0], items[1])
+    proxy.Set(**extraArgs)
     proxy.UpdateVTKObjects()
     view.Representations.append(proxy)
     return proxy

@@ -5,16 +5,14 @@ from paraview.simple import *
 w = Wavelet()
 UpdatePipeline()
 
-ainfo = w.PointData["RTData"]
-
-assert AssignLookupTable(ainfo, "Cool to Warm") == True
+assert AssignFieldToColorPreset("RTData", "Cool to Warm") == True
 
 try:
-    AssignLookupTable(ainfo, "--non-existent--")
+    AssignFieldToColorPreset("RTData", "--non-existent--")
 
     # this should never happen!
     assert False
 except RuntimeError:
     pass
 
-assert len(GetLookupTableNames()) > 0
+assert len(ListColorPresetNames()) > 0

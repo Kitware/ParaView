@@ -91,6 +91,6 @@ import math
 def frange(start, stop, step=1.0):
     start = float(start)
     count = int(math.ceil( (stop-start)/step )  )
-    return list(start + n*step for n in xrange(count))
+    return list(start + n*step for n in range(count))
 """
 

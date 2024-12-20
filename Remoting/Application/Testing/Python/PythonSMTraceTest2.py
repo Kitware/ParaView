@@ -11,26 +11,36 @@ import sys
 smtesting.ProcessCommandLineArguments()
 tempDir = smtesting.TempDir
 
+
 def fail(message):
     raise Exception(message)
 
+
 def clear_proxies():
     """Method for clearing all user created proxies"""
-    groups = ["sources", "representations", "views",
-                  "implicit_functions", "piecewise_functions",
-                  "lookup_tables", "scalar_bars", "selection_sources"]
+    groups = [
+        "sources",
+        "representations",
+        "views",
+        "implicit_functions",
+        "piecewise_functions",
+        "lookup_tables",
+        "scalar_bars",
+        "selection_sources",
+    ]
     for g in groups:
         for p in servermanager.ProxyManager().GetProxiesInGroup(g).values():
             Delete(p)
+
 
 ########################################################
 # Begin build pipeline
 def create_pipeline():
     view = CreateRenderView()
-    view.Background=[0,0,1]
+    view.Background = [0, 0, 1]
     sphere = Sphere(guiName="my sphere")
     Show()
-    view2 = CreateRenderView() # create a second view for the remaining sources
+    view2 = CreateRenderView()  # create a second view for the remaining sources
     glyph = Glyph(guiName="my glyph")
     Show()
     glyph.GlyphType = "Cone"
@@ -44,6 +54,8 @@ def create_pipeline():
     Show()
     GetDisplayProperties().Representation = "Surface With Edges"
     Render()
+
+
 create_pipeline()
 # End build pipeline
 ########################################################
@@ -83,7 +95,7 @@ if abs(clip.ClipType.Radius - 0.25) > epsilon:
     fail("Clip sphere radius is incorrect.")
 if sphere not in group.Input or clip not in group.Input:
     fail("Group has wrong inputs.")
-if GetDisplayProperties(group, view2).Representation != "Surface With Edges":
+if GetRepresentation(group, view2).Representation != "Surface With Edges":
     fail("Group representation is incorrect")
 if abs(view.Background[1] - 0) > epsilon or abs(view.Background[2] - 1) > epsilon:
     fail("View has incorrect background color")

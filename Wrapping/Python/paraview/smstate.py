@@ -13,10 +13,6 @@ Note, this cannot be called when Python tracing is active.
 from paraview import servermanager as sm
 from paraview import smtrace
 from paraview import simple
-import sys
-
-if sys.version_info >= (3,):
-    xrange = range
 
 RECORD_MODIFIED_PROPERTIES = sm.vtkSMTrace.RECORD_MODIFIED_PROPERTIES
 RECORD_ALL_PROPERTIES = sm.vtkSMTrace.RECORD_ALL_PROPERTIES
@@ -77,7 +73,7 @@ def __toposort_visit(result, proxy, input_set, marked_set, t_marked_set=None):
 def get_consumers(proxy, filter, consumer_set, recursive=True):
     """Returns the consumers for a proxy iteratively. If filter is non-None,
     filter is used to cull consumers."""
-    for i in xrange(proxy.GetNumberOfConsumers()):
+    for i in range(proxy.GetNumberOfConsumers()):
         consumer = proxy.GetConsumerProxy(i)
         consumer = consumer.GetTrueParentProxy() if consumer else None
         consumer = sm._getPyProxy(consumer)
@@ -91,7 +87,7 @@ def get_consumers(proxy, filter, consumer_set, recursive=True):
 def get_producers(proxy, filter, producer_set):
     """Returns the producers for a proxy iteratively. If filter is non-None,
     filter is used to cull producers."""
-    for i in xrange(proxy.GetNumberOfProducers()):
+    for i in range(proxy.GetNumberOfProducers()):
         producer = proxy.GetProducerProxy(i)
         producer = producer.GetTrueParentProxy() if producer else None
         producer = sm._getPyProxy(producer)

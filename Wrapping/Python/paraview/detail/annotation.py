@@ -21,9 +21,6 @@ import paraview.modules.vtkPVVTKExtensionsFiltersPython
 
 import sys  # also for sys.stderr
 
-if sys.version_info >= (3,):
-    xrange = range
-
 
 def _get_ns(self, do, association):
     if association == vtkDataObject.FIELD:
