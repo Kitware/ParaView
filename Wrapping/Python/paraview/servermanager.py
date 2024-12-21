@@ -592,8 +592,10 @@ def _extract_array_info(array):
     ranges = []
     for c_idx in range(components):
         data_range = array.GetRange(c_idx)
+        default_name = f"component_{c_idx}" if components > 1 else "scalar"
+        range_name = array.GetComponentName(c_idx) or default_name
         ranges.append({
-            "name": array.GetComponentName(c_idx),
+            "name": range_name,
             "min": data_range[0],
             "max": data_range[1],
         })
@@ -606,6 +608,14 @@ def _extract_array_info(array):
             })
     return name, dict(name=name, type=type, components=components, ranges=ranges)
 
+def _field_data_to_str(fields_info, indent=3):
+    lines = [""]
+    for k, v in fields_info.items():
+        lines.append(f"{' '*indent}{k}: type({v.get('type')}) - tuple({v.get('components')})")
+        for r in v.get("ranges"):
+            lines.append(f"{' '*(indent+3)}{r.get('name')}: [{r.get('min')}, {r.get('max')}]")
+
+    return '\n'.join(lines)
 
 class SourceInformation:
     def __init__(self, source_proxy):
@@ -643,6 +653,22 @@ class SourceInformation:
             array_info = fd_info.GetArray(array_idx)
             k, v = _extract_array_info(array_info)
             self.field_data[k] = v
+
+    def __repr__(self):
+        return f"""Data Information:
+  - bounds: [
+     {self.bounds[0]}, {self.bounds[1]},
+     {self.bounds[2]}, {self.bounds[3]},
+     {self.bounds[4]}, {self.bounds[5]},
+    ]
+  - number_of_points: {self.number_of_points}
+  - number_of_cells: {self.number_of_cells}
+  - data_type: {self.data_type}
+  - memory: {self.memory}
+  - point_data:{_field_data_to_str(self.point_data, 7)}
+  - cell_data:{_field_data_to_str(self.cell_data, 7)}
+  - field_data:{_field_data_to_str(self.field_data, 7)}
+        """
 
 
 class SourceProxy(Proxy):
