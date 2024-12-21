@@ -62,6 +62,7 @@ set(python_files
   paraview/simple/example/__init__.py
   paraview/simple/example/demo1.py
   paraview/simple/example/demo2.py
+  paraview/simple/example/trame.py
   paraview/simple/io.py
   paraview/simple/layout.py
   paraview/simple/light.py

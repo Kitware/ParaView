@@ -247,51 +247,7 @@ def ColorBy(rep=None, value=None, separate=False):
     if not rep:
         raise ValueError("No display properties can be determined.")
 
-    rep.UseSeparateColorMap = separate
-    association = rep.ColorArrayName.GetAssociation()
-    arrayname = rep.ColorArrayName.GetArrayName()
-    component = None
-    if value == None:
-        rep.SetScalarColoring(None, servermanager.GetAssociationFromString(association))
-        return
-    if not isinstance(value, tuple) and not isinstance(value, list):
-        value = (value,)
-    if len(value) == 1:
-        arrayname = value[0]
-    elif len(value) >= 2:
-        association = value[0]
-        arrayname = value[1]
-    if len(value) == 3:
-        # component name provided
-        componentName = value[2]
-        if componentName == "Magnitude":
-            component = -1
-        else:
-            if association == "POINTS":
-                array = rep.Input.PointData.GetArray(arrayname)
-            if association == "CELLS":
-                array = rep.Input.CellData.GetArray(arrayname)
-            if array:
-                # looking for corresponding component name
-                for i in range(0, array.GetNumberOfComponents()):
-                    if componentName == array.GetComponentName(i):
-                        component = i
-                        break
-                    # none have been found, try to use the name as an int
-                    if i == array.GetNumberOfComponents() - 1:
-                        try:
-                            component = int(componentName)
-                        except ValueError:
-                            pass
-    if component is None:
-        rep.SetScalarColoring(
-            arrayname, servermanager.GetAssociationFromString(association)
-        )
-    else:
-        rep.SetScalarColoring(
-            arrayname, servermanager.GetAssociationFromString(association), component
-        )
-    rep.RescaleTransferFunctionToDataRange()
+    rep.ColorBy(value, separate)
 
 
 # -----------------------------------------------------------------------------
@@ -317,66 +273,5 @@ def ColorBlocksBy(rep=None, selectors=None, value=None, separate=False):
     rep = rep if rep else GetDisplayProperties()
     if not rep:
         raise ValueError("No display properties can be determined.")
-    if selectors is None or len(selectors) == 0:
-        raise ValueError("No selector can be determined.")
 
-    rep.SetBlocksUseSeparateColorMap(selectors, separate)
-
-    firstSelector = selectors[0]
-    associationInt = rep.GetBlockColorArrayAssociation(firstSelector)
-    association = (
-        servermanager.GetAssociationAsString(associationInt)
-        if associationInt != -1
-        else None
-    )
-    arrayname = rep.GetBlockColorArrayName(firstSelector)
-    component = None
-    if value is None:
-        if association is not None:
-            rep.SetBlocksScalarColoring(
-                selectors, None, servermanager.GetAssociationFromString(association)
-            )
-        else:
-            rep.SetBlocksScalarColoring(selectors, None, 0)
-        return
-    if not isinstance(value, tuple) and not isinstance(value, list):
-        value = (value,)
-    if len(value) == 1:
-        arrayname = value[0]
-    elif len(value) >= 2:
-        association = value[0]
-        arrayname = value[1]
-    if len(value) == 3:
-        # component name provided
-        componentName = value[2]
-        if componentName == "Magnitude":
-            component = -1
-        else:
-            if association == "POINTS":
-                array = rep.Input.PointData.GetArray(arrayname)
-            if association == "CELLS":
-                array = rep.Input.CellData.GetArray(arrayname)
-            if array:
-                # looking for corresponding component name
-                for i in range(0, array.GetNumberOfComponents()):
-                    if componentName == array.GetComponentName(i):
-                        component = i
-                        break
-                    # none have been found, try to use the name as an int
-                    if i == array.GetNumberOfComponents() - 1:
-                        try:
-                            component = int(componentName)
-                        except ValueError:
-                            pass
-    if component is None:
-        rep.SetBlocksScalarColoring(
-            selectors, arrayname, servermanager.GetAssociationFromString(association)
-        )
-    else:
-        rep.SetBlocksScalarColoring(
-            selectors,
-            arrayname,
-            servermanager.GetAssociationFromString(association),
-            component,
-        )
-    rep.RescaleBlocksTransferFunctionToDataRange(selectors)
+    rep.ColorBlocksBy(selectors, value, separate)
