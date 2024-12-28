@@ -60,10 +60,14 @@ paraview_add_plugin(BivariateRepresentations
 
 # XXX(cmake-3.13)
 if (COMMAND target_link_options)
-  # XXX(cmake-3.29): Suppress warnings with Xcode 15+ linkers; resolved with CMake 3.29.
-  target_link_options(BivariateRepresentations
-    PRIVATE
-      "$<$<PLATFORM_ID:Darwin>:LINKER:-no_warn_duplicate_libraries>")
+  # XXX(cmake-3.29): Suppress warnings with Xcode 15+ linkers; resolved with
+  # CMake 3.29.
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "15")
+    target_link_options(BivariateRepresentations
+      PRIVATE
+        "$<$<PLATFORM_ID:Darwin>:LINKER:-no_warn_duplicate_libraries>")
+  endif ()
 endif ()
 
 if (BUILD_TESTING)
