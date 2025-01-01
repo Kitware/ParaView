@@ -554,6 +554,12 @@ QString pqServerConfiguration::sshFullCommand(
     }
   }
 
+  QString options = qgetenv("PARAVIEW_SSH_OPTIONS");
+  if (!options.isEmpty())
+  {
+    sshStream << options << " ";
+  }
+
   QString sshUser = sshConfigXML->GetAttributeOrDefault("user", "");
   if (!sshUser.isEmpty())
   {
