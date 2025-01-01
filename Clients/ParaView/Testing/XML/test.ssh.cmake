@@ -1,6 +1,11 @@
 
 message(STATUS
-  "With PARAVIEW_SSH_SERVERS_TESTING, to have the SSH Server tests pass, make sure that the machine running the test has a SSH server running on port 2222, its own ssh public key as an authorized_keys, that 127.0.0.1 is in the known_hosts file and that /usr/bin/xterm is available. In case of failing tests, pvserver logs are available in ${CMAKE_CURRENT_BINARY_DIR}/sshServer.log")
+  "With PARAVIEW_SSH_SERVERS_TESTING, to have the SSH Server tests pass, make "
+  "sure that the machine running the test has a SSH server running on port "
+  "2222, its own ssh public key as an authorized_keys, that 127.0.0.1 is in "
+  "the known_hosts file and that /usr/bin/xterm is available. In case of "
+  "failing tests, pvserver logs are available in "
+  "${CMAKE_CURRENT_BINARY_DIR}/sshServer-*.log")
 
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/server.sh.in"
