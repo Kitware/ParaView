@@ -16,6 +16,5 @@ shift
 # DIRTY FIX
 # Wait 120s for all the SSH test to run, then make sure that all remaining instance of x-terminal-emulator are killed
 # TODO : A better and cleaner solution
-sleep 120&
-wait $!
+sleep 120
 kill $(pgrep 'x-terminal-emulator')
