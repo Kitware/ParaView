@@ -415,7 +415,7 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
       return QString();
     }
 
-    // Recover a sssh command
+    // Recover a ssh command
     // It can be specified in the XML.
     // If not we look for default ssh names.
     vtkPVXMLElement* sshCommandExecXML = sshConfigXML->FindNestedElementByName("SSH");
