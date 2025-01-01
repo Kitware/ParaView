@@ -18,12 +18,12 @@ ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 # Generate a SSH server configuration
-echo "
+cat > "$HOME/.ssh/sshd_conf" <<EOF
 Port 2222
 HostKey ~/.ssh/id_rsa
 PidFile ~/.ssh/sshd.pid
 AuthorizedKeysFile ~/.ssh/id_rsa.pub
-" > $HOME/.ssh/sshd_conf
+EOF
 
 # Run SSH server as daemon
 /usr/sbin/sshd -f $HOME/.ssh/sshd_conf
