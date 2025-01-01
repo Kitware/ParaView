@@ -12,18 +12,21 @@ if [ "$( id -u )" != "0" ]; then
     exit 0
 fi
 
+readonly ssh_root=".gitlab/ssh"
+mkdir -p "$ssh_root"
+
 # Generate keys and append own public key as authorized
 mkdir ~/.ssh
-ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+ssh-keygen -t rsa -q -f "$ssh_root/id_rsa" -N ""
+cp "$ssh_root/id_rsa.pub" "$ssh_root/authorized_keys"
 
 # Generate a SSH server configuration
-cat > "$HOME/.ssh/sshd_conf" <<EOF
+cat > "$ssh_root/sshd_config" <<EOF
 Port 2222
-HostKey ~/.ssh/id_rsa
-PidFile ~/.ssh/sshd.pid
-AuthorizedKeysFile ~/.ssh/id_rsa.pub
+HostKey $ssh_root/id_rsa
+PidFile $ssh_root/sshd.pid
+AuthorizedKeysFile $ssh_root/id_rsa.pub
 EOF
 
 # Run SSH server as daemon
-/usr/sbin/sshd -f $HOME/.ssh/sshd_conf
+/usr/sbin/sshd -f "$ssh_root/sshd_config"
