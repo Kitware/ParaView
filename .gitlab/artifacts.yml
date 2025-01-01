@@ -11,6 +11,9 @@
             - prepare_output.log
             - build/CMakeCache.txt
             - build/Documentation/ParaViewGeneratedDocs.tar.gz
+        reports:
+            annotations:
+                - build/annotations.json
 
 .cmake_translations_artifacts:
     artifacts:
