@@ -17,6 +17,7 @@
 #include "vtkVolumeMapper.h"
 #include "vtkVolumeProperty.h"
 
+#include <algorithm>
 #include <cmath>
 
 //-----------------------------------------------------------------------------
@@ -260,14 +261,8 @@ double* vtkPVLODVolume::GetBounds()
     {
       for (n = 0; n < 3; n++)
       {
-        if (bbox[i * 3 + n] < this->Bounds[n * 2])
-        {
-          this->Bounds[n * 2] = bbox[i * 3 + n];
-        }
-        if (bbox[i * 3 + n] > this->Bounds[n * 2 + 1])
-        {
-          this->Bounds[n * 2 + 1] = bbox[i * 3 + n];
-        }
+        this->Bounds[n * 2] = std::min(this->Bounds[n * 2], bbox[i * 3 + n]);
+        this->Bounds[n * 2 + 1] = std::max(this->Bounds[n * 2 + 1], bbox[i * 3 + n]);
       }
     }
     this->BoundsMTime.Modified();

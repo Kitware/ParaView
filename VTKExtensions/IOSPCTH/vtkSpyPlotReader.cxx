@@ -42,6 +42,7 @@
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cmath>
@@ -2261,10 +2262,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
         // Grab the number of levels from left child
         this->GlobalController->Receive(
           &ulintMsgValue, 1, left, VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
-        if (numberOfLevels < ulintMsgValue)
-        {
-          numberOfLevels = ulintMsgValue;
-        }
+        numberOfLevels = std::max<unsigned long>(numberOfLevels, ulintMsgValue);
       }
       if (right < numProcessors)
       {
@@ -2273,10 +2271,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
           // Grab the number of levels from right child
           this->GlobalController->Receive(
             &ulintMsgValue, 1, right, VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
-          if (numberOfLevels < ulintMsgValue)
-          {
-            numberOfLevels = ulintMsgValue;
-          }
+          numberOfLevels = std::max<unsigned long>(numberOfLevels, ulintMsgValue);
         }
       }
     }

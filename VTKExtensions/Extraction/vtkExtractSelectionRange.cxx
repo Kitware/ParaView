@@ -21,6 +21,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <vector>
@@ -169,10 +170,7 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
     for (vtkIdType i = 0; i < idList->GetNumberOfTuples(); i++)
     {
       vtkIdType id = idList->GetTuple1(i);
-      if (id > idmax)
-      {
-        idmax = id;
-      }
+      idmax = std::max(idmax, id);
     }
     if (idmax > dataArray->GetNumberOfTuples())
     {
@@ -196,24 +194,12 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
         value = values[this->Component];
       }
 
-      if (value < tempRange[0])
-      {
-        tempRange[0] = value;
-      }
-      if (value > tempRange[1])
-      {
-        tempRange[1] = value;
-      }
+      tempRange[0] = std::min(tempRange[0], value);
+      tempRange[1] = std::max(tempRange[1], value);
     }
 
-    if (tempRange[0] < this->Range[0])
-    {
-      this->Range[0] = tempRange[0];
-    }
-    if (tempRange[1] > this->Range[1])
-    {
-      this->Range[1] = tempRange[1];
-    }
+    this->Range[0] = std::min(this->Range[0], tempRange[0]);
+    this->Range[1] = std::max(this->Range[1], tempRange[1]);
 
     vtkDebugMacro(<< "Current range " << this->Range[0] << " " << this->Range[1]);
   }

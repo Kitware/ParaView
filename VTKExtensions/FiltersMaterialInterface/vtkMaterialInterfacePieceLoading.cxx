@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkMaterialInterfacePieceLoading.h"
 #include "vtkMaterialInterfaceUtilities.h"
+#include <algorithm>
 #include <vector>
 using std::cerr;
 using std::endl;
@@ -35,10 +36,7 @@ void PrintPieceLoadingHistogram(vector<vector<vtkIdType>>& pla)
       {
         minLoading = loading;
       }
-      if (maxLoading < loading)
-      {
-        maxLoading = loading;
-      }
+      maxLoading = std::max(maxLoading, loading);
     }
   }
   // generate histogram

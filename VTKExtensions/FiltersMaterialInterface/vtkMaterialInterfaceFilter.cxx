@@ -67,7 +67,7 @@ using std::ostringstream;
 using std::vector;
 #include <string>
 using std::string;
-#include "algorithm"
+#include <algorithm>
 // ansi c
 #include <cmath>
 #include <ctime>
@@ -1917,30 +1917,12 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
         const int* ext;
         ext = block->GetBaseCellExtent();
         // We need the cumulative extent to determine the grid extent.
-        if (cumulativeExt[0] > ext[0])
-        {
-          cumulativeExt[0] = ext[0];
-        }
-        if (cumulativeExt[1] < ext[1])
-        {
-          cumulativeExt[1] = ext[1];
-        }
-        if (cumulativeExt[2] > ext[2])
-        {
-          cumulativeExt[2] = ext[2];
-        }
-        if (cumulativeExt[3] < ext[3])
-        {
-          cumulativeExt[3] = ext[3];
-        }
-        if (cumulativeExt[4] > ext[4])
-        {
-          cumulativeExt[4] = ext[4];
-        }
-        if (cumulativeExt[5] < ext[5])
-        {
-          cumulativeExt[5] = ext[5];
-        }
+        cumulativeExt[0] = std::min(cumulativeExt[0], ext[0]);
+        cumulativeExt[1] = std::max(cumulativeExt[1], ext[1]);
+        cumulativeExt[2] = std::min(cumulativeExt[2], ext[2]);
+        cumulativeExt[3] = std::max(cumulativeExt[3], ext[3]);
+        cumulativeExt[4] = std::min(cumulativeExt[4], ext[4]);
+        cumulativeExt[5] = std::max(cumulativeExt[5], ext[5]);
       }
     }
 
@@ -1965,30 +1947,12 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
       for (int ii = 1; ii < numProcs; ++ii)
       {
         this->Controller->Receive(tmp, 6, ii, 212130);
-        if (cumulativeExt[0] > tmp[0])
-        {
-          cumulativeExt[0] = tmp[0];
-        }
-        if (cumulativeExt[1] < tmp[1])
-        {
-          cumulativeExt[1] = tmp[1];
-        }
-        if (cumulativeExt[2] > tmp[2])
-        {
-          cumulativeExt[2] = tmp[2];
-        }
-        if (cumulativeExt[3] < tmp[3])
-        {
-          cumulativeExt[3] = tmp[3];
-        }
-        if (cumulativeExt[4] > tmp[4])
-        {
-          cumulativeExt[4] = tmp[4];
-        }
-        if (cumulativeExt[5] < tmp[5])
-        {
-          cumulativeExt[5] = tmp[5];
-        }
+        cumulativeExt[0] = std::min(cumulativeExt[0], tmp[0]);
+        cumulativeExt[1] = std::max(cumulativeExt[1], tmp[1]);
+        cumulativeExt[2] = std::min(cumulativeExt[2], tmp[2]);
+        cumulativeExt[3] = std::max(cumulativeExt[3], tmp[3]);
+        cumulativeExt[4] = std::min(cumulativeExt[4], tmp[4]);
+        cumulativeExt[5] = std::max(cumulativeExt[5], tmp[5]);
       }
       // Redistribute the global grid extent
       for (int ii = 1; ii < numProcs; ++ii)
@@ -2575,30 +2539,12 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(vtkNonOverlapping
         ++totalNumberOfBlocksInThisProcess;
         image->GetBounds(bounds);
         // Compute globalBounds.
-        if (globalBounds[0] > bounds[0])
-        {
-          globalBounds[0] = bounds[0];
-        }
-        if (globalBounds[1] < bounds[1])
-        {
-          globalBounds[1] = bounds[1];
-        }
-        if (globalBounds[2] > bounds[2])
-        {
-          globalBounds[2] = bounds[2];
-        }
-        if (globalBounds[3] < bounds[3])
-        {
-          globalBounds[3] = bounds[3];
-        }
-        if (globalBounds[4] > bounds[4])
-        {
-          globalBounds[4] = bounds[4];
-        }
-        if (globalBounds[5] < bounds[5])
-        {
-          globalBounds[5] = bounds[5];
-        }
+        globalBounds[0] = std::min(globalBounds[0], bounds[0]);
+        globalBounds[1] = std::max(globalBounds[1], bounds[1]);
+        globalBounds[2] = std::min(globalBounds[2], bounds[2]);
+        globalBounds[3] = std::max(globalBounds[3], bounds[3]);
+        globalBounds[4] = std::min(globalBounds[4], bounds[4]);
+        globalBounds[5] = std::max(globalBounds[5], bounds[5]);
         image->GetExtent(ext);
         cellDims[0] = ext[1] - ext[0]; // ext is point extent.
         cellDims[1] = ext[3] - ext[2];
@@ -2701,30 +2647,12 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(vtkNonOverlapping
           lowestDims[1] = iMsg[7];
           lowestDims[2] = iMsg[8];
         }
-        if (globalBounds[0] > dMsg[9])
-        {
-          globalBounds[0] = dMsg[9];
-        }
-        if (globalBounds[1] < dMsg[10])
-        {
-          globalBounds[1] = dMsg[10];
-        }
-        if (globalBounds[2] > dMsg[11])
-        {
-          globalBounds[2] = dMsg[11];
-        }
-        if (globalBounds[3] < dMsg[12])
-        {
-          globalBounds[3] = dMsg[12];
-        }
-        if (globalBounds[4] > dMsg[13])
-        {
-          globalBounds[4] = dMsg[13];
-        }
-        if (globalBounds[5] < dMsg[14])
-        {
-          globalBounds[5] = dMsg[14];
-        }
+        globalBounds[0] = std::min(globalBounds[0], dMsg[9]);
+        globalBounds[1] = std::max(globalBounds[1], dMsg[10]);
+        globalBounds[1] = std::max(globalBounds[1], dMsg[10]);
+        globalBounds[3] = std::max(globalBounds[3], dMsg[12]);
+        globalBounds[4] = std::min(globalBounds[4], dMsg[13]);
+        globalBounds[5] = std::max(globalBounds[5], dMsg[14]);
       }
     }
   }
@@ -2735,10 +2663,7 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(vtkNonOverlapping
     this->StandardBlockDimensions[1] = largestDims[1] - 1 - static_cast<int>(this->BlockGhostLevel);
     this->StandardBlockDimensions[2] = largestDims[2] - 1 - static_cast<int>(this->BlockGhostLevel);
     // For 2d case
-    if (this->StandardBlockDimensions[2] < 1)
-    {
-      this->StandardBlockDimensions[2] = 1;
-    }
+    this->StandardBlockDimensions[2] = std::max(this->StandardBlockDimensions[2], 1);
     this->RootSpacing[0] = lowestSpacing[0] * (1 << (lowestLevel));
     this->RootSpacing[1] = lowestSpacing[1] * (1 << (lowestLevel));
     this->RootSpacing[2] = lowestSpacing[2] * (1 << (lowestLevel));
@@ -3091,30 +3016,12 @@ int vtkMaterialInterfaceFilter::ComputeRequiredGhostExtent(
               remoteLayerExt[4] = remoteLayerExt[5];
             }
             // Take the union of all blocks.
-            if (neededExt[0] > remoteLayerExt[0])
-            {
-              neededExt[0] = remoteLayerExt[0];
-            }
-            if (neededExt[1] < remoteLayerExt[1])
-            {
-              neededExt[1] = remoteLayerExt[1];
-            }
-            if (neededExt[2] > remoteLayerExt[2])
-            {
-              neededExt[2] = remoteLayerExt[2];
-            }
-            if (neededExt[3] < remoteLayerExt[3])
-            {
-              neededExt[3] = remoteLayerExt[3];
-            }
-            if (neededExt[4] > remoteLayerExt[4])
-            {
-              neededExt[4] = remoteLayerExt[4];
-            }
-            if (neededExt[5] < remoteLayerExt[5])
-            {
-              neededExt[5] = remoteLayerExt[5];
-            }
+            neededExt[0] = std::min(neededExt[0], remoteLayerExt[0]);
+            neededExt[1] = std::max(neededExt[1], remoteLayerExt[1]);
+            neededExt[2] = std::min(neededExt[2], remoteLayerExt[2]);
+            neededExt[3] = std::max(neededExt[3], remoteLayerExt[3]);
+            neededExt[4] = std::min(neededExt[4], remoteLayerExt[4]);
+            neededExt[5] = std::max(neededExt[5], remoteLayerExt[5]);
           }
         }
       }
@@ -4141,15 +4048,9 @@ int vtkMaterialInterfaceFilter::ComputeDisplacementFactors(
   // of a unit cube.
   double max = fabs(g[0]);
   double tmp = fabs(g[1]);
-  if (tmp > max)
-  {
-    max = tmp;
-  }
+  max = std::max(tmp, max);
   tmp = fabs(g[2]);
-  if (tmp > max)
-  {
-    max = tmp;
-  }
+  max = std::max(tmp, max);
   tmp = 0.5 / max;
   g[0] *= tmp;
   g[1] *= tmp;
@@ -4192,14 +4093,8 @@ int vtkMaterialInterfaceFilter::ComputeDisplacementFactors(
   // We could also keep clean from creating non manifold surfaces.
   // I do not generate the surface in a second pass (when we have
   // the fragment ids) because it would be too expensive.
-  if (k < 0.0)
-  {
-    k = 0.0;
-  }
-  if (k > 1.0)
-  {
-    k = 1.0;
-  }
+  k = std::max(k, 0.0);
+  k = std::min(k, 1.0);
 
   // This should give us decent displacement factors.
   k *= 2.0;
@@ -4272,14 +4167,8 @@ int vtkMaterialInterfaceFilter::SubVoxelPositionCorner(double* point,
     projection = (point[0] - this->ClipCenter[0]) * this->ClipPlaneNormal[0];
     projection += (point[1] - this->ClipCenter[1]) * this->ClipPlaneNormal[1];
     projection += (point[2] - this->ClipCenter[2]) * this->ClipPlaneNormal[2];
-    if (this->ClipDepthMax < projection)
-    {
-      this->ClipDepthMax = projection;
-    }
-    if (this->ClipDepthMin > projection)
-    {
-      this->ClipDepthMin = projection;
-    }
+    this->ClipDepthMax = std::max(this->ClipDepthMax, projection);
+    this->ClipDepthMin = std::min(this->ClipDepthMin, projection);
   }
 
   return retVal;
@@ -5112,30 +5001,12 @@ void vtkMaterialInterfaceFilter::FindNeighbor(int faceIdx[3], int faceLevel,
 
   // We have a block
   // clamp the neighbor index to pad the volume
-  if (refIdx[0] < refExt[0])
-  {
-    refIdx[0] = refExt[0];
-  }
-  if (refIdx[0] > refExt[1])
-  {
-    refIdx[0] = refExt[1];
-  }
-  if (refIdx[1] < refExt[2])
-  {
-    refIdx[1] = refExt[2];
-  }
-  if (refIdx[1] > refExt[3])
-  {
-    refIdx[1] = refExt[3];
-  }
-  if (refIdx[2] < refExt[4])
-  {
-    refIdx[2] = refExt[4];
-  }
-  if (refIdx[2] > refExt[5])
-  {
-    refIdx[2] = refExt[5];
-  }
+  refIdx[0] = std::max(refIdx[0], refExt[0]);
+  refIdx[0] = std::min(refIdx[0], refExt[1]);
+  refIdx[1] = std::max(refIdx[1], refExt[2]);
+  refIdx[1] = std::min(refIdx[1], refExt[3]);
+  refIdx[2] = std::max(refIdx[2], refExt[4]);
+  refIdx[2] = std::min(refIdx[2], refExt[5]);
 
   neighbor->Block = refBlock;
   neighbor->Index[0] = refIdx[0];
@@ -9993,10 +9864,7 @@ double vtkMaterialInterfaceFilterHalfSphere::EvaluateHalfSpherePoint(double pt[3
   double combined;
   // Take the maximum (union) for inversion.
   combined = planeDot;
-  if (combined < sphereDist)
-  {
-    combined = sphereDist;
-  }
+  combined = std::max(combined, sphereDist);
 
   return combined;
 }

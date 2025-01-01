@@ -30,6 +30,8 @@
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
+#include <algorithm>
+
 vtkStandardNewMacro(vtkRedistributePolyData);
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, vtkMultiProcessController);
@@ -231,10 +233,7 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
     // only copy that many or copy all of input cells if extra are
     // added
 
-    if (numCells[type] < origNumCells[type])
-    {
-      origNumCells[type] = numCells[type];
-    }
+    origNumCells[type] = std::min(origNumCells[type], numCells[type]);
   }
 
 #if VTK_REDIST_DO_TIMING

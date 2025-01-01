@@ -31,6 +31,7 @@
 #include "vtkMPIController.h"
 #endif
 
+#include <algorithm>
 #include <list>
 #include <map>
 
@@ -412,10 +413,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
       for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel(level); blockId++)
       {
         vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock(level, blockId);
-        if (block->BlockId > maxId)
-        {
-          maxId = block->BlockId;
-        }
+        maxId = std::max(maxId, block->BlockId);
       }
       this->NeighborList[level].resize(maxId + 1);
       for (int blockId = 0; blockId < maxId; blockId++)

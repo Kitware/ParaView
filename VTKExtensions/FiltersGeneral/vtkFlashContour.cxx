@@ -18,6 +18,8 @@
 #include "vtkPolyData.h"
 #include "vtkUnsignedCharArray.h"
 
+#include <algorithm>
+
 vtkStandardNewMacro(vtkFlashContour);
 
 // How do we find edge/corner neighbors and neighbors in different levels.
@@ -442,10 +444,7 @@ unsigned char vtkFlashContour::ComputeBranchDepth(int globalBlockId)
   for (int i = 0; i < 8; ++i)
   {
     unsigned char tmp = this->ComputeBranchDepth(children[i]);
-    if (tmp > max)
-    {
-      max = tmp;
-    }
+    max = std::max(max, tmp);
   }
   return max + 1;
 }

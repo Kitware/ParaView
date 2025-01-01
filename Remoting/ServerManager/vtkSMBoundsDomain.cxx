@@ -13,6 +13,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
+#include <algorithm>
 #include <cmath>
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
@@ -179,14 +180,8 @@ void vtkSMBoundsDomain::UpdateOriented()
     double min = dist[0], max = dist[0];
     for (i = 1; i < 8; i++)
     {
-      if (dist[i] < min)
-      {
-        min = dist[i];
-      }
-      if (dist[i] > max)
-      {
-        max = dist[i];
-      }
+      min = std::min(min, dist[i]);
+      max = std::max(max, dist[i]);
     }
 
     std::vector<vtkEntry> entries;

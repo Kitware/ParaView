@@ -23,6 +23,8 @@
 
 #include <QCoreApplication>
 
+#include <algorithm>
+
 //-----------------------------------------------------------------------------
 pqSourcesMenuReaction::pqSourcesMenuReaction(pqProxyGroupMenuManager* menuManager)
   : Superclass(menuManager)
@@ -116,10 +118,7 @@ bool pqSourcesMenuReaction::warnOnCreate(
               continue;
             }
             long long remainingMemory = hostMemoryAvailable - hostMemoryUse;
-            if (remainingMemory < worstRemainingMemory)
-            {
-              worstRemainingMemory = remainingMemory;
-            }
+            worstRemainingMemory = std::min(remainingMemory, worstRemainingMemory);
           }
 
           // Compare with the input size

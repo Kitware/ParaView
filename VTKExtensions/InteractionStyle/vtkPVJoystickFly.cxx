@@ -11,6 +11,8 @@
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
+#include <algorithm>
+
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
 {
@@ -112,10 +114,7 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor* rwi, dou
       this->LastRenderTime = timer->GetElapsedTime();
       // Limit length of render time because we do not want such large jumps
       // when rendering takes more than 1 second.
-      if (this->LastRenderTime > 1.0)
-      {
-        this->LastRenderTime = 1.0;
-      }
+      this->LastRenderTime = std::min(this->LastRenderTime, 1.0);
     }
     first = 0;
 

@@ -17,6 +17,8 @@
 
 #include "pqSMAdaptor.h"
 
+#include <algorithm>
+
 //-----------------------------------------------------------------------------
 class pqSignalAdaptorSelectionTreeWidget::pqInternal
 {
@@ -105,10 +107,7 @@ void pqSignalAdaptorSelectionTreeWidget::setValues(const QList<QList<QVariant>>&
 
   bool old_bs = this->blockSignals(true);
   int max = this->Internal->TreeWidget->topLevelItemCount();
-  if (new_values.size() < max)
-  {
-    max = new_values.size();
-  }
+  max = std::min<qsizetype>(new_values.size(), max);
 
   bool changed = false;
   for (int cc = 0; cc < max; cc++)

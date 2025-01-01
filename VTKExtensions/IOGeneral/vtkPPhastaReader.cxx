@@ -20,6 +20,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <map>
 #include <sstream>
 
@@ -411,10 +412,7 @@ int vtkPPhastaReader::RequestInformation(
           int index;
           if (nested2->GetScalarAttribute("index", &index))
           {
-            if ((index + 1) > numTimeSteps)
-            {
-              numTimeSteps = index + 1;
-            }
+            numTimeSteps = std::max(numTimeSteps, index + 1);
             vtkPPhastaReaderInternal::TimeStepInfo& info = this->Internal->TimeStepInfoMap[index];
             int gIdx;
             if (nested2->GetScalarAttribute("geometry_index", &gIdx))
@@ -503,10 +501,7 @@ int vtkPPhastaReader::RequestInformation(
         }
       }
 
-      if (numberOfFields < numberOfFields2)
-      {
-        numberOfFields = numberOfFields2;
-      }
+      numberOfFields = std::max(numberOfFields, numberOfFields2);
 
       break;
     }

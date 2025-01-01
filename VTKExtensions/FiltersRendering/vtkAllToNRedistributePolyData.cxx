@@ -7,6 +7,8 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 
+#include <algorithm>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAllToNRedistributePolyData);
 
@@ -53,10 +55,7 @@ void vtkAllToNRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSche
   {
     numberOfValidProcesses = numProcs;
   }
-  if (numberOfValidProcesses > numProcs)
-  {
-    numberOfValidProcesses = numProcs;
-  }
+  numberOfValidProcesses = std::min(numberOfValidProcesses, numProcs);
 
   this->SetWeights(0, numberOfValidProcesses - 1, 1.);
   if (numberOfValidProcesses < numProcs)

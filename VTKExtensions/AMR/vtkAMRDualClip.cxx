@@ -33,6 +33,8 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
+
+#include <algorithm>
 #include <cmath>
 #include <ctime>
 
@@ -503,30 +505,12 @@ void vtkAMRDualClipLocator::CopyNeighborLevelMask(
   sourceExt[5] = ((sourceExt[5] + 1) << levelDiff) - 1;
 
   // Take the intersection to find the destination extent.
-  if (destExt[0] < sourceExt[0])
-  {
-    destExt[0] = sourceExt[0];
-  }
-  if (destExt[1] > sourceExt[1])
-  {
-    destExt[1] = sourceExt[1];
-  }
-  if (destExt[2] < sourceExt[2])
-  {
-    destExt[2] = sourceExt[2];
-  }
-  if (destExt[3] > sourceExt[3])
-  {
-    destExt[3] = sourceExt[3];
-  }
-  if (destExt[4] < sourceExt[4])
-  {
-    destExt[4] = sourceExt[4];
-  }
-  if (destExt[5] > sourceExt[5])
-  {
-    destExt[5] = sourceExt[5];
-  }
+  destExt[0] = std::max(destExt[0], sourceExt[0]);
+  destExt[1] = std::min(destExt[1], sourceExt[1]);
+  destExt[2] = std::max(destExt[2], sourceExt[2]);
+  destExt[3] = std::min(destExt[3], sourceExt[3]);
+  destExt[4] = std::max(destExt[4], sourceExt[4]);
+  destExt[5] = std::min(destExt[5], sourceExt[5]);
 
   // Loop over the extent.
   unsigned char* sourcePtr = neighborLocator->GetLevelMaskPointer();
@@ -733,22 +717,13 @@ vtkIdType* vtkAMRDualClipLocator::GetCornerPointer(
     // It looks like we need to know the origin of the block.
     xCell += blockOrigin[0];
     xCell = ((xCell >> diff) << diff) - blockOrigin[0];
-    if (xCell < 0)
-    {
-      xCell = 0;
-    }
+    xCell = std::max(xCell, 0);
     yCell += blockOrigin[1];
     yCell = ((yCell >> diff) << diff) - blockOrigin[1];
-    if (yCell < 0)
-    {
-      yCell = 0;
-    }
+    yCell = std::max(yCell, 0);
     zCell += blockOrigin[2];
     zCell = ((zCell >> diff) << diff) - blockOrigin[2];
-    if (zCell < 0)
-    {
-      zCell = 0;
-    }
+    zCell = std::max(zCell, 0);
   }
 
   return this->Corners + (xCell + (yCell * this->YIncrement) + (zCell * this->ZIncrement));
@@ -894,54 +869,18 @@ void vtkAMRDualClipLocator::ShareBlockLocatorWithNeighbor(
   ext[4] = (ext[4] >> levelDiff) - block->OriginIndex[2];
   ext[5] = (ext[5] >> levelDiff) - block->OriginIndex[2];
   // Intersect with in (source) low level block.
-  if (ext[0] < 0)
-  {
-    ext[0] = 0;
-  }
-  if (ext[0] > blockLocator->DualCellDimensions[0])
-  {
-    ext[0] = blockLocator->DualCellDimensions[0];
-  }
-  if (ext[1] < 0)
-  {
-    ext[1] = 0;
-  }
-  if (ext[1] > blockLocator->DualCellDimensions[0])
-  {
-    ext[1] = blockLocator->DualCellDimensions[0];
-  }
-  if (ext[2] < 0)
-  {
-    ext[2] = 0;
-  }
-  if (ext[2] > blockLocator->DualCellDimensions[1])
-  {
-    ext[2] = blockLocator->DualCellDimensions[1];
-  }
-  if (ext[3] < 0)
-  {
-    ext[3] = 0;
-  }
-  if (ext[3] > blockLocator->DualCellDimensions[1])
-  {
-    ext[3] = blockLocator->DualCellDimensions[1];
-  }
-  if (ext[4] < 0)
-  {
-    ext[4] = 0;
-  }
-  if (ext[4] > blockLocator->DualCellDimensions[2])
-  {
-    ext[4] = blockLocator->DualCellDimensions[2];
-  }
-  if (ext[5] < 0)
-  {
-    ext[5] = 0;
-  }
-  if (ext[5] > blockLocator->DualCellDimensions[2])
-  {
-    ext[5] = blockLocator->DualCellDimensions[2];
-  }
+  ext[0] = std::max(ext[0], 0);
+  ext[0] = std::min(ext[0], blockLocator->DualCellDimensions[0]);
+  ext[1] = std::max(ext[1], 0);
+  ext[1] = std::min(ext[1], blockLocator->DualCellDimensions[0]);
+  ext[2] = std::max(ext[2], 0);
+  ext[2] = std::min(ext[2], blockLocator->DualCellDimensions[1]);
+  ext[3] = std::max(ext[3], 0);
+  ext[3] = std::min(ext[3], blockLocator->DualCellDimensions[1]);
+  ext[4] = std::max(ext[4], 0);
+  ext[4] = std::min(ext[4], blockLocator->DualCellDimensions[2]);
+  ext[5] = std::max(ext[5], 0);
+  ext[5] = std::min(ext[5], blockLocator->DualCellDimensions[2]);
 
   vtkIdType pointId;
   int xOut, yOut, zOut;
@@ -954,27 +893,18 @@ void vtkAMRDualClipLocator::ShareBlockLocatorWithNeighbor(
     // Like the other places this locator indexconversion is done,
     // The min ghost index is shifted to fit into the locator array.
     zOut = ((zIn + block->OriginIndex[2]) << levelDiff) - neighbor->OriginIndex[2];
-    if (zOut < 0)
-    {
-      zOut = 0;
-    }
+    zOut = std::max(zOut, 0);
     outOffsetZ = zOut * neighborLocator->ZIncrement;
     for (int yIn = ext[2]; yIn <= ext[3]; ++yIn)
     {
       inOffsetX = inOffsetY;
       yOut = ((yIn + block->OriginIndex[1]) << levelDiff) - neighbor->OriginIndex[1];
-      if (yOut < 0)
-      {
-        yOut = 0;
-      }
+      yOut = std::max(yOut, 0);
       outOffsetY = outOffsetZ + yOut * neighborLocator->YIncrement;
       for (int xIn = ext[0]; xIn <= ext[1]; ++xIn)
       {
         xOut = ((xIn + block->OriginIndex[0]) << levelDiff) - neighbor->OriginIndex[0];
-        if (xOut < 0)
-        {
-          xOut = 0;
-        }
+        xOut = std::max(xOut, 0);
         outOffsetX = outOffsetY + xOut;
 
         pointId = blockLocator->XEdges[inOffsetX];

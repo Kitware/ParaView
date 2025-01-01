@@ -35,6 +35,7 @@
 #include VTK_CGNS(cgnslib.h)
 // clang-format on
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <sstream>
@@ -478,10 +479,7 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
     {
       vtkCell* cell = grid->GetCell(i);
       int cellDim = cell->GetCellDimension();
-      if (info.CellDim < cellDim)
-      {
-        info.CellDim = cellDim;
-      }
+      info.CellDim = std::max(info.CellDim, cellDim);
     }
   }
 
@@ -830,10 +828,7 @@ int vtkCGNSWriter::vtkPrivate::DetermineCellDimension(vtkPointSet* pointSet)
       {
         vtkCell* cell = unstructuredGrid->GetCell(n);
         int curCellDim = cell->GetCellDimension();
-        if (CellDim < curCellDim)
-        {
-          CellDim = curCellDim;
-        }
+        CellDim = std::max(CellDim, curCellDim);
       }
     }
   }

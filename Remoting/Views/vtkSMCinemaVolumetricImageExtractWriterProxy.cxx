@@ -315,10 +315,7 @@ bool vtkSMCinemaVolumetricImageExtractWriterProxy::WriteInternal(
     // for when number_of_opacity_levels is greater than 1 that adds number_of_opacity_levels**r
     // for each combination
     // of functions
-    if (maximum_number_of_functions > number_of_functions)
-    {
-      maximum_number_of_functions = number_of_functions;
-    }
+    maximum_number_of_functions = std::min(maximum_number_of_functions, number_of_functions);
     int sum = 0;
     for (int r = 1; r < maximum_number_of_functions; r++)
     {

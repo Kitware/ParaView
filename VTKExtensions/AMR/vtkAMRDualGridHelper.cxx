@@ -22,6 +22,7 @@
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
+#include <algorithm>
 #include <list>
 #include <vector>
 
@@ -2282,10 +2283,7 @@ int vtkAMRDualGridHelper::Initialize(vtkNonOverlappingAMR* input)
     this->StandardBlockDimensions[1] = standardBoxSizeIa->GetValue(1) - 2;
     this->StandardBlockDimensions[2] = standardBoxSizeIa->GetValue(2) - 2;
     // For 2d case
-    if (this->StandardBlockDimensions[2] < 1)
-    {
-      this->StandardBlockDimensions[2] = 1;
-    }
+    this->StandardBlockDimensions[2] = std::max(this->StandardBlockDimensions[2], 1);
     int lowestLevel = minLevelIa->GetValue(0);
     this->RootSpacing[0] = minLevelSpacingDa->GetValue(0) * (1 << (lowestLevel));
     this->RootSpacing[1] = minLevelSpacingDa->GetValue(1) * (1 << (lowestLevel));
@@ -2669,21 +2667,12 @@ class vtkReduceMeta : public vtkCommunicator::Operation
       // // dmsgB[19] = dmsgA[19]; // lowestDims 1
       // dmsgB[20] = dmsgA[20]; // lowestDims 2
     }
-    if (dmsgB[8] > dmsgA[8])
-    {
-      dmsgB[8] = dmsgA[8];
-    } // globalBounds 0
-    // if (dmsgB[22] < dmsgA[22]) { dmsgB[22] = dmsgA[22]; } // globalBounds 1
-    if (dmsgB[9] > dmsgA[9])
-    {
-      dmsgB[9] = dmsgA[9];
-    } // globalBounds 2
-    // if (dmsgB[24] < dmsgA[24]) { dmsgB[24] = dmsgA[24]; } // globalBounds 3
-    if (dmsgB[10] > dmsgA[10])
-    {
-      dmsgB[10] = dmsgA[10];
-    } // globalBounds 4
-    // if (dmsgB[26] < dmsgA[26]) { dmsgB[26] = dmsgA[26]; } // globalBounds 5
+    dmsgB[8] = std::min(dmsgB[8], dmsgA[8]); // globalBounds 0
+    // dmsgB[22] = std::max(dmsgB[22], dmsgA[22]); // globalBounds 1
+    dmsgB[9] = std::min(dmsgB[9], dmsgA[9]); // globalBounds 2
+    // dmsgB[24] = std::max(dmsgB[24], dmsgA[24]); // globalBounds 3
+    dmsgB[10] = std::min(dmsgB[10], dmsgA[10]); // globalBounds 4
+    // dmsgB[26] = std::max(dmsgB[26], dmsgA[26]); // globalBounds 5
   }
   int Commutative() override { return 1; }
 };
@@ -2750,30 +2739,12 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
         ++this->NumberOfBlocksInThisProcess;
         image->GetBounds(bounds);
         // Compute globalBounds.
-        if (globalBounds[0] > bounds[0])
-        {
-          globalBounds[0] = bounds[0];
-        }
-        if (globalBounds[1] < bounds[1])
-        {
-          globalBounds[1] = bounds[1];
-        }
-        if (globalBounds[2] > bounds[2])
-        {
-          globalBounds[2] = bounds[2];
-        }
-        if (globalBounds[3] < bounds[3])
-        {
-          globalBounds[3] = bounds[3];
-        }
-        if (globalBounds[4] > bounds[4])
-        {
-          globalBounds[4] = bounds[4];
-        }
-        if (globalBounds[5] < bounds[5])
-        {
-          globalBounds[5] = bounds[5];
-        }
+        globalBounds[0] = std::min(globalBounds[0], bounds[0]);
+        globalBounds[1] = std::max(globalBounds[1], bounds[1]);
+        globalBounds[2] = std::min(globalBounds[2], bounds[2]);
+        globalBounds[3] = std::max(globalBounds[3], bounds[3]);
+        globalBounds[4] = std::min(globalBounds[4], bounds[4]);
+        globalBounds[5] = std::max(globalBounds[5], bounds[5]);
         image->GetExtent(ext);
         cellDims[0] = ext[1] - ext[0]; // ext is point extent.
         cellDims[1] = ext[3] - ext[2];
@@ -2879,10 +2850,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
   this->StandardBlockDimensions[1] = largestDims[1] - 2;
   this->StandardBlockDimensions[2] = largestDims[2] - 2;
   // For 2d case
-  if (this->StandardBlockDimensions[2] < 1)
-  {
-    this->StandardBlockDimensions[2] = 1;
-  }
+  this->StandardBlockDimensions[2] = std::max(this->StandardBlockDimensions[2], 1);
   this->RootSpacing[0] = lowestSpacing[0] * (1 << (lowestLevel));
   this->RootSpacing[1] = lowestSpacing[1] * (1 << (lowestLevel));
   this->RootSpacing[2] = lowestSpacing[2] * (1 << (lowestLevel));

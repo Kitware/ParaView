@@ -39,6 +39,7 @@
 #include "pqPipelineSource.h"
 #include "pqTimer.h"
 
+#include <algorithm>
 #include <cassert>
 
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
@@ -238,10 +239,7 @@ void pqSpreadSheetViewModel::onDataFetched(vtkObject*, unsigned long, void*, voi
   // visible viewport is always updated.
   vtkIdType rowMin = blockSize * block - 1;
   vtkIdType rowMax = blockSize * (block + 1);
-  if (rowMin < 0)
-  {
-    rowMin = 0;
-  }
+  rowMin = std::max<vtkIdType>(rowMin, 0);
 
   if (rowMax >= this->rowCount())
   {

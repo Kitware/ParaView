@@ -16,6 +16,8 @@
 #include <nvpipe.h>
 #endif
 
+#include <algorithm>
+
 // ------------------------
 // NOTE for OGVSupport
 // ------------------------
@@ -207,19 +209,10 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
 
     // IceT either is there or is not.
     this->UseIceT = serverInfo->GetUseIceT();
-    if (this->NumberOfProcesses < serverInfo->NumberOfProcesses)
-    {
-      this->NumberOfProcesses = serverInfo->NumberOfProcesses;
-    }
+    this->NumberOfProcesses = std::max(this->NumberOfProcesses, serverInfo->NumberOfProcesses);
     this->MPIInitialized = serverInfo->MPIInitialized;
-    if (this->MultiClientsEnable < serverInfo->MultiClientsEnable)
-    {
-      this->MultiClientsEnable = serverInfo->MultiClientsEnable;
-    }
-    if (this->ClientId < serverInfo->ClientId)
-    {
-      this->ClientId = serverInfo->ClientId;
-    }
+    this->MultiClientsEnable = std::max(this->MultiClientsEnable, serverInfo->MultiClientsEnable);
+    this->ClientId = std::max(this->ClientId, serverInfo->ClientId);
     this->SMPBackendName = serverInfo->GetSMPBackendName();
     this->SMPMaxNumberOfThreads = serverInfo->GetSMPMaxNumberOfThreads();
     this->SetIdTypeSize(serverInfo->GetIdTypeSize());
