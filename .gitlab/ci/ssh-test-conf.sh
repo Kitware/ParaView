@@ -7,6 +7,11 @@ if ! echo "$CMAKE_CONFIGURATION" | grep -q -e 'fedora'; then
     exit 0
 fi
 
+# Only works when running as root.
+if [ "$( id -u )" != "0" ]; then
+    exit 0
+fi
+
 # Generate keys and append own public key as authorized
 mkdir ~/.ssh
 ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
