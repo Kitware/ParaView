@@ -16,7 +16,7 @@ readonly ssh_root=".gitlab/ssh"
 mkdir -p "$ssh_root"
 
 # Generate keys and append own public key as authorized
-mkdir ~/.ssh
+mkdir -p ~/.ssh
 ssh-keygen -t rsa -q -f "$ssh_root/id_rsa" -N ""
 cp "$ssh_root/id_rsa.pub" "$ssh_root/authorized_keys"
 
