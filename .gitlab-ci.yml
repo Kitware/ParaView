@@ -289,14 +289,11 @@ documentation:build:
 
 fedora35-doxygen:build:
     extends:
-        - .fedora35
+        - .fedora35_doxygen
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_doxygen_artifacts
         - .run_manually
-
-    variables:
-        CMAKE_CONFIGURATION: fedora35_doxygen
 
 # Triggers
 
