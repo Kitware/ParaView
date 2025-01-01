@@ -20,7 +20,7 @@
 #include "vtkXMLStructuredGridReader.h"
 #include <vtksys/SystemTools.hxx>
 
-int CPXMLPWriterPipeline(int argc, char* argv[])
+extern int CPXMLPWriterPipeline(int argc, char* argv[])
 {
   vtkNew<vtkCPDataDescription> dd;
   dd->SetTimeData(10, 10);

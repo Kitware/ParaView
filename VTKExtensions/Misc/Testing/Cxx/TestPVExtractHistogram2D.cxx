@@ -6,7 +6,7 @@
 #include "vtkPointDataToCellData.h"
 #include "vtkSphereSource.h"
 
-int TestPVExtractHistogram2D(int, char*[])
+extern int TestPVExtractHistogram2D(int, char*[])
 {
   vtkNew<vtkSphereSource> sphere;
   sphere->SetThetaResolution(100);

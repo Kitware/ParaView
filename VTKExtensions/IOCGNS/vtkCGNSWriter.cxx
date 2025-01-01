@@ -502,6 +502,8 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
 }
 
 //------------------------------------------------------------------------------
+namespace
+{
 /**
  * This function assigns the correct order of data elements for cases where
  * multiple element types are written in different sections in a CGNS zone.
@@ -528,6 +530,7 @@ void ReorderData(
   {
     temp[i] = reordered[i];
   }
+}
 }
 
 //------------------------------------------------------------------------------

@@ -25,7 +25,7 @@ def RequestDataDescription(datadescription):
     datadescription.GetInputDescriptionByName('input').GenerateMeshOn()
 )==";
 
-int LoadVTKmFilterPluginDriver(int argc, char* argv[])
+extern int LoadVTKmFilterPluginDriver(int argc, char* argv[])
 {
   vtkNew<vtkCPProcessor> processor;
   processor->Initialize();

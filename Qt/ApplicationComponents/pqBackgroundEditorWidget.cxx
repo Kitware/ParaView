@@ -26,6 +26,8 @@ using pqCheckState = Qt::CheckState;
 using pqCheckState = int;
 #endif
 
+namespace
+{
 const char* COLOR_PROPERTY = "Background";
 const char* COLOR2_PROPERTY = "Background2";
 const char* GRADIENT_BACKGROUND_PROPERTY = "UseGradientBackground";
@@ -47,11 +49,12 @@ enum BackgroundType
   IMAGE_TYPE,
   SKYBOX_TYPE
 };
+}
 
 class pqBackgroundEditorWidget::pqInternal : public Ui::BackgroundEditorWidget
 {
 public:
-  enum BackgroundType PreviousType;
+  enum ::BackgroundType PreviousType;
   pqTextureSelectorPropertyWidget* TextureSelector = nullptr;
 
   // whether the widget is customized for Environmental background settings or
@@ -97,23 +100,23 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
 
   if (!this->Internal->ForEnvironment)
   {
-    this->addPropertyLink(ui.Color, COLOR_PROPERTY);
-    this->addPropertyLink(ui.Color2, COLOR2_PROPERTY);
+    this->addPropertyLink(ui.Color, ::COLOR_PROPERTY);
+    this->addPropertyLink(ui.Color2, ::COLOR2_PROPERTY);
   }
   else
   {
-    this->addPropertyLink(ui.Color, ENV_COLOR_PROPERTY);
-    this->addPropertyLink(ui.Color2, ENV_COLOR2_PROPERTY);
+    this->addPropertyLink(ui.Color, ::ENV_COLOR_PROPERTY);
+    this->addPropertyLink(ui.Color2, ::ENV_COLOR2_PROPERTY);
   }
 
   vtkSMProperty* smProperty;
   if (!this->Internal->ForEnvironment)
   {
-    smProperty = smGroup->GetProperty(GRADIENT_BACKGROUND_PROPERTY);
+    smProperty = smGroup->GetProperty(::GRADIENT_BACKGROUND_PROPERTY);
   }
   else
   {
-    smProperty = smGroup->GetProperty(ENV_GRADIENT_BACKGROUND_PROPERTY);
+    smProperty = smGroup->GetProperty(::ENV_GRADIENT_BACKGROUND_PROPERTY);
   }
   if (smProperty)
   {
@@ -127,11 +130,11 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
 
   if (!this->Internal->ForEnvironment)
   {
-    smProperty = smGroup->GetProperty(IMAGE_BACKGROUND_PROPERTY);
+    smProperty = smGroup->GetProperty(::IMAGE_BACKGROUND_PROPERTY);
   }
   else
   {
-    smProperty = smGroup->GetProperty(ENV_IMAGE_BACKGROUND_PROPERTY);
+    smProperty = smGroup->GetProperty(::ENV_IMAGE_BACKGROUND_PROPERTY);
   }
   if (smProperty)
   {
@@ -142,7 +145,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
     ui.BackgroundType->hide();
   }
 
-  smProperty = smGroup->GetProperty(SKYBOX_BACKGROUND_PROPERTY);
+  smProperty = smGroup->GetProperty(::SKYBOX_BACKGROUND_PROPERTY);
   if (smProperty)
   {
     this->addPropertyLink(this, "skyboxBackground", SIGNAL(skyboxBackgroundChanged()), smProperty);
@@ -155,7 +158,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
     }
   }
 
-  smProperty = smGroup->GetProperty(ENV_LIGHTING_PROPERTY);
+  smProperty = smGroup->GetProperty(::ENV_LIGHTING_PROPERTY);
   if (smProperty)
   {
     this->addPropertyLink(
@@ -176,11 +179,11 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
 
   if (!this->Internal->ForEnvironment)
   {
-    smProperty = smGroup->GetProperty(IMAGE_PROPERTY);
+    smProperty = smGroup->GetProperty(::IMAGE_PROPERTY);
   }
   else
   {
-    smProperty = smGroup->GetProperty(ENV_IMAGE_PROPERTY);
+    smProperty = smGroup->GetProperty(::ENV_IMAGE_PROPERTY);
   }
   if (smProperty)
   {
@@ -227,7 +230,7 @@ void pqBackgroundEditorWidget::currentIndexChangedBackgroundType(int type)
   ui.stackedWidget->setCurrentIndex(currentPage[type]);
   ui.Color->setText(colorButtonName[type]);
   fireGradientAndImageChanged(this->Internal->PreviousType, type);
-  this->Internal->PreviousType = BackgroundType(type);
+  this->Internal->PreviousType = ::BackgroundType(type);
 }
 
 bool pqBackgroundEditorWidget::gradientBackground() const
@@ -237,7 +240,7 @@ bool pqBackgroundEditorWidget::gradientBackground() const
 
 void pqBackgroundEditorWidget::setGradientBackground(bool gradientValue)
 {
-  enum BackgroundType typeFunction[4][2] = { { SINGLE_COLOR_TYPE, GRADIENT_TYPE },
+  enum ::BackgroundType typeFunction[4][2] = { { SINGLE_COLOR_TYPE, GRADIENT_TYPE },
     { SINGLE_COLOR_TYPE, GRADIENT_TYPE }, { IMAGE_TYPE, GRADIENT_TYPE },
     { SKYBOX_TYPE, GRADIENT_TYPE } };
   int newType = typeFunction[this->Internal->PreviousType][gradientValue];
@@ -252,10 +255,10 @@ bool pqBackgroundEditorWidget::imageBackground() const
 
 void pqBackgroundEditorWidget::setImageBackground(bool imageValue)
 {
-  enum BackgroundType typeFunction[4][2] = { { SINGLE_COLOR_TYPE, IMAGE_TYPE },
+  enum ::BackgroundType typeFunction[4][2] = { { SINGLE_COLOR_TYPE, IMAGE_TYPE },
     { GRADIENT_TYPE, GRADIENT_TYPE }, // gradient has precedence over image
     { SINGLE_COLOR_TYPE, IMAGE_TYPE }, { SKYBOX_TYPE, IMAGE_TYPE } };
-  enum BackgroundType newType = typeFunction[this->Internal->PreviousType][imageValue];
+  enum ::BackgroundType newType = typeFunction[this->Internal->PreviousType][imageValue];
   fireGradientAndImageChanged(this->Internal->PreviousType, newType);
   this->Internal->BackgroundType->setCurrentIndex(newType);
 }
@@ -267,11 +270,11 @@ bool pqBackgroundEditorWidget::skyboxBackground() const
 
 void pqBackgroundEditorWidget::setSkyboxBackground(bool skyboxValue)
 {
-  enum BackgroundType typeFunction[4][2] = { { SINGLE_COLOR_TYPE, SKYBOX_TYPE },
+  enum ::BackgroundType typeFunction[4][2] = { { SINGLE_COLOR_TYPE, SKYBOX_TYPE },
     { GRADIENT_TYPE, GRADIENT_TYPE }, // gradient has precedence over skybox
     { IMAGE_TYPE, IMAGE_TYPE },       // image has precedence over skybox
     { SINGLE_COLOR_TYPE, SKYBOX_TYPE } };
-  enum BackgroundType newType = typeFunction[this->Internal->PreviousType][skyboxValue];
+  enum ::BackgroundType newType = typeFunction[this->Internal->PreviousType][skyboxValue];
   fireGradientAndImageChanged(this->Internal->PreviousType, newType);
   this->Internal->BackgroundType->setCurrentIndex(newType);
 }
@@ -309,11 +312,11 @@ void pqBackgroundEditorWidget::clickedRestoreDefaultColor()
 {
   if (!this->Internal->ForEnvironment)
   {
-    this->changeColor(COLOR_PROPERTY);
+    this->changeColor(::COLOR_PROPERTY);
   }
   else
   {
-    this->changeColor(ENV_COLOR_PROPERTY);
+    this->changeColor(::ENV_COLOR_PROPERTY);
   }
 }
 
@@ -321,11 +324,11 @@ void pqBackgroundEditorWidget::clickedRestoreDefaultColor2()
 {
   if (!this->Internal->ForEnvironment)
   {
-    this->changeColor(COLOR2_PROPERTY);
+    this->changeColor(::COLOR2_PROPERTY);
   }
   else
   {
-    this->changeColor(ENV_COLOR2_PROPERTY);
+    this->changeColor(::ENV_COLOR2_PROPERTY);
   }
 }
 

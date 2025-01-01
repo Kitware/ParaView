@@ -56,7 +56,7 @@ public:
   }
 };
 
-int TestHyperTreeGridGradient(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
+extern int TestHyperTreeGridGradient(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   // test is inside class such that friend declaration in
   // filter can work

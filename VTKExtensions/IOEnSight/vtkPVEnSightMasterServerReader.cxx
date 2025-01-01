@@ -78,6 +78,8 @@ void vtkPVEnSightMasterServerReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 template <class T>
 int vtkPVEnSightMasterServerReaderSyncValues(
@@ -149,6 +151,7 @@ int vtkPVEnSightMasterServerReaderSyncValues(T*, int, int, vtkMultiProcessContro
   return VTK_OK;
 }
 #endif
+}
 
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader::RequestInformation(
@@ -174,7 +177,7 @@ int vtkPVEnSightMasterServerReader::RequestInformation(
 
   // Make sure all nodes could parse the file and agree on the number
   // of pieces.
-  if ((vtkPVEnSightMasterServerReaderSyncValues(
+  if ((::vtkPVEnSightMasterServerReaderSyncValues(
          parseResults, 2, this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK) ||
     (parseResults[0] != VTK_OK))
   {
@@ -192,7 +195,7 @@ int vtkPVEnSightMasterServerReader::RequestInformation(
     this->SuperclassExecuteInformation(request, inputVector, outputVector);
     this->Internal->EnSightVersion = this->EnSightVersion;
   }
-  if (vtkPVEnSightMasterServerReaderSyncValues(
+  if (::vtkPVEnSightMasterServerReaderSyncValues(
         &this->Internal->EnSightVersion, 1, this->NumberOfPieces, this->Controller) != VTK_OK)
   {
     vtkErrorMacro("EnSight version mismatch across nodes.");
@@ -211,7 +214,7 @@ int vtkPVEnSightMasterServerReader::RequestInformation(
   // Compare number of time sets.
   vtkDataArrayCollection* timeSets = this->GetTimeSets();
   this->Internal->NumberOfTimeSets = timeSets ? timeSets->GetNumberOfItems() : 0;
-  if (vtkPVEnSightMasterServerReaderSyncValues(
+  if (::vtkPVEnSightMasterServerReaderSyncValues(
         &this->Internal->NumberOfTimeSets, 1, this->NumberOfPieces, this->Controller) != VTK_OK)
   {
     vtkErrorMacro("Number of time sets not equal on all nodes.");
@@ -230,7 +233,7 @@ int vtkPVEnSightMasterServerReader::RequestInformation(
         (this->Internal->CumulativeTimeSetSizes[i] + timeSets->GetItem(i)->GetNumberOfTuples());
     }
   }
-  if (vtkPVEnSightMasterServerReaderSyncValues(&*this->Internal->CumulativeTimeSetSizes.begin(),
+  if (::vtkPVEnSightMasterServerReaderSyncValues(&*this->Internal->CumulativeTimeSetSizes.begin(),
         this->Internal->NumberOfTimeSets + 1, this->NumberOfPieces, this->Controller) != VTK_OK)
   {
     vtkErrorMacro("Time set sizes not equal on all nodes.");
@@ -263,7 +266,7 @@ int vtkPVEnSightMasterServerReader::RequestInformation(
     this->Internal->TimeSetValues.resize(
       this->Internal->CumulativeTimeSetSizes[this->Internal->NumberOfTimeSets]);
   }
-  if (vtkPVEnSightMasterServerReaderSyncValues(&*this->Internal->TimeSetValues.begin(),
+  if (::vtkPVEnSightMasterServerReaderSyncValues(&*this->Internal->TimeSetValues.begin(),
         static_cast<int>(this->Internal->TimeSetValues.size()), this->NumberOfPieces,
         this->Controller) != VTK_OK)
   {
@@ -292,7 +295,7 @@ int vtkPVEnSightMasterServerReader::RequestData(
     // Let the superclass read the data and setup the outputs.
     this->SuperclassExecuteData(request, inputVector, outputVector);
   }
-  if (vtkPVEnSightMasterServerReaderSyncValues(
+  if (::vtkPVEnSightMasterServerReaderSyncValues(
         &this->Internal->NumberOfOutputs, 1, this->NumberOfPieces, this->Controller) != VTK_OK)
   {
     vtkErrorMacro("Number of outputs does not match on all nodes.");

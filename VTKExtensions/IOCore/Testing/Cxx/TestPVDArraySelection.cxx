@@ -16,7 +16,7 @@
     return EXIT_FAILURE;                                                                           \
   }
 
-bool HasArray(vtkDataObject* dobj, int association, const char* aname)
+static bool HasArray(vtkDataObject* dobj, int association, const char* aname)
 {
   if (auto cd = vtkCompositeDataSet::SafeDownCast(dobj))
   {
@@ -35,7 +35,7 @@ bool HasArray(vtkDataObject* dobj, int association, const char* aname)
   }
 }
 
-int TestPVDArraySelection(int argc, char* argv[])
+extern int TestPVDArraySelection(int argc, char* argv[])
 {
   vtkNew<vtkPVDReader> reader;
 

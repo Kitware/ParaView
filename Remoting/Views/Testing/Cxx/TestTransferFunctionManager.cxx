@@ -13,7 +13,7 @@
 #include <cassert>
 #include <sstream>
 
-int TestTransferFunctionManager(int argc, char* argv[])
+extern int TestTransferFunctionManager(int argc, char* argv[])
 {
   (void)argc;
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);

@@ -36,6 +36,8 @@ class pqRemoteCommandDialogUI : public Ui::pqRemoteCommandDialogForm
 {
 };
 
+namespace
+{
 // command token map, the following tokens may be provided by
 // the user to be substituted into the selected command template
 // at run time.
@@ -52,6 +54,7 @@ enum
 
 const char* tokens[] = { "$TERM_EXEC$", "$TERM_OPTS$", "$SSH_EXEC$", "$FE_URL$", "$PV_HOST$",
   "$PV_PID$" };
+}
 
 // a command set is selected based on host system types.
 // client | server | descr
@@ -262,7 +265,7 @@ pqRemoteCommandDialog::pqRemoteCommandDialog(
   this->Tokens.resize(N_TOKENS);
   for (int i = 0; i < N_TOKENS; ++i)
   {
-    this->Tokens[i] = tokens[i];
+    this->Tokens[i] = ::tokens[i];
   }
 
   this->TokenValues.resize(N_TOKENS);
@@ -402,11 +405,11 @@ void pqRemoteCommandDialog::SetActivePid(string pid)
 void pqRemoteCommandDialog::AddCommandTemplate()
 {
   // remind the user of the available tokens.
-  QString toks(tokens[0]);
+  QString toks(::tokens[0]);
   for (int i = 1; i < N_TOKENS; ++i)
   {
     toks += " ";
-    toks += tokens[i];
+    toks += ::tokens[i];
   }
 
   pqRemoteCommandTemplateDialog dialog(this, Qt::WindowFlags{});

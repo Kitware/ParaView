@@ -10,7 +10,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 
-int TestSessionProxyManager(int argc, char* argv[])
+extern int TestSessionProxyManager(int argc, char* argv[])
 {
   (void)argc;
 

@@ -30,7 +30,7 @@ vtkSmartPointer<vtkTable> ReadAsTable(const char* fname)
 }
 }
 
-int TestMergeTablesMultiBlock(int argc, char* argv[])
+extern int TestMergeTablesMultiBlock(int argc, char* argv[])
 {
   char* fname0 = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/table_0.vtt");
   auto data0 = ReadAsTable(fname0);

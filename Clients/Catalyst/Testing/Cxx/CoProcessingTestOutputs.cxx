@@ -98,7 +98,7 @@ private:
 vtkStandardNewMacro(vtkCPTestPipeline);
 }
 
-int CoProcessingTestOutputs(int, char*[])
+extern int CoProcessingTestOutputs(int, char*[])
 {
   vtkSmartPointer<vtkCPProcessor> processor = vtkSmartPointer<vtkCPProcessor>::New();
   processor->Initialize();

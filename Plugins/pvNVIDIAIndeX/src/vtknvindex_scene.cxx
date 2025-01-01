@@ -232,8 +232,6 @@ unsigned int get_number_of_physical_cpus()
   return physical_cpus;
 }
 
-} // namespace
-
 //-------------------------------------------------------------------------------------------------
 void update_slice_planes(nv::index::IPlane* plane, const vtknvindex_slice_params& slice_params,
   const mi::math::Vector_struct<mi::Uint32, 3>& volume_size)
@@ -278,6 +276,8 @@ void update_slice_planes(nv::index::IPlane* plane, const vtknvindex_slice_params
   plane->set_point(pos + normal * displace);
   plane->set_extent(extent);
 }
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_scene::vtknvindex_scene()

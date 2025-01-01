@@ -12,7 +12,7 @@
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 
-int TestRectilinearGrid(int argc, char* argv[])
+extern int TestRectilinearGrid(int argc, char* argv[])
 {
   vtkNew<vtkPVTestUtilities> u;
   u->Initialize(argc, argv);

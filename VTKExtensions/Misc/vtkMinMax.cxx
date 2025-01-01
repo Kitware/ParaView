@@ -22,8 +22,11 @@
 
 vtkStandardNewMacro(vtkMinMax);
 
+namespace
+{
 template <class T>
 void vtkMinMaxExecute(vtkMinMax* self, int numComp, int compIdx, T* idata, T* odata);
+}
 
 //-----------------------------------------------------------------------------
 vtkMinMax::vtkMinMax()
@@ -292,7 +295,7 @@ void vtkMinMax::OperateOnArray(vtkAbstractArray* ia, vtkAbstractArray* oa)
     // perform odata[jdx] = operation(idata[jdx],odata[jdx])
     switch (datatype)
     {
-      vtkTemplateMacro(vtkMinMaxExecute(this, numComp, this->ComponentIdx,
+      vtkTemplateMacro(::vtkMinMaxExecute(this, numComp, this->ComponentIdx,
         static_cast<VTK_TT*>(idata), static_cast<VTK_TT*>(odata)));
 
         // if you can make an operator for things like strings etc,
@@ -307,6 +310,8 @@ void vtkMinMax::OperateOnArray(vtkAbstractArray* ia, vtkAbstractArray* oa)
 
 //-----------------------------------------------------------------------------
 // This templated function performs the operation on any type of data.
+namespace
+{
 template <class T>
 void vtkMinMaxExecute(vtkMinMax* self, int numComp, int compIdx, T* idata, T* odata)
 {
@@ -352,6 +357,7 @@ void vtkMinMaxExecute(vtkMinMax* self, int numComp, int compIdx, T* idata, T* od
       }
     }
   }
+}
 }
 
 //-----------------------------------------------------------------------------

@@ -16,7 +16,7 @@
 #include <sstream>
 
 //----------------------------------------------------------------------------
-int TestProxyAnnotation(int argc, char* argv[])
+extern int TestProxyAnnotation(int argc, char* argv[])
 {
   int ret_val = EXIT_SUCCESS;
   bool success = true;

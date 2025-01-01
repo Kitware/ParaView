@@ -24,7 +24,7 @@
 #include <cassert>
 
 //=============================================================================
-namespace rfm
+namespace
 {
 bool iconAndLabel(const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces,
   const pqServerResource& resource, QIcon& icon, QString& label)
@@ -146,7 +146,7 @@ void pqRecentFilesMenu::buildMenu()
       const pqServerResource& item = criter.value()[kk];
       QString label;
       QIcon icon;
-      if (rfm::iconAndLabel(ifaces, item, icon, label))
+      if (::iconAndLabel(ifaces, item, icon, label))
       {
         QAction* const act = new QAction(label, this->Menu);
         act->setData(item.serializeString());
@@ -220,7 +220,7 @@ bool pqRecentFilesMenu::open(pqServer* server, const pqServerResource& resource)
   pqInterfaceTracker* itk = pqApplicationCore::instance()->interfaceTracker();
   QList<pqRecentlyUsedResourceLoaderInterface*> ifaces =
     itk->interfaces<pqRecentlyUsedResourceLoaderInterface*>();
-  if (rfm::load(ifaces, resource, server))
+  if (::load(ifaces, resource, server))
   {
     pqRecentlyUsedResourcesList& mruList = pqApplicationCore::instance()->recentlyUsedResources();
     mruList.add(resource);

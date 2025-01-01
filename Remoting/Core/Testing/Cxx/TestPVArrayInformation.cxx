@@ -10,7 +10,7 @@
 
 #include <cstdlib>
 
-vtkSmartPointer<vtkFloatArray> GetPolyData()
+static vtkSmartPointer<vtkFloatArray> GetPolyData()
 {
   vtkIdType numPts = 101;
   vtkSmartPointer<vtkFloatArray> array = vtkSmartPointer<vtkFloatArray>::New();
@@ -24,7 +24,7 @@ vtkSmartPointer<vtkFloatArray> GetPolyData()
   return array;
 }
 
-bool AreArrayInformationsEqual(vtkPVArrayInformation* lhs, vtkPVArrayInformation* rhs)
+static bool AreArrayInformationsEqual(vtkPVArrayInformation* lhs, vtkPVArrayInformation* rhs)
 {
   bool equal = true;
   equal &= lhs->GetIsPartial() == rhs->GetIsPartial();
@@ -53,7 +53,7 @@ bool AreArrayInformationsEqual(vtkPVArrayInformation* lhs, vtkPVArrayInformation
   return equal;
 }
 
-int TestPVArrayInformation(int, char*[])
+extern int TestPVArrayInformation(int, char*[])
 {
 
   vtkSmartPointer<vtkFloatArray> array = GetPolyData();

@@ -84,6 +84,8 @@ void vtkPVEnSightMasterServerReader2::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 template <class T>
 int vtkPVEnSightMasterServerReader2SyncValues(
@@ -162,6 +164,7 @@ int vtkPVEnSightMasterServerReader2SyncValues(T*, int, int, vtkMultiProcessContr
   return VTK_OK;
 }
 #endif
+}
 
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation* vtkNotUsed(request),
@@ -187,7 +190,7 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation* vtkNotUs
 
   // Make sure all nodes could parse the file and agree on the number
   // of pieces.
-  if ((vtkPVEnSightMasterServerReader2SyncValues(
+  if ((::vtkPVEnSightMasterServerReader2SyncValues(
          parseResults, 2, this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK) ||
     (parseResults[0] != VTK_OK))
   {
@@ -221,7 +224,7 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation* vtkNotUs
   // Across nodes.
   this->Internal->EnSightVersion = this->Internal->RealReaders[0]->GetEnSightVersion();
 
-  if (vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->EnSightVersion, 1,
+  if (::vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->EnSightVersion, 1,
         this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
   {
     vtkErrorMacro("EnSight version mismatch across nodes.");
@@ -254,7 +257,7 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation* vtkNotUs
   }
   // Across nodes.
   this->Internal->NumberOfTimeSets = (timeSets ? timeSets->GetNumberOfItems() : 0);
-  if (vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->NumberOfTimeSets, 1,
+  if (::vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->NumberOfTimeSets, 1,
         this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
   {
     this->InformationError = 1;
@@ -285,7 +288,7 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation* vtkNotUs
       (this->Internal->CumulativeTimeSetSizes[i] + timeSets->GetItem(i)->GetNumberOfTuples());
   }
 
-  if (vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->CumulativeTimeSetSizes.at(0),
+  if (::vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->CumulativeTimeSetSizes.at(0),
         this->Internal->NumberOfTimeSets + 1, this->Controller->GetNumberOfProcesses(),
         this->Controller) != VTK_OK)
   {
@@ -333,7 +336,7 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation* vtkNotUs
 
   if (!this->Internal->TimeSetValues.empty())
   {
-    if (vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->TimeSetValues.at(0),
+    if (::vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->TimeSetValues.at(0),
           static_cast<int>(this->Internal->TimeSetValues.size()),
           this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
     {

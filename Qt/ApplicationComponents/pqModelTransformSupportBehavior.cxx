@@ -107,7 +107,7 @@ void pqModelTransformSupportBehavior::viewUpdated()
 
   // Check if there is any data source visible in the view that has a
   // ChangeOfBasisMatrix and BoundingBoxInModelCoordinates specified.
-  if (vtkSMSourceProxy* producer = FindVisibleProducerWithChangeOfBasisMatrix(view))
+  if (vtkSMSourceProxy* producer = ::FindVisibleProducerWithChangeOfBasisMatrix(view))
   {
     this->enableModelTransform(view, producer);
   }
@@ -134,16 +134,16 @@ void pqModelTransformSupportBehavior::enableModelTransform(pqView* view, vtkSMSo
 
     if (are_titles_valid)
     {
-      SafeSetAxisTitle(gridAxes3DActor, "XTitle", titles[0].c_str());
-      SafeSetAxisTitle(gridAxes3DActor, "YTitle", titles[1].c_str());
-      SafeSetAxisTitle(gridAxes3DActor, "ZTitle", titles[2].c_str());
+      ::SafeSetAxisTitle(gridAxes3DActor, "XTitle", titles[0].c_str());
+      ::SafeSetAxisTitle(gridAxes3DActor, "YTitle", titles[1].c_str());
+      ::SafeSetAxisTitle(gridAxes3DActor, "ZTitle", titles[2].c_str());
     }
     else
     {
       // clear data-dependent axis titles.
-      SafeSetAxisTitle(gridAxes3DActor, "XTitle", nullptr);
-      SafeSetAxisTitle(gridAxes3DActor, "YTitle", nullptr);
-      SafeSetAxisTitle(gridAxes3DActor, "ZTitle", nullptr);
+      ::SafeSetAxisTitle(gridAxes3DActor, "XTitle", nullptr);
+      ::SafeSetAxisTitle(gridAxes3DActor, "YTitle", nullptr);
+      ::SafeSetAxisTitle(gridAxes3DActor, "ZTitle", nullptr);
     }
     gridAxes3DActor->UpdateVTKObjects();
   }
@@ -169,14 +169,16 @@ void pqModelTransformSupportBehavior::disableModelTransform(pqView* view)
     {
       helper.Set(0);
     }
-    SafeSetAxisTitle(gridAxes3DActor, "XTitle", nullptr);
-    SafeSetAxisTitle(gridAxes3DActor, "YTitle", nullptr);
-    SafeSetAxisTitle(gridAxes3DActor, "ZTitle", nullptr);
+    ::SafeSetAxisTitle(gridAxes3DActor, "XTitle", nullptr);
+    ::SafeSetAxisTitle(gridAxes3DActor, "YTitle", nullptr);
+    ::SafeSetAxisTitle(gridAxes3DActor, "ZTitle", nullptr);
     gridAxes3DActor->UpdateVTKObjects();
   }
 }
 
 //-----------------------------------------------------------------------------
+namespace
+{
 template <class T, int size>
 vtkTuple<T, size> GetValues(const char* aname, vtkSMSourceProxy* producer, int port, bool* pisvalid)
 {
@@ -199,6 +201,7 @@ vtkTuple<T, size> GetValues(const char* aname, vtkSMSourceProxy* producer, int p
     }
   }
   return value;
+}
 }
 
 //-----------------------------------------------------------------------------

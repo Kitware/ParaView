@@ -18,7 +18,7 @@ extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
 
-int TestSphere(int, char**)
+extern int TestSphere(int, char**)
 {
   vtkClientServerInterpreter* interp = vtkClientServerInterpreter::New();
   interp->SetLogStream(&cout);

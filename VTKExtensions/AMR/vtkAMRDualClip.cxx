@@ -169,6 +169,8 @@ unsigned char* vtkAMRDualClipLocator::GetLevelMaskPointer()
   return this->LevelMaskArray->GetPointer(0);
 }
 
+namespace
+{
 //----------------------------------------------------------------------------
 vtkAMRDualClipLocator* vtkAMRDualClipGetBlockLocator(vtkAMRDualGridHelperBlock* block)
 {
@@ -238,6 +240,7 @@ void vtkDualGridClipInitializeLevelMask(
     scalarPtr += 2 * dims[0];
   }
 }
+}
 
 //----------------------------------------------------------------------------
 // Initializes the center region of the level mask.
@@ -257,7 +260,7 @@ void vtkAMRDualClipLocator::ComputeLevelMask(vtkDataArray* scalars, double isoVa
 
   switch (scalars->GetDataType())
   {
-    vtkTemplateMacro(vtkDualGridClipInitializeLevelMask(
+    vtkTemplateMacro(::vtkDualGridClipInitializeLevelMask(
       (VTK_TT*)(scalars->GetVoidPointer(0)), isoValue, this->GetLevelMaskPointer(), dims));
     default:
       vtkGenericWarningMacro("Execute: Unknown ScalarType");
@@ -465,7 +468,7 @@ void vtkAMRDualClipLocator::CopyNeighborLevelMask(
   {
     return;
   }
-  vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighborBlock);
+  vtkAMRDualClipLocator* neighborLocator = ::vtkAMRDualClipGetBlockLocator(neighborBlock);
   if (neighborLocator == nullptr)
   { // Figuring out logic for parallel case.
     return;
@@ -851,8 +854,8 @@ void vtkAMRDualClipLocator::SharePointIdsWithNeighbor(
 void vtkAMRDualClipLocator::ShareBlockLocatorWithNeighbor(
   vtkAMRDualGridHelperBlock* block, vtkAMRDualGridHelperBlock* neighbor)
 {
-  vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);
-  vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
+  vtkAMRDualClipLocator* blockLocator = ::vtkAMRDualClipGetBlockLocator(block);
+  vtkAMRDualClipLocator* neighborLocator = ::vtkAMRDualClipGetBlockLocator(neighbor);
 
   // Working on the logic to parallelize level mask.
   if (blockLocator == nullptr || neighborLocator == nullptr)
@@ -1229,6 +1232,8 @@ vtkMultiBlockDataSet* vtkAMRDualClip::DoRequestData(
 //----------------------------------------------------------------------------
 // The only data specific stuff we need to do for the contour.
 //----------------------------------------------------------------------------
+namespace
+{
 template <class T>
 void vtkDualGridContourCastCornerValues(T* ptr, vtkIdType offsets[8], double values[8])
 {
@@ -1240,6 +1245,7 @@ void vtkDualGridContourCastCornerValues(T* ptr, vtkIdType offsets[8], double val
   values[5] = (double)(ptr[offsets[5]]);
   values[6] = (double)(ptr[offsets[6]]);
   values[7] = (double)(ptr[offsets[7]]);
+}
 }
 
 //----------------------------------------------------------------------------
@@ -1279,7 +1285,7 @@ void vtkAMRDualClip::ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* b
             // The unused center flag is used as a flag to indicate
             if (neighbor && neighbor->Image && neighbor->RegionBits[1][1][1])
             {
-              vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);
+              vtkAMRDualClipLocator* blockLocator = ::vtkAMRDualClipGetBlockLocator(block);
               blockLocator->ShareBlockLocatorWithNeighbor(block, neighbor);
             }
           }
@@ -1301,7 +1307,7 @@ void vtkAMRDualClip::InitializeLevelMask(vtkAMRDualGridHelperBlock* block)
   }
   vtkDataArray* volumeFractionArray = image->GetCellData()->GetArray(this->Helper->GetArrayName());
 
-  vtkAMRDualClipLocator* locator = vtkAMRDualClipGetBlockLocator(block);
+  vtkAMRDualClipLocator* locator = ::vtkAMRDualClipGetBlockLocator(block);
   locator->ComputeLevelMask(volumeFractionArray, this->IsoValue, this->EnableInternalDecimation);
 
   vtkAMRDualGridHelperBlock* neighbor;
@@ -1343,7 +1349,7 @@ void vtkAMRDualClip::InitializeLevelMask(vtkAMRDualGridHelperBlock* block)
             // was copied to this block already.
             if (neighbor && neighbor->RegionBits[1][1][1] != 0)
             {
-              neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
+              neighborLocator = ::vtkAMRDualClipGetBlockLocator(neighbor);
               image = neighbor->Image;
               if (image)
               {
@@ -1431,7 +1437,7 @@ void vtkAMRDualClip::ShareLevelMask(vtkAMRDualGridHelperBlock* block)
             // was copied to this block already.
             if (neighbor && neighbor->Image && neighbor->RegionBits[1][1][1] != 0)
             {
-              neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
+              neighborLocator = ::vtkAMRDualClipGetBlockLocator(neighbor);
               // NOLINTNEXTLINE(readability-suspicious-call-argument)
               neighborLocator->CopyNeighborLevelMask(neighbor, block);
             }
@@ -1477,7 +1483,7 @@ void vtkAMRDualClip::ProcessBlock(
   if (this->EnableMergePoints)
   {
     this->InitializeLevelMask(block);
-    this->BlockLocator = vtkAMRDualClipGetBlockLocator(block);
+    this->BlockLocator = ::vtkAMRDualClipGetBlockLocator(block);
   }
   else
   { // Shared locator.
@@ -2004,7 +2010,7 @@ void vtkAMRDualClip::DistributeLevelMasks()
                     if (block->Image)
                     {
                       scalars = block->Image->GetCellData()->GetArray(arrayName);
-                      vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);
+                      vtkAMRDualClipLocator* blockLocator = ::vtkAMRDualClipGetBlockLocator(block);
                       blockLocator->ComputeLevelMask(
                         scalars, this->IsoValue, this->EnableInternalDecimation);
                       blockLevelMaskArray = blockLocator->GetLevelMaskArray();
@@ -2013,7 +2019,7 @@ void vtkAMRDualClip::DistributeLevelMasks()
                     {
                       scalars = neighborBlock->Image->GetCellData()->GetArray(arrayName);
                       vtkAMRDualClipLocator* neighborLocator =
-                        vtkAMRDualClipGetBlockLocator(neighborBlock);
+                        ::vtkAMRDualClipGetBlockLocator(neighborBlock);
                       neighborLocator->ComputeLevelMask(
                         scalars, this->IsoValue, this->EnableInternalDecimation);
                       neighborLevelMaskArray = neighborLocator->GetLevelMaskArray();

@@ -30,7 +30,7 @@ static const std::string PLOAD2_KEY = "PLOAD2";
 static const std::string TIME_KEY = "TIME";
 static const std::string TITLE_KEY = "TITLE";
 
-namespace utils
+namespace
 {
 // Returns if `line` starts with the string `keyword`
 bool StartsWith(const std::string& line, const std::string& keyword)
@@ -245,36 +245,36 @@ int vtkNastranBDFReader::RequestData(vtkInformation*, vtkInformationVector**, vt
   while (vtksys::SystemTools::GetLineFromStream(filestream, line) && success)
   {
     // skip blank and comments
-    if (line.empty() || utils::IsIgnored(line))
+    if (line.empty() || ::IsIgnored(line))
     {
       continue;
     }
 
-    utils::TrimTrailingComment(line);
+    ::TrimTrailingComment(line);
 
     // we parse values with std::sto[ild] that may raise exception. Catch them.
     try
     {
       // parse line depending on keyword
-      if (utils::StartsWith(line, TITLE_KEY))
+      if (::StartsWith(line, TITLE_KEY))
       {
-        success = this->AddTitle(utils::ParseArgs(line, TITLE_KEY));
+        success = this->AddTitle(ParseArgs(line, TITLE_KEY));
       }
-      else if (utils::StartsWith(line, TIME_KEY))
+      else if (::StartsWith(line, TIME_KEY))
       {
-        success = this->AddTimeInfo(utils::ParseArgs(line, TITLE_KEY));
+        success = this->AddTimeInfo(::ParseArgs(line, TITLE_KEY));
       }
-      else if (utils::StartsWith(line, GRID_KEY))
+      else if (::StartsWith(line, GRID_KEY))
       {
-        success = this->AddPoint(utils::ParseArgs(line, GRID_KEY));
+        success = this->AddPoint(::ParseArgs(line, GRID_KEY));
       }
-      else if (utils::StartsWith(line, CTRIA3_KEY))
+      else if (::StartsWith(line, CTRIA3_KEY))
       {
-        success = this->AddTriangle(utils::ParseArgs(line, CTRIA3_KEY));
+        success = this->AddTriangle(::ParseArgs(line, CTRIA3_KEY));
       }
-      else if (utils::StartsWith(line, PLOAD2_KEY))
+      else if (::StartsWith(line, PLOAD2_KEY))
       {
-        success = this->AddPload2Data(utils::ParseArgs(line, PLOAD2_KEY));
+        success = this->AddPload2Data(::ParseArgs(line, PLOAD2_KEY));
       }
       // store unsupported keyword for summary reporting.
       else

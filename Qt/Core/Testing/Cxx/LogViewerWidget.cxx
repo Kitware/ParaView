@@ -338,7 +338,7 @@ void LogViewerWidgetTester::basic()
   }
 }
 
-int LogViewerWidget(int argc, char* argv[])
+extern int LogViewerWidget(int argc, char* argv[])
 {
   QApplication app(argc, argv);
   LogViewerWidgetTester tester;

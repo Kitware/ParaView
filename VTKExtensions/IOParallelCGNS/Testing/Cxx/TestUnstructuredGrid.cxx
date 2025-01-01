@@ -16,7 +16,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtksys/SystemTools.hxx"
 
-int TestUnstructuredGrid(int argc, char* argv[])
+extern int TestUnstructuredGrid(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
   vtkObject::GlobalWarningDisplayOff();

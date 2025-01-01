@@ -115,7 +115,7 @@ bool ReadAndVerifyCSV(const std::string& fname, int rank, int numRanks)
 
 } // end of namespace
 
-int TestCSVWriter(int argc, char* argv[])
+extern int TestCSVWriter(int argc, char* argv[])
 {
   vtkMPIController* contr = vtkMPIController::New();
   contr->Initialize(&argc, &argv);

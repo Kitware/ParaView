@@ -18,7 +18,7 @@
 
 int CellAndPointDataTest(vtkPointSet* target, vtkIdType N, const char* phase);
 
-int TestCellAndPointData(int argc, char* argv[])
+extern int TestCellAndPointData(int argc, char* argv[])
 {
   vtkNew<vtkPVTestUtilities> utitilies;
   utitilies->Initialize(argc, argv);

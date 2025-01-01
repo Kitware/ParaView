@@ -14,10 +14,10 @@
 #include <QScrollBar>
 #include <QTextBlock>
 
-namespace details
+namespace
 {
 //-----------------------------------------------------------------------------
-inline std::uint32_t getNumberOfDigits(std::uint32_t i)
+inline static std::uint32_t getNumberOfDigits(std::uint32_t i)
 {
   return i > 0 ? static_cast<std::int32_t>(std::log10(static_cast<float>(i)) + 1) : 1;
 }
@@ -27,7 +27,7 @@ inline std::uint32_t getNumberOfDigits(std::uint32_t i)
 QSize pqPythonLineNumberArea::sizeHint() const
 {
   const std::uint32_t numberOfDigits =
-    details::getNumberOfDigits(std::max(1, this->TextEdit.document()->blockCount()));
+    ::getNumberOfDigits(std::max(1, this->TextEdit.document()->blockCount()));
 
   const std::int32_t space = 2 * this->TextEdit.fontMetrics().horizontalAdvance(' ') +
     numberOfDigits * this->TextEdit.fontMetrics().horizontalAdvance(QLatin1Char('9'));

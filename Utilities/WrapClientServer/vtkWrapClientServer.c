@@ -1359,7 +1359,7 @@ int main(int argc, char* argv[])
   }
   if (!data->IsAbstract)
   {
-    fprintf(fp, "\nvtkObjectBase *%sClientServerNewCommand(void* /*ctx*/)\n{\n", data->Name);
+    fprintf(fp, "\nstatic vtkObjectBase *%sClientServerNewCommand(void* /*ctx*/)\n{\n", data->Name);
     fprintf(fp, "  return %s::New();\n}\n\n", data->Name);
   }
 

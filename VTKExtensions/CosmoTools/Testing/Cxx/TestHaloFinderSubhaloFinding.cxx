@@ -96,7 +96,7 @@ int runHaloFinderTest(int argc, char* argv[])
 }
 }
 
-int TestHaloFinderSubhaloFinding(int argc, char* argv[])
+extern int TestHaloFinderSubhaloFinding(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
 

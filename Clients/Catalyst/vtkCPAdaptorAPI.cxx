@@ -14,7 +14,7 @@
 #include <iostream>
 
 // This code is meant as an API for Fortran and C simulation codes.
-namespace ParaViewCoProcessing
+namespace
 {
 
 /// Clear all of the field data from the grids.
@@ -125,7 +125,7 @@ void vtkCPAdaptorAPI::NeedToCreateGrid(int* needGrid)
     if (vtkDataSet* grid = vtkDataSet::SafeDownCast(
           vtkCPAdaptorAPI::CoProcessorData->GetInputDescriptionByName("input")->GetGrid()))
     {
-      ParaViewCoProcessing::ClearFieldDataFromGrid(grid);
+      ::ClearFieldDataFromGrid(grid);
     }
     else
     {
@@ -137,8 +137,7 @@ void vtkCPAdaptorAPI::NeedToCreateGrid(int* needGrid)
         iter->InitTraversal();
         for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
         {
-          ParaViewCoProcessing::ClearFieldDataFromGrid(
-            vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()));
+          ::ClearFieldDataFromGrid(vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()));
         }
         iter->Delete();
       }

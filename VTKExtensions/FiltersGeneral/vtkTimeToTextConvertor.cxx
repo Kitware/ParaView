@@ -53,9 +53,12 @@ int vtkTimeToTextConvertor::RequestInformation(
   return 1;
 }
 //----------------------------------------------------------------------------
+namespace
+{
 inline double vtkTimeToTextConvertor_ForwardConvert(double T0, double shift, double scale)
 {
   return T0 * scale + shift;
+}
 }
 //----------------------------------------------------------------------------
 int vtkTimeToTextConvertor::RequestData(vtkInformation* vtkNotUsed(request),
@@ -74,7 +77,7 @@ int vtkTimeToTextConvertor::RequestData(vtkInformation* vtkNotUsed(request),
   {
     timeArgumentPushed = true;
     double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEP());
-    time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
+    time = ::vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
     vtkPVStringFormatter::PushScope("TEXT", fmt::arg("time", time));
   }
   else if (outputInfo && outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) &&
@@ -82,7 +85,7 @@ int vtkTimeToTextConvertor::RequestData(vtkInformation* vtkNotUsed(request),
   {
     timeArgumentPushed = true;
     double time = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
+    time = ::vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
     vtkPVStringFormatter::PushScope("TEXT", fmt::arg("time", time));
   }
 

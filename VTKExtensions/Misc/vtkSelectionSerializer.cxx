@@ -94,6 +94,8 @@ void vtkSelectionSerializer::PrintXML(
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 template <class T>
 void vtkSelectionSerializerWriteSelectionList(
   ostream& os, vtkIndent indent, vtkIdType numElems, T* dataPtr)
@@ -104,6 +106,7 @@ void vtkSelectionSerializerWriteSelectionList(
     os << dataPtr[idx] << " ";
   }
   os << endl;
+}
 }
 
 //----------------------------------------------------------------------------
@@ -127,7 +130,7 @@ void vtkSelectionSerializer::WriteSelectionData(
       void* dataPtr = list->GetVoidPointer(0);
       switch (list->GetDataType())
       {
-        vtkTemplateMacro(vtkSelectionSerializerWriteSelectionList(
+        vtkTemplateMacro(::vtkSelectionSerializerWriteSelectionList(
           os, indent, numTuples * numComps, (VTK_TT*)(dataPtr)));
       }
       os << indent << "</SelectionList>" << endl;

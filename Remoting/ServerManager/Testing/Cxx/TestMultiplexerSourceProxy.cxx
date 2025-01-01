@@ -161,7 +161,7 @@ static bool ValidateWavelet(vtkSMProxy* mux)
   return true;
 }
 
-int TestMultiplexerSourceProxy(int argc, char* argv[])
+extern int TestMultiplexerSourceProxy(int argc, char* argv[])
 {
   vtkNew<vtkPVTestUtilities> testing;
   testing->Initialize(argc, argv);

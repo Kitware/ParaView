@@ -90,7 +90,7 @@ bool TableEq(vtkTable* lhs, vtkTable* rhs)
 
 }
 
-int TestDSPTableFFT(int, char*[])
+extern int TestDSPTableFFT(int, char*[])
 {
   vtkNew<vtkSpatioTemporalHarmonicsSource> source;
 

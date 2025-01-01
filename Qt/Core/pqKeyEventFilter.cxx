@@ -6,7 +6,7 @@
 #include <QEvent>
 #include <QKeyEvent>
 
-namespace constant
+namespace
 {
 QList<int> AcceptList = { Qt::Key_Enter, Qt::Key_Return };
 QList<int> RejectList = { Qt::Key_Escape };
@@ -60,13 +60,13 @@ bool pqKeyEventFilter::shouldHandle(QObject* monitored, int type)
 //-----------------------------------------------------------------------------
 bool pqKeyEventFilter::isAcceptType(int key)
 {
-  return constant::AcceptList.contains(key);
+  return ::AcceptList.contains(key);
 }
 
 //-----------------------------------------------------------------------------
 bool pqKeyEventFilter::isRejectType(int key)
 {
-  return constant::RejectList.contains(key);
+  return ::RejectList.contains(key);
 }
 
 //-----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ bool pqKeyEventFilter::isTextUpdateType(QChar key)
 //-----------------------------------------------------------------------------
 bool pqKeyEventFilter::isMotionType(int key)
 {
-  return constant::MotionList.contains(key);
+  return ::MotionList.contains(key);
 }
 
 //-----------------------------------------------------------------------------

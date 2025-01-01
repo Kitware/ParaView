@@ -65,6 +65,8 @@ vtkPVExtractVOI::~vtkPVExtractVOI()
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 template <class FilterType>
 void vtkPVExtractVOIProcessRequest(FilterType* filter, vtkPVExtractVOI* self,
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
@@ -72,6 +74,7 @@ void vtkPVExtractVOIProcessRequest(FilterType* filter, vtkPVExtractVOI* self,
   filter->SetVOI(self->GetVOI());
   filter->SetSampleRate(self->GetSampleRate());
   filter->ProcessRequest(request, inputVector, outputVector);
+}
 }
 
 //----------------------------------------------------------------------------
@@ -83,15 +86,15 @@ int vtkPVExtractVOI::RequestUpdateExtent(
 
   if (output->GetDataObjectType() == VTK_IMAGE_DATA)
   {
-    vtkPVExtractVOIProcessRequest(this->ExtractVOI, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractVOI, this, request, inputVector, outputVector);
   }
   else if (output->GetDataObjectType() == VTK_STRUCTURED_GRID)
   {
-    vtkPVExtractVOIProcessRequest(this->ExtractGrid, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractGrid, this, request, inputVector, outputVector);
   }
   else if (output->GetDataObjectType() == VTK_RECTILINEAR_GRID)
   {
-    vtkPVExtractVOIProcessRequest(this->ExtractRG, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractRG, this, request, inputVector, outputVector);
   }
 
   // We can handle anything.
@@ -110,17 +113,17 @@ int vtkPVExtractVOI::RequestInformation(
 
   if (output->GetDataObjectType() == VTK_IMAGE_DATA)
   {
-    vtkPVExtractVOIProcessRequest(this->ExtractVOI, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractVOI, this, request, inputVector, outputVector);
   }
   else if (output->GetDataObjectType() == VTK_STRUCTURED_GRID)
   {
     this->ExtractGrid->SetIncludeBoundary(this->IncludeBoundary);
-    vtkPVExtractVOIProcessRequest(this->ExtractGrid, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractGrid, this, request, inputVector, outputVector);
   }
   else if (output->GetDataObjectType() == VTK_RECTILINEAR_GRID)
   {
     this->ExtractRG->SetIncludeBoundary(this->IncludeBoundary);
-    vtkPVExtractVOIProcessRequest(this->ExtractRG, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractRG, this, request, inputVector, outputVector);
   }
 
   return 1;
@@ -147,17 +150,17 @@ int vtkPVExtractVOI::RequestData(
 
   if (output->GetDataObjectType() == VTK_IMAGE_DATA)
   {
-    vtkPVExtractVOIProcessRequest(this->ExtractVOI, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractVOI, this, request, inputVector, outputVector);
   }
   else if (output->GetDataObjectType() == VTK_STRUCTURED_GRID)
   {
     this->ExtractGrid->SetIncludeBoundary(this->IncludeBoundary);
-    vtkPVExtractVOIProcessRequest(this->ExtractGrid, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractGrid, this, request, inputVector, outputVector);
   }
   else if (output->GetDataObjectType() == VTK_RECTILINEAR_GRID)
   {
     this->ExtractRG->SetIncludeBoundary(this->IncludeBoundary);
-    vtkPVExtractVOIProcessRequest(this->ExtractRG, this, request, inputVector, outputVector);
+    ::vtkPVExtractVOIProcessRequest(this->ExtractRG, this, request, inputVector, outputVector);
   }
 
   return 1;

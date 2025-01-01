@@ -16,7 +16,7 @@
 
 #include <cassert>
 
-namespace detail
+namespace
 {
 vtkSmartPointer<vtkSMSourceProxy> CreateWriter(
   vtkInSituPipelineIO* self, vtkSMSourceProxy* producer)
@@ -84,7 +84,7 @@ bool vtkInSituPipelineIO::Execute(int timestep, double time)
     auto producer = vtkInSituInitializationHelper::GetProducer(this->ChannelName);
     assert(producer != nullptr);
 
-    this->Writer = detail::CreateWriter(this, producer);
+    this->Writer = ::CreateWriter(this, producer);
     if (!this->Writer)
     {
       vtkErrorMacro("Failed to create writer on channel '" << this->ChannelName << "' for file '"

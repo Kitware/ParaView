@@ -36,11 +36,14 @@ public:
   size_t Length;
 };
 
+namespace
+{
 inline ostream& operator<<(ostream& os, const vtkSpyPlotWriteString& c)
 {
   os.write(c.Data, c.Length);
   os.flush();
   return os;
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -667,6 +670,8 @@ void vtkSpyPlotUniReader::PrintInformation()
    n bytes long. */
 
 //-----------------------------------------------------------------------------
+namespace
+{
 template <class t>
 int vtkSpyPlotUniReaderRunLengthDataDecode(
   vtkSpyPlotUniReader* self, const unsigned char* in, int inSize, t* out, int outSize, t scale = 1)
@@ -725,6 +730,7 @@ int vtkSpyPlotUniReaderRunLengthDataDecode(
   } // while
 
   return 1;
+}
 }
 
 //-----------------------------------------------------------------------------

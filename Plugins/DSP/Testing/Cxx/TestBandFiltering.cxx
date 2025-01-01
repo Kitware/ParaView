@@ -72,7 +72,7 @@ int CheckArray(vtkDataArray* array, std::array<double, N> expected)
 }
 
 // ----------------------------------------------------------------------------
-int TestBandFiltering(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
+extern int TestBandFiltering(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   constexpr int N_ELEMENTS = 1000;
 

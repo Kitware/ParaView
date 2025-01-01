@@ -13,7 +13,7 @@
 
 #include <string>
 
-int TestExecutableRunner(int, char* argv[])
+extern int TestExecutableRunner(int, char* argv[])
 {
   vtkInitializationHelper::SetApplicationName("TestExecutableRunner");
   vtkInitializationHelper::SetOrganizationName("Humanity");

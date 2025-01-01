@@ -2989,6 +2989,8 @@ void vtkPVRenderView::SetStereoRender(int val)
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 inline int vtkGetNumberOfRendersPerFrame(int stereoMode)
 {
   switch (stereoMode)
@@ -3010,6 +3012,7 @@ inline int vtkGetNumberOfRendersPerFrame(int stereoMode)
     default:
       return 1;
   }
+}
 }
 
 //----------------------------------------------------------------------------
@@ -3042,9 +3045,10 @@ void vtkPVRenderView::UpdateStereoProperties()
     // in this mode, the render server processes are showing results to the user
     // and the stereo mode is more relevant on the server side than the client
     // side since the client is merely a driver.
-    if (vtkGetNumberOfRendersPerFrame(server_type) != vtkGetNumberOfRendersPerFrame(client_type))
+    if (::vtkGetNumberOfRendersPerFrame(server_type) !=
+      ::vtkGetNumberOfRendersPerFrame(client_type))
     {
-      if (vtkGetNumberOfRendersPerFrame(server_type) == 2)
+      if (::vtkGetNumberOfRendersPerFrame(server_type) == 2)
       {
         client_type = VTK_STEREO_EMULATE;
       }
@@ -3059,7 +3063,7 @@ void vtkPVRenderView::UpdateStereoProperties()
     // the client is the main viewport for the user, the server side processes
     // are not showing final results to the user. The server never needs any 2
     // pass mode except VTK_STEREO_EMULATE.
-    if (vtkGetNumberOfRendersPerFrame(client_type) == 2)
+    if (::vtkGetNumberOfRendersPerFrame(client_type) == 2)
     {
       server_type = VTK_STEREO_EMULATE;
     }

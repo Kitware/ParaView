@@ -25,7 +25,7 @@
 
 #include <numeric> // for std::iota
 
-const char* test_xml = R"(
+static const char* test_xml = R"(
 <ServerManagerConfiguration>
  <ProxyGroup name="sources">
     <!-- ==================================================================== -->
@@ -90,7 +90,7 @@ const char* test_xml = R"(
 )";
 
 //----------------------------------------------------------------------------
-int TestSteeringDataGenerator(int argc, char* argv[])
+extern int TestSteeringDataGenerator(int argc, char* argv[])
 {
   vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT);
 

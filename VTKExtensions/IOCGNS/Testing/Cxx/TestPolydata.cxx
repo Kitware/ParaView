@@ -16,7 +16,7 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-int TestPolydata(int argc, char* argv[])
+extern int TestPolydata(int argc, char* argv[])
 {
   vtkNew<vtkPolyData> pd;
   Create(pd);

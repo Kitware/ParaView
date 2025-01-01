@@ -27,7 +27,7 @@
  * with model that respects Qt::CheckStateRole for setHeaderData and headerData
  * calls.
  */
-int HeaderViewCheckState(int argc, char* argv[])
+extern int HeaderViewCheckState(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 

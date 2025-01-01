@@ -6,7 +6,7 @@
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkRemotingCoreConfiguration.h"
 
-int TestRemotingCoreConfiguration(int argc, char* argv[])
+extern int TestRemotingCoreConfiguration(int argc, char* argv[])
 {
   vtkNew<vtkCLIOptions> options;
   options->SetName("TestRemotingCoreConfiguration");

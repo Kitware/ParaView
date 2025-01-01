@@ -17,7 +17,7 @@
 
 #include "vtksys/SystemTools.hxx"
 
-int TestPartitionedDataSetCollection(int argc, char* argv[])
+extern int TestPartitionedDataSetCollection(int argc, char* argv[])
 {
 
   int result(0);

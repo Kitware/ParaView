@@ -52,7 +52,7 @@ QSet<QString> checkedItemNames(const QList<QStandardItem*>& items)
   }
 }
 
-int TreeViewSelectionAndCheckState(int argc, char* argv[])
+extern int TreeViewSelectionAndCheckState(int argc, char* argv[])
 {
   QTestApp app(argc, argv);
 

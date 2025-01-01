@@ -15,7 +15,7 @@
 #include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
 
-int TestUnstructuredGrid(int argc, char* argv[])
+extern int TestUnstructuredGrid(int argc, char* argv[])
 {
   vtkNew<vtkUnstructuredGrid> ug;
   Create(ug.GetPointer(), 10);

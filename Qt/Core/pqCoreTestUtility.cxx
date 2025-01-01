@@ -77,6 +77,8 @@ const char* pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME = "PQ_COMPAREVIEW_PR
 
 static constexpr const char* DASHBOARD_MODE_ENV_VAR = "DASHBOARD_TEST_FROM_CTEST";
 
+namespace
+{
 template <typename WriterT>
 bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 {
@@ -88,6 +90,7 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
   writer->Delete();
 
   return result;
+}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -227,15 +230,15 @@ bool pqCoreTestUtility::SaveScreenshot(vtkRenderWindow* RenderWindow, const QStr
 
   const QFileInfo file(File);
   if (file.completeSuffix() == "bmp")
-    success = saveImage<vtkBMPWriter>(capture, file);
+    success = ::saveImage<vtkBMPWriter>(capture, file);
   else if (file.completeSuffix() == "tif")
-    success = saveImage<vtkTIFFWriter>(capture, file);
+    success = ::saveImage<vtkTIFFWriter>(capture, file);
   else if (file.completeSuffix() == "ppm")
-    success = saveImage<vtkPNMWriter>(capture, file);
+    success = ::saveImage<vtkPNMWriter>(capture, file);
   else if (file.completeSuffix() == "png")
-    success = saveImage<vtkPNGWriter>(capture, file);
+    success = ::saveImage<vtkPNGWriter>(capture, file);
   else if (file.completeSuffix() == "jpg")
-    success = saveImage<vtkJPEGWriter>(capture, file);
+    success = ::saveImage<vtkJPEGWriter>(capture, file);
 
   capture->Delete();
 

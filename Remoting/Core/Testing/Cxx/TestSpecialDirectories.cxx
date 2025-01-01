@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-int TestSpecialDirectories(int, char*[])
+extern int TestSpecialDirectories(int, char*[])
 {
   vtkPVFileInformationHelper* helper = vtkPVFileInformationHelper::New();
   vtkPVFileInformation* info = vtkPVFileInformation::New();

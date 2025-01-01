@@ -64,7 +64,7 @@ bool valid_range(double range[2])
 }
 }
 
-int TestAdjustRange(int argc, char* argv[])
+extern int TestAdjustRange(int argc, char* argv[])
 {
   (void)argc;
   (void)argv;

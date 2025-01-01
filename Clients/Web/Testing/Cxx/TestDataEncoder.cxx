@@ -13,7 +13,7 @@
 #include <vector>
 
 // returns 0 on success.
-int TestDataEncoder(int argc, char* argv[])
+extern int TestDataEncoder(int argc, char* argv[])
 {
   char* dataroot = vtkTestUtilities::GetDataRoot(argc, argv);
   if (!dataroot)

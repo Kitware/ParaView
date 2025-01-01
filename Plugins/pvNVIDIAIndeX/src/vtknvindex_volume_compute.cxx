@@ -33,6 +33,8 @@
 #include "vtknvindex_sparse_volume_importer.h"
 #include "vtknvindex_utilities.h"
 
+namespace
+{
 inline mi::Sint32 volume_format_size(const nv::index::Sparse_volume_voxel_format fmt)
 {
   switch (fmt)
@@ -50,6 +52,7 @@ inline mi::Sint32 volume_format_size(const nv::index::Sparse_volume_voxel_format
     default:
       return 0;
   }
+}
 }
 
 //-------------------------------------------------------------------------------------------------

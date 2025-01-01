@@ -12,7 +12,7 @@
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-int TestXMLSaveLoadState(int argc, char* argv[])
+extern int TestXMLSaveLoadState(int argc, char* argv[])
 {
   vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT);
 

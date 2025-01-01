@@ -102,7 +102,7 @@ bool CheckDSPIteratorWithObject(vtkDataObject* object)
 }
 
 //-----------------------------------------------------------------------------
-int TestDSPIterator(int argc, char* argv[])
+extern int TestDSPIterator(int argc, char* argv[])
 {
   // Read temporal dataset
   char* fname =

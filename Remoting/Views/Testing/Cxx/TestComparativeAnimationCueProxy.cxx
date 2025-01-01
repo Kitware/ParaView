@@ -19,7 +19,7 @@
   cerr << "ERROR: " msg << endl;                                                                   \
   return 1;
 
-int TestComparativeAnimationCueProxy(int argc, char* argv[])
+extern int TestComparativeAnimationCueProxy(int argc, char* argv[])
 {
   // Initialization
   vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT);

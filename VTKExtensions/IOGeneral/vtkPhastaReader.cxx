@@ -54,6 +54,8 @@ struct vtkPhastaReaderInternal
 
 // Begin of copy from phastaIO
 
+namespace
+{
 std::map<int, char*> LastHeaderKey;
 std::vector<FILE*> fileArray;
 std::vector<int> byte_order;
@@ -62,6 +64,7 @@ int LastHeaderNotFound = 0;
 int Wrong_Endian = 0;
 int Strict_Error = 0;
 int binary_format = 0;
+}
 
 // the caller has the responsibility to delete the returned string
 char* vtkPhastaReader::StringStripper(const char istring[])
@@ -121,11 +124,11 @@ void vtkPhastaReader::isBinary(const char iotype[])
   char* fname = StringStripper(iotype);
   if (cscompare(fname, "binary"))
   {
-    binary_format = 1;
+    ::binary_format = 1;
   }
   else
   {
-    binary_format = 0;
+    ::binary_format = 0;
   }
   delete[] fname;
 }
@@ -228,13 +231,13 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
       }
       else if (cscompare(token, "byteorder magic number"))
       {
-        if (binary_format)
+        if (::binary_format)
         {
           xfread((void*)&integer_value, sizeof(int), 1, fileObject);
           xfread(&junk, sizeof(char), 1, fileObject);
           if (362436 != integer_value)
           {
-            Wrong_Endian = 1;
+            ::Wrong_Endian = 1;
           }
         }
         else
@@ -247,7 +250,7 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
         /* some other header, so just skip over */
         token = strtok(nullptr, " ,;<>");
         skip_size = atoi(token);
-        if (binary_format)
+        if (::binary_format)
         {
           fseek(fileObject, skip_size, SEEK_CUR);
         }
@@ -328,10 +331,10 @@ void vtkPhastaReader::openfile(const char filename[], const char mode[], int* fi
   }
   else
   {
-    fileArray.push_back(file);
-    byte_order.push_back(0);
-    header_type.push_back(sizeof(int));
-    *fileDescriptor = static_cast<int>(fileArray.size());
+    ::fileArray.push_back(file);
+    ::byte_order.push_back(0);
+    ::header_type.push_back(sizeof(int));
+    *fileDescriptor = static_cast<int>(::fileArray.size());
   }
   delete[] imode;
 }
@@ -342,10 +345,10 @@ void vtkPhastaReader::closefile(int* fileDescriptor, const char mode[])
 
   if (cscompare("write", imode) || cscompare("append", imode))
   {
-    fflush(fileArray[*fileDescriptor - 1]);
+    fflush(::fileArray[*fileDescriptor - 1]);
   }
 
-  fclose(fileArray[*fileDescriptor - 1]);
+  fclose(::fileArray[*fileDescriptor - 1]);
   delete[] imode;
 }
 
@@ -356,7 +359,7 @@ void vtkPhastaReader::readheader(int* fileDescriptor, const char keyphrase[], vo
   FILE* fileObject;
   int* valueListInt;
 
-  if (*fileDescriptor < 1 || *fileDescriptor > (int)fileArray.size())
+  if (*fileDescriptor < 1 || *fileDescriptor > (int)::fileArray.size())
   {
     vtkGenericWarningMacro(<< "No file associated with Descriptor " << *fileDescriptor << "\n"
                            << "openfile function has to be called before \n"
@@ -365,11 +368,11 @@ void vtkPhastaReader::readheader(int* fileDescriptor, const char keyphrase[], vo
     return;
   }
 
-  LastHeaderKey[filePtr] = const_cast<char*>(keyphrase);
-  LastHeaderNotFound = 0;
+  ::LastHeaderKey[filePtr] = const_cast<char*>(keyphrase);
+  ::LastHeaderNotFound = 0;
 
-  fileObject = fileArray[filePtr];
-  Wrong_Endian = byte_order[filePtr];
+  fileObject = ::fileArray[filePtr];
+  ::Wrong_Endian = ::byte_order[filePtr];
 
   isBinary(iotype);
   typeSize(datatype); // redundant call, just avoid a compiler warning.
@@ -380,11 +383,11 @@ void vtkPhastaReader::readheader(int* fileDescriptor, const char keyphrase[], vo
   valueListInt = static_cast<int*>(valueArray);
   int ierr = readHeader(fileObject, keyphrase, valueListInt, *nItems);
 
-  byte_order[filePtr] = Wrong_Endian;
+  ::byte_order[filePtr] = ::Wrong_Endian;
 
   if (ierr)
   {
-    LastHeaderNotFound = 1;
+    ::LastHeaderNotFound = 1;
   }
 }
 
@@ -395,7 +398,7 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
   FILE* fileObject;
   char junk;
 
-  if (*fileDescriptor < 1 || *fileDescriptor > (int)fileArray.size())
+  if (*fileDescriptor < 1 || *fileDescriptor > (int)::fileArray.size())
   {
     vtkGenericWarningMacro(<< "No file associated with Descriptor " << *fileDescriptor << "\n"
                            << "openfile function has to be called before \n"
@@ -408,36 +411,36 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
   // since we require that a consistent header always precede the data block
   // let us check to see that it is actually the case.
 
-  if (!cscompare(LastHeaderKey[filePtr], keyphrase))
+  if (!cscompare(::LastHeaderKey[filePtr], keyphrase))
   {
     vtkGenericWarningMacro(<< "Header not consistent with data block\n"
-                           << "Header: " << LastHeaderKey[filePtr] << "\n"
+                           << "Header: " << ::LastHeaderKey[filePtr] << "\n"
                            << "DataBlock: " << keyphrase << "\n"
                            << "Please recheck read sequence \n");
-    if (Strict_Error)
+    if (::Strict_Error)
     {
       vtkGenericWarningMacro(<< "fatal error: cannot continue, returning out of call\n");
       return;
     }
   }
 
-  if (LastHeaderNotFound)
+  if (::LastHeaderNotFound)
   {
     return;
   }
 
-  fileObject = fileArray[filePtr];
-  Wrong_Endian = byte_order[filePtr];
+  fileObject = ::fileArray[filePtr];
+  ::Wrong_Endian = ::byte_order[filePtr];
 
   size_t type_size = typeSize(datatype);
   int nUnits = *nItems;
   isBinary(iotype);
 
-  if (binary_format)
+  if (::binary_format)
   {
     xfread(valueArray, type_size, nUnits, fileObject);
     xfread(&junk, sizeof(char), 1, fileObject);
-    if (Wrong_Endian)
+    if (::Wrong_Endian)
     {
       SwapArrayByteOrder(valueArray, static_cast<int>(type_size), nUnits);
     }

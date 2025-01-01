@@ -17,7 +17,7 @@
 
 #include "vtksys/SystemTools.hxx"
 
-int TestMultiBlockData(int argc, char* argv[])
+extern int TestMultiBlockData(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
   vtkObject::GlobalWarningDisplayOff();

@@ -3,7 +3,7 @@
 #include <vtkFileSequenceParser.h>
 #include <vtkNew.h>
 
-bool check_group(vtkFileSequenceParser* parser, const char* fname, const char* seqname)
+static bool check_group(vtkFileSequenceParser* parser, const char* fname, const char* seqname)
 {
   if (!parser->ParseFileSequence(fname))
   {
@@ -20,7 +20,7 @@ bool check_group(vtkFileSequenceParser* parser, const char* fname, const char* s
   return true;
 }
 
-bool check_no_group(vtkFileSequenceParser* parser, const char* fname)
+static bool check_no_group(vtkFileSequenceParser* parser, const char* fname)
 {
   if (parser->ParseFileSequence(fname))
   {
@@ -30,7 +30,7 @@ bool check_no_group(vtkFileSequenceParser* parser, const char* fname)
   return true;
 }
 
-int TestFileSequenceParser(int, char* argv[])
+extern int TestFileSequenceParser(int, char* argv[])
 {
   (void)argv;
   vtkNew<vtkFileSequenceParser> seqParser;

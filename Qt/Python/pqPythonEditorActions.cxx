@@ -20,7 +20,7 @@
 #include <QTextEdit>
 #include <QUndoStack>
 
-namespace details
+namespace
 {
 QStringList ListFiles(const QString& directory)
 {
@@ -129,7 +129,7 @@ pqPythonEditorActions::pqPythonEditorActions()
 //-----------------------------------------------------------------------------
 void pqPythonEditorActions::updateScriptsList(pqPythonManager* python_mgr)
 {
-  auto scripts = details::ListFiles(pqPythonScriptEditor::getScriptsDir());
+  auto scripts = ::ListFiles(pqPythonScriptEditor::getScriptsDir());
 
   this->ScriptActions.clear();
   this->ScriptActions.reserve(scripts.size());

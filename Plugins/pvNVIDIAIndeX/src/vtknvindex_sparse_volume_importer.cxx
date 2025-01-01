@@ -38,6 +38,8 @@
 
 static const std::string LOG_svol_rvol_prefix = "Sparse volume importer: ";
 
+namespace
+{
 //-------------------------------------------------------------------------------------------------
 inline nv::index::Sparse_volume_voxel_format match_volume_format(const std::string& fmt_string)
 {
@@ -97,6 +99,7 @@ inline mi::Size volume_format_size(const nv::index::Sparse_volume_voxel_format f
     default:
       return 0;
   }
+}
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -632,7 +635,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
 
   const mi::Uint32 svol_attrib_index_0 = 0u;
   ISparse_volume_attribute_set_descriptor::Attribute_parameters svol_attrib_param_0;
-  svol_attrib_param_0.format = match_volume_format(m_scalar_type);
+  svol_attrib_param_0.format = ::match_volume_format(m_scalar_type);
 
   if (svol_attrib_param_0.format == nv::index::SPARSE_VOLUME_VOXEL_FORMAT_COUNT)
   {
@@ -653,7 +656,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   }
 
   const nv::index::Sparse_volume_voxel_format vol_fmt = svol_attrib_param_0.format;
-  const mi::Size vol_fmt_size = volume_format_size(vol_fmt);
+  const mi::Size vol_fmt_size = ::volume_format_size(vol_fmt);
 
   // Input the required data-bricks into the subset
   Handle<const ISparse_volume_subset_data_descriptor> svol_subset_desc(

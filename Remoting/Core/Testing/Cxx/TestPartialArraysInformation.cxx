@@ -11,7 +11,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
 
-vtkSmartPointer<vtkPolyData> GetPolyData(
+static vtkSmartPointer<vtkPolyData> GetPolyData(
   const char** parrays = nullptr, const char** carrays = nullptr)
 {
   vtkNew<vtkSphereSource> sphere;
@@ -42,7 +42,7 @@ vtkSmartPointer<vtkPolyData> GetPolyData(
   return pd;
 }
 
-int TestPartialArraysInformation(int, char*[])
+extern int TestPartialArraysInformation(int, char*[])
 {
   vtkNew<vtkMultiBlockDataSet> data;
 

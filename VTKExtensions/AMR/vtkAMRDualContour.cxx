@@ -421,6 +421,8 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetCornerPointer(
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 vtkAMRDualContourEdgeLocator* vtkAMRDualContourGetBlockLocator(vtkAMRDualGridHelperBlock* block)
 {
   if (block->UserData == nullptr)
@@ -445,14 +447,15 @@ vtkAMRDualContourEdgeLocator* vtkAMRDualContourGetBlockLocator(vtkAMRDualGridHel
   }
   return (vtkAMRDualContourEdgeLocator*)(block->UserData);
 }
+}
 
 //----------------------------------------------------------------------------
 // This version works with higher level neighbor blocks.
 void vtkAMRDualContourEdgeLocator::ShareBlockLocatorWithNeighbor(
   vtkAMRDualGridHelperBlock* block, vtkAMRDualGridHelperBlock* neighbor)
 {
-  vtkAMRDualContourEdgeLocator* blockLocator = vtkAMRDualContourGetBlockLocator(block);
-  vtkAMRDualContourEdgeLocator* neighborLocator = vtkAMRDualContourGetBlockLocator(neighbor);
+  vtkAMRDualContourEdgeLocator* blockLocator = ::vtkAMRDualContourGetBlockLocator(block);
+  vtkAMRDualContourEdgeLocator* neighborLocator = ::vtkAMRDualContourGetBlockLocator(neighbor);
 
   // Compute the extent of the locator to copy.
   // Moving too many will not hurt, so do not worry about which block owns the region.
@@ -862,7 +865,8 @@ void vtkAMRDualContour::ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock
             // The unused center flag is used as a flag to indicate
             if (neighbor && neighbor->Image && neighbor->RegionBits[1][1][1])
             {
-              vtkAMRDualContourEdgeLocator* blockLocator = vtkAMRDualContourGetBlockLocator(block);
+              vtkAMRDualContourEdgeLocator* blockLocator =
+                ::vtkAMRDualContourGetBlockLocator(block);
               blockLocator->ShareBlockLocatorWithNeighbor(block, neighbor);
             }
           }
@@ -905,7 +909,7 @@ void vtkAMRDualContour::ProcessBlock(
   // Input the dimensions of the dual cells with ghosts.
   if (this->EnableMergePoints)
   {
-    this->BlockLocator = vtkAMRDualContourGetBlockLocator(block);
+    this->BlockLocator = ::vtkAMRDualContourGetBlockLocator(block);
   }
   else
   { // Shared locator.
@@ -1024,6 +1028,8 @@ void vtkAMRDualContour::ProcessBlock(
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 template <class T>
 void vtkDualGridContourCastCornerValues(T* ptr, vtkIdType offsets[8], double values[8])
 {
@@ -1035,6 +1041,7 @@ void vtkDualGridContourCastCornerValues(T* ptr, vtkIdType offsets[8], double val
   values[5] = (double)(ptr[offsets[5]]);
   values[6] = (double)(ptr[offsets[6]]);
   values[7] = (double)(ptr[offsets[7]]);
+}
 }
 
 // Generic table for clipping a square.
@@ -1095,7 +1102,7 @@ void vtkAMRDualContour::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int bl
   double cornerValues[8];
   switch (dataType)
   {
-    vtkTemplateMacro(vtkDualGridContourCastCornerValues(
+    vtkTemplateMacro(::vtkDualGridContourCastCornerValues(
       (VTK_TT*)(volumeFractionPtr), cornerOffsets, cornerValues));
     default:
       vtkGenericWarningMacro("Execute: Unknown ScalarType");

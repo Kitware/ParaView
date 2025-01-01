@@ -15,7 +15,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtksys/SystemTools.hxx"
 
-int TestPolygonalData(int argc, char* argv[])
+extern int TestPolygonalData(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
   vtkNew<vtkMPIController> mpiController;

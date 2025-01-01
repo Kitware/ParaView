@@ -190,7 +190,7 @@ void HierarchicalGridLayoutTester::interactiveResize()
   QTest::qWait(250);
 }
 
-int HierarchicalGridLayout(int argc, char* argv[])
+extern int HierarchicalGridLayout(int argc, char* argv[])
 {
   QApplication app(argc, argv);
   HierarchicalGridLayoutTester tester;
