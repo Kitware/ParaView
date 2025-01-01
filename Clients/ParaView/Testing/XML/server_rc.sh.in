@@ -5,4 +5,4 @@ DISPLAY=:0 @ParaView_BINARY_DIR@/bin/pvserver --rc --client-host=$1 --sp=$2 2>&1
 # TODO : A better and cleaner solution
 sleep 120&
 wait $!
-kill $(ps aux | grep 'x-terminal-emulator' | awk '{print $2}')
+kill $(pgrep 'x-terminal-emulator')
