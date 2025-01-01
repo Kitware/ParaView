@@ -497,6 +497,7 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
            rm script to clean up at the end.
          */
         stream << "/bin/sh -c \"tmpFile=`mktemp`; echo \'#!/bin/sh\n"
+               // FIXME: Quoting needs to be performed on the command.
                << sshFullCommand << " " << execCommand
                << ";pid=`ps -o ppid= -p $PPID`; ppid=`ps -o ppid= -p $pid`; kill -2 $ppid; exit\'"
                   "> $tmpFile; chmod +x $tmpFile; chmod -rw ~/Library/Saved\\ Application\\ "
