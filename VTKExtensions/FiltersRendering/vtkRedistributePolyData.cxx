@@ -37,12 +37,14 @@ vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, vtkMultiProcessControl
 #define VTK_REDIST_DO_TIMING 0
 #define NUM_CELL_TYPES 4
 
+#if VTK_REDIST_DO_TIMING
 typedef struct
 {
   vtkTimerLog* timer;
   float time;
 } _TimerInfo;
 _TimerInfo timerInfo8;
+#endif
 
 vtkRedistributePolyData::vtkRedistributePolyData()
 {
@@ -299,7 +301,7 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
 
   // ... allocate memory before receiving data ...
 
-#if (VTK_REDIST_DO_TIMING == 1)
+#if VTK_REDIST_DO_TIMING
   timerInfo8.timer->StopTimer();
   timerInfo8.time += timerInfo8.timer->GetElapsedTime();
   if (myId == 0)
