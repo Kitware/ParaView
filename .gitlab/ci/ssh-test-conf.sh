@@ -1,9 +1,10 @@
 #!/bin/sh
+
 set -e
 
 # Skip if we're not in a `fedora` job.
 if ! echo "$CMAKE_CONFIGURATION" | grep -q -e 'fedora'; then
-  exit 0
+    exit 0
 fi
 
 # Generate keys and append own public key as authorized
