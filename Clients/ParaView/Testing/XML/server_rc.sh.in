@@ -2,13 +2,16 @@
 
 set -e
 
+readonly test_name="$1"
+shift
+
 readonly host="$1"
 shift
 
 readonly port="$1"
 shift
 
-@ParaView_BINARY_DIR@/bin/pvserver --rc --client-host="$host" --sp="$port" 2>&1 | tee sshServer.log &
+@ParaView_BINARY_DIR@/bin/pvserver --rc --client-host="$host" --sp="$port" 2>&1 | tee "sshServer-$test_name.log" &
 
 # DIRTY FIX
 # Wait 120s for all the SSH test to run, then make sure that all remaining instance of x-terminal-emulator are killed
