@@ -25,11 +25,5 @@ PidFile ~/.ssh/sshd.pid
 AuthorizedKeysFile ~/.ssh/id_rsa.pub
 " > $HOME/.ssh/sshd_conf
 
-# Disable host checking
-echo "
-Host *
-    StrictHostKeyChecking no
-" > $HOME/.ssh/config
-
 # Run SSH server as daemon
 /usr/sbin/sshd -f $HOME/.ssh/sshd_conf
