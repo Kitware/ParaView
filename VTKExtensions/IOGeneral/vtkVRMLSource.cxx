@@ -59,7 +59,7 @@ int vtkVRMLSource::CanReadFile(const char* filename)
 
   // Technically, the header should start with "#VRML V2.0 utf8", but who's
   // to say that new versions will not be forward compatible.  Let's not be
-  // perscriptive yet.  If some future version of VRML is incompatible, we
+  // prescriptive yet.  If some future version of VRML is incompatible, we
   // can make this test more strict.
   int valid = (strncmp(header, "#VRML ", 6) == 0);
 

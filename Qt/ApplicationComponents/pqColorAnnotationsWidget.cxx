@@ -122,7 +122,7 @@ public:
   {
   }
 
-  // Overriden to update the global checkbox based on filtered elements only.
+  // Overridden to update the global checkbox based on filtered elements only.
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
     pqAnnotationsModel* sourceModel = qobject_cast<pqAnnotationsModel*>(this->sourceModel());
@@ -157,7 +157,7 @@ public:
     return sourceModel->headerData(section, orientation, role);
   }
 
-  // Overriden in order to set the visibility / opacity values on the filtered elements only.
+  // Overridden in order to set the visibility / opacity values on the filtered elements only.
   bool setHeaderData(
     int section, Qt::Orientation orientation, const QVariant& value, int role) override
   {
