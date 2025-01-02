@@ -56,6 +56,7 @@ int vtkVRMLSource::CanReadFile(const char* filename)
   char header[128];
   if (fgets(header, 128, fd) == nullptr)
   {
+    fclose(fd);
     return 0;
   }
 
