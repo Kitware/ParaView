@@ -156,28 +156,31 @@ pqPipelineSource* pqCustomFilterDefinitionModelLink::GetPipelineSource() const
 //-----------------------------------------------------------------------------
 pqCustomFilterDefinitionModel::pqCustomFilterDefinitionModel(QObject* parentObject)
   : QAbstractItemModel(parentObject)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  , PixmapList(pqCustomFilterDefinitionModel::LastType + 1)
+#endif
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  for (int i = pqCustomFilterDefinitionModel::Source; i <= pqCustomFilterDefinitionModel::LastType;
+       ++i)
+  {
+    this->PixmapList.append(QPixmap());
+  }
+#endif
+
   this->Root = new pqCustomFilterDefinitionModelItem();
 
   // Initialize the pixmap list.
-  this->PixmapList = new QPixmap[pqCustomFilterDefinitionModel::LastType + 1];
-  if (this->PixmapList)
-  {
-    this->PixmapList[pqCustomFilterDefinitionModel::Source].load(
-      ":/pqWidgets/Icons/pqSource16.png");
-    this->PixmapList[pqCustomFilterDefinitionModel::Filter].load(
-      ":/pqWidgets/Icons/pqFilter16.png");
-    this->PixmapList[pqCustomFilterDefinitionModel::CustomFilter].load(
-      ":/pqWidgets/Icons/pqBundle16.png");
-    this->PixmapList[pqCustomFilterDefinitionModel::Link].load(
-      ":/pqWidgets/Icons/pqLinkBack16.png");
-  }
+  this->PixmapList[pqCustomFilterDefinitionModel::Source].load(":/pqWidgets/Icons/pqSource16.png");
+  this->PixmapList[pqCustomFilterDefinitionModel::Filter].load(":/pqWidgets/Icons/pqFilter16.png");
+  this->PixmapList[pqCustomFilterDefinitionModel::CustomFilter].load(
+    ":/pqWidgets/Icons/pqBundle16.png");
+  this->PixmapList[pqCustomFilterDefinitionModel::Link].load(":/pqWidgets/Icons/pqLinkBack16.png");
 }
 
 pqCustomFilterDefinitionModel::~pqCustomFilterDefinitionModel()
 {
   delete this->Root;
-  delete[] this->PixmapList;
 }
 
 int pqCustomFilterDefinitionModel::rowCount(const QModelIndex& parentIndex) const
@@ -246,8 +249,7 @@ QVariant pqCustomFilterDefinitionModel::data(const QModelIndex& idx, int role) c
       }
       case Qt::DecorationRole:
       {
-        if (idx.column() == 0 && this->PixmapList &&
-          item->Type != pqCustomFilterDefinitionModel::Invalid)
+        if (idx.column() == 0 && item->Type != pqCustomFilterDefinitionModel::Invalid)
         {
           return QVariant(this->PixmapList[item->Type]);
         }

@@ -171,7 +171,7 @@ private:
   pqCustomFilterDefinitionModelItem* getNextItem(pqCustomFilterDefinitionModelItem* item) const;
 
   pqCustomFilterDefinitionModelItem* Root; ///< The root of the model tree.
-  QPixmap* PixmapList;                     ///< Stores the item icons.
+  QList<QPixmap> PixmapList;               ///< Stores the item icons.
 };
 
 #endif
