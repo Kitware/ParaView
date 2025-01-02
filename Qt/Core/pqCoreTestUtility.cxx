@@ -75,10 +75,10 @@
 
 const char* pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME = "PQ_COMPAREVIEW_PROPERTY_NAME";
 
-static constexpr const char* DASHBOARD_MODE_ENV_VAR = "DASHBOARD_TEST_FROM_CTEST";
-
 namespace
 {
+constexpr const char* DASHBOARD_MODE_ENV_VAR = "DASHBOARD_TEST_FROM_CTEST";
+
 template <typename WriterT>
 bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 {
@@ -130,7 +130,7 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p)
 //-----------------------------------------------------------------------------
 void pqCoreTestUtility::updatePlayers()
 {
-  if (vtksys::SystemTools::HasEnv(DASHBOARD_MODE_ENV_VAR))
+  if (vtksys::SystemTools::HasEnv(::DASHBOARD_MODE_ENV_VAR))
   {
     // Safe to add multiple times
     this->eventPlayer()->addWidgetEventPlayer(new pqFileDialogEventPlayer(this));
@@ -144,7 +144,7 @@ void pqCoreTestUtility::updatePlayers()
 //-----------------------------------------------------------------------------
 void pqCoreTestUtility::updateTranslators()
 {
-  if (vtksys::SystemTools::HasEnv(DASHBOARD_MODE_ENV_VAR))
+  if (vtksys::SystemTools::HasEnv(::DASHBOARD_MODE_ENV_VAR))
   {
     // Safe to add multiple times
     this->eventTranslator()->addWidgetEventTranslator(new pqFileDialogEventTranslator(this));
@@ -486,11 +486,11 @@ void pqCoreTestUtility::setDashboardMode(bool value)
 {
   if (value)
   {
-    qputenv(DASHBOARD_MODE_ENV_VAR, "1");
+    qputenv(::DASHBOARD_MODE_ENV_VAR, "1");
   }
   else
   {
-    qunsetenv(DASHBOARD_MODE_ENV_VAR);
+    qunsetenv(::DASHBOARD_MODE_ENV_VAR);
   }
   this->updatePlayers();
   this->updateTranslators();
