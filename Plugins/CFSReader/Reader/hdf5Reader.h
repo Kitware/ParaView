@@ -26,7 +26,7 @@ namespace H5CFS
  * Class for handling the reading of mesh and simulation data from
  * HDF5 files.
  */
-class VTK_EXPORT Hdf5Reader
+class Hdf5Reader
 {
 public:
   Hdf5Reader() = default;
