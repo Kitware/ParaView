@@ -9,7 +9,7 @@
 #include "vtkCPUniformGridBuilder.h"
 #include "vtkObjectFactory.h"
 
-class VTK_EXPORT vtkCPImplementedTestDriver : public vtkCPTestDriver
+class vtkCPImplementedTestDriver : public vtkCPTestDriver
 {
 public:
   static vtkCPImplementedTestDriver* New();

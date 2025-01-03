@@ -20,7 +20,7 @@ class vtkIdList;
 class vtkPoints;
 class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkCustomUnstructuredGridBuilder : public vtkCPUnstructuredGridBuilder
+class vtkCustomUnstructuredGridBuilder : public vtkCPUnstructuredGridBuilder
 {
 public:
   static vtkCustomUnstructuredGridBuilder* New();
