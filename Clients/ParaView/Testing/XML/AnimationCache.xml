@@ -45,6 +45,8 @@
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.2" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.2" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.2,1" />
+
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
 
@@ -66,6 +68,7 @@
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.2" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.2" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.2,0.5" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/vcrBar/actionVCRPlay" command="activate" arguments="" />
@@ -79,6 +82,7 @@
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.2" />
   <pqevent object="pqClientMainWindow/1QDialog0" command="key" arguments="16777248" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.2,1" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
 
