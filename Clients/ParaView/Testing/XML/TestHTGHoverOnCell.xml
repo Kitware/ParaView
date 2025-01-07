@@ -18,12 +18,5 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.443128,0.230189,1,0,0)" />
   <pqevent object="pqClientMainWindow" command="pause" arguments="1000"/>
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="keyEvent" arguments="6:67:67108864:c:0:1" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
-  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsOpenScriptEditor" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/1pqPythonTabWidget0/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="Edit" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/Edit" command="activate" arguments="Paste" />
-  <pqcheck object="pqClientMainWindow/1pqPythonScriptEditor0/1pqPythonTabWidget0/qt_tabwidget_stackedwidget/1pqPythonTextArea0/1QTextEdit0" property="plainText" arguments="Unbalanced3DepthOctTree3x2x3.htg&#xA;  Type: Voxel&#xA;  Depth: 1&#xA;  OriginalIds: 8" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="&amp;Save" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/tmp.py" />
+  <pqcheck object="qtooltip_label" property="text" arguments="&lt;p style='white-space:pre'&gt;&lt;b&gt;Unbalanced3DepthOctTree3x2x3.htg&lt;/b&gt;&#xA;  Type: Voxel&#xA;  Depth: 1&#xA;  OriginalIds: 8&lt;/p&gt;" />
 </pqevents>
