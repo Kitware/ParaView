@@ -278,7 +278,7 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
         auto pipeline = vtkInSituInitializationHelper::AddPipeline(script.name(), fname);
 
         // check for optional 'args'
-        if (script.has_path("args"))
+        if (script.has_path("args") && pipeline)
         {
           ::process_script_args(vtkInSituPipelinePython::SafeDownCast(pipeline), script["args"]);
         }

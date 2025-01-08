@@ -15,8 +15,8 @@
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
@@ -73,8 +73,11 @@ class pqMultiBlockInspectorWidget::pqInternals : public QObject
 
   static bool isCompositeDataSet(pqDataRepresentation* repr)
   {
-    auto reprProxy = repr ? vtkSMRepresentationProxy::SafeDownCast(repr->getProxy()) : nullptr;
-    auto dataInfo = reprProxy ? reprProxy->GetRepresentedDataInformation() : nullptr;
+    auto reprProxy = repr ? repr->getProxy() : nullptr;
+    auto inputProxy = reprProxy
+      ? vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(reprProxy, "Input").GetAsProxy())
+      : nullptr;
+    auto dataInfo = inputProxy ? inputProxy->GetDataInformation() : nullptr;
     return dataInfo && dataInfo->IsCompositeDataSet();
   }
 

@@ -16,6 +16,7 @@
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
+#include "pqTestingReaction.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkNew.h"
@@ -169,6 +170,7 @@ void pqDeleteReaction::deleteAll()
       output->clear();
     }
   }
+  pqTestingReaction::lockViewSize(false);
   END_UNDO_EXCLUDE();
   CLEAR_UNDO_STACK();
   pqApplicationCore::instance()->render();
