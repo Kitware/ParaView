@@ -29,6 +29,7 @@
 #include "pqPluginSettingsBehavior.h"
 #include "pqPluginToolBarBehavior.h"
 #include "pqPropertiesPanel.h"
+#include "pqPropertyPanelVisibilitiesBehavior.h"
 #include "pqServerManagerModel.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
 #include "pqStandardPropertyWidgetInterface.h"
@@ -142,6 +143,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(LiveSourceBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CustomShortcutBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(MainWindowEventBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(UsageLoggingBehavior, false);
+PQ_BEHAVIOR_DEFINE_FLAG(PropertyPanelVisibilitiesBehavior, true);
 #undef PQ_BEHAVIOR_DEFINE_FLAG
 
 #define PQ_IS_BEHAVIOR_ENABLED(_name) enable##_name()
@@ -153,6 +155,11 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   // Register ParaView interfaces.
   pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
 
+  if (PQ_IS_BEHAVIOR_ENABLED(PropertyPanelVisibilitiesBehavior))
+  {
+    // Note that this behavior will not modify already created proxy widgets.
+    new pqPropertyPanelVisibilitiesBehavior(this);
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(StandardPropertyWidgets))
   {
     // Register standard types of property widgets.
