@@ -84,6 +84,14 @@ public:
 
   ///@{
   /**
+   * Save current properties as default on apply.
+   */
+  vtkGetMacro(PreservePropertyValues, bool);
+  vtkSetMacro(PreservePropertyValues, bool);
+  /// }
+
+  ///@{
+  /**
    * Get/Set the default view type.
    */
   vtkGetMacro(DefaultViewType, std::string);
@@ -356,6 +364,7 @@ protected:
   bool AutoApply = false;
   int AutoApplyDelay = 0;
   bool AutoApplyActiveOnly = false;
+  bool PreservePropertyValues = false;
   std::string DefaultViewType = "RenderView";
   std::string InterfaceLanguage = "en";
   int ScalarBarMode = AUTOMATICALLY_HIDE_SCALAR_BARS;

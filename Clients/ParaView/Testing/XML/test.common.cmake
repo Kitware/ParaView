@@ -991,6 +991,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
   PolarAxesBackwardsCompatibility.xml
+  PreservePropertyValues.xml
   ProcessIdScalarsBackwardCompat.xml
   ProxyCategoriesConfiguration.xml
   ProxyCategoriesDialog.xml
