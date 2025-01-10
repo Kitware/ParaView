@@ -682,7 +682,12 @@ void pqSMAdaptor::setSelectionProperty(
 
   QString name = value[0].toString();
   QVariant status = value[1];
-  if (status.type() == QVariant::Bool)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  auto typeId = static_cast<QMetaType::Type>(status.type());
+#else
+  auto typeId = status.typeId();
+#endif
+  if (typeId == QMetaType::Bool)
   {
     status = status.toInt();
   }

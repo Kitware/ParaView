@@ -246,7 +246,12 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
   QVariant smValue = this->currentServerManagerValue(use_unchecked);
   if (qtValue != smValue)
   {
-    if (static_cast<QMetaType::Type>(smValue.type()) == QMetaType::Double)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    auto typeId = static_cast<QMetaType::Type>(smValue.type());
+#else
+    auto typeId = smValue.typeId();
+#endif
+    if (typeId == QMetaType::Double)
     {
       // QVariant is able to convert double to string but we need to be able
       // to specify how it should be formatted using settings, which
