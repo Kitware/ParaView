@@ -199,8 +199,11 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
 
   if (!fgets(Line, 1024, fileObject) && feof(fileObject))
   {
-    rewind(fileObject);
-    clearerr(fileObject);
+    if (fseek(fileObject, 0, SEEK_SET))
+    {
+      vtkErrorWithObjectMacro(nullptr, << "Failed to rewind input: " << strerror(errno) << endl);
+      return 1;
+    }
     rewind_count++;
 
     xfgets(Line, 1024, fileObject);
@@ -269,7 +272,12 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
     {
       if (!fgets(Line, 1024, fileObject) && feof(fileObject))
       {
-        rewind(fileObject);
+        if (fseek(fileObject, 0, SEEK_SET))
+        {
+          vtkErrorWithObjectMacro(
+            nullptr, << "Failed to rewind input: " << strerror(errno) << endl);
+          return 1;
+        }
         clearerr(fileObject);
         rewind_count++;
         xfgets(Line, 1024, fileObject);
