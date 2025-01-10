@@ -50,7 +50,7 @@ void pqTestingReaction::recordTest(const QString& filename)
 {
   if (!filename.isEmpty())
   {
-    QApplication::setActiveWindow(pqCoreUtilities::mainWidget());
+    pqCoreUtilities::mainWidget()->activateWindow();
     pqApplicationCore::instance()->testUtility()->recordTests(filename);
   }
 }
