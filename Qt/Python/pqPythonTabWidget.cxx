@@ -206,7 +206,11 @@ void pqPythonTabWidget::mousePressEvent(QMouseEvent* mouseEvent)
         [this, tabIndex]() { this->tabCloseRequested(tabIndex); });
       contextMenu.addAction(&closeTabAction);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
       contextMenu.exec(mouseEvent->globalPos());
+#else
+      contextMenu.exec(mouseEvent->globalPosition().toPoint());
+#endif
     }
 
     mouseEvent->accept();

@@ -62,7 +62,8 @@ bool pqQVTKWidgetEventPlayer::playEvent(
         {
           type = QEvent::MouseButtonDblClick;
         }
-        QMouseEvent e(type, QPoint(x, y), button, buttons, keym);
+        QPoint localPos(x, y);
+        QMouseEvent e(type, localPos, widget->mapToGlobal(localPos), button, buttons, keym);
 
         if (qvtkStereoWidget != nullptr)
         {
