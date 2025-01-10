@@ -40,6 +40,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "doxygen")
     message("Doxygen failed to install")
     set(build_result "${doxygen_result}")
   endif ()
+elseif ("$ENV{CMAKE_CONFIGURATION}" MATCHES "documentation")
+  list(APPEND targets_to_build
+    ParaViewDoc-TGZ)
 endif ()
 
 set(num_warnings 0)

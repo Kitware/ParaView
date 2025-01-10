@@ -281,7 +281,7 @@ windows-vs2022-qt:test:
 
 documentation:build:
     extends:
-        - .fedora35
+        - .fedora35_documentation
         - .doxygen_build_linux
         - .linux_builder_tags
         - .doxygen_log_artifacts
