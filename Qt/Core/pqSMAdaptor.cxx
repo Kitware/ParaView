@@ -1592,10 +1592,18 @@ void pqSMAdaptor::setMultipleElementProperty(
   {
     bool ok = true;
     int v = Value.toInt(&ok);
-    if (!ok && Value.canConvert(QVariant::Bool))
+    if (!ok)
     {
-      v = Value.toBool() ? 1 : 0;
-      ok = true;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+      bool canConvert = Value.canConvert(QVariant::Bool);
+#else
+      bool canConvert = Value.canConvert(QMetaType(QMetaType::Bool));
+#endif
+      if (canConvert)
+      {
+        v = Value.toBool() ? 1 : 0;
+        ok = true;
+      }
     }
     if (ok)
     {

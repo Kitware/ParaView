@@ -77,7 +77,13 @@ public:
     switch (index)
     {
       case pqAnnotationsModel::COLOR:
-        if (value.canConvert(QVariant::Color))
+      {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        bool canConvert = value.canConvert(QVariant::Color);
+#else
+        bool canConvert = value.canConvert(QMetaType(QMetaType::QColor));
+#endif
+        if (canConvert)
         {
           if (this->Color != value.value<QColor>())
           {
@@ -86,7 +92,8 @@ public:
             return true;
           }
         }
-        break;
+      }
+      break;
       case pqAnnotationsModel::OPACITY:
       {
         if (this->Opacity != value.toDouble())
