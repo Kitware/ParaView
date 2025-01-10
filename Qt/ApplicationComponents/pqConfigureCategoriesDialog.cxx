@@ -796,7 +796,12 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::getSourceItem(QDropEvent* dropEven
 //----------------------------------------------------------------------------
 QTreeWidgetItem* pqConfigureCategoriesDialog::getDestinationItem(QDropEvent* dropEvent)
 {
-  return this->Internal->Ui->customCategoriesTree->itemAt(dropEvent->pos());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  auto pos = dropEvent->pos();
+#else
+  auto pos = dropEvent->position().toPoint();
+#endif
+  return this->Internal->Ui->customCategoriesTree->itemAt(pos);
 }
 
 //----------------------------------------------------------------------------
