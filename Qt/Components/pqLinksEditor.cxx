@@ -41,6 +41,14 @@
 // std
 #include <cassert>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 #define QT_ENDL endl
 #else
@@ -455,15 +463,17 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
     &pqLinksEditor::updateSelectedProxies, Qt::QueuedConnection);
 
   QObject::connect(
-    this->Ui->interactiveViewLinkCheckBox, &QCheckBox::stateChanged, this,
-    [this](
-      int state) { this->Ui->cameraWidgetViewLinkCheckBox->setEnabled(!static_cast<bool>(state)); },
+    this->Ui->interactiveViewLinkCheckBox, &QCheckBox::pqCheckBoxSignal, this,
+    [this](pqCheckState state) {
+      this->Ui->cameraWidgetViewLinkCheckBox->setEnabled(state == Qt::Unchecked);
+    },
     Qt::QueuedConnection);
 
   QObject::connect(
-    this->Ui->cameraWidgetViewLinkCheckBox, &QCheckBox::stateChanged, this,
-    [this](
-      int state) { this->Ui->interactiveViewLinkCheckBox->setEnabled(!static_cast<bool>(state)); },
+    this->Ui->cameraWidgetViewLinkCheckBox, &QCheckBox::pqCheckBoxSignal, this,
+    [this](pqCheckState state) {
+      this->Ui->interactiveViewLinkCheckBox->setEnabled(state == Qt::Unchecked);
+    },
     Qt::QueuedConnection);
 
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();

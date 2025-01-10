@@ -18,6 +18,14 @@
 
 #include "ui_pqLogViewerDialog.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 namespace
 {
 std::map<int, vtkLogger::Verbosity> indexToVerbosity;
@@ -195,18 +203,30 @@ pqLogViewerDialog::pqLogViewerDialog(QWidget* parent)
   }
 
   // Set up category checkbox connections
-  QObject::connect(this->Ui->dataMovementCheckBox, &QCheckBox::stateChanged,
-    [=](bool checked) { this->updateCategory(DATA_MOVEMENT_CATEGORY, checked); });
-  QObject::connect(this->Ui->renderingCheckBox, &QCheckBox::stateChanged,
-    [=](bool checked) { this->updateCategory(RENDERING_CATEGORY, checked); });
-  QObject::connect(this->Ui->applicationCheckBox, &QCheckBox::stateChanged,
-    [=](bool checked) { this->updateCategory(APPLICATION_CATEGORY, checked); });
-  QObject::connect(this->Ui->pipelineCheckBox, &QCheckBox::stateChanged,
-    [=](bool checked) { this->updateCategory(PIPELINE_CATEGORY, checked); });
-  QObject::connect(this->Ui->pluginsCheckBox, &QCheckBox::stateChanged,
-    [=](bool checked) { this->updateCategory(PLUGINS_CATEGORY, checked); });
-  QObject::connect(this->Ui->executionCheckBox, &QCheckBox::stateChanged,
-    [=](bool checked) { this->updateCategory(EXECUTION_CATEGORY, checked); });
+  QObject::connect(
+    this->Ui->dataMovementCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
+      this->updateCategory(DATA_MOVEMENT_CATEGORY, checked != Qt::Unchecked);
+    });
+  QObject::connect(
+    this->Ui->renderingCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
+      this->updateCategory(RENDERING_CATEGORY, checked != Qt::Unchecked);
+    });
+  QObject::connect(
+    this->Ui->applicationCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
+      this->updateCategory(APPLICATION_CATEGORY, checked != Qt::Unchecked);
+    });
+  QObject::connect(
+    this->Ui->pipelineCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
+      this->updateCategory(PIPELINE_CATEGORY, checked != Qt::Unchecked);
+    });
+  QObject::connect(
+    this->Ui->pluginsCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
+      this->updateCategory(PLUGINS_CATEGORY, checked != Qt::Unchecked);
+    });
+  QObject::connect(
+    this->Ui->executionCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
+      this->updateCategory(EXECUTION_CATEGORY, checked != Qt::Unchecked);
+    });
 }
 
 //----------------------------------------------------------------------------

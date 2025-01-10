@@ -34,7 +34,7 @@ protected Q_SLOTS:
   /**
    * React to checkbox events
    */
-  void onDoNotShowAgainStateChanged(int);
+  void onDoNotShowAgainStateChanged(Qt::CheckState);
 
 private:
   Ui::pqWelcomeDialog* ui;

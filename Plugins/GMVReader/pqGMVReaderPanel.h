@@ -46,7 +46,7 @@ protected:
   pqTreeWidget* treeWidget;
 
 protected Q_SLOTS:
-  void updateTracerDataStatus(int state);
+  void updateTracerDataStatus(Qt::CheckState state);
 };
 
 #endif // pqGMVReaderPanel_h

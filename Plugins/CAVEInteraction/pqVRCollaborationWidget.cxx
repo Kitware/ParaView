@@ -22,6 +22,15 @@
 #include <string>
 
 #if CAVEINTERACTION_HAS_COLLABORATION
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 #include "pqVRAvatarEvents.h"
 #include "vtkSMVRCollaborationStyleProxy.h"
 #include "vtkVRCollaborationClient.h"
@@ -543,8 +552,8 @@ pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::Wind
 
   connect(this->Internals->configureAvatarBtn, SIGNAL(clicked()), this, SLOT(configureAvatar()));
 
-  connect(this->Internals->cCollabEnable, SIGNAL(stateChanged(int)), this,
-    SLOT(collabEnabledChanged(int)));
+  QObject::connect(this->Internals->cCollabEnable, &QCheckBox::pqCheckBoxSignal, this,
+    [&](pqCheckState state) { this->collabEnabledChanged(static_cast<Qt::CheckState>(state); });
 
   connect(this->Internals->cPortValue, SIGNAL(editingFinished()), this, SLOT(collabPortChanged()));
 
@@ -634,7 +643,7 @@ void pqVRCollaborationWidget::updateCollabWidgetState()
 }
 
 //-----------------------------------------------------------------------------
-void pqVRCollaborationWidget::collabEnabledChanged(int state)
+void pqVRCollaborationWidget::collabEnabledChanged(Qt::CheckState state)
 {
   this->Internals->CollabEnabled = state != 0;
   this->updateCollabWidgetState();
@@ -720,7 +729,7 @@ void pqVRCollaborationWidget::initializeCollaboration(pqView* view) {}
 void pqVRCollaborationWidget::stopCollaboration() {}
 void pqVRCollaborationWidget::configureAvatar() {}
 void pqVRCollaborationWidget::updateCollabWidgetState() {}
-void pqVRCollaborationWidget::collabEnabledChanged(int state) {}
+void pqVRCollaborationWidget::collabEnabledChanged(Qt::CheckState state) {}
 void pqVRCollaborationWidget::collabServerChanged() {}
 void pqVRCollaborationWidget::collabSessionChanged() {}
 void pqVRCollaborationWidget::collabNameChanged() {}

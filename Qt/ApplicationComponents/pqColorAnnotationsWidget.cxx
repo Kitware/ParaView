@@ -53,6 +53,14 @@
 #include <sstream>
 #include <vector>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 static const std::string INDEXED_COLORS = "IndexedColors";
 static const std::string ANNOTATIONS = "Annotations";
 
@@ -421,8 +429,8 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)));
 
   // Opacity mapping enable/disable mechanism
-  this->connect(
-    ui.EnableOpacityMapping, SIGNAL(stateChanged(int)), SLOT(updateOpacityColumnState()));
+  this->connect(ui.EnableOpacityMapping, &QCheckBox::pqCheckBoxSignal, this,
+    &pqColorAnnotationsWidget::updateOpacityColumnState);
   this->connect(ui.EnableOpacityMapping, SIGNAL(clicked()), SIGNAL(opacityMappingChanged()));
 
   // Animation tick events will update list of available annotations.

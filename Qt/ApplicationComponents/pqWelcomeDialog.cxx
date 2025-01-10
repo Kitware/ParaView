@@ -17,6 +17,14 @@
 #include <QString>
 #include <QUrl>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 //-----------------------------------------------------------------------------
 pqWelcomeDialog::pqWelcomeDialog(QWidget* parentObject)
   : Superclass(parentObject)
@@ -26,8 +34,10 @@ pqWelcomeDialog::pqWelcomeDialog(QWidget* parentObject)
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
-  QObject::connect(this->ui->DoNotShowAgainButton, SIGNAL(stateChanged(int)), this,
-    SLOT(onDoNotShowAgainStateChanged(int)));
+  QObject::connect(
+    this->ui->DoNotShowAgainButton, &QCheckBox::pqCheckBoxSignal, this, [&](pqCheckState state) {
+      this->onDoNotShowAgainStateChanged(static_cast<Qt::CheckState>(state));
+    });
   QObject::connect(this->ui->GettingStartedGuideButton, SIGNAL(clicked(bool)), this,
     SLOT(onGettingStartedGuideClicked()));
   QObject::connect(this->ui->ExampleVisualizationsButton, SIGNAL(clicked(bool)), this,
@@ -62,7 +72,7 @@ void pqWelcomeDialog::onExampleVisualizationsClicked()
 }
 
 //-----------------------------------------------------------------------------
-void pqWelcomeDialog::onDoNotShowAgainStateChanged(int state)
+void pqWelcomeDialog::onDoNotShowAgainStateChanged(Qt::CheckState state)
 {
   bool showDialog = (state != Qt::Checked);
 

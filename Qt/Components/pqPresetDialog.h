@@ -122,7 +122,7 @@ protected Q_SLOTS:
   void importPresets();
   void exportPresets();
 
-  void setPresetIsAdvanced(int newState);
+  void setPresetIsAdvanced(Qt::CheckState newState);
 
 private Q_SLOTS:
   void updateGroups();

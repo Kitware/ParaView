@@ -19,6 +19,14 @@
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 //-----------------------------------------------------------------------------
 pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
   : QWidget(firstLink->widget(), Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint)
@@ -41,14 +49,17 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
   l->addWidget(this->CameraWidgetViewLinkCheckBox);
 
   QObject::connect(
-    this->InteractiveViewLinkCheckBox, &QCheckBox::stateChanged, this,
-    [this](
-      int state) { this->CameraWidgetViewLinkCheckBox->setEnabled(!static_cast<bool>(state)); },
+    this->InteractiveViewLinkCheckBox, &QCheckBox::pqCheckBoxSignal, this,
+    [this](pqCheckState state) {
+      this->CameraWidgetViewLinkCheckBox->setEnabled(state == Qt::Unchecked);
+    },
     Qt::QueuedConnection);
 
   QObject::connect(
-    this->CameraWidgetViewLinkCheckBox, &QCheckBox::stateChanged, this,
-    [this](int state) { this->InteractiveViewLinkCheckBox->setEnabled(!static_cast<bool>(state)); },
+    this->CameraWidgetViewLinkCheckBox, &QCheckBox::pqCheckBoxSignal, this,
+    [this](pqCheckState state) {
+      this->InteractiveViewLinkCheckBox->setEnabled(state == Qt::Unchecked);
+    },
     Qt::QueuedConnection);
 
   QPushButton* button = new QPushButton(this);

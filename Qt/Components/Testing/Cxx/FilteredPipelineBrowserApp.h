@@ -29,6 +29,6 @@ protected:
 public Q_SLOTS:
   void processTest();
   void updateSelectedFilter(int);
-  void invertFilterMatching(int);
+  void invertFilterMatching(Qt::CheckState);
   void showSettings();
 };
