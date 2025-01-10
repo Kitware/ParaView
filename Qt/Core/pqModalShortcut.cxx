@@ -54,7 +54,7 @@ void pqModalShortcut::setContextWidget(QWidget* contextWidget, Qt::ShortcutConte
   bool enabled = this->isEnabled();
   if (m_shortcut)
   {
-    if (m_shortcut->parentWidget() == contextWidget)
+    if (qobject_cast<QWidget*>(m_shortcut->parent()) == contextWidget)
     {
       if (m_shortcut->context() != contextArea)
       {
