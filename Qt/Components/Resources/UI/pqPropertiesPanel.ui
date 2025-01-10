@@ -63,7 +63,7 @@
      <item>
       <widget class="QPushButton" name="Help">
        <property name="text">
-        <string/>
+        <string>Help</string>
        </property>
        <property name="icon">
         <iconset resource="../pqComponents.qrc">
