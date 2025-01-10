@@ -54,6 +54,12 @@
 
 #include <cassert>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#define pqKeyCombo(mod, key) (mod) | (key)
+#else
+#define pqKeyCombo(mod, key) (mod) + (key)
+#endif
+
 namespace
 {
 class WheelFilter : public QObject
@@ -283,14 +289,14 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   if (PQ_IS_BEHAVIOR_ENABLED(QuickLaunchShortcuts))
   {
     // Setup quick-launch shortcuts.
-    QShortcut* ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space, mainWindow);
+    QShortcut* ctrlSpace = new QShortcut(pqKeyCombo(Qt::CTRL, Qt::Key_Space), mainWindow);
     QObject::connect(
       ctrlSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
     QShortcut* ctrlShiftSpace =
       new QShortcut(QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Space), mainWindow);
     QObject::connect(
       ctrlShiftSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
-    QShortcut* altSpace = new QShortcut(Qt::ALT + Qt::Key_Space, mainWindow);
+    QShortcut* altSpace = new QShortcut(pqKeyCombo(Qt::ALT, Qt::Key_Space), mainWindow);
     QObject::connect(
       altSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
   }
