@@ -209,7 +209,7 @@ function (_vtk_module_wrap_client_server_library name)
   set(_vtk_client_server_calls)
   foreach (_vtk_client_server_class IN LISTS _vtk_client_server_library_classes)
     string(APPEND _vtk_client_server_declarations
-      "extern void ${_vtk_client_server_class}_Init(vtkClientServerInterpreter*);\n")
+      "extern \"C\" { void ${_vtk_client_server_class}_Init(vtkClientServerInterpreter*); }\n")
     string(APPEND _vtk_client_server_calls
       "  ${_vtk_client_server_class}_Init(csi);\n")
   endforeach ()
@@ -218,7 +218,7 @@ function (_vtk_module_wrap_client_server_library name)
 #include \"vtkClientServerInterpreter.h\"
 
 ${_vtk_client_server_declarations}
-extern \"C\" void VTK_ABI_EXPORT ${name}_Initialize(vtkClientServerInterpreter* csi)
+extern \"C\" VTK_ABI_EXPORT void ${name}_Initialize(vtkClientServerInterpreter* csi)
 {
   (void)csi;
 ${_vtk_client_server_calls}}\n")
