@@ -54,11 +54,9 @@ static string GetMPIVersion()
   oss << major << "." << minor;
   return oss.str();
 }
-#endif
 
 // Description:
 // Get the implementor name and release info
-#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 static string GetMPILibraryVersion()
 {
   ostringstream oss;
@@ -129,13 +127,13 @@ extern int TestSystemCaps(int argc, char* argv[])
        << "CPU = " << sysinfo.GetCPUDescription() << endl
        << "RAM = " << sysinfo.GetMemoryDescription() << endl
        << endl
-#if defined(TEST_MPI_CAPS)
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
        << "MPI:" << endl
        << "Version = " << GetMPIVersion() << endl
        << "Library = " << GetMPILibraryVersion() << endl
        << endl
 #endif
-#if defined(TEST_PY_CAPS)
+#if VTK_MODULE_ENABLE_VTK_Python
        << "Python:" << endl
        << "Version = " << GetPythonVersion() << endl
        << endl
