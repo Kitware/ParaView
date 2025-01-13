@@ -1670,15 +1670,6 @@ void vtkAMRDualContour::CapCell(
   }
 }
 
-//----------------------------------------------------------------------------
-//  Note that the out attribute arrays must be preallocated to correct size.
-template <class T>
-double vtkDualGridContourInterpolateAttribute(T* inPtr, vtkIdType inId0, vtkIdType inId1, double k)
-{
-  double in0 = (double)(inPtr[inId0]);
-  return in0 * (1.0 - k) + k * (double)(inPtr[inId1]);
-}
-
 //============================================================================
 // Stuff for using input cell attributes to add output point attributes.
 // I am not using the built in Attribute methods for duing this, although

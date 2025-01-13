@@ -11,8 +11,6 @@
 
 class vtkDoubleArray;
 class vtkFloatArray;
-// class vtkMaterialInterfaceCommBuffer;
-// ostream &operator<<(ostream &sout,const vtkMaterialInterfaceCommBuffer &fcb);
 
 //============================================================================
 // Description:

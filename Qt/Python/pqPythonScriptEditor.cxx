@@ -24,18 +24,6 @@
 
 #include <vtkPythonInterpreter.h>
 
-namespace details
-{
-void FillMenu(QMenu* menu, std::vector<QAction*>& actions)
-{
-  menu->clear();
-  for (auto const& action : actions)
-  {
-    menu->addAction(action);
-  }
-}
-}
-
 pqPythonScriptEditor* pqPythonScriptEditor::UniqueInstance = nullptr;
 
 //-----------------------------------------------------------------------------

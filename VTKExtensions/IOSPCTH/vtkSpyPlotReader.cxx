@@ -50,8 +50,6 @@
 #include <string>
 #include <vector>
 
-#define vtkMIN(x, y) (((x) < (y)) ? (x) : (y))
-
 #define coutVector6(x)                                                                             \
   (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]

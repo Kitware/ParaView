@@ -58,7 +58,6 @@ std::map<int, char*> LastHeaderKey;
 std::vector<FILE*> fileArray;
 std::vector<int> byte_order;
 std::vector<int> header_type;
-int DataSize = 0;
 int LastHeaderNotFound = 0;
 int Wrong_Endian = 0;
 int Strict_Error = 0;

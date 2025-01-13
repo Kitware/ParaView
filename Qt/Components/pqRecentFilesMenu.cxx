@@ -26,21 +26,6 @@
 //=============================================================================
 namespace rfm
 {
-bool canLoad(
-  const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces, const pqServerResource& resource)
-{
-  // using Q_FOREACH here was causing failures on VS
-  for (int cc = 0, max = ifaces.size(); cc < max; ++cc)
-  {
-    pqRecentlyUsedResourceLoaderInterface* iface = ifaces[cc];
-    if (iface->canLoad(resource))
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
 bool iconAndLabel(const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces,
   const pqServerResource& resource, QIcon& icon, QString& label)
 {

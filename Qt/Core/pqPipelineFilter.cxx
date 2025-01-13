@@ -31,11 +31,6 @@
 #include "pqOutputPort.h"
 #include "pqServerManagerModel.h"
 
-uint qHash(QPair<QPointer<pqPipelineSource>, int> arg)
-{
-  return qHash(static_cast<pqPipelineSource*>(arg.first)) + qHash(arg.second);
-}
-
 //-----------------------------------------------------------------------------
 class pqPipelineFilter::pqInternal
 {
