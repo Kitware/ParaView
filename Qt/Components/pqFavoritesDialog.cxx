@@ -197,7 +197,12 @@ bool pqFavoritesDialog::eventFilter(QObject* object, QEvent* event)
   {
     auto* dropEvent = static_cast<QDropEvent*>(event);
     auto* sourceTreeView = dynamic_cast<QTreeWidget*>(dropEvent->source());
-    auto* destItem = this->Ui->favorites->itemAt(dropEvent->pos());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    auto pos = dropEvent->pos();
+#else
+    auto pos = dropEvent->position().toPoint();
+#endif
+    auto* destItem = this->Ui->favorites->itemAt(pos);
     QTreeWidgetItem* categoryItem = nullptr;
     if (destItem)
     {

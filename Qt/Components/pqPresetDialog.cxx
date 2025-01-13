@@ -33,6 +33,14 @@
 
 #include <cassert>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 class pqPresetDialogTableModel : public QAbstractTableModel
 {
   typedef QAbstractTableModel Superclass;
@@ -501,9 +509,9 @@ public:
       (int)(this->Ui.gradients->verticalHeader()->defaultSectionSize() * 1.5));
 
     QObject::connect(
-      this->Ui.useRegexp, &QCheckBox::stateChanged, [&]() { this->updateRegexpWidgets(); });
+      this->Ui.useRegexp, &QCheckBox::pqCheckBoxSignal, [&]() { this->updateRegexpWidgets(); });
     QObject::connect(
-      this->Ui.annotations, &QCheckBox::stateChanged, [&]() { this->updateRegexpWidgets(); });
+      this->Ui.annotations, &QCheckBox::pqCheckBoxSignal, [&]() { this->updateRegexpWidgets(); });
   }
 
   void updateRegexpWidgets()
@@ -565,7 +573,8 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
     });
   this->Internals->ProxyModel->connect(
     ui.searchBox, &pqSearchBox::textChanged, this, &pqPresetDialog::updateFiltering);
-  this->connect(ui.showDefault, SIGNAL(stateChanged(int)), SLOT(setPresetIsAdvanced(int)));
+  QObject::connect(ui.showDefault, &QCheckBox::pqCheckBoxSignal, this,
+    [&](pqCheckState state) { this->setPresetIsAdvanced(static_cast<Qt::CheckState>(state)); });
   auto groupMgr = this->Internals->Model->GroupManager;
   this->connect(
     groupMgr, &pqPresetGroupsManager::groupsUpdated, this, &pqPresetDialog::updateGroups);
@@ -939,7 +948,7 @@ void pqPresetDialog::exportPresets()
 }
 
 //-----------------------------------------------------------------------------
-void pqPresetDialog::setPresetIsAdvanced(int newState)
+void pqPresetDialog::setPresetIsAdvanced(Qt::CheckState newState)
 {
   bool showByDefault = newState == Qt::Checked;
   const pqInternals& internals = *this->Internals;

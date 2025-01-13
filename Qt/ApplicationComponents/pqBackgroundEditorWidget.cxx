@@ -18,6 +18,14 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 const char* COLOR_PROPERTY = "Background";
 const char* COLOR2_PROPERTY = "Background2";
 const char* GRADIENT_BACKGROUND_PROPERTY = "UseGradientBackground";
@@ -161,8 +169,8 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
     }
   }
 
-  QObject::connect(this->Internal->EnvLighting, SIGNAL(stateChanged(int)), this,
-    SIGNAL(environmentLightingChanged()));
+  QObject::connect(this->Internal->EnvLighting, &QCheckBox::pqCheckBoxSignal, this,
+    &pqBackgroundEditorWidget::environmentLightingChanged);
 
   currentIndexChangedBackgroundType(this->Internal->PreviousType);
 

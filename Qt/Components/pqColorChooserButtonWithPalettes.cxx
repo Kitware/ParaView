@@ -114,7 +114,12 @@ void pqColorChooserButtonWithPalettes::updateMenu()
 void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
 {
   QColor color;
-  if (action->data().type() == QVariant::String)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  QMetaType::Type typeId = static_cast<QMetaType::Type>(action->data().type());
+#else
+  auto typeId = action->data().typeId();
+#endif
+  if (typeId == QMetaType::QString)
   {
     QString prop_name = action->data().toString();
     vtkSMProxy* globalProps = this->colorPalette();
@@ -129,7 +134,7 @@ void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
       helper->setSelectedPaletteColor(prop_name);
     }
   }
-  else if (action->data().type() == QVariant::Color)
+  else if (typeId == QMetaType::QColor)
   {
     color = action->data().value<QColor>();
   }

@@ -78,8 +78,13 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
         if (mouseEvent)
         {
           QSize size = widget->size();
-          double normalized_x = mouseEvent->x() / static_cast<double>(size.width());
-          double normalized_y = mouseEvent->y() / static_cast<double>(size.height());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+          auto pos = mouseEvent->localPos();
+#else
+          auto pos = mouseEvent->position();
+#endif
+          double normalized_x = pos.x() / static_cast<double>(size.width());
+          double normalized_y = pos.y() / static_cast<double>(size.height());
           Q_EMIT recordEvent(widget, "mousePress",
             QString("(%1,%2,%3,%4,%5)")
               .arg(normalized_x)
@@ -98,8 +103,13 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
         if (mouseEvent)
         {
           QSize size = widget->size();
-          double normalized_x = mouseEvent->x() / static_cast<double>(size.width());
-          double normalized_y = mouseEvent->y() / static_cast<double>(size.height());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+          auto pos = mouseEvent->localPos();
+#else
+          auto pos = mouseEvent->position();
+#endif
+          double normalized_x = pos.x() / static_cast<double>(size.width());
+          double normalized_y = pos.y() / static_cast<double>(size.height());
           // Move to the place where the mouse was released and then release it.
           // This mimics drag without actually having to save all the intermediate
           // mouse move positions.

@@ -53,6 +53,14 @@
 #include <QSpacerItem>
 #include <QVBoxLayout>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 // ----------------------------------------------------------------------------
 class pqNodeEditorApplyBehavior : public pqApplyBehavior
 {
@@ -285,7 +293,7 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
     auto checkBox = new QCheckBox(tr("View Nodes"));
     checkBox->setObjectName("ViewNodesCheckbox");
     checkBox->setCheckState(this->showViewNodes ? Qt::Checked : Qt::Unchecked);
-    this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {
+    this->connect(checkBox, &QCheckBox::pqCheckBoxSignal, this, [this](pqCheckState state) {
       this->showViewNodes = state;
       this->toggleViewNodesVisibility();
     });
@@ -305,7 +313,7 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
     auto checkBox = new QCheckBox(tr("Auto Layout"));
     checkBox->setObjectName("AutoLayoutCheckbox");
     checkBox->setCheckState(this->autoUpdateLayout ? Qt::Checked : Qt::Unchecked);
-    this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {
+    this->connect(checkBox, &QCheckBox::pqCheckBoxSignal, this, [this](pqCheckState state) {
       this->autoUpdateLayout = state;
       this->actionAutoLayout->trigger();
       return 1;

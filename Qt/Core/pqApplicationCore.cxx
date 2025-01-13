@@ -798,7 +798,11 @@ QString pqApplicationCore::getTranslationsPathFromInterfaceLanguage(QString pref
 QTranslator* pqApplicationCore::getQtTranslations(QString prefix, QString locale)
 {
   QTranslator* translator = new QTranslator(this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   QString qtQmPath(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+#else
+  QString qtQmPath(QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+#endif
   bool qtLoaded = translator->load(QLocale(locale), prefix, "_", qtQmPath);
   if (qtLoaded)
   {

@@ -32,7 +32,7 @@ protected Q_SLOTS:
 
 private Q_SLOTS:
   void configureAvatar();
-  void collabEnabledChanged(int state);
+  void collabEnabledChanged(Qt::CheckState state);
   void collabPortChanged();
   void collabServerChanged();
   void collabSessionChanged();

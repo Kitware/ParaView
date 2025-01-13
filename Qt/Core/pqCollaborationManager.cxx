@@ -280,8 +280,13 @@ void pqCollaborationManager::updateMousePointerLocation(QMouseEvent* e)
 
     double w2 = widget->width() / 2.0;
     double h2 = widget->height() / 2.0;
-    double px = (e->x() - w2) / (isChartView ? w2 : h2);
-    double py = (e->y() - h2) / h2;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    auto pos = e->localPos();
+#else
+    auto pos = e->position();
+#endif
+    double px = (pos.x() - w2) / (isChartView ? w2 : h2);
+    double py = (pos.y() - h2) / h2;
 
     this->Internals->LastMousePointerPosition.SetExtension(
       MousePointer::view, widget->getProxyId());

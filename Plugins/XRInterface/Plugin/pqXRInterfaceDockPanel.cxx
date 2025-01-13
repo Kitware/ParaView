@@ -21,6 +21,14 @@
 
 #include <sstream>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 //-----------------------------------------------------------------------------
 struct pqXRInterfaceDockPanel::pqInternals
 {
@@ -75,10 +83,12 @@ void pqXRInterfaceDockPanel::constructor()
   connect(this->Internals->Ui.exportLocationsAsViewButton, SIGNAL(clicked()), this,
     SLOT(exportLocationsAsView()));
 
-  QObject::connect(this->Internals->Ui.multisamples, &QCheckBox::stateChanged,
-    [&](int state) { this->Internals->Helper->SetMultiSample(state == Qt::Checked); });
-  QObject::connect(this->Internals->Ui.baseStationVisibility, &QCheckBox::stateChanged,
-    [&](int state) { this->Internals->Helper->SetBaseStationVisibility(state == Qt::Checked); });
+  QObject::connect(this->Internals->Ui.multisamples, &QCheckBox::pqCheckBoxSignal,
+    [&](pqCheckState state) { this->Internals->Helper->SetMultiSample(state == Qt::Checked); });
+  QObject::connect(this->Internals->Ui.baseStationVisibility, &QCheckBox::pqCheckBoxSignal,
+    [&](pqCheckState state) {
+      this->Internals->Helper->SetBaseStationVisibility(state == Qt::Checked);
+    });
 
   connect(pqApplicationCore::instance(), SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
     this, SLOT(loadState(vtkPVXMLElement*, vtkSMProxyLocator*)));
@@ -138,13 +148,14 @@ void pqXRInterfaceDockPanel::constructor()
 
 #if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
   this->Internals->Ui.useOpenxrRemoting->setVisible(true);
-  QObject::connect(this->Internals->Ui.useOpenxrRemoting, &QCheckBox::stateChanged, [&](int state) {
-    this->Internals->Helper->SetUseOpenXRRemoting(state == Qt::Checked);
-    this->Internals->Ui.remotingAddress->setVisible(state);
-    this->Internals->Ui.remoteAddress->setVisible(state);
-    this->Internals->Ui.runtimeVersionLabel->setText(
-      this->Internals->Helper->GetOpenXRRuntimeVersionString().c_str());
-  });
+  QObject::connect(
+    this->Internals->Ui.useOpenxrRemoting, &QCheckBox::pqCheckBoxSignal, [&](pqCheckState state) {
+      this->Internals->Helper->SetUseOpenXRRemoting(state == Qt::Checked);
+      this->Internals->Ui.remotingAddress->setVisible(state);
+      this->Internals->Ui.remoteAddress->setVisible(state);
+      this->Internals->Ui.runtimeVersionLabel->setText(
+        this->Internals->Helper->GetOpenXRRuntimeVersionString().c_str());
+    });
   QObject::connect(this->Internals->Ui.remoteAddress, &QLineEdit::textChanged,
     [&](QString text) { this->Internals->Helper->SetRemotingAddress(text.toStdString()); });
 #else

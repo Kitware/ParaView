@@ -682,7 +682,12 @@ void pqSMAdaptor::setSelectionProperty(
 
   QString name = value[0].toString();
   QVariant status = value[1];
-  if (status.type() == QVariant::Bool)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  auto typeId = static_cast<QMetaType::Type>(status.type());
+#else
+  auto typeId = status.typeId();
+#endif
+  if (typeId == QMetaType::Bool)
   {
     status = status.toInt();
   }
@@ -1587,10 +1592,18 @@ void pqSMAdaptor::setMultipleElementProperty(
   {
     bool ok = true;
     int v = Value.toInt(&ok);
-    if (!ok && Value.canConvert(QVariant::Bool))
+    if (!ok)
     {
-      v = Value.toBool() ? 1 : 0;
-      ok = true;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+      bool canConvert = Value.canConvert(QVariant::Bool);
+#else
+      bool canConvert = Value.canConvert(QMetaType(QMetaType::Bool));
+#endif
+      if (canConvert)
+      {
+        v = Value.toBool() ? 1 : 0;
+        ok = true;
+      }
     }
     if (ok)
     {

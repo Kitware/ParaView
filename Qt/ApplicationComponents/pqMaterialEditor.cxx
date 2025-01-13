@@ -50,6 +50,14 @@
 #include <map>
 #include <sstream>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 namespace
 {
 void AddDefaultValue(
@@ -607,11 +615,12 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* vtkNotUse
     QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() { this->Internals->Render(); });
   QObject::connect(&this->Internals->AttributesModel, &pqMaterialProxyModel::dataChanged,
     [this]() { this->Internals->ShaderBall->Modified(); });
-  QObject::connect(this->Internals->Ui.ShowShaderBall, &QCheckBox::stateChanged, [this](int state) {
-    this->Internals->Ui.RenderWidget->setVisible(state);
-    this->Internals->ShaderBall->SetVisible(state);
-    this->Internals->ShaderBall->Render();
-  });
+  QObject::connect(
+    this->Internals->Ui.ShowShaderBall, &QCheckBox::pqCheckBoxSignal, [this](pqCheckState state) {
+      this->Internals->Ui.RenderWidget->setVisible(state);
+      this->Internals->ShaderBall->SetVisible(state);
+      this->Internals->ShaderBall->Render();
+    });
   QObject::connect(
     this->Internals->Ui.ShaderBallNumberOfSamples, &QSpinBox::editingFinished, [this]() {
       this->Internals->ShaderBall->SetNumberOfSamples(

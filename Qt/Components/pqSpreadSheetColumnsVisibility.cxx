@@ -15,6 +15,14 @@
 #include <memory>
 #include <set>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 //-----------------------------------------------------------------------------
 QCheckBox* pqSpreadSheetColumnsVisibility::addCheckableAction(
   QMenu* menu, const QString& text, const bool checked)
@@ -164,8 +172,8 @@ void pqSpreadSheetColumnsVisibility::populateMenu(
   }
 
   updateAllCheckState(allCheckbox, *checkboxes);
-  QObject::connect(
-    allCheckbox, &QCheckBox::stateChanged, [proxy, checkboxes, allCheckbox](int checkState) {
+  QObject::connect(allCheckbox, &QCheckBox::pqCheckBoxSignal,
+    [proxy, checkboxes, allCheckbox](pqCheckState checkState) {
       std::vector<std::string> hidden_columns;
       for (auto cb : (*checkboxes))
       {

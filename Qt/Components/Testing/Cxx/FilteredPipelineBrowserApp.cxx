@@ -27,6 +27,14 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 MainPipelineWindow::MainPipelineWindow()
 {
   // Init ParaView
@@ -49,8 +57,10 @@ MainPipelineWindow::MainPipelineWindow()
   this->InvertMatching = new QCheckBox();
   this->InvertMatching->setText(tr("display matching sources"));
   this->InvertMatching->setChecked(true);
-  QObject::connect(this->InvertMatching, SIGNAL(stateChanged(int)), this,
-    SLOT(invertFilterMatching(int)), Qt::QueuedConnection);
+  QObject::connect(
+    this->InvertMatching, &QCheckBox::pqCheckBoxSignal, this,
+    [&](pqCheckState state) { this->invertFilterMatching(static_cast<Qt::CheckState>(state)); },
+    Qt::QueuedConnection);
 
   // Set Pipeline Widget
   this->PipelineWidget = new pqPipelineBrowserWidget(nullptr);
@@ -80,7 +90,7 @@ MainPipelineWindow::MainPipelineWindow()
 }
 
 //-----------------------------------------------------------------------------
-void MainPipelineWindow::invertFilterMatching(int newState)
+void MainPipelineWindow::invertFilterMatching(Qt::CheckState newState)
 {
   this->PipelineWidget->setAnnotationFilterMatching(newState == Qt::Checked);
 }

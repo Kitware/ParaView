@@ -112,6 +112,12 @@
 #include "vtkPVVersion.h"
 #include "vtkSMProxyManager.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#define pqKeyCombo(mod, key) (mod) | (key)
+#else
+#define pqKeyCombo(mod, key) (mod) + (key)
+#endif
+
 //-----------------------------------------------------------------------------
 class pqActiveDisabledStyle : public QProxyStyle
 {
@@ -193,7 +199,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqChangeFileNameReaction(ui.actionChangeFile);
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
-  ui.actionDelete->setShortcut(QKeySequence(Qt::ALT + Qt::Key_D));
+  ui.actionDelete->setShortcut(QKeySequence(pqKeyCombo(Qt::ALT, Qt::Key_D)));
   ui.actionDelete->setAutoRepeat(false);
   new pqDeleteReaction(ui.actionDeleteTree, pqDeleteReaction::DeleteModes::TREE);
   new pqDeleteReaction(ui.actionDelete_All, pqDeleteReaction::DeleteModes::ALL);
@@ -215,11 +221,11 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   {
     QAction* applyAction = new QAction(QIcon(":/pqWidgets/Icons/pqApply.svg"),
       QCoreApplication::translate("pqEditMenu", "Apply"), &menu);
-    applyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
+    applyAction->setShortcut(QKeySequence(pqKeyCombo(Qt::ALT, Qt::Key_A)));
     applyAction->setAutoRepeat(false);
     QAction* resetAction = new QAction(QIcon(":/pqWidgets/Icons/pqCancel.svg"),
       QCoreApplication::translate("pqEditMenu", "Reset"), &menu);
-    resetAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_R));
+    resetAction->setShortcut(QKeySequence(pqKeyCombo(Qt::ALT, Qt::Key_R)));
     resetAction->setAutoRepeat(false);
     menu.insertAction(ui.actionDelete, applyAction);
     menu.insertAction(ui.actionDelete, resetAction);

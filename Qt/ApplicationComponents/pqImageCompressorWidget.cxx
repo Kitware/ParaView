@@ -9,6 +9,14 @@
 
 #include <QRegExp>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define pqCheckBoxSignal checkStateChanged
+using pqCheckState = Qt::CheckState;
+#else
+#define pqCheckBoxSignal stateChanged
+using pqCheckState = int;
+#endif
+
 static const int NO_COMPRESSION = 0;
 static const int LZ4_COMPRESSION = 1;
 static const int SQUIRT_COMPRESSION = 2;
@@ -48,7 +56,8 @@ pqImageCompressorWidget::pqImageCompressorWidget(
   this->connect(ui.squirtColorSpace, SIGNAL(valueChanged(int)), SIGNAL(compressorConfigChanged()));
   this->connect(ui.zlibColorSpace, SIGNAL(valueChanged(int)), SIGNAL(compressorConfigChanged()));
   this->connect(ui.zlibLevel, SIGNAL(valueChanged(int)), SIGNAL(compressorConfigChanged()));
-  this->connect(ui.zlibStripAlpha, SIGNAL(stateChanged(int)), SIGNAL(compressorConfigChanged()));
+  QObject::connect(ui.zlibStripAlpha, &QCheckBox::pqCheckBoxSignal, this,
+    &pqImageCompressorWidget::compressorConfigChanged);
 
 #if VTK_MODULE_ENABLE_ParaView_nvpipe
   ui.compressionType->addItem("NvPipe");
