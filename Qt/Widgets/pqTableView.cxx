@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqTableView.h"
 
-#include "cassert"
+#include <cassert>
 
 #include <QAbstractItemModel>
 #include <QEvent>

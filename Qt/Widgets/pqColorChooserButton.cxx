@@ -5,7 +5,7 @@
 // self includes
 #include "pqColorChooserButton.h"
 
-#include "cassert"
+#include <cassert>
 
 // Qt includes
 #include <QColorDialog>
