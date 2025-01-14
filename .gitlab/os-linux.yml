@@ -77,6 +77,21 @@
     variables:
         CMAKE_CONFIGURATION: el8_shared_icc_mpi_python
 
+.fedora35_documentation:
+    extends:
+        - .fedora35
+        - .fedora_openmpi_addon
+
+    variables:
+        CMAKE_CONFIGURATION: fedora35_documentation_mpi_python
+
+.fedora35_doxygen:
+    extends:
+        - .fedora35
+
+    variables:
+        CMAKE_CONFIGURATION: fedora35_doxygen
+
 .fedora35_shared_mpi_offscreen_osmesa_python_qt_vtkmoverride:
     extends:
         - .fedora35
@@ -275,14 +290,11 @@
             CURRENT_RELEASE="$CI_COMMIT_TAG";
             MAYBE_UPDATE_LATEST="-u";
           fi
-        - $LAUNCHER cmake -S $GIT_CLONE_PATH -B $GIT_CLONE_PATH/build
-            -GNinja
-            -DDOCUMENTATION_HTML_TARZ=ON
-            -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON
-            -DPARAVIEW_USE_MPI=ON
-            -DPARAVIEW_USE_PYTHON=ON
-        - $LAUNCHER cmake --build $GIT_CLONE_PATH/build -j $(nproc) &> $GIT_CLONE_PATH/compile_output.log
-        - $LAUNCHER cmake --build $GIT_CLONE_PATH/build --target ParaViewDoc-TGZ &> $GIT_CLONE_PATH/doxygen_output.log
+        - sccache --start-server
+        - sccache --show-stats
+        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
+        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
+        - sccache --show-stats
         - $LAUNCHER bash -x $GIT_CLONE_PATH/Utilities/DocsUploader/Scripts/paraview_docs_uploader
             -s "$GIT_CLONE_PATH"
             -b "$GIT_CLONE_PATH/build"
@@ -293,7 +305,6 @@
             &> $GIT_CLONE_PATH/prepare_output.log
 
     variables:
-        CMAKE_PREFIX_PATH: "/usr/lib64/openmpi:$CMAKE_PREFIX_PATH"
         CURRENT_RELEASE: nightly
         MAYBE_SSH_KEY_PATH:
         MAYBE_UPDATE_LATEST:

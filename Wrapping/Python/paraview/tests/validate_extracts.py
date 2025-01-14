@@ -40,94 +40,104 @@ def get_baseline(tname, path, image, root):
     return tname + "_" + re.sub('[^0-9a-zA-Z.]+', '_', relpath)
 
 
-parser = argparse.ArgumentParser( \
-    description="Validate Extrats generated in tests")
+def _get_options():
+    parser = argparse.ArgumentParser( \
+        description="Validate Extrats generated in tests")
 
-parser.add_argument("--name", type=str, required=True,
-                    help="name of the test being validated")
-parser.add_argument("--subdir", type=str, default=None,
-                    help="sub directory to validate")
-parser.add_argument("--root", type=str, required=True,
-                    help="root directory with results")
-parser.add_argument("--json", type=str, required=True,
-                    help="validation json file")
-parser.add_argument("--baseline-dir", type=str, default=None,
-                    help="directory for baselines for regression tests, if any")
-parser.add_argument("--temp-dir", type=str, default="/tmp",
-                    help="directory for results for regression test failures, if any")
+    parser.add_argument("--name", type=str, required=True,
+                        help="name of the test being validated")
+    parser.add_argument("--subdir", type=str, default=None,
+                        help="sub directory to validate")
+    parser.add_argument("--root", type=str, required=True,
+                        help="root directory with results")
+    parser.add_argument("--json", type=str, required=True,
+                        help="validation json file")
+    parser.add_argument("--baseline-dir", type=str, default=None,
+                        help="directory for baselines for regression tests, if any")
+    parser.add_argument("--temp-dir", type=str, default="/tmp",
+                        help="directory for results for regression test failures, if any")
 
-args = parser.parse_args()
+    return parser
 
-with open(args.json, 'r') as f:
-    data = json.load(f)[0]
 
-node = data
-test_dir = args.root
-if args.subdir is not None:
-    node = find_directory(args.subdir, node)
-    test_dir = os.path.join(args.root, args.subdir)
+def main():
+    parser = _get_options()
+    args = parser.parse_args()
 
-# Check that directory exists since `os.walk()` does not fail
-# for non extant directories.
-if not os.path.isdir(test_dir):
-    raise RuntimeError("Missing directory: '%s'" % test_dir)
+    with open(args.json, 'r') as f:
+        data = json.load(f)[0]
 
-# Validate directory structure.
-regressions_failure_count = 0
-for dirpath, dirs, files in os.walk(test_dir):
-    # skip hidden files and directories
-    # ref: https://stackoverflow.com/questions/13454164/os-walk-without-hidden-folders
-    files = [f for f in files if not f[0] == '.']
-    dirs[:] = [d for d in dirs if not d[0] == '.']
+    node = data
+    test_dir = args.root
+    if args.subdir is not None:
+        node = find_directory(args.subdir, node)
+        test_dir = os.path.join(args.root, args.subdir)
 
-    relpath = os.path.relpath(dirpath, test_dir)
-    currentnode = find_directory(relpath, node)
-    if not currentnode:
-        raise RuntimeError("Unexpected directory was found: '%s'" % dirpath)
+    # Check that directory exists since `os.walk()` does not fail
+    # for non extant directories.
+    if not os.path.isdir(test_dir):
+        raise RuntimeError("Missing directory: '%s'" % test_dir)
 
-    dirs = set(dirs)
-    files = set(files)
-    expected_dirs = set()
-    expected_files = set()
+    # Validate directory structure.
+    regressions_failure_count = 0
+    for dirpath, dirs, files in os.walk(test_dir):
+        # skip hidden files and directories
+        # ref: https://stackoverflow.com/questions/13454164/os-walk-without-hidden-folders
+        files = [f for f in files if not f[0] == '.']
+        dirs[:] = [d for d in dirs if not d[0] == '.']
 
-    regression_test = []
-    for item in currentnode["contents"]:
-        if item["type"] == "directory":
-            expected_dirs.add(item["name"])
-        elif item["type"] == "file":
-            expected_files.add(item["name"])
-            if item.get("compare", False):
-                regression_test.append(item["name"])
+        relpath = os.path.relpath(dirpath, test_dir)
+        currentnode = find_directory(relpath, node)
+        if not currentnode:
+            raise RuntimeError("Unexpected directory was found: '%s'" % dirpath)
 
-    if expected_dirs != dirs:
-        missing = expected_dirs - dirs
-        unexpected = dirs - expected_dirs
-        raise RuntimeError( \
-            "Mismatched directories under '%s' found.\n" \
-            "Missing : %s\n" \
-            "Unexpected: %s" % (dirpath, missing, unexpected))
+        dirs = set(dirs)
+        files = set(files)
+        expected_dirs = set()
+        expected_files = set()
 
-    if expected_files != files:
-        missing = expected_files - files
-        unexpected = files - expected_files
-        raise RuntimeError( \
-            "Mismatched files under '%s' found.\n" \
-            "Missing : %s\n" \
-            "Unexpected: %s" % (dirpath, missing, unexpected))
+        regression_test = []
+        for item in currentnode["contents"]:
+            if item["type"] == "directory":
+                expected_dirs.add(item["name"])
+            elif item["type"] == "file":
+                expected_files.add(item["name"])
+                if item.get("compare", False):
+                    regression_test.append(item["name"])
 
-    if regression_test:
-        from vtkmodules.vtkTestingRendering import vtkTesting
+        if expected_dirs != dirs:
+            missing = expected_dirs - dirs
+            unexpected = dirs - expected_dirs
+            raise RuntimeError( \
+                "Mismatched directories under '%s' found.\n" \
+                "Missing : %s\n" \
+                "Unexpected: %s" % (dirpath, missing, unexpected))
 
-        t = vtkTesting()
-        for image in regression_test:
-            t.CleanArguments()
-            t.AddArgument("-V")
-            baseline_name = get_baseline(args.name, dirpath, image, args.root)
-            t.AddArgument(os.path.join(args.baseline_dir, baseline_name))
-            t.AddArgument("-T")
-            t.AddArgument(args.temp_dir)
-            if t.RegressionTest(os.path.join(dirpath, image), 15) != t.PASSED:
-                regressions_failure_count += 1
-                print("\n")
-if regressions_failure_count:
-    raise RuntimeError("ERROR: %d regression tests failed!" % regressions_failure_count)
+        if expected_files != files:
+            missing = expected_files - files
+            unexpected = files - expected_files
+            raise RuntimeError( \
+                "Mismatched files under '%s' found.\n" \
+                "Missing : %s\n" \
+                "Unexpected: %s" % (dirpath, missing, unexpected))
+
+        if regression_test:
+            from vtkmodules.vtkTestingRendering import vtkTesting
+
+            t = vtkTesting()
+            for image in regression_test:
+                t.CleanArguments()
+                t.AddArgument("-V")
+                baseline_name = get_baseline(args.name, dirpath, image, args.root)
+                t.AddArgument(os.path.join(args.baseline_dir, baseline_name))
+                t.AddArgument("-T")
+                t.AddArgument(args.temp_dir)
+                if t.RegressionTest(os.path.join(dirpath, image), 15) != t.PASSED:
+                    regressions_failure_count += 1
+                    print("\n")
+    if regressions_failure_count:
+        raise RuntimeError("ERROR: %d regression tests failed!" % regressions_failure_count)
+
+
+if __name__ == '__main__':
+    main()

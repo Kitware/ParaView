@@ -22,13 +22,16 @@ This root package can be used to launch all the tests one after another.
 import argparse, textwrap, os, os.path
 from .. import print_info as log
 
-parser = argparse.ArgumentParser(
-    prog="paraview.tests",
-    description=textwrap.dedent(greeting),
-    formatter_class=argparse.RawDescriptionHelpFormatter)
-parser.add_argument("-i", "--interactive", help="enable interaction", action="store_true")
-parser.add_argument("-o", "--output_directory", help="output directory", type=str)
-parser.add_argument("-v", "--baseline_directory", help="baseline directory (for comparison)", type=str)
+def _get_options():
+    parser = argparse.ArgumentParser(
+        prog="paraview.tests",
+        description=textwrap.dedent(greeting),
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-i", "--interactive", help="enable interaction", action="store_true")
+    parser.add_argument("-o", "--output_directory", help="output directory", type=str)
+    parser.add_argument("-v", "--baseline_directory", help="baseline directory (for comparison)", type=str)
+
+    return parser
 
 
 def single_yes_or_no_question(question, default_no=True):
@@ -71,5 +74,7 @@ def main(opts):
         log("done '%s'" % tname)
 
 
-args = parser.parse_args()
-main(args)
+if __name__ == '__main__':
+    parser = _get_options()
+    args = parser.parse_args()
+    main(args)

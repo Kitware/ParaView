@@ -11,6 +11,9 @@
             - prepare_output.log
             - build/CMakeCache.txt
             - build/Documentation/ParaViewGeneratedDocs.tar.gz
+        reports:
+            annotations:
+                - build/annotations.json
 
 .cmake_translations_artifacts:
     artifacts:
@@ -100,6 +103,9 @@
         paths:
             - compile_output.log
             - doxygen_output.log
+        reports:
+            annotations:
+                - build/annotations.json
 
 .cmake_tidy_artifacts:
     artifacts:
