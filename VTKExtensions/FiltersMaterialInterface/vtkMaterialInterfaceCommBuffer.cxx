@@ -285,7 +285,7 @@ int vtkMaterialInterfaceCommBuffer::UnPack(
 }
 //----------------------------------------------------------------------------
 // Extract data from the buffer. Copy flag indicates whether to
-// copy or set poi9nter to buffer.
+// copy or set pointer to buffer.
 int vtkMaterialInterfaceCommBuffer::UnPack(
   int*& rData, const int nComps, const vtkIdType nTups, const bool copyFlag)
 {

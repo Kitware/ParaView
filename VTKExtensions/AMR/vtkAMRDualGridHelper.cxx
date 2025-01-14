@@ -1439,7 +1439,7 @@ void vtkAMRDualGridHelper::DegenerateRegionMessageSize(
 // The following three methods are all similar and should be reworked so that
 // the share more code.  One possibility to to have block to block copy
 // always go through an intermediate buffer (as if is were remote).
-// THis should not add much overhead to the copy.
+// This should not add much overhead to the copy.
 
 void vtkDualGridHelperCopyBlockToBlock(vtkDataArray* ptr, vtkDataArray* lowerPtr, int ext[6],
   int levelDiff, int yInc, int zInc, int highResBlockOriginIndex[3], int lowResBlockOriginIndex[3])

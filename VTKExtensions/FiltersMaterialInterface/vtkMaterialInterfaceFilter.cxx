@@ -4236,7 +4236,7 @@ int vtkMaterialInterfaceFilter::SubVoxelPositionCorner(double* point,
   // voxels which all have the same size.  Although this
   // is a simplification of the real interpolation problem, there is some
   // justification for this solution.  A neighboring small voxel should
-  // not influence infuence interpolated values beyond its own size.
+  // not influence influence interpolated values beyond its own size.
   // However, this solution can cause the interpolation field to be
   // less smooth.  The alternative is to just interpolate to the center
   // of each voxel.  Although this approach make general interpolation
@@ -9533,9 +9533,9 @@ int vtkMaterialInterfaceFilter::WriteGeometryOutputToTextFile()
 }
 
 //----------------------------------------------------------------------------
-// Write the fragment attribute attached ot the statistics output
+// Write the fragment attribute attached to the statistics output
 // to a text file. This is roughly a csv format except that column headers
-// are written one per line follwed by the number of components per tuple.
+// are written one per line followed by the number of components per tuple.
 int vtkMaterialInterfaceFilter::WriteStatisticsOutputToTextFile()
 {
   // Only proc 0 has the stats output.
@@ -9638,7 +9638,7 @@ int vtkMaterialInterfaceFilter::WriteStatisticsOutputToTextFile()
 
 //============================================================================
 // Implementation of the object that computes the fraction of a box clipped
-// by a half sphere implicit funtcion.
+// by a half sphere implicit function.
 // The algorithm is to use a case table to construct the clipped polyhedra.
 // The case table is similar to marching cubes, but the result is a list
 // of triangles for the closed polyhedra.  We then use the projected areas
@@ -9671,7 +9671,7 @@ struct vtkHexClipCase
 // (0,0,.)(1,0,.),(0,1,.)(1,1,.)(0,|,0)(1,|,0),(0,|,1)(1,|,1)(-,0,0)(-,1,0)(-,0,1)(-,1,0)
 // Corner points for surface triangles arbitrary starting index 20-27 same order as above.
 // Order of triangle points: Right hand rule points in.
-// We skipped triangels that do not contribute to the area calculation:
+// We skipped triangles that do not contribute to the area calculation:
 // Side faces that project to a line on a z plane. Triangles on the base (dZ = 0).
 #include "vtkMaterialInterfaceFilterCases.cxx"
 
