@@ -1,25 +1,18 @@
 
 message(STATUS
-  "With PARAVIEW_SSH_SERVERS_TESTING, to have the SSH Server tests pass, make sure that the machine running the test has a SSH server running on port 2222, its own ssh public key as an authorized_keys, that 127.0.0.1 is in the known_hosts file and that /usr/bin/xterm is available. In case of failing tests, pvserver logs are available in ${CMAKE_CURRENT_BINARY_DIR}/sshServer.log")
+  "With PARAVIEW_SSH_SERVERS_TESTING, to have the SSH Server tests pass, make "
+  "sure that the machine running the test has a SSH server running on port "
+  "2222, its own ssh public key as an authorized_keys, that 127.0.0.1 is in "
+  "the known_hosts file and that /usr/bin/xterm is available. In case of "
+  "failing tests, pvserver logs are available in "
+  "${CMAKE_CURRENT_BINARY_DIR}/sshServer-*.log")
 
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/server.sh.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/tmp/server.sh" @ONLY)
+  "${CMAKE_CURRENT_BINARY_DIR}/server.sh" @ONLY)
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/server_rc.sh.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/tmp/server_rc.sh" @ONLY)
-
-file(
-  COPY ${CMAKE_CURRENT_BINARY_DIR}/tmp/server.sh
-  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-  )
-
-file(
-  COPY ${CMAKE_CURRENT_BINARY_DIR}/tmp/server_rc.sh
-  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-  )
+  "${CMAKE_CURRENT_BINARY_DIR}/server_rc.sh" @ONLY)
 
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/sshServers.pvsc.in"

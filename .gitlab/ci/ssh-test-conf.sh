@@ -1,29 +1,32 @@
 #!/bin/sh
+
 set -e
 
 # Skip if we're not in a `fedora` job.
 if ! echo "$CMAKE_CONFIGURATION" | grep -q -e 'fedora'; then
-  exit 0
+    exit 0
 fi
 
+# Only works when running as root.
+if [ "$( id -u )" != "0" ]; then
+    exit 0
+fi
+
+readonly ssh_root=".gitlab/ssh"
+mkdir -p "$ssh_root"
+
 # Generate keys and append own public key as authorized
-mkdir ~/.ssh
-ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+mkdir -p ~/.ssh
+ssh-keygen -t rsa -q -f "$ssh_root/id_rsa" -N ""
+cp "$ssh_root/id_rsa.pub" "$ssh_root/authorized_keys"
 
 # Generate a SSH server configuration
-echo "
+cat > "$ssh_root/sshd_config" <<EOF
 Port 2222
-HostKey ~/.ssh/id_rsa
-PidFile ~/.ssh/sshd.pid
-AuthorizedKeysFile ~/.ssh/id_rsa.pub
-" > $HOME/.ssh/sshd_conf
-
-# Disable host checking
-echo "
-Host *
-    StrictHostKeyChecking no
-" > $HOME/.ssh/config
+HostKey $ssh_root/id_rsa
+PidFile $ssh_root/sshd.pid
+AuthorizedKeysFile $ssh_root/id_rsa.pub
+EOF
 
 # Run SSH server as daemon
-/usr/sbin/sshd -f $HOME/.ssh/sshd_conf
+/usr/sbin/sshd -f "$ssh_root/sshd_config"

@@ -415,7 +415,7 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
       return QString();
     }
 
-    // Recover a sssh command
+    // Recover a ssh command
     // It can be specified in the XML.
     // If not we look for default ssh names.
     vtkPVXMLElement* sshCommandExecXML = sshConfigXML->FindNestedElementByName("SSH");
@@ -497,6 +497,7 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
            rm script to clean up at the end.
          */
         stream << "/bin/sh -c \"tmpFile=`mktemp`; echo \'#!/bin/sh\n"
+               // FIXME: Quoting needs to be performed on the command.
                << sshFullCommand << " " << execCommand
                << ";pid=`ps -o ppid= -p $PPID`; ppid=`ps -o ppid= -p $pid`; kill -2 $ppid; exit\'"
                   "> $tmpFile; chmod +x $tmpFile; chmod -rw ~/Library/Saved\\ Application\\ "
@@ -551,6 +552,12 @@ QString pqServerConfiguration::sshFullCommand(
       sshStream << "-L " << QString::number(this->LocalPortForwardingPort)
                 << ":localhost:" << QString::number(this->resource().port()) << " ";
     }
+  }
+
+  QString options = qgetenv("PARAVIEW_SSH_OPTIONS");
+  if (!options.isEmpty())
+  {
+    sshStream << options << " ";
   }
 
   QString sshUser = sshConfigXML->GetAttributeOrDefault("user", "");
