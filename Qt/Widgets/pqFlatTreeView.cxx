@@ -908,7 +908,12 @@ bool pqFlatTreeView::startEditing(const QModelIndex& index)
 
     // Create an editor appropriate for the value.
     const QItemEditorFactory* factory = QItemEditorFactory::defaultFactory();
-    this->Internal->Editor = factory->createEditor(value.type(), this->viewport());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QMetaType::Type typeId = static_cast<QMetaType::Type>(value.type());
+#else
+    auto typeId = value.typeId();
+#endif
+    this->Internal->Editor = factory->createEditor(typeId, this->viewport());
     if (!this->Internal->Editor)
     {
       return false;
@@ -918,7 +923,7 @@ bool pqFlatTreeView::startEditing(const QModelIndex& index)
     this->Internal->Index = index;
 
     // Set the editor value.
-    QByteArray name = factory->valuePropertyName(value.type());
+    QByteArray name = factory->valuePropertyName(typeId);
     if (!name.isEmpty())
     {
       this->Internal->Editor->setProperty(name.data(), value);
@@ -951,7 +956,13 @@ void pqFlatTreeView::finishEditing()
     QVariant value;
     QModelIndex index = this->Internal->Index;
     const QItemEditorFactory* factory = QItemEditorFactory::defaultFactory();
-    QByteArray name = factory->valuePropertyName(value.type());
+    // FIXME: `value` is not initialized, so what `typeId` differences are expected here?
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QMetaType::Type typeId = static_cast<QMetaType::Type>(value.type());
+#else
+    auto typeId = value.typeId();
+#endif
+    QByteArray name = factory->valuePropertyName(typeId);
     if (!name.isEmpty())
     {
       value = this->Internal->Editor->property(name.data());
@@ -1483,7 +1494,12 @@ void pqFlatTreeView::updateData(const QModelIndex& topLeft, const QModelIndex& b
         {
           QVariant value = this->Model->data(this->Internal->Index, Qt::EditRole);
           const QItemEditorFactory* factory = QItemEditorFactory::defaultFactory();
-          QByteArray name = factory->valuePropertyName(value.type());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+          QMetaType::Type typeId = static_cast<QMetaType::Type>(value.type());
+#else
+          auto typeId = value.typeId();
+#endif
+          QByteArray name = factory->valuePropertyName(typeId);
           if (!name.isEmpty())
           {
             this->Internal->Editor->setProperty(name.data(), value);
@@ -3079,7 +3095,12 @@ int pqFlatTreeView::getDataWidth(const QModelIndex& index, const QFontMetrics& f
   // item is an image or list of images, the desired width is
   // the image width(s).
   QVariant indexData = index.data();
-  if (indexData.type() == QVariant::Pixmap)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  QMetaType::Type typeId = static_cast<QMetaType::Type>(indexData.type());
+#else
+  auto typeId = indexData.typeId();
+#endif
+  if (typeId == QMetaType::QPixmap)
   {
     // Make sure the pixmap is scaled to fit the item height.
     QSize pixmapSize = qvariant_cast<QPixmap>(indexData).size();
@@ -3640,11 +3661,16 @@ void pqFlatTreeView::drawData(QPainter& painter, int px, int py, const QModelInd
   bool selected)
 {
   QVariant indexData = this->Model->data(index);
-  if (indexData.type() == QVariant::Pixmap || indexData.canConvert(QVariant::Icon))
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  QMetaType::Type typeId = static_cast<QMetaType::Type>(indexData.type());
+#else
+  auto typeId = indexData.typeId();
+#endif
+  if (typeId == QMetaType::QPixmap || indexData.canConvert(QVariant::Icon))
   {
     QIcon icon;
     QPixmap pixmap;
-    if (indexData.type() == QVariant::Pixmap)
+    if (typeId == QMetaType::QPixmap)
     {
       pixmap = qvariant_cast<QPixmap>(indexData);
       if (pixmap.height() > itemHeight)
