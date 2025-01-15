@@ -482,7 +482,7 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
-      <DoubleVectorProperty command="SetClipValue"
+      <DoubleVectorProperty command="SetValue"
                             default_values="0.0"
                             name="ClipValue"
                             number_of_elements="1">

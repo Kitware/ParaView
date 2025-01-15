@@ -562,7 +562,7 @@
         </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetHorizontalAngle"
-                            default_values="45"
+                            default_values="30"
                             name="HorizontalAngle"
                             number_of_elements="1">
         <DoubleRangeDomain name="range"
@@ -574,7 +574,7 @@
         </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetVerticalAngle"
-                            default_values="45"
+                            default_values="30"
                             name="VerticalAngle"
                             number_of_elements="1">
         <DoubleRangeDomain name="range"

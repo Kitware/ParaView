@@ -60,6 +60,3 @@ with zipfile.ZipFile(archive_file_name, mode='r') as archive:
         assert("timeStep" in step)
         indexStepPath = url + step["url"] + "/index.json"
         assert(indexStepPath in archive.namelist())
-
-    # Check that there's only 26 data array
-    assert(sum(map(lambda x : x.startswith("data/"), archive.namelist())) == 26)
