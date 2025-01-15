@@ -9,6 +9,9 @@ hyperTreeGridRandom = HyperTreeGridRandom()
 hyperTreeGridAxisReflection = HyperTreeGridAxisReflection(Input=hyperTreeGridRandom)
 assert(type(hyperTreeGridAxisReflection).__name__ == "AxisAlignedReflectionFilter")
 
+hyperTreeGridAxisReflection.PlaneNormal = 'Z Axis'
+assert(hyperTreeGridAxisReflection.ReflectionPlane.Normal == [0.0, 0.0, 1.0])
+
 hyperTreeGridAxisReflection.PlaneNormal = 7
 hyperTreeGridAxisReflection.PlanePosition = 2
 

@@ -15,6 +15,9 @@ sphereReflection.Center = 2
 assert(sphereReflection.ReflectionPlane.Normal == [0.0, 1.0, 0.0])
 assert(sphereReflection.ReflectionPlane.Origin == [2.0, 2.0, 2.0])
 
+sphereReflection.Plane = 'Z Min'
+assert(sphereReflection.PlaneMode == 'Z Min')
+
 sphereReflection.PlaneMode = 2
 assert(sphereReflection.Plane == 'Y Min')
 

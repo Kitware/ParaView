@@ -525,6 +525,13 @@ def setattr(proxy, pname, value):
     if proxy.SMProxy and proxy.SMProxy.GetXMLName() in ("HyperTreeGridAxisReflection", "AxisAlignedReflectionFilter"):
         if pname == "PlaneNormal":
             if compatibility_version < (5, 14):
+                if type(value).__name__ == 'str':
+                    if value == 'X Axis':
+                        value = 6
+                    elif value == 'Y Axis':
+                        value = 7
+                    elif value == 'Z Axis':
+                        value = 8
                 if value == 6:
                     proxy.GetProperty("ReflectionPlane").GetData().Normal = [1, 0, 0]
                 elif value == 7:
@@ -545,6 +552,25 @@ def setattr(proxy, pname, value):
     if proxy.SMProxy and proxy.SMProxy.GetXMLName() in ("ReflectionFilter", "AxisAlignedReflectionFilter"):
         if pname == "Plane":
             if compatibility_version < (5, 14):
+                if type(value).__name__ == 'str':
+                    if value == 'X Min':
+                        value = 0
+                    elif value == 'Y Min':
+                        value = 1
+                    elif value == 'Z Min':
+                        value = 2
+                    elif value == 'X Max':
+                        value = 3
+                    elif value == 'Y Max':
+                        value = 4
+                    elif value == 'Z Max':
+                        value = 5
+                    elif value == 'X':
+                        value = 6
+                    elif value == 'Y':
+                        value = 7
+                    elif value == 'Z':
+                        value = 8
                 if value < 6:
                     proxy.PlaneMode = value + 1
                 else:
