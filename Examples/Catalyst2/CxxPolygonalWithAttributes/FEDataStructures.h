@@ -66,10 +66,15 @@ public:
   void UpdateFields(double time);
   double* GetVelocityArray();
   float* GetPressureArray();
+  unsigned char* GetGhostsArray();
 
 private:
+  // Points' Velocity
   std::vector<double> Velocity;
+  // Cells' Pressure
   std::vector<float> Pressure;
+  // Cells' Ghosts
+  std::vector<unsigned char> Ghosts;
   Grid* GridPtr;
 };
 #endif

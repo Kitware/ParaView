@@ -15,3 +15,5 @@ def catalyst_execute(info):
     print("bounds:", producer.GetDataInformation().GetBounds())
     print("velocity-magnitude-range:", producer.PointData["velocity"].GetRange(-1))
     print("pressure-range:", producer.CellData["pressure"].GetRange(0))
+    # make sure that the ghost array has been renamed to vtkGhostType
+    print("pressure-range:", producer.CellData["vtkGhostType"].GetRange(0))

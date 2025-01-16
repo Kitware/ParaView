@@ -104,6 +104,26 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
   fields["pressure/volume_dependent"].set("false");
   fields["pressure/values"].set_external(attribs.GetPressureArray(), grid.GetNumberOfCells());
 
+  // set the pressure metadata as scalars as follows
+  auto pressureMetaData = mesh["state/metadata/vtk_fields/pressure"];
+  pressureMetaData["attribute_type"] = "Scalars";
+
+  // similar to pressure, you can define an array that represents GlobalIds
+
+  // ghosts is cell-data.
+  fields["ghosts/association"].set("element");
+  fields["ghosts/topology"].set("mesh");
+  fields["ghosts/volume_dependent"].set("false");
+  fields["ghosts/values"].set_external(attribs.GetGhostsArray(), grid.GetNumberOfCells());
+
+  auto ghostsMetaData = mesh["state/metadata/vtk_fields/ghosts"];
+  ghostsMetaData["attribute_type"] = "Ghosts";
+  // If your ghost values are not VTK compliant, you can replace them
+  //  std::vector<int> cellGhostValuesToReplace(1, 1);
+  //  std::vector<int> cellGhostReplacementValues(1, vtkDataSetAttributes::HIDDENCELL);
+  //  ghostMetaData["values_to_replace"] = cellGhostValuesToReplace;
+  //  ghostMetaData["replacement_values"] = cellGhostReplacementValues;
+
   catalyst_status err = catalyst_execute(conduit_cpp::c_node(&exec_params));
   if (err != catalyst_status_ok)
   {

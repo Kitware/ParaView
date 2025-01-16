@@ -100,6 +100,10 @@ void Attributes::UpdateFields(double time)
   size_t numCells = this->GridPtr->GetNumberOfCells();
   this->Pressure.resize(numCells);
   std::fill(this->Pressure.begin(), this->Pressure.end(), 1.f);
+
+  this->Ghosts.resize(numCells);
+  std::fill(this->Ghosts.begin(), this->Ghosts.end(), 0);
+  this->Ghosts[0] = /*vtkDataSetAttributes::CellGhostTypes::DUPLICATECELL*/ 1;
 }
 
 double* Attributes::GetVelocityArray()
@@ -118,4 +122,13 @@ float* Attributes::GetPressureArray()
     return nullptr;
   }
   return &this->Pressure[0];
+}
+
+unsigned char* Attributes::GetGhostsArray()
+{
+  if (this->Ghosts.empty())
+  {
+    return nullptr;
+  }
+  return &this->Ghosts[0];
 }

@@ -2,7 +2,7 @@
 # to Catalyst.
 
 cmake_minimum_required(VERSION 3.13)
-project(CxxPolygonal LANGUAGES C CXX)
+project(CxxPolygonalWithAttributes LANGUAGES C CXX)
 
 include (GNUInstallDirs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
@@ -23,11 +23,11 @@ if (NOT MPI_FOUND)
 endif ()
 
 #------------------------------------------------------------------------------
-add_executable(CxxPolygonal
+add_executable(CxxPolygonalWithAttributes
   FEDataStructures.cxx
   FEDataStructures.h
   FEDriver.cxx)
-target_link_libraries(CxxPolygonal
+target_link_libraries(CxxPolygonalWithAttributes
   PRIVATE
     MPI::MPI_C
     MPI::MPI_CXX)
@@ -37,19 +37,19 @@ option(USE_CATALYST "Build example with Catalyst enabled" ON)
 if (USE_CATALYST)
   find_package(catalyst REQUIRED
     PATHS "${ParaView_DIR}/catalyst")
-  target_compile_definitions(CxxPolygonal
+  target_compile_definitions(CxxPolygonalWithAttributes
     PRIVATE
       "PARAVIEW_IMPL_DIR=\"${ParaView_CATALYST_DIR}\""
       USE_CATALYST=1)
-  target_link_libraries(CxxPolygonal
+  target_link_libraries(CxxPolygonalWithAttributes
     PRIVATE
       catalyst::catalyst)
 
   include(CTest)
   if (BUILD_TESTING)
     add_test(
-      NAME CxxPolyhedraV2::SimplePipeline
-      COMMAND CxxPolyhedraV2
+      NAME CxxPolygonalWithAttributesV2::SimplePipeline
+      COMMAND CxxPolygonalWithAttributesV2
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
 
     set(_vtk_fail_regex
@@ -61,7 +61,7 @@ if (USE_CATALYST)
       # vtkDebugLeaks
       "instance(s)? still around")
 
-    set_tests_properties("CxxPolyhedraV2::SimplePipeline"
+    set_tests_properties("CxxPolygonalWithAttributesV2::SimplePipeline"
       PROPERTIES
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
         PASS_REGULAR_EXPRESSION "executing catalyst_pipeline"
