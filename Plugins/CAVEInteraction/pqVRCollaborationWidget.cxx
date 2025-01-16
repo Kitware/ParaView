@@ -553,7 +553,7 @@ pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::Wind
   connect(this->Internals->configureAvatarBtn, SIGNAL(clicked()), this, SLOT(configureAvatar()));
 
   QObject::connect(this->Internals->cCollabEnable, &QCheckBox::pqCheckBoxSignal, this,
-    [&](pqCheckState state) { this->collabEnabledChanged(static_cast<Qt::CheckState>(state); });
+    [&](pqCheckState state) { this->collabEnabledChanged(static_cast<Qt::CheckState>(state)); });
 
   connect(this->Internals->cPortValue, SIGNAL(editingFinished()), this, SLOT(collabPortChanged()));
 
