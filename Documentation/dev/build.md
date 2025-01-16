@@ -220,11 +220,11 @@ Required:
   * [CMake][cmake]
     - Version 3.12 or newer, however, the latest version is always recommended
   * Supported compiler
-    - GCC 4.8 or newer
-    - Intel 17 or newer
-    - IBM XL 16.1 or newer
-    - Clang 4 or newer
-    - Xcode 9 or newer
+    - GCC 8.0 or newer
+    - Intel 19 or newer
+    - IBM XL 17.1 or newer
+    - Clang 5 or newer
+    - Xcode 10 or newer
     - Visual Studio 2019 or newer
 
 Optional dependencies:
