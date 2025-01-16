@@ -51,7 +51,12 @@ void pqTestingReaction::recordTest(const QString& filename)
   if (!filename.isEmpty())
   {
     pqCoreUtilities::mainWidget()->activateWindow();
-    pqApplicationCore::instance()->testUtility()->recordTests(filename);
+    // The `activateWindow` function schedules a request on the platform's event queue to set the
+    // active widget. To enable the test recorder to check the active window, we use a one-time
+    // timer. This allows the platform's windowing system to process the request for the active
+    // window change, before we query it.
+    QTimer::singleShot(
+      50, [=]() { pqApplicationCore::instance()->testUtility()->recordTests(filename); });
   }
 }
 
