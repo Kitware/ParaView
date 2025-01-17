@@ -965,6 +965,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   DefaultReadersSetting.xml
   DelimitedTextReader.xml
   DynamicFieldDataDomain.xml
+  ExplodeDataSet.xml
   ExportFilteredColumnsSpreadsheet.xml
   ExportSpreadsheetFormatting.xml
   ExpressionsDialog.xml

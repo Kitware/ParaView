@@ -289,6 +289,7 @@
   <Proxy group="filters" name="AppendReductionFilter" />
   <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
   <Proxy group="filters" name="AxisAlignedReflectionFilter" />
+  <Proxy group="filters" name="AxisAlignedSlice" />
   <Proxy group="filters" name="BlockIdScalars" />
   <Proxy group="filters" name="BlockIds" />
   <Proxy group="filters" name="BoundaryMeshQuality"/>
@@ -341,11 +342,11 @@
   <Proxy group="filters" name="Delaunay3D" />
   <Proxy group="filters" name="DescriptiveStatistics" />
   <Proxy group="filters" name="DistributePoints" />
-  <Proxy group="filters" name="PointAndCellIds" />
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="EnvironmentAnnotation" />
   <Proxy group="filters" name="EqualizerFilter"/>
   <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
+  <Proxy group="filters" name="ExplodeDataSet" />
   <Proxy group="filters" name="ExtractBlock" icon=":/pqWidgets/Icons/pqGroupExtract.svg" />
   <Proxy group="filters" name="ExtractCellsAlongLine" />
   <Proxy group="filters" name="ExtractCellsAlongLineCustom" />
@@ -368,6 +369,7 @@
   <Proxy group="filters" name="ExtractTimeSteps" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
   <Proxy group="filters" name="FeatureEdges" />
+  <Proxy group="filters" name="FeatureEdgesRegionIds" />
   <Proxy group="filters" name="FieldArraysFromFile" />
   <Proxy group="filters" name="FieldDataToDataSetAttribute" />
   <Proxy group="filters" name="FiniteElementFieldDistributor" />
@@ -392,7 +394,6 @@
   <Proxy group="filters" name="GroupTimeSteps" />
   <Proxy group="filters" name="HyperTreeGridAxisReflection" />
   <Proxy group="filters" name="HyperTreeGridCellCenters" />
-  <Proxy group="filters" name="HyperTreeGridVisibleLeavesSize" />
   <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
   <Proxy group="filters" name="HyperTreeGridEvaluateCoarse" />
   <Proxy group="filters" name="HyperTreeGridFeatureEdges" />
@@ -400,6 +401,7 @@
   <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
   <Proxy group="filters" name="HyperTreeGridToDualGrid" />
   <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
+  <Proxy group="filters" name="HyperTreeGridVisibleLeavesSize" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToPointSet" />
@@ -451,6 +453,7 @@
   <Proxy group="filters" name="PlotDataOverTime" />
   <Proxy group="filters" name="PlotOnIntersectionCurves" />
   <Proxy group="filters" name="PlotOnSortedLines" />
+  <Proxy group="filters" name="PointAndCellIds" />
   <Proxy group="filters" name="PointDataToCellData" />
   <Proxy group="filters" name="PointDatasetInterpolator" />
   <Proxy group="filters" name="PointLineInterpolator" />
@@ -494,7 +497,6 @@
   <Proxy group="filters" name="ScatterPlot" />
   <Proxy group="filters" name="ShrinkFilter" />
   <Proxy group="filters" name="SliceAlongPolyLine" />
-  <Proxy group="filters" name="AxisAlignedSlice" />
   <Proxy group="filters" name="SliceWithPlane" />
   <Proxy group="filters" name="SmoothPolyDataFilter" />
   <Proxy group="filters" name="SpatioTemporalHarmonics" />
@@ -504,7 +506,6 @@
   <Proxy group="filters" name="Stripper" />
   <Proxy group="filters" name="StructuredGridOutlineFilter" />
   <Proxy group="filters" name="Subdivide" />
-  <Proxy group="filters" name="FeatureEdgesRegionIds" />
   <Proxy group="filters" name="SurfaceNormals" />
   <Proxy group="filters" name="SurfaceTangents" />
   <Proxy group="filters" name="SurfaceVectors" />
@@ -516,9 +517,9 @@
   <Proxy group="filters" name="TemporalCache" />
   <Proxy group="filters" name="TemporalInterpolator" />
   <Proxy group="filters" name="TemporalShiftScale" />
+  <Proxy group="filters" name="TemporalSmoothing" />
   <Proxy group="filters" name="TemporalSnapToTimeStep" />
   <Proxy group="filters" name="TemporalStatistics" />
-  <Proxy group="filters" name="TemporalSmoothing" />
   <Proxy group="filters" name="TensorGlyph" />
   <Proxy group="filters" name="TensorPrincipalInvariants" />
   <Proxy group="filters" name="TessellatorFilter" />
