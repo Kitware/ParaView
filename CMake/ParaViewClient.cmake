@@ -723,10 +723,10 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
 
   foreach (_paraview_gpd_group IN LISTS _paraview_gpd_groups)
     if (_paraview_gpd_group STREQUAL "readers")
-      set(_paraview_gpd_query "contains(lower-case($proxy_name),'reader')")
+      set(_paraview_gpd_query "contains(translate($proxy_name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'reader')")
       set(_paraview_gpd_group_real "sources")
     else ()
-      set(_paraview_gpd_query "not(contains(lower-case($proxy_name),'reader'))")
+      set(_paraview_gpd_query "not(contains(translate($proxy_name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'reader'))")
       set(_paraview_gpd_group_real "${_paraview_gpd_group}")
     endif ()
 

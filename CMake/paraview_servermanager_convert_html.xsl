@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf8"?>
 <!-- Used to convert XML DOM generated from smxml_to_xml.xsl to HTML -->
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="html"/>
 <xsl:template match="/xml">
   <xsl:apply-templates select="proxy" />
