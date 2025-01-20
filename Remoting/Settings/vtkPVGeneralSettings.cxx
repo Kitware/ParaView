@@ -294,15 +294,15 @@ void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
+  os << indent << "AnimationGeometryCacheLimit: " << this->AnimationGeometryCacheLimit << "\n";
   os << indent << "AutoApply: " << this->AutoApply << "\n";
-  os << indent << "AutoApplyDelay: " << this->AutoApplyDelay << "\n";
   os << indent << "AutoApplyActiveOnly: " << this->AutoApplyActiveOnly << "\n";
-  os << indent << "PreservePropertyValues: " << this->PreservePropertyValues << "\n";
+  os << indent << "AutoApplyDelay: " << this->AutoApplyDelay << "\n";
+  os << indent << "CacheGeometryForAnimation: " << this->CacheGeometryForAnimation << "\n";
   os << indent << "DefaultViewType: " << this->DefaultViewType << "\n";
   os << indent << "InterfaceLanguage: " << this->InterfaceLanguage << "\n";
-  os << indent << "ScalarBarMode: " << this->ScalarBarMode << "\n";
-  os << indent << "CacheGeometryForAnimation: " << this->CacheGeometryForAnimation << "\n";
-  os << indent << "AnimationGeometryCacheLimit: " << this->AnimationGeometryCacheLimit << "\n";
-  os << indent << "PropertiesPanelMode: " << this->PropertiesPanelMode << "\n";
   os << indent << "LockPanels: " << this->LockPanels << "\n";
+  os << indent << "PreservePropertyValues: " << this->PreservePropertyValues << "\n";
+  os << indent << "PropertiesPanelMode: " << this->PropertiesPanelMode << "\n";
+  os << indent << "ScalarBarMode: " << this->ScalarBarMode << "\n";
 }
