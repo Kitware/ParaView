@@ -565,17 +565,25 @@ function (paraview_client_documentation)
       "The `XMLS` argument is required.")
   endif ()
 
-  include("${_ParaViewClient_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
-  find_program(qt_xmlpatterns_executable
-    NAMES xmlpatterns-qt5 xmlpatterns
-    HINTS "${Qt5_DIR}/../../../bin"
-          "${Qt5_DIR}/../../../libexec/qt5/bin"
-    DOC   "Path to xmlpatterns")
-  mark_as_advanced(qt_xmlpatterns_executable)
+  if (PARAVIEW_QT_MAJOR_VERSION EQUAL "5")
+    include("${_ParaViewClient_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
+    find_program(qt_xmlpatterns_executable
+      NAMES xmlpatterns-qt5 xmlpatterns
+      HINTS "${Qt5_DIR}/../../../bin"
+            "${Qt5_DIR}/../../../libexec/qt5/bin"
+      DOC   "Path to xmlpatterns")
+    mark_as_advanced(qt_xmlpatterns_executable)
+  endif ()
 
-  if (NOT qt_xmlpatterns_executable)
+  find_program(ParaViewClient_xsltproc_executable
+    NAMES xsltproc
+    DOC   "Path to xsltproc")
+  mark_as_advanced(ParaViewClient_xsltproc_executable)
+
+  if (NOT qt_xmlpatterns_executable AND
+      NOT ParaViewClient_xsltproc_executable)
     message(FATAL_ERROR
-      "Cannot find the xmlpatterns executable.")
+      "Cannot find the `xmlpatterns` or `xsltproc` executables.")
   endif ()
 
   set(_paraview_client_doc_xmls)
@@ -597,6 +605,7 @@ function (paraview_client_documentation)
             ${_paraview_client_doc_outputs}
     COMMAND "${CMAKE_COMMAND}"
             "-Dxmlpatterns=${qt_xmlpatterns_executable}"
+            "-Dxsltproc=${ParaViewClient_xsltproc_executable}"
             "-Doutput_dir=${_paraview_client_doc_OUTPUT_DIR}"
             "-Doutput_file=${_paraview_client_doc_OUTPUT_DIR}/${_paraview_client_doc_TARGET}.xslt"
             "-Dxmls_file=${_paraview_client_doc_xmls_file}"
@@ -622,7 +631,23 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
   function (xslt reason xsl xml)
     set(output "${ARGV3}")
 
-    if (xmlpatterns)
+    if (xsltproc)
+      set(_xslt_output_args)
+      if (output)
+        list(APPEND _xslt_output_args
+          --output "${output}")
+      endif ()
+      execute_process(
+        COMMAND "${xsltproc}"
+                --nonet
+                ${_xslt_output_args}
+                "${xsl}"
+                "${xml}"
+        OUTPUT_VARIABLE _paraview_gpd_output
+        ERROR_VARIABLE  _paraview_gpd_error
+        RESULT_VARIABLE _paraview_gpd_result)
+      string(REPLACE [[<?xml version="1.0"?>]] "" _paraview_gpd_output "${_paraview_gpd_output}")
+    elseif (xmlpatterns)
       set(_xslt_output_args)
       if (output)
         list(APPEND _xslt_output_args
