@@ -98,8 +98,12 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   vtkImplicitFunction* ClipFunction = nullptr;
   vtkPlane* ClipPlane = nullptr;
 
-  vtkDataArray* XFEMCutOriginArray = input->GetCellData()->GetArray("xfem_cut_origin_");
-  vtkDataArray* XFEMCutNormalArray = input->GetCellData()->GetArray("xfem_cut_normal_");
+  vtkDataArray* XFEMCutOriginArray = input->GetCellData()->GetArray("xfem_cut_origin_")
+    ? input->GetCellData()->GetArray("xfem_cut_origin_")
+    : input->GetCellData()->GetArray("xfem_cut_origin");
+  vtkDataArray* XFEMCutNormalArray = input->GetCellData()->GetArray("xfem_cut_normal_")
+    ? input->GetCellData()->GetArray("xfem_cut_normal_")
+    : input->GetCellData()->GetArray("xfem_cut_normal");
   if (XFEMCutOriginArray && XFEMCutNormalArray)
   {
     ClipFunction = vtkPlane::New();
