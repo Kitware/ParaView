@@ -78,10 +78,13 @@ public:
   void RemoveBlockRange(vtkSMRepresentationProxy* proxy, const std::string& blockSelector);
   ///@}
 
+  ///@{
   /**
    * Get the current range of the scalar bar.
    */
-  void GetRange(double range[2]);
+  void GetRange(double range[2], int component);
+  void GetRange(double range[2]) { this->GetRange(range, -1); }
+  ///@}
 
   /**
    * Clears all data held by the scalar bar concerning range.
