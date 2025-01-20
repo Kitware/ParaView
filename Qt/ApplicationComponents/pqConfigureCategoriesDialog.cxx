@@ -19,15 +19,6 @@
 #include "pqProxyGroupMenuManager.h"
 #include "pqProxyInfo.h"
 
-// pqCore
-#include "pqApplicationCore.h"
-#include "pqSettings.h"
-
-#include "vtkPVXMLElement.h"
-#include "vtkPVXMLParser.h"
-
-#include <sstream>
-
 namespace
 {
 static constexpr int PROXY_ROLE = Qt::UserRole + 1;

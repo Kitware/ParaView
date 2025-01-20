@@ -40,7 +40,6 @@
 #include <QProcess>
 #include <QProgressBar>
 #include <QProxyStyle>
-#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <QStyleFactory>

@@ -5,12 +5,10 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqCameraDialog.h"
 #include "pqCustomViewpointButtonDialog.h"
 #include "pqCustomViewpointsController.h"
 #include "pqCustomViewpointsDefaultController.h"
 #include "pqRenderView.h"
-#include "pqSettings.h"
 #include <QApplication>
 #include <QPainter>
 

@@ -16,13 +16,9 @@
 #include "pqScopedOverrideCursor.h"
 #include "pqSearchBox.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
-#include "pqTimer.h"
 #include "pqUndoStack.h"
-#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkLegacy.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
@@ -38,7 +34,6 @@
 #include <QStyleFactory>
 
 #include <cassert>
-#include <iostream>
 
 namespace
 {

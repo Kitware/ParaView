@@ -41,7 +41,6 @@
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "pqTimer.h"
 
 #include <cassert>
