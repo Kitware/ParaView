@@ -619,6 +619,37 @@ endfunction ()
 
 # Generate proxy documentation.
 if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
+  function (xslt reason xsl xml)
+    set(output "${ARGV3}")
+
+    if (xmlpatterns)
+      set(_xslt_output_args)
+      if (output)
+        list(APPEND _xslt_output_args
+          -output "${output}")
+      endif ()
+      execute_process(
+        COMMAND "${xmlpatterns}"
+                ${_xslt_output_args}
+                "${xsl}"
+                "${xml}"
+        OUTPUT_VARIABLE _paraview_gpd_output
+        ERROR_VARIABLE  _paraview_gpd_error
+        RESULT_VARIABLE _paraview_gpd_result)
+    else ()
+      message(FATAL_ERROR
+        "No XSL transformer found.")
+    endif ()
+
+    if (_paraview_gpd_result)
+      message(FATAL_ERROR
+        "Failed to ${reason}: ${_paraview_gpd_error}")
+    endif ()
+
+    set(_paraview_gpd_output
+      "${_paraview_gpd_output}"
+      PARENT_SCOPE)
+  endfunction ()
 
   file(READ "${xmls_file}" xmls)
 
@@ -630,17 +661,9 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
   set(_paraview_gpd_xslt "<xml>\n")
   file(MAKE_DIRECTORY "${output_dir}")
   foreach (_paraview_gpd_xml IN LISTS xmls)
-    execute_process(
-      COMMAND "${xmlpatterns}"
-              "${_paraview_gpd_to_xml}"
-              "${_paraview_gpd_xml}"
-      OUTPUT_VARIABLE _paraview_gpd_output
-      ERROR_VARIABLE  _paraview_gpd_error
-      RESULT_VARIABLE _paraview_gpd_result)
-    if (_paraview_gpd_result)
-      message(FATAL_ERROR
-        "Failed to convert servermanager XML: ${_paraview_gpd_error}")
-    endif ()
+    xslt("convert servermanager XML"
+      "${_paraview_gpd_to_xml}"
+      "${_paraview_gpd_xml}")
 
     string(APPEND _paraview_gpd_xslt
       "${_paraview_gpd_output}")
@@ -650,29 +673,15 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
 
   file(WRITE "${output_file}.xslt"
     "${_paraview_gpd_xslt}")
-  execute_process(
-    COMMAND "${xmlpatterns}"
-            -output "${output_file}"
-            "${_paraview_gpd_to_catindex}"
-            "${output_file}.xslt"
-    RESULT_VARIABLE _paraview_gpd_result)
-  if (_paraview_gpd_result)
-    message(FATAL_ERROR
-      "Failed to generate category index")
-  endif ()
+  xslt("generate category index"
+    "${_paraview_gpd_to_catindex}"
+    "${output_file}.xslt"
+    "${output_file}")
 
   # Generate HTML files.
-  execute_process(
-    COMMAND "${xmlpatterns}"
-            "${_paraview_gpd_to_html}"
-            "${output_file}"
-    OUTPUT_VARIABLE _paraview_gpd_output
-    RESULT_VARIABLE _paraview_gpd_result
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if (_paraview_gpd_result)
-    message(FATAL_ERROR
-      "Failed to generate HTML output")
-  endif ()
+  xslt("generate HTML output"
+    "${_paraview_gpd_to_html}"
+    "${output_file}")
 
   # Escape open/close brackets as HTML entities as they somehow interfere with the foreach loop below.
   string(REPLACE "[" "&#91;" _paraview_gpd_output "${_paraview_gpd_output}")
@@ -727,16 +736,9 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
       "${_paraview_gpd_to_wiki}"
       "${_paraview_gpd_wiki_xsl}"
       @ONLY)
-    execute_process(
-      COMMAND "${xmlpatterns}"
-              "${_paraview_gpd_wiki_xsl}"
-              "${output_file}"
-      OUTPUT_VARIABLE _paraview_gpd_output
-      RESULT_VARIABLE _paraview_gpd_result)
-    if (_paraview_gpd_result)
-      message(FATAL_ERROR
-        "Failed to generate Wiki output for ${_paraview_gpd_group}")
-    endif ()
+    xslt("generate Wiki output"
+      "${_paraview_gpd_wiki_xsl}"
+      "${output_file}")
     string(REGEX REPLACE " +" " " _paraview_gpd_output "${_paraview_gpd_output}")
     string(REPLACE "\n " "\n" _paraview_gpd_output "${_paraview_gpd_output}")
     file(WRITE "${output_dir}/${_paraview_gpd_group}.wiki"
