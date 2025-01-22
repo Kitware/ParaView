@@ -36,3 +36,9 @@ paraview_client_add(
   MAIN_WINDOW_CLASS myMainWindow
   ORGANIZATION "Kitware, Inc."
   TITLE "ParaView (ReVisEd)")
+
+enable_testing()
+option(BUILD_TESTING "Build Clone1 Testing" OFF)
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()

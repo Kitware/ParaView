@@ -27,15 +27,22 @@ set(sources
 set(ui_files
   SpreadSheetMainWindow.ui)
 
+set(app_name spreadsheet_paraview)
 # The main cmake macro to create a paraview based application
 paraview_client_add(
-  NAME spreadsheet_paraview
+  NAME ${app_name}
   VERSION "1.0.1"
   SOURCES ${sources} ${ui_files}
   MAIN_WINDOW_CLASS SpreadSheetMainWindow
   ORGANIZATION "Kitware SAS."
   TITLE "Spreadsheet ParaView")
 
-target_link_libraries(spreadsheet_paraview
+target_link_libraries(${app_name}
   PRIVATE
     ParaView::RemotingSettings)
+
+enable_testing()
+option(BUILD_TESTING "Build Spreadsheet Testing" OFF)
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()
