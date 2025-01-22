@@ -209,6 +209,22 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="PreservePropertyValues"
+        command="SetPreservePropertyValues"
+        number_of_elements="1"
+        default_values="0"
+        information_property="PreservePropertyValuesInfo">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          New proxies (filter, representation and view) are initialized with their previous property values.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="PreservePropertyValuesInfo"
+        command="GetPreservePropertyValues"
+        information_only="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
       <IntVectorProperty name="LoadAllVariables"
         number_of_elements="1"
         default_values="0"
@@ -651,6 +667,7 @@
       <PropertyGroup label="Properties Panel Options">
         <Property name="AutoApply" />
         <Property name="AutoApplyActiveOnly" />
+        <Property name="PreservePropertyValues"/>
         <Property name="LoadAllVariables" />
         <Property name="LoadNoChartVariables" />
       </PropertyGroup>

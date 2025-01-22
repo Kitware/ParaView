@@ -199,7 +199,7 @@ public Q_SLOTS:
   /**
    * Saves settings as defaults for proxy
    */
-  void saveAsDefaults();
+  void saveAsDefaults() const;
 
   /**
    * create a widget for a property.

@@ -21,6 +21,7 @@
 #include "pqTimer.h"
 #include "vtkCollection.h"
 #include "vtkNew.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompoundSourceProxy.h"
@@ -964,6 +965,12 @@ void pqProxyWidget::applyInternal() const
   {
     item->apply();
   }
+
+  bool preserveProperties = vtkPVGeneralSettings::GetInstance()->GetPreservePropertyValues();
+  if (preserveProperties)
+  {
+    this->saveAsDefaults();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1531,7 +1538,7 @@ bool pqProxyWidget::restoreDefaults()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidget::saveAsDefaults()
+void pqProxyWidget::saveAsDefaults() const
 {
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
   vtkSMNamedPropertyIterator* propertyIt = nullptr;
@@ -1614,6 +1621,11 @@ void pqProxyWidget::onChangeFinished()
     {
       SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxy());
       pqSender->apply();
+      bool preserveProperties = vtkPVGeneralSettings::GetInstance()->GetPreservePropertyValues();
+      if (preserveProperties)
+      {
+        this->saveAsDefaults();
+      }
     }
   }
   Q_EMIT this->changeFinished();
