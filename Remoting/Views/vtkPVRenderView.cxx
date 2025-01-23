@@ -100,9 +100,11 @@
 #include "vtkOSPRayRendererNode.h"
 #endif
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#include "vtkAnariDevice.h"
 #include "vtkAnariLightNode.h"
 #include "vtkAnariPass.h"
-#include "vtkAnariRendererNode.h"
+#include "vtkAnariRenderer.h"
+#include "vtkAnariSceneGraph.h"
 #endif
 
 #include <cassert>
@@ -3614,7 +3616,7 @@ void vtkPVRenderView::SetEnableANARI(bool v)
   if (v && !this->Internals->AnariPass)
   {
     this->Internals->AnariPass = vtkSmartPointer<vtkAnariPass>::New();
-    vtkAnariRendererNode::SetCompositeOnGL(1, ren);
+    this->Internals->AnariPass->GetSceneGraph()->SetCompositeOnGL(ren, 1);
   }
   // if (!vtkAnariPass::IsSupported())
   // {
@@ -3662,24 +3664,10 @@ void vtkPVRenderView::SetANARILibrary(std::string l)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
-  const char* curL = vtkAnariRendererNode::GetLibraryName(ren);
-  if (!curL || strcmp(curL, l.c_str()))
+  if (this->Internals->AnariPass)
   {
-    vtkAnariRendererNode::SetLibraryName(l.c_str(), ren);
-    // Need to reset anaripass to re-init with the new library
-    if (this->Internals->AnariPass)
-    {
-      bool isinanari = this->Internals->IsInAnari;
-      if (isinanari)
-      {
-        this->SetEnableANARI(false);
-      }
-      this->Internals->AnariPass = nullptr;
-      if (isinanari)
-      {
-        this->SetEnableANARI(true);
-      }
-    }
+    this->Internals->AnariPass->GetAnariDevice()->SetupAnariDeviceFromLibrary(
+      l.c_str(), "default", false);
   }
 #endif
 }
@@ -3689,7 +3677,7 @@ const char* vtkPVRenderView::GetANARILibrary()
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
-  return vtkAnariRendererNode::GetLibraryName(ren);
+  return "";
 #else
   return nullptr;
 #endif
@@ -3805,7 +3793,7 @@ void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetAmbientSamples(v, ren);
-  vtkAnariRendererNode::SetAmbientSamples((v < 1 ? -1 : v), ren);
+  // vtkAnariRendererNode::SetAmbientSamples((v < 1 ? -1 : v), ren);
 #else
   (void)v;
 #endif
@@ -3850,7 +3838,7 @@ void vtkPVRenderView::SetSamplesPerPixel(int v)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetSamplesPerPixel(v, ren);
-  vtkAnariRendererNode::SetSamplesPerPixel(v, ren);
+  // vtkAnariRendererNode::SetSamplesPerPixel(v, ren);
 #else
   (void)v;
 #endif
@@ -3873,7 +3861,10 @@ void vtkPVRenderView::SetMaxFrames(int v)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
-  vtkAnariRendererNode::SetAccumulationCount(v, ren);
+  if (this->Internals->AnariPass)
+  {
+    this->Internals->AnariPass->GetSceneGraph()->SetAccumulationCount(ren, v);
+  }
   static bool warned_once = false;
   if (!warned_once && v > 1 && vtkPVView::GetEnableStreaming() == false)
   {
@@ -3904,7 +3895,7 @@ void vtkPVRenderView::SetDenoise(bool v)
   this->Internals->OSPRayDenoise = v;
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetEnableDenoiser(v, ren);
-  vtkAnariRendererNode::SetUseDenoiser(v, ren);
+  // vtkAnariRendererNode::SetUseDenoiser(v, ren);
 #else
   (void)v;
 #endif
@@ -3927,7 +3918,7 @@ void vtkPVRenderView::SetLightScale(double v)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkOSPRayLightNode::SetLightScale(v);
   vtkRenderer* ren = this->GetRenderer();
-  vtkAnariRendererNode::SetLightFalloff(v, ren);
+  // vtkAnariRendererNode::SetLightFalloff(v, ren);
 #else
   (void)v;
 #endif
