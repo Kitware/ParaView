@@ -24,7 +24,7 @@ using std::string;
 // Description:
 // Get python version
 #if VTK_MODULE_ENABLE_VTK_Python
-string GetPythonVersion()
+static string GetPythonVersion()
 {
   ostringstream oss;
 #if defined(PY_VERSION)
@@ -40,7 +40,7 @@ string GetPythonVersion()
 // Get the version of the standard implemented by this
 // MPI
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
-string GetMPIVersion()
+static string GetMPIVersion()
 {
   ostringstream oss;
   int major = -1, minor = -1;
@@ -54,12 +54,10 @@ string GetMPIVersion()
   oss << major << "." << minor;
   return oss.str();
 }
-#endif
 
 // Description:
 // Get the implementor name and release info
-#if VTK_MODULE_ENABLE_VTK_ParallelMPI
-string GetMPILibraryVersion()
+static string GetMPILibraryVersion()
 {
   ostringstream oss;
 #if defined(MPI_VERSION) && (MPI_VERSION >= 3)
@@ -99,7 +97,7 @@ string GetMPILibraryVersion()
 
 #define safes(arg) ((arg) ? ((const char*)(arg)) : "<null>")
 
-string GetOpenGLInfo()
+static string GetOpenGLInfo()
 {
   ostringstream oss;
   vtkNew<vtkRenderWindow> rwin;
@@ -111,7 +109,7 @@ string GetOpenGLInfo()
   return oss.str();
 }
 
-int TestSystemCaps(int argc, char* argv[])
+extern int TestSystemCaps(int argc, char* argv[])
 {
   (void)argc;
   (void)argv;
@@ -129,13 +127,13 @@ int TestSystemCaps(int argc, char* argv[])
        << "CPU = " << sysinfo.GetCPUDescription() << endl
        << "RAM = " << sysinfo.GetMemoryDescription() << endl
        << endl
-#if defined(TEST_MPI_CAPS)
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
        << "MPI:" << endl
        << "Version = " << GetMPIVersion() << endl
        << "Library = " << GetMPILibraryVersion() << endl
        << endl
 #endif
-#if defined(TEST_PY_CAPS)
+#if VTK_MODULE_ENABLE_VTK_Python
        << "Python:" << endl
        << "Version = " << GetPythonVersion() << endl
        << endl

@@ -26,6 +26,8 @@
 #include <QVector>
 #include <QtDebug>
 
+#include <algorithm>
+
 class pqFlatTreeViewColumn
 {
 public:
@@ -1498,10 +1500,7 @@ void pqFlatTreeView::updateData(const QModelIndex& topLeft, const QModelIndex& b
       else
       {
         int updateWidth = this->viewport()->width();
-        if (this->ContentsWidth > updateWidth)
-        {
-          updateWidth = this->ContentsWidth;
-        }
+        updateWidth = std::max(this->ContentsWidth, updateWidth);
 
         QRect area(0, startPoint, updateWidth, point - startPoint);
         area.translate(-this->horizontalOffset(), -this->verticalOffset());
@@ -1886,10 +1885,7 @@ void pqFlatTreeView::keyPressEvent(QKeyEvent* e)
         if (this->Behavior == pqFlatTreeView::SelectColumns)
         {
           column = this->Model->columnCount() - 1;
-          if (column < 0)
-          {
-            column = 0;
-          }
+          column = std::max(column, 0);
         }
 
         item = this->getLastVisibleItem();
@@ -2436,10 +2432,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
   // Draw the column selection first so it is behind the text.
   int columnWidth = 0;
   int totalHeight = this->viewport()->height();
-  if (this->ContentsHeight > totalHeight)
-  {
-    totalHeight = this->ContentsHeight;
-  }
+  totalHeight = std::max(this->ContentsHeight, totalHeight);
 
   for (i = 0; i < this->Root->Cells.size(); i++)
   {
@@ -2471,10 +2464,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
         if (item->RowSelected)
         {
           itemWidth = this->viewport()->width();
-          if (this->ContentsWidth > itemWidth)
-          {
-            itemWidth = this->ContentsWidth;
-          }
+          itemWidth = std::max(this->ContentsWidth, itemWidth);
 
           painter.fillRect(0, item->ContentsY + pqFlatTreeView::PipeLength, itemWidth, itemHeight,
             options.palette.highlight());
@@ -2503,10 +2493,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
               ox = itemWidth - item->Cells[i].Width - this->DoubleTextMargin;
             }
 
-            if (itemWidth > columnWidth)
-            {
-              itemWidth = columnWidth;
-            }
+            itemWidth = std::min(itemWidth, columnWidth);
 
             // Add a little length to the highlight rectangle to see
             // the text better.
@@ -2569,10 +2556,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
             index.parent() == item->Index.parent())
           {
             itemWidth = this->viewport()->width();
-            if (this->ContentsWidth > itemWidth)
-            {
-              itemWidth = this->ContentsWidth;
-            }
+            itemWidth = std::max(this->ContentsWidth, itemWidth);
 
             QRect rowRect(0, py, itemWidth, itemHeight);
             this->drawFocus(painter, rowRect, options, item->RowSelected);
@@ -2751,10 +2735,7 @@ void pqFlatTreeView::changeSelection(
   int cy = 0;
   int totalHeight = 0;
   int totalWidth = this->viewport()->width();
-  if (totalWidth < this->ContentsWidth)
-  {
-    totalWidth = this->ContentsWidth;
-  }
+  totalWidth = std::max(totalWidth, this->ContentsWidth);
 
   // Start with the deselected items.
   pqFlatTreeViewItem* parentItem = nullptr;
@@ -2932,10 +2913,7 @@ void pqFlatTreeView::layoutEditor()
     {
       // Add some extra space to the editor.
       editWidth += this->DoubleTextMargin;
-      if (editWidth > columnWidth)
-      {
-        editWidth = columnWidth;
-      }
+      editWidth = std::min(editWidth, columnWidth);
     }
 
     // Figure out how much space is taken up by decoration.
@@ -2964,10 +2942,7 @@ void pqFlatTreeView::layoutItems()
     // The minimum indent width should be 18 to fit the +/- icon.
     QStyleOptionViewItem options = this->getViewOptions();
     this->IndentWidth = options.decorationSize.height() + 2;
-    if (this->IndentWidth < 18)
-    {
-      this->IndentWidth = 18;
-    }
+    this->IndentWidth = std::max(this->IndentWidth, 18);
 
     // If the header is shown, adjust the starting point of the
     // item layout.
@@ -3042,10 +3017,7 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem* item, int& point, const QFon
         {
           QFontMetrics indexFont(qvariant_cast<QFont>(value));
           item->Cells[i].Width = this->getDataWidth(index, indexFont);
-          if (indexFont.height() > preferredHeight)
-          {
-            preferredHeight = indexFont.height();
-          }
+          preferredHeight = std::max(indexFont.height(), preferredHeight);
         }
         else
         {
@@ -3056,10 +3028,7 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem* item, int& point, const QFon
       // The text width, the indent, the icon width, and the padding
       // between the icon and the item all factor into the desired width.
       preferredWidth = this->getWidthSum(item, i);
-      if (preferredWidth > this->Root->Cells[i].Width)
-      {
-        this->Root->Cells[i].Width = preferredWidth;
-      }
+      this->Root->Cells[i].Width = std::max(preferredWidth, this->Root->Cells[i].Width);
     }
 
     // Save the preferred height for the item.
@@ -3141,10 +3110,7 @@ bool pqFlatTreeView::updateContentsWidth()
       {
         oldWidth = this->HeaderView->sectionSize(i);
         newWidth = this->HeaderView->sectionSizeHint(i);
-        if (newWidth < this->Root->Cells[i].Width)
-        {
-          newWidth = this->Root->Cells[i].Width;
-        }
+        newWidth = std::max(newWidth, this->Root->Cells[i].Width);
 
         if (newWidth != oldWidth)
         {

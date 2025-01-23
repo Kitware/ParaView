@@ -10,6 +10,8 @@
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 
+#include <algorithm>
+
 vtkStandardNewMacro(vtkPVMultiClientsInformation);
 
 //----------------------------------------------------------------------------
@@ -122,18 +124,9 @@ void vtkPVMultiClientsInformation::AddInformation(vtkPVInformation* info)
   serverInfo = vtkPVMultiClientsInformation::SafeDownCast(info);
   if (serverInfo)
   {
-    if (this->NumberOfClients < serverInfo->NumberOfClients)
-    {
-      this->NumberOfClients = serverInfo->NumberOfClients;
-    }
-    if (this->ClientId < serverInfo->ClientId)
-    {
-      this->ClientId = serverInfo->ClientId;
-    }
-    if (this->MasterId < serverInfo->MasterId)
-    {
-      this->MasterId = serverInfo->MasterId;
-    }
+    this->NumberOfClients = std::max(this->NumberOfClients, serverInfo->NumberOfClients);
+    this->ClientId = std::max(this->ClientId, serverInfo->ClientId);
+    this->MasterId = std::max(this->MasterId, serverInfo->MasterId);
     if (this->ClientIds == nullptr && serverInfo->ClientIds)
     {
       this->ClientIds = new int[serverInfo->NumberOfClients];

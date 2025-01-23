@@ -20,7 +20,7 @@ void SubCommunicatorDriver(MPI_Comm* handle)
   processor->Finalize();
 }
 
-int SubController(int argc, char* argv[])
+extern int SubController(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
   int myrank, numprocs;

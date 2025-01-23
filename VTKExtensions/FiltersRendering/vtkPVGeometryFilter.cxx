@@ -68,7 +68,7 @@
 #include <string>
 #include <vector>
 
-namespace details
+namespace
 {
 static constexpr const char* ORIGINAL_FACE_IDS = "RecoverWireframeOriginalFaceIds";
 static constexpr const char* TEMP_ORIGINAL_IDS = "__original_ids__";
@@ -79,7 +79,7 @@ void AddOriginalIds(vtkDataSetAttributes* attributes, vtkIdType size)
   vtkNew<vtkAffineArray<vtkIdType>> ids;
   ids->SetBackend(std::make_shared<vtkAffineImplicitBackend<vtkIdType>>(1, 0));
   ids->SetNumberOfTuples(size);
-  ids->SetName(details::TEMP_ORIGINAL_IDS);
+  ids->SetName(::TEMP_ORIGINAL_IDS);
   attributes->AddArray(ids);
 }
 
@@ -102,15 +102,15 @@ void AddTemporaryOriginalIdsArrays(vtkDataObject* object)
       auto leafDataSet = vtkDataSet::SafeDownCast(dataLeaf);
       if (leafDataSet)
       {
-        details::AddOriginalIds(leafDataSet->GetPointData(), leafDataSet->GetNumberOfPoints());
-        details::AddOriginalIds(leafDataSet->GetCellData(), leafDataSet->GetNumberOfCells());
+        ::AddOriginalIds(leafDataSet->GetPointData(), leafDataSet->GetNumberOfPoints());
+        ::AddOriginalIds(leafDataSet->GetCellData(), leafDataSet->GetNumberOfCells());
       }
     }
   }
   else if (dataSet)
   {
-    details::AddOriginalIds(dataSet->GetPointData(), dataSet->GetNumberOfPoints());
-    details::AddOriginalIds(dataSet->GetCellData(), dataSet->GetNumberOfCells());
+    ::AddOriginalIds(dataSet->GetPointData(), dataSet->GetNumberOfPoints());
+    ::AddOriginalIds(dataSet->GetCellData(), dataSet->GetNumberOfCells());
   }
 }
 
@@ -133,20 +133,22 @@ void CleanupTemporaryOriginalIds(vtkDataObject* object)
       auto leafDataSet = vtkDataSet::SafeDownCast(dataLeaf);
       if (leafDataSet)
       {
-        leafDataSet->GetPointData()->RemoveArray(details::TEMP_ORIGINAL_IDS);
-        leafDataSet->GetCellData()->RemoveArray(details::TEMP_ORIGINAL_IDS);
+        leafDataSet->GetPointData()->RemoveArray(::TEMP_ORIGINAL_IDS);
+        leafDataSet->GetCellData()->RemoveArray(::TEMP_ORIGINAL_IDS);
       }
     }
   }
   else if (dataSet)
   {
-    dataSet->GetPointData()->RemoveArray(details::TEMP_ORIGINAL_IDS);
-    dataSet->GetCellData()->RemoveArray(details::TEMP_ORIGINAL_IDS);
+    dataSet->GetPointData()->RemoveArray(::TEMP_ORIGINAL_IDS);
+    dataSet->GetCellData()->RemoveArray(::TEMP_ORIGINAL_IDS);
   }
 }
 
 };
 
+namespace
+{
 template <typename T>
 void GetValidWholeExtent(T* ds, const int wholeExt[6], int validWholeExt[6])
 {
@@ -158,6 +160,7 @@ void GetValidWholeExtent(T* ds, const int wholeExt[6], int validWholeExt[6])
   {
     ds->GetExtent(validWholeExt);
   }
+}
 }
 
 //----------------------------------------------------------------------------
@@ -238,8 +241,8 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->UseNonOverlappingAMRMetaDataForOutlines = true;
 
   this->MeshCache->SetConsumer(this);
-  this->MeshCache->AddOriginalIds(vtkDataObject::POINT, details::TEMP_ORIGINAL_IDS);
-  this->MeshCache->AddOriginalIds(vtkDataObject::CELL, details::TEMP_ORIGINAL_IDS);
+  this->MeshCache->AddOriginalIds(vtkDataObject::POINT, ::TEMP_ORIGINAL_IDS);
+  this->MeshCache->AddOriginalIds(vtkDataObject::CELL, ::TEMP_ORIGINAL_IDS);
 }
 
 //----------------------------------------------------------------------------
@@ -465,20 +468,20 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
 void vtkPVGeometryFilter::UpdateCache(vtkDataObject* output)
 {
   this->MeshCache->UpdateCache(output);
-  details::CleanupTemporaryOriginalIds(output);
+  ::CleanupTemporaryOriginalIds(output);
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVGeometryFilter::UseCacheIfPossible(vtkDataObject* input, vtkDataObject* output)
 {
-  details::AddTemporaryOriginalIdsArrays(input);
+  ::AddTemporaryOriginalIdsArrays(input);
   this->MeshCache->SetOriginalDataObject(input);
 
   vtkDataObjectMeshCache::Status status = this->MeshCache->GetStatus();
   if (status.enabled())
   {
     this->MeshCache->CopyCacheToDataObject(output);
-    details::CleanupTemporaryOriginalIds(output);
+    ::CleanupTemporaryOriginalIds(output);
     return true;
   }
 
@@ -825,7 +828,7 @@ vtkSmartPointer<vtkDataObjectTree> vtkPVGeometryFilter::GetDataObjectTreeInput(
     tempInput->ShallowCopy(converter->GetOutput());
   }
 
-  details::AddTemporaryOriginalIdsArrays(tempInput);
+  ::AddTemporaryOriginalIdsArrays(tempInput);
 
   vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::CheckAttributes");
   if (this->CheckAttributes(tempInput))
@@ -1435,7 +1438,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       // UnstructuredGridGeometryFilter, the ids will represent the faces rather
       // than the original cells, which is important.
       this->GeometryFilter->PassThroughCellIdsOn();
-      this->GeometryFilter->SetOriginalCellIdsName(details::ORIGINAL_FACE_IDS);
+      this->GeometryFilter->SetOriginalCellIdsName(::ORIGINAL_FACE_IDS);
 
       if (this->PassThroughPointIds)
       {
@@ -1477,7 +1480,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       vtkNew<vtkPolyData> nextStageInput;
       nextStageInput->ShallowCopy(output); // Yes output is correct.
       this->RecoverWireframeFilter->SetInputData(nextStageInput.Get());
-      this->RecoverWireframeFilter->SetCellIdsAttribute(details::ORIGINAL_FACE_IDS);
+      this->RecoverWireframeFilter->SetCellIdsAttribute(::ORIGINAL_FACE_IDS);
       this->RecoverWireframeFilter->Update();
       this->RecoverWireframeFilter->SetInputData(nullptr);
 
@@ -1515,7 +1518,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       }
     }
 
-    output->GetCellData()->RemoveArray(details::ORIGINAL_FACE_IDS);
+    output->GetCellData()->RemoveArray(::ORIGINAL_FACE_IDS);
     return;
   }
 
@@ -1538,7 +1541,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
       originalCellIds->SetName("vtkOriginalCellIds");
       originalCellIds->SetNumberOfComponents(1);
       vtkNew<vtkIdTypeArray> originalFaceIds;
-      originalFaceIds->SetName(details::ORIGINAL_FACE_IDS);
+      originalFaceIds->SetName(::ORIGINAL_FACE_IDS);
       originalFaceIds->SetNumberOfComponents(1);
       vtkCellData* outputCD = output->GetCellData();
       outputCD->AddArray(originalCellIds.Get());
@@ -1580,7 +1583,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
       // Get what should be the final output.
       output->ShallowCopy(this->RecoverWireframeFilter->GetOutput());
 
-      output->GetCellData()->RemoveArray(details::ORIGINAL_FACE_IDS);
+      output->GetCellData()->RemoveArray(::ORIGINAL_FACE_IDS);
     }
     return;
   }

@@ -120,7 +120,7 @@ void ClientManager::RunTests()
   server->ProcessMessage(data, len);
 }
 
-int TestSimple(int, char**)
+extern int TestSimple(int, char**)
 {
   Server server;
   ClientManager cmgr;

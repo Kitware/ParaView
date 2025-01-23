@@ -6,7 +6,7 @@
 #include <cstring>
 #include <iostream>
 
-bool CheckStringEquivalent(const std::string& tested, const std::string& reference)
+static bool CheckStringEquivalent(const std::string& tested, const std::string& reference)
 {
   if (tested != reference)
   {
@@ -16,7 +16,7 @@ bool CheckStringEquivalent(const std::string& tested, const std::string& referen
   return true;
 }
 
-int TestSMPrettyLabel(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
+extern int TestSMPrettyLabel(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   if (!CheckStringEquivalent(vtkSMObject::CreatePrettyLabel("MYSpace"), "MY Space"))
   {

@@ -25,7 +25,7 @@
     return TEST_FAILED;                                                                            \
   }
 
-int TestResampledAMRImageSource(int argc, char* argv[])
+extern int TestResampledAMRImageSource(int argc, char* argv[])
 {
   vtkNew<vtkTesting> testing;
   testing->AddArguments(argc, (const char**)(argv));

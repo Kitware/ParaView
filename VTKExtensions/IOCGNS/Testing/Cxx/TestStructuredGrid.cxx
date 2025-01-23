@@ -13,7 +13,7 @@
 #include "vtkPointData.h"
 #include "vtkStructuredGrid.h"
 
-int TestStructuredGrid(int argc, char* argv[])
+extern int TestStructuredGrid(int argc, char* argv[])
 {
   vtkNew<vtkPVTestUtilities> u;
   u->Initialize(argc, argv);

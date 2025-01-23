@@ -54,6 +54,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -1404,14 +1405,8 @@ bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(
 
     double tempRange[2];
     vtkSMPropertyHelper(rangeExtractor, "Range").Get(tempRange, 2);
-    if (tempRange[0] < range[0])
-    {
-      range[0] = tempRange[0];
-    }
-    if (tempRange[1] > range[1])
-    {
-      range[1] = tempRange[1];
-    }
+    range[0] = std::min(range[0], tempRange[0]);
+    range[1] = std::max(range[1], tempRange[1]);
   }
 
   return (range[1] >= range[0]);

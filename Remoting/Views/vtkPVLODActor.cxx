@@ -15,6 +15,7 @@
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
 
+#include <algorithm>
 #include <cmath>
 
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
@@ -268,14 +269,8 @@ double* vtkPVLODActor::GetBounds()
     {
       for (n = 0; n < 3; n++)
       {
-        if (bbox[i * 3 + n] < this->Bounds[n * 2])
-        {
-          this->Bounds[n * 2] = bbox[i * 3 + n];
-        }
-        if (bbox[i * 3 + n] > this->Bounds[n * 2 + 1])
-        {
-          this->Bounds[n * 2 + 1] = bbox[i * 3 + n];
-        }
+        this->Bounds[n * 2] = std::min(this->Bounds[n * 2], bbox[i * 3 + n]);
+        this->Bounds[n * 2 + 1] = std::max(this->Bounds[n * 2 + 1], bbox[i * 3 + n]);
       }
     }
     this->BoundsMTime.Modified();

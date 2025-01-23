@@ -17,7 +17,7 @@
 
 #include "vtksys/SystemTools.hxx"
 
-int TestPartitionedDataSet(int argc, char* argv[])
+extern int TestPartitionedDataSet(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
   vtkObject::GlobalWarningDisplayOff();

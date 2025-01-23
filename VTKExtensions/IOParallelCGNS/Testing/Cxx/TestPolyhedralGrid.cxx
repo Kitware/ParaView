@@ -14,7 +14,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtksys/SystemTools.hxx"
 
-int TestPolyhedralGrid(int argc, char* argv[])
+extern int TestPolyhedralGrid(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
   vtkNew<vtkMPIController> mpiController;

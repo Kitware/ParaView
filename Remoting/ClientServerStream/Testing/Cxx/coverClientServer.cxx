@@ -46,7 +46,7 @@ struct Help
 };
 
 // Store a bunch of values in a stream.
-void do_store(vtkClientServerStream& css)
+static void do_store(vtkClientServerStream& css)
 {
   vtkClientServerID id(123);
   css.Reserve(64);
@@ -122,7 +122,7 @@ void do_store(vtkClientServerStream& css)
 }
 
 // Check stored values in a stream.
-bool do_check(vtkClientServerStream& css)
+static bool do_check(vtkClientServerStream& css)
 {
   if (css.GetNumberOfMessages() != 1)
   {
@@ -282,7 +282,7 @@ bool do_check(vtkClientServerStream& css)
   return true;
 }
 
-bool do_test()
+static bool do_test()
 {
   // Construct a stream and store values.
   vtkClientServerStream css1;
@@ -347,7 +347,7 @@ bool do_test()
   return true;
 }
 
-int coverClientServer(int, char*[])
+extern int coverClientServer(int, char*[])
 {
   return do_test() ? 0 : 1;
 }

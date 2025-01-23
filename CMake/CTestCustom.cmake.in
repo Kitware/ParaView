@@ -48,6 +48,34 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   "note: declared here"
 )
 
+# CI-specific warning suppressions.
+#
+# Some of our CI ends up generating warnings that don't really matter. Of
+# particular interest are warnings which have different behavior in older
+# compilers than modern ones. It's not really all that important to cater to
+# old, broken warning implementations when newer compilers tell us when we
+# aren't doing things properly.
+if (NOT "$ENV{CI}" STREQUAL "")
+  # For some reason, warning flags aren't working here.
+  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora40")
+    list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
+      "Wstringop-overflow="
+      "note: destination object allocated here"
+      "note: destination object '.*' of size .*"
+      "note: destination object of size .* allocated by 'operator new'"
+
+      "Wstringop-overread"
+      "note: source object '.*' of size .*"
+      "note: at offset .* into source object '.*' of size .*"
+
+      # Seems to fire for the destructor of `std::vector`? Ignoring all
+      # instances is sad, but it's not clear what to do about it otherwise.
+      "Wfree-nonheap-object"
+      "note: returned from 'void\\* operator new\\(std::size_t\\)'"
+      )
+  endif ()
+endif ()
+
 list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION
   # Xcb error does not seem to cause errors in generated test images
   "qt.qpa.xcb: internal error"

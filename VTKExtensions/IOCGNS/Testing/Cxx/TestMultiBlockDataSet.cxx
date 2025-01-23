@@ -14,7 +14,7 @@
 #include "vtkUnstructuredGrid.h"
 
 int MultiBlockTest(vtkMultiBlockDataSet*);
-int TestMultiBlockDataSet(int argc, char* argv[])
+extern int TestMultiBlockDataSet(int argc, char* argv[])
 {
   vtkNew<vtkUnstructuredGrid> ug;
   Create(ug, 10);

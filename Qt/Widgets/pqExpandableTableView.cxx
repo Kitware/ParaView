@@ -107,13 +107,13 @@ void pqExpandableTableView::keyPressEvent(QKeyEvent* e)
       // Split the lines in the text
       QString text = mimeData->text();
       QStringList lines = text.split("\n", PV_QT_SKIP_EMPTY_PARTS);
-      for (qsizetype row = 0; row < std::min((qsizetype)lines.size(), numModelRows); ++row)
+      for (qsizetype row = 0; row < std::min<qsizetype>(lines.size(), numModelRows); ++row)
       {
         // Split within each line
         QStringList items = lines[row].split(QRegularExpression("\\s+"));
 
         // Set the data in the table
-        for (qsizetype column = 0; column < std::min((qsizetype)items.size(), numModelColumns);
+        for (qsizetype column = 0; column < std::min<qsizetype>(items.size(), numModelColumns);
              ++column)
         {
           QVariant value(items[column]);

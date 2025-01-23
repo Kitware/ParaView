@@ -40,7 +40,7 @@
 
 #include <cassert>
 
-namespace vtkSMViewProxyNS
+namespace
 {
 const char* GetRepresentationNameFromHints(const char* viewType, vtkPVXMLElement* hints, int port)
 {
@@ -84,7 +84,10 @@ const char* GetRepresentationNameFromHints(const char* viewType, vtkPVXMLElement
   }
   return nullptr;
 }
+}
 
+namespace vtkSMViewProxyNS
+{
 /**
  * Extends vtkWindowToImageFilter to call
  * `vtkSMViewProxy::RenderForImageCapture()` when the filter wants to request a
@@ -538,8 +541,8 @@ const char* vtkSMViewProxy::GetRepresentationType(vtkSMSourceProxy* producer, in
 
   // Process producer hints to see if indicates what type of representation
   // to create for this view.
-  if (const char* reprName = vtkSMViewProxyNS::GetRepresentationNameFromHints(
-        this->GetXMLName(), producer->GetHints(), outputPort))
+  if (const char* reprName =
+        ::GetRepresentationNameFromHints(this->GetXMLName(), producer->GetHints(), outputPort))
   {
     return reprName;
   }

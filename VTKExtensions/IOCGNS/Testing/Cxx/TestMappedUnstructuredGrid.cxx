@@ -15,7 +15,7 @@
 #include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
 
-int TestMappedUnstructuredGrid(int argc, char* argv[])
+extern int TestMappedUnstructuredGrid(int argc, char* argv[])
 {
   vtkUnstructuredGridBase* ug;
   vtkMappedUnstructuredGridGenerator::GenerateMappedUnstructuredGrid(&ug);

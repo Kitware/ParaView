@@ -328,29 +328,3 @@ void vtkMaterialInterfaceCommBuffer::SizeHeader(
     buffers[bufferId].SizeHeader(nBlocks);
   }
 }
-//----------------------------------------------------------------------------
-ostream& operator<<(ostream& sout, const vtkMaterialInterfaceCommBuffer& fcb)
-{
-  int hs = fcb.GetHeaderSize();
-  sout << "Header size:" << hs << endl;
-  int bs = fcb.GetBufferSize();
-  sout << "Buffer size:" << bs << endl;
-  sout << "EOD:" << fcb.GetEOD() << endl;
-  sout << "Header:{";
-  const vtkIdType* header = fcb.GetHeader();
-  for (int i = 0; i < hs; ++i)
-  {
-    sout << header[i] << ",";
-  }
-  sout << (char)0x08 << "}" << endl;
-  sout << "Buffer:{";
-  const int* buffer = reinterpret_cast<const int*>(fcb.GetBuffer());
-  bs /= sizeof(int);
-  for (int i = 0; i < bs; ++i)
-  {
-    sout << buffer[i] << ",";
-  }
-  sout << (char)0x08 << "}" << endl;
-
-  return sout;
-}

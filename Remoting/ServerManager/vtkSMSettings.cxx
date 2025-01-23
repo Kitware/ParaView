@@ -66,7 +66,7 @@ void TransformJSON(std::string& settingsJSON)
 class vtkSMSettings::vtkSMSettingsInternal
 {
 public:
-  std::vector<SettingsCollection> SettingCollections;
+  std::vector<::SettingsCollection> SettingCollections;
   bool SettingCollectionsAreSorted;
   bool IsModified;
 
@@ -79,7 +79,7 @@ public:
   {
     // Sort the settings roots by priority (highest to lowest)
     std::stable_sort(
-      this->SettingCollections.begin(), this->SettingCollections.end(), SortByPriority);
+      this->SettingCollections.begin(), this->SettingCollections.end(), ::SortByPriority);
     this->SettingCollectionsAreSorted = true;
   }
 
@@ -940,7 +940,7 @@ public:
   {
     if (this->SettingCollections.empty())
     {
-      SettingsCollection newCollection;
+      ::SettingsCollection newCollection;
       newCollection.Priority = VTK_DOUBLE_MAX;
       this->SettingCollections.push_back(newCollection);
       this->IsModified = true;
@@ -1000,7 +1000,7 @@ vtkSMSettings* vtkSMSettings::GetInstance()
 //----------------------------------------------------------------------------
 bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double priority)
 {
-  SettingsCollection collection;
+  ::SettingsCollection collection;
   collection.Priority = priority;
 
   vtkVLogF(
@@ -1015,7 +1015,7 @@ bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double 
   }
 
   // Take care of any backwards compatibility issues
-  TransformJSON(processedSettings);
+  ::TransformJSON(processedSettings);
 
   Json::CharReaderBuilder builder;
   builder["collectComments"] = true;
@@ -1443,6 +1443,8 @@ void vtkSMSettings::SetSettingDescription(const char* settingName, const char* d
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 template <class T>
 Json::Value vtkConvertXMLElementToJSON(
   vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement>>& elements)
@@ -1525,6 +1527,7 @@ Json::Value vtkConvertXMLElementToJSON<std::string>(
   }
   return value;
 }
+}
 
 //---------------------------------------------------------------------------
 Json::Value vtkSMSettings::SerializeAsJSON(
@@ -1569,7 +1572,7 @@ Json::Value vtkSMSettings::SerializeAsJSON(
         }
       }
       vtkSMVectorPropertyTemplateMacro(prop,
-                                       root[pname] = vtkConvertXMLElementToJSON<SM_TT>(
+                                       root[pname] = ::vtkConvertXMLElementToJSON<SM_TT>(
                                          vtkSMVectorProperty::SafeDownCast(prop), valueElements););
     }
   }

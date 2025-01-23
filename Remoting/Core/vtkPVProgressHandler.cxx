@@ -29,6 +29,8 @@
     return;                                                                                        \
   }
 
+namespace
+{
 inline const char* vtkGetProgressText(vtkObjectBase* o)
 {
   vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(o);
@@ -38,6 +40,7 @@ inline const char* vtkGetProgressText(vtkObjectBase* o)
   }
 
   return o->GetClassName();
+}
 }
 
 class vtkPVProgressHandler::RMICallback

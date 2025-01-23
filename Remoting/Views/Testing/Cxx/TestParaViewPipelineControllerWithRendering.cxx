@@ -76,7 +76,7 @@ vtkSMSourceProxy* CreatePipelineProxy(
 }
 }
 
-int TestParaViewPipelineControllerWithRendering(int argc, char* argv[])
+extern int TestParaViewPipelineControllerWithRendering(int argc, char* argv[])
 {
   vtkInitializationHelper::SetApplicationName("TestParaViewPipelineControllerWithRendering");
   vtkInitializationHelper::SetOrganizationName("Humanity");

@@ -9,7 +9,7 @@
 #include <vtkPartitionedDataSetCollection.h>
 #include <vtkPartitionedDataSetCollectionSource.h>
 
-int TestDataUtilities(int, char*[])
+extern int TestDataUtilities(int, char*[])
 {
   vtkNew<vtkPartitionedDataSetCollectionSource> pdcSource;
   pdcSource->SetNumberOfShapes(2);

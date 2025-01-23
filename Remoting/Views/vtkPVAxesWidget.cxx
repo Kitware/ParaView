@@ -17,6 +17,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
+#include <algorithm>
 #include <cmath>
 
 vtkStandardNewMacro(vtkPVAxesWidget);
@@ -454,19 +455,13 @@ void vtkPVAxesWidget::ResizeTopLeft()
     this->StartPosition[0] = 0;
     newPos[0] = 0;
   }
-  if (newPos[0] >= newPos[2] - 0.01)
-  {
-    newPos[0] = newPos[2] - 0.01;
-  }
+  newPos[0] = std::min(newPos[0], newPos[2] - 0.01);
   if (newPos[3] > 1)
   {
     this->StartPosition[1] = size[1];
     newPos[3] = 1;
   }
-  if (newPos[3] <= newPos[1] + 0.01)
-  {
-    newPos[3] = newPos[1] + 0.01;
-  }
+  newPos[3] = std::max(newPos[3], newPos[1] + 0.01);
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
@@ -514,19 +509,13 @@ void vtkPVAxesWidget::ResizeTopRight()
     this->StartPosition[0] = size[0];
     newPos[2] = 1;
   }
-  if (newPos[2] <= newPos[0] + 0.01)
-  {
-    newPos[2] = newPos[0] + 0.01;
-  }
+  newPos[2] = std::max(newPos[2], newPos[0] + 0.01);
   if (newPos[3] > 1)
   {
     this->StartPosition[1] = size[1];
     newPos[3] = 1;
   }
-  if (newPos[3] <= newPos[1] + 0.01)
-  {
-    newPos[3] = newPos[1] + 0.01;
-  }
+  newPos[3] = std::max(newPos[3], newPos[1] + 0.01);
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
@@ -573,19 +562,13 @@ void vtkPVAxesWidget::ResizeBottomLeft()
     this->StartPosition[0] = 0;
     newPos[0] = 0;
   }
-  if (newPos[0] >= newPos[2] - 0.01)
-  {
-    newPos[0] = newPos[2] - 0.01;
-  }
+  newPos[0] = std::min(newPos[0], newPos[2] - 0.01);
   if (newPos[1] < 0)
   {
     this->StartPosition[1] = 0;
     newPos[1] = 0;
   }
-  if (newPos[1] >= newPos[3] - 0.01)
-  {
-    newPos[1] = newPos[3] - 0.01;
-  }
+  newPos[1] = std::min(newPos[1], newPos[3] - 0.01);
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
@@ -636,19 +619,13 @@ void vtkPVAxesWidget::ResizeBottomRight()
     this->StartPosition[0] = size[0];
     newPos[2] = 1;
   }
-  if (newPos[2] <= newPos[0] + 0.01)
-  {
-    newPos[2] = newPos[0] + 0.01;
-  }
+  newPos[2] = std::max(newPos[2], newPos[0] + 0.01);
   if (newPos[1] < 0)
   {
     this->StartPosition[1] = 0;
     newPos[1] = 0;
   }
-  if (newPos[1] >= newPos[3] - 0.01)
-  {
-    newPos[1] = newPos[3] - 0.01;
-  }
+  newPos[1] = std::min(newPos[1], newPos[3] - 0.01);
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();

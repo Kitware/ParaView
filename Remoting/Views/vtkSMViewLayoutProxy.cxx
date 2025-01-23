@@ -670,10 +670,7 @@ int vtkSMViewLayoutProxy::AssignViewToAnyCell(vtkSMViewProxy* view, int location
     return cur_location;
   }
 
-  if (location_hint < 0)
-  {
-    location_hint = 0;
-  }
+  location_hint = std::max(location_hint, 0);
 
   // If location_hint refers to an empty cell, use it.
   if (this->Internals->IsCellValid(location_hint))

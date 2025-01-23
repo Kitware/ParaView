@@ -396,7 +396,7 @@ void pqTextEditTester::testReTypeText_data()
 }
 
 // --------------------------------------------------------------------------
-int pqTextEditTest(int argc, char* argv[])
+extern int pqTextEditTest(int argc, char* argv[])
 {
   QApplication app(argc, argv);
   pqTextEditTester test1;

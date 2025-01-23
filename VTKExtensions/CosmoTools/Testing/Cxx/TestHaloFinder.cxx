@@ -41,7 +41,7 @@ int runHaloFinderTest1(int argc, char* argv[])
 }
 }
 
-int TestHaloFinder(int argc, char* argv[])
+extern int TestHaloFinder(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
 

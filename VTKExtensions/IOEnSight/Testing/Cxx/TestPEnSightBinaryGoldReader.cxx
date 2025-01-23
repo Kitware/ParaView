@@ -7,7 +7,7 @@
 #include "vtkTestUtilities.h"
 #include "vtkUnstructuredGrid.h"
 
-int TestPEnSightBinaryGoldReader(int argc, char* argv[])
+extern int TestPEnSightBinaryGoldReader(int argc, char* argv[])
 {
   char* fname =
     vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/EnSight/TEST_bin.case");

@@ -22,7 +22,7 @@
 #include <QTextEdit>
 #include <QTextStream>
 
-namespace details
+namespace
 {
 //-----------------------------------------------------------------------------
 QString GetSwapDir()
@@ -82,7 +82,7 @@ bool pqPythonFileIO::PythonFile::writeToFile() const
     return false;
   }
 
-  return details::Write(this->Name, this->Location, this->Text->toPlainText());
+  return ::Write(this->Name, this->Location, this->Text->toPlainText());
 }
 
 //-----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
     return false;
   }
 
-  const QString swapFilename = details::GetSwapFilename(this->Name);
+  const QString swapFilename = ::GetSwapFilename(this->Name);
   if (QFileInfo::exists(swapFilename))
   {
     const auto userAnswer = pqCoreUtilities::promptUserGeneric(tr("Script Editor"),
@@ -106,8 +106,8 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
     {
       case QMessageBox::Yes:
       {
-        const auto contents = details::Read(swapFilename, vtkPVSession::CLIENT);
-        details::Write(this->Name, this->Location, contents);
+        const auto contents = ::Read(swapFilename, vtkPVSession::CLIENT);
+        ::Write(this->Name, this->Location, contents);
         QFile::remove(swapFilename);
         break;
       }
@@ -123,7 +123,7 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
 
   {
     pqScopedOverrideCursor scopedWaitCursor(Qt::WaitCursor);
-    str = details::Read(this->Name, this->Location);
+    str = ::Read(this->Name, this->Location);
   }
 
   pqPythonScriptEditor::bringFront();
@@ -137,10 +137,10 @@ void pqPythonFileIO::PythonFile::start()
   QObject::connect(this->Text, &QTextEdit::textChanged, [this]() {
     if (this->Text)
     {
-      const QString swapFilename = details::GetSwapFilename(this->Name);
+      const QString swapFilename = ::GetSwapFilename(this->Name);
       if (!swapFilename.isEmpty())
       {
-        details::Write(swapFilename, vtkPVSession::CLIENT, this->Text->toPlainText());
+        ::Write(swapFilename, vtkPVSession::CLIENT, this->Text->toPlainText());
       }
     }
   });
@@ -149,7 +149,7 @@ void pqPythonFileIO::PythonFile::start()
 //-----------------------------------------------------------------------------
 void pqPythonFileIO::PythonFile::removeSwap() const
 {
-  const QString swapFilename = details::GetSwapFilename(this->Name);
+  const QString swapFilename = ::GetSwapFilename(this->Name);
   if (QFile::exists(swapFilename))
   {
     QFile::remove(swapFilename);

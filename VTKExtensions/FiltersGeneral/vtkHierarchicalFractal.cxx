@@ -24,6 +24,7 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 
+#include <algorithm>
 #include <cassert>
 
 vtkStandardNewMacro(vtkHierarchicalFractal);
@@ -101,10 +102,7 @@ public:
         double* gridOrigin = grid->GetOrigin();
         for (int d = 0; d < 3; d++)
         {
-          if (gridOrigin[d] < origin[d])
-          {
-            origin[d] = gridOrigin[d];
-          }
+          origin[d] = std::min(origin[d], gridOrigin[d]);
         }
       }
       for (unsigned int j = static_cast<unsigned int>(blocksPerLevel.size()); j <= level; j++)
@@ -1304,10 +1302,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet* grid, int dim[3], in
     {
       tmp = k - dims[2] + 1 + this->GhostLevels;
     }
-    if (tmp > kLevel)
-    {
-      kLevel = tmp;
-    }
+    kLevel = std::max(kLevel, tmp);
     if (this->TwoDimensional)
     {
       kLevel = 0;
@@ -1323,10 +1318,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet* grid, int dim[3], in
       {
         tmp = this->GhostLevels - j;
       }
-      if (tmp > jLevel)
-      {
-        jLevel = tmp;
-      }
+      jLevel = std::max(jLevel, tmp);
       if (onFace[3])
       {
         tmp = j - dims[1] + 1 + this->GhostLevels - 1;
@@ -1335,10 +1327,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet* grid, int dim[3], in
       {
         tmp = j - dims[1] + 1 + this->GhostLevels;
       }
-      if (tmp > jLevel)
-      {
-        jLevel = tmp;
-      }
+      jLevel = std::max(tmp, jLevel);
       for (i = 0; i < dims[0]; ++i)
       {
         iLevel = jLevel;
@@ -1350,10 +1339,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet* grid, int dim[3], in
         {
           tmp = this->GhostLevels - i;
         }
-        if (tmp > iLevel)
-        {
-          iLevel = tmp;
-        }
+        iLevel = std::max(iLevel, tmp);
         if (onFace[1])
         {
           tmp = i - dims[0] + 1 + this->GhostLevels - 1;
@@ -1362,10 +1348,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet* grid, int dim[3], in
         {
           tmp = i - dims[0] + 1 + this->GhostLevels;
         }
-        if (tmp > iLevel)
-        {
-          iLevel = tmp;
-        }
+        iLevel = std::max(iLevel, tmp);
 
         if (iLevel <= 0)
         {

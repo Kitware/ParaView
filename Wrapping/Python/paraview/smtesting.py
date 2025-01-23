@@ -90,7 +90,7 @@ def LoadServerManagerState(filename):
     except:
         return Error("Failed to open state file %s" % filename)
 
-    regExp = re.compile("\${DataDir}")
+    regExp = re.compile(r"\${DataDir}")
     data = regExp.sub(DataDir, data)
     if not parser.Parse(data):
         return Error("Failed to parse")

@@ -5,7 +5,7 @@
 #include "vtkInitializationHelper.h"
 #include "vtkProcessModule.h"
 
-int TestSMProxy(int argc, char* argv[])
+extern int TestSMProxy(int argc, char* argv[])
 {
   vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT);
   vtkSMProxyTest test;

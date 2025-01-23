@@ -11,6 +11,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <vector>
@@ -160,10 +161,7 @@ void vtkPVSelectionSource::RemoveAllPedigreeStringIDs()
 //----------------------------------------------------------------------------
 void vtkPVSelectionSource::AddID(vtkIdType piece, vtkIdType id)
 {
-  if (piece < -1)
-  {
-    piece = -1;
-  }
+  piece = std::max<vtkIdType>(piece, -1);
   this->Mode = ID;
   this->Internal->IDs.insert(vtkInternal::PieceIdType(piece, id));
   this->Modified();
@@ -180,10 +178,7 @@ void vtkPVSelectionSource::RemoveAllIDs()
 //----------------------------------------------------------------------------
 void vtkPVSelectionSource::AddValue(vtkIdType piece, vtkIdType value)
 {
-  if (piece < -1)
-  {
-    piece = -1;
-  }
+  piece = std::max<vtkIdType>(piece, -1);
   this->Mode = VALUES;
   this->Internal->Values.insert(vtkInternal::PieceIdType(piece, value));
   this->Modified();
@@ -201,10 +196,7 @@ void vtkPVSelectionSource::RemoveAllValues()
 void vtkPVSelectionSource::AddCompositeID(
   unsigned int composite_index, vtkIdType piece, vtkIdType id)
 {
-  if (piece < -1)
-  {
-    piece = -1;
-  }
+  piece = std::max<vtkIdType>(piece, -1);
 
   this->Mode = COMPOSITEID;
   this->Internal->CompositeIDs[composite_index].insert(vtkInternal::PieceIdType(piece, id));

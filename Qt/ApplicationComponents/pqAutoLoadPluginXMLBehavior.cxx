@@ -12,6 +12,8 @@
 #include "vtkObject.h"
 #include <QDir>
 
+namespace
+{
 void getAllParaViewResourcesDirs(const QString& prefix, QSet<QString>& set)
 {
   QDir dir(prefix);
@@ -31,8 +33,9 @@ void getAllParaViewResourcesDirs(const QString& prefix, QSet<QString>& set)
   QStringList contents = dir.entryList(QDir::AllDirs);
   Q_FOREACH (QString sub_dir, contents)
   {
-    getAllParaViewResourcesDirs(prefix + "/" + sub_dir, set);
+    ::getAllParaViewResourcesDirs(prefix + "/" + sub_dir, set);
   }
+}
 }
 
 //-----------------------------------------------------------------------------

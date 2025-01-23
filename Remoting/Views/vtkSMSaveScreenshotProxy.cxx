@@ -36,6 +36,8 @@
 #include <sstream>
 #include <vtksys/SystemTools.hxx>
 
+namespace
+{
 template <typename T>
 T SymmetricReturnCode(const T& ref)
 {
@@ -63,6 +65,7 @@ bool SymmetricReturnCode(const bool& ref)
 {
   int val = ref ? 1 : 0;
   return SymmetricReturnCode<int>(val) != 0;
+}
 }
 
 //============================================================================
@@ -949,7 +952,7 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage(
   return shProxy->CaptureImage();
 }
 
-namespace detail
+namespace
 {
 std::pair<std::string, std::vector<std::string>> GetFormatOptions(vtkSMProxy* proxy)
 {
@@ -977,7 +980,7 @@ std::string vtkSMSaveScreenshotProxy::GetFileFormatFilters()
     if (auto formatProxy =
           pxm->GetPrototypeProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str()))
     {
-      const auto options = detail::GetFormatOptions(formatProxy);
+      const auto options = ::GetFormatOptions(formatProxy);
       if (options.second.empty())
       {
         continue;
@@ -1019,7 +1022,7 @@ vtkSMProxy* vtkSMSaveScreenshotProxy::GetFormatProxy(const std::string& filename
     if (auto formatProxy =
           pxm->GetPrototypeProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str()))
     {
-      const auto options = detail::GetFormatOptions(formatProxy);
+      const auto options = ::GetFormatOptions(formatProxy);
       if (!options.second.empty())
       {
         const auto& exts = options.second;

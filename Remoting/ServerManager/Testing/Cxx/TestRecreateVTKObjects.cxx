@@ -12,7 +12,7 @@
 #include "vtkSphereSource.h"
 #include "vtkWeakPointer.h"
 
-int TestRecreateVTKObjects(int argc, char* argv[])
+extern int TestRecreateVTKObjects(int argc, char* argv[])
 {
   (void)argc;
 

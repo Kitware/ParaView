@@ -16,7 +16,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
-int TestTimeWriting(int argc, char* argv[])
+extern int TestTimeWriting(int argc, char* argv[])
 {
   vtkNew<vtkUnstructuredGrid> ug;
   Create(ug.GetPointer(), 10);

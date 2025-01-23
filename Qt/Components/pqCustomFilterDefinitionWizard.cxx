@@ -30,6 +30,8 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 
+#include <algorithm>
+
 class pqCustomFilterDefinitionWizardForm : public Ui::pqCustomFilterDefinitionWizard
 {
 public:
@@ -640,10 +642,7 @@ void pqCustomFilterDefinitionWizard::removeInput()
     QString key = QString("INPUT:%1.%2").arg(item->text(0)).arg(item->text(1));
     this->Form->ToExposeNames.removeAll(key);
     delete item;
-    if (row < 0)
-    {
-      row = 0;
-    }
+    row = std::max(row, 0);
 
     item = this->Form->InputPorts->topLevelItem(row);
     if (item)
@@ -793,10 +792,7 @@ void pqCustomFilterDefinitionWizard::removeOutput()
     QString key = QString("OUTPUT:%1 (%2)").arg(source->getSMName()).arg(port->getPortNumber());
     this->Form->ToExposeNames.removeAll(key);
     delete item;
-    if (row < 0)
-    {
-      row = 0;
-    }
+    row = std::max(row, 0);
 
     item = this->Form->OutputPorts->topLevelItem(row);
     if (item)
@@ -928,10 +924,7 @@ void pqCustomFilterDefinitionWizard::removeProperty()
     QString key = QString("INPUT:%1.%2").arg(item->text(0)).arg(item->text(1));
     this->Form->ToExposeNames.removeAll(key);
     delete item;
-    if (row < 0)
-    {
-      row = 0;
-    }
+    row = std::max(row, 0);
 
     item = this->Form->PropertyList->topLevelItem(row);
     if (item)

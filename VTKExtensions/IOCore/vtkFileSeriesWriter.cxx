@@ -18,6 +18,7 @@
 
 #include "vtk_jsoncpp.h"
 
+#include <algorithm>
 #include <sstream>
 #include <string>
 
@@ -122,10 +123,7 @@ int vtkFileSeriesWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request)
     inputVector[0]->GetInformationObject(0)->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   if (inTimes && this->WriteAllTimeSteps)
   {
-    if (this->CurrentTimeIndex < this->MinTimeStep)
-    {
-      this->CurrentTimeIndex = this->MinTimeStep;
-    }
+    this->CurrentTimeIndex = std::max(this->CurrentTimeIndex, this->MinTimeStep);
     double timeReq = inTimes[this->CurrentTimeIndex];
     inputVector[0]->GetInformationObject(0)->Set(
       vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), timeReq);

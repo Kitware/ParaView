@@ -10,7 +10,7 @@
 #define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
 
 #define PARAVIEW_VERSION_CHECK(major, minor, build)                                                     \
-  (10000000000ULL * major + 100000000ULL * minor + build)
+  ((10000000000ULL * (major)) + (100000000ULL * (minor)) + (build))
 #define PARAVIEW_VERSION_NUMBER_QUICK                                                                   \
   PARAVIEW_VERSION_CHECK(PARAVIEW_VERSION_MAJOR, PARAVIEW_VERSION_MINOR, PARAVIEW_VERSION_EPOCH)
 

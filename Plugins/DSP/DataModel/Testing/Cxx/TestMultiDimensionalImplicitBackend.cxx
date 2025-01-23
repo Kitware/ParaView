@@ -32,7 +32,7 @@ DataContainerInt generateIntArrayVector(int nbOfArrays, int nbOfTuples, int nbOf
 }
 
 //-----------------------------------------------------------------------------
-int TestMultiDimensionalImplicitBackend(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
+extern int TestMultiDimensionalImplicitBackend(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   constexpr vtkIdType nbOfArrays = 3;
   constexpr vtkIdType nbOfTuples = 3;

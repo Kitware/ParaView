@@ -98,22 +98,10 @@ void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
       double position[2];
       position[0] = repr->GetPosition()[0];
       position[1] = repr->GetPosition()[1];
-      if (position[0] < 0.0)
-      {
-        position[0] = 0.0;
-      }
-      if (position[0] > 0.97)
-      {
-        position[0] = 0.97;
-      }
-      if (position[1] < 0.0)
-      {
-        position[1] = 0.0;
-      }
-      if (position[1] > 0.97)
-      {
-        position[1] = 0.97;
-      }
+      position[0] = std::max(position[0], 0.0);
+      position[0] = std::min(position[0], 0.97);
+      position[1] = std::max(position[1], 0.0);
+      position[1] = std::min(position[1], 0.97);
       repr->SetPosition(position);
     }
     // user interacted. lock the position.

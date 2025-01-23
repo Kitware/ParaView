@@ -49,6 +49,8 @@ pqChartSelectionReaction::pqChartSelectionReaction(
 }
 
 //-----------------------------------------------------------------------------
+namespace
+{
 inline void setChartParameters(pqContextView* view, int selectionType, bool update_type,
   int selectionModifier, bool update_modifier)
 {
@@ -85,6 +87,7 @@ inline void setChartParameters(pqContextView* view, int selectionType, bool upda
       chart->SetSelectionMode(selectionModifier);
     }
   }
+}
 }
 
 //-----------------------------------------------------------------------------

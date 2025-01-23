@@ -125,7 +125,7 @@ private:
 
 } // end of namespace
 
-int TabbedMultiViewWidgetFilteringApp(int argc, char* argv[])
+extern int TabbedMultiViewWidgetFilteringApp(int argc, char* argv[])
 {
   QApplication app(argc, argv);
   pqApplicationCore appCore(argc, argv);

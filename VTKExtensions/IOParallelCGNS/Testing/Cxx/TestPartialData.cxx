@@ -16,7 +16,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtksys/SystemTools.hxx"
 
-int TestPartialData(int argc, char* argv[])
+extern int TestPartialData(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
   vtkNew<vtkMPIController> mpiController;

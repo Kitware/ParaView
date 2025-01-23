@@ -2446,11 +2446,9 @@ void vtkPEnSightReader::PrepareStructuredDimensionsForDistribution(int partId, i
     int realPointEnd = pointEndIndex;
 
     cellBeginIndex -= ghostLevel;
-    if (cellBeginIndex < 0)
-      cellBeginIndex = 0;
+    cellBeginIndex = std::max(cellBeginIndex, 0);
     cellEndIndex += ghostLevel;
-    if (cellEndIndex > oldCellDimension)
-      cellEndIndex = oldCellDimension;
+    cellEndIndex = std::min(cellEndIndex, oldCellDimension);
     newCellDimension = cellEndIndex - cellBeginIndex;
 
     newPointDimension = newCellDimension + 1;

@@ -20,6 +20,8 @@ pqPluginTreeWidgetEventPlayer::pqPluginTreeWidgetEventPlayer(QObject* parentObje
 //-----------------------------------------------------------------------------
 pqPluginTreeWidgetEventPlayer::~pqPluginTreeWidgetEventPlayer() = default;
 
+namespace
+{
 //-----------------------------------------------------------------------------
 QModelIndex pqPluginTreeWidgetEventPlayerGetIndex(
   const QString& str_index, QTreeView* treeView, bool& error)
@@ -60,6 +62,7 @@ QModelIndex pqTreeViewEventPlayerGetIndexByColumnValue(
   error = true;
   qCritical() << "ERROR: Failed to find column with data '" << columnValue << "'";
   return QModelIndex();
+}
 }
 
 //-----------------------------------------------------------------------------0000000

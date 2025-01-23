@@ -95,7 +95,7 @@ private:
 vtkStandardNewMacro(vtkIteratorTestFilter);
 
 //-----------------------------------------------------------------------------
-int TestDSPIteratorIntegration(int argc, char* argv[])
+extern int TestDSPIteratorIntegration(int argc, char* argv[])
 {
   // Read temporal dataset
   char* fname =

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkMaterialInterfacePieceLoading.h"
 #include "vtkMaterialInterfaceUtilities.h"
+#include <algorithm>
 #include <vector>
 using std::cerr;
 using std::endl;
@@ -14,22 +15,6 @@ ostream& operator<<(ostream& sout, const vtkMaterialInterfacePieceLoading& fp)
 {
   sout << "(" << fp.GetId() << "," << fp.GetLoading() << ")";
 
-  return sout;
-}
-//
-ostream& operator<<(ostream& sout, vector<vector<vtkMaterialInterfacePieceLoading>>& pla)
-{
-  size_t nProcs = pla.size();
-  for (size_t procId = 0; procId < nProcs; ++procId)
-  {
-    cerr << "Fragment loading on process " << procId << ":" << endl;
-    size_t nLocalFragments = pla[procId].size();
-    for (size_t fragmentIdx = 0; fragmentIdx < nLocalFragments; ++fragmentIdx)
-    {
-      sout << pla[procId][fragmentIdx] << ", ";
-    }
-    sout << endl;
-  }
   return sout;
 }
 //
@@ -51,10 +36,7 @@ void PrintPieceLoadingHistogram(vector<vector<vtkIdType>>& pla)
       {
         minLoading = loading;
       }
-      if (maxLoading < loading)
-      {
-        maxLoading = loading;
-      }
+      maxLoading = std::max(maxLoading, loading);
     }
   }
   // generate histogram

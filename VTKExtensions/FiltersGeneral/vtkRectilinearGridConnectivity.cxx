@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUnsignedCharArray.h"
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
@@ -2386,16 +2387,14 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
           }
 
           // keep track of the smallest fragment id to use for this volume
-          if (minIndex > hashFace->FragmentId) // --- case A
-          {
-            // The first face (certainly internal, since hashFace->FragmentId
-            // > 0 holds above) of this volume is guaranteed to come here. In
-            // addition, non-first internal faces (of this volume) that are
-            // shared by new volumes also come here. In either case, minIndex
-            // is updated below to reflect the smallest fragment Id so far and
-            // will be assigned to those subsequent new faces of this volume.
-            minIndex = hashFace->FragmentId;
-          }
+          // --- case A
+          // The first face (certainly internal, since hashFace->FragmentId
+          // > 0 holds above) of this volume is guaranteed to come here. In
+          // addition, non-first internal faces (of this volume) that are
+          // shared by new volumes also come here. In either case, minIndex
+          // is updated below to reflect the smallest fragment Id so far and
+          // will be assigned to those subsequent new faces of this volume.
+          minIndex = std::min<int>(minIndex, hashFace->FragmentId);
         }
         else
         {
@@ -3079,17 +3078,15 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
             }
 
             // keep track of the smallest fragment id to use for this 'macro' volume
-            if (minIndex > hashFace->FragmentId) // --- case A
-            {
-              // The first face (certainly internal, since hashFace->FragmentId
-              // > 0 holds above) of this 'macro' volume is guaranteed to come here.
-              // In addition, non-first internal faces (of this 'macro' volume) that
-              // are shared by new 'macro' volumes also come here. In either case,
-              // minIndex is updated below to reflect the smallest fragment Id so
-              // far and will be assigned to those subsequent new faces of this
-              // 'macro' volume.
-              minIndex = hashFace->FragmentId;
-            }
+            // --- case A
+            // The first face (certainly internal, since hashFace->FragmentId
+            // > 0 holds above) of this 'macro' volume is guaranteed to come here.
+            // In addition, non-first internal faces (of this 'macro' volume) that
+            // are shared by new 'macro' volumes also come here. In either case,
+            // minIndex is updated below to reflect the smallest fragment Id so
+            // far and will be assigned to those subsequent new faces of this
+            // 'macro' volume.
+            minIndex = std::min<int>(minIndex, hashFace->FragmentId);
           }
           else
           {
@@ -3753,17 +3750,15 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
             }
 
             // keep track of the smallest fragment id to use for this 'macro' volume
-            if (minIndex > hashFace->FragmentId) // --- case A
-            {
-              // The first face (certainly internal, since hashFace->FragmentId
-              // > 0 holds above) of this 'macro' volume is guaranteed to come here.
-              // In addition, non-first internal faces (of this 'macro' volume) that
-              // are shared by new 'macro' volumes also come here. In either case,
-              // minIndex is updated below to reflect the smallest fragment Id so
-              // far and will be assigned to those subsequent new faces of this
-              // 'macro' volume.
-              minIndex = hashFace->FragmentId;
-            }
+            // --- case A
+            // The first face (certainly internal, since hashFace->FragmentId
+            // > 0 holds above) of this 'macro' volume is guaranteed to come here.
+            // In addition, non-first internal faces (of this 'macro' volume) that
+            // are shared by new 'macro' volumes also come here. In either case,
+            // minIndex is updated below to reflect the smallest fragment Id so
+            // far and will be assigned to those subsequent new faces of this
+            // 'macro' volume.
+            minIndex = std::min<int>(minIndex, hashFace->FragmentId);
           }
           else
           {

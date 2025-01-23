@@ -20,18 +20,18 @@
 
 vtkStandardNewMacro(vtkNastranBDFReader);
 
-static const std::string COMMENT_KEY = "$";
-static const std::vector<std::string> IGNORED_KEYS = { COMMENT_KEY, "BEGIN BULK", "ENDDATA",
-  "PSHELL", "MAT1" };
-
-static const std::string CTRIA3_KEY = "CTRIA3";
-static const std::string GRID_KEY = "GRID";
-static const std::string PLOAD2_KEY = "PLOAD2";
-static const std::string TIME_KEY = "TIME";
-static const std::string TITLE_KEY = "TITLE";
-
-namespace utils
+namespace
 {
+const std::string COMMENT_KEY = "$";
+const std::vector<std::string> IGNORED_KEYS = { COMMENT_KEY, "BEGIN BULK", "ENDDATA", "PSHELL",
+  "MAT1" };
+
+const std::string CTRIA3_KEY = "CTRIA3";
+const std::string GRID_KEY = "GRID";
+const std::string PLOAD2_KEY = "PLOAD2";
+const std::string TIME_KEY = "TIME";
+const std::string TITLE_KEY = "TITLE";
+
 // Returns if `line` starts with the string `keyword`
 bool StartsWith(const std::string& line, const std::string& keyword)
 {
@@ -66,12 +66,12 @@ void TrimTrailingComment(std::string& line)
 std::vector<std::string> ParseArgs(const std::string& line, const std::string& keyword)
 {
   std::vector<std::string> arguments;
-  if (keyword == TITLE_KEY)
+  if (keyword == ::TITLE_KEY)
   {
     // remove `TITLE` keyword and the `=` char
     arguments.push_back(line.substr(line.find(keyword) + keyword.size() + 1));
   }
-  else if (keyword == TIME_KEY)
+  else if (keyword == ::TIME_KEY)
   {
     arguments.push_back(line.substr(line.find(keyword) + keyword.size()));
   }
@@ -110,7 +110,7 @@ vtkIdType vtkNastranBDFReader::GetVTKPointId(const std::string& arg)
 bool vtkNastranBDFReader::AddTitle(const std::vector<std::string>& args)
 {
   vtkNew<vtkStringArray> data;
-  data->SetName(TITLE_KEY.c_str());
+  data->SetName(::TITLE_KEY.c_str());
   data->InsertNextValue(args[0]);
   this->GetOutput()->GetFieldData()->AddArray(data);
   return true;
@@ -120,7 +120,7 @@ bool vtkNastranBDFReader::AddTitle(const std::vector<std::string>& args)
 bool vtkNastranBDFReader::AddTimeInfo(const std::vector<std::string>& args)
 {
   vtkNew<vtkDoubleArray> data;
-  data->SetName(TIME_KEY.c_str());
+  data->SetName(::TIME_KEY.c_str());
   data->InsertNextValue(std::stod(args[0]));
   this->GetOutput()->GetFieldData()->AddArray(data);
   return true;
@@ -216,7 +216,7 @@ bool vtkNastranBDFReader::AddPload2Data(const std::vector<std::string>& args)
   {
     this->Pload2 = vtkSmartPointer<vtkDoubleArray>::New();
     this->Pload2->SetNumberOfTuples(this->Cells->GetNumberOfCells());
-    this->Pload2->SetName(PLOAD2_KEY.c_str());
+    this->Pload2->SetName(::PLOAD2_KEY.c_str());
   }
 
   this->Pload2->InsertValue(this->CellsIds[std::stol(args[2])], std::stod(args[1]));
@@ -245,36 +245,36 @@ int vtkNastranBDFReader::RequestData(vtkInformation*, vtkInformationVector**, vt
   while (vtksys::SystemTools::GetLineFromStream(filestream, line) && success)
   {
     // skip blank and comments
-    if (line.empty() || utils::IsIgnored(line))
+    if (line.empty() || ::IsIgnored(line))
     {
       continue;
     }
 
-    utils::TrimTrailingComment(line);
+    ::TrimTrailingComment(line);
 
     // we parse values with std::sto[ild] that may raise exception. Catch them.
     try
     {
       // parse line depending on keyword
-      if (utils::StartsWith(line, TITLE_KEY))
+      if (::StartsWith(line, ::TITLE_KEY))
       {
-        success = this->AddTitle(utils::ParseArgs(line, TITLE_KEY));
+        success = this->AddTitle(ParseArgs(line, ::TITLE_KEY));
       }
-      else if (utils::StartsWith(line, TIME_KEY))
+      else if (::StartsWith(line, ::TIME_KEY))
       {
-        success = this->AddTimeInfo(utils::ParseArgs(line, TITLE_KEY));
+        success = this->AddTimeInfo(::ParseArgs(line, TITLE_KEY));
       }
-      else if (utils::StartsWith(line, GRID_KEY))
+      else if (::StartsWith(line, ::GRID_KEY))
       {
-        success = this->AddPoint(utils::ParseArgs(line, GRID_KEY));
+        success = this->AddPoint(::ParseArgs(line, ::GRID_KEY));
       }
-      else if (utils::StartsWith(line, CTRIA3_KEY))
+      else if (::StartsWith(line, ::CTRIA3_KEY))
       {
-        success = this->AddTriangle(utils::ParseArgs(line, CTRIA3_KEY));
+        success = this->AddTriangle(::ParseArgs(line, ::CTRIA3_KEY));
       }
-      else if (utils::StartsWith(line, PLOAD2_KEY))
+      else if (::StartsWith(line, ::PLOAD2_KEY))
       {
-        success = this->AddPload2Data(utils::ParseArgs(line, PLOAD2_KEY));
+        success = this->AddPload2Data(::ParseArgs(line, ::PLOAD2_KEY));
       }
       // store unsupported keyword for summary reporting.
       else

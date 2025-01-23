@@ -30,6 +30,8 @@
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
+#include <algorithm>
+
 vtkStandardNewMacro(vtkRedistributePolyData);
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, vtkMultiProcessController);
@@ -37,12 +39,17 @@ vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, vtkMultiProcessControl
 #define VTK_REDIST_DO_TIMING 0
 #define NUM_CELL_TYPES 4
 
+#if VTK_REDIST_DO_TIMING
+namespace
+{
 typedef struct
 {
   vtkTimerLog* timer;
   float time;
 } _TimerInfo;
 _TimerInfo timerInfo8;
+}
+#endif
 
 vtkRedistributePolyData::vtkRedistributePolyData()
 {
@@ -62,10 +69,10 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
 {
 #if VTK_REDIST_DO_TIMING
   vtkTimerLog* timer8 = vtkTimerLog::New();
-  timerInfo8.timer = timer8;
+  ::timerInfo8.timer = timer8;
 
-  // timerInfo8.time = 0.;
-  timerInfo8.timer->StartTimer();
+  // ::timerInfo8.time = 0.;
+  ::timerInfo8.timer->StartTimer();
 #endif
 
   vtkPolyData* tmp = vtkPolyData::GetData(inputVector[0]);
@@ -100,13 +107,13 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
   this->Controller->Barrier();
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == 0)
   {
-    vtkDebugMacro("barrier bef sched time = " << timerInfo8.Time);
+    vtkDebugMacro("barrier bef sched time = " << ::timerInfo8.Time);
   }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 
   vtkCommSched localSched;
@@ -124,13 +131,13 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
   vtkIdType* numCells = localSched.NumberOfCells;
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.timer->StopTimer();
-  timerInfo8.time += timerInfo8.timer->GetElapsedTime();
+  ::timerInfo8.timer->StopTimer();
+  ::timerInfo8.time += ::timerInfo8.timer->GetElapsedTime();
   if (myId == 0)
   {
-    vtkDebugMacro(<< "schedule time = " << timerInfo8.time);
+    vtkDebugMacro(<< "schedule time = " << ::timerInfo8.time);
   }
-  timerInfo8.timer->StartTimer();
+  ::timerInfo8.timer->StartTimer();
 #endif
 
 // beginning of turned of bounds section (not needed)
@@ -140,13 +147,13 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
   this->Controller->Barrier();
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.timer->StopTimer();
-  timerInfo8.time += timerInfo8.timer->GetElapsedTime();
+  ::timerInfo8.timer->StopTimer();
+  ::timerInfo8.time += ::timerInfo8.timer->GetElapsedTime();
   if (myId==0)
     {
-    vtkDegugMacro(<<"barrier bef bounds time = "<<timerInfo8.time);
+    vtkDegugMacro(<<"barrier bef bounds time = "<<::timerInfo8.time);
     }
-  timerInfo8.timer->StartTimer();
+  ::timerInfo8.timer->StartTimer();
 #endif
 
 
@@ -180,13 +187,13 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
     }
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId==0)
     {
-    vtkDebugMacro(<<" bounds time = "<<timerInfo8.Time);
+    vtkDebugMacro(<<" bounds time = "<<::timerInfo8.Time);
     }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 
 #endif // end of turned of bounds section
@@ -226,20 +233,17 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
     // only copy that many or copy all of input cells if extra are
     // added
 
-    if (numCells[type] < origNumCells[type])
-    {
-      origNumCells[type] = numCells[type];
-    }
+    origNumCells[type] = std::min(origNumCells[type], numCells[type]);
   }
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == 0)
   {
-    vtkDebugMacro(<< "copy alloctime = " << timerInfo8.Time);
+    vtkDebugMacro(<< "copy alloctime = " << ::timerInfo8.Time);
   }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 
   // sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
@@ -299,14 +303,14 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
 
   // ... allocate memory before receiving data ...
 
-#if (VTK_REDIST_DO_TIMING == 1)
-  timerInfo8.timer->StopTimer();
-  timerInfo8.time += timerInfo8.timer->GetElapsedTime();
+#if VTK_REDIST_DO_TIMING
+  ::timerInfo8.timer->StopTimer();
+  ::timerInfo8.time += ::timerInfo8.timer->GetElapsedTime();
   if (myId == 0)
   {
-    vtkDebugMacro(<< "send sizes time = " << timerInfo8.time);
+    vtkDebugMacro(<< "send sizes time = " << ::timerInfo8.time);
   }
-  timerInfo8.timer->StartTimer();
+  ::timerInfo8.timer->StartTimer();
 #endif
 
   // ... find memory requirements for on processor copy ...
@@ -315,13 +319,13 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
   this->FindMemReq(origNumCells, input, numPointsOnProc, numCellPtsOnProc);
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.timer->StopTimer();
-  timerInfo8.time += timerInfo8.timer->GetElapsedTime();
+  ::timerInfo8.timer->StopTimer();
+  ::timerInfo8.time += ::timerInfo8.timer->GetElapsedTime();
   if (myId == 0)
   {
-    vtkDebugMacro(<< "mem req time = " << timerInfo8.time);
+    vtkDebugMacro(<< "mem req time = " << ::timerInfo8.time);
   }
-  timerInfo8.timer->StartTimer();
+  ::timerInfo8.timer->StartTimer();
 #endif
   vtkIdType* numPointsRec = new vtkIdType[cntRec];
   vtkIdType** cellptCntr = new vtkIdType*[cntRec];
@@ -422,13 +426,13 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
   this->CopyCells(origNumCells, input, output, keepCellList);
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == 0)
   {
-    vtkDebugMacro("copy cells time = " << timerInfo8.Time);
+    vtkDebugMacro("copy cells time = " << ::timerInfo8.Time);
   }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 
   // eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
@@ -558,11 +562,11 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
 
 // eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == 0)
   {
-    vtkDebugMacro("send/rec (at end) time = " << timerInfo8.Time);
+    vtkDebugMacro("send/rec (at end) time = " << ::timerInfo8.Time);
   }
 #endif
 
@@ -992,13 +996,13 @@ void vtkRedistributePolyData::CopyCells(
   }
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == -7)
   {
-    vtkDebugMacro("1st copy data arrays time = " << timerInfo8.Time);
+    vtkDebugMacro("1st copy data arrays time = " << ::timerInfo8.Time);
   }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 
   // ... Now copy points and point data. ...
@@ -1017,13 +1021,13 @@ void vtkRedistributePolyData::CopyCells(
   }
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == -7)
   {
-    vtDebugMacro("alloc  pts time = " << timerInfo8.Time)
+    vtDebugMacro("alloc  pts time = " << ::timerInfo8.Time)
   }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 
   // ... Allocate maximum possible number of points (use total
@@ -1119,13 +1123,13 @@ void vtkRedistributePolyData::CopyCells(
   }     // end loop over type
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == -7)
   {
-    vtkDebugMacro("copy pt ids time = " << timerInfo8.Time);
+    vtkDebugMacro("copy pt ids time = " << ::timerInfo8.Time);
   }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 
   // ... Copy cell points. ...
@@ -1148,13 +1152,13 @@ void vtkRedistributePolyData::CopyCells(
   }
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == -7)
   {
-    vtkDebugMacro("copy pts time = " << timerInfo8.Time);
+    vtkDebugMacro("copy pts time = " << ::timerInfo8.Time);
   }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 
   vtkPointData* inputPointData = input->GetPointData();
@@ -1165,13 +1169,13 @@ void vtkRedistributePolyData::CopyCells(
   delete[] fromPtIds;
 
 #if VTK_REDIST_DO_TIMING
-  timerInfo8.Timer->StopTimer();
-  timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
+  ::timerInfo8.Timer->StopTimer();
+  ::timerInfo8.Time += ::timerInfo8.Timer->GetElapsedTime();
   if (myId == -7)
   {
-    vtkDebugMacro("setting time = " << timerInfo8.Time);
+    vtkDebugMacro("setting time = " << ::timerInfo8.Time);
   }
-  timerInfo8.Timer->StartTimer();
+  ::timerInfo8.Timer->StartTimer();
 #endif
 }
 

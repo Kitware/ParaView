@@ -27,6 +27,7 @@
 // SPDX-FileCopyrightText: Copyright 2023 NVIDIA Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
+#include <algorithm>
 #include <string>
 
 #include "vtkMultiProcessController.h"
@@ -38,6 +39,8 @@
 
 static const std::string LOG_svol_rvol_prefix = "Sparse volume importer: ";
 
+namespace
+{
 //-------------------------------------------------------------------------------------------------
 inline nv::index::Sparse_volume_voxel_format match_volume_format(const std::string& fmt_string)
 {
@@ -98,6 +101,7 @@ inline mi::Size volume_format_size(const nv::index::Sparse_volume_voxel_format f
       return 0;
   }
 }
+}
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_import_bricks::vtknvindex_import_bricks(
@@ -126,8 +130,7 @@ vtknvindex_import_bricks::vtknvindex_import_bricks(
     m_nb_fragments = DEFAULT_NB_FRAGMENTS;
   }
 
-  if (m_nb_fragments > m_nb_bricks)
-    m_nb_fragments = m_nb_bricks;
+  m_nb_fragments = std::min(m_nb_fragments, m_nb_bricks);
 }
 
 namespace
@@ -287,8 +290,7 @@ void vtknvindex_import_bricks::execute_fragment(
 
   mi::Uint32 min_brick_idx = static_cast<mi::Uint32>(index * nb_bricks_per_index);
   mi::Uint32 max_brick_idx = static_cast<mi::Uint32>((index + 1) * nb_bricks_per_index);
-  if (max_brick_idx > m_nb_bricks)
-    max_brick_idx = m_nb_bricks;
+  max_brick_idx = std::min<mi::Size>(max_brick_idx, m_nb_bricks);
 
   for (mi::Uint32 brick_idx = min_brick_idx; brick_idx < max_brick_idx; brick_idx++)
   {
@@ -632,7 +634,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
 
   const mi::Uint32 svol_attrib_index_0 = 0u;
   ISparse_volume_attribute_set_descriptor::Attribute_parameters svol_attrib_param_0;
-  svol_attrib_param_0.format = match_volume_format(m_scalar_type);
+  svol_attrib_param_0.format = ::match_volume_format(m_scalar_type);
 
   if (svol_attrib_param_0.format == nv::index::SPARSE_VOLUME_VOXEL_FORMAT_COUNT)
   {
@@ -653,7 +655,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   }
 
   const nv::index::Sparse_volume_voxel_format vol_fmt = svol_attrib_param_0.format;
-  const mi::Size vol_fmt_size = volume_format_size(vol_fmt);
+  const mi::Size vol_fmt_size = ::volume_format_size(vol_fmt);
 
   // Input the required data-bricks into the subset
   Handle<const ISparse_volume_subset_data_descriptor> svol_subset_desc(

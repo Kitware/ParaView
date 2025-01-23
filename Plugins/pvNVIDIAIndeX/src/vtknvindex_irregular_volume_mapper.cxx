@@ -27,6 +27,7 @@
 // SPDX-FileCopyrightText: Copyright 2023 NVIDIA Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <iostream>
@@ -328,11 +329,8 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
         unstructured_grid->GetPoint(cell_point_ids[TET_EDGES[i][1]], p2);
         mi::Float64 size2 = vtkMath::Distance2BetweenPoints(p1, p2);
 
-        if (size2 > max_cell_edge_size2)
-          max_cell_edge_size2 = size2;
-
-        if (size2 < min_cell_edge_size2)
-          min_cell_edge_size2 = size2;
+        max_cell_edge_size2 = std::max(max_cell_edge_size2, size2);
+        min_cell_edge_size2 = std::min(min_cell_edge_size2, size2);
 
         avg_edge_size2 += size2;
       }

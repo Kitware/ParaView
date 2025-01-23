@@ -15,7 +15,7 @@
 #include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
 
-int TestPolyhedral(int argc, char* argv[])
+extern int TestPolyhedral(int argc, char* argv[])
 {
   vtkNew<vtkUnstructuredGrid> ph;
   CreatePolyhedral(ph);

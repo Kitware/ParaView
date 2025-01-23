@@ -383,9 +383,12 @@ void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array, vtkFieldData*
   {
     int arrayIdx = -1;
     fieldData->GetAbstractArray(array->GetName(), arrayIdx);
-    return this->CopyFromArray(fieldData, arrayIdx);
+    this->CopyFromArray(fieldData, arrayIdx);
   }
-  return this->CopyFromArray(array);
+  else
+  {
+    this->CopyFromArray(array);
+  }
 }
 
 //----------------------------------------------------------------------------

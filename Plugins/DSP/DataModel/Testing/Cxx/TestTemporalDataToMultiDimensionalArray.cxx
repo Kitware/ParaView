@@ -24,7 +24,7 @@ namespace
 using DataContainerDouble = typename vtkMultiDimensionalImplicitBackend<double>::DataContainerT;
 }
 
-int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
+extern int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
 {
   // Read can.ex2 using ioss reader
   char* fileNameC = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/can.ex2");

@@ -35,6 +35,7 @@
 #include VTK_CGNS(cgnslib.h)
 // clang-format on
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <sstream>
@@ -478,10 +479,7 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
     {
       vtkCell* cell = grid->GetCell(i);
       int cellDim = cell->GetCellDimension();
-      if (info.CellDim < cellDim)
-      {
-        info.CellDim = cellDim;
-      }
+      info.CellDim = std::max(info.CellDim, cellDim);
     }
   }
 
@@ -502,6 +500,8 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
 }
 
 //------------------------------------------------------------------------------
+namespace
+{
 /**
  * This function assigns the correct order of data elements for cases where
  * multiple element types are written in different sections in a CGNS zone.
@@ -528,6 +528,7 @@ void ReorderData(
   {
     temp[i] = reordered[i];
   }
+}
 }
 
 //------------------------------------------------------------------------------
@@ -827,10 +828,7 @@ int vtkCGNSWriter::vtkPrivate::DetermineCellDimension(vtkPointSet* pointSet)
       {
         vtkCell* cell = unstructuredGrid->GetCell(n);
         int curCellDim = cell->GetCellDimension();
-        if (CellDim < curCellDim)
-        {
-          CellDim = curCellDim;
-        }
+        CellDim = std::max(CellDim, curCellDim);
       }
     }
   }

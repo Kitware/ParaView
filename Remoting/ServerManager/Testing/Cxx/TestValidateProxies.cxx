@@ -21,7 +21,7 @@
 #include <string>
 #include <utility>
 
-int TestValidateProxies(int argc, char* argv[])
+extern int TestValidateProxies(int argc, char* argv[])
 {
   vtkNew<vtkDummyController> contr;
   contr->Initialize(&argc, &argv);

@@ -16,7 +16,7 @@
 #include <cassert>
 #include <sstream>
 
-const char* testdefinition =
+static const char* testdefinition =
   "<ServerManagerConfiguration>"
   "   <ProxyGroup name=\"sources\">"
   "     <SelfGeneratingSourceProxy name=\"ExampleSelfGeneratingSourceProxy\" "
@@ -24,18 +24,18 @@ const char* testdefinition =
   "   </ProxyGroup>"
   "</ServerManagerConfiguration>";
 
-const char* extension = " <Proxy> "
-                        "     <DoubleVectorProperty animateable='1'"
-                        "                           command='SetCenter'"
-                        "                           default_values='0.0 0.0 0.0'"
-                        "                           name='Center'"
-                        "                           number_of_elements='3'"
-                        "                           panel_visibility='default'>"
-                        "       <DoubleRangeDomain name='range' />"
-                        "     </DoubleVectorProperty>"
-                        " </Proxy> ";
+static const char* extension = " <Proxy> "
+                               "     <DoubleVectorProperty animateable='1'"
+                               "                           command='SetCenter'"
+                               "                           default_values='0.0 0.0 0.0'"
+                               "                           name='Center'"
+                               "                           number_of_elements='3'"
+                               "                           panel_visibility='default'>"
+                               "       <DoubleRangeDomain name='range' />"
+                               "     </DoubleVectorProperty>"
+                               " </Proxy> ";
 
-int TestSelfGeneratingSourceProxy(int argc, char* argv[])
+extern int TestSelfGeneratingSourceProxy(int argc, char* argv[])
 {
   (void)argc;
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);

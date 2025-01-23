@@ -67,6 +67,8 @@ pqAboutDialog::~pqAboutDialog()
 }
 
 //-----------------------------------------------------------------------------
+namespace
+{
 inline void addItem(QTreeWidget* tree, const QString& key, const QString& value)
 {
   QTreeWidgetItem* item = new QTreeWidgetItem(tree);
@@ -76,6 +78,7 @@ inline void addItem(QTreeWidget* tree, const QString& key, const QString& value)
 inline void addItem(QTreeWidget* tree, const QString& key, int value)
 {
   ::addItem(tree, key, QString("%1").arg(value));
+}
 }
 
 //-----------------------------------------------------------------------------

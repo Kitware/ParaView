@@ -17,7 +17,7 @@
     qWarning("case failed at line " TOSTRING(__LINE__) " :\n\t" TOSTRING(a));                      \
   }
 
-void FlatTreeViewTests(pqFlatTreeView* w)
+static void FlatTreeViewTests(pqFlatTreeView* w)
 {
   QTestApp::keyClick(w, Qt::Key_Down, Qt::NoModifier, 20);
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
@@ -75,7 +75,7 @@ void FlatTreeViewTests(pqFlatTreeView* w)
   QTestApp::mouseDClick(w->viewport(), QPoint(31, 62), Qt::LeftButton, Qt::NoModifier, 20);
 }
 
-int FlatTreeView(int argc, char* argv[])
+extern int FlatTreeView(int argc, char* argv[])
 {
   QTestApp app(argc, argv);
 

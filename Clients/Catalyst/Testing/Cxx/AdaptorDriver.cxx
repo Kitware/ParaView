@@ -7,7 +7,7 @@
 #include "vtkCPTestDriver.h"
 #include "vtkCustomUnstructuredGridBuilder.h"
 
-int AdaptorDriver(int, char*[])
+extern int AdaptorDriver(int, char*[])
 {
   // Set the type of grid we are building.
   vtkCustomUnstructuredGridBuilder* gridBuilder = vtkCustomUnstructuredGridBuilder::New();

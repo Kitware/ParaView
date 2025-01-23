@@ -5,7 +5,8 @@
 // self includes
 #include "pqColorChooserButton.h"
 
-#include "cassert"
+#include <algorithm>
+#include <cassert>
 
 // Qt includes
 #include <QColorDialog>
@@ -114,10 +115,7 @@ void pqColorChooserButton::setChosenColorRgbaF(const QVariantList& val)
 QIcon pqColorChooserButton::renderColorSwatch(const QColor& color)
 {
   int radius = qRound(this->height() * this->IconRadiusHeightRatio);
-  if (radius <= 10)
-  {
-    radius = 10;
-  }
+  radius = std::max(radius, 10);
 
   QPixmap pix(radius, radius);
   pix.fill(QColor(0, 0, 0, 0));

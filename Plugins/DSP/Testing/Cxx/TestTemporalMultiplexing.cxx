@@ -15,7 +15,7 @@
 #include "vtkDataArraySelection.h"
 
 //-----------------------------------------------------------------------------
-int TestTemporalMultiplexing(int argc, char* argv[])
+extern int TestTemporalMultiplexing(int argc, char* argv[])
 {
   // Read temporal dataset
   char* fname =

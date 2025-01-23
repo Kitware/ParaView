@@ -9,7 +9,7 @@
 #include "vtkCPUniformGridBuilder.h"
 #include "vtkObjectFactory.h"
 
-class VTK_EXPORT vtkCPImplementedTestDriver : public vtkCPTestDriver
+class vtkCPImplementedTestDriver : public vtkCPTestDriver
 {
 public:
   static vtkCPImplementedTestDriver* New();
@@ -58,7 +58,7 @@ private:
 
 vtkStandardNewMacro(vtkCPImplementedTestDriver);
 
-int SimpleDriver2(int, char*[])
+extern int SimpleDriver2(int, char*[])
 {
   vtkCPImplementedTestDriver* testDriver = vtkCPImplementedTestDriver::New();
   testDriver->SetNumberOfTimeSteps(100);

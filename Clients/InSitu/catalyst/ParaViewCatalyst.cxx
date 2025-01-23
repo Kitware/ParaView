@@ -240,6 +240,7 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
   {
     vtkLogF(
       ERROR, "invalid 'catalyst' node passed to 'catalyst_initialize'. Initialization failed.");
+    // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
     return pvcatalyst_err(invalid_node);
   }
 
@@ -347,6 +348,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
   if (!cpp_params.has_path("catalyst"))
   {
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Path 'catalyst' is not provided. Skipping.");
+    // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
     return pvcatalyst_err(invalid_node);
   }
 
@@ -354,6 +356,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
   if (!vtkCatalystBlueprint::Verify("execute", root))
   {
     vtkLogF(ERROR, "invalid 'catalyst' node passed to 'catalyst_execute'. Execution failed.");
+    // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
     return pvcatalyst_err(invalid_node);
   }
 
@@ -577,5 +580,6 @@ enum catalyst_status catalyst_results_paraview(conduit_node* params)
 
   vtkInSituInitializationHelper::GetResultsFromPipelines(params);
 
+  // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
   return is_success ? catalyst_status_ok : pvcatalyst_err(results);
 }

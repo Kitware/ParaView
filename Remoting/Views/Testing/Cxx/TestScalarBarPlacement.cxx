@@ -82,7 +82,7 @@ vtkSMSourceProxy* CreatePipelineProxy(
 }
 }
 
-int TestScalarBarPlacement(int argc, char* argv[])
+extern int TestScalarBarPlacement(int argc, char* argv[])
 {
   (void)argc;
   // setup a basic application without Qt for views/interaction

@@ -468,6 +468,8 @@ int vtkPVXMLElement::GetScalarAttribute(const char* name, vtkIdType* value)
 #endif
 
 //----------------------------------------------------------------------------
+namespace
+{
 template <class T>
 int vtkPVXMLVectorAttributeParse(const char* str, int length, T* data)
 {
@@ -488,49 +490,50 @@ int vtkPVXMLVectorAttributeParse(const char* str, int length, T* data)
   }
   return length;
 }
+}
 
 //----------------------------------------------------------------------------
 int vtkPVXMLElement::GetVectorAttribute(const char* name, int length, int* data)
 {
-  return vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
+  return ::vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVXMLElement::GetVectorAttribute(const char* name, int length, float* data)
 {
-  return vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
+  return ::vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVXMLElement::GetVectorAttribute(const char* name, int length, double* data)
 {
-  return vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
+  return ::vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
 }
 
 #if defined(VTK_USE_64BIT_IDS)
 //----------------------------------------------------------------------------
 int vtkPVXMLElement::GetVectorAttribute(const char* name, int length, vtkIdType* data)
 {
-  return vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
+  return ::vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
 }
 #endif
 
 //----------------------------------------------------------------------------
 int vtkPVXMLElement::GetCharacterDataAsVector(int length, int* data)
 {
-  return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
+  return ::vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVXMLElement::GetCharacterDataAsVector(int length, float* data)
 {
-  return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
+  return ::vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVXMLElement::GetCharacterDataAsVector(int length, double* data)
 {
-  return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
+  return ::vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
 }
 
 //----------------------------------------------------------------------------

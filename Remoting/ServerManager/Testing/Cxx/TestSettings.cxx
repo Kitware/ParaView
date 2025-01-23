@@ -17,7 +17,7 @@
 #include <cassert>
 #include <sstream>
 #include <vtk_jsoncpp.h>
-int TestSettings(int argc, char* argv[])
+extern int TestSettings(int argc, char* argv[])
 {
   (void)argc;
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);

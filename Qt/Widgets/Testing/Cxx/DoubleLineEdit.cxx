@@ -98,7 +98,7 @@ void DoubleLineEditTester::useGlobalPrecision()
   QCOMPARE(e1.simplifiedText(), simplifiedText);
 }
 
-int DoubleLineEdit(int argc, char* argv[])
+extern int DoubleLineEdit(int argc, char* argv[])
 {
   QApplication app(argc, argv);
   DoubleLineEditTester tester;

@@ -22,7 +22,7 @@ void verifyOutput(vtkInformation* info, int size, double last)
 }
 };
 
-int TestTrivialProducer(int, char*[])
+extern int TestTrivialProducer(int, char*[])
 {
   vtkNew<vtkSphereSource> sourceData;
   sourceData->Update();

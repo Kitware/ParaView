@@ -166,7 +166,7 @@ std::set<vtkSMProxy*> CreatePipeline(
 }
 }
 
-int TestProxyManagerUtilities(int, char* argv[])
+extern int TestProxyManagerUtilities(int, char* argv[])
 {
   vtkInitializationHelper::SetApplicationName("TestParaViewPipelineControllerWithRendering");
   vtkInitializationHelper::SetOrganizationName("Humanity");

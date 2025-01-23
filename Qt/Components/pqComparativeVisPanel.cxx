@@ -43,7 +43,7 @@ public:
   pqPropertyLinks Links;
 };
 
-namespace pqComparativeVisPanelNS
+namespace
 {
 enum
 {
@@ -296,9 +296,8 @@ void pqComparativeVisPanel::updateParametersList()
       vtkSMPropertyHelper(cues.GetAsProxy(cc), "AnimatedPropertyName").GetAsString();
     int pindex = vtkSMPropertyHelper(cues.GetAsProxy(cc), "AnimatedElement").GetAsInt();
 
-    QTableWidgetItem* item = pqComparativeVisPanelNS::newItem(curProxy, pname, pindex);
-    item->setData(pqComparativeVisPanelNS::CUE_PROXY,
-      QVariant::fromValue<pqSMProxy>(pqSMProxy(cues.GetAsProxy(cc))));
+    QTableWidgetItem* item = ::newItem(curProxy, pname, pindex);
+    item->setData(::CUE_PROXY, QVariant::fromValue<pqSMProxy>(pqSMProxy(cues.GetAsProxy(cc))));
     this->Internal->activeParameters->setItem(static_cast<int>(cc), 0, item);
 
     QTableWidgetItem* headerItem =
@@ -334,10 +333,9 @@ void pqComparativeVisPanel::addParameter()
 
   if (realProxy)
   {
-    BEGIN_UNDO_SET(
-      tr("Add parameter %1 : %2")
-        .arg(pqComparativeVisPanelNS::getName(realProxy))
-        .arg(pqComparativeVisPanelNS::getName(realProxy, pname.toUtf8().data(), pindex)));
+    BEGIN_UNDO_SET(tr("Add parameter %1 : %2")
+                     .arg(::getName(realProxy))
+                     .arg(::getName(realProxy, pname.toUtf8().data(), pindex)));
   }
   else
   {
@@ -345,7 +343,7 @@ void pqComparativeVisPanel::addParameter()
   }
 
   // Add new cue.
-  vtkSMProxy* cueProxy = pqComparativeVisPanelNS::newCue(realProxy, pname.toUtf8().data(), pindex);
+  vtkSMProxy* cueProxy = ::newCue(realProxy, pname.toUtf8().data(), pindex);
   vtkSMPropertyHelper(this->view()->getProxy(), "Cues").Add(cueProxy);
   cueProxy->Delete();
   this->view()->getProxy()->UpdateVTKObjects();
@@ -361,10 +359,8 @@ int pqComparativeVisPanel::findRow(
   for (int cc = 0; cc < this->Internal->activeParameters->rowCount(); cc++)
   {
     QTableWidgetItem* item = this->Internal->activeParameters->item(cc, 0);
-    if (item->data(pqComparativeVisPanelNS::PROXY).value<pqSMProxy>().GetPointer() ==
-        animatedProxy &&
-      item->data(pqComparativeVisPanelNS::PROPERTY_NAME) == animatedPName &&
-      item->data(pqComparativeVisPanelNS::PROPERTY_INDEX) == animatedIndex)
+    if (item->data(::PROXY).value<pqSMProxy>().GetPointer() == animatedProxy &&
+      item->data(::PROPERTY_NAME) == animatedPName && item->data(::PROPERTY_INDEX) == animatedIndex)
     {
       return cc;
     }
@@ -378,8 +374,7 @@ void pqComparativeVisPanel::parameterSelectionChanged()
   QTableWidgetItem* activeItem = this->Internal->activeParameters->currentItem();
   if (activeItem)
   {
-    vtkSMProxy* cue =
-      activeItem->data(pqComparativeVisPanelNS::CUE_PROXY).value<pqSMProxy>().GetPointer();
+    vtkSMProxy* cue = activeItem->data(::CUE_PROXY).value<pqSMProxy>().GetPointer();
     this->Internal->cueGroup->setTitle(activeItem->text());
     this->Internal->cueWidget->setCue(cue);
     this->Internal->multivalueHint->setVisible(this->Internal->cueWidget->acceptsMultipleValues());
@@ -416,8 +411,7 @@ void pqComparativeVisPanel::removeParameter(int index)
   BEGIN_UNDO_SET(tr("Remove Parameter"));
 
   vtkSMSessionProxyManager* pxm = this->view()->proxyManager();
-  vtkSmartPointer<vtkSMProxy> cue =
-    item->data(pqComparativeVisPanelNS::CUE_PROXY).value<pqSMProxy>().GetPointer();
+  vtkSmartPointer<vtkSMProxy> cue = item->data(::CUE_PROXY).value<pqSMProxy>().GetPointer();
   item = nullptr;
 
   vtkSMPropertyHelper(this->view()->getProxy(), "Cues").Remove(cue);

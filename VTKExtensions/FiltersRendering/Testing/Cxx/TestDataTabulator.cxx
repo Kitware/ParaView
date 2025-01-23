@@ -88,7 +88,7 @@ bool TestNonMultiblockFieldData()
 }
 }
 
-int TestDataTabulator(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
+extern int TestDataTabulator(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   return TestMultiblockFieldData() && TestNonMultiblockFieldData() ? EXIT_SUCCESS : EXIT_FAILURE;
 }

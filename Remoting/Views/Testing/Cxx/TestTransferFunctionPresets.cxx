@@ -24,7 +24,7 @@
     return EXIT_FAILURE;                                                                           \
   }
 
-int TestTransferFunctionPresets(int argc, char* argv[])
+extern int TestTransferFunctionPresets(int argc, char* argv[])
 {
   (void)argc;
 

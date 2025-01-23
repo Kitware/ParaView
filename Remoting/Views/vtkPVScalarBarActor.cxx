@@ -669,10 +669,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
     double tsize[2];
     dummyActor->GetSize(this->P->Viewport, tsize);
 
-    if (tsize[1] < targetHeight)
-    {
-      targetHeight = tsize[1];
-    }
+    targetHeight = std::min(targetHeight, tsize[1]);
   }
 
   bool precede = this->TextPosition == vtkScalarBarActor::PrecedeScalarBar;
@@ -694,10 +691,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
     vtkTextActor* textActor = this->P->TextActors[labelIdx];
 
     int labelFontSize = textActor->GetTextProperty()->GetFontSize();
-    if (labelFontSize < minimumFontSize)
-    {
-      minimumFontSize = labelFontSize;
-    }
+    minimumFontSize = std::min(minimumFontSize, labelFontSize);
   }
 
   // Now place the label actors

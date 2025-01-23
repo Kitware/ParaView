@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 
-int TestDistributedTrivialProducer(int, char*[])
+extern int TestDistributedTrivialProducer(int, char*[])
 {
   vtkNew<vtkSphereSource> sourceData;
   sourceData->Update();

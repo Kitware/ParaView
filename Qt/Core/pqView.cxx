@@ -41,10 +41,13 @@
 
 #include <cmath>
 
+namespace
+{
 template <class T>
 inline uint qHash(QPointer<T> p)
 {
   return qHash(static_cast<T*>(p));
+}
 }
 
 class pqViewInternal

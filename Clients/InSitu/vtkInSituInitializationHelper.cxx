@@ -106,6 +106,8 @@ struct PropertyCopier
   }
 };
 
+namespace
+{
 template <typename T>
 void SetPropertyValue(T* prop, vtkDataArray* array)
 {
@@ -116,6 +118,7 @@ void SetPropertyValue(T* prop, vtkDataArray* array)
   {
     copier(array);
   }
+}
 }
 
 int vtkInSituInitializationHelper::WasInitializedOnce;
@@ -696,15 +699,15 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
       {
         if (auto dp = vtkSMDoubleVectorProperty::SafeDownCast(property))
         {
-          SetPropertyValue<vtkSMDoubleVectorProperty>(dp, array);
+          ::SetPropertyValue<vtkSMDoubleVectorProperty>(dp, array);
         }
         else if (auto ip = vtkSMIntVectorProperty::SafeDownCast(property))
         {
-          SetPropertyValue<vtkSMIntVectorProperty>(ip, array);
+          ::SetPropertyValue<vtkSMIntVectorProperty>(ip, array);
         }
         else if (auto idp = vtkSMIdTypeVectorProperty::SafeDownCast(property))
         {
-          SetPropertyValue<vtkSMIdTypeVectorProperty>(idp, array);
+          ::SetPropertyValue<vtkSMIdTypeVectorProperty>(idp, array);
         }
         else
         {

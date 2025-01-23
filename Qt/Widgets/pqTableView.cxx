@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqTableView.h"
 
-#include "cassert"
+#include <algorithm>
+#include <cassert>
 
 #include <QAbstractItemModel>
 #include <QEvent>
@@ -135,10 +136,7 @@ QSize pqTableView::sizeHint() const
   }
   rows += qMax(0, this->Padding);
 
-  if (rows > this->MaximumRowCountBeforeScrolling)
-  {
-    rows = this->MaximumRowCountBeforeScrolling;
-  }
+  rows = std::min(rows, this->MaximumRowCountBeforeScrolling);
 
   // rows can't be negative.
   assert(rows >= 0);

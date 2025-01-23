@@ -16,7 +16,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-int TestPartitionedDataSetCollection2(int argc, char* argv[])
+extern int TestPartitionedDataSetCollection2(int argc, char* argv[])
 {
   // read can.ex2 using ioss reader
   char* fileNameC = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/can.ex2");

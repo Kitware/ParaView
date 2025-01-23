@@ -10,6 +10,8 @@
 #include "vtkSMVectorProperty.h"
 #include "vtkSmartPointer.h"
 
+#include <algorithm>
+
 vtkStandardNewMacro(vtkPVKeyFrameAnimationCueForProxies);
 vtkCxxSetObjectMacro(vtkPVKeyFrameAnimationCueForProxies, AnimatedProxy, vtkSMProxy);
 //----------------------------------------------------------------------------
@@ -94,10 +96,7 @@ void vtkPVKeyFrameAnimationCueForProxies::SetAnimationValue(int index, double va
     vtkSMPropertyHelper(property).Set(index, value);
   }
 
-  if (this->ValueIndexMax < index)
-  {
-    this->ValueIndexMax = index;
-  }
+  this->ValueIndexMax = std::max(this->ValueIndexMax, index);
 }
 
 //----------------------------------------------------------------------------
