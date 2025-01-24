@@ -236,6 +236,12 @@ private:
    */
   void create3DWidgets();
 
+  /**
+   * Return true if the current values should be saved as default.
+   * This is based on the corresponding settings and on proxy group.
+   */
+  bool shouldPreservePropertyValues() const;
+
   Q_DISABLE_COPY(pqProxyWidget);
 
   QSet<QString> DefaultVisibilityLabels;

@@ -44,6 +44,7 @@
 #include "vtkStringList.h"
 #include "vtkWeakPointer.h"
 
+#include <QCoreApplication>
 #include <QHideEvent>
 #include <QLabel>
 #include <QMenu>
@@ -51,11 +52,11 @@
 #include <QShowEvent>
 #include <QVBoxLayout>
 
-#include <QCoreApplication>
 #include <cassert>
 #include <cmath>
 #include <list>
 #include <map>
+#include <set>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -966,8 +967,7 @@ void pqProxyWidget::applyInternal() const
     item->apply();
   }
 
-  bool preserveProperties = vtkPVGeneralSettings::GetInstance()->GetPreservePropertyValues();
-  if (preserveProperties)
+  if (this->shouldPreservePropertyValues())
   {
     this->saveAsDefaults();
   }
@@ -1621,12 +1621,22 @@ void pqProxyWidget::onChangeFinished()
     {
       SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxy());
       pqSender->apply();
-      bool preserveProperties = vtkPVGeneralSettings::GetInstance()->GetPreservePropertyValues();
-      if (preserveProperties)
+
+      if (this->shouldPreservePropertyValues())
       {
         this->saveAsDefaults();
       }
     }
   }
   Q_EMIT this->changeFinished();
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidget::shouldPreservePropertyValues() const
+{
+  vtkSMProxy* proxy = this->proxy();
+  std::set<std::string> possibleGroups = { "filters", "sources", "extractors" };
+  bool preserveProperties = vtkPVGeneralSettings::GetInstance()->GetPreservePropertyValues();
+
+  return preserveProperties && (possibleGroups.count(proxy->GetXMLGroup()) == 1);
 }

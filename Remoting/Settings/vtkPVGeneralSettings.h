@@ -84,7 +84,10 @@ public:
 
   ///@{
   /**
-   * Save current properties as default on apply.
+   * Preserve applied properties values for next use.
+   * This is intended to be used for pipeline sources,
+   * and acts as "save current values as default" on each Apply.
+   * Default is false.
    */
   vtkGetMacro(PreservePropertyValues, bool);
   vtkSetMacro(PreservePropertyValues, bool);
