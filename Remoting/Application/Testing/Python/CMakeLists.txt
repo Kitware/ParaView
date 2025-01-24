@@ -315,6 +315,14 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
            -m paraview.tests.proxy_deprecation
     TEST_NAME "proxy_deprecation")
 
+  paraview_add_test(
+          PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview.tests"
+          ARGS   "$<TARGET_FILE:ParaView::pvpython>"
+          --dr
+          --
+          -m paraview.tests.fetch_composite
+          TEST_NAME "fetch_composite")
+
 endif()
 
 #----------------------------------------------------------------------

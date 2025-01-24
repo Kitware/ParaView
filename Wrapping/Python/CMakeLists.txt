@@ -83,6 +83,7 @@ set(python_files
   paraview/spatiotemporalparallelism.py
   paraview/tests/basic_rendering.py
   paraview/tests/__init__.py
+  paraview/tests/fetch_composite.py
   paraview/tests/internals.py
   paraview/tests/__main__.py
   paraview/tests/proxy_deprecation.py
