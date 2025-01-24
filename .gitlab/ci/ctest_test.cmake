@@ -115,10 +115,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22743
     "^pv.SimpleSSHServerTermExec$"
-
-    # Temporary exclusion pending a fix in order to bump VTK
-    # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11615#note_1613223
-    "^ParaViewExample-Catalyst2/CxxPolyhedra$"
     )
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
