@@ -103,7 +103,7 @@ void vtkPVMultiServerDataSource::FetchData(vtkDataObject* dataObjectToFill)
     // Handle custom ones
     if (this->Internal->OutputPortInformation->IsCompositeDataSet())
     {
-      postGatherHelperName = "vtkMultiBlockDataGroupFilter";
+      postGatherHelperName = "vtkGroupDataSetsFilter";
     }
     else if (datasetType == VTK_POLY_DATA)
     {

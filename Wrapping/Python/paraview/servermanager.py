@@ -2780,7 +2780,7 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
         dinfo = input.GetDataInformation(idx)
         if dinfo.IsCompositeDataSet():
             paraview.print_debug_info("use composite data append")
-            reducer.PostGatherHelperName = "vtkMultiBlockDataGroupFilter"
+            reducer.PostGatherHelperName = "vtkGroupDataSetsFilter"
 
         elif dinfo.GetDataClassName() == "vtkPolyData":
             paraview.print_debug_info("use append poly data filter")
