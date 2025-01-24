@@ -953,10 +953,9 @@ void pqFlatTreeView::finishEditing()
   if (this->Internal->Index.isValid() && this->Internal->Editor)
   {
     // Get the new value from the editor.
-    QVariant value;
     QModelIndex index = this->Internal->Index;
+    QVariant value = this->Model->data(index, Qt::DisplayRole);
     const QItemEditorFactory* factory = QItemEditorFactory::defaultFactory();
-    // FIXME: `value` is not initialized, so what `typeId` differences are expected here?
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QMetaType::Type typeId = static_cast<QMetaType::Type>(value.type());
 #else
