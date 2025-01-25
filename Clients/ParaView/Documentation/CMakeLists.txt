@@ -59,7 +59,7 @@ target_link_libraries(vtkParaViewDocumentation
 set_property(GLOBAL PROPERTY paraview_qch_build_file "${paraview_qch}")
 set_property(GLOBAL PROPERTY paraview_qch_install_file "${CMAKE_INSTALL_DOCDIR}/paraview.qch")
 
-install(                                               
+install(
   FILES       "${paraview_qch}"
   DESTINATION "${CMAKE_INSTALL_DOCDIR}"
   COMPONENT   doc)
