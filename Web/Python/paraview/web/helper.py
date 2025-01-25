@@ -493,10 +493,10 @@ def listFiles(pathToList):
 
     .. code-block:: json
 
-         {
-            children: [
-                { name: 'fileName.vtk', path: '/full_path/to_file/fileName.vtk' },
-                { name: 'directoryName', path: '/full_path/to_file/directoryName', children: [] }
+        {
+            "children": [
+                { "name": "fileName.vtk", "path": "/full_path/to_file/fileName.vtk" },
+                { "name": "directoryName", "path": "/full_path/to_file/directoryName", "children": [] }
             ]
         }
 

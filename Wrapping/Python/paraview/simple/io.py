@@ -43,17 +43,17 @@ def LoadState(
 
         [
             {
-                # either 'name' or 'id' are required. if both are provided, 'id'
-                # is checked first.
+                // either 'name' or 'id' are required. if both are provided, 'id'
+                // is checked first.
                 "name" : "[reader name shown in pipeline browser]",
                 "id"   : "[reader id used in the pvsm state file]",
 
-                # all modified filename-like properties on this reader
-                "FileName" : ...
-                ....
-            },
+                // all modified filename-like properties on this reader
+                "FileName" : "..."
+                // ...
+            }
 
-            ...
+            // ...
         ]
 
     Calling this function with other positional or keyword arguments
