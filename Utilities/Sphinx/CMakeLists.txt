@@ -11,6 +11,12 @@ if (NOT sphinx_found)
   return ()
 endif ()
 
+# Copy files referenced from docstrings.
+configure_file(
+  "${ParaView_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/PythonAlgorithmExamples.py"
+  "${CMAKE_CURRENT_BINARY_DIR}/PythonAlgorithmExamples.py"
+  @ONLY)
+
 set(sphinx_config_files
   config/_themes/sphinx_rtd_theme/static/css/badge_only.css
   config/_themes/sphinx_rtd_theme/static/css/fonts/Roboto-Slab-Bold.woff

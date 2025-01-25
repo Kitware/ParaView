@@ -283,7 +283,7 @@ Examples
 **PythonAlgorithmExamples.py** provides a working example that demonstrates how
 several of the decorators described here may be used.
 
-.. literalinclude:: ../../../../Examples/Plugins/PythonAlgorithm/PythonAlgorithmExamples.py
+.. literalinclude:: ../PythonAlgorithmExamples.py
    :caption:
 
 """
