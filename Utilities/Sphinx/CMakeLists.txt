@@ -6,7 +6,7 @@ endif()
 include(ParaViewFindPythonModules)
 find_python_module("sphinx" sphinx_found)
 if (NOT sphinx_found)
-  message(STATUS
+  message(WARNING
     "Please install Sphinx to generate documentation for Python modules.")
   return ()
 endif ()
