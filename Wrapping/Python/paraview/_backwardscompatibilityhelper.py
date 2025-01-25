@@ -19,12 +19,14 @@ Each compatibility code is called depending on the current version
 and on the compatibility version asked by the script.
 Compatibility version should be specified before importing `simple` module.
 For instance:
-```
-import paraview
-paraview.compatibility.major=5
-paraview.compatibility.minor=11
-from paraview.simple import *
-```
+
+.. code:: python
+
+    import paraview
+    paraview.compatibility.major=5
+    paraview.compatibility.minor=11
+    from paraview.simple import *
+
 Will create fallback proxies and properties for deprecation done since 5.11
 and will fail for object deprecated before 5.11.
 """

@@ -15,23 +15,25 @@ more user friendly API.
 
 A simple example::
 
-  from paraview.servermanager import *
+.. code:: python
 
-  # Creates a new built-in session and makes it the active session.
-  Connect()
+    from paraview.servermanager import *
 
-  # Creates a new render view on the active session.
-  renModule = CreateRenderView()
+    # Creates a new built-in session and makes it the active session.
+    Connect()
 
-  # Create a new sphere proxy on the active session and register it
-  # in the sources group.
-  sphere = sources.SphereSource(registrationGroup="sources", ThetaResolution=16, PhiResolution=32)
+    # Creates a new render view on the active session.
+    renModule = CreateRenderView()
 
-  # Create a representation for the sphere proxy and adds it to the render
-  # module.
-  display = CreateRepresentation(sphere, renModule)
+    # Create a new sphere proxy on the active session and register it
+    # in the sources group.
+    sphere = sources.SphereSource(registrationGroup="sources", ThetaResolution=16, PhiResolution=32)
 
-  renModule.StillRender()
+    # Create a representation for the sphere proxy and adds it to the render
+    # module.
+    display = CreateRepresentation(sphere, renModule)
+
+    renModule.StillRender()
 
 """
 from __future__ import print_function

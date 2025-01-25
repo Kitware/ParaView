@@ -5,19 +5,23 @@ r"""
 The paraview package provides modules used to script ParaView. Generally, users
 should import the modules of interest directly e.g.::
 
-  from paraview.simple import *
+.. code:: python
+
+    from paraview.simple import *
 
 However, one may want to import paraview package before importing any of the
 ParaView modules to force backwards compatibility to an older version::
 
-  # To run scripts written for ParaView 4.0 in newer versions, you can use the
-  # following.
-  import paraview
-  paraview.compatibility.major = 4
-  paraview.compatibility.minor = 0
+.. code:: python
 
-  # Now, import the modules of interest.
-  from paraview.simple import *
+    # To run scripts written for ParaView 4.0 in newer versions, you can use the
+    # following.
+    import paraview
+    paraview.compatibility.major = 4
+    paraview.compatibility.minor = 0
+
+    # Now, import the modules of interest.
+    from paraview.simple import *
 """
 from __future__ import absolute_import
 

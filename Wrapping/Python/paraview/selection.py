@@ -6,28 +6,30 @@ a convenience layer to provide functionality provided by the underlying C++ clas
 
 A simple example::
 
-  from paraview.selection import *
+.. code:: python
 
-  # Create a new sphere proxy on the active connection and register it
-  # in the sources group.
-  sphere = Sphere(ThetaResolution=16, PhiResolution=32)
+    from paraview.selection import *
 
-  # Show the sphere
-  Show(sphere)
+    # Create a new sphere proxy on the active connection and register it
+    # in the sources group.
+    sphere = Sphere(ThetaResolution=16, PhiResolution=32)
 
-  # Select cells falling inside a rectangle defined by two points on a diagonal,
-  # (300, 400) and (600, 800).
-  SelectSurfaceCells(Rectangle=[300, 400, 600, 800])
+    # Show the sphere
+    Show(sphere)
 
-  # Add cells on processor 0 with ids 1 and 2 to the current selection.
-  SelectIDs(IDs=[0, 1, 0, 2], FieldType='CELL', Source=sphere, Modifier='ADD')
+    # Select cells falling inside a rectangle defined by two points on a diagonal,
+    # (300, 400) and (600, 800).
+    SelectSurfaceCells(Rectangle=[300, 400, 600, 800])
 
-  # Remove cells on processor 0 with ids 4 and 5 from the current selection.
-  SelectIDS(IDs=[0, 4, 0, 5], FieldType='CELL', Source=sphere, Modifier='SUBTRACT')
+    # Add cells on processor 0 with ids 1 and 2 to the current selection.
+    SelectIDs(IDs=[0, 1, 0, 2], FieldType='CELL', Source=sphere, Modifier='ADD')
 
-  # Extract the currently extracted cells
-  es = ExtractSelection()
-  Show(es)
+    # Remove cells on processor 0 with ids 4 and 5 from the current selection.
+    SelectIDS(IDs=[0, 4, 0, 5], FieldType='CELL', Source=sphere, Modifier='SUBTRACT')
+
+    # Extract the currently extracted cells
+    es = ExtractSelection()
+    Show(es)
 
 """
 
