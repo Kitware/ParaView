@@ -292,6 +292,9 @@
           fi
         - sccache --start-server
         - sccache --show-stats
+        - python3 -m venv venv
+        - . venv/bin/activate
+        - pip install -r .gitlab/ci/requirements-docs.txt
         - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
         - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
         - sccache --show-stats
