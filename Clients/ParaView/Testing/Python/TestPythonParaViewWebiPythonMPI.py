@@ -50,7 +50,7 @@ def start_thread():
     sphere.Update()
     pv_ipython.IPythonProtocol.RegisterDataSet('iPython-demo', sphere.GetOutput())
 
-    # Start root+satelites
+    # Start root+satellites
     thread = threading.Thread(target=start)
     print ("Starting thread")
     thread.start()

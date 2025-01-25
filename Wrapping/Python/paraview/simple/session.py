@@ -666,6 +666,6 @@ def ResetFirstRender():
 # Initialize module
 # -----------------------------------------------------------------------------
 
-if not paraview.options.satelite:
+if not paraview.options.satellite:
     active_session_observer = _active_session_observer()
     active_objects = _active_objects()

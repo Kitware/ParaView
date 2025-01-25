@@ -3649,7 +3649,7 @@ if not vtkProcessModule.GetProcessModule():
     # from master
     pm = vtkProcessModule.GetProcessModule()
     if not pm.GetSymmetricMPIMode() and pm.GetPartitionId() > 0:
-        paraview.options.satelite = True
+        paraview.options.satellite = True
         sid = vtkSMSession.ConnectToSelf()
         pm.GetGlobalController().ProcessRMIs()
         pm.UnRegisterSession(sid)

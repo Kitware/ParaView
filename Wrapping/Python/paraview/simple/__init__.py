@@ -468,7 +468,7 @@ def _extend_simple(*namespaces):
 # Start the session and initialize the ServerManager
 # ==============================================================================
 
-if not paraview.options.satelite:
+if not paraview.options.satellite:
     if not servermanager.ActiveConnection:
         Connect()
     else:
