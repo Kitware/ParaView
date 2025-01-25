@@ -75,12 +75,18 @@ def write_file(name, text, opts):
     if opts.dryrun:
         print('Would create file %s.' % fname)
         return
+    new_content = text.encode('UTF-8')
     if not opts.force and path.isfile(fname):
-        print('File %s already exists, skipping.' % fname)
+        with open(fname, 'rb') as fin:
+            contents = fin.read()
+        if contents == new_content:
+            print('File %s already exists with same contents, skipping.' % fname)
+            return
+        print('Updating file %s.' % fname)
     else:
         print('Creating file %s.' % fname)
-        with open(fname, 'wb') as f:
-            f.write(text.encode('UTF-8'))
+    with open(fname, 'wb') as f:
+        f.write(new_content)
 
 def format_heading(level, text):
     """Create a heading of <level> [1, 2 or 3 supported]."""
