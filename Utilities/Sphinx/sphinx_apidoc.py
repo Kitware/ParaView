@@ -35,7 +35,7 @@ def is_exclude_module(module):
     excludeList = ['paraview/vtk/vtk','paraview/vtk/tk','paraview/vtk/gtk','paraview/vtk/test',
             'paraview/vtk/qt', 'paraview/vtk/wx', 'paraview/vtk/util',
             'paraview/_arg', 'paraview/compile_all', 'paraview/vtkConstants',
-            'paraview/tpl']
+            'paraview/tpl', 'paraview/pv-vtk-all']
     m = str(module)
     for exclude in excludeList:
         if m.__contains__(exclude):
