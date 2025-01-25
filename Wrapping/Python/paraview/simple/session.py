@@ -301,6 +301,7 @@ def _add_functions(g):
                 f.__doc__ = "{} is a deprecated proxy. It will be automatically replaced by {}".format(
                     oldProxyLabel, newProxyLabel
                 )
+                f.__qualname__ = oldProxyLabel
                 f.__name__ = oldProxyLabel
                 g[oldProxyLabel] = f
                 added_entries.add(oldProxyLabel)
@@ -312,6 +313,7 @@ def _add_functions(g):
             if key not in g and _func_name_valid(key):
                 # print "add %s function" % key
                 f = _create_func(key, m, skipRegistration)
+                f.__qualname__ = key
                 f.__name__ = key
                 f.__doc__ = _create_doc(m.getDocumentation(key), f.__doc__)
                 g[key] = f
