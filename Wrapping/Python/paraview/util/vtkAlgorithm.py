@@ -94,8 +94,7 @@ All available decorators exhibit the following characteristics:
     @smdomain.intrange(min=0, max=10)
     @smhint.xml("<SomeHint/>")
     def SetRadius(self, radius):
-        ...
-
+        pass
 
    Note, since domains can't have nested hints, the hint specified after the
    `smdomain.intrange` invocation is intended for the `smproperty` and not the
