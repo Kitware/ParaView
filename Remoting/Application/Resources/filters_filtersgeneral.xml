@@ -1467,7 +1467,7 @@
     <Documentation short_help="Union or intersection of inputs timesteps, without duplicate">
         Merge all inputs timestep list. Remove duplicate using a Tolerance,
         either absolute or relative. The resulting timesteps list can be an union or an
-    intersection of the inputs ones.</Documentation>
+        intersection of the inputs ones.</Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
