@@ -81,10 +81,7 @@ def write_file(name, text, opts):
     else:
         print('Creating file %s.' % fname)
         with open(fname, 'wb') as f:
-            if sys.version_info >= (3,):
-                f.write(text.encode('UTF-8'))
-            else:
-                f.write(text)
+            f.write(text.encode('UTF-8'))
 
 def format_heading(level, text):
     """Create a heading of <level> [1, 2 or 3 supported]."""
