@@ -117,24 +117,7 @@ def extract_paraview_flags(components, cmake='cmake',
     cmake_format['components'] = ' '.join(components)
     cmake_format['vtk_components'] = ' '.join(vtk_components)
 
-    def tempdir():
-        if sys.version_info.major == 3:
-            return tempfile.TemporaryDirectory()
-        else:
-            class DummyTemporaryDirectory:
-                def __init__(self):
-                    self._dir = tempfile.mkdtemp()
-
-                def __enter__(self):
-                    return self._dir
-
-                def __exit__(self, *args):
-                    import shutil
-                    shutil.rmtree(self._dir)
-
-            return DummyTemporaryDirectory()
-
-    with tempdir() as workdir:
+    with tempfile.TemporaryDirectory() as workdir:
         srcdir = os.path.join(workdir, 'src')
         builddir = os.path.join(workdir, 'build')
 
@@ -158,14 +141,8 @@ def extract_paraview_flags(components, cmake='cmake',
         if paraview_dir is not None:
             paraview_dir = os.path.abspath(paraview_dir)
             configure_cmd.append('-DParaView_DIR:PATH=' + paraview_dir)
-        if sys.version_info.major == 3:
-            stdout = subprocess.DEVNULL
-        else:
-            stdout = open('/dev/null', 'w')
         subprocess.check_call(configure_cmd, cwd=builddir,
-                              stdout=stdout)
-        if sys.version_info.major == 2:
-            stdout.close()
+                              stdout=subprocess.DEVNULL)
 
         # Run the build tool.
         build_cmd = [
@@ -217,9 +194,6 @@ def extract_paraview_flags(components, cmake='cmake',
 
 
 if __name__ == '__main__':
-    if sys.version_info.major == 2:
-        sys.stderr.write('Warning: paraview-config supports Python2, but it is recommended to use Python3\n')
-
     bindir = '@CMAKE_INSTALL_BINDIR@'
     prefix = os.path.abspath(__file__)
     for _ in os.path.split(bindir):
