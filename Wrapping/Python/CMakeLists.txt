@@ -8,7 +8,6 @@ set(python_files
   paraview/apps/__main__.py
   paraview/apps/_internals.py
   paraview/apps/glance.py
-  paraview/apps/trame.py
   paraview/benchmark/__init__.py
   paraview/benchmark/basic.py
   paraview/benchmark/logbase.py
@@ -96,6 +95,11 @@ set(python_files
   paraview/variant.py
   paraview/vtkConstants.py
   paraview/vtk.py)
+
+if (TARGET ParaView::PVWebPython)
+  list(APPEND python_files
+    paraview/apps/trame.py)
+endif ()
 
 # build the "__all__ = [...]" list for paraview/incubator/__init__.py
 set(_paraview_incubator)
