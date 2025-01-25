@@ -236,6 +236,8 @@ def create_package_file(root, master_package, subroot, py_files, opts, subs):
         text += format_heading(2, 'Subpackages')
         text += '.. toctree::\n\n'
         for sub in subs:
+            if is_exclude_module(path.join(master_package, subroot, sub)):
+                continue
             text += '    %s.%s\n' % (makename(master_package, subroot), sub)
         text += '\n'
 
