@@ -132,12 +132,9 @@ if (PARAVIEW_USE_MPI)
   set(nompi_flags "--no-mpi")
 endif ()
 
-# This depends on the python modules being placed at the appropriate locations.
-# Since all python files are copies to lib/site-packages at configure time and
-# since this CMakeLists.txt file is added at the end of the top-level
-# CMakeLists.txt file, that indeed is true.
 add_custom_target(ParaViewPythonDoc
   DEPENDS paraview_copy_sphinx_config
+          paraview_all_python_modules
   COMMAND "$<TARGET_FILE:pvpython>"
           ${nompi_flags}
           "${CMAKE_CURRENT_SOURCE_DIR}/sphinx_apidoc.py"
