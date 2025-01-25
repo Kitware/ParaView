@@ -1026,11 +1026,6 @@ class Property(object):
         return ((self is None and other is None) or
                 (self is not None and other is not None and self.__repr__() == other.__repr__()))
 
-    if sys.version_info < (3,):
-        def __ne__(self, other):
-            "Returns true if the properties or properties values are not the same."
-            return not self.__eq__(other)
-
     def __repr__(self):
         """Returns a string representation containing property name
         and value"""
@@ -2770,10 +2765,7 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
     """
 
     import sys
-    if sys.version_info < (3,):
-        integer_types = (int, long,)
-    else:
-        integer_types = (int,)
+    integer_types = (int,)
 
     reducer = filters.ReductionFilter(Input=OutputPort(input, idx))
 
