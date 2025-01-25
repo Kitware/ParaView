@@ -2,10 +2,12 @@
 # the background.
 try: paraview.simple
 except: from paraview.simple import *
-paraview.simple._DisableFirstRenderCameraReset()
 
-spcth_0 = GetActiveSource()
-ExtractSurface2 = ExtractSurface()
-DataRepresentation5 = Show()
-DataRepresentation5.Representation = 'Wireframe'
-DataRepresentation5.BackfaceRepresentation = 'Cull Frontface'
+if __name__ == "__main__":
+    paraview.simple._DisableFirstRenderCameraReset()
+
+    spcth_0 = GetActiveSource()
+    ExtractSurface2 = ExtractSurface()
+    DataRepresentation5 = Show()
+    DataRepresentation5.Representation = 'Wireframe'
+    DataRepresentation5.BackfaceRepresentation = 'Cull Frontface'
