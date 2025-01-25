@@ -36,6 +36,8 @@ ${BUILD}/lib/site-packages to make it work.)
 When using a Mac to use the build tree in IDLE, start by loading the
 servermanager module:
 
+.. code-block:: pycon
+
     >>> from paraview.simple import *
 
 Importing the paraview module directly is deprecated, although still
@@ -86,9 +88,13 @@ http://paraview.org/OnlineHelpCurrent/)
 
 Start by creating a Cone object:
 
+.. code-block:: pycon
+
     >>> cone = Cone()
 
 You can get some documentation about the cone object using help().
+
+.. code-block:: pycon
 
     >>> help(cone)
 
@@ -139,19 +145,27 @@ Help on Cone in module paraview.servermanager object:
 
 This gives you a full list of properties. Check what the resolution property is set to:
 
+.. code-block:: pycon
+
     >>> cone.Resolution
     6
 
 You can increase the resolution as shown below:
 
+.. code-block:: pycon
+
     >>> cone.Resolution = 32
 
 Alternatively, we could have specified a value for resolution when creating the object:
+
+.. code-block:: pycon
 
     >>> cone = Cone(Resolution=32)
 
 You can assign values to any number of properties during construction using
 keyword arguments: You can also change the center.
+
+.. code-block:: pycon
 
     >>> cone.Center
     [0.0, 0.0, 0.0]
@@ -159,11 +173,15 @@ keyword arguments: You can also change the center.
 
 Vector properties such as this one support setting and retrieval of individual elements, as well as slices (ranges of elements):
 
+.. code-block:: pycon
+
     >>> cone.Center[0:2] = [2, 4]
     >>> cone.Center
     [2.0, 4.0, 3.0]
 
 Next, apply a shrink filter to the cone:
+
+.. code-block:: pycon
 
     >>> shrinkFilter = Shrink(cone)
     >>> shrinkFilter.Input
@@ -173,6 +191,8 @@ At this point, if you are interested in getting some information about the
 output of the shrink filter, you can force it to update (which will also cause
 the execution of the cone source). For details about VTK's demand-driven
 pipeline model used by ParaView, see one of the VTK books.
+
+.. code-block:: pycon
 
     >>> shrinkFilter.UpdatePipeline()
     >>> shrinkFilter.GetDataInformation().GetNumberOfCells()
@@ -193,6 +213,8 @@ in a view. A view is responsible for managing a render context and a collection
 of representations. Simple creates a view by default. The representation object
 is created automatically with Show().
 
+.. code-block:: pycon
+
     >>> Show(shrinkFilter)
     >>> Render()
 
@@ -201,22 +223,24 @@ to Python variables and used to build the pipeline. ParaView keeps track of the
 last pipeline object created by the user. This allows you to accomplish
 everything you did above using the following code:
 
-  >>> from paraview.simple import *
-  # Create a cone and assign it as the active object
-  >>> Cone()
-  <paraview.servermanager.Cone object at 0x2910f0>
-  # Set a property of the active object
-  >>> SetProperties(Resolution=32)
-  # Apply the shrink filter to the active object
-  # Shrink is now active
-  >>> Shrink()
-  <paraview.servermanager.Shrink object at 0xaf64050>
-  # Show shrink
-  >>> Show()
-  <paraview.servermanager.UnstructuredGridRepresentation object at 0xaf57f90>
-  # Render the active view
-  >>> Render()
-  <paraview.servermanager.RenderView object at 0xaf57ff0>
+.. code-block:: pycon
+
+    >>> from paraview.simple import *
+    # Create a cone and assign it as the active object
+    >>> Cone()
+    <paraview.servermanager.Cone object at 0x2910f0>
+    # Set a property of the active object
+    >>> SetProperties(Resolution=32)
+    # Apply the shrink filter to the active object
+    # Shrink is now active
+    >>> Shrink()
+    <paraview.servermanager.Shrink object at 0xaf64050>
+    # Show shrink
+    >>> Show()
+    <paraview.servermanager.UnstructuredGridRepresentation object at 0xaf57f90>
+    # Render the active view
+    >>> Render()
+    <paraview.servermanager.RenderView object at 0xaf57ff0>
 
 This was a quick introduction to the paraview.simple module. In the following
 sections, we will discuss the Python interface in more detail and introduce more
