@@ -188,6 +188,9 @@ def create_package_file(root, master_package, subroot, py_files, opts, subs):
     package = path.split(root)[-1]
     text = format_heading(1, '%s Package' % package)
 
+    if shall_skip(root):
+        return
+
     modules = []
     # add each module in the package
     for py_file in py_files:
