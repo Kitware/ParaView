@@ -343,7 +343,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::RemoveBlockRange(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetRepresentationProxy::GetRange(double range[2])
+void vtkSMScalarBarWidgetRepresentationProxy::GetRange(double range[2], int component)
 {
   bool valid = false;
   range[0] = std::numeric_limits<double>::infinity();
@@ -371,7 +371,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::GetRange(double range[2])
         continue;
       }
       valid = true;
-      const double* localRange = info->GetComponentRange(-1);
+      const double* localRange = info->GetComponentRange(component);
       min = std::min(min, localRange[0]);
       max = std::max(max, localRange[1]);
     }
@@ -407,7 +407,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::GetRange(double range[2])
         continue;
       }
       valid = true;
-      const double* localRange = info->GetComponentRange(-1);
+      const double* localRange = info->GetComponentRange(component);
       min = std::min(min, localRange[0]);
       max = std::max(max, localRange[1]);
     }
