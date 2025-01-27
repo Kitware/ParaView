@@ -7,11 +7,7 @@
 
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/MooseXfemClip/Testing/Data/init_solution_propagation_out.e" />
-  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="Legacy Exodus II Reader" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget" command="setSelection" arguments="0.0,11.0" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget" command="openContextMenu" arguments="0.0" />
-  <pqevent object="TreeViewCheckMenu" command="activate" arguments="Check highlighted items" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MooseXfemClip" />
@@ -22,7 +18,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface With Edges" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="disp_" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="disp" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
