@@ -51,6 +51,7 @@ set(PY_TESTS
   PythonPVSimpleSphere.py
   PythonSMTraceTest1.py
   PythonSMTraceTest2.py,NO_VALID
+  PythonSMTraceTest4.py,NO_VALID
   PythonSMScopedTrace.py,NO_VALID
   PythonTestBenchmark.py,NO_VALID
   ReaderReload.py,NO_VALID

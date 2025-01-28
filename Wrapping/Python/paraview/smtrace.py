@@ -582,12 +582,15 @@ class RealProxyAccessor(Accessor):
             return ",\n    ".join([x.get_property_trace(in_ctor) for x in props])
 
         lines = []
-        if len(props):
+        if len(props) > 1:
             proxy_name = props[0].ProxyAccessor
             lines.append(f"{proxy_name}.Set(")
             for prop in props:
                 lines.append(f"    {prop.get_property_trace(True)},")
             lines.append(f")")
+        else:
+            for prop in props:
+                lines.append(prop.get_property_trace(False))
 
         return "\n".join(lines)
 
