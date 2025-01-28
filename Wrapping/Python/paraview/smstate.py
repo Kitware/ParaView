@@ -119,10 +119,14 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         propertiesToTraceOnCreate = options.PropertiesToTraceOnCreate
         skipHiddenRepresentations = options.SkipHiddenDisplayProperties
         skipRenderingComponents = options.SkipRenderingComponents
+        skipActiveComponents = options.SkipActiveComponents
+        skipLayoutComponents = options.SkipLayoutComponents
     else:
         propertiesToTraceOnCreate = RECORD_MODIFIED_PROPERTIES
         skipHiddenRepresentations = True
         skipRenderingComponents = False
+        skipActiveComponents = False
+        skipLayoutComponents = False
 
     # essential to ensure any obsolete accessors don't linger - can cause havoc
     # when saving state following a Python trace session
@@ -197,7 +201,9 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                 traceitem.finalize()
                 del traceitem
             trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
-            trace.append_separated(["SetActiveView(None)"])
+
+            if not skipActiveComponents:
+                trace.append_separated(["SetActiveView(None)"])
 
         # from views,  build the list of layouts of interest.
         layouts = set()
@@ -207,7 +213,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                 layouts.add(simple.GetLayout(aview))
 
         # trace create of layouts
-        if layouts:
+        if layouts and not skipLayoutComponents:
             layouts = sorted(layouts, key=lambda x: \
                 smtrace.Trace.get_registered_name(x, "layouts"))
             trace.append_separated([ \
@@ -220,7 +226,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                 del traceitem
             trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
-        if views:
+        if views and not skipActiveComponents:
             # restore the active view after the layouts have been created.
             trace.append_separated([ \
                 "# ----------------------------------------------------------------",
@@ -413,11 +419,12 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         # restore the active source since the order in which the pipeline is created
         # in the state file can end up changing the active source to be different
         # than what it was when the state is being saved.
-        trace.append_separated([ \
-            "# ----------------------------------------------------------------",
-            "# restore active source",
-            "SetActiveSource(%s)" % smtrace.Trace.get_accessor(simple.GetActiveSource()),
-            "# ----------------------------------------------------------------"])
+        if not skipActiveComponents:
+            trace.append_separated([ \
+                "# ----------------------------------------------------------------",
+                "# restore active source",
+                "SetActiveSource(%s)" % smtrace.Trace.get_accessor(simple.GetActiveSource()),
+                "# ----------------------------------------------------------------"])
 
         if postamble is None:
             trace.append_separated(smtrace._get_standard_postamble_comment())

@@ -2090,6 +2090,24 @@
           Skip rendering components such as views, representations, etc.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="SkipActiveComponents"
+                         panel_visibility="never"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Skip active components such as views, sources, etc.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="SkipLayoutComponents"
+                         panel_visibility="never"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Skip layout components.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty name="SkipHiddenDisplayProperties"
                          default_values="1"
                          number_of_elements="1">
