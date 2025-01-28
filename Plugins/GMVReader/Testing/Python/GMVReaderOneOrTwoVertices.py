@@ -18,11 +18,11 @@ one_vertexgmv = GMVReader(registrationName='one_vertex.gmv',
         FileNames=[os.path.join(GMVDir, "one_vertex.gmv")])
 one_vertexgmv.CellArrayStatus = ['material id']
 
-assert(sm.Fetch(one_vertexgmv).GetBlock(1).GetNumberOfVerts() == 3)
+assert(sm.Fetch(one_vertexgmv).GetBlock(0).GetBlock(1).GetNumberOfVerts() == 3)
 
 # create a new 'GMV Reader'
 two_vertexgmv = GMVReader(registrationName='two_vertex.gmv',
         FileNames=[os.path.join(GMVDir, "two_vertex.gmv")])
 two_vertexgmv.CellArrayStatus = ['material id']
 
-assert(sm.Fetch(two_vertexgmv).GetBlock(1).GetNumberOfLines() == 2)
+assert(sm.Fetch(two_vertexgmv).GetBlock(0).GetBlock(1).GetNumberOfLines() == 2)
