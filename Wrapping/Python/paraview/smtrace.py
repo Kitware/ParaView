@@ -512,6 +512,66 @@ class Accessor(object):
         return self.__Object
 
 
+class PropertyFormatter:
+    def format(self, data):
+        raise NotImplementedError
+
+
+class DefaultFormatter(PropertyFormatter):
+    def format(self, data):
+        return repr(data)
+
+
+class TabulatedVectorFormatter(PropertyFormatter):
+    def __init__(self, col_names):
+        self.col_names = col_names
+
+    def format(self, data):
+        if len(data) == 0:
+            return "[]"
+
+        n_cols = len(self.col_names)
+
+        if n_cols == 0:
+            return repr(data)
+
+        assert len(data) % n_cols == 0
+
+        INDENT = "    "
+
+        lines = []
+        lines.append("[")
+        lines.append(f"{INDENT}# {', '.join(self.col_names)}")
+        for i in range(len(data) // n_cols):
+            start = i * n_cols
+            stop = start + n_cols
+            lines.append(
+                f"{INDENT}{', '.join(str(d) for d in data[start:stop])},"
+            )
+        lines.append("]")
+
+        return "\n".join(lines)
+
+
+DEFAULT_FORMATTER = DefaultFormatter()
+PROPERTY_FORMATTERS = {
+    "RGBPoints": TabulatedVectorFormatter(
+        ["scalar", "red", "green", "blue"]
+    ),
+}
+
+def get_property_formatter(property_trace_helper):
+    return PROPERTY_FORMATTERS.get(
+        property_trace_helper.PropertyName, DEFAULT_FORMATTER
+    )
+
+
+def indent_lines(string, n_indent):
+    lines = string.splitlines(keepends=True)
+    INDENT = "    " * n_indent
+    return INDENT.join(lines)
+
+
 class RealProxyAccessor(Accessor):
     __CreateCallbacks = []
 
@@ -579,14 +639,16 @@ class RealProxyAccessor(Accessor):
 
     def trace_properties(self, props, in_ctor):
         if in_ctor:
-            return ",\n    ".join([x.get_property_trace(in_ctor) for x in props])
+            return ",\n    ".join([
+                indent_lines(x.get_property_trace(in_ctor), 1) for x in props]
+            )
 
         lines = []
         if len(props) > 1:
             proxy_name = props[0].ProxyAccessor
             lines.append(f"{proxy_name}.Set(")
             for prop in props:
-                lines.append(f"    {prop.get_property_trace(True)},")
+                lines.append(f"    {indent_lines(prop.get_property_trace(True), 1)},")
             lines.append(f")")
         else:
             for prop in props:
@@ -764,6 +826,7 @@ class PropertyTraceHelper(object):
                     return "None"
             else:
                 return data[0]
+
         elif (myobject.SMProperty.IsA("vtkSMStringVectorProperty") and not
         (fileListDomain and fileListDomain.GetIsOptional() == 0
          or myobject.Proxy.GetVTKClassName() == "vtkPythonAnnotationFilter")):
@@ -772,7 +835,15 @@ class PropertyTraceHelper(object):
             # nor if the filter is a PythonAnnotation (see #21654)
             return self.create_multiline_string(repr(myobject))
         else:
-            return repr(myobject)
+            return self.format_object(myobject)
+
+    def format_object(self, obj):
+        formatter = get_property_formatter(self)
+
+        try:
+            return formatter.format(obj)
+        except Exception:
+            return DEFAULT_FORMATTER.format(obj)
 
     def has_proxy_list_domain(self):
         """Returns True if this property has a ProxyListDomain, else False."""
