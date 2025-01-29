@@ -9,6 +9,7 @@ set(classes
   vtkSMCSVProxiesInitializationHelper
   vtkSMExporterProxy
   vtkSMGL2PSExporterProxy
+  vtkSMPropArrayListDomain
   vtkSMRenderViewExporterProxy
   vtkSMViewExportHelper)
 

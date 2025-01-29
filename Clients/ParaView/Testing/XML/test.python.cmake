@@ -26,6 +26,7 @@ endif()
 if (PARAVIEW_ENABLE_WEB)
   list (APPEND TESTS_WITHOUT_BASELINES
     ExportToVTKJS.xml
+    ExportToVTKJSWithArraySelection.xml
   )
   set (ExportToVTKJS_FORCE_SERIAL TRUE) # since this uses popup-menu
 endif ()

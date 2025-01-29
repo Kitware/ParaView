@@ -15,6 +15,12 @@
 #include "vtkRemotingExportModule.h" //needed for exports
 #include "vtkSMExporterProxy.h"
 
+#include <map>
+#include <string>
+
+class vtkSMRenderViewProxy;
+class vtkActor;
+
 class VTKREMOTINGEXPORT_EXPORT vtkSMRenderViewExporterProxy : public vtkSMExporterProxy
 {
 public:
@@ -26,6 +32,11 @@ public:
    * Exports the view.
    */
   void Write() override;
+
+  /**
+   * Set the view used for export, and update all domains based on prop extraction using the view.
+   */
+  void SetView(vtkSMViewProxy* view) override;
 
   /**
    * Returns if the view can be exported.
@@ -40,6 +51,12 @@ protected:
 private:
   vtkSMRenderViewExporterProxy(const vtkSMRenderViewExporterProxy&) = delete;
   void operator=(const vtkSMRenderViewExporterProxy&) = delete;
+
+  /**
+   * From a renderview proxy, return a map of actors with the name of the source proxies they
+   * represent in this view as keys.
+   */
+  std::map<std::string, vtkActor*> GetNamedActorMap(vtkSMRenderViewProxy* rv);
 };
 
 #endif

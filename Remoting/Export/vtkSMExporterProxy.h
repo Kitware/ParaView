@@ -29,7 +29,7 @@ public:
   /**
    * Set the view proxy to export.
    */
-  void SetView(vtkSMViewProxy* view);
+  virtual void SetView(vtkSMViewProxy* view);
   vtkGetObjectMacro(View, vtkSMViewProxy);
   ///@}
 

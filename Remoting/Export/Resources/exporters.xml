@@ -654,6 +654,28 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <StringVectorProperty name="PointArrays"
+                            command="GetPointArraySelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <PropArrayListDomain name="array_list" array_type="point" />
+        <Documentation>
+          Select the point arrays to export.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrays"
+                            command="GetCellArraySelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <PropArrayListDomain name="array_list" array_type="cell" />
+        <Documentation>
+          Select the cell arrays to export.
+        </Documentation>
+      </StringVectorProperty>
+
       <Hints>
         <ExporterFactory extensions="vtkjs" />
       </Hints>
