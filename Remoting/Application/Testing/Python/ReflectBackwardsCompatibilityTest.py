@@ -26,3 +26,8 @@ assert(sphereReflection.PlaneMode == 'Z Min')
 
 sphereReflection.Plane = 8
 assert(sphereReflection.ReflectionPlane.Normal == [0.0, 0.0, 1.0])
+
+assert(not sphereReflection.ReflectAllInputArrays)
+sphereReflection.FlipAllInputArrays = True
+assert(sphereReflection.ReflectAllInputArrays)
+assert(sphereReflection.FlipAllInputArrays)
