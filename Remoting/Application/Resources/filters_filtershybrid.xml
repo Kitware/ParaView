@@ -138,6 +138,11 @@
         If empty, output will be suffixed with '_' and the operation type.
         </Documentation>
       </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
       <!-- End TemporalArrayOperator -->
     </SourceProxy>
 
