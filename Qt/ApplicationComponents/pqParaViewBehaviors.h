@@ -83,6 +83,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(PythonShellResetBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(CustomShortcutBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(MainWindowEventBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(PropertyPanelVisibilitiesBehavior);
 
   ///@{
   /**
@@ -151,6 +152,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(CustomShortcutBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(MainWindowEventBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(UsageLoggingBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(PropertyPanelVisibilitiesBehavior);
 };
 
 #undef PQ_BEHAVIOR_DECLARE_FLAG

@@ -70,7 +70,7 @@ QString pqCoreUtilities::getParaViewUserDirectory()
   auto testDir = pqCoreTestUtility::TestDirectory();
   if (!testDir.isEmpty() && vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry())
   {
-    return QFileInfo(testDir).absolutePath();
+    return QFileInfo(testDir).absoluteFilePath();
   }
 
   pqSettings* settings = pqApplicationCore::instance()->settings();

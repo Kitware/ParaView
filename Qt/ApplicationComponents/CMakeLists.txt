@@ -147,6 +147,7 @@ set(classes
   pqPointPickingHelper
   pqPreviewMenuManager
   pqPropertyCollectionWidget
+  pqPropertyPanelVisibilitiesBehavior
   pqProxyCategory
   pqProxyGroupMenuManager
   pqProxyInfo

@@ -2241,3 +2241,16 @@ if (PARAVIEW_PLUGIN_ENABLE_ArrowGlyph)
     FORCE_SERIAL
     TEST_SCRIPTS ${CMAKE_CURRENT_BINARY_DIR}/ServerConnectPluginLoad.xml)
 endif ()
+
+# PropertyPanelVisibilitiesOverride test requires a configuration file.
+# Use a custom TEST_DIRECTORY for that: this overrides user config dir when testing
+# (see pqCoreUtilities::getParaViewUserDirectory). Copy config in it.
+set (PropertyPanelVisibilitiesOverrideDir "${CMAKE_CURRENT_BINARY_DIR}/PropertyPanelVisibilitiesOverride")
+file (MAKE_DIRECTORY ${PropertyPanelVisibilitiesOverrideDir})
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/PropertyPanelVisibilities.json.in"
+  "${PropertyPanelVisibilitiesOverrideDir}/PropertyPanelVisibilities.json" @ONLY)
+paraview_add_client_tests(
+  TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/PropertyPanelVisibilitiesOverride.xml
+  TEST_DIRECTORY ${PropertyPanelVisibilitiesOverrideDir}
+)
