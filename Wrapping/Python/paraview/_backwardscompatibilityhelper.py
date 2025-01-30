@@ -589,6 +589,11 @@ def setattr(proxy, pname, value):
                 proxy.GetProperty("ReflectionPlane").GetData().Origin = [value, value, value]
             else:
                 raise NotSupportedException("'Center' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+        if pname == "FlipAllInputArrays":
+            if compatibility_version < (5, 14):
+                proxy.GetProperty("ReflectAllInputArrays").SetData(value)
+            else:
+                raise NotSupportedException("'FlipAllInputArrays' was renamed in 'ReflectAllInputArrays' since ParaView 5.14")
 
 
     if not hasattr(proxy, pname):
@@ -1224,6 +1229,11 @@ def getattr(proxy, pname):
                     return origin[2]
             else:
                 raise NotSupportedException("'Center' property has been removed in ParaView 5.14. Please use ReflectionPlane to define the plane instead.")
+        if pname == "FlipAllInputArrays":
+            if compatibility_version < (5, 14):
+                return proxy.GetProperty("ReflectAllInputArrays").GetData()
+            else:
+                raise NotSupportedException("'FlipAllInputArrays' was renamed in 'ReflectAllInputArrays' since ParaView 5.14")
 
     raise Continue()
 
