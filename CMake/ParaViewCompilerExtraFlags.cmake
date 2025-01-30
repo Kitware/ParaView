@@ -49,6 +49,15 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     string(APPEND CMAKE_CXX_FLAGS_DEBUG
       " ${CMAKE_CXX_FLAGS_WARN} ${CMAKE_CXX_FLAGS_ERROR}")
   endif()
+
+  # Silence spurious -Wattribute warnings on GCC < 9.1:
+  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
+    target_compile_options(paraviewbuild
+      INTERFACE
+        "$<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:C>:-Wno-attributes>>"
+        "$<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:CXX>:-Wno-attributes>>")
+  endif()
 endif()
 
 # Intel OneAPI compilers >= 2021.2.0 turn on "fast math" at any non-zero
