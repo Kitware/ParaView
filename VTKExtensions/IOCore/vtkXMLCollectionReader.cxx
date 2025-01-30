@@ -15,8 +15,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkXMLDataElement.h"
-#include "vtkXMLHierarchicalBoxDataReader.h"
-#include "vtkXMLHierarchicalDataReader.h" // legacy reader - produces vtkMultiBlockDataSet.
 #include "vtkXMLHyperTreeGridReader.h"
 #include "vtkXMLImageDataReader.h"
 #include "vtkXMLMultiBlockDataReader.h"
@@ -122,8 +120,8 @@ const vtkXMLCollectionReaderInternals::ReaderConstructorsType
     // legacy reader - produces vtkMultiBlockDataSet.
     { "vtmg", GET_NEW_FUNCTOR(vtkXMLMultiGroupDataReader) },
     // legacy reader - produces vtkMultiBlockDataSet.
-    { "vthd", GET_NEW_FUNCTOR(vtkXMLHierarchicalDataReader) },
-    { "vthb", GET_NEW_FUNCTOR(vtkXMLHierarchicalBoxDataReader) },
+    { "vthd", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
+    { "vthb", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     { "vts", GET_NEW_FUNCTOR(vtkXMLStructuredGridReader) },
     { "vtt", GET_NEW_FUNCTOR(vtkXMLTableReader) },
     { "pvtp", GET_NEW_FUNCTOR(vtkXMLPPolyDataReader) },

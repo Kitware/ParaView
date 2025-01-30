@@ -24,7 +24,7 @@ class vtkIntArray;
 class vtkUniformGrid;
 class vtkRectilinearGrid;
 class vtkDataSet;
-class vtkHierarchicalBoxDataSet;
+class vtkOverlappingAMR;
 class HierarchicalFractalOutputUtil;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkHierarchicalFractal
@@ -162,7 +162,7 @@ protected:
   void AddTestArray(vtkCompositeDataSet* output);
   void AddFractalArray(vtkCompositeDataSet* output);
   void AddBlockIdArray(vtkCompositeDataSet* output);
-  void AddDepthArray(vtkHierarchicalBoxDataSet* output);
+  void AddDepthArray(vtkOverlappingAMR* output);
 
   void AddGhostLevelArray(vtkDataSet* grid, int dim[3], int onFace[6]);
 
