@@ -8,7 +8,6 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDoubleArray.h"
-#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkImageMandelbrotSource.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -17,6 +16,7 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkParallelAMRUtilities.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
@@ -89,7 +89,7 @@ public:
       block->SetBlock(index, dataSet);
     }
   }
-  void CreateOutput(vtkHierarchicalBoxDataSet* hbds)
+  void CreateOutput(vtkOverlappingAMR* hbds)
   {
     std::vector<int> blocksPerLevel;
     double origin[3] = { DBL_MAX, DBL_MAX, DBL_MAX };
@@ -209,7 +209,7 @@ int vtkHierarchicalFractal::RequestDataObject(
   }
   else
   {
-    outData = vtkHierarchicalBoxDataSet::New();
+    outData = vtkOverlappingAMR::New();
   }
 
   outInfo->Set(vtkDataObject::DATA_OBJECT(), outData);
@@ -608,9 +608,9 @@ int vtkHierarchicalFractal::RequestData(vtkInformation* vtkNotUsed(request),
   this->Levels->Initialize();
   this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4], ext[5], onFace);
 
-  if (vtkHierarchicalBoxDataSet::SafeDownCast(output))
+  if (vtkOverlappingAMR::SafeDownCast(output))
   {
-    this->OutputUtil->CreateOutput(vtkHierarchicalBoxDataSet::SafeDownCast(output));
+    this->OutputUtil->CreateOutput(vtkOverlappingAMR::SafeDownCast(output));
   }
   else if (vtkMultiBlockDataSet::SafeDownCast(output))
   {
@@ -640,7 +640,7 @@ int vtkHierarchicalFractal::RequestData(vtkInformation* vtkNotUsed(request),
     this->AddVectorArray(output);
     this->AddTestArray(output);
     this->AddBlockIdArray(output);
-    vtkHierarchicalBoxDataSet* hset = vtkHierarchicalBoxDataSet::SafeDownCast(output);
+    vtkOverlappingAMR* hset = vtkOverlappingAMR::SafeDownCast(output);
     this->AddDepthArray(hset);
     vtkParallelAMRUtilities::BlankCells(hset, vtkMultiProcessController::GetGlobalController());
     info->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(), hset);
@@ -1216,7 +1216,7 @@ void vtkHierarchicalFractal::AddBlockIdArray(vtkCompositeDataSet* output)
 }
 
 //----------------------------------------------------------------------------
-void vtkHierarchicalFractal::AddDepthArray(vtkHierarchicalBoxDataSet* output)
+void vtkHierarchicalFractal::AddDepthArray(vtkOverlappingAMR* output)
 {
   int levels = output->GetNumberOfLevels();
   int level = 0;
