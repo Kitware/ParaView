@@ -24,7 +24,7 @@ function(paraview_add_test_driven)
   endif ()
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::smTestDriver>")
   set(_vtk_test_python_args
-    --server $<TARGET_FILE:ParaView::pvserver>
+    --server $<TARGET_FILE:ParaView::pvserver> --bind-address 127.0.0.1
     --client $<TARGET_FILE:ParaView::pvpython> --dr)
   vtk_add_test_python(${ARGN})
 endfunction ()
@@ -361,6 +361,7 @@ function (paraview_add_client_server_tests)
     _COMMAND_PATTERN
       __paraview_smtesting_args__
       --server "$<TARGET_FILE:ParaView::pvserver>"
+        --bind-address 127.0.0.1
         --enable-bt
         __paraview_args__
       --client __paraview_client__
@@ -395,9 +396,11 @@ function (paraview_add_client_server_render_tests)
     _COMMAND_PATTERN
       __paraview_smtesting_args__
       --data-server "$<TARGET_FILE:ParaView::pvdataserver>"
+        --bind-address 127.0.0.1
         --enable-bt
         __paraview_args__
       --render-server "$<TARGET_FILE:ParaView::pvrenderserver>"
+        --bind-address 127.0.0.1
         --enable-bt
         __paraview_args__
       --client __paraview_client__
@@ -432,6 +435,7 @@ function (paraview_add_multi_server_tests count)
       __paraview_smtesting_args__
       --test-multi-servers "${count}"
       --server "$<TARGET_FILE:ParaView::pvserver>"
+        --bind-address 127.0.0.1
         --enable-bt
       --client __paraview_client__
         --enable-bt
@@ -462,6 +466,7 @@ function (paraview_add_tile_display_tests width height)
     _COMMAND_PATTERN
       __paraview_smtesting_args__
       --server "$<TARGET_FILE:ParaView::pvserver>"
+        --bind-address 127.0.0.1
         --enable-bt
         --tdx=${width}
         --tdy=${height}
@@ -496,6 +501,7 @@ function (paraview_add_cave_tests num_ranks config)
     _COMMAND_PATTERN
       __paraview_smtesting_args__
       --server "$<TARGET_FILE:ParaView::pvserver>"
+        --bind-address 127.0.0.1
         --enable-bt
         # using offscreen to avoid clobbering display (although should not be
         # necessary) when running tests in parallel.
