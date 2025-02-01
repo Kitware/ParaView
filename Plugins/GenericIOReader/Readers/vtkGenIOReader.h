@@ -23,6 +23,7 @@
 class vtkDataArray;
 class vtkMultiProcessController;
 
+// NOLINTNEXTLINE(modernize-concat-nested-namespaces)
 namespace lanl
 {
 namespace gio
