@@ -73,11 +73,11 @@ void pqXRInterfaceDockPanel::constructor()
   this->Internals->Ui.showXRViewButton->setEnabled(false);
 
   QObject::connect(this->Internals->Ui.sendToXRButton, &QPushButton::clicked,
-    std::bind(&pqXRInterfaceDockPanel::sendToXRInterface, this));
+    [this]() { this->sendToXRInterface(); });
   QObject::connect(this->Internals->Ui.attachToCurrentViewButton, &QPushButton::clicked,
-    std::bind(&pqXRInterfaceDockPanel::attachToCurrentView, this));
-  QObject::connect(this->Internals->Ui.showXRViewButton, &QPushButton::clicked,
-    std::bind(&pqXRInterfaceDockPanel::showXRView, this));
+    [this]() { this->attachToCurrentView(); });
+  QObject::connect(
+    this->Internals->Ui.showXRViewButton, &QPushButton::clicked, [this]() { this->showXRView(); });
   connect(this->Internals->Ui.exportLocationsAsSkyboxesButton, SIGNAL(clicked()), this,
     SLOT(exportLocationsAsSkyboxes()));
   connect(this->Internals->Ui.exportLocationsAsViewButton, SIGNAL(clicked()), this,
@@ -372,8 +372,9 @@ void pqXRInterfaceDockPanel::collaborationConnect()
   if (this->Internals->Ui.cConnectButton->text() == "Connect")
   {
     vtkPVXRInterfaceCollaborationClient* cc = this->Internals->Helper->GetCollaborationClient();
-    cc->SetLogCallback(std::bind(&pqXRInterfaceDockPanel::collaborationCallback, this,
-      std::placeholders::_1, std::placeholders::_2));
+    cc->SetLogCallback([this](const std::string& msg, vtkLogger::Verbosity verbosity) {
+      this->collaborationCallback(msg, verbosity);
+    });
     cc->SetCollabHost(this->Internals->Ui.cServerValue->text().toUtf8().data());
     cc->SetCollabSession(this->Internals->Ui.cSessionValue->text().toUtf8().data());
     cc->SetCollabName(this->Internals->Ui.cNameValue->text().toUtf8().data());
