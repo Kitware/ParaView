@@ -45,6 +45,7 @@ private:
   vtkPVGhostCellsGenerator(const vtkPVGhostCellsGenerator&) = delete;
   void operator=(const vtkPVGhostCellsGenerator&) = delete;
 
+  int GhostCellsGeneratorUsingHyperTreeGrid(vtkDataObject* inputDO, vtkDataObject* outputDO);
   bool HasCompositeHTG = false;
 };
 

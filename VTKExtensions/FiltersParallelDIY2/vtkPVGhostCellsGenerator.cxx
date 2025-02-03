@@ -59,60 +59,28 @@ int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGhostCellsGenerator::RequestDataObject(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingHyperTreeGrid(
+  vtkDataObject* inputDO, vtkDataObject* outputDO)
 {
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  this->HasCompositeHTG = false;
-
-  vtkDataObjectTree* inputComposite = vtkDataObjectTree::GetData(inInfo);
-  if (inputComposite)
+  if (!outputDO)
   {
-    vtkSmartPointer<vtkDataObjectTreeIterator> iter;
-    iter.TakeReference(inputComposite->NewTreeIterator());
-    iter->VisitOnlyLeavesOn();
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-      auto pds = vtkPartitionedDataSet::SafeDownCast(iter->GetCurrentDataObject());
-      if (vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject()) ||
-        (pds && pds->GetNumberOfPartitions() > 0 &&
-          vtkHyperTreeGrid::SafeDownCast(pds->GetPartitionAsDataObject(0))))
-      {
-        this->HasCompositeHTG = true;
-      }
-    }
+    return 0;
   }
-
-  // When the input contains HTG in some partitions, we will convert it to PDC so we can
-  // process one Partitioned dataset at a time, routing it to either the classic or the HTG
-  // specialized filter.
-  int someAreCompositeHTG = 0;
-  int isCompositeHTG = this->HasCompositeHTG;
-  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  controller->AllReduce(&isCompositeHTG, &someAreCompositeHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
-  const bool outputAlreadyCreated = vtkPartitionedDataSetCollection::GetData(outInfo);
-  if (!outputAlreadyCreated && someAreCompositeHTG)
+  vtkNew<vtkHyperTreeGridGhostCellsGenerator> instance;
+  instance->SetController(this->GetController());
+  instance->SetInputDataObject(inputDO);
+  const int result = instance->GetExecutive()->Update();
+  if (result == 1)
   {
-    vtkWarningMacro("Create as PDC");
-    vtkNew<vtkPartitionedDataSetCollection> outputPDC;
-    this->GetExecutive()->SetOutputData(0, outputPDC);
-    this->GetOutputPortInformation(0)->Set(
-      vtkDataObject::DATA_EXTENT_TYPE(), outputPDC->GetExtentType());
-    return 1;
+    outputDO->ShallowCopy(instance->GetOutput());
   }
-
-  vtkWarningMacro("Create as superclass");
-  return Superclass::RequestDataObject(request, inputVector, outputVector);
+  return result;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVGhostCellsGenerator::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-
-  // return Superclass::Superclass::RequestData(request, inputVector, outputVector);
-
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
   vtkDataObject* output = vtkDataObject::GetData(outputVector);
 
@@ -135,17 +103,14 @@ int vtkPVGhostCellsGenerator::RequestData(
   controller->AllReduce(&isHTG, &someAreHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
   if (someAreHTG)
   {
-    vtkNew<vtkHyperTreeGridGhostCellsGenerator> ghostCellsGenerator;
-    ghostCellsGenerator->SetInputData(input);
-    ghostCellsGenerator->Update();
-
-    if (ghostCellsGenerator->GetExecutive()->Update())
+    const int result = this->GhostCellsGeneratorUsingHyperTreeGrid(input, output);
+    if (result != 1)
     {
-      output->ShallowCopy(ghostCellsGenerator->GetOutput(0));
-      return 1;
+      vtkErrorMacro(<< "Failed to generate ghost cells for input HyperTreeGrid");
+      return 0;
     }
 
-    return 0;
+    return 1;
   }
 
   // Check if our composite input contains HTG.
@@ -217,12 +182,12 @@ int vtkPVGhostCellsGenerator::RequestData(
                         << " partitions");
 
         vtkWarningMacro("Forward pds to HTG GCG");
-        vtkNew<vtkHyperTreeGridGhostCellsGenerator> ghostCellsGenerator;
-        ghostCellsGenerator->SetInputData(currentPDS);
-        const int result = ghostCellsGenerator->GetExecutive()->Update();
-        if (result == 1)
+
+        const int result = this->GhostCellsGeneratorUsingHyperTreeGrid(currentPDS, outputPDS);
+        if (result != 1)
         {
-          outputPDS->ShallowCopy(ghostCellsGenerator->GetOutput());
+          vtkErrorMacro(<< "Failed to generate ghost cells for partitioned dataset #" << pdsIdx);
+          return 0;
         }
 
         vtkWarningMacro(<< "output PDS #" << pdsIdx << " has " << outputPDS->GetNumberOfPartitions()
