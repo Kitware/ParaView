@@ -551,7 +551,11 @@ pqServerConfigurationCollection& pqApplicationCore::serverConfigurations()
 QString pqApplicationCore::getSettingFileBaseName()
 {
   QString fileBaseName = QApplication::applicationName();
-  fileBaseName += QApplication::applicationVersion();
+
+  if (this->VersionedSettings)
+  {
+    fileBaseName += QApplication::applicationVersion();
+  }
 
   const bool disableSettings = vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry();
   if (disableSettings)
@@ -561,6 +565,13 @@ QString pqApplicationCore::getSettingFileBaseName()
 
   return fileBaseName;
 }
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::useVersionedSettings(bool use)
+{
+  this->VersionedSettings = use;
+}
+
 //-----------------------------------------------------------------------------
 pqSettings* pqApplicationCore::settings()
 {

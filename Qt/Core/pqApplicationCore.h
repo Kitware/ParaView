@@ -248,6 +248,16 @@ public:
   QString getDefaultSaveStateFileFormatQString(bool pythonAvailable, bool loading);
 
   /**
+   * Set versioned settings mode.
+   * If true, the setting file name includes application version numbers.
+   * Should be set before the first call to settings(): later calls will
+   * not be taken into account.
+   *
+   * Default is true.
+   */
+  void useVersionedSettings(bool use);
+
+  /**
    * Save the ServerManager state to a XML element.
    */
   vtkPVXMLElement* saveState();
@@ -482,6 +492,8 @@ private:
    * This use application name and optional suffix (version and -dr)
    */
   QString getSettingFileBaseName();
+
+  bool VersionedSettings = true;
 };
 
 #endif
