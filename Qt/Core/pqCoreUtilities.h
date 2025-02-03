@@ -98,11 +98,36 @@ public:
   static QString getParaViewApplicationDataDirectory();
 
   /**
+   * Return the list of directories that can contains ParaView configurations.
+   * First is the User Directory.
+   * @see getParaViewUserDirectory(),  getApplicationDirectories()
+   */
+  static QStringList getParaViewApplicationConfigDirectories();
+
+  /**
    * Return the list of full available path that exists inside the shared
    * application path and the user specific one
+   * see getApplicationDirectories()
    */
   static QStringList findParaviewPaths(
-    QString directoryOrFileName, bool lookupInAppDir, bool lookupInUserDir);
+    const QString& directoryOrFileName, bool lookupInAppDir, bool lookupInUserDir);
+
+  /**
+   * Return the list of possible directories for share application path and user directory.
+   * App directories are computed from current application installation.
+   * see getParaViewApplicationDirectory(), vtkPVStandardPaths::GetInstallDirectories()
+   */
+  static QStringList getApplicationDirectories(bool lookupInAppDir, bool lookupInUserDir);
+
+  /**
+   * Returns the first app directory found that contains the given relative path.
+   * Return an empty string if not found.
+   * Do not look in user space.
+   *
+   * @see getApplicationDirectories(true, false)
+   */
+  static QString findInApplicationDirectories(const QString& relativePath);
+
   static QString getNoneExistingFileName(QString expectedFilePath);
 
   /**
