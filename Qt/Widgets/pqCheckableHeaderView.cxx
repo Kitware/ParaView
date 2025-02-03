@@ -286,8 +286,13 @@ void pqCheckableHeaderView::mousePressEvent(QMouseEvent* evt)
       int secPosX = this->orientation() == Qt::Horizontal ? secPos : 0;
       int secPosY = this->orientation() == Qt::Horizontal ? 0 : secPos;
       QRect chbRect = this->Internal->checkBoxRectHash[logicalIndexPressed];
-      if (evt->x() <= (secPosX + chbRect.right()) && evt->x() >= (secPosX + chbRect.left()) &&
-        evt->y() <= (secPosY + chbRect.bottom()) && evt->y() >= (secPosY + chbRect.top()))
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+      auto pos = evt->localPos();
+#else
+      auto pos = evt->position();
+#endif
+      if (pos.x() <= (secPosX + chbRect.right()) && pos.x() >= (secPosX + chbRect.left()) &&
+        pos.y() <= (secPosY + chbRect.bottom()) && pos.y() >= (secPosY + chbRect.top()))
       {
         if (this->Internal->checkState.contains(logicalIndexPressed))
         {
