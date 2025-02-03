@@ -28,13 +28,18 @@ set(xml_files
   ParaViewFilters.xml
   ParaViewSources.xml)
 
+# also used in testing
+set (app_name "paraview_clone1")
+set (organization_name "Kitware, Inc")
+set (app_version "1.1.1")
+
 paraview_client_add(
-  NAME paraview_clone1
-  VERSION "1.1.1"
+  NAME ${app_name}
+  VERSION ${app_version}
   SOURCES ${sources} ${ui_files}
   APPLICATION_XMLS ${xml_files}
   MAIN_WINDOW_CLASS myMainWindow
-  ORGANIZATION "Kitware, Inc."
+  ORGANIZATION ${organization_name}
   TITLE "ParaView (ReVisEd)")
 
 enable_testing()

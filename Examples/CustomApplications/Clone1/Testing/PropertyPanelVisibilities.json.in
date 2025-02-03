@@ -1,0 +1,17 @@
+{
+  "annotations" :
+  {
+    "GridAxes3DActor" :
+    {
+      "XTitle" : "advanced"
+    }
+  },
+  "sources" :
+  {
+    "SphereSource" :
+    {
+      "StartTheta" : "default",
+      "StartPhi" : "never"
+    }
+  }
+}

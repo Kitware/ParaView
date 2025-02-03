@@ -1,5 +1,0 @@
-<?xml version="1.0" ?>
-<pqevents>
-  <!-- wait 1 sec and quit -->
-  <pqevent object="pqClientMainWindow" command="pause" arguments="1000" />
-</pqevents>
