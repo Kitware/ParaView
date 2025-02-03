@@ -2,11 +2,18 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class   vtkInitializationHelper
- * @brief   help class for python modules
+ * @brief   Helpers class to initialize ParaView Clients.
  *
- * This class is used by the python modules when they are loaded from
- * python (as opposed to pvpython). It simply initializes the server
- * manager so that it can be used.
+ * It initializes the server manager so that it can be used.
+ *
+ * This class is in fact a collection of static methods to
+ * initialize different part of the application:
+ * parse command line argument, load settings, initialize a vtkProcessModule.
+ *
+ * A main `Initialize` method calls subsequent methods
+ * in the appropriate order for ParaView.
+ *
+ * Also cleanup is available through `Finalize`.
  */
 
 #ifndef vtkInitializationHelper_h
@@ -224,11 +231,13 @@ public:
    * Get directory for user settings file. The last character is always the
    * file path separator appropriate for the system.
    */
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkPVStandardPaths::GetUserSettingsDirectory instead")
   static std::string GetUserSettingsDirectory();
 
   /**
    * Get file path for the user settings file.
    */
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkPVStandardPaths::GetUserSettingsFilePath instead")
   static std::string GetUserSettingsFilePath();
 
 protected:

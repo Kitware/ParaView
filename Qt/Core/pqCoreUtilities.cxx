@@ -23,6 +23,7 @@
 #include "vtkObject.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
+#include "vtkPVStandardPaths.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkWeakPointer.h"
 #include "vtksys/SystemTools.hxx"
@@ -112,18 +113,11 @@ QStringList pqCoreUtilities::findParaviewPaths(
   QStringList allPossibleDirs;
   if (lookupInAppDir)
   {
-    allPossibleDirs.push_back(
-      getParaViewApplicationDirectory() + QDir::separator() + directoryOrFileName);
-    allPossibleDirs.push_back(getParaViewApplicationDirectory() + "/../" + directoryOrFileName);
-    // Mac specific begin
-    allPossibleDirs.push_back(
-      getParaViewApplicationDirectory() + "/../Support/" + directoryOrFileName);
-    allPossibleDirs.push_back(
-      getParaViewApplicationDirectory() + "/../../../Support/" + directoryOrFileName);
-    // This one's for when running from the build directory.
-    allPossibleDirs.push_back(
-      getParaViewApplicationDirectory() + "/../../../" + directoryOrFileName);
-    // Mac specific end
+    std::vector<std::string> dirs = vtkPVStandardPaths::GetInstallDirectories();
+    for (const std::string& dir : dirs)
+    {
+      allPossibleDirs.push_back(dir.c_str());
+    }
   }
 
   if (lookupInUserDir)

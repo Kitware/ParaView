@@ -7,6 +7,7 @@
 #include "pqCoreUtilities.h"
 #include "pqSettings.h"
 #include "vtkInitializationHelper.h"
+#include "vtkPVStandardPaths.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMSettings.h"
 
@@ -106,7 +107,7 @@ QStringList pqResetDefaultSettingsReaction::backupSettings()
   QStringList retval;
   retval << fname;
 
-  const QString smsettingsFile(vtkInitializationHelper::GetUserSettingsFilePath().c_str());
+  const QString smsettingsFile(vtkPVStandardPaths::GetUserSettingsFilePath().c_str());
   if (QFile::exists(smsettingsFile))
   {
     const QString backup(smsettingsFile + ".bak");
@@ -135,6 +136,6 @@ void pqResetDefaultSettingsReaction::clearSettings()
   vtkSMSettings::GetInstance()->ClearAllSettings();
   if (vtkInitializationHelper::GetLoadSettingsFilesDuringInitialization())
   {
-    QFile::remove(vtkInitializationHelper::GetUserSettingsFilePath().c_str());
+    QFile::remove(vtkPVStandardPaths::GetUserSettingsFilePath().c_str());
   }
 }
