@@ -216,7 +216,7 @@
         information_property="PreservePropertyValuesInfo">
         <BooleanDomain name="bool"/>
         <Documentation>
-          New proxies (filter, representation and view) are initialized with their previous property values.
+          New source proxies (filter, sources, readers and extractors) are initialized with their previous property values.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="PreservePropertyValuesInfo"
