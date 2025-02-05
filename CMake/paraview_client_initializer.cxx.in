@@ -15,7 +15,7 @@
 
 #include "@_paraview_client_MAIN_WINDOW_INCLUDE@"
 
-#include "pqPVApplicationCore.h"
+#include "@_paraview_client_APPLICATION_CORE_INCLUDE@"
 #include "pqPluginManager.h"
 #include "pqQtDeprecated.h"
 #include "pqSettings.h"
@@ -58,8 +58,8 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
 {
   try
   {
-    vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "initialize pqPVApplicationCore");
-    this->PVApp = new pqPVApplicationCore (argc, argv);
+    vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "initialize @_paraview_client_APPLICATION_CORE_CLASS@");
+    this->PVApp = new @_paraview_client_APPLICATION_CORE_CLASS@ (argc, argv);
   }
   catch (const pqApplicationCoreExitCode& exitCode)
   {
