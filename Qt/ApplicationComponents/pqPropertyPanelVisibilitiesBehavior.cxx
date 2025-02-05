@@ -18,6 +18,7 @@
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 
+#include <QDebug>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QMainWindow>
