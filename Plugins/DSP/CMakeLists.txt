@@ -2,7 +2,8 @@ set(sources)
 set(interfaces)
 set(uifiles)
 
-option(PARAVIEW_PLUGIN_dsp_enable_audio_player "Enable building the Audio Player Dock. Requires Qt Multimedia." OFF)
+cmake_dependent_option(PARAVIEW_PLUGIN_dsp_enable_audio_player "Enable building the Audio Player Dock. Requires Qt5 Multimedia." OFF
+  "PARAVIEW_QT_MAJOR_VERSION EQUAL 5" OFF)
 mark_as_advanced(PARAVIEW_PLUGIN_dsp_enable_audio_player)
 
 if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player)
