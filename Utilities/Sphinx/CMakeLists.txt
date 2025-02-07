@@ -140,6 +140,10 @@ add_custom_target(ParaViewPythonDoc
           "${CMAKE_CURRENT_SOURCE_DIR}/sphinx_apidoc.py"
           -o "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${ParaView_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/paraview"
+          # CI utilities end up living here.
+          ".gitlab"
+          # CI venv
+          "venv"
   COMMAND "$<TARGET_FILE:pvpython>"
           ${nompi_flags}
           -m sphinx
