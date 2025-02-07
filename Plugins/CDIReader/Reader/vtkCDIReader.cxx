@@ -939,7 +939,11 @@ int vtkCDIReader::ReadHorizontalGridData()
     vtkErrorMacro("No VList found in Grid file.");
     return 0;
   }
+#ifdef CDI_241_VLIST_API
+  int ngrids = vlistNumGrids(vListID);
+#else
   int ngrids = vlistNgrids(vListID);
+#endif
   for (int i = 0; i < ngrids; ++i)
   {
     int gridID_l = vlistGrid(vListID, i);
@@ -967,7 +971,11 @@ int vtkCDIReader::ReadHorizontalGridData()
 int vtkCDIReader::ReadVerticalGridData()
 {
   this->ZAxisID = -1;
+#ifdef CDI_241_VLIST_API
+  int nzaxis = vlistNumZaxis(this->Internals->VGridFile.getVListID());
+#else
   int nzaxis = vlistNzaxis(this->Internals->VGridFile.getVListID());
+#endif
   int found = 0;
   for (int i = 0; i < nzaxis; ++i)
   {
@@ -3096,8 +3104,13 @@ int vtkCDIReader::FillGridDimensions()
 {
   this->Internals->DimensionSets.clear();
 
+#ifdef CDI_241_VLIST_API
+  int ngrids = vlistNumGrids(this->Internals->DataFile.getVListID());
+  int nzaxis = vlistNumZaxis(this->Internals->DataFile.getVListID());
+#else
   int ngrids = vlistNgrids(this->Internals->DataFile.getVListID());
   int nzaxis = vlistNzaxis(this->Internals->DataFile.getVListID());
+#endif
   int nvars = vlistNvars(this->Internals->DataFile.getVListID());
   char nameGridX[CDI_MAX_NAME];
   char nameGridY[CDI_MAX_NAME];
