@@ -14,11 +14,11 @@
 
 #include <QKeyEvent>
 #include <QMessageBox>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 #include <QtCore/QDebug>
 #include <QtCore/QPair>
-#include <QtCore/QRegExp>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QString>
 
 #include <map>
@@ -129,11 +129,14 @@ pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject, Qt::Wind
   this->connectionTypeChanged();
 
   // Restrict input in some line edits
-  QRegExpValidator* connNameValidator = new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
-  QRegExpValidator* addressValidator =
-    new QRegExpValidator(QRegExp("([0-9a-zA-Z.]+@)?([a-zA-Z]+://)?[0-9a-zA-Z.:]+"), this);
-  QRegExpValidator* inputIdValidator = new QRegExpValidator(QRegExp("[0-9]+"), this);
-  QRegExpValidator* inputNameValidator = new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
+  QRegularExpressionValidator* connNameValidator =
+    new QRegularExpressionValidator(QRegularExpression("[0-9a-zA-Z]+"), this);
+  QRegularExpressionValidator* addressValidator = new QRegularExpressionValidator(
+    QRegularExpression("([0-9a-zA-Z.]+@)?([a-zA-Z]+://)?[0-9a-zA-Z.:]+"), this);
+  QRegularExpressionValidator* inputIdValidator =
+    new QRegularExpressionValidator(QRegularExpression("[0-9]+"), this);
+  QRegularExpressionValidator* inputNameValidator =
+    new QRegularExpressionValidator(QRegularExpression("[0-9a-zA-Z]+"), this);
   this->Internals->connectionName->setValidator(connNameValidator);
   this->Internals->connectionAddress->setValidator(addressValidator);
   this->Internals->inputId->setValidator(inputIdValidator);
@@ -406,14 +409,13 @@ void pqVRAddConnectionDialog::pqInternals::updateUi()
 QPair<QString, QString> pqVRAddConnectionDialog::pqInternals::parseEntry(const QString& entry)
 {
   QPair<QString, QString> result;
-  QRegExp regexp("([^:]+): (.+)");
-  if (regexp.indexIn(entry) < 0)
+  QRegularExpression regexp("([^:]+): (.+)");
+  auto match = regexp.match(entry);
+  if (match.hasMatch())
   {
-    return result;
+    result.first = match.captured(1);
+    result.second = match.captured(2);
   }
-
-  result.first = regexp.cap(1);
-  result.second = regexp.cap(2);
   return result;
 }
 
