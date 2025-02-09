@@ -665,7 +665,11 @@ void pqVRUIConnection::newValuatorValue(std::vector<float>* data)
   temp.connId = this->Address;
   temp.name = name(VALUATOR_EVENT);
   temp.eventType = VALUATOR_EVENT;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   temp.timeStamp = QDateTime::currentDateTime().toTime_t();
+#else
+  temp.timeStamp = QDateTime::currentDateTime().currentSecsSinceEpoch();
+#endif
   temp.data.valuator.num_channels = (int)(*data).size();
   for (unsigned int i = 0; i < (*data).size(); ++i)
   {
@@ -681,7 +685,11 @@ void pqVRUIConnection::newButtonValue(int state, int button)
   temp.connId = this->Address;
   temp.name = this->name(BUTTON_EVENT, button);
   temp.eventType = BUTTON_EVENT;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   temp.timeStamp = QDateTime::currentDateTime().toTime_t();
+#else
+  temp.timeStamp = QDateTime::currentDateTime().currentSecsSinceEpoch();
+#endif
   temp.data.button.button = button;
   temp.data.button.state = state;
   this->EventQueue->Enqueue(temp);
@@ -694,7 +702,11 @@ void pqVRUIConnection::newTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data
   temp.connId = this->Address;
   temp.name = name(TRACKER_EVENT, sensor);
   temp.eventType = TRACKER_EVENT;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   temp.timeStamp = QDateTime::currentDateTime().toTime_t();
+#else
+  temp.timeStamp = QDateTime::currentDateTime().currentSecsSinceEpoch();
+#endif
   temp.data.tracker.sensor = sensor;
   float rotMatrix[3][3];
   float pos[3];

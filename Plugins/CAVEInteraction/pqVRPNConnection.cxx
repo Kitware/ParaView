@@ -213,7 +213,11 @@ void pqVRPNConnection::newAnalogValue(vrpn_ANALOGCB data)
   event.connId = this->Address;
   event.name = name(VALUATOR_EVENT);
   event.eventType = VALUATOR_EVENT;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   event.timeStamp = QDateTime::currentDateTime().toTime_t();
+#else
+  event.timeStamp = QDateTime::currentDateTime().currentSecsSinceEpoch();
+#endif
   event.data.valuator.num_channels = data.num_channel;
   for (int i = 0; i < data.num_channel; ++i)
   {
@@ -229,7 +233,11 @@ void pqVRPNConnection::newButtonValue(vrpn_BUTTONCB data)
   event.connId = this->Address;
   event.name = this->name(BUTTON_EVENT, data.button);
   event.eventType = BUTTON_EVENT;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   event.timeStamp = QDateTime::currentDateTime().toTime_t();
+#else
+  event.timeStamp = QDateTime::currentDateTime().currentSecsSinceEpoch();
+#endif
   event.data.button.button = data.button;
   event.data.button.state = data.state;
   this->EventQueue->Enqueue(event);
@@ -242,7 +250,11 @@ void pqVRPNConnection::newTrackerValue(vrpn_TRACKERCB data)
   event.connId = this->Address;
   event.name = name(TRACKER_EVENT, data.sensor);
   event.eventType = TRACKER_EVENT;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   event.timeStamp = QDateTime::currentDateTime().toTime_t();
+#else
+  event.timeStamp = QDateTime::currentDateTime().currentSecsSinceEpoch();
+#endif
   event.data.tracker.sensor = data.sensor;
   double rotMatrix[3][3];
   double vtkQuat[4] = { data.quat[3], data.quat[0], data.quat[1], data.quat[2] };

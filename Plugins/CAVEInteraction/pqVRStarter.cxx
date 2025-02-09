@@ -13,6 +13,7 @@
 #include "vtkVRInteractorStyleFactory.h"
 #include "vtkVRQueue.h"
 
+#include <QRegularExpression>
 #include <QTimer>
 #include <QtDebug>
 
@@ -37,19 +38,19 @@ public:
         // Syntax is (one line:)
         // "vrpn_trackerEvent:[connName];[sensorid];[pos_x],[pos_y],[pos_z];
         // [quat_w],[quat_x],[quat_y],[quat_z]"
-        QRegExp capture("vrpn_trackerEvent:"
-                        "([\\w.@]+);" // Connection name
-                        "(\\d+);"     // sensor id
-                        "([\\d.-]+)," // pos_x
-                        "([\\d.-]+)," // pos_y
-                        "([\\d.-]+);" // pos_z
-                        "([\\d.-]+)," // quat_w
-                        "([\\d.-]+)," // quat_x
-                        "([\\d.-]+)," // quat_y
-                        "([\\d.-]+)$" // quat_z
+        QRegularExpression capture("vrpn_trackerEvent:"
+                                   "([\\w.@]+);" // Connection name
+                                   "(\\d+);"     // sensor id
+                                   "([\\d.-]+)," // pos_x
+                                   "([\\d.-]+)," // pos_y
+                                   "([\\d.-]+);" // pos_z
+                                   "([\\d.-]+)," // quat_w
+                                   "([\\d.-]+)," // quat_x
+                                   "([\\d.-]+)," // quat_y
+                                   "([\\d.-]+)$" // quat_z
         );
-        int ind = capture.indexIn(arguments);
-        if (ind < 0)
+        auto match = capture.match(arguments);
+        if (!match.hasMatch())
         {
           qWarning() << "pqVREventPlayer: bad arguments:" << command;
           error = true;
@@ -57,15 +58,15 @@ public:
         }
         vrpn_TRACKERCB event;
         QString connName;
-        connName = capture.cap(1);
-        event.sensor = capture.cap(2).toInt();
-        event.pos[0] = capture.cap(3).toDouble();
-        event.pos[1] = capture.cap(4).toDouble();
-        event.pos[2] = capture.cap(5).toDouble();
-        event.quat[0] = capture.cap(6).toDouble();
-        event.quat[1] = capture.cap(7).toDouble();
-        event.quat[2] = capture.cap(8).toDouble();
-        event.quat[3] = capture.cap(9).toDouble();
+        connName = match.captured(1);
+        event.sensor = match.captured(2).toInt();
+        event.pos[0] = match.captured(3).toDouble();
+        event.pos[1] = match.captured(4).toDouble();
+        event.pos[2] = match.captured(5).toDouble();
+        event.quat[0] = match.captured(6).toDouble();
+        event.quat[1] = match.captured(7).toDouble();
+        event.quat[2] = match.captured(8).toDouble();
+        event.quat[3] = match.captured(9).toDouble();
         pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
         pqVRPNConnection* conn = mgr->GetVRPNConnection(connName);
         if (!conn)
