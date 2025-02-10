@@ -18,7 +18,6 @@
 #include "vtkXMLHyperTreeGridReader.h"
 #include "vtkXMLImageDataReader.h"
 #include "vtkXMLMultiBlockDataReader.h"
-#include "vtkXMLMultiGroupDataReader.h" // legacy reader - produces vtkMultiBlockDataSet.
 #include "vtkXMLPImageDataReader.h"
 #include "vtkXMLPPolyDataReader.h"
 #include "vtkXMLPRectilinearGridReader.h"
@@ -118,7 +117,7 @@ const vtkXMLCollectionReaderInternals::ReaderConstructorsType
     { "vtm", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     { "vtmb", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     // legacy reader - produces vtkMultiBlockDataSet.
-    { "vtmg", GET_NEW_FUNCTOR(vtkXMLMultiGroupDataReader) },
+    { "vtmg", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     // legacy reader - produces vtkMultiBlockDataSet.
     { "vthd", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     { "vthb", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
