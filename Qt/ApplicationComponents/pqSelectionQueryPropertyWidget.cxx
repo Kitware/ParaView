@@ -463,7 +463,7 @@ protected:
     // clang-format off
     map["term"] = R"==(\w+|\w+\(\w+\)|\w+\[:,\d+\])==";
     // clang-format on
-    map["value"] = "[a-zA-Z0-9\\_\\,\\ \\-]+";
+    map["value"] = "[a-zA-Z0-9\\.\\_\\,\\ \\-]+";
     map["value_min"] = map["value_max"] = map["value_x"] = map["value_y"] = map["value_z"] =
       map["value_tolerance"] = "[a-zA-Z0-9\\_\\.\\-]+";
 
