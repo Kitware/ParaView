@@ -66,8 +66,6 @@ private:
    * Assumes output has the same structure as the input
    */
   int ProcessComposite(vtkCompositeDataSet* input, vtkCompositeDataSet* output);
-
-  bool HasCompositeHTG = false;
 };
 
 #endif

@@ -88,7 +88,7 @@ bool vtkPVGhostCellsGenerator::HasHTG(vtkMultiProcessController* controller, vtk
   {
     // Look for either a simple HTG or a composite dataset containing HTG.
     int isHTG = vtkHyperTreeGrid::SafeDownCast(object) != nullptr;
-    int someAreHTG = true;
+    int someAreHTG = 1;
     controller->AllReduce(&isHTG, &someAreHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
     return someAreHTG;
   }
@@ -98,7 +98,6 @@ bool vtkPVGhostCellsGenerator::HasHTG(vtkMultiProcessController* controller, vtk
   vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter);
   treeIter->TraverseSubTreeOn();
   treeIter->VisitOnlyLeavesOn();
-  unsigned int index;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     if (vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject()))
