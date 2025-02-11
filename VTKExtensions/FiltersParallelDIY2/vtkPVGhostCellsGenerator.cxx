@@ -3,10 +3,12 @@
 #include "vtkPVGhostCellsGenerator.h"
 
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSetRange.h"
 #include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataObjectTree.h"
 #include "vtkDataObjectTreeIterator.h"
+#include "vtkDataObjectTreeRange.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
@@ -18,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
-#include <vtkDataObjectTreeRange.h>
+#include "vtkRange.h"
 
 vtkStandardNewMacro(vtkPVGhostCellsGenerator);
 
@@ -152,57 +154,53 @@ int vtkPVGhostCellsGenerator::RequestData(
 
   // Composite structure: iterate recursively over composite datasets and partitioned datasets,
   // routing to either HTG or classic GCG
-  compositeOutput->CopyStructure(compositeInput);
   return this->ProcessComposite(compositeInput, compositeOutput);
 }
 
 int vtkPVGhostCellsGenerator::ProcessComposite(
   vtkCompositeDataSet* input, vtkCompositeDataSet* output)
 {
-  // Setup input iterator
-  vtkCompositeDataIterator* inputIter = input->NewIterator();
-  vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(inputIter);
-  treeIter->TraverseSubTreeOff();
-  treeIter->VisitOnlyLeavesOff();
-
-  // Setup output iterator
-  vtkCompositeDataIterator* outputIter = output->NewIterator();
-  vtkDataObjectTreeIterator* outputTreeIter = vtkDataObjectTreeIterator::SafeDownCast(outputIter);
-  outputTreeIter->TraverseSubTreeOff();
-  outputTreeIter->VisitOnlyLeavesOff();
-  outputIter->InitTraversal();
-
   int result = 1;
 
-  for (inputIter->InitTraversal(); !inputIter->IsDoneWithTraversal(); inputIter->GoToNextItem())
+  output->CopyStructure(input);
+  auto outputRange = vtk::Range(output, vtk::CompositeDataSetOptions::None);
+  auto inputRange = vtk::Range(input, vtk::CompositeDataSetOptions::None);
+  for (auto inIt = inputRange.begin(), outIt = outputRange.begin(); inIt != inputRange.end();
+       ++inIt, ++outIt)
   {
-    auto inputObj = inputIter->GetCurrentDataObject();
-    auto outputObj = outputIter->GetCurrentDataObject();
-    auto inputComposite = vtkCompositeDataSet::SafeDownCast(inputObj);
-    auto outputComposite = vtkCompositeDataSet::SafeDownCast(outputObj);
-
-    bool isComposite = inputObj && inputComposite;
-    bool isPDS = inputObj && inputObj->GetDataObjectType() == VTK_PARTITIONED_DATA_SET;
-
-    // Composite but not PartitionedDS: recurse over the composite structure
-    if (isComposite && !isPDS)
+    if (*inIt)
     {
-      if (!outputComposite)
+      *outIt = vtkSmartPointer<vtkDataObject>::Take(inIt->NewInstance());
+
+      auto inputComposite = vtkCompositeDataSet::SafeDownCast(*inIt);
+      auto outputComposite = vtkCompositeDataSet::SafeDownCast(*outIt);
+
+      bool isComposite = inputComposite != nullptr;
+      bool isPDS = inIt->GetDataObjectType() == VTK_PARTITIONED_DATA_SET;
+
+      // Composite but not PartitionedDS: recurse over the composite structure
+      if (isComposite && !isPDS)
       {
-        vtkErrorMacro(<< "");
+        if (!outputComposite)
+        {
+          vtkErrorMacro(<< "Found no composite output data object");
+        }
+        result &= this->ProcessComposite(inputComposite, outputComposite);
       }
-      result &= this->ProcessComposite(inputComposite, outputComposite);
-    }
-    else if (vtkPVGhostCellsGenerator::HasHTG(this->GetController(), inputObj))
-    {
-      // Not composite or PartitionedDS: process data either in HTG GCG or classic GCG
-      result &= this->GhostCellsGeneratorUsingHyperTreeGrid(inputObj, outputObj);
+      else if (vtkPVGhostCellsGenerator::HasHTG(this->GetController(), *inIt))
+      {
+        // Not composite or PartitionedDS: process data either in HTG GCG or classic GCG
+        result &= this->GhostCellsGeneratorUsingHyperTreeGrid(*inIt, *outIt);
+      }
+      else
+      {
+        result &= this->GhostCellsGeneratorUsingSuperclassInstance(*inIt, *outIt);
+      }
     }
     else
     {
-      result &= this->GhostCellsGeneratorUsingSuperclassInstance(inputObj, outputObj);
+      *outIt = nullptr;
     }
-    outputIter->GoToNextItem();
   }
 
   return result;
