@@ -89,7 +89,7 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   this->Internals->Ui.setupUi(t_widget);
 
   QObject::connect(this->Internals->Ui.exitButton, &QPushButton::clicked,
-    std::bind(&vtkPVXRInterfaceHelper::Quit, this->Internals->Helper));
+    [this]() { this->Internals->Helper->Quit(); });
 
   QObject::connect(this->Internals->Ui.resetCameraButton, &QPushButton::clicked, this,
     &pqXRInterfaceControls::resetCamera);
@@ -109,7 +109,7 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   });
 
   QObject::connect(this->Internals->Ui.comeToMeButton, &QPushButton::clicked,
-    std::bind(&vtkPVXRInterfaceHelper::ComeToMe, this->Internals->Helper));
+    [this]() { this->Internals->Helper->ComeToMe(); });
 
   QObject::connect(this->Internals->Ui.navigationPanel, &QPushButton::toggled,
     [&](bool checked) { this->Internals->Helper->SetShowNavigationPanel(checked); });
@@ -155,15 +155,15 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
 
   // connect crop plane buttons to the helper
   QObject::connect(this->Internals->Ui.addCropButton, &QPushButton::clicked,
-    std::bind(&vtkPVXRInterfaceHelper::AddACropPlane, this->Internals->Helper, nullptr, nullptr));
+    [this]() { this->Internals->Helper->AddACropPlane(nullptr, nullptr); });
   QObject::connect(this->Internals->Ui.addThickCropButton, &QPushButton::clicked,
-    std::bind(&vtkPVXRInterfaceHelper::AddAThickCrop, this->Internals->Helper, nullptr));
+    [this]() { this->Internals->Helper->AddAThickCrop(nullptr); });
 
   QObject::connect(this->Internals->Ui.hideCropPlanesButton, &QPushButton::toggled,
     [&](bool checked) { this->Internals->Helper->ShowCropPlanes(!checked); });
 
   QObject::connect(this->Internals->Ui.removeCropsButton, &QPushButton::clicked,
-    std::bind(&vtkPVXRInterfaceHelper::RemoveAllCropPlanesAndThickCrops, this->Internals->Helper));
+    [this]() { this->Internals->Helper->RemoveAllCropPlanesAndThickCrops(); });
   QObject::connect(this->Internals->Ui.cropSnapping, &QPushButton::toggled,
     [&](bool checked) { this->Internals->Helper->SetCropSnapping(checked); });
 

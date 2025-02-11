@@ -26,10 +26,10 @@
 
 .el7_mindeps:
     extends: .linux
-    image: "kitware/paraview:ci-el7-mindeps-20240521"
+    image: "kitware/paraview:ci-el7-mindeps-20250116"
 
     variables:
-        LAUNCHER: "scl enable rh-python38 --"
+        LAUNCHER: "scl enable rh-python38 devtoolset-8 --"
 
 .el8_icc:
     extends: .linux

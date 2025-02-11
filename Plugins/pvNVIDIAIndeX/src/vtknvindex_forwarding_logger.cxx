@@ -38,6 +38,7 @@
 
 #include "vtknvindex_global_settings.h"
 
+// NOLINTNEXTLINE(modernize-concat-nested-namespaces)
 namespace vtknvindex
 {
 namespace logger
