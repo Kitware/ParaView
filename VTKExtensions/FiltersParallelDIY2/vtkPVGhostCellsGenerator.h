@@ -18,6 +18,8 @@
 #include "vtkParaViewDeprecation.h"                      // for PARAVIEW_DEPRECATED_IN_5_14_0
 
 class vtkDataObject;
+class vtkMultiProcessController;
+class vtkCompositeDataSet;
 
 class VTKPVVTKEXTENSIONSFILTERSPARALLELDIY2_EXPORT vtkPVGhostCellsGenerator
   : public vtkGhostCellsGenerator
@@ -31,7 +33,6 @@ protected:
   vtkPVGhostCellsGenerator() = default;
   ~vtkPVGhostCellsGenerator() override = default;
 
-  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int, vtkInformation*) override;
 
@@ -39,13 +40,33 @@ protected:
     "Use int GhostCellsGeneratorUsingSuperclassInstance(vtkDataObject*, vtkDataObject*)")
   int GhostCellsGeneratorUsingSuperclassInstance(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
+  /**
+   * Execute classic GCG on the input dataset
+   */
   int GhostCellsGeneratorUsingSuperclassInstance(vtkDataObject* inputDO, vtkDataObject* outputDO);
 
 private:
   vtkPVGhostCellsGenerator(const vtkPVGhostCellsGenerator&) = delete;
   void operator=(const vtkPVGhostCellsGenerator&) = delete;
 
+  /**
+   * Execute HTG GCG on the input data object.
+   */
   int GhostCellsGeneratorUsingHyperTreeGrid(vtkDataObject* inputDO, vtkDataObject* outputDO);
+
+  /**
+   * Return true if the object is a HyperTreeGrid or a data object tree containing HyperTreeGrid
+   */
+  static bool HasHTG(vtkMultiProcessController* controller, vtkDataObject* object);
+
+  /**
+   * Apply the GCG filter to the composite input recursively.
+   * Partitioned DataSets will be processes toghether.
+   * Assumes output has the same structure as the input
+   */
+  int ProcessComposite(vtkCompositeDataSet* input, vtkCompositeDataSet* output);
+
   bool HasCompositeHTG = false;
 };
 
