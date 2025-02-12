@@ -27,7 +27,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPMultiResolutionGenericIOReader
 public:
   static vtkPMultiResolutionGenericIOReader* New();
   vtkTypeMacro(vtkPMultiResolutionGenericIOReader, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   virtual bool CanReadFile(const char* fileName);
 
@@ -99,9 +99,9 @@ protected:
   vtkPMultiResolutionGenericIOReader();
   ~vtkPMultiResolutionGenericIOReader();
 
-  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   char* FileName;
   char* XAxisVariableName;

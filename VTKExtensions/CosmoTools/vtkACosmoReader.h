@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkACosmoReader : public vtkMultiBlock
 public:
   static vtkACosmoReader* New();
   vtkTypeMacro(vtkACosmoReader, vtkMultiBlockDataSetAlgorithm);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
   /**
@@ -78,8 +78,8 @@ protected:
   ~vtkACosmoReader();
 
   // Standard pipeline methods
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Loads the metadata
