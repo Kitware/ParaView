@@ -13,11 +13,13 @@
 #define vtkCPMappedVectorArrayTemplate_h
 
 #include "vtkMappedDataArray.h"
-
-#include "vtkObjectFactory.h" // for vtkStandardNewMacro
+#include "vtkObjectFactory.h"       // for vtkStandardNewMacro
+#include "vtkParaViewDeprecation.h" // For deprecation macro
 
 template <class Scalar>
-class vtkCPMappedVectorArrayTemplate : public vtkMappedDataArray<Scalar>
+class PARAVIEW_DEPRECATED_IN_5_14_0(
+  "Please use the SetArray functionality of `vtkAOSDataArrayTemplate` instead.")
+  vtkCPMappedVectorArrayTemplate : public vtkMappedDataArray<Scalar>
 {
 public:
   vtkAbstractTemplateTypeMacro(vtkCPMappedVectorArrayTemplate<Scalar>, vtkMappedDataArray<Scalar>);

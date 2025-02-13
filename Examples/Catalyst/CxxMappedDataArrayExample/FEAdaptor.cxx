@@ -2,23 +2,21 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "FEAdaptor.h"
 #include "FEDataStructures.h"
-#include <iostream>
 
+#include <vtkAOSDataArrayTemplate.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonPipeline.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>
-#include <vtkDoubleArray.h>
-#include <vtkFloatArray.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
 
-#include "vtkCPMappedVectorArrayTemplate.h"
+#include <iostream>
 
 namespace
 {
@@ -28,14 +26,12 @@ vtkUnstructuredGrid* VTKGrid;
 void BuildVTKGrid(Grid& grid)
 {
   // create the points information
-  vtkCPMappedVectorArrayTemplate<double>* pointArray =
-    vtkCPMappedVectorArrayTemplate<double>::New();
-
-  pointArray->SetVectorArray(
-    grid.GetPointsArray(), static_cast<vtkIdType>(grid.GetNumberOfPoints()));
+  vtkNew<vtkAOSDataArrayTemplate<double>> pointArray;
+  pointArray->SetNumberOfComponents(3);
+  pointArray->SetArray(
+    grid.GetPointsArray(), 3 * static_cast<vtkIdType>(grid.GetNumberOfPoints()), /*save=*/1);
   vtkNew<vtkPoints> points;
   points->SetData(pointArray);
-  pointArray->Delete();
   VTKGrid->SetPoints(points);
 
   // create the cells
@@ -57,33 +53,30 @@ void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkCPInputDataDescr
     if (VTKGrid->GetPointData()->GetNumberOfArrays() == 0)
     {
       // velocity array
-      vtkCPMappedVectorArrayTemplate<double>* velocity =
-        vtkCPMappedVectorArrayTemplate<double>::New();
+      vtkNew<vtkAOSDataArrayTemplate<double>> velocity;
       velocity->SetName("velocity");
+      velocity->SetNumberOfComponents(3);
       VTKGrid->GetPointData()->AddArray(velocity);
-      velocity->Delete();
     }
-    vtkCPMappedVectorArrayTemplate<double>* velocity =
-      vtkCPMappedVectorArrayTemplate<double>::SafeDownCast(
-        VTKGrid->GetPointData()->GetArray("velocity"));
-    velocity->SetVectorArray(attributes.GetVelocityArray(), VTKGrid->GetNumberOfPoints());
+    auto velocity =
+      vtkAOSDataArrayTemplate<double>::SafeDownCast(VTKGrid->GetPointData()->GetArray("velocity"));
+    velocity->SetArray(attributes.GetVelocityArray(), 3 * VTKGrid->GetNumberOfPoints(), /*save=*/1);
   }
   if (idd->IsFieldNeeded("pressure", vtkDataObject::CELL))
   {
     if (VTKGrid->GetCellData()->GetNumberOfArrays() == 0)
     {
       // pressure array
-      vtkNew<vtkFloatArray> pressure;
+      vtkNew<vtkAOSDataArrayTemplate<float>> pressure;
       pressure->SetName("pressure");
       pressure->SetNumberOfComponents(1);
       VTKGrid->GetCellData()->AddArray(pressure);
     }
-    vtkFloatArray* pressure =
-      vtkFloatArray::SafeDownCast(VTKGrid->GetCellData()->GetArray("pressure"));
+    auto pressure =
+      vtkAOSDataArrayTemplate<float>::SafeDownCast(VTKGrid->GetCellData()->GetArray("pressure"));
     // The pressure array is a scalar array so we can reuse
     // memory as long as we ordered the points properly.
-    float* pressureData = attributes.GetPressureArray();
-    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfCells()), 1);
+    pressure->SetArray(attributes.GetPressureArray(), VTKGrid->GetNumberOfCells(), /*save=*/1);
   }
 }
 
