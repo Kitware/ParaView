@@ -1019,6 +1019,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   STLReaderMergePoints.xml
   StringInLineChartView.xml
   TableHistogram.xml
+  TemporalArrayOperator.xml
   TensorPrincipalInvariants.xml
   TestCompositePropertyWidgetDecorator.xml
   TestFileListPropertyWidget.xml

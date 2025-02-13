@@ -91,6 +91,17 @@
         <Documentation>This property lists the name of the array from which to
         use.</Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty name="RelativeTimeStep"
+        command="SetRelativeMode"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>In relative mode, use current timestep and a shifted version.
+           Otherwise both timesteps are explicitly set.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty
         name="FirstTimeStepIndex"
         command="SetFirstTimeStepIndex"
@@ -101,7 +112,11 @@
         <Documentation>
           This property specifies the timestep index to use in the first part of the comparison computation
         </Documentation>
+        <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="RelativeTimeStep" value="1" inverse="1" />
+        </Hints>
       </IntVectorProperty>
+
       <IntVectorProperty command="SetOperator"
                          default_values="0"
                          name="Operator"
@@ -129,7 +144,25 @@
         <Documentation>
           This property specifies the timestep index to use in the second part of the comparison computation
         </Documentation>
+        <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="RelativeTimeStep" value="1" inverse="1" />
+        </Hints>
       </IntVectorProperty>
+
+      <IntVectorProperty name="Shift"
+       command="SetTimeStepShift"
+       number_of_elements="1"
+       default_values="-1"
+       animateable="1" >
+         <Documentation>Specify the shift to apply to get the second timesteps to operate.
+           Negative means previous time.
+         </Documentation>
+        <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="RelativeTimeStep" value="1" inverse="0" />
+        </Hints>
+       </IntVectorProperty>
+
+
       <StringVectorProperty command="SetOutputArrayNameSuffix"
                             name="OutputArrayNameSuffix"
                             number_of_elements="1"
@@ -138,6 +171,11 @@
         If empty, output will be suffixed with '_' and the operation type.
         </Documentation>
       </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
       <!-- End TemporalArrayOperator -->
     </SourceProxy>
 
