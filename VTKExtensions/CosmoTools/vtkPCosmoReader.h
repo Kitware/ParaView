@@ -40,7 +40,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPCosmoReader : public vtkUnstructur
 public:
   static vtkPCosmoReader* New();
   vtkTypeMacro(vtkPCosmoReader, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
   /**
@@ -105,8 +105,8 @@ protected:
   vtkPCosmoReader();
   ~vtkPCosmoReader();
 
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkMultiProcessController* Controller;
 

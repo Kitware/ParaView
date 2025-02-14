@@ -48,6 +48,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <set>
 #include <algorithm>
+#include <random>
 
 #include <math.h>
 #include <stdio.h>
@@ -837,7 +838,9 @@ void CosmoHaloFinderP::writeTaggedParticles(int hmin, float ss, int minPerHalo,
       }
 
       // randomly sort the array.
-      std::random_shuffle(haloIndices.begin(), haloIndices.end(), drand48elmt);
+      std::random_device rng;
+      std::mt19937 urng(rng());
+      std::shuffle(haloIndices.begin(), haloIndices.end(), urng);
       int NumOutput = std::max((int) (ss*this->haloCount[h]), minPerHalo);
       for (int i = 0; i < NumOutput && i < (int) haloIndices.size(); ++i) {
         p = haloIndices[i];

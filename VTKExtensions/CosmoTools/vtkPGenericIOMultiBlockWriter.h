@@ -19,7 +19,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPGenericIOMultiBlockWriter : public
 public:
   static vtkPGenericIOMultiBlockWriter* New();
   vtkTypeMacro(vtkPGenericIOMultiBlockWriter, vtkWriter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
@@ -28,7 +28,7 @@ protected:
   vtkPGenericIOMultiBlockWriter();
   ~vtkPGenericIOMultiBlockWriter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  int FillInputPortInformation(int port, vtkInformation* info) override;
   virtual void WriteData();
 
 private:

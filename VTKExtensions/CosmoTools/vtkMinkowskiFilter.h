@@ -25,14 +25,14 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkMinkowskiFilter : public vtkUnstruc
 public:
   static vtkMinkowskiFilter* New();
   vtkTypeMacro(vtkMinkowskiFilter, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkMinkowskiFilter();
   ~vtkMinkowskiFilter();
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  int FillOutputPortInformation(int, vtkInformation*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillOutputPortInformation(int, vtkInformation*) override;
 
 private:
   vtkMinkowskiFilter(const vtkMinkowskiFilter&) = delete;
