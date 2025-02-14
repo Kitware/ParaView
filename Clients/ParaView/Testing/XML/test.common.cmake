@@ -137,6 +137,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/glTF/SimpleSkin/SimpleSkin.gltf}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/WaterBottle/WaterBottle.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/binary_3D_333_mask.htg}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTG/donut_XZ_shift_2d.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/ghost.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGCellCentersBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGFeatureEdgesBackwardCompat.pvsm}"
@@ -481,6 +482,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HistogramSelection3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HistogramSelection4.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HistogramSelection4_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGrid2DGeometryFillMaterial_Filled.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGrid2DGeometryFillMaterial_Lines.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridAxisClip1-Plane.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridAxisClip2-RevPlane.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridAxisClip3-Box.png}"
@@ -1094,6 +1097,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   FeatureEdgesHTGNoMask.xml
   FileSeries.xml
   FontScalingInScreenshots.xml
+  HyperTreeGrid2DGeometryFillMaterial.xml
   HyperTreeGridAxisClip.xml
   HyperTreeGridAxisCut.xml
   HyperTreeGridAxisReflection.xml
