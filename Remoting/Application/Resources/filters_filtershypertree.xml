@@ -218,6 +218,16 @@
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty name="FillMaterial"
+                         command="SetFillMaterial"
+                         default_values="1"
+                         number_of_elements="1">
+        <Documentation>
+          If disabled, only draw the interface (lines).
+          Otherwise, draw the full cell with interface (poly).
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- End vtkHyperTreeGridGeometry -->
     </SourceProxy>
 
