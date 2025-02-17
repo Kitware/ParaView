@@ -39,6 +39,22 @@ public:
   void restoreState(const QString& key, QDialog& dialog);
 
   /**
+   * Enum to capture possible Save State file formats.
+   */
+  enum class StateFileFormat : unsigned int
+  {
+    PVSM = 0,
+    Python = 1
+  };
+
+  /**
+   * Return the extension for the given format
+   * See StateFileFormat.
+   * Default to pvsm
+   */
+  static QString formatToExtension(pqSettings::StateFileFormat format);
+
+  /**
    * Calling this method will cause the modified signal to be emitted.
    */
   void alertSettingsModified();
