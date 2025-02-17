@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Disables dashboard mode to be able to interact with the file dialog-->
+  <pqevent object="pqClientMainWindow" command="dashboard_mode" arguments="false" />
+
+  <!-- Check default save state format-->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
+  <pqcheck object="pqClientMainWindow/FileSaveServerStateDialog/tabWidget/qt_tabwidget_stackedwidget/Filesystem_0/mainWidget/mainSplitter/layoutWidget/EntityType" property="currentText" arguments="ParaView state file (*.pvsm)" />
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog/tabWidget/qt_tabwidget_stackedwidget/Filesystem_0/mainWidget/mainSplitter/layoutWidget/Cancel" command="activate" arguments="" />
+
+  <!-- Change save state format in settings-->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/DefaultSaveStateFormat/ComboBox" command="activated" arguments="py" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Check new save state format-->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
+  <pqcheck object="pqClientMainWindow/FileSaveServerStateDialog/tabWidget/qt_tabwidget_stackedwidget/Filesystem_0/mainWidget/mainSplitter/layoutWidget/EntityType" property="currentText" arguments="Python state file (*.py)" />
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog/tabWidget/qt_tabwidget_stackedwidget/Filesystem_0/mainWidget/mainSplitter/layoutWidget/Cancel" command="activate" arguments="" />
+</pqevents>

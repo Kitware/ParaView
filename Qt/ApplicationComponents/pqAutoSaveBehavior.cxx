@@ -132,14 +132,15 @@ QString pqAutoSaveBehavior::getBakStatePath()
 }
 
 //-----------------------------------------------------------------------------
-pqSettings::StateFileFormat pqAutoSaveBehavior::getStateFormat()
+pqApplicationCore::StateFileFormat pqAutoSaveBehavior::getStateFormat()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   int value =
-    settings->value(::AUTOSAVE_FORMAT_KEY, static_cast<int>(pqSettings::StateFileFormat::PVSM))
+    settings
+      ->value(::AUTOSAVE_FORMAT_KEY, static_cast<int>(pqApplicationCore::StateFileFormat::PVSM))
       .toInt();
 
-  return pqSettings::StateFileFormat(value);
+  return pqApplicationCore::StateFileFormat(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -153,8 +154,8 @@ QString pqAutoSaveBehavior::getStatePath(bool bak)
     state = state.arg("bak.%1");
   }
 
-  pqSettings::StateFileFormat format = pqAutoSaveBehavior::getStateFormat();
-  QString stateExtension = pqSettings::formatToExtension(format);
+  pqApplicationCore::StateFileFormat format = pqAutoSaveBehavior::getStateFormat();
+  QString stateExtension = pqApplicationCore::stateFileFormatToExtension(format);
   state = state.arg(stateExtension);
   return state;
 }
@@ -197,8 +198,8 @@ void pqAutoSaveBehavior::saveState()
     QFile::copy(newState, bakState);
   }
 
-  pqSettings::StateFileFormat format = pqAutoSaveBehavior::getStateFormat();
-  if (format == pqSettings::StateFileFormat::Python)
+  pqApplicationCore::StateFileFormat format = pqAutoSaveBehavior::getStateFormat();
+  if (format == pqApplicationCore::StateFileFormat::Python)
   {
     vtkSmartPointer<vtkSMProxy> options;
     options.TakeReference(pqSaveStateReaction::createPythonStateOptions(false));

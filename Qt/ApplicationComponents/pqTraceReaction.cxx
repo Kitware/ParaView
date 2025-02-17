@@ -101,7 +101,7 @@ void pqTraceReaction::start()
   }
 
   this->AutoSavePythonEnabled = pqAutoSaveBehavior::autoSaveSettingEnabled() &&
-    pqAutoSaveBehavior::getStateFormat() == pqSettings::StateFileFormat::Python;
+    pqAutoSaveBehavior::getStateFormat() == pqApplicationCore::StateFileFormat::Python;
   if (this->AutoSavePythonEnabled)
   {
     auto userAnswer = QMessageBox::warning(pqCoreUtilities::mainWidget(),

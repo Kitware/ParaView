@@ -61,19 +61,6 @@ QString pqSettings::backup(const QString& argName)
 }
 
 //-----------------------------------------------------------------------------
-QString pqSettings::formatToExtension(pqSettings::StateFileFormat format)
-{
-  switch (format)
-  {
-    case pqSettings::StateFileFormat::Python:
-      return "py";
-    case pqSettings::StateFileFormat::PVSM:
-    default:
-      return "pvsm";
-  }
-}
-
-//-----------------------------------------------------------------------------
 void pqSettings::alertSettingsModified()
 {
   Q_EMIT this->modified();

@@ -9,8 +9,8 @@
 #include <QDir>
 #include <QString>
 
-#include "pqSettings.h"
 #include "pqUndoStack.h"
+#include "vtkSMSessionProxyManager.h"
 
 /**
  * @ingroup Behaviors
@@ -66,7 +66,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Return the file format for the statefile, as defined in the settings.
    * Default to StateFormat::PVSM.
    */
-  static pqSettings::StateFileFormat getStateFormat();
+  static pqApplicationCore::StateFileFormat getStateFormat();
 
 private Q_SLOTS:
   /**

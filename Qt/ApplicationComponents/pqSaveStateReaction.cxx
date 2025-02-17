@@ -61,23 +61,26 @@ bool pqSaveStateReaction::saveState(pqServer* server)
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   unsigned int value = settings->value(::DEFAULT_SAVE_STATE_FORMAT_KEY, 0).toInt();
-  pqSettings::StateFileFormat format = pqSettings::StateFileFormat(value);
+  pqApplicationCore::StateFileFormat format = pqApplicationCore::StateFileFormat(value);
 
-  QString fileExt = "";
-  if (format == pqSettings::StateFileFormat::PVSM)
-  {
-    fileExt += tr("ParaView state file") + QString(" (*.pvsm);;");
+  const QString pvsmExt = tr("ParaView state file") + QString(" (*.pvsm);;");
+  QString pyExt;
+
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-    fileExt += tr("Python state file") + QString(" (*.py);;");
+  pyExt += tr("Python state file") + QString(" (*.py);;");
 #endif
+
+  QString fileExt;
+  // Order matters as first argument is default
+  if (format == pqApplicationCore::StateFileFormat::PVSM)
+  {
+    fileExt = pvsmExt + pyExt;
   }
   else
   {
-#if VTK_MODULE_ENABLE_ParaView_pqPython
-    fileExt += tr("Python state file") + QString(" (*.py);;");
-#endif
-    fileExt += tr("ParaView state file") + QString(" (*.pvsm);;");
+    fileExt = pyExt + pvsmExt;
   }
+  fileExt += tr("All Files") + QString(" (*)");
 
   pqFileDialog fileDialog(
     server, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt, false, false);
