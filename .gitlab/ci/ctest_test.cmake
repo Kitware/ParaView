@@ -134,6 +134,12 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
       "^paraviewPython-TestCatalystClient$")
   endif ()
 
+  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_qt")
+    list(APPEND test_exclusions
+      # Test fails when PARAVIEW_ENABLE_VISITBRIDGE is ON (it doesn't know which Fluent reader to chose)
+      "FluentReaderZoneSelection$")
+  endif ()
+
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
