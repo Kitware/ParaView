@@ -89,7 +89,7 @@ template <class T>
 void cdi_get_part_struct(CDIVar* cdiVar, int start, size_t size, T* buffer, int nlevels)
 {
   const size_t gridsize = cdiVar->GridSize;
-  T fullbuff[gridsize * nlevels];
+  T* fullbuff = new T[gridsize * nlevels];
   cdi_get_full(cdiVar, fullbuff, nlevels);
   for (size_t lev = 0; lev < nlevels; lev++)
   {
@@ -98,6 +98,7 @@ void cdi_get_part_struct(CDIVar* cdiVar, int start, size_t size, T* buffer, int 
       buffer[i + lev * size] = fullbuff[(lev * gridsize) + start + i];
     }
   }
+  delete[] fullbuff;
 }
 
 template <class T>

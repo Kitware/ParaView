@@ -31,12 +31,13 @@ std::string get_att_str(const std::string& filename, const std::string& var, con
   status = nc_inq_attlen(ncFD, varId, att.c_str(), &len);
   if (status != NC_NOERR)
     return result;
-  char buffer[len + 1];
+  char* buffer = new char[len + 1];
   status = nc_get_att_text(ncFD, varId, att.c_str(), buffer);
   if (status != NC_NOERR)
     return result;
   buffer[len] = 0;
   result = buffer;
+  delete[] buffer;
   return result;
 }
 
