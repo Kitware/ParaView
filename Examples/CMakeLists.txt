@@ -43,6 +43,12 @@ if (ParaView_BINARY_DIR)
           TIMEOUT "${arg_TEST_TIMEOUT}")
     endif()
   endfunction ()
+
+  # When building ParaView, also adds existings Python example in the testing suite.
+  function (add_python_example dir)
+    set(_vtk_test_python_suffix "ParaViewExample-${dir}")
+    add_subdirectory("${dir}/Testing")
+  endfunction()
 else ()
   if (NOT BUILD_SHARED_LIBS)
     set(CMAKE_JOB_POOL_LINK static_exe_link)
@@ -57,7 +63,19 @@ else ()
   macro (add_example dir)
     add_subdirectory("${dir}")
   endmacro ()
+
+  # When outside of a ParaView build, we have nothing to do for Python.
+  # Create the method anyway to define the API regardless this fact,
+  # but implement it as a no-op.
+  function (add_python_example dir)
+  # pass
+  endfunction()
 endif ()
+
+
+if (PARAVIEW_USE_PYTHON AND PARAVIEW_ENABLE_RENDERING)
+  add_python_example(Plugins/ComplexPythonArchitecture)
+endif()
 
 add_example(Plugins/AddPQProxy)
 add_example(Plugins/Autostart)
