@@ -74,6 +74,7 @@ EXCLUDE              = \
     "@ParaView_SOURCE_DIR@/VTK" \
     "@ParaView_SOURCE_DIR@/Web/Documentation" \
     "@ParaView_BINARY_DIR@/@vtk_cmake_destination@" \
+    "@ParaView_SOURCE_DIR@/venv" \
 
 
 # Exclude module testing directories.
