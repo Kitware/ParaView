@@ -152,6 +152,7 @@ add_custom_target(ParaViewPythonDoc
   SOURCES sphinx_apidoc.py
           parse_pydoc_output.py
           ${sphinx_config_files}
+  COMMENT "Generate Python HTML documentation"
   # ensures that the output is continuously generated
   # when using ninja; avoids builder from timing out
   USES_TERMINAL)
