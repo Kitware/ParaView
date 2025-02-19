@@ -209,6 +209,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_0.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_1.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/random_torus.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/room.cas}"
+  "DATA{${paraview_test_data_directory_input}/Data/room.dat}"
   "DATA{${paraview_test_data_directory_input}/Data/room.cas.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/room.dat.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/sample.h5part}"
@@ -977,6 +979,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ExtractParticlesOverTime.xml
   FieldDataToAttribute.xml
   FileDialogOpenInteractClose.xml
+  FluentReaderZoneSelection.xml
   ForceStaticMesh.xml
   GradientBackwardsCompatibility.xml
   HTGCellCentersBackwardCompat.xml
