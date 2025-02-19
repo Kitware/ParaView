@@ -150,10 +150,8 @@ add_custom_target(ParaViewPythonDoc
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/python"
   SOURCES sphinx_apidoc.py
-          config/index.rst
-          config/quick-start.rst
-          config/api-changes.rst
-          config/conf.py.in
+          parse_pydoc_output.py
+          ${sphinx_config_files}
   # ensures that the output is continuously generated
   # when using ninja; avoids builder from timing out
   USES_TERMINAL)
