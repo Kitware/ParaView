@@ -41,8 +41,7 @@ def ResetCameraToDirection(
     :param sbounds: If provided, reset the camera using computed bounds from a sphere_bounds (center_x, center_y, center_z, radius).
     :type sbounds: 4-element tuple or list of floats.
 
-    Examples
-    --------
+    Examples:
 
     >> ResetCameraToDirection(
     ...   direction=[-1, -1, -1],

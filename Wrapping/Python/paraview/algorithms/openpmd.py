@@ -119,8 +119,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
           https://github.com/openPMD/openPMD-viewer/pull/347
         - or move out of the reader into VTK itself, so all readers behave the same
 
-        Parameters
-        ----------
+        Parameters:
 
         outInfo: vktInformation
           Exchanges information between pipeline objects, e.g., between two filters.
@@ -129,8 +128,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
           UPDATE_... are requests. Here, we request a new step for a time, e.g., to animate.
 
-        Returns
-        -------
+        Returns:
+
           The time (float) of the first time step available
           that is less than the requested time.
         """
@@ -232,8 +231,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
         - vtkPartitionedDataSet: openPMD meshes
         - vtkPartitionedDataSetCollection: openPMD particle species
 
-        Parameters
-        ----------
+        Parameters:
 
         port: Int
           Output indices: 0 for meshes, 1 for particle species
@@ -257,8 +255,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
         - species names
         - particle array names per species
 
-        Parameters
-        ----------
+        Parameters:
+
         request:
           Not used.
 
@@ -378,8 +376,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
         Scalars have no components, e.g., a density field "rho".
         Vectors/tensors have components, e.g., the electric field E ("E_x", "E_y", "E_z").
 
-        Parameters
-        ----------
+        Parameters:
+
         itr: openPMD.Iteration
           The current iteration to inspect.
         name: openPMD record name of the mesh, e.g., "rho" or "E_x"
