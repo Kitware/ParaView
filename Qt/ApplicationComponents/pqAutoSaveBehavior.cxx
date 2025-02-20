@@ -77,19 +77,6 @@ void pqAutoSaveBehavior::setAutoSaveSetting(bool enable)
 }
 
 //-----------------------------------------------------------------------------
-QString pqAutoSaveBehavior::formatToExtension(StateFormat format)
-{
-  switch (format)
-  {
-    case StateFormat::Python:
-      return "py";
-    case StateFormat::PVSM:
-    default:
-      return "pvsm";
-  }
-}
-
-//-----------------------------------------------------------------------------
 void pqAutoSaveBehavior::updateConnections()
 {
   this->clearConnections();
@@ -145,12 +132,15 @@ QString pqAutoSaveBehavior::getBakStatePath()
 }
 
 //-----------------------------------------------------------------------------
-pqAutoSaveBehavior::StateFormat pqAutoSaveBehavior::getStateFormat()
+pqApplicationCore::StateFileFormat pqAutoSaveBehavior::getStateFormat()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  int value = settings->value(::AUTOSAVE_FORMAT_KEY, static_cast<int>(StateFormat::PVSM)).toInt();
+  int value =
+    settings
+      ->value(::AUTOSAVE_FORMAT_KEY, static_cast<int>(pqApplicationCore::StateFileFormat::PVSM))
+      .toInt();
 
-  return StateFormat(value);
+  return pqApplicationCore::StateFileFormat(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -164,8 +154,8 @@ QString pqAutoSaveBehavior::getStatePath(bool bak)
     state = state.arg("bak.%1");
   }
 
-  StateFormat format = pqAutoSaveBehavior::getStateFormat();
-  QString stateExtension = pqAutoSaveBehavior::formatToExtension(format);
+  pqApplicationCore::StateFileFormat format = pqAutoSaveBehavior::getStateFormat();
+  QString stateExtension = pqApplicationCore::stateFileFormatToExtension(format);
   state = state.arg(stateExtension);
   return state;
 }
@@ -208,8 +198,8 @@ void pqAutoSaveBehavior::saveState()
     QFile::copy(newState, bakState);
   }
 
-  StateFormat format = pqAutoSaveBehavior::getStateFormat();
-  if (format == StateFormat::Python)
+  pqApplicationCore::StateFileFormat format = pqAutoSaveBehavior::getStateFormat();
+  if (format == pqApplicationCore::StateFileFormat::Python)
   {
     vtkSmartPointer<vtkSMProxy> options;
     options.TakeReference(pqSaveStateReaction::createPythonStateOptions(false));

@@ -216,6 +216,22 @@ public:
   void clearSettings();
 
   /**
+   * Enum to capture possible Save State file formats.
+   */
+  enum class StateFileFormat : unsigned int
+  {
+    PVSM = 0,
+    Python = 1
+  };
+
+  /**
+   * Return the extension for the given format
+   * See StateFileFormat.
+   * Default to pvsm
+   */
+  static QString stateFileFormatToExtension(pqApplicationCore::StateFileFormat format);
+
+  /**
    * Save the ServerManager state to a XML element.
    */
   vtkPVXMLElement* saveState();

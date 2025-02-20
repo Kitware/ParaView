@@ -304,6 +304,19 @@ QObject* pqApplicationCore::manager(const QString& function)
 }
 
 //-----------------------------------------------------------------------------
+QString pqApplicationCore::stateFileFormatToExtension(pqApplicationCore::StateFileFormat format)
+{
+  switch (format)
+  {
+    case pqApplicationCore::StateFileFormat::Python:
+      return "py";
+    case pqApplicationCore::StateFileFormat::PVSM:
+    default:
+      return "pvsm";
+  }
+}
+
+//-----------------------------------------------------------------------------
 bool pqApplicationCore::saveState(const QString& filename, vtkTypeUInt32 location)
 {
   // * Save the Proxy Manager state.

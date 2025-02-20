@@ -34,6 +34,23 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="DefaultSaveStateFormat"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the default save state format.
+          `pvsm` is the standard xml-based statefile. `py` is the Python version.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="pvsm" />
+          <Entry value="1" text="py" />
+        </EnumerationDomain>
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty name="AutoSave"
         number_of_elements="1"
         default_values="0" >

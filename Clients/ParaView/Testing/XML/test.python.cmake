@@ -6,6 +6,7 @@ list(APPEND TESTS_WITHOUT_BASELINES
   MacroEditor.xml
   MultipleNumberOfComponents.xml
   ProgrammableSourcePythonEditorLink.xml
+  PythonDefaultSaveState.xml
   PythonEditorTab.xml
   PythonResetSessionMacro.xml
   SpreadSheetNullArrayName.xml # needs programmable filter

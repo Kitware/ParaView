@@ -10,6 +10,7 @@
 #include <QString>
 
 #include "pqUndoStack.h"
+#include "vtkSMSessionProxyManager.h"
 
 /**
  * @ingroup Behaviors
@@ -34,12 +35,6 @@ public:
   pqAutoSaveBehavior(QObject* parent = nullptr);
   ~pqAutoSaveBehavior() override;
 
-  enum class StateFormat : unsigned int
-  {
-    PVSM = 0,
-    Python = 1
-  };
-
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Saves the state.
@@ -58,13 +53,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   static QDir getStateDirectory();
 
   /**
-   * Return the extension for the given format
-   * See StateFormat.
-   * Default to pvsm
-   */
-  static QString formatToExtension(StateFormat format);
-
-  /**
    * Return true if the AutoSave settings is enabled.
    */
   static bool autoSaveSettingEnabled();
@@ -78,7 +66,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Return the file format for the statefile, as defined in the settings.
    * Default to StateFormat::PVSM.
    */
-  static StateFormat getStateFormat();
+  static pqApplicationCore::StateFileFormat getStateFormat();
 
 private Q_SLOTS:
   /**

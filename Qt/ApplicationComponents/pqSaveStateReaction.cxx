@@ -9,6 +9,7 @@
 #include "pqFileDialog.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
+#include "pqSettings.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "pqUndoStack.h"
 #include "vtkNew.h"
@@ -24,6 +25,11 @@
 #include <QtDebug>
 
 #include <cassert>
+
+namespace
+{
+static const QString DEFAULT_SAVE_STATE_FORMAT_KEY = "GeneralSettings.DefaultSaveStateFormat";
+};
 
 //-----------------------------------------------------------------------------
 pqSaveStateReaction::pqSaveStateReaction(QAction* parentObject)
@@ -53,10 +59,27 @@ bool pqSaveStateReaction::saveState()
 //-----------------------------------------------------------------------------
 bool pqSaveStateReaction::saveState(pqServer* server)
 {
-  QString fileExt = tr("ParaView state file") + QString(" (*.pvsm);;");
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  unsigned int value = settings->value(::DEFAULT_SAVE_STATE_FORMAT_KEY, 0).toInt();
+  pqApplicationCore::StateFileFormat format = pqApplicationCore::StateFileFormat(value);
+
+  const QString pvsmExt = tr("ParaView state file") + QString(" (*.pvsm);;");
+  QString pyExt;
+
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-  fileExt += tr("Python state file") + QString(" (*.py);;");
+  pyExt += tr("Python state file") + QString(" (*.py);;");
 #endif
+
+  QString fileExt;
+  // Order matters as first argument is default
+  if (format == pqApplicationCore::StateFileFormat::PVSM)
+  {
+    fileExt = pvsmExt + pyExt;
+  }
+  else
+  {
+    fileExt = pyExt + pvsmExt;
+  }
   fileExt += tr("All Files") + QString(" (*)");
 
   pqFileDialog fileDialog(
