@@ -81,6 +81,8 @@ list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION
   "qt.qpa.xcb: internal error"
   # Qt lupdate writes warning on stderr when finding class as template types
   "Ignoring definition of undeclared qualified class"
+  # Sphinx warning exclusions
+  "The str interface for _CascadingStyleSheet objects is deprecated. Use css.filename instead."
 )
 
 # Regular expression for excluding files from coverage testing
