@@ -343,7 +343,7 @@ QString pqApplicationCore::getDefaultSaveStateFileFormatQString(bool pythonAvail
   QString pyExt;
   if (pythonAvailable)
   {
-    pyExt += tr("Python state file") + QString(" (*.py);;");
+    pyExt = tr("Python state file") + QString(" (*.py);;");
   }
 
   QString fileExt;
