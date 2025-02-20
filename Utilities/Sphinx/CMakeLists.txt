@@ -132,10 +132,17 @@ if (PARAVIEW_USE_MPI)
   set(nompi_flags "--no-mpi")
 endif ()
 
+set(venv_flags)
+if (DEFINED ENV{VIRTUAL_ENV})
+  list(APPEND venv_flags
+    --venv "$ENV{VIRTUAL_ENV}")
+endif ()
+
 add_custom_target(ParaViewPythonDoc
   DEPENDS paraview_copy_sphinx_config
           paraview_all_python_modules
   COMMAND "$<TARGET_FILE:pvpython>"
+          ${venv_flags}
           ${nompi_flags}
           "${CMAKE_CURRENT_SOURCE_DIR}/sphinx_apidoc.py"
           -o "${CMAKE_CURRENT_BINARY_DIR}/config"
@@ -145,6 +152,7 @@ add_custom_target(ParaViewPythonDoc
           # CI venv
           "venv"
   COMMAND "$<TARGET_FILE:pvpython>"
+          ${venv_flags}
           ${nompi_flags}
           -m sphinx
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
