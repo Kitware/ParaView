@@ -26,11 +26,6 @@
 
 #include <cassert>
 
-namespace
-{
-static const QString DEFAULT_SAVE_STATE_FORMAT_KEY = "GeneralSettings.DefaultSaveStateFormat";
-};
-
 //-----------------------------------------------------------------------------
 pqSaveStateReaction::pqSaveStateReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -59,28 +54,13 @@ bool pqSaveStateReaction::saveState()
 //-----------------------------------------------------------------------------
 bool pqSaveStateReaction::saveState(pqServer* server)
 {
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  unsigned int value = settings->value(::DEFAULT_SAVE_STATE_FORMAT_KEY, 0).toInt();
-  pqApplicationCore::StateFileFormat format = pqApplicationCore::StateFileFormat(value);
-
-  const QString pvsmExt = tr("ParaView state file") + QString(" (*.pvsm);;");
-  QString pyExt;
-
+  bool pythonAvailable = false;
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-  pyExt += tr("Python state file") + QString(" (*.py);;");
+  pythonAvailable = true;
 #endif
 
-  QString fileExt;
-  // Order matters as first argument is default
-  if (format == pqApplicationCore::StateFileFormat::PVSM)
-  {
-    fileExt = pvsmExt + pyExt;
-  }
-  else
-  {
-    fileExt = pyExt + pvsmExt;
-  }
-  fileExt += tr("All Files") + QString(" (*)");
+  QString fileExt =
+    pqApplicationCore::instance()->getDefaultSaveStateFileFormatQString(pythonAvailable, false);
 
   pqFileDialog fileDialog(
     server, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt, false, false);
