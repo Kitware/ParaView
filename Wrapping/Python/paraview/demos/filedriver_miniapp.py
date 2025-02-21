@@ -6,8 +6,9 @@ simulation data.
 
 Example usage:
 
-    mpirun -np 8 ./bin/pvbatch --sym -m paraview.demos.filedriver_miniapp \
-          -g "/tmp/extracts/Wavelet1_*.pvti" -s /tmp/foo.py
+.. code:: sh
+
+    mpirun -np 8 ./bin/pvbatch --sym -m paraview.demos.filedriver_miniapp -g "/tmp/extracts/Wavelet1_*.pvti" -s /tmp/foo.py
 
 """
 

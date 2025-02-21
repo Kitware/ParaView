@@ -544,40 +544,41 @@ of operations applies. Each of the calculator functions is described
 below. Unless otherwise noted, enclose the operand in parentheses
 using the ( and ) buttons.
 
-- Clear: Erase the current function (displayed in the read-only text
+- <tt>Clear</tt>: Erase the current function (displayed in the read-only text
   box above the calculator buttons).
-- /: Divide one scalar by another. The operands for this function are
+- <tt>/</tt>: Divide one scalar by another. The operands for this function are
   not required to be enclosed in parentheses.
-- *: Multiply two scalars, or multiply a vector by a scalar (scalar multiple).
+- <tt>*</tt>: Multiply two scalars, or multiply a vector by a scalar (scalar multiple).
   The operands for this function are not required to be enclosed in parentheses.
-- -: Negate a scalar or vector (unary minus), or subtract one scalar or vector
+- <tt>-</tt>: Negate a scalar or vector (unary minus), or subtract one scalar or vector
   from another. The operands for this function are not required to be enclosed
   in parentheses.
-- +: Add two scalars or two vectors. The operands for this function are not
+- <tt>+</tt>: Add two scalars or two vectors. The operands for this function are not
   required to be enclosed in parentheses.
-- sin: Compute the sine of a scalar.
-- cos: Compute the cosine of a scalar.
-- tan: Compute the tangent of a scalar.
-- asin: Compute the arcsine of a scalar.
-- acos: Compute the arccosine of a scalar.
-- atan: Compute the arctangent of a scalar.
-- sinh: Compute the hyperbolic sine of a scalar.
-- cosh: Compute the hyperbolic cosine of a scalar.
-- tanh: Compute the hyperbolic tangent of a scalar.
-- min: Compute minimum of two scalars.
-- max: Compute maximum of two scalars.
-- x^y: Raise one scalar to the power of another scalar. The operands for
-  this function are not required to be enclosed in parentheses.
-- sqrt: Compute the square root of a scalar.
-- exp: Raise e to the power of a scalar.
-- ln: Compute the logarithm of a scalar to the base 'e'.
-- log10: Compute the logarithm of a scalar to the base 10.
-- ceil: Compute the ceiling of a scalar. floor: Compute the floor of a scalar.
-- abs: Compute the absolute value of a scalar.
-- dot: Compute the dot product of two vectors.
-- cross: Compute cross product of two vectors.
-- mag: Compute the magnitude of a vector.
-- norm: Normalize a vector.
+- <tt>sin</tt>: Compute the sine of a scalar.
+- <tt>cos</tt>: Compute the cosine of a scalar.
+- <tt>tan</tt>: Compute the tangent of a scalar.
+- <tt>asin</tt>: Compute the arcsine of a scalar.
+- <tt>acos</tt>: Compute the arccosine of a scalar.
+- <tt>atan</tt>: Compute the arctangent of a scalar.
+- <tt>sinh</tt>: Compute the hyperbolic sine of a scalar.
+- <tt>cosh</tt>: Compute the hyperbolic cosine of a scalar.
+- <tt>tanh</tt>: Compute the hyperbolic tangent of a scalar.
+- <tt>min</tt>: Compute minimum of two scalars.
+- <tt>max</tt>: Compute maximum of two scalars.
+- <tt>x^y</tt>: Raise one scalar to the power of another scalar. The
+  operands for this function are not required to be enclosed in parentheses.
+- <tt>sqrt</tt>: Compute the square root of a scalar.
+- <tt>exp</tt>: Raise e to the power of a scalar.
+- <tt>ln</tt>: Compute the logarithm of a scalar to the base 'e'.
+- <tt>log10</tt>: Compute the logarithm of a scalar to the base 10.
+- <tt>ceil</tt>: Compute the ceiling of a scalar.
+- <tt>floor</tt>: Compute the floor of a scalar.
+- <tt>abs</tt>: Compute the absolute value of a scalar.
+- <tt>dot</tt>: Compute the dot product of two vectors.
+- <tt>cross</tt>: Compute cross product of two vectors.
+- <tt>mag</tt>: Compute the magnitude of a vector.
+- <tt>norm</tt>: Normalize a vector.
 
 The operands are described below. The digits 0 - 9 and the decimal
 point are used to enter constant scalar values. **iHat**, **jHat**,

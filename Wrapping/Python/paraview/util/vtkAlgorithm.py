@@ -88,14 +88,13 @@ All available decorators exhibit the following characteristics:
    the direction of nesting in the XML e.g. to add a domain to a property, one
    would nest decorators as follows:
 
-.. code-block:: python
+    .. code-block:: python
 
-    @smproperty.intvector(name="Radius", default_values=[0])
-    @smdomain.intrange(min=0, max=10)
-    @smhint.xml("<SomeHint/>")
-    def SetRadius(self, radius):
-        ...
-
+        @smproperty.intvector(name="Radius", default_values=[0])
+        @smdomain.intrange(min=0, max=10)
+        @smhint.xml("<SomeHint/>")
+        def SetRadius(self, radius):
+            pass
 
    Note, since domains can't have nested hints, the hint specified after the
    `smdomain.intrange` invocation is intended for the `smproperty` and not the
@@ -284,7 +283,7 @@ Examples
 **PythonAlgorithmExamples.py** provides a working example that demonstrates how
 several of the decorators described here may be used.
 
-.. literalinclude:: ../../../../Examples/Plugins/PythonAlgorithm/PythonAlgorithmExamples.py
+.. literalinclude:: ../PythonAlgorithmExamples.py
    :caption:
 
 """

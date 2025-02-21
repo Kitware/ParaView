@@ -18,7 +18,11 @@ add_custom_target(ParaViewDoc-TGZ
   WORKING_DIRECTORY ${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/..
   COMMENT "Generate ParaViewGeneratedDocs.tar.gz")
 
-add_dependencies(ParaViewDoc-TGZ ParaViewDoxygenDoc)
+set(doc_targets
+  ParaViewDoxygenDoc)
 if (TARGET ParaViewPythonDoc)
-  add_dependencies(ParaViewDoc-TGZ ParaViewPythonDoc)
+  list(APPEND doc_targets
+    ParaViewPythonDoc)
 endif ()
+
+add_dependencies(ParaViewDoc-TGZ ${doc_targets})

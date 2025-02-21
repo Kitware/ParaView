@@ -135,8 +135,10 @@
 
           <ul>
             <li> <a href="{{ pathto(master_doc) }}">
-              <img src="{{ pathto('_static/' + logo, 1) }}"
-              alt="{{ project }}"></img></a> </li>
+              {%- if logo %}
+              <img src="{{ pathto('_static/' + logo, 1) }}" alt="{{ project }}"></img>
+              {%- endif %}
+              </a> </li>
             <li class="version"> version {{ release }}</li>
           </ul>
 

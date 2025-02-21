@@ -2853,13 +2853,15 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
         .. code-block:: json
 
-            "colorBy": {
-                "representation": "652",
-                "scalarBar": 0,
-                "mode": "color",   # 'array'
-                "color": [0.5, 1.0, 1.0],
-                "array": ["POINTS", "RTData", -1],
-                "colorMap": "Blue to Red"
+            {
+                "colorBy": {
+                    "representation": "652",
+                    "scalarBar": 0,
+                    "mode": "color",   // 'array'
+                    "color": [0.5, 1.0, 1.0],
+                    "array": ["POINTS", "RTData", -1],
+                    "colorMap": "Blue to Red"
+                }
             }
 
         """
@@ -2915,16 +2917,16 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             "ui": [
                 {
                     "name": "Clip Type",
-                    "advanced": 1,                  # 0
+                    "advanced": 1,                  // 0
                     "doc": "Documentation string for the property",
                     "dependency": "498:ClipFunction:Sphere:1",
                     "values": { "Plane": "456", "Box": "457", "Scalar": "458", "Sphere": "459" },
-                    "type": "int",                  # 'float', 'int', 'str', 'proxy', 'input', ...
-                    "widget": "textfield",          # 'checkbox', 'textarea', 'list-1', 'list-n'
-                    "size": -1,                     # -1, 0, 2, 3, 6
+                    "type": "int",                  // 'float', 'int', 'str', 'proxy', 'input', ...
+                    "widget": "textfield",          // 'checkbox', 'textarea', 'list-1', 'list-n'
+                    "size": -1,                     // -1, 0, 2, 3, 6
                     "range": [ { "min": 0, "max": 1 }, { "min": 4, "max": 7 } ]
                 }
-                # More objects...
+                // More objects...
             ]
 
         """

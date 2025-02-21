@@ -177,7 +177,7 @@
     <WriterProxy class="vtkXdmfWriter"
                  name="XdmfWriter">
       <Documentation short_help="Write data in Xdmf files.">Writer to write
-      data in eXtensible Data Model and Format *(XDMF) files.</Documentation>
+      data in eXtensible Data Model and Format (XDMF) files.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">

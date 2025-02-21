@@ -1,5 +1,4 @@
 from paraview.simple import *
-from paraview.incubator import vtkPVIncubatorCAVEInteractionStyles
 from vtkmodules.vtkCommonMath import vtkMatrix4x4
 
 

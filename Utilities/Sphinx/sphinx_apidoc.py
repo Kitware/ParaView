@@ -35,8 +35,7 @@ def is_exclude_module(module):
     excludeList = ['paraview/vtk/vtk','paraview/vtk/tk','paraview/vtk/gtk','paraview/vtk/test',
             'paraview/vtk/qt', 'paraview/vtk/wx', 'paraview/vtk/util',
             'paraview/_arg', 'paraview/compile_all', 'paraview/vtkConstants',
-            'paraview/tpl',
-            'paraview/modules']
+            'paraview/tpl', 'paraview/pv-vtk-all']
     m = str(module)
     for exclude in excludeList:
         if m.__contains__(exclude):
@@ -76,15 +75,18 @@ def write_file(name, text, opts):
     if opts.dryrun:
         print('Would create file %s.' % fname)
         return
+    new_content = text.encode('UTF-8')
     if not opts.force and path.isfile(fname):
-        print('File %s already exists, skipping.' % fname)
+        with open(fname, 'rb') as fin:
+            contents = fin.read()
+        if contents == new_content:
+            print('File %s already exists with same contents, skipping.' % fname)
+            return
+        print('Updating file %s.' % fname)
     else:
         print('Creating file %s.' % fname)
-        with open(fname, 'wb') as f:
-            if sys.version_info >= (3,):
-                f.write(text.encode('UTF-8'))
-            else:
-                f.write(text)
+    with open(fname, 'wb') as f:
+        f.write(new_content)
 
 def format_heading(level, text):
     """Create a heading of <level> [1, 2 or 3 supported]."""
@@ -158,8 +160,8 @@ def create_module_file(package, module, opts):
 
 def create_simple_module_files(package, module, proxy, opts):
     """Build the text of the simple and proxy files and write them."""
-    import paraview.simple
-    gen_prx = sorted(paraview.simple._get_generated_proxies())
+    import paraview.simple.session
+    gen_prx = sorted(paraview.simple.session._get_generated_proxies())
 
     # Create file for simple module
     text = format_heading(1, '%s Module' % module)
@@ -178,7 +180,7 @@ def create_simple_module_files(package, module, proxy, opts):
     # Create a separate file for each proxy
     for prx in gen_prx:
         text = format_heading(1, '%s.%s.%s' % (package, module, prx))
-        text += format_simple_proxy_directive(prx)
+        text += format_simple_proxy_directive(prx, package, module)
         text += '\n\nFor the full list of servermanager proxies, please refer to '\
                 ':doc:`Available readers, sources, writers, filters and animation cues <paraview.servermanager_proxies>`'
         write_file(makename('%s.%s' % (package, module), prx), text, opts)
@@ -192,6 +194,9 @@ def create_package_file(root, master_package, subroot, py_files, opts, subs):
     package = path.split(root)[-1]
     text = format_heading(1, '%s Package' % package)
 
+    if shall_skip(root):
+        return
+
     modules = []
     # add each module in the package
     for py_file in py_files:
@@ -201,22 +206,21 @@ def create_package_file(root, master_package, subroot, py_files, opts, subs):
         py_file = path.splitext(py_file)[0]
         py_path = makename(subroot, py_file)
         if is_package:
+            if master_package == 'paraview' and py_path == 'simple.__init__':
+                proxy_path = 'servermanager_proxies'
+                create_simple_module_files(master_package, py_path, proxy_path,
+                                           opts)
+                modules.append(makename(master_package, py_path))
+                modules.append(makename(master_package, proxy_path))
             heading = ':mod:`%s` Package' % package
             text += format_heading(2, heading)
             text += format_directive(is_package and subroot or py_path,
                                      master_package)
             text += '\n'
         else:
-            if master_package == 'paraview' and py_path == 'simple':
-                proxy_path = 'servermanager_proxies'
-                create_simple_module_files(master_package, py_path, proxy_path,
-                                           opts)
-                modules.append(makename(master_package, py_path))
-                modules.append(makename(master_package, proxy_path))
-            else:
-                # create a new file for the module.
-                create_module_file(master_package, py_path, opts)
-                modules.append(makename(master_package, py_path))
+            # create a new file for the module.
+            create_module_file(master_package, py_path, opts)
+            modules.append(makename(master_package, py_path))
 
     if modules:
         text += format_heading(2, 'Modules')
@@ -232,6 +236,8 @@ def create_package_file(root, master_package, subroot, py_files, opts, subs):
         text += format_heading(2, 'Subpackages')
         text += '.. toctree::\n\n'
         for sub in subs:
+            if is_exclude_module(path.join(master_package, subroot, sub)):
+                continue
             text += '    %s.%s\n' % (makename(master_package, subroot), sub)
         text += '\n'
 

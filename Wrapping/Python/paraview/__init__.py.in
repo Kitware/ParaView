@@ -5,21 +5,62 @@ r"""
 The paraview package provides modules used to script ParaView. Generally, users
 should import the modules of interest directly e.g.::
 
-  from paraview.simple import *
+.. code:: python
+
+    from paraview.simple import *
 
 However, one may want to import paraview package before importing any of the
 ParaView modules to force backwards compatibility to an older version::
 
-  # To run scripts written for ParaView 4.0 in newer versions, you can use the
-  # following.
-  import paraview
-  paraview.compatibility.major = 4
-  paraview.compatibility.minor = 0
+.. code:: python
 
-  # Now, import the modules of interest.
-  from paraview.simple import *
+    # To run scripts written for ParaView 4.0 in newer versions, you can use the
+    # following.
+    import paraview
+    paraview.compatibility.major = 4
+    paraview.compatibility.minor = 0
+
+    # Now, import the modules of interest.
+    from paraview.simple import *
 """
 from __future__ import absolute_import
+try:
+    from warnings import deprecated # PARAVIEW_DEPRECATED_IN_5_14_0
+except ImportError: # XXX(python-3.13): warnings.deprecated is new
+    class deprecated:
+        def __init__(self, message) -> None:
+            if not isinstance(message, str):
+                raise TypeError(
+                    f"Expected an object of type str for 'message', not {type(message).__name__!r}"
+                )
+            self.message = message
+
+        def __call__(self, arg, /):
+            msg = self.message
+            stacklevel = 1
+            # Pull support for classes from CPython 3.13 if necessary.
+            if callable(arg):
+                import functools
+                import inspect
+                from warnings import warn
+
+                @functools.wraps(arg)
+                def wrapper(*args, **kwargs):
+                    warn(msg, category=DeprecationWarning, stacklevel=stacklevel + 1)
+                    return arg(*args, **kwargs)
+
+                if inspect.iscoroutinefunction(arg):
+                    wrapper = inspect.markcoroutinefunction(wrapper)
+
+                arg.__deprecated__ = wrapper.__deprecated__ = msg
+                return wrapper
+            else:
+                raise TypeError(
+                    "@deprecated decorator with non-None category must be applied to "
+                    f"or callable, not {arg!r}"
+                )
+
+
 
 __version__ = '@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@'
 __version_full__ = '@PARAVIEW_VERSION_FULL@'
@@ -190,7 +231,20 @@ class options:
 
     """When True, This mean the current process is a satellite and should not try to
     connect or do anything else."""
-    satelite = False
+    satellite = False
+
+    @property
+    # PARAVIEW_DEPRECATED_IN_5_14_0
+    @deprecated("Use `satellite` instead (since 5.14.0)")
+    def satelite(self):
+        return self.satellite
+
+    @satelite.setter
+    # PARAVIEW_DEPRECATED_IN_5_14_0
+    @deprecated("Use `satellite` instead (since 5.14.0)")
+    def satelite(self, s):
+        self.satellite = s
+
 
 class NotSupportedException(Exception):
     """Exception that is fired when obsolete API is used in a script."""

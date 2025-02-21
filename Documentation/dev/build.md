@@ -624,6 +624,13 @@ ParaView's plugin system has a similar setup:
   * `ParaView_DEBUG_PLUGINS_plugin` (default `OFF`): Log information about
     discovered plugins.
 
+### Building Python
+
+The following target is provided to ensure that everything needed under `import
+paraview` is available:
+
+  * `paraview_all_python_modules`
+
 ### Building documentation
 
 The following targets are used to build documentation for ParaView:
