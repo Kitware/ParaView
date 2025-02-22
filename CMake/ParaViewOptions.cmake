@@ -563,6 +563,7 @@ paraview_require_module(
             VTK::IOERF
             VTK::IOFDS
             VTK::IOIOSS
+            VTK::IOLANLX3D
             VTK::IOH5part
             VTK::IOH5Rage
             VTK::IONetCDF

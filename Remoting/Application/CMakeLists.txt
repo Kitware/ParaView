@@ -222,6 +222,10 @@ _paraview_remoting_application_optional_xml(
   FILES   Resources/proxies_gdal.xml)
 
 _paraview_remoting_application_optional_xml(
+  TARGETS VTK::IOLANLX3D
+  FILES Resources/readers_lanlx3d.xml)
+
+_paraview_remoting_application_optional_xml(
   TARGETS VTK::IOLAS
   FILES   Resources/proxies_las.xml)
 
