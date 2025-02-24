@@ -80,6 +80,12 @@
 #endif
 
 //-----------------------------------------------------------------------------
+namespace
+{
+static const QString DEFAULT_SAVE_STATE_FORMAT_KEY = "GeneralSettings.DefaultSaveStateFormat";
+};
+
+//-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
 {
 public:
@@ -314,6 +320,45 @@ QString pqApplicationCore::stateFileFormatToExtension(pqApplicationCore::StateFi
     default:
       return "pvsm";
   }
+}
+
+//-----------------------------------------------------------------------------
+QString pqApplicationCore::getDefaultSaveStateFileFormatQString(bool pythonAvailable, bool loading)
+{
+  unsigned int value = settings()->value(::DEFAULT_SAVE_STATE_FORMAT_KEY, 0).toInt();
+  pqApplicationCore::StateFileFormat format = pqApplicationCore::StateFileFormat(value);
+
+  QString pvsmExt = tr("ParaView state file");
+  if (loading)
+  {
+    // .png is only added when loading, as saving .png state files is done using the save screenshot
+    // feature
+    pvsmExt += QString(" (*.pvsm *.png);;");
+  }
+  else
+  {
+    pvsmExt += QString(" (*.pvsm);;");
+  }
+
+  QString pyExt;
+  if (pythonAvailable)
+  {
+    pyExt = tr("Python state file") + QString(" (*.py);;");
+  }
+
+  QString fileExt;
+  // Order matters as first argument is default
+  if (format == pqApplicationCore::StateFileFormat::PVSM)
+  {
+    fileExt = pvsmExt + pyExt;
+  }
+  else
+  {
+    fileExt = pyExt + pvsmExt;
+  }
+  fileExt += tr("All Files") + QString(" (*)");
+
+  return fileExt;
 }
 
 //-----------------------------------------------------------------------------

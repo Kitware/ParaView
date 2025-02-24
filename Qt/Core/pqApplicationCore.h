@@ -232,6 +232,12 @@ public:
   static QString stateFileFormatToExtension(pqApplicationCore::StateFileFormat format);
 
   /**
+   * Return the QString to populate the pqFileDialog with available file formats for saving/loading
+   * State. Takes into account the default state file format setting.
+   */
+  QString getDefaultSaveStateFileFormatQString(bool pythonAvailable, bool loading);
+
+  /**
    * Save the ServerManager state to a XML element.
    */
   vtkPVXMLElement* saveState();
