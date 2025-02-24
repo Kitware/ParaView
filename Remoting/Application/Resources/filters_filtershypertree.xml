@@ -78,9 +78,129 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy name="HyperTreeGridGenerateFields"
+                 class="vtkHyperTreeGridGenerateFields"
+                 label="HyperTreeGrid Generate Fields">
+      <Documentation short_help="Compute cell/field data arrays for HTG leaves">
+        Create cell/field data arrays for HTG leaves.
+        Each field can be enabled/disabled and its output array can be renamed.
+        Please note that some field data arrays may rely on cell data arrays,
+        so disabling cell data arrays may cause warnings and prevent field data arrays from being computed.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="ComputeCellSizeArray"
+                         command="SetComputeCellSizeArray"
+                         default_values="1"
+                         number_of_elements="1">
+        <Documentation>
+          Enable/disable the computation of the CellSize array.
+          Default is true.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CellSizeArrayName"
+                            command="SetCellSizeArrayName"
+                            number_of_elements="1"
+                            default_values="CellSize">
+        <Documentation>
+          Name of the cell size array in the output.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ComputeValidCellArray"
+                         command="SetComputeValidCellArray"
+                         default_values="1"
+                         number_of_elements="1">
+        <Documentation>
+          Enable/disable the computation of the ValidCell array.
+          Default is true.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ValidCellArrayName"
+                            command="SetValidCellArrayName"
+                            number_of_elements="1"
+                            default_values="ValidCell">
+        <Documentation>
+          Name of the cell validity array in the output.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ComputeCellCenterArray"
+                         command="SetComputeCellCenterArray"
+                         default_values="1"
+                         number_of_elements="1">
+        <Documentation>
+          Enable/disable the computation of the CellCenter array.
+          Default is true.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CellCenterArrayName"
+                            command="SetCellCenterArrayName"
+                            number_of_elements="1"
+                            default_values="CellCenter">
+        <Documentation>
+          Name of the cell center array in the output.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ComputeTotalVisibleVolumeArray"
+                         command="SetComputeTotalVisibleVolumeArray"
+                         default_values="1"
+                         number_of_elements="1">
+        <Documentation>
+          Enable/disable the computation of the TotalVisibleVolume array.
+          ValidCell and CellSize cell data arrays are required to compute TotalVisibleVolume.
+          If any of them is disabled, a warning will be generated and TotalVisibleVolume will not be computed.
+          Default is true.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ComputeValidCellArray" value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ComputeCellSizeArray" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="TotalVisibleVolumeArrayName"
+                            command="SetTotalVisibleVolumeArrayName"
+                            number_of_elements="1"
+                            default_values="TotalVisibleVolume">
+        <Documentation>
+          Name of the total visible volume array in the output.
+          ValidCell and CellSize cell data arrays are required to compute TotalVisibleVolume.
+          If any of them is disabled, a warning will be generated and TotalVisibleVolume will not be computed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ComputeValidCellArray" value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ComputeCellSizeArray" value="1" />
+        </Hints>
+      </StringVectorProperty>
+
+      <!-- End HyperTreeGridGenerateFields -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy name="HyperTreeGridVisibleLeavesSize"
                  class="vtkHyperTreeGridVisibleLeavesSize"
                  label="HyperTreeGrid Visible Leaves Size">
+      <Deprecated deprecated_in="5.14" to_remove_in="5.16">
+        This filter has been replaced by 'HyperTreeGrid Generate Fields'.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation short_help="Compute size and validity cell fields for HTG leaves">
         Create 2 new cell fields. The first one, named 'ValidCell' by default, has a value of 1.0
         for leaf (non-refined) cells that are neither masked nor ghost, and 0.0 otherwise.

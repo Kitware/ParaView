@@ -104,8 +104,8 @@ if (numpy_found)
     ExpressionChooser.xml
     ExpressionClear.xml
     FieldDataDomainDefault.xml
+    HyperTreeGridGenerateFields.xml
     HTGPlotSelectionOverTime.xml
-    HyperTreeGridVisibleLeavesSize.xml
     PlotOverLine_htg.xml # needs find data
     ProgrammableFilterFieldData.xml
     PythonCalculator.xml

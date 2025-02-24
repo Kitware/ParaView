@@ -32,6 +32,7 @@ set(PY_TESTS
   HTGFeatureEdgesBackwardsCompatibilityTest.py,NO_VALID
   HTGGhostCellsGeneratorBackwardsCompatibilityTest.py,NO_VALID
   HTGReflectionFilterBackwardsCompatibilityTest.py,NO_VALID
+  HTGVisibleLeavesSizeBackwardsCompatibilityTest.py,NO_VALID
   IntegrateAttributes.py,NO_VALID
   LocatorNonMergingBackwardsCompatibilityTest.py,NO_VALID
   LookupTable.py,NO_VALID
