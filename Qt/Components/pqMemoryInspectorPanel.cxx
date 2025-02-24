@@ -1583,7 +1583,8 @@ void pqMemoryInspectorPanel::ShowHostPropertiesDialog()
     QString mem = item->data(0, ITEM_KEY_HOST_MEM).toString();
 
     QString descr = "<h2>" +
-      (ITEM_DATA_CLIENT_HOST ? tr("Client System Properties") : tr("Server System Properties")) +
+      ((type == ITEM_DATA_CLIENT_HOST) ? tr("Client System Properties")
+                                       : tr("Server System Properties")) +
       "</h2><hr><table>" + "<tr><td><b>" + tr("Host:") +
       QString("</b></td><td>%1</td></tr>").arg(host) + "<tr><td><b>" + tr("OS:") +
       QString("</b></td><td>%1</td></tr>").arg(os) + "<tr><td><b>" + tr("CPU:") +
