@@ -150,25 +150,6 @@ void pqCopyReaction::paste()
 
 namespace
 {
-// checks that source is a downstream filter of some item in selection
-bool checkDownstream(QList<pqPipelineSource*>& selection, pqPipelineSource* source)
-{
-  for (auto src2 : selection)
-  {
-    if (src2 == source)
-    {
-      continue;
-    }
-    auto consumers = src2->getAllConsumers();
-    if (consumers.contains(source))
-    {
-      return true;
-    }
-    return checkDownstream(consumers, source);
-  }
-
-  return false;
-}
 
 //-----------------------------------------------------------------------------
 // Returns nullptr if there are more than 1 input port to the whole pipeline
