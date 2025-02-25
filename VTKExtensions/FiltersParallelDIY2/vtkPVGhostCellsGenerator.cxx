@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVGhostCellsGenerator.h"
 
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSetRange.h"
 #include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataObjectTree.h"
 #include "vtkDataObjectTreeIterator.h"
+#include "vtkDataObjectTreeRange.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
@@ -17,6 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
+#include "vtkRange.h"
 
 vtkStandardNewMacro(vtkPVGhostCellsGenerator);
 
@@ -59,41 +63,56 @@ int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGhostCellsGenerator::RequestDataObject(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingHyperTreeGrid(
+  vtkDataObject* inputDO, vtkDataObject* outputDO)
 {
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  this->HasCompositeHTG = false;
-
-  vtkDataObjectTree* inputComposite = vtkDataObjectTree::GetData(inInfo);
-  if (inputComposite)
+  if (!outputDO)
   {
-    vtkSmartPointer<vtkDataObjectTreeIterator> iter;
-    iter.TakeReference(inputComposite->NewTreeIterator());
-    iter->VisitOnlyLeavesOn();
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-      auto pds = vtkPartitionedDataSet::SafeDownCast(iter->GetCurrentDataObject());
-      if (vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject()) ||
-        (pds && pds->GetNumberOfPartitions() > 0 &&
-          vtkHyperTreeGrid::SafeDownCast(pds->GetPartitionAsDataObject(0))))
-      {
-        const bool outputAlreadyCreated = vtkPartitionedDataSetCollection::GetData(outInfo);
-        if (!outputAlreadyCreated)
-        {
-          vtkNew<vtkPartitionedDataSetCollection> outputPDC;
-          this->GetExecutive()->SetOutputData(0, outputPDC);
-          this->GetOutputPortInformation(0)->Set(
-            vtkDataObject::DATA_EXTENT_TYPE(), outputPDC->GetExtentType());
-          this->HasCompositeHTG = true;
-        }
-        return 1;
-      }
-    }
+    return 0;
+  }
+  vtkNew<vtkHyperTreeGridGhostCellsGenerator> instance;
+  instance->SetController(this->GetController());
+  instance->SetInputDataObject(inputDO);
+  const int result = instance->GetExecutive()->Update();
+  if (result == 1)
+  {
+    outputDO->ShallowCopy(instance->GetOutput());
+  }
+  return result;
+}
+
+bool vtkPVGhostCellsGenerator::HasHTG(vtkMultiProcessController* controller, vtkDataObject* object)
+{
+  auto tree = vtkDataObjectTree::SafeDownCast(object);
+  if (!tree)
+  {
+    // Look for either a simple HTG or a composite dataset containing HTG.
+    int isHTG = vtkHyperTreeGrid::SafeDownCast(object) != nullptr;
+    int someAreHTG = 1;
+    controller->AllReduce(&isHTG, &someAreHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
+    return someAreHTG;
   }
 
-  return Superclass::RequestDataObject(request, inputVector, outputVector);
+  int hasHTGLeaves = 0;
+  vtkCompositeDataIterator* iter = vtkDataObjectTree::SafeDownCast(object)->NewIterator();
+  vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter);
+  treeIter->TraverseSubTreeOn();
+  treeIter->VisitOnlyLeavesOn();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  {
+    if (vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject()))
+    {
+      hasHTGLeaves = 1;
+      break;
+    }
+  }
+  iter->Delete();
+
+  // Some ranks may have null pieces, so we detect HTG using a reduction operation:
+  // If at least 1 rank has a HTG piece, this means we must forward to the HTG specialized filter.
+  int someHaveHTGLeaves = 1;
+  controller->AllReduce(&hasHTGLeaves, &someHaveHTGLeaves, 1, vtkCommunicator::LOGICAL_OR_OP);
+  return someHaveHTGLeaves;
 }
 
 //----------------------------------------------------------------------------
@@ -112,121 +131,79 @@ int vtkPVGhostCellsGenerator::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro(<< "Failed to get output data object.");
   }
 
-  if (vtkHyperTreeGrid::SafeDownCast(input))
+  // Input dataset is neither directly a HTG or a composite structure containing HTG.
+  // Fast forward it to the classic GCG filter.
+  bool inputHasHTG = vtkPVGhostCellsGenerator::HasHTG(this->GetController(), input);
+  if (!inputHasHTG)
   {
-    // Match behavior from vtkGhostCellsGenerator
-    vtkNew<vtkHyperTreeGridGhostCellsGenerator> ghostCellsGenerator;
-    ghostCellsGenerator->SetInputData(input);
-    ghostCellsGenerator->Update();
-
-    if (ghostCellsGenerator->GetExecutive()->Update())
-    {
-      output->ShallowCopy(ghostCellsGenerator->GetOutput(0));
-      return 1;
-    }
-
-    return 0;
+    return this->GhostCellsGeneratorUsingSuperclassInstance(input, output);
   }
 
-  // Check if our composite input contains HTG.
-  // If it does, dispatch the blocks to the right implementation of the filter.
-  auto inputComposite = vtkDataObjectTree::SafeDownCast(input);
-  if (inputComposite && this->HasCompositeHTG)
+  // Simple non-composite HTG
+  auto compositeInput = vtkCompositeDataSet::SafeDownCast(input);
+  if (!compositeInput)
   {
-    auto outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(output);
-    if (!outputPDC)
+    return this->GhostCellsGeneratorUsingHyperTreeGrid(input, output);
+  }
+
+  auto compositeOutput = vtkCompositeDataSet::SafeDownCast(output);
+  if (!compositeOutput)
+  {
+    vtkErrorMacro(<< "Failed to get a composite output structure");
+  }
+
+  // Composite structure: iterate recursively over composite datasets and partitioned datasets,
+  // routing to either HTG or classic GCG
+  return this->ProcessComposite(compositeInput, compositeOutput);
+}
+
+int vtkPVGhostCellsGenerator::ProcessComposite(
+  vtkCompositeDataSet* input, vtkCompositeDataSet* output)
+{
+  int result = 1;
+
+  output->CopyStructure(input);
+  auto outputRange = vtk::Range(output, vtk::CompositeDataSetOptions::None);
+  auto inputRange = vtk::Range(input, vtk::CompositeDataSetOptions::None);
+  for (auto inIt = inputRange.begin(), outIt = outputRange.begin(); inIt != inputRange.end();
+       ++inIt, ++outIt)
+  {
+    if (*inIt)
     {
-      vtkErrorMacro(<< "Unable to retrieve output as vtkPartitionedDataSetCollection.");
-      return 0;
-    }
+      *outIt = vtkSmartPointer<vtkDataObject>::Take(inIt->NewInstance());
 
-    // Convert the input structure to PDC if necessary
-    vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
-    converter->SetInputDataObject(inputComposite);
-    converter->Update();
-    vtkPartitionedDataSetCollection* inputPDC = converter->GetOutput();
+      auto inputComposite = vtkCompositeDataSet::SafeDownCast(*inIt);
+      auto outputComposite = vtkCompositeDataSet::SafeDownCast(*outIt);
 
-    if (!inputPDC)
-    {
-      vtkErrorMacro(<< "Unable to convert composite input to Partitioned DataSet Collection");
-      return 0;
-    }
+      bool isComposite = inputComposite != nullptr;
+      bool isPDS = inIt->GetDataObjectType() == VTK_PARTITIONED_DATA_SET;
 
-    outputPDC->Initialize();
-    vtkDataAssembly* inputHierarchy = inputPDC->GetDataAssembly();
-    if (inputHierarchy)
-    {
-      vtkNew<vtkDataAssembly> outputHierarchy;
-      outputHierarchy->DeepCopy(inputHierarchy);
-      outputPDC->SetDataAssembly(outputHierarchy);
-    }
-
-    outputPDC->SetNumberOfPartitionedDataSets(inputPDC->GetNumberOfPartitionedDataSets());
-
-    // Dispatch individual partitioned datasets from the input PDC
-    for (unsigned int pdsIdx = 0; pdsIdx < inputPDC->GetNumberOfPartitionedDataSets(); pdsIdx++)
-    {
-      auto currentPDS = inputPDC->GetPartitionedDataSet(pdsIdx);
-      if (!currentPDS)
+      // Composite but not PartitionedDS: recurse over the composite structure
+      if (isComposite && !isPDS)
       {
-        continue;
-      }
-
-      auto pdsHTG = vtkHyperTreeGrid::SafeDownCast(currentPDS->GetPartitionAsDataObject(0));
-      const int pdsIsHTG = pdsHTG != nullptr; // Needs to be int to be reduced
-      int allPartitionedDSAreHTG = true;
-      int somePartitionedDSAreHTG = false;
-
-      vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-      controller->AllReduce(&pdsIsHTG, &allPartitionedDSAreHTG, 1, vtkCommunicator::LOGICAL_AND_OP);
-      controller->AllReduce(&pdsIsHTG, &somePartitionedDSAreHTG, 1, vtkCommunicator::LOGICAL_OR_OP);
-
-      if (allPartitionedDSAreHTG)
-      {
-        // HTG GCG cannot handle PDS input, so we apply the filter to each individual partition
-        vtkNew<vtkPartitionedDataSet> outputPDS;
-        outputPDS->SetNumberOfPartitions(currentPDS->GetNumberOfPartitions());
-
-        for (unsigned int partId = 0; partId < currentPDS->GetNumberOfPartitions(); partId++)
+        if (!outputComposite)
         {
-          vtkNew<vtkHyperTreeGridGhostCellsGenerator> ghostCellsGenerator;
-          ghostCellsGenerator->SetInputData(currentPDS->GetPartitionAsDataObject(partId));
-          ghostCellsGenerator->Update();
-
-          outputPDS->SetPartition(partId, ghostCellsGenerator->GetOutput(0));
+          vtkErrorMacro(<< "Found no composite output data object");
         }
-        outputPDC->SetPartitionedDataSet(pdsIdx, outputPDS);
+        result &= this->ProcessComposite(inputComposite, outputComposite);
       }
-      else if (somePartitionedDSAreHTG)
+      else if (vtkPVGhostCellsGenerator::HasHTG(this->GetController(), *inIt))
       {
-        // Some ranks have PartitionedDatasets that are not HTG. In this case, ghost cells cannot be
-        // computed, so simply copy the input.
-        vtkWarningMacro("Cannot generate ghost cells for partitioned dataset #"
-          << pdsIdx << ", because some MPI ranks do not contain any data.");
-        vtkNew<vtkPartitionedDataSet> outputPDS;
-        if (currentPDS)
-        {
-          outputPDS->ShallowCopy(currentPDS);
-        }
-        outputPDC->SetPartitionedDataSet(pdsIdx, outputPDS);
+        // Not composite or PartitionedDS: process data either in HTG GCG or classic GCG
+        result &= this->GhostCellsGeneratorUsingHyperTreeGrid(*inIt, *outIt);
       }
       else
       {
-        // Forward the whole PDS to non-HTG GCG.
-        vtkNew<vtkPartitionedDataSet> outputPDS;
-        const int result = this->GhostCellsGeneratorUsingSuperclassInstance(currentPDS, outputPDS);
-        if (result != 1)
-        {
-          vtkErrorMacro(<< "Failed to generate ghost cells for partitioned dataset #" << pdsIdx);
-          return 0;
-        }
-        outputPDC->SetPartitionedDataSet(pdsIdx, outputPDS);
+        result &= this->GhostCellsGeneratorUsingSuperclassInstance(*inIt, *outIt);
       }
     }
-    return 1;
+    else
+    {
+      *outIt = nullptr;
+    }
   }
 
-  return this->GhostCellsGeneratorUsingSuperclassInstance(input, output);
+  return result;
 }
 
 //----------------------------------------------------------------------------
