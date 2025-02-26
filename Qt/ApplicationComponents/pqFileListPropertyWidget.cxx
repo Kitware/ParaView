@@ -102,17 +102,16 @@ pqFileListPropertyWidget::pqFileListPropertyWidget(
       internals.Ui.browse->setEnabled(selectionModel->hasSelection());
     });
 
-  QObject::connect(
-    internals.Ui.add, &QAbstractButton::clicked, [&internals, this, selectionModel]() {
-      const auto filename = internals.chooseFile(this);
-      if (!filename.isEmpty())
-      {
-        auto list = internals.Model.stringList();
-        list.push_back(filename);
-        internals.Model.setStringList(list);
-        internals.Ui.tableView->setCurrentIndex(internals.Model.index(list.size() - 1, 0));
-      }
-    });
+  QObject::connect(internals.Ui.add, &QAbstractButton::clicked, [&internals, this]() {
+    const auto filename = internals.chooseFile(this);
+    if (!filename.isEmpty())
+    {
+      auto list = internals.Model.stringList();
+      list.push_back(filename);
+      internals.Model.setStringList(list);
+      internals.Ui.tableView->setCurrentIndex(internals.Model.index(list.size() - 1, 0));
+    }
+  });
 
   QObject::connect(
     internals.Ui.browse, &QAbstractButton::clicked, [selectionModel, &internals, this]() {

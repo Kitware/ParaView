@@ -499,7 +499,7 @@ private:
         Q_EMIT qobject_cast<pqDataAssemblyPropertyWidget*>(this->parent())->changeFinished();
       });
     QObject::connect(widget, &pqMultiBlockPropertiesStateWidget::stateChanged, this,
-      [this, nodeId](pqMultiBlockPropertiesStateWidget::BlockPropertyState) {
+      [this](pqMultiBlockPropertiesStateWidget::BlockPropertyState) {
         auto sourceModel = qobject_cast<pqDataAssemblyTreeModel*>(this->sourceModel());
         QModelIndex sourceModelIndex = sourceModel->index(0);
         // TODO: The above line forces the entire model to be updated, which is not great,
