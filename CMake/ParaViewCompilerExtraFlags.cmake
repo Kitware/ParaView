@@ -3,27 +3,28 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   include(CheckCXXCompilerFlag)
 
   # Additional warnings for GCC
-  set(CMAKE_CXX_FLAGS_WARN "")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wnon-virtual-dtor")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wno-long-long")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -ansi")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wcast-align")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wchar-subscripts")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wall")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wextra")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wpointer-arith")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wformat-security")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Woverloaded-virtual")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wshadow")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wunused-parameter")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -fno-check-new")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Werror=undef")
+  set(paraview_extra_warning_flags
+    -Wnon-virtual-dtor
+    -Wno-long-long
+    -ansi
+    -Wcast-align
+    -Wchar-subscripts
+    -Wall
+    -Wextra
+    -Wpointer-arith
+    -Wformat-security
+    -Woverloaded-virtual
+    -Wshadow
+    -Wunused-parameter
+    -fno-check-new
+    -Werror=undef)
 
   # This flag is useful as not returning from a non-void function is an error
   # with MSVC, but it is not supported on all GCC compiler versions
   check_cxx_compiler_flag(-Werror=return-type HAVE_GCC_ERROR_RETURN_TYPE)
   if (HAVE_GCC_ERROR_RETURN_TYPE)
-    set(CMAKE_CXX_FLAGS_ERROR "-Werror=return-type")
+    list(APPEND paraview_extra_warning_flags
+      -Werror=return-type)
   endif ()
 
   # If we are compiling on Linux then set some extra linker flags too
@@ -42,12 +43,13 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 
   # Set up the debug CXX_FLAGS for extra warnings
   option(PARAVIEW_EXTRA_COMPILER_WARNINGS
-    "Add compiler flags to do stricter checking when building debug." OFF)
+    "Add compiler flags to do stricter checking" OFF)
   if (PARAVIEW_EXTRA_COMPILER_WARNINGS)
-    string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO
-      " ${CMAKE_CXX_FLAGS_WARN}")
-    string(APPEND CMAKE_CXX_FLAGS_DEBUG
-      " ${CMAKE_CXX_FLAGS_WARN} ${CMAKE_CXX_FLAGS_ERROR}")
+    if (TARGET paraviewbuild)
+      target_compile_options(paraviewbuild
+        INTERFACE
+          "$<$<COMPILE_LANGUAGE:CXX>${paraview_extra_warning_flags}>")
+    endif ()
   endif ()
 
   # Silence spurious -Wattribute warnings on GCC < 9.1:
