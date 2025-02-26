@@ -1,4 +1,4 @@
-if(CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX)
 
   include(CheckCXXCompilerFlag)
 
@@ -22,12 +22,12 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   # This flag is useful as not returning from a non-void function is an error
   # with MSVC, but it is not supported on all GCC compiler versions
   check_cxx_compiler_flag(-Werror=return-type HAVE_GCC_ERROR_RETURN_TYPE)
-  if(HAVE_GCC_ERROR_RETURN_TYPE)
+  if (HAVE_GCC_ERROR_RETURN_TYPE)
     set(CMAKE_CXX_FLAGS_ERROR "-Werror=return-type")
-  endif()
+  endif ()
 
   # If we are compiling on Linux then set some extra linker flags too
-  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     option(PARAVIEW_LINKER_FATAL_WARNINGS "Specify if linker warnings must be considered as errors." OFF)
     mark_as_advanced(PARAVIEW_LINKER_FATAL_WARNINGS)
     if (TARGET paraviewbuild)
@@ -37,17 +37,18 @@ if(CMAKE_COMPILER_IS_GNUCXX)
           INTERFACE_LINK_OPTIONS
             "$<$<BOOL:${PARAVIEW_LINKER_FATAL_WARNINGS}>:LINKER:--fatal-warnings>"
             "-lc")
-    endif()
-  endif()
+    endif ()
+  endif ()
 
   # Set up the debug CXX_FLAGS for extra warnings
   option(PARAVIEW_EXTRA_COMPILER_WARNINGS
     "Add compiler flags to do stricter checking when building debug." OFF)
-  if(PARAVIEW_EXTRA_COMPILER_WARNINGS)
-    string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " ${CMAKE_CXX_FLAGS_WARN}")
+  if (PARAVIEW_EXTRA_COMPILER_WARNINGS)
+    string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO
+      " ${CMAKE_CXX_FLAGS_WARN}")
     string(APPEND CMAKE_CXX_FLAGS_DEBUG
       " ${CMAKE_CXX_FLAGS_WARN} ${CMAKE_CXX_FLAGS_ERROR}")
-  endif()
+  endif ()
 
   # Silence spurious -Wattribute warnings on GCC < 9.1:
   # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
@@ -56,8 +57,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
       INTERFACE
         "$<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:C>:-Wno-attributes>>"
         "$<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:CXX>:-Wno-attributes>>")
-  endif()
-endif()
+  endif ()
+endif ()
 
 # Intel OneAPI compilers >= 2021.2.0 turn on "fast math" at any non-zero
 # optimization level. Suppress this non-standard behavior using the
@@ -79,5 +80,5 @@ string(REPLACE ";" "," intel_oneapi_compiler_detections "${intel_oneapi_compiler
 if (TARGET paraviewbuild)
   target_compile_options(paraviewbuild
     INTERFACE
-    "$<BUILD_INTERFACE:$<$<OR:${intel_oneapi_compiler_detections}>:-fp-model=precise>>")
+      "$<BUILD_INTERFACE:$<$<OR:${intel_oneapi_compiler_detections}>:-fp-model=precise>>")
 endif ()
