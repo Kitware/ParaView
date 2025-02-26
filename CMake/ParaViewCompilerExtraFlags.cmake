@@ -30,14 +30,13 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     option(PARAVIEW_LINKER_FATAL_WARNINGS "Specify if linker warnings must be considered as errors." OFF)
     mark_as_advanced(PARAVIEW_LINKER_FATAL_WARNINGS)
-    if(PARAVIEW_LINKER_FATAL_WARNINGS)
-      set(PARAVIEW_EXTRA_SHARED_LINKER_FLAGS "--fatal-warnings")
-    endif()
     if (TARGET paraviewbuild)
-      set_target_properties(paraviewbuild
-        PROPERTIES
-        INTERFACE_LINK_OPTIONS
-        "LINKER:SHELL:${PARAVIEW_EXTRA_SHARED_LINKER_FLAGS} -lc")
+      # XXX(cmake-3.13): use `target_link_options`
+      set_property(TARGET paraviewbuild APPEND
+        PROPERTY
+          INTERFACE_LINK_OPTIONS
+            "$<$<BOOL:${PARAVIEW_LINKER_FATAL_WARNINGS}>:LINKER:--fatal-warnings>"
+            "-lc")
     endif()
   endif()
 
