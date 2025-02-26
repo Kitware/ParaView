@@ -55,8 +55,8 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
     target_compile_options(paraviewbuild
       INTERFACE
-        "$<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:C>:-Wno-attributes>>"
-        "$<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:CXX>:-Wno-attributes>>")
+        # XXX(cmake-3.15): `COMPILE_LANGUAGE` supports multiple languages.
+        "$<BUILD_INTERFACE:$<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:-Wno-attributes>>")
   endif ()
 endif ()
 
