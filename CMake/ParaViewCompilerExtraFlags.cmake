@@ -36,8 +36,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       set_property(TARGET paraviewbuild APPEND
         PROPERTY
           INTERFACE_LINK_OPTIONS
-            "$<$<BOOL:${PARAVIEW_LINKER_FATAL_WARNINGS}>:LINKER:--fatal-warnings>"
-            "-lc")
+            "$<$<BOOL:${PARAVIEW_LINKER_FATAL_WARNINGS}>:LINKER:--fatal-warnings>")
     endif ()
   endif ()
 
