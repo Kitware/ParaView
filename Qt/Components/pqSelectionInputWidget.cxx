@@ -422,6 +422,7 @@ void pqSelectionInputWidget::setSelection(pqSMProxy newAppendSelections)
   this->AppendSelections = newAppendSelections;
 
   this->updateLabels();
+  this->preAccept();
   Q_EMIT this->selectionChanged(this->AppendSelections);
 }
 
@@ -431,6 +432,7 @@ void pqSelectionInputWidget::onActiveSelectionChanged()
   // The selection has changed, either a new selection was created
   // or an old one cleared.
   this->Ui->label->setText(tr("Copied Selection (Active Selection Changed)"));
+  this->preAccept();
 }
 
 //-----------------------------------------------------------------------------
