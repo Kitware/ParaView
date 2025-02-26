@@ -6,17 +6,15 @@ executed.
 Typical usage is as follows::
 
     from paraview import smtrace
-    config = smtracer.start_trace()
 
-    # config is an instance of vtkSMTrace. One can setup properties on this
-    # object to control  the generated trace. e.g.
-    config.SetFullyTraceSupplementalProxies(True)
+    tracer = ScopedTracer()
+    with tracer:
+      # configure the tracer for this scope
+      tracer.config.SetFullyTraceSupplementalProxies = True
+      # do actions to trace
+      # ...
 
-    # do the actions to trace.
-        ...
-
-    # stop trace. The generated trace is returned.
-    txt = smtracer.stop_trace()
+    txt = tracer.last_trace()
 
 =========================
 Developer Documentation
@@ -69,7 +67,6 @@ import paraview.servermanager as sm
 import paraview.simple as simple
 from paraview.vtk import vtkTimeStamp
 from paraview.modules.vtkRemotingCore import vtkPVSession
-
 
 def _get_skip_rendering():
     return sm.vtkSMTrace.GetActiveTracer().GetSkipRenderingComponents()
@@ -2226,14 +2223,17 @@ def _get_standard_postamble_comment():
 # Public methods
 # ------------------------------------------------------------------------------
 def start_trace(preamble=None):
-    """Starting tracing. On successful start, will return a vtkSMTrace object.
+    """Starting tracing.
+    On successful start, will return a vtkSMTrace object.
     One can set tracing options on it to control how the tracing. If tracing was
-    already started, calling this contine with the same trace."""
+    already started, calling this contine with the same trace.
+    NOTE: please prefer using ScopedTracer, to ensure stop_trace call."""
     return sm.vtkSMTrace.StartTrace(preamble)
 
 
 def stop_trace():
-    """Stops the trace and returns the generated trace output string."""
+    """Stops the trace and returns the generated trace output string.
+    NOTE: please prefer using ScopedTracer"""
     return sm.vtkSMTrace.StopTrace()
 
 
@@ -2263,13 +2263,34 @@ def reset_trace_output():
 
 
 # ------------------------------------------------------------------------------
+class ScopedTracer():
+    """A tracer class that implements context management,
+    to ensure start_trace() call on enter and stop_trace on exit.
+    """
+    def __init__(self, preamble = ""):
+        self._preamble = preamble
+        self.config = None
+        self._last_trace = ""
+
+    def __enter__(self):
+        self.config = start_trace(self._preamble)
+
+    def __exit__(self, type, value, tb):
+        self._last_trace = stop_trace()
+        self.config = None
+
+    def last_trace(self):
+        return self._last_trace
+
+
+# ------------------------------------------------------------------------------
 if __name__ == "__main__":
     print("Running test")
-    start_trace()
+    tracer = ScopedTracer("")
+    with tracer.trace() as active_trace:
+        s = simple.Sphere()
+        c = simple.Clip()
+        simple.Show()
+        print("***** TRACE RESULT *****")
 
-    s = simple.Sphere()
-    c = simple.PlotOverLine()
-    simple.Show()
-
-    print("***** TRACE RESULT *****")
-    print(stop_trace())
+    print(tracer.last_trace())

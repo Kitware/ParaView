@@ -35,31 +35,34 @@ def _get_catalyst_preamble(options):
 
 def _get_catalyst_postamble(options):
     """returns the postamble text"""
-    trace_config = smtrace.start_trace(preamble="")
-    trace_config.SetFullyTraceSupplementalProxies(True)
 
-    # flush out some of the header since its not applicable here.
-    smtrace.get_current_trace_output_and_reset()
+    tracer = smtrace.ScopedTracer()
+    with tracer:
+        tracer.config.SetFullyTraceSupplementalProxies(True)
 
-    trace = smtrace.TraceOutput()
-    trace.append_separated([ \
-        "# " + "-" * 78,
-        '# Catalyst options',
-        "from paraview import catalyst"])
-    accessor = smtrace.ProxyAccessor("options", options)
-    trace.append(accessor.trace_ctor("catalyst.Options",
-                                     smtrace.ProxyFilter()))
-    del accessor
-    smtrace.stop_trace()
-    del trace_config
-    trace.append_separated([ \
-        "# " + "-" * 78,
-        "if __name__ == '__main__':",
-        "    from paraview.simple import SaveExtractsUsingCatalystOptions",
-        "    # Code for non in-situ environments; if executing in post-processing",
-        "    # i.e. non-Catalyst mode, let's generate extracts using Catalyst options",
-        "    SaveExtractsUsingCatalystOptions(options)"])
-    return str(trace)
+        # flush out some of the header since its not applicable here.
+        smtrace.get_current_trace_output_and_reset()
+
+        trace = smtrace.TraceOutput()
+        trace.append_separated([ \
+            "# " + "-" * 78,
+            '# Catalyst options',
+            "from paraview import catalyst"])
+        accessor = smtrace.ProxyAccessor("options", options)
+        trace.append(accessor.trace_ctor("catalyst.Options",
+                                         smtrace.ProxyFilter()))
+        del accessor
+
+        trace.append_separated([ \
+            "# " + "-" * 78,
+            "if __name__ == '__main__':",
+            "    from paraview.simple import SaveExtractsUsingCatalystOptions",
+            "    # Code for non in-situ environments; if executing in post-processing",
+            "    # i.e. non-Catalyst mode, let's generate extracts using Catalyst options",
+            "    SaveExtractsUsingCatalystOptions(options)"])
+        return str(trace)
+
+    return ""
 
 
 def save_catalyst_state(fname, options, location=vtkPVSession.CLIENT):
