@@ -1,64 +1,65 @@
-if(CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX)
 
   include(CheckCXXCompilerFlag)
 
   # Additional warnings for GCC
-  set(CMAKE_CXX_FLAGS_WARN "")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wnon-virtual-dtor")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wno-long-long")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -ansi")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wcast-align")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wchar-subscripts")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wall")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wextra")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wpointer-arith")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wformat-security")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Woverloaded-virtual")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wshadow")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Wunused-parameter")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -fno-check-new")
-  string(APPEND CMAKE_CXX_FLAGS_WARN " -Werror=undef")
+  set(paraview_extra_warning_flags
+    -Wnon-virtual-dtor
+    -Wno-long-long
+    -ansi
+    -Wcast-align
+    -Wchar-subscripts
+    -Wall
+    -Wextra
+    -Wpointer-arith
+    -Wformat-security
+    -Woverloaded-virtual
+    -Wshadow
+    -Wunused-parameter
+    -fno-check-new
+    -Werror=undef)
 
   # This flag is useful as not returning from a non-void function is an error
   # with MSVC, but it is not supported on all GCC compiler versions
   check_cxx_compiler_flag(-Werror=return-type HAVE_GCC_ERROR_RETURN_TYPE)
-  if(HAVE_GCC_ERROR_RETURN_TYPE)
-    set(CMAKE_CXX_FLAGS_ERROR "-Werror=return-type")
-  endif()
+  if (HAVE_GCC_ERROR_RETURN_TYPE)
+    list(APPEND paraview_extra_warning_flags
+      -Werror=return-type)
+  endif ()
 
   # If we are compiling on Linux then set some extra linker flags too
-  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     option(PARAVIEW_LINKER_FATAL_WARNINGS "Specify if linker warnings must be considered as errors." OFF)
     mark_as_advanced(PARAVIEW_LINKER_FATAL_WARNINGS)
-    if(PARAVIEW_LINKER_FATAL_WARNINGS)
-      set(PARAVIEW_EXTRA_SHARED_LINKER_FLAGS "--fatal-warnings")
-    endif()
     if (TARGET paraviewbuild)
-      set_target_properties(paraviewbuild
-        PROPERTIES
-        INTERFACE_LINK_OPTIONS
-        "LINKER:SHELL:${PARAVIEW_EXTRA_SHARED_LINKER_FLAGS} -lc")
-    endif()
-  endif()
+      # XXX(cmake-3.13): use `target_link_options`
+      set_property(TARGET paraviewbuild APPEND
+        PROPERTY
+          INTERFACE_LINK_OPTIONS
+            "$<$<BOOL:${PARAVIEW_LINKER_FATAL_WARNINGS}>:LINKER:--fatal-warnings>")
+    endif ()
+  endif ()
 
   # Set up the debug CXX_FLAGS for extra warnings
   option(PARAVIEW_EXTRA_COMPILER_WARNINGS
-    "Add compiler flags to do stricter checking when building debug." OFF)
-  if(PARAVIEW_EXTRA_COMPILER_WARNINGS)
-    string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " ${CMAKE_CXX_FLAGS_WARN}")
-    string(APPEND CMAKE_CXX_FLAGS_DEBUG
-      " ${CMAKE_CXX_FLAGS_WARN} ${CMAKE_CXX_FLAGS_ERROR}")
-  endif()
+    "Add compiler flags to do stricter checking" OFF)
+  if (PARAVIEW_EXTRA_COMPILER_WARNINGS)
+    if (TARGET paraviewbuild)
+      target_compile_options(paraviewbuild
+        INTERFACE
+          "$<$<COMPILE_LANGUAGE:CXX>${paraview_extra_warning_flags}>")
+    endif ()
+  endif ()
 
   # Silence spurious -Wattribute warnings on GCC < 9.1:
   # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
     target_compile_options(paraviewbuild
       INTERFACE
-        "$<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:C>:-Wno-attributes>>"
-        "$<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:CXX>:-Wno-attributes>>")
-  endif()
-endif()
+        # XXX(cmake-3.15): `COMPILE_LANGUAGE` supports multiple languages.
+        "$<BUILD_INTERFACE:$<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:-Wno-attributes>>")
+  endif ()
+endif ()
 
 # Intel OneAPI compilers >= 2021.2.0 turn on "fast math" at any non-zero
 # optimization level. Suppress this non-standard behavior using the
@@ -80,5 +81,5 @@ string(REPLACE ";" "," intel_oneapi_compiler_detections "${intel_oneapi_compiler
 if (TARGET paraviewbuild)
   target_compile_options(paraviewbuild
     INTERFACE
-    "$<BUILD_INTERFACE:$<$<OR:${intel_oneapi_compiler_detections}>:-fp-model=precise>>")
+      "$<BUILD_INTERFACE:$<$<OR:${intel_oneapi_compiler_detections}>:-fp-model=precise>>")
 endif ()
