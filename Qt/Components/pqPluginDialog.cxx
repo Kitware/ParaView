@@ -24,7 +24,6 @@
 #include "pqFileDialog.h"
 #include "pqPluginManager.h"
 #include "pqServer.h"
-#include "pqSettings.h"
 #include "vtkNew.h"
 #include "vtkPVPythonInformation.h"
 #include "vtkSMSession.h"

@@ -548,21 +548,63 @@ pqServerConfigurationCollection& pqApplicationCore::serverConfigurations()
 }
 
 //-----------------------------------------------------------------------------
+QString pqApplicationCore::getSettingFileBaseName()
+{
+  QString fileBaseName = QApplication::applicationName();
+
+  if (this->VersionedSettings)
+  {
+    fileBaseName += QApplication::applicationVersion();
+  }
+
+  const bool disableSettings = vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry();
+  if (disableSettings)
+  {
+    fileBaseName += "-dr";
+  }
+
+  return fileBaseName;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::useVersionedSettings(bool use)
+{
+  this->VersionedSettings = use;
+}
+
+//-----------------------------------------------------------------------------
 pqSettings* pqApplicationCore::settings()
 {
   if (!this->Settings)
   {
-    const bool disable_settings = vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry();
+    vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Loading client settings");
 
+    // First look for site settings and set them as SystemScope,
+    // for automatic fallback
     const QString settingsOrg = QApplication::organizationName();
-    const QString settingsApp =
-      QApplication::applicationName() + QApplication::applicationVersion();
+    const QString iniFileBaseName = this->getSettingFileBaseName();
+    // QSettings enforce this directory hierarchy: ini file is under an "organization" subdir.
+    // https://doc.qt.io/qt-5/qsettings.html#platform-specific-notes
+    const QString iniRelativePath = settingsOrg + "/" + iniFileBaseName + ".ini";
+    const QString systemDirPath = pqCoreUtilities::findInApplicationDirectories(iniRelativePath);
+    if (!systemDirPath.isEmpty() && QFile::exists(systemDirPath))
+    {
+      vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+        "using system scope settings under " << systemDirPath.toStdString() << ", containing "
+                                             << iniRelativePath.toStdString());
+      QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, systemDirPath);
+    }
+    else
+    {
+      vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+        << "system scope settings not found " << iniRelativePath.toStdString());
+    }
 
-    // for the app name, we use a "-dr" suffix is disable_settings is true.
-    const QString suffix(disable_settings ? "-dr" : "");
-
+    // Create settings with UserScope priority.
     auto settings = new pqSettings(
-      QSettings::IniFormat, QSettings::UserScope, settingsOrg, settingsApp + suffix, this);
+      QSettings::IniFormat, QSettings::UserScope, settingsOrg, iniFileBaseName, this);
+
+    const bool disable_settings = vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry();
     if (disable_settings || settings->value("pqApplicationCore.DisableSettings", false).toBool())
     {
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "loading of Qt settings skipped (disabled).");
@@ -570,7 +612,7 @@ pqSettings* pqApplicationCore::settings()
     }
     else
     {
-      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "loading Qt settings from '%s'",
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "loading Qt user settings from '%s'",
         settings->fileName().toUtf8().data());
     }
     // now settings are ready!

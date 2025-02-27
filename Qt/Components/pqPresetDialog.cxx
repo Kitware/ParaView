@@ -9,15 +9,10 @@
 #include "pqPresetGroupsManager.h"
 #include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
-#include "pqQVTKWidget.h"
 #include "pqServer.h"
-#include "pqSettings.h"
 
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionPresets.h"
-#include "vtkSMTransferFunctionProxy.h"
-
-#include "vtksys/FStream.hxx"
 
 #include "vtk_jsoncpp.h"
 

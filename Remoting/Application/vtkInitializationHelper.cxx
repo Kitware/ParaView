@@ -13,6 +13,7 @@
 #include "vtkPVLogger.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVSession.h"
+#include "vtkPVStandardPaths.h"
 #include "vtkPVStringFormatter.h"
 #include "vtkPVVersion.h"
 #include "vtkProcessModule.h"
@@ -555,7 +556,7 @@ void vtkInitializationHelper::Finalize()
   if (vtkInitializationHelper::SaveUserSettingsFileDuringFinalization)
   {
     // Write out settings file(s)
-    std::string userSettingsFilePath = vtkInitializationHelper::GetUserSettingsFilePath();
+    std::string userSettingsFilePath = vtkPVStandardPaths::GetUserSettingsFilePath();
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
     bool savingSucceeded = settings->SaveSettingsToFile(userSettingsFilePath);
     if (!savingSucceeded)
@@ -603,7 +604,7 @@ void vtkInitializationHelper::LoadSettings()
   }
 
   // Load user-level settings
-  std::string userSettingsFilePath = vtkInitializationHelper::GetUserSettingsFilePath();
+  std::string userSettingsFilePath = vtkPVStandardPaths::GetUserSettingsFilePath();
   if (!settings->AddCollectionFromFile(userSettingsFilePath, VTK_DOUBLE_MAX))
   {
     // Loading user settings failed, so we need to create an empty
@@ -614,35 +615,7 @@ void vtkInitializationHelper::LoadSettings()
   }
 
   // Load site-level settings
-  const auto& app_dir = pm->GetSelfDir();
-
-  // If the application path ends with lib/paraview-X.X, shared
-  // forwarding of the executable was used. Remove that part of the
-  // path to get back to the installation root.
-  std::string installDirectory = app_dir.substr(0, app_dir.find("/lib/paraview-" PARAVIEW_VERSION));
-
-  // Remove the trailing /bin if it is there.
-  if (installDirectory.size() >= 4 &&
-    installDirectory.substr(installDirectory.size() - 4) == "/bin")
-  {
-    installDirectory = installDirectory.substr(0, installDirectory.size() - 4);
-  }
-
-  std::vector<std::string> pathsToSearch;
-  pathsToSearch.push_back(installDirectory + "/share/paraview-" PARAVIEW_VERSION);
-  pathsToSearch.push_back(installDirectory + "/lib/");
-  pathsToSearch.push_back(installDirectory);
-#if defined(__APPLE__)
-  // paths for app
-  pathsToSearch.push_back(installDirectory + "/../../..");
-  pathsToSearch.push_back(installDirectory + "/../../../../lib");
-
-  // paths when doing a unix style install.
-  pathsToSearch.push_back(installDirectory + "/../lib/paraview-" PARAVIEW_VERSION);
-#endif
-  // On windows configuration files are in the parent directory
-  pathsToSearch.push_back(installDirectory + "/../");
-
+  const std::vector<std::string> pathsToSearch = vtkPVStandardPaths::GetInstallDirectories();
   const std::string filename = vtkInitializationHelper::GetApplicationName() + "-SiteSettings.json";
   for (const std::string& path : pathsToSearch)
   {
@@ -660,61 +633,13 @@ void vtkInitializationHelper::LoadSettings()
 //----------------------------------------------------------------------------
 std::string vtkInitializationHelper::GetUserSettingsDirectory()
 {
-  std::string organizationName(vtkInitializationHelper::GetOrganizationName());
-#if defined(_WIN32)
-  const char* appData = vtksys::SystemTools::GetEnv("APPDATA");
-  if (!appData)
-  {
-    return std::string();
-  }
-  std::string separator("\\");
-  std::string directoryPath(appData);
-  if (directoryPath[directoryPath.size() - 1] != separator[0])
-  {
-    directoryPath.append(separator);
-  }
-  directoryPath += organizationName + separator;
-#else
-  std::string directoryPath;
-  std::string separator("/");
-
-  // Emulating QSettings behavior.
-  const char* xdgConfigHome = getenv("XDG_CONFIG_HOME");
-  if (xdgConfigHome && strlen(xdgConfigHome) > 0)
-  {
-    directoryPath = xdgConfigHome;
-    if (directoryPath[directoryPath.size() - 1] != separator[0])
-    {
-      directoryPath += separator;
-    }
-  }
-  else
-  {
-    const char* home = getenv("HOME");
-    if (!home)
-    {
-      return std::string();
-    }
-    directoryPath = home;
-    if (directoryPath[directoryPath.size() - 1] != separator[0])
-    {
-      directoryPath += separator;
-    }
-    directoryPath += ".config/";
-  }
-  directoryPath += organizationName + separator;
-#endif
-  return directoryPath;
+  return vtkPVStandardPaths::GetUserSettingsDirectory();
 }
 
 //----------------------------------------------------------------------------
 std::string vtkInitializationHelper::GetUserSettingsFilePath()
 {
-  std::string path = vtkInitializationHelper::GetUserSettingsDirectory();
-  path.append(vtkInitializationHelper::GetApplicationName());
-  path.append("-UserSettings.json");
-
-  return path;
+  return vtkPVStandardPaths::GetUserSettingsFilePath();
 }
 
 //----------------------------------------------------------------------------

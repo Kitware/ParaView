@@ -8,7 +8,6 @@
 
 class pqCameraDialogInternal;
 class pqView;
-class pqSettings;
 class vtkSMRenderViewProxy;
 class QDoubleSpinBox;
 

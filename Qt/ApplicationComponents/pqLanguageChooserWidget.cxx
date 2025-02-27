@@ -3,15 +3,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqLanguageChooserWidget.h"
 
-#include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
-#include "pqCoreUtilities.h"
-#include "pqFileDialog.h"
 #include "pqServer.h"
-#include "pqSettings.h"
 #include "vtkPVFileInformation.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSessionProxyManager.h"
 
 #include <QComboBox>

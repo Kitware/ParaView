@@ -4,9 +4,7 @@
 
 #include "pqExpressionChooserButton.h"
 
-#include "pqApplicationCore.h"
 #include "pqExpressionsManager.h"
-#include "pqSettings.h"
 
 #include <QAction>
 #include <QMenu>

@@ -20,9 +20,11 @@
 #include "pqCoreTestUtility.h"
 #include "pqDoubleLineEdit.h"
 #include "pqSettings.h"
+#include "vtkLogger.h"
 #include "vtkObject.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
+#include "vtkPVStandardPaths.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkWeakPointer.h"
 #include "vtksys/SystemTools.hxx"
@@ -100,46 +102,100 @@ QString pqCoreUtilities::getParaViewApplicationDataDirectory()
 }
 
 //-----------------------------------------------------------------------------
+QStringList pqCoreUtilities::getParaViewApplicationConfigDirectories()
+{
+  QStringList configDirs;
+
+  // Starts with the User directory, because it is:
+  // - writeable
+  // - higher priority on read
+  configDirs += pqCoreUtilities::getParaViewUserDirectory();
+
+  // then add some standard locations
+  configDirs += QStandardPaths::standardLocations(QStandardPaths::ConfigLocation);
+
+  // and end with ParaView custom ones.
+  configDirs += pqCoreUtilities::getApplicationDirectories(true, true);
+
+  return configDirs;
+}
+
+//-----------------------------------------------------------------------------
 QString pqCoreUtilities::getParaViewApplicationDirectory()
 {
   return QApplication::applicationDirPath();
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqCoreUtilities::findParaviewPaths(
-  QString directoryOrFileName, bool lookupInAppDir, bool lookupInUserDir)
+QStringList pqCoreUtilities::getApplicationDirectories(bool lookupInAppDir, bool lookupInUserDir)
 {
   QStringList allPossibleDirs;
   if (lookupInAppDir)
   {
-    allPossibleDirs.push_back(
-      getParaViewApplicationDirectory() + QDir::separator() + directoryOrFileName);
-    allPossibleDirs.push_back(getParaViewApplicationDirectory() + "/../" + directoryOrFileName);
-    // Mac specific begin
-    allPossibleDirs.push_back(
-      getParaViewApplicationDirectory() + "/../Support/" + directoryOrFileName);
-    allPossibleDirs.push_back(
-      getParaViewApplicationDirectory() + "/../../../Support/" + directoryOrFileName);
-    // This one's for when running from the build directory.
-    allPossibleDirs.push_back(
-      getParaViewApplicationDirectory() + "/../../../" + directoryOrFileName);
-    // Mac specific end
+    std::vector<std::string> dirs = vtkPVStandardPaths::GetInstallDirectories();
+    for (const std::string& dir : dirs)
+    {
+      allPossibleDirs.push_back(dir.c_str());
+    }
   }
 
   if (lookupInUserDir)
   {
-    allPossibleDirs.push_back(getParaViewUserDirectory() + QDir::separator() + directoryOrFileName);
+    allPossibleDirs.push_back(pqCoreUtilities::getParaViewUserDirectory());
   }
+
+  return allPossibleDirs;
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqCoreUtilities::findParaviewPaths(
+  const QString& directoryOrFileName, bool lookupInAppDir, bool lookupInUserDir)
+{
+  QStringList allPossibleDirs =
+    pqCoreUtilities::getApplicationDirectories(lookupInAppDir, lookupInUserDir);
 
   // Filter with only existing ones
   QStringList existingDirs;
-  Q_FOREACH (QString path, allPossibleDirs)
+  for (const QString& dir : allPossibleDirs)
   {
+    QString path = dir + "/" + directoryOrFileName;
     if (QFile::exists(path))
+    {
       existingDirs.push_back(path);
+    }
   }
 
   return existingDirs;
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::findInApplicationDirectories(const QString& relativePath)
+{
+  QStringList allPossibleDirs = pqCoreUtilities::getApplicationDirectories(true, false);
+
+  vtkVLogScopeF(
+    PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Looking for file '%s'", relativePath.toUtf8().data());
+
+  for (const QString& dirPath : allPossibleDirs)
+  {
+    QDir dir(dirPath);
+    if (dir.exists(relativePath))
+    {
+      vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+        "found application file " << dir.absoluteFilePath(relativePath).toStdString());
+      return dirPath;
+    }
+  }
+
+  vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+    "fails to find requested file " << relativePath.toStdString()
+                                    << " under any of the following paths: ");
+  for (const QString& dirPath : allPossibleDirs)
+  {
+    vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(), << dirPath.toStdString());
+  }
+
+  return QString();
 }
 
 //-----------------------------------------------------------------------------

@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqcheck object="pqClientMainWindow" property="windowTitle" arguments="Spreadsheet ParaView"/>
+</pqevents>

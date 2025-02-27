@@ -5,13 +5,10 @@
 #include "pqCustomViewpointsDefaultController.h"
 
 #include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
 #include "pqCameraDialog.h"
-#include "pqCustomViewpointButtonDialog.h"
 #include "pqCustomViewpointsController.h"
 #include "pqCustomViewpointsToolbar.h"
 #include "pqRenderView.h"
-#include "pqSettings.h"
 
 //-----------------------------------------------------------------------------
 pqCustomViewpointsDefaultController::pqCustomViewpointsDefaultController(QObject* parent)

@@ -18,7 +18,6 @@
 #include "pqRescaleScalarRangeReaction.h"
 #include "pqRescaleScalarRangeToCustomDialog.h"
 #include "pqRescaleScalarRangeToDataOverTimeDialog.h"
-#include "pqSettings.h"
 #include "pqSignalsBlocker.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"

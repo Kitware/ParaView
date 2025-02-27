@@ -6,50 +6,70 @@
 #include "pqCoreUtilities.h"
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
+#include "vtkInitializationHelper.h"
 #include "vtkNew.h"
 #include "vtkPVLogger.h"
+#include "vtkPVStandardPaths.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkResourceFileLocator.h"
 #include "vtkVersion.h"
 
+#include <string>
+#include <vector>
 #include <vtksys/SystemTools.hxx>
 
 #include <QApplication>
 #include <QDir>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QtDebug>
-#include <sstream>
 
 namespace
 {
-// get path to user-servers
+static const QString SERVER_FILE = "servers.pvsc";
+
+/**
+ * Get path to the user servers file.
+ * As it is used with QFile, separator should be "/" regardless of the system.
+ * see QFile doc
+ */
 static QString userServers()
 {
-  return pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
+  return pqCoreUtilities::getParaViewUserDirectory() + "/" + SERVER_FILE;
 }
 
+/**
+ * Get path to custom servers file.
+ */
 static const std::vector<std::string>& customServers()
 {
   return vtkRemotingCoreConfiguration::GetInstance()->GetServerConfigurationsFiles();
 }
-// get path to shared system servers.
+
+/**
+ * Get path to shared system servers file.
+ * As it is used with QFile, separator should be "/" regardless of the system.
+ * see QFile doc
+ */
 static QString systemServers()
 {
-  QString settingsRoot;
-#if defined(Q_OS_WIN)
-  settingsRoot = QString::fromUtf8(getenv("COMMON_APPDATA"));
-#else
-  settingsRoot = QString::fromUtf8("/usr/share");
-#endif
-  QString settingsPath = QString("%2%1%3%1%4");
-  settingsPath = settingsPath.arg(QDir::separator());
-  settingsPath = settingsPath.arg(settingsRoot);
-  settingsPath = settingsPath.arg(QApplication::organizationName());
-  settingsPath = settingsPath.arg("servers.pvsc");
-  return settingsPath;
+  std::vector<std::string> systemDirs = vtkPVStandardPaths::GetSystemDirectories();
+  for (const std::string& dir : systemDirs)
+  {
+    QString settingsPath = QString("%1/%2/%3");
+    settingsPath = settingsPath.arg(dir.c_str());
+    settingsPath = settingsPath.arg(vtkInitializationHelper::GetApplicationName().c_str());
+    settingsPath = settingsPath.arg(SERVER_FILE);
+    QFileInfo pathInfo(settingsPath);
+    if (pathInfo.exists())
+    {
+      return pathInfo.absoluteFilePath();
+    }
+  }
+
+  return QString();
 }
 
 static QString defaultServers()

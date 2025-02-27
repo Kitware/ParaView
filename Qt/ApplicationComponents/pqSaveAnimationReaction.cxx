@@ -15,7 +15,6 @@
 #include "pqSaveScreenshotReaction.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
 #include "pqUndoStack.h"
 #include "pqView.h"

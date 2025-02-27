@@ -202,16 +202,26 @@ public:
 
   /**
    * Get the application settings.
+   * This uses a user settings file (created as needed) and falls back
+   * to an installed settings file for options not found in the user file.
+   *
+   * When "--disable-registry (--dr)" is specified, a "XXX-dr.ini" alternative file
+   * is used instead of the usual config, so nothing is read/write on usual files.
+   * Then clearSettings is called.
+   *
+   * @see clearSettings(), useVersionedSettings(), pqCoreUtilities::findInApplicationDirectories()
    */
   pqSettings* settings();
 
   /**
-   * Clears the settings. Since various UI components that only
+   * Clears the user settings. Since various UI components that only
    * read settings at creation time may get out of sync, it's best
    * to warn the user to restart the application.
    *
    * Any changes made to pqSettings after calling this method will be lost and
    * will not get restored. If that's not desired, see `QSettings::clear`.
+   *
+   * Site settings are still present, though.
    */
   void clearSettings();
 
@@ -236,6 +246,16 @@ public:
    * State. Takes into account the default state file format setting.
    */
   QString getDefaultSaveStateFileFormatQString(bool pythonAvailable, bool loading);
+
+  /**
+   * Set versioned settings mode.
+   * If true, the setting file name includes application version numbers.
+   * Should be set before the first call to settings(): later calls will
+   * not be taken into account.
+   *
+   * Default is true.
+   */
+  void useVersionedSettings(bool use);
 
   /**
    * Save the ServerManager state to a XML element.
@@ -466,6 +486,14 @@ private:
   pqInternals* Internal;
   static pqApplicationCore* Instance;
   void constructor();
+
+  /**
+   * Get Setting file name.
+   * This use application name and optional suffix (version and -dr)
+   */
+  QString getSettingFileBaseName();
+
+  bool VersionedSettings = true;
 };
 
 #endif

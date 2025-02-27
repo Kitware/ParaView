@@ -15,6 +15,10 @@ class vtkSMProperty;
 /**
  * pqSettings extends QSettings to add support for following:
  * \li saving/restoring window/dialog geometry.
+ *
+ * Note that pqApplicationCore::settings() configure differents things about
+ * the settings files in used (name, site-settings path).
+ * This should be prefered over creating a new instance of pqSettings manually.
  */
 class PQCORE_EXPORT pqSettings : public QSettings
 {
@@ -22,6 +26,15 @@ class PQCORE_EXPORT pqSettings : public QSettings
   typedef QSettings Superclass;
 
 public:
+  ///@{
+  /**
+   * Create a new instance of pqSettings.
+   * Note that the differents arguments impact the actual file path/name used:
+   * be sure to be consistent or you will end up with different files.
+   *
+   * If you want to access the standard ParaView application settings,
+   * please use pqApplicationCore::settings() that already ensure the configuration.
+   */
   pqSettings(
     const QString& organization, const QString& application = QString(), QObject* parent = nullptr);
   pqSettings(Scope scope, const QString& organization, const QString& application = QString(),
@@ -31,6 +44,7 @@ public:
   pqSettings(const QString& fileName, Format format, QObject* parent = nullptr);
   pqSettings(QObject* parent = nullptr);
   ~pqSettings() override;
+  ///@}
 
   void saveState(const QMainWindow& window, const QString& key);
   void saveState(const QDialog& dialog, const QString& key);
