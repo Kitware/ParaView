@@ -20,7 +20,7 @@ set(suffix "-dr")
 # Custom configuration file that makes "advanced" properties visible by default
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/${app_name}.ini.in"
-  "${SiteSettingsDir}/${organization_name}/${app_name}${app_version}${suffix}.ini" @ONLY)
+  "${SiteSettingsDir}/${organization_name}/${app_name}${suffix}.ini" @ONLY)
 
 # Custom configuration file that overrides some SphereSource property visibilities.
 configure_file(

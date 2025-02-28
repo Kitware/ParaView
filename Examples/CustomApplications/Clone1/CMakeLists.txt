@@ -20,6 +20,8 @@ set(CMAKE_AUTOMOC 1)
 set(CMAKE_AUTOUIC 1)
 
 set(sources
+  myApplication.cxx
+  myApplication.h
   myMainWindow.cxx
   myMainWindow.h)
 set(ui_files
@@ -39,6 +41,8 @@ paraview_client_add(
   SOURCES ${sources} ${ui_files}
   APPLICATION_XMLS ${xml_files}
   MAIN_WINDOW_CLASS myMainWindow
+  APPLICATION_CORE_CLASS myApplicationCore
+  APPLICATION_CORE_INCLUDE "myApplication.h"
   ORGANIZATION ${organization_name}
   TITLE "ParaView (ReVisEd)")
 

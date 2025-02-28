@@ -14,8 +14,10 @@ paraview_client_add(
   [APPLICATION_XMLS <xml>...]
   [QCH_FILES <file>...]
 
-  [MAIN_WINDOW_CLASS    <class>]
-  [MAIN_WINDOW_INCLUDE  <include>]
+  [MAIN_WINDOW_CLASS        <class>]
+  [MAIN_WINDOW_INCLUDE      <include>]
+  [APPLICATION_CORE_CLASS   <class>]
+  [APPLICATION_CORE_INCLUDE <include>]
 
   [PLUGINS_TARGETS  <target>...]
   [REQUIRED_PLUGINS <plugin>...]
@@ -55,6 +57,10 @@ paraview_client_add(
   * `MAIN_WINDOW_INCLUDE`: (Defaults to `QMainWindow` or
     `<MAIN_WINDOW_CLASS>.h` if it is specified) The include file for the main
     window.
+  * `APPLICATION_CORE_CLASS` (Defaults to `pqPVApplicationCore`) The name
+    of the application core class.
+  * `APPLICATION_CORE_INCLUDE` (Defaults to `pqPVApplicationCore.h`) The include
+    file for the application core class.
   * `PLUGINS_TARGETS`: The targets for plugins. The associated functions
     will be called upon startup.
   * `REQUIRED_PLUGINS`: Plugins to load upon startup.
@@ -92,7 +98,7 @@ paraview_client_add(
 function (paraview_client_add)
   cmake_parse_arguments(_paraview_client
     ""
-    "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT;TRANSLATION_TARGET;TRANSLATE_XML;TRANSLATIONS_DIRECTORY"
+    "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;APPLICATION_CORE_CLASS;APPLICATION_CORE_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT;TRANSLATION_TARGET;TRANSLATE_XML;TRANSLATIONS_DIRECTORY"
     "REQUIRED_PLUGINS;OPTIONAL_PLUGINS;APPLICATION_XMLS;SOURCES;QCH_FILES;QCH_FILE;PLUGINS_TARGETS"
     ${ARGN})
 
@@ -193,6 +199,24 @@ function (paraview_client_add)
   if (NOT DEFINED _paraview_client_MAIN_WINDOW_INCLUDE)
     set(_paraview_client_MAIN_WINDOW_INCLUDE
       "${_paraview_client_MAIN_WINDOW_CLASS}.h")
+  endif ()
+
+  if (NOT DEFINED _paraview_client_APPLICATION_CORE_CLASS)
+    if (DEFINED _paraview_client_APPLICATION_CORE_INCLUDE)
+      message(FATAL_ERROR
+        "The `APPLICATION_CORE_INCLUDE` argument cannot be specified without "
+        "`APPLICATION_CORE_CLASS`.")
+    endif ()
+
+    set(_paraview_client_APPLICATION_CORE_CLASS
+      "pqPVApplicationCore")
+    set(_paraview_client_APPLICATION_CORE_INCLUDE
+      "pqPVApplicationCore.h")
+  endif ()
+
+  if (NOT DEFINED _paraview_client_APPLICATION_CORE_INCLUDE)
+    set(_paraview_client_APPLICATION_CORE_INCLUDE
+      "${_paraview_client_APPLICATION_CORE_CLASS}.h")
   endif ()
 
   set(_paraview_client_extra_sources)

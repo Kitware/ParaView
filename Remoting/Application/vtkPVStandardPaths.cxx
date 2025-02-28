@@ -21,7 +21,7 @@ std::string GetWindowsUserSettingsDirectory()
   std::string appData;
   if (vtksys::SystemTools::GetEnv("APPDATA", appData))
   {
-    vtkLog(TRACE, << "found APPDATA env: " << appData);
+    vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(), << "found APPDATA env: " << appData);
     std::string separator("\\");
     if (appData[appData.size() - 1] != separator[0])
     {
@@ -42,7 +42,7 @@ std::vector<std::string> GetWindowsSystemDirectories()
   // https://learn.microsoft.com/en-us/windows/win32/shell/knownfolderid
   if (vtksys::SystemTools::GetEnv("COMMON_APPDATA", appData))
   {
-    vtkLog(TRACE, << "found COMMON_APPDATA env: " << appData);
+    vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(), << "found COMMON_APPDATA env: " << appData);
     paths.push_back(appData);
   }
 
@@ -61,7 +61,8 @@ std::string GetUnixUserSettingsDirectory()
   std::string xdgConfigHome;
   if (vtksys::SystemTools::GetEnv("XDG_CONFIG_HOME", xdgConfigHome))
   {
-    vtkLog(TRACE, << "found XDG_CONFIG_HOME env: " << xdgConfigHome);
+    vtkVLog(
+      PARAVIEW_LOG_APPLICATION_VERBOSITY(), << "found XDG_CONFIG_HOME env: " << xdgConfigHome);
     directoryPath = xdgConfigHome;
     if (directoryPath[directoryPath.size() - 1] != separator[0])
     {
@@ -75,7 +76,7 @@ std::string GetUnixUserSettingsDirectory()
     {
       return std::string();
     }
-    vtkLog(TRACE, << "found HOME env: " << home);
+    vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(), << "found HOME env: " << home);
     directoryPath = home;
     if (directoryPath[directoryPath.size() - 1] != separator[0])
     {
@@ -95,7 +96,7 @@ std::vector<std::string> GetUnixSystemDirectories()
   std::string dataDirs;
   if (vtksys::SystemTools::GetEnv("XDG_DATA_DIRS", dataDirs))
   {
-    vtkLog(TRACE, << "found XDG_DATA_DIRS env: " << dataDirs);
+    vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(), << "found XDG_DATA_DIRS env: " << dataDirs);
     std::string envDir(dataDirs);
     std::vector<std::string> dirs = vtksys::SystemTools::SplitString(envDir, ':');
     for (const std::string& directory : dirs)
