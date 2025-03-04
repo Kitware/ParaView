@@ -37,10 +37,10 @@ public:
    * Automatically convert data arrays as needed by filters including converting
    * cell arrays to point arrays, or vice versa, and extracting single components
    * from multi-component arrays.
-   * Forwards the call to vtkSMInputArrayDomain::SetAutomaticPropertyConversion.
    */
-  void SetAutoConvertProperties(bool val);
-  bool GetAutoConvertProperties();
+  vtkSetMacro(AutoConvertProperties, bool);
+  vtkGetMacro(AutoConvertProperties, bool);
+  vtkBooleanMacro(AutoConvertProperties, bool);
   ///@}
 
   ///@{
@@ -390,6 +390,7 @@ protected:
   bool ColorByBlockColorsOnApply = true;
   bool EnableStreaming = false;
   bool SelectOnClickMultiBlockInspector = true;
+  bool AutoConvertProperties = false;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;

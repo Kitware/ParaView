@@ -10,7 +10,6 @@
 #include "vtkProcessModule.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSMArraySelectionDomain.h"
-#include "vtkSMInputArrayDomain.h"
 #include "vtkSMPTools.h"
 #include "vtkSMTrace.h"
 #include "vtkThreadedCallbackQueue.h"
@@ -55,22 +54,6 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::GetInstance()
     vtkPVGeneralSettings::Instance.TakeReference(instance);
   }
   return vtkPVGeneralSettings::Instance;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetAutoConvertProperties(bool val)
-{
-  if (this->GetAutoConvertProperties() != val)
-  {
-    vtkSMInputArrayDomain::SetAutomaticPropertyConversion(val);
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVGeneralSettings::GetAutoConvertProperties()
-{
-  return vtkSMInputArrayDomain::GetAutomaticPropertyConversion();
 }
 
 //----------------------------------------------------------------------------

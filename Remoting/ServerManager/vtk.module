@@ -17,6 +17,7 @@ DEPENDS
   ParaView::RemotingCore
   VTK::jsoncpp
 PRIVATE_DEPENDS
+  ParaView::RemotingSettings
   VTK::CommonSystem
   VTK::IOImage
   VTK::vtksys

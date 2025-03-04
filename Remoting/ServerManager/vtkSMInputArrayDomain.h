@@ -24,16 +24,19 @@
  *                         If not specified, 'any-except-field' is assumed. This
  *                         indicates the attribute type for acceptable arrays.
  * \li \c number_of_components : (optional) Indicates the number of components
- *                         required in arrays that are considered acceptable.
- *                         0 (default) indicates any number of components is acceptable.
- *                         A comma-separated list (e.g., "1" or "1,3,4") of component counts
- *                         limits acceptable arrays to those with a number of components that
- *                         appear in the list.
+ *                               required in arrays that are considered acceptable.
+ *                               0 (default) indicates any number of components is acceptable.
+ *                               A comma-separated list (e.g., "1" or "1,3,4") of component counts
+ *                               limits acceptable arrays to those with a number of components that
+ *                               appear in the list.
  * \li \c data_type: (optional) when specified must be the class name for
- *                         data type that this domain is applicable to. This is
- *                         useful when adding multiple input-array-domains a
- *                         property with different requirements based on the
- *                         type (see `("filters", "Contour")` filter, for example).
+ *                   data type that this domain is applicable to. This is
+ *                   useful when adding multiple input-array-domains a
+ *                   property with different requirements based on the
+ *                   type (see `("filters", "Contour")` filter, for example).
+ * \li \c auto_convert_association: (optional) Indicates if an automatic attribute type conversion
+ *                                  can be applied to the input arrays to match the attribute_type
+ *                                  criteria.
  *
  * This domain doesn't support any required properties (to help clean old
  * code, we print a warning if any required properties are specified).
@@ -100,11 +103,21 @@ public:
    */
   std::vector<int> GetAcceptableNumbersOfComponents() const;
 
-  /// Get/Set the application wide setting for automatic conversion of properties.
-  /// Automatic conversion of properties allows conversion between cell and point
-  /// based properties, and the extraction of vector components as scalar properties
+  ///@{
+  /**
+   * Get/Set the application wide setting for automatic conversion of properties.
+   * Automatic conversion of properties allows conversion between cell and point
+   * based properties, and the extraction of vector components as scalar properties
+   */
   static void SetAutomaticPropertyConversion(bool);
   static bool GetAutomaticPropertyConversion();
+  ///@}
+
+  /**
+   * Get the auto convert property for this specific domain.
+   * This returns true if either application settings or local value is true.
+   */
+  bool GetAutoConvertProperties();
 
   enum AttributeTypes
   {
@@ -119,6 +132,7 @@ public:
     NUMBER_OF_ATTRIBUTE_TYPES = ANY + 1,
   };
 
+  ///@{
   /**
    * Method to check if a particular attribute-type (\c attribute_type) will
    * be accepted by this domain with a required attribute type (\c required_type).
@@ -133,6 +147,10 @@ public:
    */
   static bool IsAttributeTypeAcceptable(
     int required_type, int attribute_type, int* acceptable_as_type = nullptr);
+
+  static bool IsAttributeTypeAcceptable(
+    int required_type, int attribute_type, int* acceptable_as_type, bool autoconvert);
+  ///@}
 
   /**
    * This method will check if the arrayInfo contain info about an acceptable array,
@@ -180,9 +198,9 @@ protected:
   std::string DataType;
 
 private:
-  static bool AutomaticPropertyConversion;
   vtkSMInputArrayDomain(const vtkSMInputArrayDomain&) = delete;
   void operator=(const vtkSMInputArrayDomain&) = delete;
+  bool AutoConvertProperties = false;
 };
 
 #endif
