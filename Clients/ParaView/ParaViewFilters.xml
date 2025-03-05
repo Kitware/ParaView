@@ -476,6 +476,7 @@
   <Proxy group="filters" name="QuadraturePointsGenerator" />
   <Proxy group="filters" name="QuadratureSchemeDictionaryGenerator" />
   <Proxy group="filters" name="QuadricClustering" />
+  <Proxy group="filters" name="QuadricDecimation" />
   <Proxy group="filters" name="RandomAttributeGenerator" />
   <Proxy group="filters" name="RectilinearGridConnectivity" />
   <Proxy group="filters" name="RectilinearGridToPointSet" />
