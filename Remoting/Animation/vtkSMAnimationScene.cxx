@@ -485,8 +485,6 @@ void vtkSMAnimationScene::TickInternal(double currenttime, double deltatime, dou
     vtkTickOnPythonCue(
       this->StartTime, this->EndTime, currenttime, deltatime, clocktime, this->Direction));
 
-  this->Internals->UpdateAllViews();
-
   std::for_each(cues.begin(), cues.end(),
     vtkTickOnCameraCue(this->StartTime, this->EndTime, currenttime, deltatime, clocktime,
       this->Direction, this->TimeKeeper));
@@ -503,6 +501,8 @@ void vtkSMAnimationScene::TickInternal(double currenttime, double deltatime, dou
   {
     this->Internals->PassUseCache(false);
   }
+
+  this->Internals->UpdateAllViews();
 }
 
 //----------------------------------------------------------------------------
