@@ -1105,10 +1105,6 @@ bool vtkSMParaViewPipelineController::PreInitializeProxy(vtkSMProxy* proxy)
     return false;
   }
 
-  // 4. Load property values from Settings.
-  vtkSMSettings* settings = vtkSMSettings::GetInstance();
-  settings->GetProxySettings(proxy);
-
   // Now, update the initialization time.
   this->Internals->InitializationTimeStamps[proxy].Modified();
 
@@ -1209,6 +1205,11 @@ bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
     {
       (*siter)->ResetToDomainDefaults();
     }
+
+    // settings override any other initialization
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+    settings->GetProxySettings(proxy);
+
     proxy->UpdateVTKObjects();
   }
   return true;

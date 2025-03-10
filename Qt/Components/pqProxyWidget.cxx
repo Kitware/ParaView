@@ -1226,7 +1226,7 @@ void pqProxyWidget::saveAsDefaults() const
     propertyIt->SetPropertyNames(this->Internals->Properties);
     propertyIt->SetProxy(this->Internals->Proxy);
   }
-  settings->SetProxySettings(this->Internals->Proxy, propertyIt);
+  settings->SetProxySettings(this->Internals->Proxy, propertyIt, false);
   if (propertyIt)
   {
     propertyIt->Delete();
@@ -1254,7 +1254,7 @@ void pqProxyWidget::showContextMenu(const QPoint& pt, pqPropertyWidget* propWidg
       propertyIt->SetProxy(this->Internals->Proxy);
       propertyIt->SetPropertyNames(names);
       vtkSMSettings* settings = vtkSMSettings::GetInstance();
-      settings->SetProxySettings(this->Internals->Proxy, propertyIt);
+      settings->SetProxySettings(this->Internals->Proxy, propertyIt, false);
     });
     useDefault->setObjectName("UseDefault");
   }

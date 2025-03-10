@@ -677,7 +677,7 @@ public:
         vtkSMProxy* listProxy = proxyListDomain->GetProxy(ip);
         if (listProxy)
         {
-          if (!this->SetProxySettings(settingName, listProxy, nullptr, true))
+          if (!this->SetProxySettings(settingName, listProxy, nullptr, false))
           {
             return false;
           }
