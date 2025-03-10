@@ -1022,6 +1022,11 @@ list (APPEND TESTS_WITHOUT_BASELINES
   RescaleVisibleRangeOption.xml
   SearchBox.xml
   ServerConnectDialog.xml
+  SettingsNoCustomDefault.xml
+  SettingsOverrideDomain.xml
+  SettingsProxyProperty.xml
+  SettingsRestoreProxyAppDefault.xml
+  SettingsSubProxy.xml
   SliceBackwardsCompatibility.xml
   SpatioTemporalHarmonicsAttribute.xml
   SpatioTemporalHarmonicsSource.xml
