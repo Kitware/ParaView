@@ -29,6 +29,7 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMOrderedPropertyIterator.h"
@@ -40,6 +41,7 @@
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkSMVectorProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 #include "vtkWeakPointer.h"
@@ -218,8 +220,8 @@ bool skip_group(
 // and have its default value restored.
 bool canSaveDefault(vtkSMProperty* smproperty)
 {
-  return (vtkSMVectorProperty::SafeDownCast(smproperty) && !smproperty->GetNoCustomDefault() &&
-    !smproperty->GetInformationOnly());
+  return (smproperty && !vtkSMInputProperty::SafeDownCast(smproperty) &&
+    !smproperty->GetNoCustomDefault() && !smproperty->GetInformationOnly());
 }
 
 // given a propertyWidget, see if it has a vtkSMProxyListDomain, and
@@ -1168,7 +1170,6 @@ void pqProxyWidget::updatePanel()
 bool pqProxyWidget::restoreDefaults()
 {
   bool anyReset = false;
-  vtkSMSettings* settings = vtkSMSettings::GetInstance();
   if (this->Internals->Proxy)
   {
     vtkSmartPointer<vtkSMPropertyIterator> iter;
@@ -1184,22 +1185,14 @@ bool pqProxyWidget::restoreDefaults()
         continue;
       }
 
-      // Restore only basic type properties.
-      if (vtkSMVectorProperty::SafeDownCast(smproperty) && !smproperty->GetNoCustomDefault() &&
-        !smproperty->GetInformationOnly())
+      // skip input and information only
+      if (vtkSMInputProperty::SafeDownCast(smproperty) || smproperty->GetInformationOnly())
       {
-        if (!smproperty->IsValueDefault())
-        {
-          anyReset = true;
-        }
-        smproperty->ResetToDefault();
-
-        // Restore to site setting if there is one. If there isn't, this does
-        // not change the property setting. NOTE: user settings have priority
-        // of VTK_DOUBLE_MAX, so we set the site settings priority to a
-        // number just below VTK_DOUBLE_MAX.
-        settings->GetPropertySetting(smproperty, nextafter(VTK_DOUBLE_MAX, 0));
+        continue;
       }
+
+      anyReset =
+        this->resetProperty(smproperty, vtkSMSettings::GetApplicationPriority(), false) || anyReset;
     }
   }
 
@@ -1236,56 +1229,33 @@ void pqProxyWidget::saveAsDefaults() const
 //-----------------------------------------------------------------------------
 void pqProxyWidget::showContextMenu(const QPoint& pt, pqPropertyWidget* propWidget)
 {
-  if (!canSaveDefault(propWidget->property()))
+  if (!::canSaveDefault(propWidget->property()))
   {
     return;
   }
   QMenu menu(this);
   menu.setObjectName("PropertyContextMenu");
-  // if a prop has a dynamic domain, can't save default, but can reset to app default.
-  if (!propWidget->property()->HasDomainsWithRequiredProperties())
-  {
-    auto* useDefault = menu.addAction(tr("Use as Default"), propWidget, [this, propWidget]() {
-      // get the property name
-      std::string name = this->Internals->Proxy->GetPropertyName(propWidget->property());
-      // tell settings to save a single property by name
-      std::vector<std::string> names{ name };
-      vtkNew<vtkSMNamedPropertyIterator> propertyIt;
-      propertyIt->SetProxy(this->Internals->Proxy);
-      propertyIt->SetPropertyNames(names);
-      vtkSMSettings* settings = vtkSMSettings::GetInstance();
-      settings->SetProxySettings(this->Internals->Proxy, propertyIt, false);
-    });
-    useDefault->setObjectName("UseDefault");
-  }
-  auto* resetToDefault =
-    menu.addAction(tr("Reset to Application Default"), propWidget, [this, propWidget]() {
-      bool anyReset = false;
-      // mirror pqProxyWidget::restoreDefaults() for a single property
-      vtkSMProperty* smproperty = propWidget->property();
-      vtkSMSettings* settings = vtkSMSettings::GetInstance();
-      if (!smproperty->IsValueDefault())
-      {
-        anyReset = true;
-      }
-      smproperty->ResetToDefault();
+  auto* useDefault = menu.addAction(tr("Use as Default"), propWidget, [this, propWidget]() {
+    // get the property name
+    std::string name = this->Internals->Proxy->GetPropertyName(propWidget->property());
+    // tell settings to save a single property by name
+    std::vector<std::string> names{ name };
+    vtkNew<vtkSMNamedPropertyIterator> propertyIt;
+    propertyIt->SetProxy(this->Internals->Proxy);
+    propertyIt->SetPropertyNames(names);
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+    settings->SetProxySettings(this->Internals->Proxy, propertyIt, false);
+  });
+  useDefault->setObjectName("UseDefault");
 
-      // Restore to site setting if there is one. If there isn't, this does
-      // not change the property setting. NOTE: user settings have priority
-      // of VTK_DOUBLE_MAX, so we set the site settings priority to a
-      // number just below VTK_DOUBLE_MAX.
-      settings->GetPropertySetting(smproperty, nextafter(VTK_DOUBLE_MAX, 0));
-      // The code above bypasses the changeAvailable() and
-      // changeFinished() signal from the pqProxyWidget, so we check here
-      // whether we should act as if changes are available only if any of
-      // the properties have been reset.
-      if (anyReset)
-      {
-        Q_EMIT this->changeAvailable();
-        Q_EMIT this->changeFinished();
-      }
-    });
-  resetToDefault->setObjectName("ResetToDefault");
+  QAction* resetToAppDefault = menu.addAction(tr("Reset to Application Default"), propWidget,
+    [this, propWidget]() { this->resetPropertyToAppDefault(propWidget); });
+  resetToAppDefault->setObjectName("ResetToDefault");
+
+  QAction* resetToSettings = menu.addAction(tr("Reset to User Settings"), propWidget,
+    [this, propWidget]() { this->resetPropertyToUserDefault(propWidget); });
+  resetToSettings->setObjectName("ResetToSettings");
+
   menu.exec(pt);
 }
 
@@ -1317,4 +1287,39 @@ bool pqProxyWidget::shouldPreservePropertyValues() const
   bool preserveProperties = vtkPVGeneralSettings::GetInstance()->GetPreservePropertyValues();
 
   return preserveProperties && (possibleGroups.count(proxy->GetXMLGroup()) == 1);
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidget::resetProperty(vtkSMProperty* prop, double settingsPriority, bool warn)
+{
+  bool anyReset = !prop->IsValueDefault();
+  prop->ResetToDefault();
+
+  anyReset = prop->ResetToSettings(settingsPriority) || anyReset;
+
+  if (warn && anyReset)
+  {
+    Q_EMIT this->changeAvailable();
+    if (this->ApplyChangesImmediately)
+    {
+      this->apply();
+    }
+    Q_EMIT this->changeFinished();
+  }
+
+  return anyReset;
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidget::resetPropertyToAppDefault(pqPropertyWidget* propWidget)
+{
+  vtkSMProperty* smproperty = propWidget->property();
+  this->resetProperty(smproperty, vtkSMSettings::GetApplicationPriority(), true);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidget::resetPropertyToUserDefault(pqPropertyWidget* propWidget)
+{
+  vtkSMProperty* smproperty = propWidget->property();
+  this->resetProperty(smproperty, vtkSMSettings::GetUserPriority(), true);
 }
