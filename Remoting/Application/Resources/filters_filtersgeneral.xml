@@ -187,6 +187,91 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkAxisAlignedTransformFilter"
+                 label="Axis-Aligned Transform Filter"
+                 name="AxisAlignedTransformFilter">
+      <Documentation long_help="This filter applies an axis-aligned affine transformation (translation, scaling, and rotation) ."
+                     short_help="Apply an axis-aligned affine transformation.">
+        The Axis Aligned Transform filter operates on any type of data
+        set or hyper tree grid and applies a transformation that is
+        constrained to be axis-aligned. The output type is the same as the
+        input.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkCompositeDataSet"/>
+          <DataType value="vtkHyperTreeGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the Axis Aligned Transform filter.
+        </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty command="SetTranslation"
+                         default_values="0 0 0"
+                         name="Translation"
+                         number_of_elements="3">
+        <Documentation>
+          This property specifies the translation vector of the transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetScale"
+                         default_values="1 1 1"
+                         name="Scale"
+                         number_of_elements="3">
+        <Documentation>
+          This property specifies the scaling vector of the transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetRotationAngle"
+                         default_values="0"
+                         name="Rotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="0°"
+                 value="0" />
+          <Entry text="90°"
+                 value="1" />
+          <Entry text="180°"
+                 value="2" />
+          <Entry text="270"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies the rotation angle of the transformation. The rotation direction
+          is set according to the right hand rule with respect to the rotation axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetRotationAxis"
+                         default_values="0"
+                         name="Axis"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="X Axis"
+                 value="0" />
+          <Entry text="Y Axis"
+                 value="1" />
+          <Entry text="Z Axis"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies the rotation axis of the transformation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End AxisAlignedTransformFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkBlockIdScalars"
                  label="Block Ids"
                  name="BlockIds">

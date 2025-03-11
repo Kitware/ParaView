@@ -292,6 +292,7 @@
   <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
   <Proxy group="filters" name="AxisAlignedReflectionFilter" />
   <Proxy group="filters" name="AxisAlignedSlice" />
+  <Proxy group="filters" name="AxisAlignedTransformFilter" />
   <Proxy group="filters" name="BlockIdScalars" />
   <Proxy group="filters" name="BlockIds" />
   <Proxy group="filters" name="BoundaryMeshQuality"/>
