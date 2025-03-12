@@ -694,9 +694,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
             i = iter(grid_offset)
             grid_offset = [next(i, 0) for _ in range(3)]
 
-            et.SetGhostLevel(0)
-            et.PieceToExtent()
-            ext = np.array(et.GetExtent()).reshape(3, 2)
+            ext = np.array(ext).reshape(3, 2)
 
             img = vtkImageData()
             if mesh_needs_transpose(var[0]):
