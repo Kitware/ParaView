@@ -1193,7 +1193,7 @@ unsigned int vtkSMSettings::GetSettingNumberOfElements(const char* settingName)
     return value.size();
   }
 
-  return 0;
+  return value.isNull() ? 0 : 1;
 }
 
 //----------------------------------------------------------------------------
