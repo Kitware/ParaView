@@ -31,8 +31,10 @@ set(PARAVIEW_SSH_SERVERS_TESTING ON CACHE BOOL "")
 
 set(PARAVIEW_XRInterface_OpenVR_Support ON CACHE BOOL "")
 set(VTK_MODULE_ENABLE_VTK_RenderingOpenVR YES CACHE STRING "")
-set(PARAVIEW_XRInterface_OpenXR_Support ON CACHE BOOL "")
-set(VTK_MODULE_ENABLE_VTK_RenderingOpenXR YES CACHE STRING "")
+
+# https://gitlab.kitware.com/paraview/paraview/-/issues/22909
+set(PARAVIEW_XRInterface_OpenXR_Support OFF CACHE BOOL "")
+set(VTK_MODULE_ENABLE_VTK_RenderingOpenXR NO CACHE STRING "")
 
 # enable optimizations for debug build because new imaging testing framework is slow otherwise
 set(CMAKE_CXX_FLAGS_DEBUG "-Og -g" CACHE STRING "")

@@ -17,7 +17,6 @@ set(PARAVIEW_GENERATE_SPDX ON CACHE BOOL "")
 
 # Enable default-off plugins.
 set(PARAVIEW_PLUGIN_ENABLE_TemporalParallelismScriptGenerator ON CACHE BOOL "")
-set(PARAVIEW_PLUGIN_ENABLE_XRInterface ON CACHE BOOL "")
 set(PARAVIEW_XRInterface_OpenVR_Support OFF CACHE BOOL "")
 
 # We run the install right after the build. Avoid rerunning it when installing.

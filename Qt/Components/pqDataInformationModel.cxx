@@ -1,9 +1,14 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
+
+// VTK_DEPRECATED_IN_9_5_0()
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "pqDataInformationModel.h"
 
 // ParaView Server Manager includes.
+#include "vtkLogger.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMSourceProxy.h"
 
@@ -167,6 +172,7 @@ struct pqSourceInfo
         return QIcon(":/pqWidgets/Icons/pqPolydata16.png");
 
       case VTK_HYPER_OCTREE:
+        vtkLogF(WARNING, "VTK_HYPER_OCTREE has been removed, do not use.");
         return QIcon(":/pqWidgets/Icons/pqOctreeData.svg");
 
       case VTK_UNSTRUCTURED_GRID:
@@ -192,15 +198,19 @@ struct pqSourceInfo
         return QIcon(":/pqWidgets/Icons/pqStructuredGrid16.png");
 
       case VTK_MULTIGROUP_DATA_SET:
+        vtkLogF(WARNING, "VTK_MULTIGROUP_DATA_SET has been removed, do not use.");
         return QIcon(":/pqWidgets/Icons/pqGroup.svg");
 
       case VTK_MULTIBLOCK_DATA_SET:
         return QIcon(":/pqWidgets/Icons/pqMultiBlockData16.png");
 
       case VTK_HIERARCHICAL_DATA_SET:
+        vtkLogF(WARNING, "VTK_HIERARCHICAL_DATA_SET has been removed, do not use.");
         return QIcon(":/pqWidgets/Icons/pqHierarchicalData16.png");
 
       case VTK_HIERARCHICAL_BOX_DATA_SET:
+        vtkLogF(WARNING,
+          "VTK_HIERARCHICAL_BOX_DATA_SET has been removed, please use vtkOverlappingAMR instead.");
         return QIcon(":/pqWidgets/Icons/pqOctreeData.svg");
 
       default:

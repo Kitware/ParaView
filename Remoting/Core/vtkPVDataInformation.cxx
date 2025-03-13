@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 
+// VTK_DEPRECATED_IN_9_5_0()
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "vtkPVDataInformation.h"
 
 #include "vtkAlgorithm.h"
@@ -747,12 +750,16 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString(int dataType)
     case VTK_COMPOSITE_DATA_SET:
       return "Composite Dataset";
     case VTK_MULTIGROUP_DATA_SET:
-      return "Multi-group Dataset";
+      vtkLogF(WARNING, "VTK_MULTIGROUP_DATA_SET has been removed, do not use.");
+      return "Multi-group Dataset (Deprecated)";
     case VTK_MULTIBLOCK_DATA_SET:
       return "Multi-block Dataset";
     case VTK_HIERARCHICAL_DATA_SET:
+      vtkLogF(WARNING, "VTK_HIERARCHICAL_DATA_SET has been removed, do not use.");
       return "Hierarchical DataSet (Deprecated)";
     case VTK_HIERARCHICAL_BOX_DATA_SET:
+      vtkLogF(WARNING,
+        "VTK_HIERARCHICAL_BOX_DATA_SET has been removed, please use vtkOverlappingAMR instead.");
       return "AMR Dataset (Deprecated)";
     case VTK_NON_OVERLAPPING_AMR:
       return "Non-Overlapping AMR Dataset";
@@ -761,10 +768,12 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString(int dataType)
     case VTK_GENERIC_DATA_SET:
       return "Generic Dataset";
     case VTK_HYPER_OCTREE:
+      vtkLogF(WARNING, "VTK_HYPER_OCTREE has been removed, do not use.");
       return "Hyper-octree";
     case VTK_HYPER_TREE_GRID:
       return "Hyper-tree Grid";
     case VTK_TEMPORAL_DATA_SET:
+      vtkLogF(WARNING, "VTK_TEMPORAL_DATA_SET has been removed, do not use.");
       return "Temporal Dataset";
     case VTK_TABLE:
       return "Table";
@@ -1184,13 +1193,8 @@ int vtkPVDataInformation::GetExtentType(int type)
     case VTK_DATA_SET:
     case VTK_POINT_SET:
     case VTK_COMPOSITE_DATA_SET:
-    case VTK_MULTIGROUP_DATA_SET:
     case VTK_MULTIBLOCK_DATA_SET:
-    case VTK_HIERARCHICAL_DATA_SET:
-    case VTK_HIERARCHICAL_BOX_DATA_SET:
     case VTK_GENERIC_DATA_SET:
-    case VTK_HYPER_OCTREE:
-    case VTK_TEMPORAL_DATA_SET:
     case VTK_TABLE:
     case VTK_GRAPH:
     case VTK_TREE:
@@ -1206,13 +1210,25 @@ int vtkPVDataInformation::GetExtentType(int type)
     case VTK_OVERLAPPING_AMR:
     case VTK_HYPER_TREE_GRID:
     case VTK_MOLECULE:
-    case VTK_PISTON_DATA_OBJECT:
     case VTK_PATH:
     case VTK_UNSTRUCTURED_GRID_BASE:
     case VTK_PARTITIONED_DATA_SET:
     case VTK_PARTITIONED_DATA_SET_COLLECTION:
     case VTK_UNIFORM_HYPER_TREE_GRID:
     case VTK_CELL_GRID:
+      return VTK_PIECES_EXTENT;
+
+    case VTK_HIERARCHICAL_BOX_DATA_SET:
+      vtkLogF(WARNING,
+        "VTK_HIERARCHICAL_BOX_DATA_SET has been removed, please use vtkOverlappingAMR instead.");
+      return VTK_PIECES_EXTENT;
+
+    case VTK_HIERARCHICAL_DATA_SET:
+    case VTK_HYPER_OCTREE:
+    case VTK_MULTIGROUP_DATA_SET:
+    case VTK_PISTON_DATA_OBJECT:
+    case VTK_TEMPORAL_DATA_SET:
+      vtkLogF(WARNING, "This type (%d) has been removed, do not use.", type);
       return VTK_PIECES_EXTENT;
 
     default:
