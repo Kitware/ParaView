@@ -34,6 +34,8 @@
 #include <QColor>
 #include <QCoreApplication>
 #include <QDir>
+#include <QPointer>
+#include <QProcess>
 #include <QStringList>
 #include <QTimer>
 #include <QtDebug>
@@ -57,6 +59,8 @@ public:
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
   vtkWeakPointer<vtkSMCollaborationManager> CollaborationCommunicator;
+
+  QPointer<QProcess> ScriptProcess;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
@@ -150,6 +154,13 @@ pqServer::~pqServer()
     vtkProcessModule::GetProcessModule()->Disconnect(this->ConnectionID);
     }
     */
+
+  // Delete the script process if any
+  if (this->Internals->ScriptProcess)
+  {
+    this->Internals->ScriptProcess->deleteLater();
+  }
+
   this->ConnectionID = 0;
   this->Session = nullptr;
   delete this->Internals;
@@ -182,6 +193,18 @@ void pqServer::setRemainingLifeTime(int value)
 int pqServer::getRemainingLifeTime() const
 {
   return this->Internals->RemainingLifeTime;
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setScriptProcess(QProcess* process)
+{
+  this->Internals->ScriptProcess = process;
+}
+
+//-----------------------------------------------------------------------------
+QProcess* pqServer::getScriptProcess() const
+{
+  return this->Internals->ScriptProcess;
 }
 
 //-----------------------------------------------------------------------------

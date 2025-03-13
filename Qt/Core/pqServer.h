@@ -26,6 +26,8 @@ class vtkSMSessionProxyManager;
 
 #include <QPointer>
 
+class QProcess;
+
 /**
  * pqServer (should be renamed to pqSession) is a pqServerManagerModelItem
  * subclass that represents a vtkSMSession. Besides providing API to access
@@ -140,6 +142,15 @@ public:
    * Set the time (in minutes) remaining.
    */
   void setRemainingLifeTime(int value);
+
+  ///@{
+  /**
+   * Set/Get the QProcess used to run the server script
+   * Will be deleted by the destructor of this class if set
+   */
+  void setScriptProcess(QProcess* process);
+  QProcess* getScriptProcess() const;
+  ///@}
 
 Q_SIGNALS:
   /**
