@@ -4,26 +4,14 @@
 
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSet.h"
-#include "vtkDoubleArray.h"
 #include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkView.h"
-
-#include "vtkAlgorithmOutput.h"
-#include "vtkDataObjectTypes.h"
-#include "vtkInformationVector.h"
-#include "vtkMultiProcessController.h"
-#include "vtkPVTrivialProducer.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-
-#include "vtkCompositeDataSet.h"
-#include "vtkDataObjectTree.h"
-#include "vtkDataObjectTreeIterator.h"
-#include "vtkPolyData.h"
-
-#include <algorithm>
 
 vtkStandardNewMacro(vtkBivariateTextureRepresentation);
 

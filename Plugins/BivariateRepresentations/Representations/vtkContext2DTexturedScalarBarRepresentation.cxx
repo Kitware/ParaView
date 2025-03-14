@@ -5,7 +5,6 @@
 
 #include "vtkContext2DTexturedScalarBarRepresentation.h"
 
-#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkViewport.h"
 

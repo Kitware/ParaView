@@ -5,30 +5,19 @@
 #include "vtkCommand.h"
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVProminentValuesInformation.h"
-#include "vtkPVTemporalDataInformation.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSMArrayListDomain.h"
-#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMLink.h"
+#include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtksys/SystemTools.hxx"
-
-#include "vtkSMParaViewPipelineController.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSession.h"
-#include "vtkSMTransferFunctionManager.h" // TO REMOVE
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkSMViewProxy.h"
 
-#include "vtkSMProxyClipboard.h"
-#include "vtkSMProxyManager.h"
-
+#include <array>
 #include <string>
 
 /**
