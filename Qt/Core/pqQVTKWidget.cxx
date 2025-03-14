@@ -45,6 +45,9 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isSter
     baseClass.setValue(ptr);
     layout->addWidget(ptr);
 
+    // Disable touch events. See ParaView issue #22901 and VTK issue #19073 for more details.
+    ptr->setEnableTouchEventProcessing(false);
+
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Using stereo-capable context.");
   }
   else
@@ -52,6 +55,9 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isSter
     auto ptr = new QVTKOpenGLNativeWidget(parentObject, f);
     baseClass.setValue(ptr);
     layout->addWidget(ptr);
+
+    // Disable touch events. See ParaView issue #22901 and VTK issue #19073 for more details.
+    ptr->setEnableTouchEventProcessing(false);
 
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Using native-capable context.");
   }
