@@ -169,7 +169,7 @@
          <item>
           <widget class="QToolButton" name="viewZPlus">
            <property name="toolTip">
-            <string>Looking down X axis from (0, 0, 1)</string>
+            <string>Looking down Z axis from (0, 0, 1)</string>
            </property>
            <property name="text">
             <string/>
