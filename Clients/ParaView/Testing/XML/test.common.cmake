@@ -1010,6 +1010,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ProxyCategoriesMenusDefault.xml
   ProxyCategoriesToolbar.xml
   QuadraturePointsDS.xml
+  QuadricDecimation.xml
   QuickLaunchCreateProxy.xml
   QuickLaunchNavigation.xml
   QuickLaunchRequest.xml

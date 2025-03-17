@@ -1456,6 +1456,317 @@ found and the point will be rejected.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy name="QuadricDecimation" class="vtkQuadricDecimation" label="Quadric Decimation">
+     <Documentation
+        long_help="Reduce the number of trianges in a mesh using vtkQuadricDecimation."
+        short_help="Reduce the number of trianges in a mesh.">
+      Reduce the number of triangles in a triangle mesh, forming a good
+      approximation to the original geometry. Only triangles are treated.
+      To decimate polygonal meshes, first triangulate the polygons with
+      Triangulate.
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty animateable="1"
+                            command="SetTargetReduction"
+                            name="TargetReduction"
+                            default_values="0.5"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>
+          Desired reduction (expressed as a fraction of the original
+          number of triangles). The actual reduction may be less depending on
+          triangulation and topological constraints.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetVolumePreservation"
+                         name="VolumePreservation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Decide whether to activate volume preservation which greatly reduces errors
+          in triangle normal direction. If off, volume preservation is disabled and
+          if AttributeErrorMetric is active, these errors can be large.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetMapPointData"
+                         name="MapPointData"
+                         default_values="1"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Keep point data to the output during decimation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetRegularize"
+                         name="Regularize"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Boolean property determining whether or not to use the regularization method.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRegularization"
+                            name="Regularization"
+                            default_values="0.05"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>
+          Adjust the level of regularization. Help to have better quality mesh elements
+          at the cost of lower precision on the geometry.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Regularize"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetAttributeErrorMetric"
+                         name="AttributeErrorMetric"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Decide whether to include data attributes in the error metric. If off,
+          then only geometric error is used to control the decimation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScalarsAttribute"
+                         name="ScalarsAttribute"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This flag controls whether scalars attributes are to be included in the error
+          calculation.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetVectorsAttribute"
+                         name="VectorsAttribute"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This flag controls whether vectors attributes are to be included in the error
+          calculation.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNormalsAttribute"
+                         name="NormalsAttribute"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This flag controls whether normals attributes are to be included in the error
+          calculation.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTCoordsAttribute"
+                         name="TCoordsAttribute"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This flag controls whether texture coordinates attributes are to be included in
+          the error calculation.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTensorsAttribute"
+                         name="TensorsAttribute"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This flag controls whether tensors attributes are to be included in the error
+          calculation.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty animateable="1"
+                            command="SetScalarsWeight"
+                            name="ScalarsWeight"
+                            default_values="0.5"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>
+          Scaling weight contribution of the scalar attribute. This
+          value is used to weight the contribution of the scalar
+          attribute towards the error metric.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ScalarsAttribute"
+                                   value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetVectorsWeight"
+                            name="VectorsWeight"
+                            default_values="0.5"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>
+          Scaling weight contribution of the vector attribute. This
+          value is used to weight the contribution of the vector
+          attribute towards the error metric.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="VectorsAttribute"
+                                   value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetNormalsWeight"
+                            name="NormalsWeight"
+                            default_values="0.5"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>
+          Scaling weight contribution of the normal attribute. This
+          value is used to weight the contribution of the normal
+          attribute towards the error metric.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="NormalsAttribute"
+                                   value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTCoordsWeight"
+                            name="TCoordsWeight"
+                            default_values="0.5"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>
+          Scaling weight contribution of the texture coordinates attribute.
+          This value is used to weight the contribution of the texture
+          coordinates attribute towards the error metric.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="TCoordsAttribute"
+                                   value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTensorsWeight"
+                            name="TensorsWeight"
+                            default_values="0.5"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>
+          Scaling weight contribution of the tensors attribute. This
+          value is used to weight the contribution of the tensors
+          attribute towards the error metric.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="TensorsAttribute"
+                                   value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AttributeErrorMetric"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <!-- End QuadricDecimation -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkResampleToImage"
                  label="Resample To Image"
                  name="ResampleToImage">
