@@ -3,11 +3,12 @@
   <!-- This section list all categories/toolbar filters. Filters should be duplicated in the next section -->
   <Category name="Common" menu_label="&amp;Common" preserve_order="1" show_in_toolbar="1">
     <Proxy group="filters" name="Calculator" />
+    <Proxy group="filters" name="CellDataToPointData" />
+    <Proxy group="filters" name="ResampleToImage" />
     <Proxy group="filters" name="Contour" />
     <Proxy group="filters" name="Clip" />
     <Proxy group="filters" name="Cut" />
     <Proxy group="filters" name="Threshold" />
-    <Proxy group="filters" name="ExtractGrid" />
     <Proxy group="filters" name="Glyph" />
     <Proxy group="filters" name="StreamTracer" />
     <Proxy group="filters" name="WarpVector" />
@@ -119,7 +120,7 @@
       <Proxy group="filters" name="ExtractLocation" omit_from_toolbar="1" />
       <Proxy group="filters" name="ExtractSelection" />
       <Proxy group="filters" name="ExtractSelectionOverTime" />
-      <Proxy group="filters" name="IntegrateAttributes" omit_from_toolbar="1" />
+      <Proxy group="filters" name="IntegrateAttributes" />
       <Proxy group="filters" name="PlotAttributes" omit_from_toolbar="1" />
       <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
       <Proxy group="filters" name="PlotOnIntersectionCurves" omit_from_toolbar="1" />
