@@ -37,6 +37,7 @@
         <file>Icons/pqCatalyst.svg</file>
         <file>Icons/pqCellCenterData.svg</file>
         <file>Icons/pqCellData.svg</file>
+        <file>Icons/pqCellDataToPointData.svg</file>
         <file>Icons/pqChangeInput.svg</file>
         <file>Icons/pqChecked.svg</file>
         <file>Icons/pqChooseIcon.svg</file>
@@ -94,6 +95,7 @@
         <file>Icons/pqInsituServerRunning16.png</file>
         <file>Icons/pqInsituServerPaused16.png</file>
         <file>Icons/pqInsituBreakpoint16.png</file>
+        <file>Icons/pqIntegrateAttributes.svg</file>
         <file>Icons/pqInteractionMode2D.svg</file>
         <file>Icons/pqInteractionMode3D.svg</file>
         <file>Icons/pqInteractiveRay.svg</file>
@@ -147,6 +149,7 @@
         <file>Icons/pqRedoCamera.svg</file>
         <file>Icons/pqReflect.svg</file>
         <file>Icons/pqReloadFile.svg</file>
+        <file>Icons/pqResampleToImage.svg</file>
         <file>Icons/pqReset.svg</file>
         <file>Icons/pqResetActorsPosition.svg</file>
         <file>Icons/pqResetCamera.svg</file>

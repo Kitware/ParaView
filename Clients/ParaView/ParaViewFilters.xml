@@ -298,7 +298,7 @@
   <Proxy group="filters" name="CTHPart" />
   <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator.svg" />
   <Proxy group="filters" name="CellCenters" />
-  <Proxy group="filters" name="CellDataToPointData" />
+  <Proxy group="filters" name="CellDataToPointData" icon=":/pqWidgets/Icons/pqCellDataToPointData.svg" />
   <Proxy group="filters" name="CellDerivatives" />
   <Proxy group="filters" name="CellGridCenters" />
   <Proxy group="filters" name="CellGridPointProbe" />
@@ -408,7 +408,7 @@
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToPointSet" />
   <Proxy group="filters" name="ImageDataToUniformGrid" />
-  <Proxy group="filters" name="IntegrateAttributes" />
+  <Proxy group="filters" name="IntegrateAttributes" icon=":/pqWidgets/Icons/pqIntegrateAttributes.svg" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
   <Proxy group="filters" name="IntersectFragments" />
   <Proxy group="filters" name="IsoVolume" />
@@ -486,7 +486,7 @@
   <Proxy group="filters" name="ReflectionFilter" icon=":/pqWidgets/Icons/pqReflect.svg" />
   <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="RenameArrays" />
-  <Proxy group="filters" name="ResampleToImage" />
+  <Proxy group="filters" name="ResampleToImage" icon=":/pqWidgets/Icons/pqResampleToImage.svg" />
   <Proxy group="filters" name="ResampleToLine" />
   <Proxy group="filters" name="ResampleWithDataset" />
   <Proxy group="filters" name="ReverseSense" />
