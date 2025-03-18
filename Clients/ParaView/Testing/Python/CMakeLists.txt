@@ -21,6 +21,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0062/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/NestedRings/NestedRings.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/plotly_json_line_chart.json}"
+  "DATA{${paraview_test_data_directory_input}/Data/WorldWithTexture.obj}"
+  "DATA{${paraview_test_data_directory_input}/Data/WorldWithTexture.png}"
 
 
   # baselines
@@ -33,6 +35,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCatalystClient.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FontSize.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SaveTransparentImages.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LoadAndApplyTexture.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LoadStateWithTextures.png}"
   )
 
@@ -97,6 +100,7 @@ paraview_add_test_python(
   TestLineChartLabelPrefix.py
   TestPythonViewScript.py
   TestResetCameraToDirection.py
+  LoadAndApplyTexture.py
   LoadStateWithTextures.py
   ExportGLTF.py
 )
