@@ -3,15 +3,11 @@
 
 #include "vtkPVGeneralSettings.h"
 
-#include "vtkAlgorithm.h"
-#include "vtkLegacy.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkSMPTools.h"
-#include "vtkSMTrace.h"
 #include "vtkThreadedCallbackQueue.h"
-#include "vtkThreads.h"
 
 #if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
 #include "vtkmFilterOverrides.h"
