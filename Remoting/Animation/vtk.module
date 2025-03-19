@@ -18,6 +18,7 @@ DEPENDS
   ParaView::VTKExtensionsIOCore
   VTK::IOMovie
 PRIVATE_DEPENDS
+  ParaView::RemotingSettings
   ParaView::VTKExtensionsMisc
   VTK::CommonComputationalGeometry
   VTK::CommonSystem

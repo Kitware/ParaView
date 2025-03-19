@@ -138,15 +138,16 @@ public:
   /**
    * Set when animation geometry caching is enabled.
    */
-  void SetCacheGeometryForAnimation(bool val);
-  bool GetCacheGeometryForAnimation();
+  vtkSetMacro(CacheGeometryForAnimation, bool);
+  vtkGetMacro(CacheGeometryForAnimation, bool);
+  vtkBooleanMacro(CacheGeometryForAnimation, bool);
   ///@}
 
   ///@{
   /**
    * Set the animation cache limit in KBs.
    */
-  void SetAnimationGeometryCacheLimit(unsigned long val);
+  vtkSetMacro(AnimationGeometryCacheLimit, unsigned long);
   vtkGetMacro(AnimationGeometryCacheLimit, unsigned long);
   ///@}
 

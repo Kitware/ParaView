@@ -24,6 +24,7 @@
 
 #include "vtkAnimationCue.h"
 #include "vtkCommand.h"                 // needed for vtkCommand::UserEvent
+#include "vtkParaViewDeprecation.h"     // for deprec macros
 #include "vtkRemotingAnimationModule.h" //needed for exports
 
 #include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_13_0
@@ -192,7 +193,9 @@ public:
    * Turn caching on/off globally. Typically, on uses vtkPVGeneralSettings to
    * toggle cache settings rather than using this API directly.
    */
+  PARAVIEW_DEPRECATED_IN_5_14_0("Use vtkPVGeneralSettings::SetCacheGeometryForAnimation")
   static void SetGlobalUseGeometryCache(bool);
+  PARAVIEW_DEPRECATED_IN_5_14_0("Use vtkPVGeneralSettings::GetCacheGeometryForAnimation")
   static bool GetGlobalUseGeometryCache();
   ///@}
 
@@ -238,8 +241,6 @@ private:
   vtkInternals* Internals;
   unsigned long TimeRangeObserverID;
   unsigned long TimestepValuesObserverID;
-
-  static bool GlobalUseGeometryCache;
 };
 
 #endif

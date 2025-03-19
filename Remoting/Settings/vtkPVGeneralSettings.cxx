@@ -13,10 +13,6 @@
 #include "vtkThreadedCallbackQueue.h"
 #include "vtkThreads.h"
 
-#if VTK_MODULE_ENABLE_ParaView_RemotingAnimation
-#include "vtkSMAnimationScene.h"
-#endif
-
 #if VTK_MODULE_ENABLE_ParaView_RemotingViews
 #include "vtkPVView.h"
 #include "vtkPVXYChartView.h"
@@ -52,38 +48,6 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::GetInstance()
     vtkPVGeneralSettings::Instance.TakeReference(instance);
   }
   return vtkPVGeneralSettings::Instance;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetCacheGeometryForAnimation(bool val)
-{
-#if VTK_MODULE_ENABLE_ParaView_RemotingAnimation
-  if (vtkSMAnimationScene::GetGlobalUseGeometryCache() != val)
-  {
-    vtkSMAnimationScene::SetGlobalUseGeometryCache(val);
-    this->Modified();
-  }
-#endif
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVGeneralSettings::GetCacheGeometryForAnimation()
-{
-#if VTK_MODULE_ENABLE_ParaView_RemotingAnimation
-  return vtkSMAnimationScene::GetGlobalUseGeometryCache();
-#else
-  return false;
-#endif
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetAnimationGeometryCacheLimit(unsigned long val)
-{
-  if (this->AnimationGeometryCacheLimit != val)
-  {
-    this->AnimationGeometryCacheLimit = val;
-    this->Modified();
-  }
 }
 
 //----------------------------------------------------------------------------
