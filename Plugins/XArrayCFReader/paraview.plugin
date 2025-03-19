@@ -1,0 +1,6 @@
+NAME
+  XArrayCFReader
+CONDITION
+  PARAVIEW_USE_PYTHON
+DESCRIPTION
+  Support for reading CF Convention data from an XArray

@@ -1,0 +1,45 @@
+if (PARAVIEW_USE_PYTHON)
+  set(_paraview_python_depends_args)
+  if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
+    list(APPEND _paraview_python_depends_args
+      DEPENDS_EXPLICIT_ONLY)
+  endif ()
+
+
+  set(python_modules
+    XArrayCFReader.py
+  )
+
+  paraview_add_plugin(
+    XArrayCFReader
+    REQUIRED_ON_SERVER
+    VERSION "1.0"
+    PYTHON_MODULES ${python_modules}
+  )
+
+  set(python_copied_modules)
+  foreach (python_file IN LISTS python_modules)
+    set(output_python_file
+      "${CMAKE_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file}")
+    add_custom_command(
+      OUTPUT  "${output_python_file}"
+      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
+      COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+              "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
+              "${output_python_file}"
+      COMMENT "Copying ${python_file} to the binary directory"
+      ${_paraview_python_depends_args})
+    get_filename_component(python_file_directory "${python_file}" DIRECTORY)
+    install(
+      FILES       "${python_file}"
+      DESTINATION "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file_directory}"
+      COMPONENT   "python"
+    )
+    list(APPEND python_copied_modules "${output_python_file}")
+  endforeach ()
+
+  add_custom_target(XArrayCFReader_copy ALL
+    DEPENDS
+      ${python_copied_modules}
+  )
+endif()
