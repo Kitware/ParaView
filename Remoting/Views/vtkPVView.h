@@ -379,7 +379,6 @@ private:
 
   vtkRenderWindow* RenderWindow;
   bool ViewTimeValid;
-  static bool EnableStreaming;
   vtkWeakPointer<vtkPVSession> Session;
   std::string LogName;
 

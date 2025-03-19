@@ -18,7 +18,6 @@ PRIVATE_DEPENDS
   ParaView::RemotingCore
   VTK::vtksys
 OPTIONAL_DEPENDS
-  ParaView::RemotingViews
   VTK::AcceleratorsVTKmFilters
 TEST_LABELS
   ParaView

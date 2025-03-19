@@ -17,6 +17,7 @@
 #include "vtkOpenGLState.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
 #include "vtkPVProcessWindow.h"
 #include "vtkPVRenderingCapabilitiesInformation.h"
@@ -145,19 +146,18 @@ vtkInformationKeyMacro(vtkPVView, REQUEST_RENDER, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE_LOD, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE, Request);
 vtkInformationKeyRestrictedMacro(vtkPVView, VIEW, ObjectBase, "vtkPVView");
-//----------------------------------------------------------------------------
-bool vtkPVView::EnableStreaming = false;
+
 //----------------------------------------------------------------------------
 void vtkPVView::SetEnableStreaming(bool val)
 {
-  vtkPVView::EnableStreaming = val;
+  vtkPVGeneralSettings::GetInstance()->SetEnableStreaming(val);
   vtkStreamingStatusMacro("Setting streaming status: " << val);
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVView::GetEnableStreaming()
 {
-  return vtkPVView::EnableStreaming;
+  return vtkPVGeneralSettings::GetInstance()->GetEnableStreaming();
 }
 
 //----------------------------------------------------------------------------
@@ -187,7 +187,8 @@ vtkPVView::vtkPVView(bool create_render_window)
     abort();
   }
 
-  vtkStreamingStatusMacro("View Streaming  Status: " << vtkPVView::GetEnableStreaming());
+  vtkStreamingStatusMacro(
+    "View Streaming  Status: " << vtkPVGeneralSettings::GetInstance()->GetEnableStreaming());
 
   vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
   if (!activeSession)

@@ -29,6 +29,7 @@
 #ifndef vtkSMChartSeriesSelectionDomain_h
 #define vtkSMChartSeriesSelectionDomain_h
 
+#include "vtkParaViewDeprecation.h"
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMStringListDomain.h"
 
@@ -73,15 +74,18 @@ public:
   vtkGetMacro(DefaultMode, int);
   ///@}
 
+  ///@{
   /**
    * Global flag to toggle between (a) the default behavior and
    * (b) setting default visibility to off.
    */
-  static void SetLoadNoChartVariables(bool choice)
-  {
-    vtkSMChartSeriesSelectionDomain::LoadNoVariables = choice;
-  }
-  static bool GetLoadNoChartVariables() { return vtkSMChartSeriesSelectionDomain::LoadNoVariables; }
+  PARAVIEW_DEPRECATED_IN_5_14_0(
+    "Please use vtkPVGeneralSettings::SetLoadNoChartVariables() instead")
+  static void SetLoadNoChartVariables(bool choice);
+  PARAVIEW_DEPRECATED_IN_5_14_0(
+    "Please use vtkPVGeneralSettings::GetLoadNoChartVariables() instead")
+  static bool GetLoadNoChartVariables();
+  ///@}
 
   vtkSetStringMacro(DefaultValue);
 

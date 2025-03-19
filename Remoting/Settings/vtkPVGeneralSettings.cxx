@@ -13,14 +13,6 @@
 #include "vtkThreadedCallbackQueue.h"
 #include "vtkThreads.h"
 
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-#include "vtkPVView.h"
-#include "vtkPVXYChartView.h"
-#include "vtkSMChartSeriesSelectionDomain.h"
-#include "vtkSMParaViewPipelineControllerWithRendering.h"
-#include "vtkSMTransferFunctionManager.h"
-#endif
-
 #if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
 #include "vtkmFilterOverrides.h"
 #endif
@@ -48,105 +40,6 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::GetInstance()
     vtkPVGeneralSettings::Instance.TakeReference(instance);
   }
   return vtkPVGeneralSettings::Instance;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetIgnoreNegativeLogAxisWarning(bool val)
-{
-  (void)val;
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-  if (vtkPVXYChartView::GetIgnoreNegativeLogAxisWarning() != val)
-  {
-    vtkPVXYChartView::SetIgnoreNegativeLogAxisWarning(val);
-    this->Modified();
-  }
-#endif
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVGeneralSettings::GetIgnoreNegativeLogAxisWarning()
-{
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-  return vtkPVXYChartView::GetIgnoreNegativeLogAxisWarning();
-#else
-  return false;
-#endif
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetScalarBarMode(int val)
-{
-  (void)val;
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-  switch (val)
-  {
-    case AUTOMATICALLY_HIDE_SCALAR_BARS:
-      vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
-      break;
-
-    case AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
-      vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
-      break;
-
-    default:
-      vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(false);
-  }
-#endif
-
-  if (val != this->ScalarBarMode)
-  {
-    this->ScalarBarMode = val;
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetInheritRepresentationProperties(bool val)
-{
-  (void)val;
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-  if (val != vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
-  {
-    vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(val);
-    this->Modified();
-  }
-#endif
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetLoadNoChartVariables(bool val)
-{
-  (void)val;
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-  if (val != vtkSMChartSeriesSelectionDomain::GetLoadNoChartVariables())
-  {
-    vtkSMChartSeriesSelectionDomain::SetLoadNoChartVariables(val);
-    this->Modified();
-  }
-#endif
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVGeneralSettings::GetLoadNoChartVariables()
-{
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-  return vtkSMChartSeriesSelectionDomain::GetLoadNoChartVariables();
-#else
-  return false;
-#endif
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetEnableStreaming(bool val)
-{
-  if (this->GetEnableStreaming() != val)
-  {
-    this->EnableStreaming = val;
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-    vtkPVView::SetEnableStreaming(val);
-#endif
-    this->Modified();
-  }
 }
 
 //----------------------------------------------------------------------------

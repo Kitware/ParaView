@@ -130,8 +130,8 @@ public:
     AUTOMATICALLY_HIDE_SCALAR_BARS = 1,
     MANUAL_SCALAR_BARS = 2
   };
+  vtkSetMacro(ScalarBarMode, int);
   vtkGetMacro(ScalarBarMode, int);
-  void SetScalarBarMode(int);
   ///@}
 
   ///@{
@@ -243,16 +243,25 @@ public:
   vtkGetMacro(FullNotationHighExponent, int);
   ///@}
 
+  ///@{
   /**
    * Forwarded for vtkSMParaViewPipelineControllerWithRendering.
    */
-  void SetInheritRepresentationProperties(bool val);
+  vtkSetMacro(InheritRepresentationProperties, bool);
+  vtkGetMacro(InheritRepresentationProperties, bool);
+  vtkBooleanMacro(InheritRepresentationProperties, bool);
+  ///@}
 
-  // Description:
-  // When plotting data with nonpositive values, ignore the standard warning
-  // and draw only the data with positive values.
-  void SetIgnoreNegativeLogAxisWarning(bool val);
-  bool GetIgnoreNegativeLogAxisWarning();
+  ///@{
+  /**
+   * Description:
+   * When plotting data with nonpositive values, ignore the standard warning
+   * and draw only the data with positive values.
+   */
+  vtkSetMacro(IgnoreNegativeLogAxisWarning, bool);
+  vtkGetMacro(IgnoreNegativeLogAxisWarning, bool);
+  vtkBooleanMacro(IgnoreNegativeLogAxisWarning, bool);
+  ///@}
 
   enum
   {
@@ -290,8 +299,9 @@ public:
   /**
    * Load no variables when showing a 2D chart.
    */
-  void SetLoadNoChartVariables(bool val);
-  bool GetLoadNoChartVariables();
+  vtkSetMacro(LoadNoChartVariables, bool);
+  vtkGetMacro(LoadNoChartVariables, bool);
+  vtkBooleanMacro(LoadNoChartVariables, bool);
   ///@}
 
   ///@{
@@ -322,7 +332,7 @@ public:
   /**
    * Turn on streamed rendering.
    */
-  void SetEnableStreaming(bool);
+  vtkSetMacro(EnableStreaming, bool);
   vtkGetMacro(EnableStreaming, bool);
   vtkBooleanMacro(EnableStreaming, bool);
   ///@}
@@ -392,8 +402,12 @@ protected:
   bool ColorByBlockColorsOnApply = true;
   bool EnableStreaming = false;
   bool SelectOnClickMultiBlockInspector = true;
+  // TODO move to private
   bool AutoConvertProperties = false;
   bool LoadAllVariables = false;
+  bool IgnoreNegativeLogAxisWarning = false;
+  bool InheritRepresentationProperties = false;
+  bool LoadNoChartVariables = false;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;

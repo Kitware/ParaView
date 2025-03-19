@@ -35,6 +35,7 @@ DEPENDS
   VTK::ViewsCore
 PRIVATE_DEPENDS
   ParaView::RemotingCore
+  ParaView::RemotingSettings
   ParaView::VTKExtensionsExtraction
   ParaView::VTKExtensionsFiltersRendering
   ParaView::VTKExtensionsInteractionStyle

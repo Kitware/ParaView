@@ -18,6 +18,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVPlotTime.h"
 #include "vtkPVStringFormatter.h"
 #include "vtkPen.h"
@@ -28,6 +29,7 @@
 #include <cmath>
 #include <vtksys/SystemTools.hxx>
 
+// PARAVIEW_DEPRECATED_IN_5_14_0
 bool vtkPVXYChartView::IgnoreNegativeLogAxisWarning = false;
 
 class vtkPVXYChartView::vtkInternals
@@ -159,7 +161,7 @@ void vtkPVXYChartView::SetChartType(const char* type)
     }
 
     bool warning = true;
-    if (vtkPVXYChartView::IgnoreNegativeLogAxisWarning == true)
+    if (vtkPVGeneralSettings::GetInstance()->GetIgnoreNegativeLogAxisWarning())
     {
       vtkChartXY* chartXY = vtkChartXY::SafeDownCast(this->Chart);
       if (chartXY)
@@ -931,4 +933,16 @@ void vtkPVXYChartView::Update()
 void vtkPVXYChartView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetIgnoreNegativeLogAxisWarning(bool val)
+{
+  vtkPVGeneralSettings::GetInstance()->SetIgnoreNegativeLogAxisWarning(val);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVXYChartView::GetIgnoreNegativeLogAxisWarning()
+{
+  return vtkPVGeneralSettings::GetInstance()->GetIgnoreNegativeLogAxisWarning();
 }
