@@ -42,17 +42,12 @@ public:
    * Global flag to toggle between (a) the default behavior of setting default
    * values according to infoProperty and (b) setting all default values to on.
    */
-  static void SetLoadAllVariables(bool choice)
-  {
-    vtkSMArraySelectionDomain::LoadAllVariables = choice;
-  }
-  static bool GetLoadAllVariables() { return vtkSMArraySelectionDomain::LoadAllVariables; }
+  static void SetLoadAllVariables(bool choice);
+  static bool GetLoadAllVariables();
 
 protected:
   vtkSMArraySelectionDomain();
   ~vtkSMArraySelectionDomain() override;
-
-  static bool LoadAllVariables;
 
 private:
   vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&) = delete;

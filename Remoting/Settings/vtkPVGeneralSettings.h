@@ -280,8 +280,9 @@ public:
   /**
    * Load all variables when loading a data set.
    */
-  void SetLoadAllVariables(bool val);
-  bool GetLoadAllVariables();
+  vtkSetMacro(LoadAllVariables, bool);
+  vtkGetMacro(LoadAllVariables, bool);
+  vtkBooleanMacro(LoadAllVariables, bool);
   ///@}
 
   ///@{
@@ -391,6 +392,7 @@ protected:
   bool EnableStreaming = false;
   bool SelectOnClickMultiBlockInspector = true;
   bool AutoConvertProperties = false;
+  bool LoadAllVariables = false;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;

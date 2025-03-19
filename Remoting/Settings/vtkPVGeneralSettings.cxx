@@ -8,8 +8,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
-#include "vtkSISourceProxy.h"
-#include "vtkSMArraySelectionDomain.h"
 #include "vtkSMPTools.h"
 #include "vtkSMTrace.h"
 #include "vtkThreadedCallbackQueue.h"
@@ -149,22 +147,6 @@ void vtkPVGeneralSettings::SetInheritRepresentationProperties(bool val)
     this->Modified();
   }
 #endif
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetLoadAllVariables(bool val)
-{
-  if (val != vtkSMArraySelectionDomain::GetLoadAllVariables())
-  {
-    vtkSMArraySelectionDomain::SetLoadAllVariables(val);
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVGeneralSettings::GetLoadAllVariables()
-{
-  return vtkSMArraySelectionDomain::GetLoadAllVariables();
 }
 
 //----------------------------------------------------------------------------
