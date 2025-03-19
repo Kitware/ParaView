@@ -28,13 +28,16 @@ public:
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void setSelection(pqSMProxy newAppendSelections);
 
+  ///@{
   /**
-   * This must be connected to the panel-accept signal to ensure that the new
-   * selection source object gets registered for undo-redo/state to work. This
-   * method also gets rid of any obsolete selection_sources.
+   * Register and unregister selection source objects.
+   * This is needed for undo/redo and Python tracing.
+   * Call this in the `Apply` process, around the actual
+   * Apply part.
    */
   virtual void preAccept();
   virtual void postAccept();
+  ///@}
 
 Q_SIGNALS:
   /**

@@ -115,6 +115,7 @@ if (numpy_found)
     PythonCalculatorFieldData.xml
     PythonCalculatorInput.xml
     PythonCalculatorMultiline.xml
+    SelectionAndAutoSaveState.xml
     )
 
   set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)

@@ -22,9 +22,7 @@ tempDir = smtesting.TempDir
 # Create a render view before starting trace
 ren = CreateRenderView()
 
-# Start trace
-config = smtrace.start_trace()
-
+tracer = smtrace.ScopedTracer()
 
 ########################################################
 # Begin build pipeline
@@ -43,14 +41,14 @@ def create_pipeline():
     Render()
 
 
-create_pipeline()
+with tracer:
+    create_pipeline()
 
 # End build pipeline
 ########################################################
 
 # Stop trace and grab the trace output string
-trace_string = smtrace.stop_trace()
-print(trace_string)
+trace_string = tracer.last_trace()
 
 # The multiline expression in the PythonAnnotation should not be processed
 # but taken 'as is'
