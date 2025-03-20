@@ -375,6 +375,12 @@ protected:
   vtkPVGeneralSettings() = default;
   ~vtkPVGeneralSettings() override = default;
 
+private:
+  vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
+  void operator=(const vtkPVGeneralSettings&) = delete;
+
+  static vtkSmartPointer<vtkPVGeneralSettings> Instance;
+
   int BlockColorsDistinctValues = 7;
   bool AutoApply = false;
   int AutoApplyDelay = 0;
@@ -402,18 +408,11 @@ protected:
   bool ColorByBlockColorsOnApply = true;
   bool EnableStreaming = false;
   bool SelectOnClickMultiBlockInspector = true;
-  // TODO move to private
   bool AutoConvertProperties = false;
   bool LoadAllVariables = false;
   bool IgnoreNegativeLogAxisWarning = false;
   bool InheritRepresentationProperties = false;
   bool LoadNoChartVariables = false;
-
-private:
-  vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
-  void operator=(const vtkPVGeneralSettings&) = delete;
-
-  static vtkSmartPointer<vtkPVGeneralSettings> Instance;
 };
 
 #endif
