@@ -1018,6 +1018,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ReaderRegistrationName.xml
   ReflectBackwardCompat.xml
   ReloadCGNSFile.xml
+  RescaleVisibleRangeOption.xml
   SearchBox.xml
   ServerConnectDialog.xml
   SliceBackwardsCompatibility.xml

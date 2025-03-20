@@ -70,7 +70,7 @@ public:
    * Iterates over all "known" transfer function proxies and request each one of
    * them to update its range using data information currently available.
    * Set \c animating to true if this is called in the context of an animation,
-   * false otherwise.
+   * false otherwise. It relies on the mode defined by the TransferFunctionResetMode enum
    */
   void ResetAllTransferFunctionRangesUsingCurrentData(
     vtkSMSessionProxyManager* pxm, bool animating = false);
@@ -83,6 +83,9 @@ public:
 
   /**
    * Enum for TransferFunctionResetMode
+   * GROW means the data range can only expand to new data
+   * RESET means the data range corresponds exactly to the data
+   * RESET_VISIBLE means the data range corresponds exactly to the visible data
    */
   enum TransferFunctionResetMode
   {
@@ -90,7 +93,9 @@ public:
     GROW_ON_APPLY = 0,
     GROW_ON_APPLY_AND_TIMESTEP = 1,
     RESET_ON_APPLY = 2,
-    RESET_ON_APPLY_AND_TIMESTEP = 3
+    RESET_ON_APPLY_AND_TIMESTEP = 3,
+    RESET_VISIBLE_ON_APPLY = 4,
+    RESET_VISIBLE_ON_APPLY_AND_TIMESTEP = 5
   };
 
   /**

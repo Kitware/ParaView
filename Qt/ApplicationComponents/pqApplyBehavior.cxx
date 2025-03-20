@@ -296,13 +296,6 @@ void pqApplyBehavior::applied(pqPropertiesPanel* panel)
   }
 
   //---------------------------------------------------------------------------
-  // If user chose it, update all transfer function data range.
-  // FIXME: This should happen for all servers available.
-  vtkNew<vtkSMTransferFunctionManager> tmgr;
-  tmgr->ResetAllTransferFunctionRangesUsingCurrentData(
-    pqActiveObjects::instance().activeServer()->proxyManager(), false /*animating*/);
-
-  //---------------------------------------------------------------------------
   // Perform the render on visible views.
   Q_FOREACH (pqView* view, dirty_views)
   {
@@ -311,6 +304,13 @@ void pqApplyBehavior::applied(pqPropertiesPanel* panel)
       view->forceRender();
     }
   }
+
+  //---------------------------------------------------------------------------
+  // If user chose it, update all transfer function data range.
+  // FIXME: This should happen for all servers available.
+  vtkNew<vtkSMTransferFunctionManager> tmgr;
+  tmgr->ResetAllTransferFunctionRangesUsingCurrentData(
+    pqActiveObjects::instance().activeServer()->proxyManager(), false /*animating*/);
 
   this->Internals->NewlyCreatedRepresentations.clear();
 }
