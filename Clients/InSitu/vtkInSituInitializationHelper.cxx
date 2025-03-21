@@ -495,8 +495,21 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
       item.ExecuteFailed = !item.Pipeline->Execute(timestep, time);
     }
   }
-
   internals.InExecutePipelines = false;
+
+  for (auto& item : internals.Pipelines)
+  {
+    if (item.InitializationFailed)
+    {
+      vtkLogF(ERROR, "%s pipeline failed to initialize", item.Pipeline->GetName());
+      return false;
+    }
+    if (item.ExecuteFailed)
+    {
+      vtkLogF(ERROR, "%s pipeline failed to execute", item.Pipeline->GetName());
+      return false;
+    }
+  }
   return true;
 }
 

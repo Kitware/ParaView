@@ -28,6 +28,8 @@ vtkCxxSetObjectMacro(vtkPhastaReader, CachedGrid, vtkUnstructuredGrid);
 #include <utility>
 #include <vector>
 
+#include "vtksys/SystemTools.hxx"
+
 struct vtkPhastaReaderInternal
 {
   struct FieldInfo
@@ -310,15 +312,15 @@ void vtkPhastaReader::openfile(const char filename[], const char mode[], int* fi
 
   if (cscompare("read", imode))
   {
-    file = fopen(fname, "rb");
+    file = vtksys::SystemTools::Fopen(fname, "rb");
   }
   else if (cscompare("write", imode))
   {
-    file = fopen(fname, "wb");
+    file = vtksys::SystemTools::Fopen(fname, "wb");
   }
   else if (cscompare("append", imode))
   {
-    file = fopen(fname, "ab");
+    file = vtksys::SystemTools::Fopen(fname, "ab");
   }
 
   if (!file)
@@ -614,7 +616,7 @@ void vtkPhastaReader::ReadGeomFile(
   int geomfile;
 
   openfile(geomFileName, "read", &geomfile);
-  // geomfile = fopen(GeometryFileName,"rb");
+  // geomfile = vtksys::SystemTools::Fopen(GeometryFileName,"rb");
 
   if (!geomfile)
   {
@@ -784,7 +786,7 @@ void vtkPhastaReader::ReadFieldFile(
   int fieldfile;
 
   openfile(fieldFileName, "read", &fieldfile);
-  // fieldfile = fopen(FieldFileName,"rb");
+  // fieldfile = vtksys::SystemTools::Fopen(FieldFileName,"rb");
 
   if (!fieldfile)
   {
@@ -877,7 +879,7 @@ void vtkPhastaReader::ReadFieldFile(
   int fieldfile;
 
   openfile(fieldFileName, "read", &fieldfile);
-  // fieldfile = fopen(FieldFileName,"rb");
+  // fieldfile = vtksys::SystemTools::Fopen(FieldFileName,"rb");
 
   if (!fieldfile)
   {

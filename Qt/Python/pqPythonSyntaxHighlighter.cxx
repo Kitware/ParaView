@@ -44,18 +44,10 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QObject* p, QTextEdit& text
       this->HighlightFunction.TakeReference(
         PyObject_GetAttrString(this->PygmentsModule, "highlight"));
       vtkSmartPyObject lexersModule(PyImport_ImportModule("pygments.lexers"));
-      vtkSmartPyObject formattersModule(PyImport_ImportModule("pygments.formatters.redtabhtml"));
+      vtkSmartPyObject formattersModule(PyImport_ImportModule("pygments.formatters"));
       vtkSmartPyObject htmlFormatterClass;
-      // If we have the custom formatter written for ParaView, great.
-      // otherwise just default to the HtmlFormatter in pygments
       if (formattersModule)
       {
-        htmlFormatterClass.TakeReference(
-          PyObject_GetAttrString(formattersModule, "RedTabHtmlFormatter"));
-      }
-      else
-      {
-        formattersModule.TakeReference(PyImport_ImportModule("pygments.formatters"));
         htmlFormatterClass.TakeReference(PyObject_GetAttrString(formattersModule, "HtmlFormatter"));
       }
 

@@ -885,7 +885,7 @@ int vtkCDIReader::GetDims()
     {
       this->NumberOfCells = static_cast<int>(this->Internals->Grids.at(GridID).Size);
 
-      if (this->NumberOfPoints and this->NumberOfPoints != this->NumberOfCells)
+      if (this->NumberOfPoints && this->NumberOfPoints != this->NumberOfCells)
       {
         vtkDebugMacro("GetDims: Changing number of points from  " << this->NumberOfPoints << " to "
                                                                   << this->NumberOfCells);
@@ -948,9 +948,7 @@ int vtkCDIReader::ReadHorizontalGridData()
 
     if (nv >= 3) //  ((nv == 3 || nv == 4)) // && gridInqType(gridID_l) == GRID_UNSTRUCTURED)
     {
-      Grid grid{
-        .GridID = gridID_l, .Size = static_cast<size_t>(gridInqSize(gridID_l)), .PointsPerCell = nv
-      };
+      Grid grid{ gridID_l, static_cast<size_t>(gridInqSize(gridID_l)), nv };
       this->Internals->Grids.push_back(grid);
     }
   }
@@ -1057,7 +1055,7 @@ int vtkCDIReader::GetVars()
     {
       vtkDebugMacro("Skipping " << aVar.Name << " as it has the wrong GridSize " << aVar.GridSize
                                 << " != " << this->NumberOfCells);
-      if (this->NumberOfPoints and this->NumberOfPoints != aVar.GridSize)
+      if (this->NumberOfPoints && this->NumberOfPoints != aVar.GridSize)
       {
         vtkWarningMacro("Not adding "
           << aVar.Name << " as point var, as it's size " << aVar.GridSize
@@ -1448,7 +1446,7 @@ int vtkCDIReader::ConstructGridGeometry()
   vtkDebugMacro("Removed duplicates for clon/clat");
   this->NumberLocalCells = new_cells[0] / this->PointsPerCell;
   this->NumberLocalPoints = new_cells[1];
-  if (this->NumberOfPoints and this->NumberOfPoints != new_cells[1])
+  if (this->NumberOfPoints && this->NumberOfPoints != new_cells[1])
   {
     vtkDebugMacro("ConstructGridGeometry: Changing number of points from  "
       << this->NumberOfPoints << " to " << new_cells[1]);
@@ -3144,12 +3142,8 @@ int vtkCDIReader::FillGridDimensions()
         << i << '\t' << j << "\t" << gridID_l << '\t' << zaxisID_l << "\t" << dimEncoding
         << " - has hits.\n");
 
-      Dimset ds{ .DimsetID = counter,
-        .GridID = -1,
-        .ZAxisID = zaxisID_l,
-        .GridSize = static_cast<size_t>(gridInqSize(gridID_l)),
-        .NLevel = zaxisInqSize(zaxisID_l),
-        .label = dimEncoding };
+      Dimset ds{ counter, -1, zaxisID_l, static_cast<size_t>(gridInqSize(gridID_l)),
+        zaxisInqSize(zaxisID_l), dimEncoding };
       this->Internals->DimensionSets[dimEncoding] = ds;
       counter++;
     }

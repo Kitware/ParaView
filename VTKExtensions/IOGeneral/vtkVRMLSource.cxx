@@ -20,6 +20,8 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkVRMLImporter.h"
 
+#include "vtksys/SystemTools.hxx"
+
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -47,7 +49,7 @@ vtkVRMLSource::~vtkVRMLSource()
 //-----------------------------------------------------------------------------
 int vtkVRMLSource::CanReadFile(const char* filename)
 {
-  FILE* fd = fopen(filename, "r");
+  FILE* fd = vtksys::SystemTools::Fopen(filename, "r");
   if (!fd)
     return 0;
 

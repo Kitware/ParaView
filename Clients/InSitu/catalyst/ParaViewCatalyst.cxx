@@ -220,6 +220,7 @@ enum paraview_catalyst_status
 {
   paraview_catalyst_status_invalid_node = 100,
   paraview_catalyst_status_results = 101,
+  paraview_catalyst_status_pipeline_execute_failed = 102,
 };
 #define pvcatalyst_err(name) static_cast<enum catalyst_status>(paraview_catalyst_status_##name)
 
@@ -517,7 +518,11 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
       "No 'catalyst/channels' found. No meshes will be processed.");
   }
 
-  vtkInSituInitializationHelper::ExecutePipelines(params);
+  if (!vtkInSituInitializationHelper::ExecutePipelines(params))
+  {
+    vtkLogF(ERROR, "catalyst pipeline failed to execute");
+    return pvcatalyst_err(pipeline_execute_failed);
+  }
 
   return catalyst_status_ok;
 }

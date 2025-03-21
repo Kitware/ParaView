@@ -12,6 +12,10 @@
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/ElementType/ComboBox" command="activated" arguments="Point" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox0" command="activated" arguments="ACCL (magnitude)" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox1" command="activated" arguments="is max" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget1/1QComboBox0" command="activated" arguments="ACCL (magnitude)" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget1/1QComboBox1" command="activated" arguments="is &gt;=" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget1/1QWidget0/value" command="set_string" arguments="1.1" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/findData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/createExpander/icon" command="mousePress" arguments="1,1,0,12,10" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/createExpander/icon" command="mouseRelease" arguments="1,0,0,12,10" />
@@ -23,6 +27,7 @@
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget1/1QWidget0/value" property="text" arguments="1.1" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/informationContainer/showTypeComboBox" command="activated" arguments="Point Data" />
 
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/labelPropertiesSelection" command="activate" arguments="" />

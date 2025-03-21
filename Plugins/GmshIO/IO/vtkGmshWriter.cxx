@@ -134,8 +134,8 @@ void FillCells(const int entityTag, GmshWriterInternal* internal,
       continue;
     }
 
-    char gmshType =
-      static_cast<char>(GmshWriterInternal::TRANSLATE_CELLS_TYPE.find(currentType)->second);
+    signed char gmshType =
+      static_cast<signed char>(GmshWriterInternal::TRANSLATE_CELLS_TYPE.find(currentType)->second);
     // If this type is not natively supported, it will be transleted in either lines or triangles
     if (gmshType < 0)
     {

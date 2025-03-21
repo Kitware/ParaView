@@ -26,6 +26,7 @@ PRIVATE_DEPENDS
   VTK::IOParallel
   VTK::IOPLY
   VTK::netcdf
+  VTK::vtksys
   VTK::ParallelCore
 OPTIONAL_DEPENDS
   VTK::ParallelMPI
