@@ -18,6 +18,8 @@ def _get_catalyst_state(options):
     soptions.PropertiesToTraceOnCreate = smstate.RECORD_MODIFIED_PROPERTIES
     soptions.SkipHiddenDisplayProperties = True
     soptions.SkipRenderingComponents = False
+    soptions.SkipActiveComponents = True
+    soptions.SkipLayoutComponents = True
     soptions.ExtractsOutputDirectory = options.ExtractsOutputDirectory
     return smstate.get_state(options=soptions, source_set=extractors,
                              preamble=_get_catalyst_preamble(options),
