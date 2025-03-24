@@ -996,6 +996,7 @@ bool vtkSMParaViewPipelineController::RegisterTextureProxy(vtkSMProxy* proxy, co
   if (filename)
   {
     vtkSMPropertyHelper(proxy, "FileName").Set(filename);
+    vtkSMPropertyHelper(proxy, "Mode").Set(0);
   }
   return true;
 }
@@ -1019,6 +1020,11 @@ bool vtkSMParaViewPipelineController::RegisterTextureProxy(
 
   // Register the proxy itself.
   proxy->GetSessionProxyManager()->RegisterProxy("textures", proxyname, proxy);
+  if (trivialProducerKey)
+  {
+    vtkSMPropertyHelper(proxy, "TrivialProducerKey").Set(trivialProducerKey);
+    vtkSMPropertyHelper(proxy, "Mode").Set(1);
+  }
   return true;
 }
 
