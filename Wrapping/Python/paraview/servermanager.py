@@ -2776,6 +2776,7 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
             paraview.print_debug_info("use composite data append")
             groupDataSets = filters.GroupDatasets()
             groupDataSets.OutputType = dinfo.GetDataSetType()
+            groupDataSets.CombineFirstLayerMultiblock = True
             reducer.PostGatherHelper = groupDataSets
 
         elif dinfo.GetDataClassName() == "vtkPolyData":
