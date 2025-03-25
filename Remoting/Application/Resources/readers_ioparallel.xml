@@ -1,691 +1,742 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="internal_sources">
-    <!-- ================================================================== -->
-    <Proxy class="vtkPDataSetReader"
-                 label="Legacy VTK Reader"
-                 name="legacyreader">
-      <Documentation long_help="Reads files stored in VTK's legacy file format."
-                     short_help="Read legacy VTK files.">The Legacy VTK reader
-                     loads files stored in VTK's legacy file format. The
-                     expected file extension is .vtk. The type of the dataset
-                     may be structured grid, uniform rectilinear grid
-                     (image/volume), non-uniform rectilinear grid, unstructured
-                     grid, or polygonal.</Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the Legacy VTK
-        reader.</Documentation>
-      </StringVectorProperty>
-      <!-- End legacyreader -->
-    </Proxy>
-    <!-- end of "internal_sources" -->
-  </ProxyGroup>
+    <ProxyGroup name="internal_sources">
+        <!-- ================================================================== -->
+        <Proxy class="vtkPDataSetReader"
+               label="Legacy VTK Reader"
+               name="legacyreader">
+            <Documentation long_help="Reads files stored in VTK's legacy file format."
+                           short_help="Read legacy VTK files.">The Legacy VTK reader
+                loads files stored in VTK's legacy file format. The
+                expected file extension is .vtk. The type of the dataset
+                may be structured grid, uniform rectilinear grid
+                (image/volume), non-uniform rectilinear grid, unstructured
+                grid, or polygonal.
+            </Documentation>
+            <StringVectorProperty animateable="0"
+                                  command="SetFileName"
+                                  name="FileName"
+                                  number_of_elements="1"
+                                  panel_visibility="never">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    This property specifies the file name for the Legacy VTK reader.
+                </Documentation>
+            </StringVectorProperty>
+            <!-- End legacyreader -->
+        </Proxy>
+        <!-- end of "internal_sources" -->
+    </ProxyGroup>
 
-  <!-- ==================================================================== -->
-  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <ProxyGroup name="sources">
 
-    <!-- ================================================================== -->
-    <SourceProxy class="vtkFileSeriesReader"
-                 file_name_method="SetFileName"
-                 label="Legacy VTK Reader"
-                 name="LegacyVTKFileReader"
-                 si_class="vtkSIMetaReaderProxy">
-      <Documentation long_help="Reads files stored in VTK's legacy file format."
-                     short_help="Read legacy VTK files.">The Legacy VTK reader
-                     loads files stored in VTK's legacy file format (before VTK
-                     4.2, although still supported). The expected file
-                     extension is .vtk. The type of the dataset may be
-                     structured grid, uniform rectilinear grid (image/volume),
-                     non-uniform rectilinear grid, unstructured grid, or
-                     polygonal. This reader also supports file
-                     series.</Documentation>
-      <SubProxy>
-        <Proxy name="Reader"
-               proxygroup="internal_sources"
-               proxyname="legacyreader"></Proxy>
-      </SubProxy>
-      <StringVectorProperty command="GetCurrentFileName"
-                            information_only="1"
-                            name="FileNameInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            clean_command="RemoveAllFileNames"
-                            command="AddFileName"
-                            information_property="FileNameInfo"
-                            name="FileNames"
-                            number_of_elements="1"
-                            panel_visibility="never"
-                            repeat_command="1">
-        <FileListDomain name="files" />
-        <Documentation>The list of files to be read by the reader. If more than
-        one file is specified, the reader will switch to file series mode in
-        which it will pretend that it can support time and provide one file per
-        time step.</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues"
-                            repeatable="1">
-        <TimeStepsInformationHelper />
-        <Documentation>Available timestep values.</Documentation>
-      </DoubleVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="vtk vtk.series"
-                       file_description="Legacy VTK files" />
-      </Hints>
-      <!-- End LegacyVTKFileReader -->
-    </SourceProxy>
+        <!-- ================================================================== -->
+        <SourceProxy class="vtkFileSeriesReader"
+                     file_name_method="SetFileName"
+                     label="Legacy VTK Reader"
+                     name="LegacyVTKFileReader"
+                     si_class="vtkSIMetaReaderProxy">
+            <Documentation long_help="Reads files stored in VTK's legacy file format."
+                           short_help="Read legacy VTK files.">The Legacy VTK reader
+                loads files stored in VTK's legacy file format (before VTK
+                4.2, although still supported). The expected file
+                extension is .vtk. The type of the dataset may be
+                structured grid, uniform rectilinear grid (image/volume),
+                non-uniform rectilinear grid, unstructured grid, or
+                polygonal. This reader also supports file series.
+            </Documentation>
+            <SubProxy>
+                <Proxy name="Reader"
+                       proxygroup="internal_sources"
+                       proxyname="legacyreader"></Proxy>
+            </SubProxy>
+            <StringVectorProperty command="GetCurrentFileName"
+                                  information_only="1"
+                                  name="FileNameInfo">
+                <SimpleStringInformationHelper/>
+            </StringVectorProperty>
+            <StringVectorProperty animateable="0"
+                                  clean_command="RemoveAllFileNames"
+                                  command="AddFileName"
+                                  information_property="FileNameInfo"
+                                  name="FileNames"
+                                  number_of_elements="1"
+                                  panel_visibility="never"
+                                  repeat_command="1">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    The list of files to be read by the reader. If more than one file is specified,
+                    the reader will switch to file series mode in which it will pretend that it can
+                    support time and provide one file per time step.
+                </Documentation>
+            </StringVectorProperty>
+            <DoubleVectorProperty information_only="1"
+                                  name="TimestepValues"
+                                  repeatable="1">
+                <TimeStepsInformationHelper/>
+                <Documentation>
+                    Available timestep values.
+                </Documentation>
+            </DoubleVectorProperty>
+            <Hints>
+                <ReaderFactory extensions="vtk vtk.series"
+                               file_description="Legacy VTK files"/>
+            </Hints>
+            <!-- End LegacyVTKFileReader -->
+        </SourceProxy>
 
-    <!-- ================================================================== -->
-    <SourceProxy class="vtkPDataSetReader"
-                 label="Partitioned Legacy VTK Reader"
-                 name="pvtkfile">
-      <Documentation long_help="Reads files stored in VTK partitioned legacy format."
-                     short_help="Read partitioned legacy VTK files.">The
-                     Partitioned Legacy VTK reader loads files stored in VTK's
-                     partitioned legacy file format (before VTK 4.2, although
-                     still supported). The expected file extension is .pvtk.
-                     The type of the dataset may be structured grid, uniform
-                     rectilinear grid (image/volume), non-uniform rectilinear
-                     grid, unstructured grid, or polygonal.</Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the
-        Partitioned Legacy VTK reader.</Documentation>
-      </StringVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="pvtk pvtk.series"
-                       file_description="Legacy VTK Files (partitioned)" />
-      </Hints>
-      <!-- End pvtkfile -->
-    </SourceProxy>
+        <!-- ================================================================== -->
+        <SourceProxy class="vtkPDataSetReader"
+                     label="Partitioned Legacy VTK Reader"
+                     name="pvtkfile">
+            <Documentation long_help="Reads files stored in VTK partitioned legacy format."
+                           short_help="Read partitioned legacy VTK files.">The
+                Partitioned Legacy VTK reader loads files stored in VTK's
+                partitioned legacy file format (before VTK 4.2, although
+                still supported). The expected file extension is .pvtk.
+                The type of the dataset may be structured grid, uniform
+                rectilinear grid (image/volume), non-uniform rectilinear
+                grid, unstructured grid, or polygonal.
+            </Documentation>
+            <StringVectorProperty animateable="0"
+                                  command="SetFileName"
+                                  name="FileName"
+                                  number_of_elements="1">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    This property specifies the file name for the Partitioned Legacy VTK reader.
+                </Documentation>
+            </StringVectorProperty>
+            <Hints>
+                <ReaderFactory extensions="pvtk pvtk.series"
+                               file_description="Legacy VTK Files (partitioned)"/>
+            </Hints>
+            <!-- End pvtkfile -->
+        </SourceProxy>
 
-    <!-- ================================================================== -->
-    <!-- Beginning of OpenFOAM Reader -->
-    <SourceProxy class="vtkPOpenFOAMReader"
-                 name="OpenFOAMReader">
-      <Documentation long_help="Reads OpenFOAM data files, producing multiblock dataset."
-                     short_help="Read OpenFOAM data files.">The OpenFOAM reader
-                     reads OpenFOAM data files and outputs multiblock
-                     datasets. Mesh information and time dependent data are
-                     supported. This is a distributed reader. See
-                     https://www.openfoam.com/documentation/user-guide
-                     for a description of the OpenFOAM format.
-      </Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="advanced">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the
-        reader.</Documentation>
-      </StringVectorProperty>
-      <Property animateable="0"
-                command="SetRefresh"
-                name="Refresh">
-        <Documentation>Refresh time information and selection list metadata.
-        Useful when watching a running simulation.</Documentation>
-      </Property>
-      <IntVectorProperty animateable="0"
-                         command="SetSkipZeroTime"
-                         default_values="1"
-                         name="SkipZeroTime"
-                         label="Skip Zero Time"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Ignore the 0/ time directory.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetCaseType"
-                         default_values="1"
-                         name="CaseType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Decomposed Case"    value="0" />
-          <Entry text="Reconstructed Case" value="1" />
-        </EnumerationDomain>
-        <Documentation>The property indicates whether decomposed mesh or
-        reconstructed mesh should be read</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetUse64BitLabels"
-                         default_values="0"
-                         label="Label Size"
-                         name="Use64BitLabels"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="32-bit" value="0" />
-          <Entry text="64-bit" value="1" />
-        </EnumerationDomain>
-        <Documentation>The expected label-size for the OpenFOAM data.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetUse64BitFloats"
-                         default_values="1"
-                         label="Scalar Size"
-                         name="Use64BitFloats"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="32-bit (SP)" value="0" />
-          <Entry text="64-bit (DP)" value="1" />
-        </EnumerationDomain>
-        <Documentation>The expected scalar-size for the OpenFOAM data.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetCreateCellToPoint"
-                         default_values="1"
-                         label="Create cell-to-point filtered data"
-                         name="CreateCellToPoint"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Create point data from cell data. Beware: the filter
-        does not do inverse distance weighting.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetAddDimensionsToArrayNames"
-                         default_values="0"
-                         label="Add dimensional units to array names"
-                         name="AddDimensionsToArrayNames"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Read dimensional units from field data and add them to
-        array names as human-readable string.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues"
-                            repeatable="1">
-        <TimeStepsInformationHelper />
-      </DoubleVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="PatchArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Patch" />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetPatchArrayStatus"
-                            element_types="2 0"
-                            information_property="PatchArrayInfo"
-                            name="MeshRegions"
-                            number_of_elements="0"
-                            number_of_elements_per_command="2"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="PatchArrayInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="CellArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Cell" />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetCellArrayStatus"
-                            element_types="2 0"
-                            information_property="CellArrayInfo"
-                            name="CellArrays"
-                            number_of_elements="0"
-                            number_of_elements_per_command="2"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="CellArrayInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="PointArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Point" />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetPointArrayStatus"
-                            element_types="2 0"
-                            information_property="PointArrayInfo"
-                            name="PointArrays"
-                            number_of_elements="0"
-                            number_of_elements_per_command="2"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="PointArrayInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="LagrangianArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Lagrangian" />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetLagrangianArrayStatus"
-                            element_types="2 0"
-                            information_property="LagrangianArrayInfo"
-                            name="LagrangianArrays"
-                            number_of_elements="0"
-                            number_of_elements_per_command="2"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="LagrangianArrayInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-      </StringVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetCacheMesh"
-                         default_values="1"
-                         label="Cache mesh"
-                         name="CacheMesh"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>Cache the OpenFOAM mesh between GUI selection
-        changes.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetSizeAverageCellToPoint"
-                         default_values="0"
-                         name="WeightPointDataByCellSize"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>Use cell size as weight in cell data-to-point data procedure.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="CreateCellToPoint"
-                                   value="1" />
-        </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetListTimeStepsByControlDict"
-                         default_values="0"
-                         label="List timesteps according to controlDict"
-                         name="ListTimeStepsByControlDict"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>List time directories listed according to the settings
-        in controlDict.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetPositionsIsIn13Format"
-                         default_values="1"
-                         label="Lagrangian positions without extra data"
-                         name="PositionsIsIn13Format"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>Lagrangian positions without extra data (before OpenFOAM 1.4, after 2.4)</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetReadZones"
-                         default_values="0"
-                         label="Read zones"
-                         name="ReadZones"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Read point/face/cell-Zones?</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetCopyDataToCellZones"
-                         default_values="0"
-                         label="Copy data to cell zones"
-                         name="CopyDataToCellZones"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Copy data of internal mesh to the cell zones</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ReadZones"
-                                   value="1" />
-        </Hints>
-      </IntVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="foam"
-          file_description="OpenFOAM" />
-        <ReloadFiles property="Refresh" />
-      </Hints>
-    </SourceProxy>
-    <!-- End of OpenFOAM Reader -->
+        <!-- ================================================================== -->
+        <!-- Beginning of OpenFOAM Reader -->
+        <SourceProxy class="vtkPOpenFOAMReader"
+                     name="OpenFOAMReader">
+            <Documentation long_help="Reads OpenFOAM data files, producing multiblock dataset."
+                           short_help="Read OpenFOAM data files.">The OpenFOAM reader
+                reads OpenFOAM data files and outputs multiblock
+                datasets. Mesh information and time dependent data are
+                supported. This is a distributed reader. See
+                https://www.openfoam.com/documentation/user-guide
+                for a description of the OpenFOAM format.
+            </Documentation>
+            <StringVectorProperty animateable="0"
+                                  command="SetFileName"
+                                  name="FileName"
+                                  number_of_elements="1"
+                                  panel_visibility="advanced">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    This property specifies the file name for the reader.
+                </Documentation>
+            </StringVectorProperty>
+            <Property animateable="0"
+                      command="SetRefresh"
+                      name="Refresh">
+                <Documentation>
+                    Refresh time information and selection list metadata. Useful when watching a running simulation.
+                </Documentation>
+            </Property>
+            <IntVectorProperty animateable="0"
+                               command="SetSkipZeroTime"
+                               default_values="1"
+                               name="SkipZeroTime"
+                               label="Skip Zero Time"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Ignore the 0/ time directory.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetCaseType"
+                               default_values="1"
+                               name="CaseType"
+                               number_of_elements="1">
+                <EnumerationDomain name="enum">
+                    <Entry text="Decomposed Case" value="0"/>
+                    <Entry text="Reconstructed Case" value="1"/>
+                </EnumerationDomain>
+                <Documentation>
+                    The property indicates whether decomposed mesh or reconstructed mesh should be read
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetUse64BitLabels"
+                               default_values="0"
+                               label="Label Size"
+                               name="Use64BitLabels"
+                               number_of_elements="1">
+                <EnumerationDomain name="enum">
+                    <Entry text="32-bit" value="0"/>
+                    <Entry text="64-bit" value="1"/>
+                </EnumerationDomain>
+                <Documentation>
+                    The expected label-size for the OpenFOAM data.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetUse64BitFloats"
+                               default_values="1"
+                               label="Scalar Size"
+                               name="Use64BitFloats"
+                               number_of_elements="1">
+                <EnumerationDomain name="enum">
+                    <Entry text="32-bit (SP)" value="0"/>
+                    <Entry text="64-bit (DP)" value="1"/>
+                </EnumerationDomain>
+                <Documentation>
+                    The expected scalar-size for the OpenFOAM data.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetCreateCellToPoint"
+                               default_values="1"
+                               label="Create cell-to-point filtered data"
+                               name="CreateCellToPoint"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Create point data from cell data. Beware: the filter does not do inverse distance weighting.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetAddDimensionsToArrayNames"
+                               default_values="0"
+                               label="Add dimensional units to array names"
+                               name="AddDimensionsToArrayNames"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Read dimensional units from field data and add them to array names as human-readable string.
+                </Documentation>
+            </IntVectorProperty>
+            <DoubleVectorProperty information_only="1"
+                                  name="TimestepValues"
+                                  repeatable="1">
+                <TimeStepsInformationHelper/>
+            </DoubleVectorProperty>
+            <StringVectorProperty information_only="1"
+                                  name="PatchArrayInfo">
+                <ArraySelectionInformationHelper attribute_name="Patch"/>
+            </StringVectorProperty>
+            <StringVectorProperty animateable="0"
+                                  command="SetPatchArrayStatus"
+                                  element_types="2 0"
+                                  information_property="PatchArrayInfo"
+                                  name="MeshRegions"
+                                  number_of_elements="0"
+                                  number_of_elements_per_command="2"
+                                  repeat_command="1">
+                <ArraySelectionDomain name="array_list">
+                    <RequiredProperties>
+                        <Property function="ArrayList"
+                                  name="PatchArrayInfo"/>
+                    </RequiredProperties>
+                </ArraySelectionDomain>
+            </StringVectorProperty>
+            <StringVectorProperty information_only="1"
+                                  name="CellArrayInfo">
+                <ArraySelectionInformationHelper attribute_name="Cell"/>
+            </StringVectorProperty>
+            <StringVectorProperty animateable="0"
+                                  command="SetCellArrayStatus"
+                                  element_types="2 0"
+                                  information_property="CellArrayInfo"
+                                  name="CellArrays"
+                                  number_of_elements="0"
+                                  number_of_elements_per_command="2"
+                                  repeat_command="1">
+                <ArraySelectionDomain name="array_list">
+                    <RequiredProperties>
+                        <Property function="ArrayList"
+                                  name="CellArrayInfo"/>
+                    </RequiredProperties>
+                </ArraySelectionDomain>
+            </StringVectorProperty>
+            <StringVectorProperty information_only="1"
+                                  name="PointArrayInfo">
+                <ArraySelectionInformationHelper attribute_name="Point"/>
+            </StringVectorProperty>
+            <StringVectorProperty animateable="0"
+                                  command="SetPointArrayStatus"
+                                  element_types="2 0"
+                                  information_property="PointArrayInfo"
+                                  name="PointArrays"
+                                  number_of_elements="0"
+                                  number_of_elements_per_command="2"
+                                  repeat_command="1">
+                <ArraySelectionDomain name="array_list">
+                    <RequiredProperties>
+                        <Property function="ArrayList"
+                                  name="PointArrayInfo"/>
+                    </RequiredProperties>
+                </ArraySelectionDomain>
+            </StringVectorProperty>
+            <StringVectorProperty information_only="1"
+                                  name="LagrangianArrayInfo">
+                <ArraySelectionInformationHelper attribute_name="Lagrangian"/>
+            </StringVectorProperty>
+            <StringVectorProperty animateable="0"
+                                  command="SetLagrangianArrayStatus"
+                                  element_types="2 0"
+                                  information_property="LagrangianArrayInfo"
+                                  name="LagrangianArrays"
+                                  number_of_elements="0"
+                                  number_of_elements_per_command="2"
+                                  repeat_command="1">
+                <ArraySelectionDomain name="array_list">
+                    <RequiredProperties>
+                        <Property function="ArrayList"
+                                  name="LagrangianArrayInfo"/>
+                    </RequiredProperties>
+                </ArraySelectionDomain>
+            </StringVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetCacheMesh"
+                               default_values="1"
+                               label="Cache mesh"
+                               name="CacheMesh"
+                               number_of_elements="1"
+                               panel_visibility="advanced">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Cache the OpenFOAM mesh between GUI selection changes.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetSizeAverageCellToPoint"
+                               default_values="0"
+                               name="WeightPointDataByCellSize"
+                               number_of_elements="1"
+                               panel_visibility="advanced">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Use cell size as weight in cell data-to-point data procedure.
+                </Documentation>
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="CreateCellToPoint"
+                                             value="1"/>
+                </Hints>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetListTimeStepsByControlDict"
+                               default_values="0"
+                               label="List timesteps according to controlDict"
+                               name="ListTimeStepsByControlDict"
+                               number_of_elements="1"
+                               panel_visibility="advanced">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    List time directories listed according to the settings in controlDict.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetPositionsIsIn13Format"
+                               default_values="1"
+                               label="Lagrangian positions without extra data"
+                               name="PositionsIsIn13Format"
+                               number_of_elements="1"
+                               panel_visibility="advanced">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Lagrangian positions without extra data (before OpenFOAM 1.4, after 2.4)
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetReadZones"
+                               default_values="0"
+                               label="Read zones"
+                               name="ReadZones"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Read point/face/cell-Zones?
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetCopyDataToCellZones"
+                               default_values="0"
+                               label="Copy data to cell zones"
+                               name="CopyDataToCellZones"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Copy data of internal mesh to the cell zones
+                </Documentation>
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="ReadZones"
+                                             value="1"/>
+                </Hints>
+            </IntVectorProperty>
+            <Hints>
+                <ReaderFactory extensions="foam"
+                               file_description="OpenFOAM"/>
+                <ReloadFiles property="Refresh"/>
+            </Hints>
+        </SourceProxy>
+        <!-- End of OpenFOAM Reader -->
 
-    <!-- Beginning of Nek5000Reader -->
-    <SourceProxy class="vtkNek5000Reader"
-                 name="Nek5000Reader">
-      <Documentation long_help="Reads Nek5000 data files, producing an unstructured grid dataset."
-                     short_help="Read Nek5000 data files.">The Nek5000 reader
-                     reads Nek5000 data files and outputs an unstructured grid
-                     dataset. This is a distributed reader.
-      </Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="advanced">
-        <FileListDomain name="files" />
-      <Documentation>This property specifies the file name for the
-        reader.</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues"
-                            repeatable="1">
-        <TimeStepsInformationHelper />
-        <Documentation>Available timestep values.</Documentation>
-      </DoubleVectorProperty>
+        <!-- Beginning of Nek5000Reader -->
+        <SourceProxy class="vtkNek5000Reader"
+                     name="Nek5000Reader">
+            <Documentation long_help="Reads Nek5000 data files, producing an unstructured grid dataset."
+                           short_help="Read Nek5000 data files.">The Nek5000 reader
+                reads Nek5000 data files and outputs an unstructured grid
+                dataset. This is a distributed reader.
+            </Documentation>
+            <StringVectorProperty animateable="0"
+                                  command="SetFileName"
+                                  name="FileName"
+                                  number_of_elements="1"
+                                  panel_visibility="advanced">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    This property specifies the file name for the reader.
+                </Documentation>
+            </StringVectorProperty>
+            <DoubleVectorProperty information_only="1"
+                                  name="TimestepValues"
+                                  repeatable="1">
+                <TimeStepsInformationHelper/>
+                <Documentation>
+                    Available timestep values.
+                </Documentation>
+            </DoubleVectorProperty>
 
-     <StringVectorProperty
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+            <StringVectorProperty
+                    name="PointArrayInfo"
+                    information_only="1">
+                <ArraySelectionInformationHelper attribute_name="Point"/>
+            </StringVectorProperty>
 
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="PointArrayInfo"
-        label="PointArrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
+            <StringVectorProperty
+                    name="PointArrayStatus"
+                    command="SetPointArrayStatus"
+                    number_of_elements="0"
+                    repeat_command="1"
+                    number_of_elements_per_command="2"
+                    element_types="2 0"
+                    information_property="PointArrayInfo"
+                    label="PointArrays">
+                <ArraySelectionDomain name="array_list">
+                    <RequiredProperties>
+                        <Property name="PointArrayInfo" function="ArrayList"/>
+                    </RequiredProperties>
+                </ArraySelectionDomain>
+                <Documentation>
+                    This property lists which point-centered arrays to read.
+                </Documentation>
+            </StringVectorProperty>
 
-     <IntVectorProperty
-        name="MergePointsToCleanGrid"
-        command="SetCleanGrid"
-        number_of_elements="1"
-        default_values="0"
-	label="Merge Points to Clean grid" >
-      <BooleanDomain name="bool" />
-      <Documentation>
-            Clean the dataset by merging coincident points. May use a lot of memory.
-      </Documentation>
-     </IntVectorProperty>
+            <IntVectorProperty
+                    name="MergePointsToCleanGrid"
+                    command="SetCleanGrid"
+                    number_of_elements="1"
+                    default_values="0"
+                    label="Merge Points to Clean grid">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Clean the dataset by merging coincident points. May use a lot of memory.
+                </Documentation>
+            </IntVectorProperty>
 
-     <IntVectorProperty
-        name="AddSpectralElementIds"
-        command="SetSpectralElementIds"
-        number_of_elements="1"
-        default_values="0"
-        label="Add Spectral Element Ids as Cell Data">
-      <BooleanDomain name="bool" />
-      <Documentation>
-            Add Spectral Element Ids as cell-data (optional)
-      </Documentation>
-     </IntVectorProperty>
+            <IntVectorProperty
+                    name="AddSpectralElementIds"
+                    command="SetSpectralElementIds"
+                    number_of_elements="1"
+                    default_values="0"
+                    label="Add Spectral Element Ids as Cell Data">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Add Spectral Element Ids as cell-data (optional)
+                </Documentation>
+            </IntVectorProperty>
 
-      <Hints>
-       <ReaderFactory extensions="nek5000"
-                      file_description="Nek5000 Files" />
-      </Hints>
-    </SourceProxy>
-    <!-- End of Nek5000Reader -->
+            <Hints>
+                <ReaderFactory extensions="nek5000"
+                               file_description="Nek5000 Files"/>
+            </Hints>
+        </SourceProxy>
+        <!-- End of Nek5000Reader -->
 
-    <!-- ================================================================== -->
-    <SourceProxy class="vtkMultiBlockPLOT3DReader"
-                 label="PLOT3D Reader"
-                 name="P3DReader" >
-      <Documentation long_help="Reads ASCII or binary PLOT3D files."
-                     short_help="Read PLOT3D files.">PLOT3D is a plotting
-                     package developed at NASA. The PLOT3D reader can read both
-                     ASCII and binary PLOT3D files. The default file extension
-                     for the geometry files is .xyz, and the default file
-                     extension for the solution files is .q. The output of this
-                     reader is a multiblock dataset containing curvilinear
-                     (structured grid) datasets. This is a distributed reader.
-                     </Documentation>
-      <StringVectorProperty command="GetCurrentFileName"
-                            information_only="1"
-                            name="FileNameInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the .xyz (geometry) file name
-        for the PLOT3D reader.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            clean_command="ClearFileNames"
-                            command="AddFileName"
-                            name="QFileName"
-                            number_of_elements="1"
-                            information_property="FileNameInfo"
-                            repeat_command="1">
-        <FileListDomain name="files" />
-        <Documentation>The list of .q (solution) files for the PLOT3D reader.
-        There can be more than one. If more that one file is specified, the
-        reader will switch to file-series mode in which it will pretend that it
-        can support time and provide one file per time step.</Documentation>
-        <Hints>
-          <FileChooser extensions="q" file_description="Solution files" />
-        </Hints>
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetFunctionFileName"
-                            name="FunctionFileName"
-                            number_of_elements="1"
-                            panel_visibility="default">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the .f (function) file name for
-        the PLOT3D reader.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetAutoDetectFormat"
-                         default_values="1"
-                         name="AutoDetectFormat"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When this options is enabled, the reader will try to
-  automatically figure out various settings for a binary file. The other
-  options are ignored. Does not work for text (ASCII) files.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetBinaryFile"
-                         default_values="1"
-                         name="BinaryFile"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether the data files are
-        binary.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMultiGrid"
-                         default_values="0"
-                         name="MultiGrid"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether these files have
-        multiple-block information.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetHasByteCount"
-                         default_values="0"
-                         name="HasByteCount"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether this file uses Fortran
-        leading-trailing byte counts.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetIBlanking"
-                         default_values="0"
-                         name="IBlanking"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether this dataset has
-        visibility information.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetTwoDimensionalGeometry"
-                         default_values="0"
-                         name="TwoDimensionalGeometry"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether the data is two- or
-        three-dimensional.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetForceRead"
-                         default_values="0"
-                         name="ForceRead"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether to attempt to read the
-        file even if it appears corrupt</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetDoublePrecision"
-                         default_values="0"
-                         name="DoublePrecision"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property specifies whether floating points values
-  are in double precision.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetByteOrder"
-                         default_values="0"
-                         name="ByteOrder"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="BigEndian"
-                 value="0" />
-          <Entry text="LittleEndian"
-                 value="1" />
-        </EnumerationDomain>
-        <Documentation>This property specifies the byte order of any binary
-        file(s).</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty clean_command="RemoveAllFunctions"
-                         command="AddFunction"
-                         name="Functions"
-                         number_of_elements_per_command="1"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <EnumerationDomain name="array_list">
-          <!-- <Entry value="100" text="Scalar - Density"/> -->
-          <Entry text="Scalar - Pressure"
-                 value="110" />
-          <Entry text="Scalar - Pressure Coefficient"
-                 value="111" />
-          <Entry text="Scalar - Mach Number"
-                 value="112" />
-          <Entry text="Scalar - Sound Speed"
-                 value="113" />
-          <Entry text="Scalar - Temperature"
-                 value="120" />
-          <Entry text="Scalar - Enthalpy"
-                 value="130" />
-          <Entry text="Scalar - Internal energy"
-                 value="140" />
-          <Entry text="Scalar - Kinetic energy"
-                 value="144" />
-          <Entry text="Scalar - Velocity magnitude"
-                 value="153" />
-          <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
-          <Entry text="Scalar - Entropy"
-                 value="170" />
-          <Entry text="Scalar - Swirl"
-                 value="184" />
-          <Entry text="Vector - Velocity"
-                 value="200" />
-          <Entry text="Vector - Vorticity"
-                 value="201" />
-          <!-- <Entry value="202" text="Vector - Momentum"/> -->
-          <Entry text="Vector - Pressure gradient"
-                 value="210" />
-          <Entry text="Scalar - Vorticity magnitude"
-                 value="211" />
-          <Entry text="Vector - Strain rate"
-                 value="212" />
-        </EnumerationDomain>
-        <Documentation>This property lists which functions (point-centered
-        arrays) to compute.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty name="PreserveIntermediateFunctions"
-        command="SetPreserveIntermediateFunctions"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When checked, the reader will preserve intermediate computed
-          quantities that were not explicitly requested e.g. if **Velocity magnitude** is
-          enabled, but not **Velocity**, the reader still needs to compute **Velocity**.
-          If this is unchecked, then the output will not have
-          **Velocity** array, only the requested **VelocityMagnitude**. This is useful to
-          avoid using up memory for arrays that are not relevant for the analysis.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues"
-                            repeatable="1">
-        <TimeStepsInformationHelper />
-        <Documentation>Available timestep values.</Documentation>
-      </DoubleVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="xyz"
-                       file_description="PLOT3D Files" />
-        <!-- This hint tells the GUI that the File | Open dialog sets the FileName
-         property -->
-        <DefaultFileNameProperty name="FileName" />
-      </Hints>
-      <!-- End P3DReader -->
-    </SourceProxy>
+        <!-- ================================================================== -->
+        <SourceProxy class="vtkMultiBlockPLOT3DReader"
+                     label="PLOT3D Reader"
+                     name="P3DReader">
+            <Documentation long_help="Reads ASCII or binary PLOT3D files."
+                           short_help="Read PLOT3D files.">PLOT3D is a plotting
+                package developed at NASA. The PLOT3D reader can read both
+                ASCII and binary PLOT3D files. The default file extension
+                for the geometry files is .xyz, and the default file
+                extension for the solution files is .q. The output of this
+                reader is a multiblock dataset containing curvilinear
+                (structured grid) datasets. This is a distributed reader.
+            </Documentation>
+            <StringVectorProperty command="GetCurrentFileName"
+                                  information_only="1"
+                                  name="FileNameInfo">
+                <SimpleStringInformationHelper/>
+            </StringVectorProperty>
+            <StringVectorProperty animateable="0"
+                                  command="SetFileName"
+                                  name="FileName"
+                                  number_of_elements="1"
+                                  panel_visibility="never">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    This property specifies the .xyz (geometry) file name for the PLOT3D reader.
+                </Documentation>
+            </StringVectorProperty>
+            <StringVectorProperty animateable="0"
+                                  clean_command="ClearFileNames"
+                                  command="AddFileName"
+                                  name="QFileName"
+                                  number_of_elements="1"
+                                  information_property="FileNameInfo"
+                                  repeat_command="1">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    The list of .q (solution) files for the PLOT3D reader.
+                    There can be more than one. If more that one file is specified, the
+                    reader will switch to file-series mode in which it will pretend that it
+                    can support time and provide one file per time step.
+                </Documentation>
+                <Hints>
+                    <FileChooser extensions="q" file_description="Solution files"/>
+                </Hints>
+            </StringVectorProperty>
+            <StringVectorProperty animateable="0"
+                                  command="SetFunctionFileName"
+                                  name="FunctionFileName"
+                                  number_of_elements="1"
+                                  panel_visibility="default">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    This property specifies the .f (function) file name for the PLOT3D reader.
+                </Documentation>
+            </StringVectorProperty>
+            <IntVectorProperty command="SetAutoDetectFormat"
+                               default_values="1"
+                               name="AutoDetectFormat"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    When this options is enabled, the reader will try to
+                    automatically figure out various settings for a binary file. The other
+                    options are ignored. Does not work for text (ASCII) files.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty command="SetBinaryFile"
+                               default_values="1"
+                               name="BinaryFile"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    This property indicates whether the data files are binary.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty command="SetMultiGrid"
+                               default_values="0"
+                               name="MultiGrid"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    This property indicates whether these files have multiple-block information.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty command="SetHasByteCount"
+                               default_values="0"
+                               name="HasByteCount"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    This property indicates whether this file uses Fortran leading-trailing byte counts.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty command="SetIBlanking"
+                               default_values="0"
+                               name="IBlanking"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    This property indicates whether this dataset has visibility information.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty command="SetTwoDimensionalGeometry"
+                               default_values="0"
+                               name="TwoDimensionalGeometry"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    This property indicates whether the data is two- or three-dimensional.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty command="SetForceRead"
+                               default_values="0"
+                               name="ForceRead"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    This property indicates whether to attempt to read the file even if it appears corrupt
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty command="SetDoublePrecision"
+                               default_values="0"
+                               name="DoublePrecision"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    This property specifies whether floating points values are in double precision.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty command="SetByteOrder"
+                               default_values="0"
+                               name="ByteOrder"
+                               number_of_elements="1">
+                <EnumerationDomain name="enum">
+                    <Entry text="BigEndian"
+                           value="0"/>
+                    <Entry text="LittleEndian"
+                           value="1"/>
+                </EnumerationDomain>
+                <Documentation>
+                    This property specifies the byte order of any binary file(s).
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty clean_command="RemoveAllFunctions"
+                               command="AddFunction"
+                               name="Functions"
+                               number_of_elements_per_command="1"
+                               panel_visibility="default"
+                               repeat_command="1">
+                <EnumerationDomain name="array_list">
+                    <!-- <Entry value="100" text="Scalar - Density"/> -->
+                    <Entry text="Scalar - Pressure"
+                           value="110"/>
+                    <Entry text="Scalar - Pressure Coefficient"
+                           value="111"/>
+                    <Entry text="Scalar - Mach Number"
+                           value="112"/>
+                    <Entry text="Scalar - Sound Speed"
+                           value="113"/>
+                    <Entry text="Scalar - Temperature"
+                           value="120"/>
+                    <Entry text="Scalar - Enthalpy"
+                           value="130"/>
+                    <Entry text="Scalar - Internal energy"
+                           value="140"/>
+                    <Entry text="Scalar - Kinetic energy"
+                           value="144"/>
+                    <Entry text="Scalar - Velocity magnitude"
+                           value="153"/>
+                    <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
+                    <Entry text="Scalar - Entropy"
+                           value="170"/>
+                    <Entry text="Scalar - Swirl"
+                           value="184"/>
+                    <Entry text="Vector - Velocity"
+                           value="200"/>
+                    <Entry text="Vector - Vorticity"
+                           value="201"/>
+                    <!-- <Entry value="202" text="Vector - Momentum"/> -->
+                    <Entry text="Vector - Pressure gradient"
+                           value="210"/>
+                    <Entry text="Scalar - Vorticity magnitude"
+                           value="211"/>
+                    <Entry text="Vector - Strain rate"
+                           value="212"/>
+                </EnumerationDomain>
+                <Documentation>
+                    This property lists which functions (point-centered arrays) to compute.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty name="PreserveIntermediateFunctions"
+                               command="SetPreserveIntermediateFunctions"
+                               number_of_elements="1"
+                               default_values="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    When checked, the reader will preserve intermediate computed
+                    quantities that were not explicitly requested e.g. if **Velocity magnitude** is
+                    enabled, but not **Velocity**, the reader still needs to compute **Velocity**.
+                    If this is unchecked, then the output will not have
+                    **Velocity** array, only the requested **VelocityMagnitude**. This is useful to
+                    avoid using up memory for arrays that are not relevant for the analysis.
+                </Documentation>
+            </IntVectorProperty>
+            <DoubleVectorProperty information_only="1"
+                                  name="TimestepValues"
+                                  repeatable="1">
+                <TimeStepsInformationHelper/>
+                <Documentation>
+                    Available timestep values.
+                </Documentation>
+            </DoubleVectorProperty>
+            <Hints>
+                <ReaderFactory extensions="xyz"
+                               file_description="PLOT3D Files"/>
+                <!-- This hint tells the GUI that the File | Open dialog sets the FileName
+                 property -->
+                <DefaultFileNameProperty name="FileName"/>
+            </Hints>
+            <!-- End P3DReader -->
+        </SourceProxy>
 
-    <!-- ================================================================== -->
-    <!-- Plot3D Meta Reader -->
-    <SourceProxy class="vtkPlot3DMetaReader"
-                 label="PLOT3D Meta-File Reader"
-                 name="Plot3DMetaReader">
-      <Documentation short_help="The main goal of this reader is to make it easy to read PLOT3D files or time series of PLOT3D files.">
-The main goal of this reader is to make it easy to read PLOT3D files,
-specifically time series of PLOT3D files. PLOT3D files can take many
-different forms based on their content. Unfortunately, it is not a
-self-describing format therefore the user needs to pass information
-about the contents of the file to the reader. Normally, this is done
-by setting a number of member variables. The goal of this reader is to
-provide a simple format that enable the writer of the PLOT3D file to
-describe its settings as well as group a number of files as a time
-series.
-      </Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the meta file
-        name</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues"
-                            repeatable="1">
-        <TimeStepsInformationHelper />
-        <Documentation>Available timestep values.</Documentation>
-      </DoubleVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="p3d"
-                       file_description="PLOT3D Meta Files" />
-      </Hints>
-      <!-- End Plot3D Meta Reader-->
-    </SourceProxy>
+        <!-- ================================================================== -->
+        <!-- Plot3D Meta Reader -->
+        <SourceProxy class="vtkPlot3DMetaReader"
+                     label="PLOT3D Meta-File Reader"
+                     name="Plot3DMetaReader">
+            <Documentation
+                    short_help="The main goal of this reader is to make it easy to read PLOT3D files or time series of PLOT3D files.">
+                The main goal of this reader is to make it easy to read PLOT3D files,
+                specifically time series of PLOT3D files. PLOT3D files can take many
+                different forms based on their content. Unfortunately, it is not a
+                self-describing format therefore the user needs to pass information
+                about the contents of the file to the reader. Normally, this is done
+                by setting a number of member variables. The goal of this reader is to
+                provide a simple format that enable the writer of the PLOT3D file to
+                describe its settings as well as group a number of files as a time series.
+            </Documentation>
+            <StringVectorProperty animateable="0"
+                                  command="SetFileName"
+                                  name="FileName"
+                                  number_of_elements="1"
+                                  panel_visibility="never">
+                <FileListDomain name="files"/>
+                <Documentation>
+                    This property specifies the meta file name
+                </Documentation>
+            </StringVectorProperty>
+            <DoubleVectorProperty information_only="1"
+                                  name="TimestepValues"
+                                  repeatable="1">
+                <TimeStepsInformationHelper/>
+                <Documentation>
+                    Available timestep values.
+                </Documentation>
+            </DoubleVectorProperty>
+            <Hints>
+                <ReaderFactory extensions="p3d"
+                               file_description="PLOT3D Meta Files"/>
+            </Hints>
+            <!-- End Plot3D Meta Reader-->
+        </SourceProxy>
 
-    <!-- ================================================================== -->
+        <!-- ================================================================== -->
 
-    <!-- end of "sources" -->
-  </ProxyGroup>
+        <!-- end of "sources" -->
+    </ProxyGroup>
 
 </ServerManagerConfiguration>
