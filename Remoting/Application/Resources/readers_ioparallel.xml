@@ -197,7 +197,7 @@
             </IntVectorProperty>
             <IntVectorProperty animateable="0"
                                command="SetCreateCellToPoint"
-                               default_values="1"
+                               default_values="0"
                                label="Create cell-to-point filtered data"
                                name="CreateCellToPoint"
                                number_of_elements="1">
