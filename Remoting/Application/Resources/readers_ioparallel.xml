@@ -323,6 +323,21 @@
                 </Documentation>
             </IntVectorProperty>
             <IntVectorProperty animateable="0"
+                               command="SetReadAllFilesToDetermineStructure"
+                               default_values="1"
+                               name="ReadAllFilesToDetermineStructure"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    When set to false, the reader will read only the first proc directory to determine
+                    the structure, and assume all files have the same structure, i.e. same blocks and arrays.
+
+                    When set to true (default) the reader will read all proc directories to determine
+                    structure of the dataset because some files might have certain blocks that other
+                    files don't have.
+                </Documentation>
+            </IntVectorProperty>
+            <IntVectorProperty animateable="0"
                                command="SetSizeAverageCellToPoint"
                                default_values="0"
                                name="WeightPointDataByCellSize"
