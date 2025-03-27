@@ -1075,14 +1075,12 @@ void vtkSMTransferFunctionProxy::RestoreFromSiteSettingsOrXML(const char* arrayN
   this->ResetPropertiesToXMLDefaults();
 
   // Restore to site setting if there is one. If there isn't, this does not
-  // change the property setting. NOTE: user settings have priority
-  // of VTK_DOUBLE_MAX, so we set the site settings priority to a
-  // number just below VTK_DOUBLE_MAX.
+  // change the property setting.
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
 
   // First, check to see if there is an array-specific transfer function in
   // the settings.
-  double sitePriority = nextafter(VTK_DOUBLE_MAX, 0);
+  double sitePriority = vtkSMSettings::GetApplicationPriority();
   std::ostringstream prefix;
   prefix << ".array_" << this->GetXMLGroup() << "." << arrayName;
   if (settings->HasSetting(prefix.str().c_str(), sitePriority))

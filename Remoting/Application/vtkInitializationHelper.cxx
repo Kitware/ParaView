@@ -605,13 +605,13 @@ void vtkInitializationHelper::LoadSettings()
 
   // Load user-level settings
   std::string userSettingsFilePath = vtkPVStandardPaths::GetUserSettingsFilePath();
-  if (!settings->AddCollectionFromFile(userSettingsFilePath, VTK_DOUBLE_MAX))
+  if (!settings->AddCollectionFromFile(userSettingsFilePath, vtkSMSettings::GetUserPriority()))
   {
     // Loading user settings failed, so we need to create an empty
     // collection with highest priority manually. Otherwise, if a
     // setting is changed, a lower-priority collection such as site
     // settings may receive the modified setting values.
-    settings->AddCollectionFromString("{}", VTK_DOUBLE_MAX);
+    settings->AddCollectionFromString("{}", vtkSMSettings::GetUserPriority());
   }
 
   // Load site-level settings

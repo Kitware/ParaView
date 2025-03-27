@@ -263,6 +263,18 @@ public:
    */
   static bool DeserializeFromJSON(vtkSMProxy* proxy, const Json::Value& value);
 
+  /**
+   * Get the priority value used for UserPriority.
+   * This is the highest priority.
+   */
+  static double GetUserPriority();
+
+  /**
+   * Get the priority for application settings.
+   * This is just lower than UserPriority.
+   */
+  static double GetApplicationPriority();
+
 protected:
   vtkSMSettings();
   ~vtkSMSettings() override;
