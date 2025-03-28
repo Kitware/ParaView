@@ -8,6 +8,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMColorMapEditorHelper.h"
@@ -167,7 +168,7 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
   }
   iter->Delete();
 
-  if (!vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
+  if (!vtkPVGeneralSettings::GetInstance()->GetInheritRepresentationProperties())
   {
     return;
   }
@@ -272,9 +273,6 @@ void vtkPickRepresentationType(vtkSMRepresentationProxy* repr, vtkSMSourceProxy*
 }
 }
 
-bool vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide = true;
-bool vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties = false;
-
 vtkObjectFactoryNewMacro(vtkSMParaViewPipelineControllerWithRendering);
 //----------------------------------------------------------------------------
 vtkSMParaViewPipelineControllerWithRendering::vtkSMParaViewPipelineControllerWithRendering()
@@ -289,19 +287,21 @@ vtkSMParaViewPipelineControllerWithRendering::~vtkSMParaViewPipelineControllerWi
 //----------------------------------------------------------------------------
 void vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(bool val)
 {
-  vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide = val;
+  vtkPVGeneralSettings::GetInstance()->SetScalarBarMode(val
+      ? vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS
+      : vtkPVGeneralSettings::MANUAL_SCALAR_BARS);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(bool val)
 {
-  vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties = val;
+  vtkPVGeneralSettings::GetInstance()->SetInheritRepresentationProperties(val);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties()
 {
-  return vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties;
+  return vtkPVGeneralSettings::GetInstance()->GetInheritRepresentationProperties();
 }
 
 //----------------------------------------------------------------------------
@@ -533,7 +533,9 @@ void vtkSMParaViewPipelineControllerWithRendering::Hide(vtkSMProxy* repr, vtkSMV
     repr->UpdateVTKObjects();
     vtkSMViewProxy::RepresentationVisibilityChanged(view, repr, false);
 
-    if (vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide)
+    int mode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
+    if (mode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS ||
+      mode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
     {
       vtkSMColorMapEditorHelper::HideScalarBarIfNotNeeded(repr, view);
       vtkSMColorMapEditorHelper::HideBlocksScalarBarIfNotNeeded(repr, view);

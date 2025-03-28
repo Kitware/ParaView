@@ -7,6 +7,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMProperty.h"
@@ -16,8 +17,6 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-
-bool vtkSMInputArrayDomain::AutomaticPropertyConversion = false;
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = { "point", "cell", "field",
@@ -124,6 +123,14 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy, unsigned int outp
 bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
   int required_type, int attribute_type, int* acceptable_as_type /*=nullptr*/)
 {
+  return vtkSMInputArrayDomain::IsAttributeTypeAcceptable(required_type, attribute_type,
+    acceptable_as_type, vtkSMInputArrayDomain::GetAutomaticPropertyConversion());
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
+  int required_type, int attribute_type, int* acceptable_as_type, bool auto_convert)
+{
   if (acceptable_as_type)
   {
     *acceptable_as_type = attribute_type;
@@ -147,9 +154,9 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
       {
         return true;
       }
-      if (required_type == CELL && vtkSMInputArrayDomain::AutomaticPropertyConversion)
+      if (required_type == CELL && auto_convert)
       {
-        // this a POINT array, however since AutomaticPropertyConversion is ON,
+        // this a POINT array, however since auto_convert is ON,
         // this array can is acceptable as a CELL array. In other words, caller
         // can pretend this array is a CELL array and VTK pipeline will take care
         // of it.
@@ -166,9 +173,9 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
       {
         return true;
       }
-      if (required_type == POINT && vtkSMInputArrayDomain::AutomaticPropertyConversion)
+      if (required_type == POINT && auto_convert)
       {
-        // this a CELL array, however since AutomaticPropertyConversion is ON,
+        // this a CELL array, however since auto_convert is ON,
         // this array can is acceptable as a POINT array. In other words, caller
         // can pretend this array is a POINT array and VTK pipeline will take care
         // of it.
@@ -222,8 +229,8 @@ int vtkSMInputArrayDomain::IsArrayAcceptable(vtkPVArrayInformation* arrayInfo)
 
     // Conversion use, only if activated, and only if AcceptableNumbersOfComponents is 1
     // Also we keep trying to check if there are other better AcceptableNumbersOfComponents
-    else if (vtkSMInputArrayDomain::AutomaticPropertyConversion &&
-      this->AcceptableNumbersOfComponents[i] == 1 && numberOfComponents > 1)
+    else if (this->GetAutoConvertProperties() && this->AcceptableNumbersOfComponents[i] == 1 &&
+      numberOfComponents > 1)
     {
       acceptableConversion = true;
     }
@@ -235,7 +242,7 @@ int vtkSMInputArrayDomain::IsArrayAcceptable(vtkPVArrayInformation* arrayInfo)
 bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(int attributeType)
 {
   return vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
-    this->AttributeType, attributeType, nullptr);
+    this->AttributeType, attributeType, nullptr, this->GetAutoConvertProperties());
 }
 
 //----------------------------------------------------------------------------
@@ -300,6 +307,12 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
   {
     this->DataType.clear();
   }
+
+  if (const char* autoConvert = element->GetAttributeOrDefault("auto_convert_association", "0"))
+  {
+    this->AutoConvertProperties = std::atoi(autoConvert) == 1;
+  }
+
   return 1;
 }
 
@@ -349,16 +362,22 @@ std::vector<int> vtkSMInputArrayDomain::GetAcceptableNumbersOfComponents() const
 //---------------------------------------------------------------------------
 void vtkSMInputArrayDomain::SetAutomaticPropertyConversion(bool convert)
 {
-  if (vtkSMInputArrayDomain::AutomaticPropertyConversion != convert)
-  {
-    vtkSMInputArrayDomain::AutomaticPropertyConversion = convert;
-  }
+  vtkPVGeneralSettings::GetInstance()->SetAutoConvertProperties(convert);
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMInputArrayDomain::GetAutoConvertProperties()
+{
+  bool autoConvert =
+    vtkSMInputArrayDomain::GetAutomaticPropertyConversion() || this->AutoConvertProperties;
+  vtkDebugMacro("Return AutoConvertProperties: " << autoConvert);
+  return autoConvert;
 }
 
 //---------------------------------------------------------------------------
 bool vtkSMInputArrayDomain::GetAutomaticPropertyConversion()
 {
-  return vtkSMInputArrayDomain::AutomaticPropertyConversion;
+  return vtkPVGeneralSettings::GetInstance()->GetAutoConvertProperties();
 }
 
 //---------------------------------------------------------------------------

@@ -14,6 +14,7 @@
 
 #include "vtkAxis.h" //for enums.
 #include "vtkPVContextView.h"
+#include "vtkParaViewDeprecation.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 
 class vtkChart;
@@ -459,14 +460,10 @@ public:
    * When plotting data with nonpositive values, ignore the standard warning
    * and draw only the data with positive values.
    */
-  static void SetIgnoreNegativeLogAxisWarning(bool val)
-  {
-    vtkPVXYChartView::IgnoreNegativeLogAxisWarning = val;
-  }
-  static bool GetIgnoreNegativeLogAxisWarning()
-  {
-    return vtkPVXYChartView::IgnoreNegativeLogAxisWarning;
-  }
+  PARAVIEW_DEPRECATED_IN_5_14_0("Use vtkPVGeneralSettings::SetIgnoreNegativeLogAxisWarning instead")
+  static void SetIgnoreNegativeLogAxisWarning(bool val);
+  PARAVIEW_DEPRECATED_IN_5_14_0("Use vtkPVGeneralSettings::GetIgnoreNegativeLogAxisWarning instead")
+  static bool GetIgnoreNegativeLogAxisWarning();
 
   /**
    * Provides access to the chart view.
@@ -518,6 +515,7 @@ protected:
   bool HideTimeMarker;
   bool SortByXAxis;
 
+  // PARAVIEW_DEPRECATED_IN_5_14_0
   static bool IgnoreNegativeLogAxisWarning;
 
 private:

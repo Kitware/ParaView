@@ -37,10 +37,10 @@ public:
    * Automatically convert data arrays as needed by filters including converting
    * cell arrays to point arrays, or vice versa, and extracting single components
    * from multi-component arrays.
-   * Forwards the call to vtkSMInputArrayDomain::SetAutomaticPropertyConversion.
    */
-  void SetAutoConvertProperties(bool val);
-  bool GetAutoConvertProperties();
+  vtkSetMacro(AutoConvertProperties, bool);
+  vtkGetMacro(AutoConvertProperties, bool);
+  vtkBooleanMacro(AutoConvertProperties, bool);
   ///@}
 
   ///@{
@@ -130,23 +130,24 @@ public:
     AUTOMATICALLY_HIDE_SCALAR_BARS = 1,
     MANUAL_SCALAR_BARS = 2
   };
+  vtkSetMacro(ScalarBarMode, int);
   vtkGetMacro(ScalarBarMode, int);
-  void SetScalarBarMode(int);
   ///@}
 
   ///@{
   /**
    * Set when animation geometry caching is enabled.
    */
-  void SetCacheGeometryForAnimation(bool val);
-  bool GetCacheGeometryForAnimation();
+  vtkSetMacro(CacheGeometryForAnimation, bool);
+  vtkGetMacro(CacheGeometryForAnimation, bool);
+  vtkBooleanMacro(CacheGeometryForAnimation, bool);
   ///@}
 
   ///@{
   /**
    * Set the animation cache limit in KBs.
    */
-  void SetAnimationGeometryCacheLimit(unsigned long val);
+  vtkSetMacro(AnimationGeometryCacheLimit, unsigned long);
   vtkGetMacro(AnimationGeometryCacheLimit, unsigned long);
   ///@}
 
@@ -242,16 +243,25 @@ public:
   vtkGetMacro(FullNotationHighExponent, int);
   ///@}
 
+  ///@{
   /**
    * Forwarded for vtkSMParaViewPipelineControllerWithRendering.
    */
-  void SetInheritRepresentationProperties(bool val);
+  vtkSetMacro(InheritRepresentationProperties, bool);
+  vtkGetMacro(InheritRepresentationProperties, bool);
+  vtkBooleanMacro(InheritRepresentationProperties, bool);
+  ///@}
 
-  // Description:
-  // When plotting data with nonpositive values, ignore the standard warning
-  // and draw only the data with positive values.
-  void SetIgnoreNegativeLogAxisWarning(bool val);
-  bool GetIgnoreNegativeLogAxisWarning();
+  ///@{
+  /**
+   * Description:
+   * When plotting data with nonpositive values, ignore the standard warning
+   * and draw only the data with positive values.
+   */
+  vtkSetMacro(IgnoreNegativeLogAxisWarning, bool);
+  vtkGetMacro(IgnoreNegativeLogAxisWarning, bool);
+  vtkBooleanMacro(IgnoreNegativeLogAxisWarning, bool);
+  ///@}
 
   enum
   {
@@ -280,16 +290,18 @@ public:
   /**
    * Load all variables when loading a data set.
    */
-  void SetLoadAllVariables(bool val);
-  bool GetLoadAllVariables();
+  vtkSetMacro(LoadAllVariables, bool);
+  vtkGetMacro(LoadAllVariables, bool);
+  vtkBooleanMacro(LoadAllVariables, bool);
   ///@}
 
   ///@{
   /**
    * Load no variables when showing a 2D chart.
    */
-  void SetLoadNoChartVariables(bool val);
-  bool GetLoadNoChartVariables();
+  vtkSetMacro(LoadNoChartVariables, bool);
+  vtkGetMacro(LoadNoChartVariables, bool);
+  vtkBooleanMacro(LoadNoChartVariables, bool);
   ///@}
 
   ///@{
@@ -320,7 +332,7 @@ public:
   /**
    * Turn on streamed rendering.
    */
-  void SetEnableStreaming(bool);
+  vtkSetMacro(EnableStreaming, bool);
   vtkGetMacro(EnableStreaming, bool);
   vtkBooleanMacro(EnableStreaming, bool);
   ///@}
@@ -363,6 +375,12 @@ protected:
   vtkPVGeneralSettings() = default;
   ~vtkPVGeneralSettings() override = default;
 
+private:
+  vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
+  void operator=(const vtkPVGeneralSettings&) = delete;
+
+  static vtkSmartPointer<vtkPVGeneralSettings> Instance;
+
   int BlockColorsDistinctValues = 7;
   bool AutoApply = false;
   int AutoApplyDelay = 0;
@@ -390,12 +408,11 @@ protected:
   bool ColorByBlockColorsOnApply = true;
   bool EnableStreaming = false;
   bool SelectOnClickMultiBlockInspector = true;
-
-private:
-  vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
-  void operator=(const vtkPVGeneralSettings&) = delete;
-
-  static vtkSmartPointer<vtkPVGeneralSettings> Instance;
+  bool AutoConvertProperties = false;
+  bool LoadAllVariables = false;
+  bool IgnoreNegativeLogAxisWarning = false;
+  bool InheritRepresentationProperties = false;
+  bool LoadNoChartVariables = false;
 };
 
 #endif

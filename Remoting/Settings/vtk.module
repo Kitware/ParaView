@@ -16,11 +16,8 @@ DEPENDS
   ParaView::Versioning
 PRIVATE_DEPENDS
   ParaView::RemotingCore
-  ParaView::RemotingServerManager
   VTK::vtksys
 OPTIONAL_DEPENDS
-  ParaView::RemotingAnimation
-  ParaView::RemotingViews
   VTK::AcceleratorsVTKmFilters
 TEST_LABELS
   ParaView

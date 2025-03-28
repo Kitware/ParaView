@@ -3,14 +3,12 @@
 #include "vtkSMArraySelectionDomain.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionDomain);
-
-//---------------------------------------------------------------------------
-bool vtkSMArraySelectionDomain::LoadAllVariables = false;
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionDomain::vtkSMArraySelectionDomain() = default;
@@ -32,7 +30,7 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_un
 
     vprop->Copy(infoProp);
 
-    if (vtkSMArraySelectionDomain::LoadAllVariables == true)
+    if (vtkSMArraySelectionDomain::GetLoadAllVariables())
     {
       vtkSMPropertyHelper helper(vprop);
 
@@ -56,4 +54,16 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_un
 void vtkSMArraySelectionDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMArraySelectionDomain::SetLoadAllVariables(bool choice)
+{
+  vtkPVGeneralSettings::GetInstance()->SetLoadAllVariables(choice);
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMArraySelectionDomain::GetLoadAllVariables()
+{
+  return vtkPVGeneralSettings::GetInstance()->GetLoadAllVariables();
 }

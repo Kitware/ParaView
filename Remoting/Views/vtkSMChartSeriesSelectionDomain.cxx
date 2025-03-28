@@ -10,6 +10,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
@@ -70,9 +71,6 @@ public:
     this->ColorCounter++;
   }
 };
-
-//---------------------------------------------------------------------------
-bool vtkSMChartSeriesSelectionDomain::LoadNoVariables = false;
 
 //----------------------------------------------------------------------------
 vtkSMChartSeriesSelectionDomain::vtkSMChartSeriesSelectionDomain()
@@ -430,7 +428,7 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
 //----------------------------------------------------------------------------
 bool vtkSMChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* name)
 {
-  if (vtkSMChartSeriesSelectionDomain::LoadNoVariables)
+  if (vtkPVGeneralSettings::GetInstance()->GetLoadNoChartVariables())
   {
     return false;
   }
@@ -470,4 +468,16 @@ void vtkSMChartSeriesSelectionDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "HidePartialArrays: " << this->HidePartialArrays << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartSeriesSelectionDomain::SetLoadNoChartVariables(bool choice)
+{
+  vtkPVGeneralSettings::GetInstance()->SetLoadNoChartVariables(choice);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMChartSeriesSelectionDomain::GetLoadNoChartVariables()
+{
+  return vtkPVGeneralSettings::GetInstance()->GetLoadNoChartVariables();
 }

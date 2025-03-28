@@ -212,6 +212,9 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
     result.insert(info);
   }
 
+  bool autoConvert =
+    iad ? iad->GetAutoConvertProperties() : vtkSMInputArrayDomain::GetAutomaticPropertyConversion();
+
   // iterate over attributes arrays in dataInfo and add acceptable arrays to the
   // domain.
   for (int type = vtkSMInputArrayDomain::POINT;
@@ -224,7 +227,8 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
     vtkPVDataSetAttributesInformation* attrInfo = dataInfo->GetAttributeInformation(type);
     int acceptable_as = type;
     if (attrInfo == nullptr ||
-      !vtkSMInputArrayDomain::IsAttributeTypeAcceptable(association, type, &acceptable_as))
+      !vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
+        association, type, &acceptable_as, autoConvert))
     {
       continue;
     }
@@ -294,9 +298,8 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
         // array has number of components that doesn't directly match the required
         // component count. The array is being accepted due to automatic property
         // conversion. So we need to split up components and add them individually.
-        assert(acceptedNumberOfComponents == 1 &&
-          vtkSMInputArrayDomain::GetAutomaticPropertyConversion() == true &&
-          arrayInfo->GetNumberOfComponents() > 1);
+        assert(
+          acceptedNumberOfComponents == 1 && autoConvert && arrayInfo->GetNumberOfComponents() > 1);
 
         for (int cc = 0, maxCC = arrayInfo->GetNumberOfComponents(); cc <= maxCC; ++cc)
         {

@@ -22,6 +22,7 @@
 #ifndef vtkSMParaViewPipelineControllerWithRendering_h
 #define vtkSMParaViewPipelineControllerWithRendering_h
 
+#include "vtkParaViewDeprecation.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMParaViewPipelineController.h"
 
@@ -177,6 +178,8 @@ public:
   /**
    * Control how scalar bar visibility is updated by the Hide call.
    */
+  PARAVIEW_DEPRECATED_IN_5_14_0(
+    "Use vtkPVGeneralSettings::SetScalarBarMode(AUTOMATICALLY_HIDE_SCALAR_BARS) instead")
   static void SetHideScalarBarOnHide(bool);
 
   ///@{
@@ -186,7 +189,11 @@ public:
    * a source, then any filter that you connect to it should be transformed as
    * well.
    */
+  PARAVIEW_DEPRECATED_IN_5_14_0(
+    "Use vtkPVGeneralSettings::SetInheritRepresentationProperties() instead")
   static void SetInheritRepresentationProperties(bool);
+  PARAVIEW_DEPRECATED_IN_5_14_0(
+    "Use vtkPVGeneralSettings::GetInheritRepresentationProperties() instead")
   static bool GetInheritRepresentationProperties();
   ///@}
 
@@ -232,8 +239,6 @@ private:
   vtkSMParaViewPipelineControllerWithRendering(
     const vtkSMParaViewPipelineControllerWithRendering&) = delete;
   void operator=(const vtkSMParaViewPipelineControllerWithRendering&) = delete;
-  static bool HideScalarBarOnHide;
-  static bool InheritRepresentationProperties;
   bool SkipUpdatePipelineBeforeDisplay;
 };
 

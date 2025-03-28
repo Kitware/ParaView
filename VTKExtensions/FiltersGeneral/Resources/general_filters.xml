@@ -879,6 +879,7 @@ array.
         <InputArrayDomain attribute_type="point"
                           name="input_array"
                           number_of_components="1"
+                          auto_convert_association="1"
                           data_type="vtkDataSet" />
         <InputArrayDomain attribute_type="cell"
                           name="input_array_htg"
