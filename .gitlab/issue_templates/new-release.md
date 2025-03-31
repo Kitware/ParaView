@@ -311,8 +311,6 @@ If making a non-RC release:
 
 /cc @cory.quammen
 
-/cc @charles.gueunet
-
 /cc @mwestphal
 
 /cc @wascott
