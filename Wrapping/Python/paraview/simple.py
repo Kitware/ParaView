@@ -3384,15 +3384,11 @@ def CreateTexture(filename=None, trivial_producer_key=None, proxyname=None):
     pxm = servermanager.ProxyManager()
     textureproxy = pxm.NewProxy("textures", "ImageTexture")
     controller = servermanager.ParaViewPipelineController()
-    py_textureproxy = servermanager._getPyProxy(textureproxy)
     if filename is not None:
-        py_textureproxy.Mode = "ReadFromFile"
         controller.SMController.RegisterTextureProxy(textureproxy, filename)
     elif trivial_producer_key is not None:
-        py_textureproxy.Mode = "ReadFromMemory"
-        py_textureproxy.TrivialProducerKey = trivial_producer_key
         controller.SMController.RegisterTextureProxy(textureproxy, trivial_producer_key, proxyname)
-    return py_textureproxy
+    return servermanager._getPyProxy(textureproxy)
 
 
 def FindTextureOrCreate(registrationName, filename=None, trivial_producer_key=None):
