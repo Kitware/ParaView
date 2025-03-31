@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of VDB datasets.
@@ -73,7 +73,7 @@ public:
 
     /// Accessing the device VDB subset for direct access to the VDB device resources
     ///
-    /// \return     Returns the device-handled seubset for direct access to the VDB device resources,
+    /// \return     Returns the device-handled subset for direct access to the VDB device resources,
     ///             will return \c NULL if data is not stored on device (yet).
     /// 
     virtual IVDB_subset_device*     get_device_subset() const = 0;

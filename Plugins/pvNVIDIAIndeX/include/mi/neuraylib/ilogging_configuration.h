@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for logging related settings.
@@ -9,6 +9,7 @@
 
 #include <mi/base/enums.h>
 #include <mi/base/interface_declare.h>
+#include <mi/neuraylib/version.h> // for MI_NEURAYLIB_DEPRECATED_ENUM_VALUE
 
 namespace mi {
 
@@ -21,7 +22,7 @@ namespace neuraylib {
 */
 
 /// Components of the log message prefix.
-enum Log_prefix {
+enum Log_prefix : Uint32 {
     LOG_PREFIX_TIME         = 0x0001, ///< human-readable timestamp
     LOG_PREFIX_TIME_SECONDS = 0x0002, ///< timestamp in seconds with milliseconds resolution
     LOG_PREFIX_HOST_THREAD  = 0x0004, ///< ID of the host and thread that generate the log message
@@ -30,11 +31,9 @@ enum Log_prefix {
     LOG_PREFIX_CATEGORY     = 0x0020, ///< category of the log message
     LOG_PREFIX_SEVERITY     = 0x0040, ///< severity of the log message
     LOG_PREFIX_CUDA_DEVICE  = 0x0080, ///< CUDA device (if relevant)
-    LOG_PREFIX_TAGS         = 0x0100, ///< message detail tags
-    LOG_PREFIX_FORCE_32_BIT = 0xffffffffU
+    LOG_PREFIX_TAGS         = 0x0100  ///< message detail tags
+    MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(LOG_PREFIX_FORCE_32_BIT, 0xffffffffU)
 };
-
-mi_static_assert( sizeof( Log_prefix) == sizeof( Uint32));
 
 /// This interface is used for configuring the logging for the \neurayLibraryName.
 ///
@@ -75,13 +74,13 @@ public:
     /// very few log messages might be received during startup before the host has joined the
     /// cluster.
     ///
-    /// \param logger      The receiving logger. It is valid to pass \c NULL in which case logging
-    ///                    is reset to be done to stderr.
+    /// \param logger      The receiving logger. It is valid to pass \c nullptr in which case
+    ///                    logging is reset to be done to stderr.
     virtual void set_receiving_logger( base::ILogger* logger) = 0;
 
     /// Returns the receiving logger.
     ///
-    /// Note that if no receiving logger has been set, this method returns \c NULL and logging is
+    /// Note that if no receiving logger has been set, this method returns \c nullptr and logging is
     /// done using a default logger that is internal to this library. This default logger simply
     /// writes to stderr.
     ///
@@ -135,22 +134,6 @@ public:
     /// \return                The logging level, in case of success, -1 in case of failure.
     virtual base::Message_severity get_log_level_by_category( const char* category) const = 0;
 
-    /// Sets the logging priority of this host.
-    ///
-    /// The log priority determines which host becomes the logging host. The preferred logging host
-    /// should have the highest number, and fallbacks in case of problems should have lower numbers,
-    /// in the preferred order of fallbacks. Hosts with the highest logging priority will take over
-    /// from designated logging hosts that have failed. The default logging priority is 0.
-    ///
-    /// This can only be configured before \NeurayProductName has been started.
-    ///
-    /// \param priority        The logging priority
-    /// \return                0, in case of success, -1 in case of failure.
-    virtual Sint32 set_log_priority( Sint32 priority) = 0;
-
-    /// Returns the logging priority of this host.
-    virtual Sint32 get_log_priority() const = 0;
-
     /// Sets the log message prefix.
     ///
     /// The log message prefix consists of several optional components that provide context for the
@@ -166,19 +149,51 @@ public:
     ///                        #mi::neuraylib::Log_prefix).
     virtual Uint32 get_log_prefix() const = 0;
 
+    /// \if MDL_SDK_API
+    /// Not supported.
+    /// \else
+    /// Sets the logging priority of this host.
+    ///
+    /// The log priority determines which host becomes the logging host. The preferred logging host
+    /// should have the highest number, and fallbacks in case of problems should have lower numbers,
+    /// in the preferred order of fallbacks. Hosts with the highest logging priority will take over
+    /// from designated logging hosts that have failed. The default logging priority is 0.
+    ///
+    /// This can only be configured before \neurayProductName has been started.
+    ///
+    /// \param priority        The logging priority
+    /// \return                0, in case of success, -1 in case of failure.
+    /// \endif
+    virtual Sint32 set_log_priority( Sint32 priority) = 0;
+
+    /// \if MDL_SDK_API
+    /// Not supported.
+    /// \else
+    /// Returns the logging priority of this host.
+    /// \endif
+    virtual Sint32 get_log_priority() const = 0;
+
+    /// \if MDL_SDK_API
+    /// Not supported.
+    /// \else
     /// Enables or disables local logging.
     ///
     /// If local logging is enabled, all log messages from this host are sent to the local logger.
     /// Otherwise, they are sent to the logger of the logging host (see #set_log_priority()).
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \param value           \c true to enable the local logging, \c false to disable it (the
     ///                        default).
     /// \return                0, in case of success, -1 in case of failure.
+    /// \endif
     virtual Sint32 set_log_locally( bool value) = 0;
 
+    /// \if MDL_SDK_API
+    /// Not supported.
+    /// \else
     /// Indicates whether local logging is enabled or not.
+    /// \endif
     virtual bool get_log_locally() const = 0;
 };
 

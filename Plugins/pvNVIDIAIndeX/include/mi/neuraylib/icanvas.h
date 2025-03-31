@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for canvases
@@ -51,9 +51,13 @@ public:
     ///
     /// The gamma value should be a positive number. Typical values are 2.2 for LDR pixel types, and
     /// 1.0 for HDR pixel types.
+    ///
+    /// The alpha channel (if present) is always linear.
     virtual Float32 get_gamma() const = 0;
 
     /// Sets the gamma value.
+    ///
+    /// The alpha channel (if present) is always linear.
     ///
     /// \note This method just sets the gamma value. It does \em not change the pixel data itself.
     virtual void set_gamma( Float32 gamma) = 0;
@@ -73,7 +77,7 @@ public:
 /// \if IRAY_API
 /// The #mi::neuraylib::IRender_target, #mi::neuraylib::ICanvas, and #mi::neuraylib::ITile classes
 /// are abstract interfaces which can to be implemented by the application. For example, this gives
-/// the application the ability to tailor the rendering process very specific to its needs. The     
+/// the application the ability to tailor the rendering process very specific to its needs. The
 /// render target has to be implemented by the application whereas default implementations for
 /// canvases and tiles are available from #mi::neuraylib::IImage_api.
 /// \endif
@@ -88,24 +92,26 @@ public:
     /// Returns the tile for the given layer.
     ///
     /// \param layer     The layer of the pixel in the canvas.
-    /// \return          The tile that contains the pixel, or \c NULL in case of invalid
+    /// \return          The tile that contains the pixel, or \c nullptr in case of invalid
     ///                  parameters.
     virtual const ITile* get_tile( Uint32 layer = 0) const = 0;
 
     /// Returns the tile for the given layer.
     ///
     /// \param layer     The layer of the pixel in the canvas.
-    /// \return          The tile that contains the pixel, or \c NULL in case of invalid
+    /// \return          The tile that contains the pixel, or \c nullptr in case of invalid
     ///                  parameters.
     virtual ITile* get_tile( Uint32 layer = 0) = 0;
 };
 
 
+#ifndef __CUDACC__
 /// Convenience function which returns a canvas' resolution in a struct.
 inline Uint32_2 get_resolution(const ICanvas_base& canvas)
 {
-    return Uint32_2(canvas.get_resolution_x(),canvas.get_resolution_y());
+    return Uint32_2{canvas.get_resolution_x(),canvas.get_resolution_y()};
 }
+#endif
 
 
 /**@}*/ // end group mi_neuray_rendering

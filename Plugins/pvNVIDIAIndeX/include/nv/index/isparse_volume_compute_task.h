@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file   isparse_volume_compute_task.h
 /// \brief  Compute tasks operating on subset data of sparse volumes.

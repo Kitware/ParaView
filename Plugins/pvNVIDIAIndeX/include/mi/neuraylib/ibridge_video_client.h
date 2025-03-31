@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief  Bridge video handling
@@ -46,10 +46,10 @@ public:
     /// Sets the video sink that will receive the decoded video frames sent from the server.
     ///
     /// \param video_sink   The video sink to set. Replaces any previously set video sink (if any).
-    ///                     Pass \c NULL to disconnect the currently set video sink.
+    ///                     Pass \c nullptr to disconnect the currently set video sink.
     virtual void set_video_sink( IVideo_sink* video_sink) = 0;
 
-    /// Returns the currently set video sink, or \c NULL if none is set.
+    /// Returns the currently set video sink, or \c nullptr if none is set.
     virtual IVideo_sink* get_video_sink() const = 0;
 
     /// Sets the GPU to use for nvcuvid hardware h264 decoding.
@@ -130,8 +130,8 @@ public:
     /// frame. The raw data buffer will be delivered to the client as is (not encoded or compressed
     /// in any way) and it is up to the application to define the format of the data.
     ///
-    /// \param video_frame     The video frame to display. Can be \c NULL.
-    /// \param frame_data      Additional frame data. Can be \c NULL.
+    /// \param video_frame     The video frame to display. Can be \c nullptr.
+    /// \param frame_data      Additional frame data. Can be \c nullptr.
     virtual void video_frame( IVideo_frame* video_frame, neuraylib::IBuffer* frame_data) = 0;
 
     /// Called when progress messages arrive for the next frame from the server-side video source.

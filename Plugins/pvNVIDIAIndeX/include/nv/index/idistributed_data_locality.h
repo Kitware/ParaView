@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file  idistributed_data_locality.h
 /// \brief Interfaces for exposing the data distribution scheme.

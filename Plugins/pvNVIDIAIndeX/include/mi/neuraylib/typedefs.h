@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Typedefs for types from the math API
@@ -25,13 +25,13 @@ namespace mi {
 ///
 /// \see #mi::Color_struct for the corresponding POD type and
 ///      #mi::math::Color for the source of the typedef
-typedef math::Color Color;
+using Color = math::Color;
 
 /// RGBA color class (underlying POD type).
 ///
 /// \see #mi::Color for the corresponding non-POD type and
 ///      #mi::math::Color_struct for the source of the typedef
-typedef math::Color_struct Color_struct;
+using Color_struct = math::Color_struct;
 
 using mi::math::Clip_mode;
 using mi::math::CLIP_RGB;
@@ -44,13 +44,13 @@ using mi::math::CLIP_RAW;
 ///
 /// \see #mi::Spectrum_struct for the corresponding POD type and
 ///      #mi::math::Spectrum for the source of the typedef
-typedef math::Spectrum Spectrum;
+using Spectrum = math::Spectrum;
 
 /// Spectrum class (underlying POD type).
 ///
 /// \see #mi::Spectrum for the corresponding non-POD type and
 ///      #mi::math::Spectrum_struct for the source of the typedef
-typedef math::Spectrum_struct Spectrum_struct;
+using Spectrum_struct = math::Spectrum_struct;
 
 
 
@@ -58,13 +58,13 @@ typedef math::Spectrum_struct Spectrum_struct;
 ///
 /// \see #mi::Bbox3_struct for the corresponding POD type and
 ///      #mi::math::Bbox for the underlying template class
-typedef math::Bbox<Float32,3> Bbox3;
+using Bbox3 = math::Bbox<Float32,3>;
 
 /// Three-dimensional bounding box (underlying POD type).
 ///
 /// \see #mi::Bbox3 for the corresponding non-POD type and
 ///      #mi::math::Bbox_struct for the underlying template class
-typedef math::Bbox_struct<Float32,3> Bbox3_struct;
+using Bbox3_struct = math::Bbox_struct<Float32,3>;
 
 
 

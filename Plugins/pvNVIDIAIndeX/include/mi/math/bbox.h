@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/bbox.h
 /// \brief An axis-aligned N-dimensional bounding box class template of fixed dimension with
@@ -73,18 +73,18 @@ template <typename T, Size DIM>
 class Bbox //-V690 PVS
 {
 public:
-    typedef math::Vector<T,DIM> Vector;         ///< Corresponding vector type.
-    typedef Bbox_struct<T,DIM>  Pod_type;       ///< POD class corresponding to this bounding box.
-    typedef Vector         value_type;          ///< Coordinate type.
-    typedef Size           size_type;           ///< Size type, unsigned.
-    typedef Difference     difference_type;     ///< Difference type, signed.
-    typedef Vector *       pointer;             ///< Mutable pointer to vector.
-    typedef const Vector * const_pointer;       ///< Const pointer to vector.
-    typedef Vector &       reference;           ///< Mutable reference to vector.
-    typedef const Vector & const_reference;     ///< Const reference to vector.
+    using Vector          = math::Vector<T, DIM>; ///< Corresponding vector type.
+    using Pod_type        = Bbox_struct<T, DIM>;  ///< POD class corresponding to this bounding box.
+    using value_type      = Vector;               ///< Coordinate type.
+    using size_type       = Size;                 ///< Size type, unsigned.
+    using difference_type = Difference;           ///< Difference type, signed.
+    using pointer         = Vector*;              ///< Mutable pointer to vector.
+    using const_pointer   = const Vector*;        ///< Const pointer to vector.
+    using reference       = Vector&;              ///< Mutable reference to vector.
+    using const_reference = const Vector&;        ///< Const reference to vector.
 
-    static const Size DIMENSION = DIM;          ///< Constant dimension of the vectors.
-    static const Size SIZE      = 2;            ///< Constant size of the bounding box.
+    static const Size DIMENSION = DIM;            ///< Constant dimension of the vectors.
+    static const Size SIZE      = 2;              ///< Constant size of the bounding box.
 
     /// Constant size of the bounding box.
     static inline Size size()     { return SIZE; }
@@ -128,10 +128,8 @@ public:
     /// Bounding box with its elements not initialized.
     inline explicit Bbox( Uninitialized_tag) { }
 
-#if (__cplusplus >= 201103L)
     /// Default copy constructor.
     Bbox( const Bbox<T,DIM>& other ) = default;
-#endif
 
     /// Bounding box initialized from corresponding POD type.
     inline Bbox( const Bbox_struct<T,DIM>& bbox_struct )

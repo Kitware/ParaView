@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief User-defined rendering canvas.
@@ -34,15 +34,17 @@ public:
     /// Frame buffer layer types that are or will be supported by a canvas layer.
     enum Frame_buffer_layer_type
     {
-        FB_LAYER_UNDEFINED  = 0u,    ///< Undefined frame buffer.
-        FB_LAYER_RGB8       = 1u,    ///< Not supported yet // 8-bit per rgb component.
-        FB_LAYER_RGBA8      = 2u,    ///< 8-bit per rgba component.
-        FB_LAYER_RGBE       = 3u,    ///< Not supported yet // RGBe hdr support.
-        FB_LAYER_DEPTH16    = 4u,    ///< Not supported yet // 16-bit depth.
-        FB_LAYER_DEPTH32    = 5u,    ///< 32-bit depth in float.
-        FB_LAYER_UINT8      = 6u,    ///< Not supported yet // 8-bit unsigned int enabling index encoding.
-        FB_LAYER_UINT32     = 7u,    ///< Not supported yet // 32-bit unsigned int enabling index encoding.
-        FB_LAYER_FLOAT32    = 8u     ///< Not supported yet // 32-bit float enabling scalar value encoding.
+        FB_LAYER_UNDEFINED  =  0u,    ///< Undefined frame buffer.
+        FB_LAYER_RGB8       =  1u,    ///< Not supported yet // 8-bit per rgb component.
+        FB_LAYER_RGBA8      =  2u,    ///< 8-bit per rgba component.
+        FB_LAYER_RGBE       =  3u,    ///< Not supported yet // RGBe hdr support.
+        FB_LAYER_RGB32      =  4u,    ///< Not supported yet // 32-bit per rgb.
+        FB_LAYER_RGBA32     =  5u,    ///< 32-bit per rgba.
+        FB_LAYER_DEPTH16    =  6u,    ///< Not supported yet // 16-bit depth.
+        FB_LAYER_DEPTH32    =  7u,    ///< 32-bit depth in float.
+        FB_LAYER_UINT8      =  8u,    ///< Not supported yet // 8-bit unsigned int enabling index encoding.
+        FB_LAYER_UINT32     =  9u,    ///< Not supported yet // 32-bit unsigned int enabling index encoding.
+        FB_LAYER_FLOAT32    = 10u     ///< Not supported yet // 32-bit float enabling scalar value encoding.
     };
 
     /// The number of layers hosted by the canvas' frame buffer.

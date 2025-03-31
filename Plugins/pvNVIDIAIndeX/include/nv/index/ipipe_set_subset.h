@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Pipe set subset.
@@ -12,8 +12,15 @@
 namespace nv {
 namespace index {
 
+class IPipe_set_subset;
+class IPipe_set_subset_device;
+
+
 /// Helper for setting the parameters of a single pipe inside a subset. An instance of this
 /// interface is returned by \c IPipe_set_subset::add_pipe().
+///
+/// \ingroup nv_index_data_subsets
+///
 class IPipe_subset_parameters :
     public mi::base::Interface_declare<0x3ee3429b,0x0607,0x4b87,0xb3,0xe6,0x9e,0x94,0x57,0x60,0x54,0x41>
 {
@@ -105,6 +112,9 @@ public:
 };
 
 /// Distributed data storage for pipe sets.
+///
+/// \ingroup nv_index_data_subsets
+///
 class IPipe_set_subset :
     public mi::base::Interface_declare<0xea834969,0x1c60,0x4416,0xbd,0x05,0x3a,0x4b,0xbe,0x78,0xef,0x5f,
                                        IDistributed_data_subset>
@@ -120,9 +130,8 @@ public:
     ///
     /// \param[in] vertices     Array of vertices
     /// \param[in] nb_vertices  Number of vertices in the array
-    ///
     /// \return The new pipe that was just added to the subset. The caller takes ownership, but
-    ///         should not store it longer than necessary. It must released before \c finalize() is
+    ///         should not store it longer than necessary. It must be released before \c finalize() is
     ///         called.
     ///
     virtual IPipe_subset_parameters* add_pipe(
@@ -133,7 +142,6 @@ public:
     /// reserved.
     ///
     /// \param[in] property_name  Unique name identifying the property.
-    ///
     /// \return true if property data is available or has been reserved.
     ///
     virtual bool has_property(const char* property_name) const = 0;
@@ -143,7 +151,6 @@ public:
     /// concurrent threads.
     ///
     /// \param[in] property_name  Unique name identifying the property.
-    ///
     /// \return true if reservation succeeded, or false if the property was already reserved.
     ///
     virtual bool reserve_property(const char* property_name) const = 0;
@@ -159,7 +166,6 @@ public:
     /// \param[in] nb_property_values  Number of values in the array.
     /// \param[in] coordinate_first    Coordinate of the first property value.
     /// \param[in] coordinate_last     Coordinate of the last property value.
-    ///
     /// \return true on success, or false if one of the arguments is invalid.
     ///
     virtual bool set_property_data(
@@ -168,8 +174,64 @@ public:
         mi::Size           nb_property_values,
         mi::Float32        coordinate_first = 0.f,
         mi::Float32        coordinate_last = 0.f) = 0;
+
+    /// Access the device pipe set subset for direct access to device resources.
+    ///
+    /// \return     Device subset interface for direct access of device resources.
+    ///             May return \c NULL if data is not on a GPU device.
+    /// 
+    virtual IPipe_set_subset_device* get_device_subset() const = 0;
+
 };
 
-}} // namespace
 
-#endif // NVIDIA_INDEX_ICORNER_POINT_GRID_SUBSET_H
+/// Distributed data storage class for pipe set subsets hosted on a GPU device.
+///
+/// Pipe_set data on GPU device can be completely redefined through this interface. 
+/// Note that data changes through this interface might invalidate pipe set data of the associated host \c IPipe_set_subset.
+///
+/// \ingroup nv_index_data_subsets
+///
+class IPipe_set_subset_device :
+    public mi::base::Interface_declare<0x5b91ea8e,0xda21,0x4134,0x87,0x4,0x6b,0xf2,0xd3,0xae,0x66,0xf7,
+                                       IDistributed_data_subset_device>
+{
+public:
+    /// List of supported color data formats.
+    enum Color_format 
+    {
+        Color_rgb_f32,  ///< 3 floats RGB
+        Color_rgba_f32  ///< 4 floats RGBA
+    };
+
+    /// Load a complete pipe set. This redefines all pipe set data. Property data will be invalidated.
+    ///
+    /// \param[in] data_is_on_device    Set true if the provided data is already on device. 
+    /// \param[in] vertices             Array of vertices (all pipes of pipe set), size: nb_vertices.
+    /// \param[in] nb_vertices          Number of vertices.
+    /// \param[in] nb_pipes             Number of pipes in pipe set.
+    /// \param[in] pipe_indices         Array of pipe vertex indices, size: (nb_pipes + 1), contents: [0, ..., nb_vertices].
+    /// \param[in] default_radius       Default pipe radius, used if no \c radii array is provided.
+    /// \param[in] default_color        Default pipe color, used of no \c colors array is provided.
+    /// \param[in] radii                Array of pipe radii, size: nb_pipes. Optional, can be nullptr.
+    /// \param[in] colors               Array of pipe colors, size: nb_pipes. Optional, can be nullptr.
+    /// \param[in] color_format         Color data format in \c colors array, \see Color_format.
+    /// \return true on succes.
+    ///
+    virtual bool    load_pipe_set(
+        bool                                            data_is_on_device,
+        const mi::math::Vector_struct<mi::Float32, 3>*  vertices,
+        mi::Uint32                                      nb_vertices,
+        mi::Uint32                                      nb_pipes,
+        const mi::Uint32*                               pipe_indices,           // size: nb_pipes + 1
+        mi::Float32                                     default_radius,         // used if no per-pipe radii
+        const mi::math::Color_struct&                   default_color,          // used if no per-pipe colors
+        const mi::Float32*                              radii,                  // size: nb_pipes
+        const void*                                     colors,                 // size: nb_pipes * sizeof(Color_format)
+        Color_format                                    color_format) = 0;
+};
+
+} // namespace index
+} // namespace nv
+
+#endif // NVIDIA_INDEX_IPIPE_SET_SUBSET_H

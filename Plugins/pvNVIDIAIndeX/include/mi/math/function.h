@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/function.h
 /// \brief Math functions and function templates on simple types or generic container and vector
@@ -9,6 +9,8 @@
 
 #ifndef MI_MATH_FUNCTION_H
 #define MI_MATH_FUNCTION_H
+
+#include <cmath>
 
 #include <mi/base/assert.h>
 #include <mi/base/types.h>
@@ -368,8 +370,8 @@ inline Float32 fast_sqrt( Float32 i)
 /// A fast implementation of exp for floats.
 inline Float32 fast_exp( Float32 x)
 {
-    const Float32 EXP_C   = 8388608.0f; // 2^23
-    const Float32 LOG_2_E = 1.4426950408889634073599246810019f; // 1 / log(2)
+    constexpr Float32 EXP_C   = 8388608.0f; // 2^23
+    constexpr Float32 LOG_2_E = 1.4426950408889634073599246810019f; // 1 / log(2)
 
     x *= LOG_2_E;
     Float32 y = x - std::floor(x);
@@ -381,7 +383,7 @@ inline Float32 fast_exp( Float32 x)
 /// A fast implementation of pow(2,x) for floats.
 inline Float32 fast_pow2( Float32 x)
 {
-    const Float32 EXP_C = 8388608.0f; // 2^23
+    constexpr Float32 EXP_C = 8388608.0f; // 2^23
 
     Float32 y = x - std::floor(x);
     y = (y - y*y) * 0.33971f;
@@ -392,7 +394,7 @@ inline Float32 fast_pow2( Float32 x)
 /// A fast implementation of log2(x) for floats.
 inline Float32 fast_log2( Float32 i)
 {
-    const Float32 LOG_C = 0.00000011920928955078125f; // 2^(-23)
+    constexpr Float32 LOG_C = 0.00000011920928955078125f; // 2^(-23)
 
     const Float32 x = static_cast<Float32>( base::binary_cast<int>( i)) * LOG_C - 127.f;
     const Float32 y = x - std::floor(x);
@@ -407,8 +409,8 @@ inline Float32 fast_pow(
     if( b == 0.0f)
         return 0.0f;
 
-    const Float32 LOG_C = 0.00000011920928955078125f; // 2^(-23)
-    const Float32 EXP_C = 8388608.0f; // 2^23
+    constexpr Float32 LOG_C = 0.00000011920928955078125f; // 2^(-23)
+    constexpr Float32 EXP_C = 8388608.0f; // 2^23
 
     const Float32 x  = static_cast<Float32>( base::binary_cast<int>( b)) * LOG_C - 127.f;
     const Float32 y  = x - std::floor(x);
@@ -591,20 +593,13 @@ inline Float64 fmod( Float64 a, Float64 b) { return std::fmod(a,b); }
 /// Returns the positive fractional part of \p s.
 inline Float32 frac( Float32 s)
 {
-    Float32 dummy;
-    if( s >= 0.0f)
-        return std::modf( s, &dummy);
-    else
-        return 1.0f + std::modf( s, &dummy);
+    return s - std::floor(s);
 }
+
 /// Returns the positive fractional part of \p s.
 inline Float64 frac( Float64 s)
 {
-    Float64 dummy;
-    if( s >= 0.0f)
-        return std::modf( s, &dummy);
-    else
-        return 1.0f + std::modf( s, &dummy);
+    return s - std::floor(s);
 }
 
 /// Compares the two given values for equality within the given epsilon.
@@ -706,7 +701,7 @@ inline Float32 log2 MI_PREVENT_MACRO_EXPAND ( Float32 s)
 { return std::log(s) * 1.4426950408889634073599246810019f /* log(2) */; }
 /// Returns the %base 2 logarithm of \p s.
 inline Float64 log2 MI_PREVENT_MACRO_EXPAND ( Float64 s)
-{ return std::log(s) * 1.4426950408889634073599246810019 /* log(2) */; }
+{ return std::log(s) * 1.4426950408889634073599246810019  /* log(2) */; }
 
 /// Returns the integer log2 of \p v.
 inline Sint32 log2_int( const Uint32 v) { return (v != 0) ? 31 - leading_zeros(v) : 0; }
@@ -715,12 +710,12 @@ inline Sint32 log2_int( const Uint32 v) { return (v != 0) ? 31 - leading_zeros(v
 inline Sint32 log2_int( const Uint64 v) { return (v != 0) ? 63 - leading_zeros(v) : 0; }
 
 /// Returns the integer log2 of \p v.
-inline Sint32 log2_int( const Float32 v) { 
-    return (mi::base::binary_cast<Uint32>(v) >> 23) - 127; 
+inline Sint32 log2_int( const Float32 v) {
+    return (mi::base::binary_cast<Uint32>(v) >> 23) - 127;
 }
 
 /// Returns the integer log2 of \p v.
-inline Sint32 log2_int( const Float64 v) { 
+inline Sint32 log2_int( const Float64 v) {
     return static_cast<Sint32>(mi::base::binary_cast<Uint64>(v) >> 52) - 1023;
 }
 
@@ -820,33 +815,7 @@ inline bool sign_bit( Float64 s)
     return (base::binary_cast<Uint64>(s) & (1ULL << 63)) != 0ULL;
 }
 
-#if (__cplusplus < 201103L)
-/// Checks a single-precision floating point number for "not a number".
-///
-/// The methods relies on the IEEE 754 floating-point standard.
-inline bool isnan MI_PREVENT_MACRO_EXPAND (const Float32 x)
-{
-    // interpret as Uint32 value
-    const Uint32 f = base::binary_cast<Uint32>(x);
-
-    // check bit pattern
-    return (f << 1) > 0xFF000000U; // shift sign bit, 8bit exp == 2^8-1, fraction != 0
-}
-
-/// Checks a double-precision floating point number for "not a number".
-///
-/// The methods relies on the IEEE 754 floating-point standard.
-inline bool isnan MI_PREVENT_MACRO_EXPAND (const Float64 x)
-{
-    // interpret as Uint64 value
-    const Uint64 f = base::binary_cast<Uint64>(x);
-
-    return (f << 1) > 0xFFE0000000000000ULL; // shift sign bit, 11bit exp == 2^11-1, fraction != 0
-}
-#else
 using std::isnan;
-#endif
-
 
 #ifndef __CUDA_ARCH__
 inline float __uint_as_float(const unsigned v)
@@ -862,11 +831,11 @@ inline unsigned __float_as_uint(const float v)
 /// The methods relies on the IEEE 754 floating-point standard.
 inline bool isinfinite MI_PREVENT_MACRO_EXPAND (const Float32 x)
 {
-    const Uint32 exponent_mask = 0x7F800000; // 8 bit exponent
-    const Uint32 fraction_mask = 0x7FFFFF;   // 23 bit fraction
+    constexpr Uint32 exponent_mask = 0x7F800000; // 8 bit exponent
+    constexpr Uint32 fraction_mask = 0x7FFFFF;   // 23 bit fraction
 
     // interpret as Uint32 value
-    const Uint32 f = base::binary_cast<Uint32>(x);
+    const auto f = base::binary_cast<Uint32>(x);
 
     // check bit pattern
     return ((f & exponent_mask) == exponent_mask) && // exp == 2^8 - 1
@@ -878,54 +847,18 @@ inline bool isinfinite MI_PREVENT_MACRO_EXPAND (const Float32 x)
 /// The methods relies on the IEEE 754 floating-point standard.
 inline bool isinfinite MI_PREVENT_MACRO_EXPAND (const Float64 x)
 {
-    const Uint64 exponent_mask = 0x7FF0000000000000ULL; // 11 bit exponent
-    const Uint64 fraction_mask = 0xFFFFFFFFFFFFFULL;    // 52 bit fraction
+    constexpr Uint64 exponent_mask = 0x7FF0000000000000ULL; // 11 bit exponent
+    constexpr Uint64 fraction_mask = 0xFFFFFFFFFFFFFULL;    // 52 bit fraction
 
     // interpret as Uint64 value
-    const Uint64 f = base::binary_cast<Uint64>(x);
+    const auto f = base::binary_cast<Uint64>(x);
 
     // check bit pattern
     return ((f & exponent_mask) == exponent_mask) && // exp == 2^11 - 1
            ((f & fraction_mask) == 0);               // fraction == 0
 }
 
-
-#if (__cplusplus < 201103L)
-/// Checks a single-precision floating point number for neither "not a number" nor "infinity".
-///
-/// The methods relies on the IEEE 754 floating-point standard. Note that the result of this
-/// function might differ from negating the result value of #isinfinite() because of the "not a
-/// number" check.
-inline bool isfinite MI_PREVENT_MACRO_EXPAND (const Float32 x)
-{
-    const Uint32 exponent_mask = 0x7F800000; // 8 bit exponent
-
-    // interpret as Uint32 value
-    const Uint32 f = base::binary_cast<Uint32>(x);
-
-    // check exponent bits
-    return ((f & exponent_mask) != exponent_mask); // exp != 2^8 - 1
-}
-
-/// Checks a double-precision floating point number for neither "not a number" nor "infinity".
-///
-/// The methods relies on the IEEE 754 floating-point standard. Note that the result of this
-/// function might differ from negating the result value of #isinfinite() because of the "not a
-/// number" check.
-inline bool isfinite MI_PREVENT_MACRO_EXPAND (const Float64 x)
-{
-    const Uint64 exponent_mask = 0x7FF0000000000000ULL; // 11 bit exponent
-
-    // interpret as Uint64 value
-    const Uint64 f = base::binary_cast<Uint64>(x);
-
-    // check exponent bits
-    return ((f & exponent_mask) != exponent_mask); // exp != 2^11 - 1
-}
-#else
 using std::isfinite;
-#endif
-
 
 /// Returns the sine of \p a. The angle \p a is specified in radians.
 inline Float32 sin( Float32 a) { return std::sin(a); }

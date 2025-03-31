@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief An RTMP server.
@@ -213,20 +213,20 @@ class IConnection : public
 public:
     /// Registers a call event handler for the passed procedure name.
     ///
-    /// \param call_handler      The call event handler for that procedure name. The value \c NULL
-    ///                          removes the installed handler.
-    /// \param procedure_name    The name of the remote call procedure. If not passed or
-    ///                          set to \c NULL this will mean this call event handler will be the
-    ///                          the default handler when no other specific handler was found.
+    /// \param call_handler      The call event handler for that procedure name. The value
+    ///                          \c nullptr removes the installed handler.
+    /// \param procedure_name    The name of the remote call procedure. If not passed or set to
+    ///                          \c nullptr this will mean this call event handler will be the the
+    ///                          default handler when no other specific handler was found.
     virtual void register_remote_call_handler(
         ICall_event_handler* call_handler,
-        const char* procedure_name = 0) = 0;
+        const char* procedure_name = nullptr) = 0;
 
     /// Registers a stream event handler.
     ///
     /// The stream event handler will get called when streams get created or removed.
     ///
-    /// \param stream_event_handler   The stream event handler. The value \c NULL
+    /// \param stream_event_handler   The stream event handler. The value \c nullptr
     ///                               removes the installed handler.
     virtual void register_stream_event_handler( IStream_event_handler* stream_event_handler) = 0;
 
@@ -257,7 +257,7 @@ public:
     /// Returns a property from the connection.
     ///
     /// \param key     The key to obtain the value for.
-    /// \return        The value of the property or \c NULL if it does not exist.
+    /// \return        The value of the property or \c nullptr if it does not exist.
     virtual const char* get_property( const char* key) const = 0;
 };
 
@@ -439,25 +439,25 @@ public:
 
     /// Registers the render event handler.
     ///
-    /// \param render_event_handler   The render event handler to install. The value \c NULL
+    /// \param render_event_handler   The render event handler to install. The value \c nullptr
     ///                               removes the installed handler.
     virtual void register_render_event_handler( IRender_event_handler* render_event_handler) = 0;
 
     /// Registers the frame event handler.
     ///
-    /// \param frame_event_handler    The frame event handler to install. The value \c NULL
+    /// \param frame_event_handler    The frame event handler to install. The value \c nullptr
     ///                               removes the installed handler.
     virtual void register_frame_event_handler( IFrame_event_handler* frame_event_handler) = 0;
 
     /// Registers the play event handler.
     ///
-    /// \param play_event_handler     The play event handler to install. The value \c NULL
+    /// \param play_event_handler     The play event handler to install. The value \c nullptr
     ///                               removes the installed handler.
     virtual void register_play_event_handler( IPlay_event_handler* play_event_handler) = 0;
 
     /// Registers the pause event handler.
     ///
-    /// \param pause_event_handler    The pause event handler to install. The value \c NULL
+    /// \param pause_event_handler    The pause event handler to install. The value \c nullptr
     ///                               removes the installed handler.
     virtual void register_pause_event_handler( IPause_event_handler* pause_event_handler) = 0;
 
@@ -466,7 +466,7 @@ public:
     /// This is the name passed in as an argument by the RTMP player in the RTMP protocol play
     /// message.
     ///
-    /// \return   The name of this stream or \c NULL if not applicable.
+    /// \return   The name of this stream or \c nullptr if not applicable.
     virtual const char* get_stream_name() const = 0;
 
     /// Sets a property on the stream.
@@ -490,7 +490,7 @@ public:
     /// Returns a property from the stream.
     ///
     /// \param key     The key to obtain the value for.
-    /// \return        The value of the property or \c NULL if it does not exist.
+    /// \return        The value of the property or \c nullptr if it does not exist.
     virtual const char* get_property( const char* key) const = 0;
 
     /// Returns the connection for this stream.

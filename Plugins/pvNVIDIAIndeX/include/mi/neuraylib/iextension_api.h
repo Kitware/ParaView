@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component that allows extensions of the \neurayApiName.
@@ -51,7 +51,7 @@ public:
     ///                     -  0: Success.
     ///                     - -1: There is already a class or structure declaration registered
     ///                           under the name \p class_name or UUID \p uuid.
-    ///                     - -2: Invalid parameters (\c NULL pointer).
+    ///                     - -2: Invalid parameters (\c nullptr).
     ///                     - -3: The method may not be called at that point of time.
     ///                     - -4: Invalid class name.
     virtual Sint32 register_class(
@@ -75,7 +75,7 @@ public:
     ///                     -  0: Success.
     ///                     - -1: There is already a class or structure declaration registered
     ///                           under the name \p class_name or UUID \p T::IID().
-    ///                     - -2: Invalid parameters (\c NULL pointer).
+    ///                     - -2: Invalid parameters (\c nullptr).
     ///                     - -3: The method may not be called at that point of time.
     ///                     - -4: Invalid class name.
     template <class T>
@@ -97,7 +97,7 @@ public:
     ///                     -  0: Success.
     ///                     - -1: There is no class declaration registered under the name
     ///                           \p class_name and/or UUID \p uuid.
-    ///                     - -2: Invalid parameters (\c NULL pointer).
+    ///                     - -2: Invalid parameters (\c nullptr).
     ///                     - -3: The method may not be called at that point of time.
     ///                     - -4: Invalid class name.
     virtual Sint32 unregister_class( const char* class_name, base::Uuid uuid) = 0;
@@ -116,7 +116,7 @@ public:
     ///                     -  0: Success.
     ///                     - -1: There is no class declaration registered under the name
     ///                           \p class_name and/or UUID \p uuid.
-    ///                     - -2: Invalid parameters (\c NULL pointer).
+    ///                     - -2: Invalid parameters (\c nullptr).
     ///                     - -3: The method may not be called at that point of time.
     ///                     - -4: Invalid class name.
     template <class T>
@@ -137,7 +137,7 @@ public:
     /// \param importer     The new importer to register.
     /// \return
     ///                     -  0: Success.
-    ///                     - -1: Invalid parameters (\c NULL pointer).
+    ///                     - -1: Invalid parameters (\c nullptr).
     ///                     - -2: The method may not be called at that point of time.
     virtual Sint32 register_importer( IImporter* importer) = 0;
 
@@ -149,7 +149,7 @@ public:
     /// \param exporter     The new exporter to register.
     /// \return
     ///                     -  0: Success.
-    ///                     - -1: Invalid parameters (\c NULL pointer).
+    ///                     - -1: Invalid parameters (\c nullptr).
     ///                     - -2: The method may not be called at that point of time.
     virtual Sint32 register_exporter( IExporter* exporter) = 0;
 
@@ -161,7 +161,7 @@ public:
     /// \param importer     The importer to unregister.
     /// \return
     ///                     -  0: Success.
-    ///                     - -1: Invalid parameters (\c NULL pointer).
+    ///                     - -1: Invalid parameters (\c nullptr).
     ///                     - -2: The method may not be called at that point of time.
     ///                     - -3: This importer is not registered.
     virtual Sint32 unregister_importer( IImporter* importer) = 0;
@@ -174,7 +174,7 @@ public:
     /// \param exporter     The exporter to unregister.
     /// \return
     ///                     -  0: Success.
-    ///                     - -1: Invalid parameters (\c NULL pointer).
+    ///                     - -1: Invalid parameters (\c nullptr).
     ///                     - -2: The method may not be called at that point of time.
     ///                     - -3: This exporter is not registered.
     virtual Sint32 unregister_exporter( IExporter* exporter) = 0;
@@ -200,7 +200,7 @@ public:
     ///                         -  0: Success.
     ///                         - -1: There is already a class, structure, enum
     ///                               declaration registered under the name \p structure_name.
-    ///                         - -2: Invalid parameters (\c NULL pointer).
+    ///                         - -2: Invalid parameters (\c nullptr).
     ///                         - -4: Invalid name for a structure declaration.
     ///                         - -5: A registration under the name \p structure_name would cause an
     ///                               infinite cycle of nested structure types.
@@ -214,7 +214,7 @@ public:
     ///                         -  0: Success.
     ///                         - -1: There is no structure declaration registered under the name
     ///                               \p structure_name.
-    ///                         - -2: Invalid parameters (\c NULL pointer).
+    ///                         - -2: Invalid parameters (\c nullptr).
     ///                         - -4: Invalid name for a structure declaration.
     ///                         - -6: The structure declaration is predefined and cannot be
     ///                               unregistered.
@@ -237,7 +237,7 @@ public:
     ///                         -  0: Success.
     ///                         - -1: There is already a class, structure, or enum
     ///                               declaration registered under the name \p enum_name.
-    ///                         - -2: Invalid parameters (\c NULL pointer).
+    ///                         - -2: Invalid parameters (\c nullptr).
     ///                         - -4: Invalid name for an enum declaration.
     ///                         - -6: The enum declaration is empty and therefore invalid.
     virtual Sint32 register_enum_decl(
@@ -250,7 +250,7 @@ public:
     ///                         -  0: Success.
     ///                         - -1: There is no enum declaration registered under the name
     ///                               \p enum_name.
-    ///                         - -2: Invalid parameters (\c NULL pointer).
+    ///                         - -2: Invalid parameters (\c nullptr).
     ///                         - -4: Invalid name for an enum declaration.
     virtual Sint32 unregister_enum_decl( const char* enum_name) = 0;
 

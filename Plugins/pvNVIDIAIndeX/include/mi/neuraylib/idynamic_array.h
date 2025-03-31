@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Dynamic array type.
@@ -67,7 +67,7 @@ public:
     /// \return
     ///                -  0: Success.
     ///                - -1: \p index is out of bounds.
-    ///                - -2: \p element is \c NULL or has the wrong type.
+    ///                - -2: \p element is \c nullptr or has the wrong type.
     virtual Sint32 insert( Size index, base::IInterface* element) = 0;
 
     /// Removes the element stored at the given index.
@@ -93,7 +93,7 @@ public:
     ///
     /// \return
     ///                -  0: Success.
-    ///                - -2: \p element is \c NULL or has the wrong type.
+    ///                - -2: \p element is \c nullptr or has the wrong type.
     virtual Sint32 push_back( base::IInterface* element) = 0;
 
     /// Removes the last element from the array and decreases the array size by one.
@@ -109,12 +109,12 @@ public:
 
     /// Returns the last element of the array.
     ///
-    /// \return        The last element, or \c NULL if the array is empty.
+    /// \return        The last element, or \c nullptr if the array is empty.
     virtual const base::IInterface* back() const = 0;
 
     /// Returns the last element of the array.
     ///
-    /// \return        The last element, or \c NULL if the array is empty.
+    /// \return        The last element, or \c nullptr if the array is empty.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
     /// convenience. It eliminates the need to call
@@ -134,12 +134,12 @@ public:
 
     /// Returns the last element of the array.
     ///
-    /// \return        The last element, or \c NULL if the array is empty.
+    /// \return        The last element, or \c nullptr if the array is empty.
     virtual base::IInterface* back() = 0;
 
     /// Returns the last element of the array.
     ///
-    /// \return        The last element, or \c NULL if the array is empty.
+    /// \return        The last element, or \c nullptr if the array is empty.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
     /// convenience. It eliminates the need to call
@@ -159,12 +159,12 @@ public:
 
     /// Returns the first element of the array.
     ///
-    /// \return        The first element, or \c NULL if the array is empty.
+    /// \return        The first element, or \c nullptr if the array is empty.
     virtual const base::IInterface* front() const = 0;
 
     /// Returns the first element of the array.
     ///
-    /// \return        The first element, or \c NULL if the array is empty.
+    /// \return        The first element, or \c nullptr if the array is empty.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
     /// convenience. It eliminates the need to call
@@ -184,12 +184,12 @@ public:
 
     /// Returns the first element of the array.
     ///
-    /// \return        The first element, or \c NULL if the array is empty.
+    /// \return        The first element, or \c nullptr if the array is empty.
     virtual base::IInterface* front() = 0;
 
     /// Returns the first element of the array.
     ///
-    /// \return        The first element, or \c NULL if the array is empty.
+    /// \return        The first element, or \c nullptr if the array is empty.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
     /// convenience. It eliminates the need to call

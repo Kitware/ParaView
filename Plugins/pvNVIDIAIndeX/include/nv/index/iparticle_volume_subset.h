@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of particle volume datasets.
@@ -27,44 +27,8 @@ class IParticle_volume_subset_device;
 ///
 class IParticle_volume_attribute_set_descriptor :
     public mi::base::Interface_declare<0x27f160e3,0x1412,0x4264,0xa2,0x5b,0x89,0x3d,0xe6,0xaa,0xb3,0x37,
-                                       IDistributed_data_attribute_set_descriptor>
-{
-public:
-    /// Particle volume attribute parameters.
-    ///
-    /// This structure defines the basic parameters of a single attribute associated with the volume dataset.
-    ///
-    struct Attribute_parameters
-    {
-        Distributed_data_attribute_format   format;     ///< Attribute format. See \c Distributed_data_attribute_format.
-    };
-
-    /// Configure the parameters for an attribute for a particle volume subset.
-    ///
-    /// \param[in]  attrib_index    The storage index of the attribute.
-    /// \param[in]  attrib_params   The attribute parameters for the given index.
-    ///
-    /// \return                     True when the attribute according to the passed index could be set up, false otherwise.
-    ///
-    virtual bool    setup_attribute(
-                        mi::Uint32                  attrib_index,
-                        const Attribute_parameters& attrib_params) = 0;
-
-    /// Get the attribute parameters of a currently valid attribute for a given index.
-    ///
-    /// \param[in]  attrib_index    The storage index of the attribute.
-    /// \param[out] attrib_params   The attribute parameters for the given index.
-    ///
-    /// \return                     True when the attribute according to the passed index could be found, false otherwise.
-    ///
-    virtual bool    get_attribute_parameters(
-                        mi::Uint32                  attrib_index,
-                        Attribute_parameters&       attrib_params) const = 0;
-
-    /// Get maximum number of attributes.
-    virtual mi::Uint32  get_attribute_count_limit() const = 0;
-
-};
+                                       ISimple_attribute_set_descriptor>
+{};
 
 /// Distributed data storage class for particle volume subsets.
 ///

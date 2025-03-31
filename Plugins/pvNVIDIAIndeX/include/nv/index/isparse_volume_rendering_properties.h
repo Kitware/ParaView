@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute controlling sparse volume rendering properties.
@@ -94,25 +94,6 @@ public:
     virtual void                        set_lod_pixel_threshold(mi::Float32 pixel_threshold) = 0;
     /// Returns the currently set scalar pixel threshold.
     virtual mi::Float32                 get_lod_pixel_threshold() const = 0;
-
-#if 0 // EXTENSION LOD active level range control
-    /// Set the active LOD-level range to be used by NVIDIA IndeX.
-    ///
-    /// The active LOD-level range limits the data NVIDIA IndeX is requesting to be written
-    /// to this LOD-texture instance and accesses during rendering.
-    ///
-    /// \param[in]  lod_level_range     The LOD-range to be used by NVIDIA IndeX.
-    ///
-    virtual void                            set_active_LOD_level_range(
-                                                const mi::math::Vector_struct<mi::Uint32, 2>& lod_level_range) = 0;
-
-    /// Returns the currently active LOD-level range to be used by NVIDIA IndeX.
-    ///
-    /// \returns    The currently active LOD-level range.
-    ///
-    virtual mi::math::Vector_struct<mi::Uint32, 2>  get_active_LOD_level_range() const = 0;
-#endif
-
 
     /// Enable or disable pre-integrated volume rendering for a sparse volume scene element (\c ISparse_volume_scene_element).
     /// Per default this is disabled.

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Asynchronous, distributed data generation techniques.
@@ -73,7 +73,7 @@ public:
     /// 
     /// Some NVIDIA IndeX data-access interfaces exposed by the particular \c IDistributed_compute_destination_buffer
     /// interfaces allow manipulation of GPU-located data directly (e.g., \c ISparse_volume_subset). This function
-    /// communicates to IndeX if the device data is accessed or manipulated in order to change the internal
+    /// communicates to IndeX whether the device data is accessed or manipulated in order to change the internal
     /// data residency scheduling during the NVIDIA IndeX rendering operation when the compute task is invoked.
     /// 
     /// \returns    Returns \c true if the compute technique will operate on the potentially exposed device data directly.

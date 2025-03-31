@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component to interact with the cache manager.
@@ -36,7 +36,7 @@ public:
     ///                                 -  0: Success.
     ///                                 - -1: The cache manager is already running.
     ///                                 - -2: Invalid parameters (\p listen_address or \p directory
-    ///                                       is \c NULL).
+    ///                                       is \c nullptr).
     ///                                 - -3: Failed to create directory for the disk cache.
     ///                                 - -4: Directory for the disk cache is not writable.
     ///                                 - -5: Failed to open the database.
@@ -57,25 +57,26 @@ public:
 
     /// Sets the address and authentication information of the HTTP server.
     ///
-    /// \param address                  The address on which the HTTP server listens, or \c NULL to
-    ///                                 disable authentication.
+    /// \param address                  The address on which the HTTP server listens, or \c nullptr
+    ///                                 to disable authentication.
     /// \param user_name                The user name for authentication with the HTTP server, or
-    ////                                \c NULL to disable authentication.
+    ///                                 \c nullptr to disable authentication.
     /// \param password                 The password for authentication with the HTTP server, or
-    ///                                 \c NULL to disable authentication.
-    /// \return                         -  0: Success.
+    ///                                 \c nullptr to disable authentication.
+    /// \return
+    ///                                 -  0: Success.
     ///                                 - -1: The cache manager is already running.
     ///                                 - -2: Invalid address.
     virtual Sint32 set_http_address(
         const char* address, const char* user_name, const char* password) = 0;
 
-    /// Returns the address of the HTTP server, or \c NULL if none is set.
+    /// Returns the address of the HTTP server, or \c nullptr if none is set.
     virtual const IString* get_http_address() const = 0;
 
-    /// Returns the user name for the HTTP server, or \c NULL if none is set.
+    /// Returns the user name for the HTTP server, or \c nullptr if none is set.
     virtual const IString* get_http_user_name() const = 0;
 
-    /// Returns the password for the HTTP server, or \c NULL if none is set.
+    /// Returns the password for the HTTP server, or \c nullptr if none is set.
     virtual const IString* get_http_password() const = 0;
 
     /// Sets the multicast address of the cache manager.
@@ -85,14 +86,15 @@ public:
     /// \see #mi::neuraylib::INetwork_configuration::set_multicast_address() for details about
     /// multicast addresses.
     ///
-    /// \param address                  The multicast address to be used, or \c NULL to disable
+    /// \param address                  The multicast address to be used, or \c nullptr to disable
     ///                                 clustering.
-    /// \return                         -  0: Success.
+    /// \return
+    ///                                 -  0: Success.
     ///                                 - -1: The cache manager is already running.
     ///                                 - -2: Invalid address.
     virtual Sint32 set_multicast_address( const char* address) = 0;
 
-    /// Returns the multicast address, or \c NULL if none is set.
+    /// Returns the multicast address, or \c nullptr if none is set.
     virtual const IString* get_multicast_address() const = 0;
 
     /// Sets the cluster interface used by the cache manager.
@@ -100,20 +102,21 @@ public:
     /// \see #mi::neuraylib::INetwork_configuration::set_cluster_interface() for details about
     /// cluster interfaces.
     ///
-    /// \param address                  The cluster interface to be used, or \c NULL to disable
+    /// \param address                  The cluster interface to be used, or \c nullptr to disable
     ///                                 a previous setting.
-    /// \return                         -  0: Success.
+    /// \return
+    ///                                 -  0: Success.
     ///                                 - -1: The cache manager is already running.
     ///                                 - -2: Invalid address.
     virtual Sint32 set_cluster_interface( const char* address) = 0;
 
-    /// Returns the cluster interface, or \c NULL if none is set.
+    /// Returns the cluster interface, or \c nullptr if none is set.
     virtual const IString* get_cluster_interface() const = 0;
 
-    /// Enables or disables the usage of RDMA InfiniBand. 
-    /// 
+    /// Enables or disables the usage of RDMA InfiniBand.
+    ///
     /// The default value is \c false (disabled).
-    /// 
+    ///
     /// \see #get_use_rdma()
     ///
     /// \param use_rdma   Indicates whether RDMA InfiniBand should be used (if it is available).
@@ -140,7 +143,8 @@ public:
     ///
     /// \see #get_rdma_interface()
     ///
-    /// \return                        The RDMA interface to be used, or \c NULL if none is found.
+    /// \return                        The RDMA interface to be used, or \c nullptr if none is
+    ///                                found.
     virtual const IString* get_rdma_interface() const = 0;
 
     /// Sets the address for the administrative HTTP server.
@@ -148,14 +152,15 @@ public:
     /// \see #mi::neuraylib::IGeneral_configuration::set_admin_http_address() for details about
     /// administrative HTTP servers.
     ///
-    /// \param address                  The address to be used, or \c NULL to disable the
+    /// \param address                  The address to be used, or \c nullptr to disable the
     ///                                 administrative HTTP server.
-    /// \return                         -  0: Success.
+    /// \return
+    ///                                 -  0: Success.
     ///                                 - -1: The cache manager is already running.
     ///                                 - -2: Invalid address.
     virtual Sint32 set_admin_http_address( const char* address) = 0;
 
-    /// Returns the address of the admin HTTP server, or \c NULL if none is set.
+    /// Returns the address of the admin HTTP server, or \c nullptr if none is set.
     virtual const IString* get_admin_http_address() const = 0;
 
     /// Sets the memory limits for the garbage collection.

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/iinterface.h
 /// \brief The basic extensible interface
@@ -53,7 +53,7 @@ class IInterface;
     to the #mi::base::IInterface::get_interface(const Uuid&) methods, introduced below, and this is
     the mode in which it is normally used.
 
-    \see 
+    \see
       - #mi::base::Handle for a smart-pointer class automating the reference counting
       - #mi::base::Interface_declare for a helper class for deriving new interfaces
       - #mi::base::Interface_implement for a helper class for implementing interfaces
@@ -72,7 +72,7 @@ class IInterface;
     \par
       If you are not sure whether \c iptr refers to an object supporting an #mi::base::IAllocator
       interface you must check that the result of the
-      #mi::base::IInterface::get_interface(const Uuid&) method call is not \c NULL.
+      #mi::base::IInterface::get_interface(const Uuid&) method call is not \c nullptr.
 
     \code
         mi::base::IInterface* iptr = ...;
@@ -84,10 +84,10 @@ class IInterface;
             allocator->release();
         }
     \endcode
-   
-    Alternatively, you can use the more convenient and type-safe template version 
+
+    Alternatively, you can use the more convenient and type-safe template version
     that eliminates the need for the subsequent \c static_cast.
-   
+
     \code
         mi::base::IInterface* iptr = ...;
         mi::base::IAllocator* allocator = iptr->get_interface<mi::base::IAllocator>();
@@ -109,7 +109,7 @@ public:
     /// type has a default constructor and the constructed value represents the universally unique
     /// identifier (UUID) for this interface. The local type is readily convertible to a
     /// #mi::base::Uuid.
-    typedef Uuid_t<0,0,0,0,0,0,0,0,0,0,0> IID;
+    using IID = Uuid_t<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>;
 
     /// Compares the interface ID \p iid against the interface ID of this interface.
     ///
@@ -139,25 +139,25 @@ public:
     /// Acquires a const interface from another.
     ///
     /// If this interface supports the interface with the passed \p interface_id, then the method
-    /// returns a non-\c NULL \c const #mi::base::IInterface* that can be casted via \c static_cast
-    /// to an interface pointer of the interface type corresponding to the passed \p interface_id.
-    /// Otherwise, the method returns \c NULL.
+    /// returns a non-\c nullptr \c const #mi::base::IInterface* that can be casted via
+    /// \c static_cast to an interface pointer of the interface type corresponding to the passed
+    /// \p interface_id. Otherwise, the method returns \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
-    /// interface pointer, whose reference count has been retained once. The caller must release the
-    /// returned interface pointer at the end to prevent a memory leak.
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
+    /// interface pointer, whose reference count has been retained once. The caller must release
+    /// the returned interface pointer at the end to prevent a memory leak.
     ///
     /// \param interface_id   Interface ID of the interface to acquire.
     virtual const IInterface* get_interface( const Uuid& interface_id ) const = 0;
 
     /// Acquires a const interface from another.
     ///
-    /// If this interface supports the interface \c T, then the method returns a non-\c NULL
-    /// \c const pointer to the interface \c T. Otherwise, the method returns \c NULL.
+    /// If this interface supports the interface \c T, then the method returns a non-\c nullptr
+    /// \c const pointer to the interface \c T. Otherwise, the method returns \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
-    /// interface pointer, whose reference count has been retained once. The caller must release the
-    /// returned interface pointer at the end to prevent a memory leak.
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
+    /// interface pointer, whose reference count has been retained once. The caller must release
+    /// the returned interface pointer at the end to prevent a memory leak.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
     /// convenience. It eliminates the need to apply \c static_cast to the returned pointer, since
@@ -174,25 +174,25 @@ public:
     /// Acquires a mutable interface from another.
     ///
     /// If this interface supports the interface with the passed \p interface_id, then the methods
-    /// returns a non-\c NULL #mi::base::IInterface* that can be casted via \c static_cast to an
+    /// returns a non-\c nullptr #mi::base::IInterface* that can be casted via \c static_cast to an
     /// interface pointer of the interface type corresponding to the passed \p interface_id.
-    /// Otherwise, the method returns \c NULL.
+    /// Otherwise, the method returns \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
-    /// interface pointer, whose reference count has been retained once. The caller must release the
-    /// returned interface pointer at the end to prevent a memory leak.
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
+    /// interface pointer, whose reference count has been retained once. The caller must release
+    /// the returned interface pointer at the end to prevent a memory leak.
     ///
     /// \param interface_id   Interface ID of the interface to acquire.
     virtual IInterface* get_interface( const Uuid& interface_id ) = 0;
 
     /// Acquires a mutable interface from another.
     ///
-    /// If this interface supports the interface \c T, then the method returns a non-\c NULL pointer
-    /// to the interface \c T. Otherwise, the method returns \c NULL.
+    /// If this interface supports the interface \c T, then the method returns a non-\c nullptr
+    /// pointer to the interface \c T. Otherwise, the method returns \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
-    /// interface pointer, whose reference count has been retained once. The caller must release the
-    /// returned interface pointer at the end to prevent a memory leak.
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
+    /// interface pointer, whose reference count has been retained once. The caller must release
+    /// the returned interface pointer at the end to prevent a memory leak.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
     /// convenience. It eliminates the need to apply \c static_cast to the returned pointer, since
@@ -224,7 +224,7 @@ protected:
             iinterface->retain();
             return iinterface;
         }
-        return 0;
+        return nullptr;
     }
 
     // Acquires a mutable interface.
@@ -241,7 +241,7 @@ protected:
             iinterface->retain();
             return iinterface;
         }
-        return 0;
+        return nullptr;
     }
 
 };

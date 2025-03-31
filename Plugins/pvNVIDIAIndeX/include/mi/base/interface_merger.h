@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/interface_merger.h
 /// \brief Mixin class template to merge an interface with an implementation.
@@ -23,9 +23,9 @@ namespace base {
 ///
 /// Note that this mixin class derives from an implementation and an interface, in contrast to
 /// #mi::base::Interface_implement_2, which derives from two interfaces. Basically,
-/// \c %Interface_merger<Interface_implement<I1>,I2> is equivalent to \c Interface_implement<I1,I2>.
-/// The benefit of this mixin class is that you are not bound to use \c %Interface_implement, any
-/// valid implementation of an interface will do.
+/// \c %Interface_merger<Interface_implement<I1>,I2> is equivalent to
+/// \c Interface_implement_2<I1,I2>. The benefit of this mixin class is that you are not bound to
+/// use \c %Interface_implement, any valid implementation of an interface will do.
 ///
 /// The template parameters representing the base classes are called MAJOR and MINOR. Note that
 /// the derivation is not symmetric:
@@ -57,16 +57,23 @@ class Interface_merger
 {
 public:
     /// Typedef for the MAJOR %base class
-    typedef MAJOR MAJOR_BASE;
-    
+    using MAJOR_BASE = MAJOR;
+
     /// Typedef for the MINOR %base class
-    typedef MINOR MINOR_BASE;
+    using MINOR_BASE = MINOR;
+
+    /// Typedef for this type
+    using Self = Interface_merger<MAJOR, MINOR>;
+
+    /// Make MAJOR's constructors available
+    using MAJOR::MAJOR;
 
     /// Reimplements #mi::base::IInterface::compare_iid().
     ///
     /// Forwards the call to the MAJOR %base class, and then, in case of failure, to the
     /// MINOR %base class.
-    static bool compare_iid( const Uuid& iid) {
+    static bool compare_iid( const Uuid& iid)
+    {
         if( MAJOR::compare_iid( iid))
             return true;
         return MINOR::compare_iid( iid);
@@ -82,7 +89,8 @@ public:
     ///
     /// The implementation is identical, but needed for visibility reasons.
     template <class T>
-    const T* get_interface() const {
+    const T* get_interface() const
+    {
         return static_cast<const T*>( get_interface( typename T::IID()));
     }
 
@@ -96,30 +104,25 @@ public:
     ///
     /// The implementation is identical, but needed for visibility reasons.
     template <class T>
-    T* get_interface() {
+    T* get_interface()
+    {
         return static_cast<T*>( get_interface( typename T::IID()));
     }
 
     /// Reimplements #mi::base::IInterface::get_iid().
     ///
     /// Forwards the call to the MAJOR %base class.
-    Uuid get_iid() const {
-        return MAJOR::get_iid();
-    }
+    Uuid get_iid() const { return MAJOR::get_iid(); }
 
     /// Reimplements #mi::base::IInterface::retain().
     ///
     /// Forwards the call to the MAJOR %base class.
-    mi::Uint32 retain() const {
-        return MAJOR::retain();
-    }
+    mi::Uint32 retain() const { return MAJOR::retain(); }
 
     /// Reimplements #mi::base::IInterface::release().
     ///
     /// Forwards the call to the MAJOR %base class.
-    mi::Uint32 release() const {
-        return MAJOR::release();
-    }
+    mi::Uint32 release() const { return MAJOR::release(); }
 
     /// Returns a pointer to the MAJOR %base class.
     ///
@@ -131,9 +134,7 @@ public:
     ///
     /// \note The name \c cast_to_major() of this method emphasizes that it behaves similar to a
     ///       static cast, in particular, it does not increase the reference count.
-    const MAJOR* cast_to_major() const {
-        return static_cast<const MAJOR*>( this);
-    }
+    const MAJOR* cast_to_major() const { return static_cast<const MAJOR*>( this); }
 
     /// Returns a pointer to the MAJOR %base class.
     ///
@@ -145,9 +146,7 @@ public:
     ///
     /// \note The name \c cast_to_major() of this method emphasizes that it behaves similar to a
     ///       static cast, in particular, it does not increase the reference count.
-    MAJOR* cast_to_major() {
-        return static_cast<MAJOR*>( this);
-    }
+    MAJOR* cast_to_major() { return static_cast<MAJOR*>( this); }
 };
 
 template <typename MAJOR, typename MINOR>

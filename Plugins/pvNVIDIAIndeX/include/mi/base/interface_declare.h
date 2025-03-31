@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/interface_declare.h
 /// \brief Mixin class template for deriving new interface declarations
@@ -25,10 +25,10 @@ class IInterface;
 ///
 /// #mi::base::Interface_declare is a mixin class template that allows you to derive
 /// new interface classes easily. It provides you with implementations for the interface ID
-/// handling and support for the #mi::base::IInterface::get_interface method used 
-/// by the corresponding mixin class template #mi::base::Interface_implement. 
+/// handling and support for the #mi::base::IInterface::get_interface method used
+/// by the corresponding mixin class template #mi::base::Interface_implement.
 ///
-/// It derives from the interface \c I, which is by default #mi::base::IInterface. 
+/// It derives from the interface \c I, which is by default #mi::base::IInterface.
 /// Each interface needs an interface ID (represented as a universally unique identifier
 /// (UUID)), which is defined here as 11 template parameter constants.
 ///
@@ -43,15 +43,15 @@ class Interface_declare : public I
 {
 public:
     /// Own type.
-    typedef Interface_declare<id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11,I> Self;
+    using Self = Interface_declare<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>;
 
     /// Declares the interface ID (IID) of this interface.
-    typedef Uuid_t<id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11> IID;
+    using IID = Uuid_t<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11>;
 
     /// Compares the interface ID \p iid against the interface ID of this interface and of its
     /// ancestors.
     ///
-    /// \return \c true if \p iid == \c IID() or is equal to one of the interface IDs of 
+    /// \return \c true if \p iid == \c IID() or is equal to one of the interface IDs of
     /// its ancestors, and \c false otherwise.
     static bool compare_iid( const Uuid& iid) {
         if( iid == IID())

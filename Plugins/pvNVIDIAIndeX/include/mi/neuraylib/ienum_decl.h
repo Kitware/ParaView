@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief enum declarations
@@ -41,7 +41,7 @@ public:
     /// \param value       The value of the new enumerator.
     /// \return
     ///                    -  0: Success.
-    ///                    - -1: Invalid parameters (\c NULL pointer).
+    ///                    - -1: Invalid parameters (\c nullptr).
     ///                    - -2: There is already an enumerator with name \p name.
     virtual Sint32 add_enumerator( const char* name, Sint32 value) = 0;
 
@@ -50,7 +50,7 @@ public:
     /// \param name        The name of the enumerator to remove.
     /// \return
     ///                    -  0: Success.
-    ///                    - -1: Invalid parameters (\c NULL pointer).
+    ///                    - -1: Invalid parameters (\c nullptr).
     ///                    - -2: There is no enumerator with name \p name.
     virtual Sint32 remove_enumerator( const char* name) = 0;
 
@@ -60,7 +60,7 @@ public:
     /// Returns the name of an enumerator.
     ///
     /// \param index   The index of the requested enumerator.
-    /// \return        The name of that enumerator, or \c NULL if \p index is out of bounds.
+    /// \return        The name of that enumerator, or \c nullptr if \p index is out of bounds.
     virtual const char* get_name( Size index) const = 0;
 
     /// Returns the value of an enumerator.
@@ -96,7 +96,7 @@ public:
     /// any way. Use the methods on this interface to obtain information about the type itself.
     ///
     /// \return        The type name under which this enum declaration was registered, or
-    ///                \c NULL in case of failure.
+    ///                \c nullptr in case of failure.
     virtual const char* get_enum_type_name() const = 0;
 };
 

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Node manager API
@@ -8,6 +8,7 @@
 #define MI_NEURAYLIB_INODE_MANAGER_H
 
 #include <mi/base/interface_declare.h>
+#include <mi/neuraylib/version.h> // for MI_NEURAYLIB_DEPRECATED_ENUM_VALUE
 
 namespace mi {
 
@@ -147,11 +148,11 @@ public:
     /// Returns a descriptor for a worker node in the cluster.
     ///
     /// \note The set of worker nodes in the cluster can change at any time. That is, this function
-    ///       can return \c NULL even if \p index is smaller than the result of the last call to
+    ///       can return \c nullptr even if \p index is smaller than the result of the last call to
     ///       #get_number_of_worker_nodes().
     ///
     /// \param index   The index of the worker node (from 0 to #get_number_of_worker_nodes()-1).
-    /// \return        The descriptor for the specified worker node, or \c NULL if \p index is
+    /// \return        The descriptor for the specified worker node, or \c nullptr if \p index is
     ///                out of bounds.
     virtual const IWorker_node_descriptor* get_worker_node( Size index) const = 0;
 
@@ -164,7 +165,7 @@ public:
     /// \see #mi::neuraylib::INode_manager_client::join_or_create_cluster() for how to reference the
     ///      head node in the argument string.
     ///
-    /// \return        The descriptor for the head node, or \c NULL if no head node has been
+    /// \return        The descriptor for the head node, or \c nullptr if no head node has been
     ///                flagged.
     virtual const IWorker_node_descriptor* get_head_node() const = 0;
 
@@ -190,7 +191,7 @@ public:
     /// It should return as soon as possible because it may block further network operations.
     ///
     /// \param cluster_descriptor      The descriptor of the cluster, containing all properties.
-    /// \param changed_property_name   The name of the changed property. This value is \c NULL if
+    /// \param changed_property_name   The name of the changed property. This value is \c nullptr if
     ///                                the callback is triggered to communicate the current set of
     ///                                properties instead of a property change.
     virtual void property_callback(
@@ -215,7 +216,7 @@ public:
     /// It should return as soon as possible because it may block further network operations.
     ///
     /// \param worker_descriptor       The descriptor of the worker node, containing all properties.
-    /// \param changed_property_name   The name of the changed property. This value is \c NULL if
+    /// \param changed_property_name   The name of the changed property. This value is \c nullptr if
     ///                                the callback is triggered to communicate the current set of
     ///                                properties instead of a property change.
     virtual void property_callback(
@@ -362,12 +363,12 @@ public:
     /// Possible cluster states.
     ///
     /// \see #get_cluster_status().
-    enum Cluster_status
+    enum Cluster_status : Uint32
     {
         CLUSTER_ESTABLISHED = 0, ///< The cluster has been successfully established.
         CLUSTER_SHUTDOWN = 1,    ///< The cluster has been shutdown.
-        CLUSTER_FAILURE = 2,     ///< The cluster has failed for unspecified reasons.
-        CLUSTER_FORCE_32_BIT = 0xffffffffU
+        CLUSTER_FAILURE = 2      ///< The cluster has failed for unspecified reasons.
+        MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(CLUSTER_FORCE_32_BIT, 0xffffffffU)
     };
 
     /// Returns the status of the cluster.
@@ -395,7 +396,7 @@ public:
     /// \param value   The value string to be set for the property.
     /// \return
     ///                -  0: Success.
-    ///                - -1: Invalid parameters (\c NULL pointers).
+    ///                - -1: Invalid parameters (\c nullptr).
     virtual Sint32 set_cluster_property( const char* name, const char* value) = 0;
 
     /// Removes a cluster property.
@@ -409,17 +410,17 @@ public:
     /// \param name   The name of the property to remove.
     /// \return
     ///                -  0: Success.
-    ///                - -1: Invalid parameters (\c NULL pointer).
+    ///                - -1: Invalid parameters (\c nullptr).
     ///                - -2: There is no property with the given name.
     virtual Sint32 remove_cluster_property( const char* name) = 0;
 
     /// Starts a worker program if none has been started when the cluster has been created.
     ///
     /// The method is to be used if \p program_name in
-    /// #mi::neuraylib::INode_manager_client::join_or_create_cluster() was \c NULL.
+    /// #mi::neuraylib::INode_manager_client::join_or_create_cluster() was \c nullptr.
     ///
     /// \param program_name                           The name of the program to run on the worker
-    ///                                               nodes. If \c NULL, a cluster is created
+    ///                                               nodes. If \c nullptr, a cluster is created
     ///                                               without child processes being forked by the
     ///                                               worker nodes.
     ///
@@ -503,7 +504,7 @@ public:
     /// \see #mi::neuraylib::INode_manager_client::join_or_create_cluster() for how to reference the
     ///      head node in the argument string.
     ///
-    /// \return        The descriptor for the head node, or \c NULL if no head node has been
+    /// \return        The descriptor for the head node, or \c nullptr if no head node has been
     ///                flagged.
     virtual IWorker_node_descriptor* get_head_node() = 0;
 
@@ -595,11 +596,11 @@ public:
     ///
     /// The new node will be added to the cluster by starting a worker process on
     /// that node using the worker_node_filter, program_name, argument_string
-    /// and child_process_timeout parameters passed to 
+    /// and child_process_timeout parameters passed to
     /// #mi::neuraylib;;INode_manager_client::join_or_create_cluster() to create the cluster.
     ///
-    /// \return The descriptor of the worker node that has been added to the 
-    ///         cluster or \c NULL if no worker node was available.
+    /// \return The descriptor of the worker node that has been added to the
+    ///         cluster or \c nullptr if no worker node was available.
     virtual const IWorker_node_descriptor* grow() = 0;
 
     /// Shrinks the cluster by one node.
@@ -607,13 +608,11 @@ public:
     /// \param remove_node  The descriptor of the node that is supposed to be
     ///                     removed from the cluster.
     ///
-    /// \return   -  0 Success. 
+    /// \return   -  0 Success.
     ///           - -1 The specified node is not a member of the cluster.
-    ///           - -2 The specified node is invalid (\c NULL pointer).
+    ///           - -2 The specified node is invalid (\c nullptr).
     virtual Sint32 shrink(const IWorker_node_descriptor* remove_node) = 0;
 };
-
-mi_static_assert( sizeof( INode_manager_cluster::Cluster_status) == sizeof( Uint32));
 
 /// A filter used to decide whether a cluster is eligible to be joined.
 class ICluster_filter : public
@@ -662,8 +661,8 @@ public:
     /// \return                    0 in case of success, -1 otherwise
     virtual Sint32 start( const char* listen_address,
                           bool tcp = false,
-                          const char* discovery_address = 0,
-                          const char* cluster_interface = 0) = 0;
+                          const char* discovery_address = nullptr,
+                          const char* cluster_interface = nullptr) = 0;
 
     /// Shuts down the operation of the node manager.
     ///
@@ -707,12 +706,12 @@ public:
     /// Returns a descriptor for a worker node currently known to the node manager.
     ///
     /// \note The set of worker nodes in the cluster can change at any time. That is, this function
-    ///       can return \c NULL even if \p index is smaller than the result of the last call to
+    ///       can return \c nullptr even if \p index is smaller than the result of the last call to
     ///       #get_number_of_worker_nodes().
     ///
     /// \param index   The index of the worker node (from 0 to #get_number_of_worker_nodes()-1).
-    /// \return        The descriptor for the specified worker node, or \c NULL if \p index is out
-    ///                of bounds.
+    /// \return        The descriptor for the specified worker node, or \c nullptr if \p index is
+    ///                out of bounds.
     virtual const IWorker_node_descriptor* get_worker_node( Size index) const = 0;
 
     /// Adds a callback to be called when a request to shutdown all clients and workers is
@@ -799,7 +798,7 @@ public:
     ///     nodes.
     /// - If at least the minimum number of requested worker nodes have been reserved, create the
     ///   cluster, and an interface describing the newly created cluster is returned.
-    /// - Otherwise, the reservation of worker nodes is released, and \c NULL is returned.
+    /// - Otherwise, the reservation of worker nodes is released, and \c nullptr is returned.
     ///
     /// If the flag \p child_process_watchdog is set to \c true, the child process started on worker
     /// nodes will be under closer scrutiny by the node manager. The node manager will substitute
@@ -815,16 +814,16 @@ public:
     /// \param max_number_of_requested_worker_nodes   The maximum number of worker nodes expected
     ///                                               in the cluster.
     /// \param cluster_filter                         A filter specifying required cluster
-    ///                                               properties. If \c NULL, no existing cluster
+    ///                                               properties. If \c nullptr, no existing cluster
     ///                                               will be joined.
     /// \param worker_node_filter                     A filter specifying required worker node
-    ///                                               properties. If \c NULL, no cluster will be
+    ///                                               properties. If \c nullptr, no cluster will be
     ///                                               created. The filter will be used again when
     ///                                               calling
     ///                                               #mi::neuraylib::INode_manager_cluster::grow()
     ///                                               to add nodes to the cluster later on.
     /// \param program_name                           The name of the program to run on the worker
-    ///                                               nodes. If \c NULL, a cluster is created
+    ///                                               nodes. If \c nullptr, a cluster is created
     ///                                               without child processes being forked by the
     ///                                               worker nodes.
     /// \param argument_string                        Arguments to \p program_name. The string may
@@ -873,7 +872,7 @@ public:
     ///                               #mi::neuraylib::INode_manager_cluster::start_worker_program().
     ///
     /// \return                                       An interface to the joined or created cluster,
-    ///                                               or \c NULL in case of failure.
+    ///                                               or \c nullptr in case of failure.
     virtual INode_manager_cluster* join_or_create_cluster(
         Size min_number_of_requested_worker_nodes,
         Size max_number_of_requested_worker_nodes,
@@ -890,11 +889,11 @@ public:
     /// Returns a descriptor for a cluster.
     ///
     /// \note The set of clusters can change at any time. This function can therefore return
-    ///       \c NULL even if \p index is smaller than the result of the last call to
+    ///       \c nullptr even if \p index is smaller than the result of the last call to
     ///       #get_number_of_clusters().
     ///
     /// \param index   The index of the cluster (from 0 to #get_number_of_clusters()-1).
-    /// \return        The descriptor for the specified cluster, or \c NULL if \p index
+    /// \return        The descriptor for the specified cluster, or \c nullptr if \p index
     ///                is out of bounds.
     virtual const ICluster_descriptor* get_cluster(Size index) const = 0;
 
@@ -939,10 +938,10 @@ public:
     /// \param program_name         The name of the program to be executed as child process.
     /// \param program_arguments    The arguments supposed to be passed to the program.
     /// \return                     If \p program_name (in combination with \p program_arguments) is
-    ///                             eligible to be run then \p program_name is returned. 
-    ///                             (The returned value may include the full pathname and may be 
+    ///                             eligible to be run then \p program_name is returned.
+    ///                             (The returned value may include the full pathname and may be
     ///                             modified based on the requirements of the local file system
-    ///                             of the worker node) Otherwise, \c NULL is returned.
+    ///                             of the worker node) Otherwise, \c nullptr is returned.
     virtual const IString* resolve_process(
         const char* program_name, const char* program_arguments) = 0;
 };
@@ -973,10 +972,10 @@ public:
     /// \param cluster_interface   The address of the cluster interface for listening.
     ///
     /// \return                    0 in case of success, -1 otherwise
-    virtual Sint32 start( const char* listen_address = 0,
+    virtual Sint32 start( const char* listen_address = nullptr,
                           bool tcp = false,
-                          const char* discovery_address = 0,
-                          const char* cluster_interface = 0) = 0;
+                          const char* discovery_address = nullptr,
+                          const char* cluster_interface = nullptr) = 0;
 
     /// Shuts down the operation of the node manager.
     ///
@@ -1024,7 +1023,7 @@ public:
     /// \param value   The value to set for the property.
     /// \return
     ///                -  0: Success.
-    ///                - -1: Invalid parameters (\c NULL pointers).
+    ///                - -1: Invalid parameters (\c nullptr).
     virtual Sint32 set_property( const char* name, const char* value) = 0;
 
     /// Returns a property of a worker node.
@@ -1032,7 +1031,7 @@ public:
     /// \see #set_property(), #remove_property()
     ///
     /// \param name    The name of the property to get.
-    /// \return        A string representing the value of the property, or \c NULL if there is no
+    /// \return        A string representing the value of the property, or \c nullptr if there is no
     ///                property with the given name.
     virtual const IString* get_property( const char* name) const = 0;
 
@@ -1045,7 +1044,7 @@ public:
     /// \param name    The name of the property to remove.
     /// \return
     ///                -  0: Success.
-    ///                - -1: Invalid parameters (\c NULL pointer).
+    ///                - -1: Invalid parameters (\c nullptr).
     ///                - -2: There is no property with the given name.
     virtual Sint32 remove_property( const char* name) = 0;
 
@@ -1053,7 +1052,7 @@ public:
     ///
     /// \see #get_child_process_resolver()
     ///
-    /// \param child_process_resolver   The new child process resolver. The value \c NULL can be
+    /// \param child_process_resolver   The new child process resolver. The value \c nullptr can be
     ///                                 used to remove the current child process resolver (which
     ///                                 effectively is the same as a child process resolver
     ///                                 instance that returns its first argument unchanged).

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Video plugin API
@@ -25,7 +25,7 @@ class IPlugin_api;
 */
 
 /// Type of video encoder plugins
-#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v31"
+#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v34"
 
 /// A buffer for video data representing a frame.
 class IVideo_data : public
@@ -85,7 +85,7 @@ public:
     /// Returns the value of a parameter for the video stream.
     ///
     /// \param name         The name of the parameter to query.
-    /// \return             The value of the parameter, or \c NULL if it doesn't exist.
+    /// \return             The value of the parameter, or \c nullptr if it doesn't exist.
     virtual const char* get_parameter(const char* name) = 0;
 
     /// Returns the \p index -th supported pixel type. The canvas passed to encode_canvas() must
@@ -95,7 +95,7 @@ public:
     /// preferred type. See \ref mi_neuray_types for a list of supported pixel types.
     ///
     /// \param index   The index of the pixel type to be returned.
-    /// \return        The \p index -th supported pixel type, \c NULL if \p index is out of
+    /// \return        The \p index -th supported pixel type, \c nullptr if \p index is out of
     ///                bounds.
     virtual const char* get_supported_type(Uint32 index) const = 0;
 
@@ -155,11 +155,12 @@ class IVideo_decoder : public
     mi::base::Interface_declare<0xe7fa52c7,0xd881,0x4a29,0x9e,0x82,0x3b,0xdd,0xa6,0xcf,0x14,0xc8>
 {
 public:
-    /// Initializes the video decoder. If not enough data is provided then 1 is returned and
-    /// this method must be called again with more data. If enough data was present to
-    /// decode one or more frames, then those frames will be decoded as part of this call.
-    /// After the call to init(), call decode_canvas() with data set to \c NULL to get any buffered
-    /// frames.
+    /// Initializes the video decoder.
+    ///
+    /// If not enough data is provided then 1 is returned and this method must be called again with
+    /// more data. If enough data was present to decode one or more frames, then those frames will
+    /// be decoded as part of this call. After the call to init(), call decode_canvas() with data
+    /// set to \c nullptr to get any buffered frames.
     ///
     /// \param data           Video stream data to be decoded.
     /// \return
@@ -191,14 +192,14 @@ public:
     /// preferred type. See \ref mi_neuray_types for a list of supported pixel types.
     ///
     /// \param index   The index of the pixel type to be returned.
-    /// \return        The \p index -th supported pixel type, \c NULL if \p index is out of
+    /// \return        The \p index -th supported pixel type, \c nullptr if \p index is out of
     ///                bounds.
     virtual const char* get_supported_type( Uint32 index) const = 0;
 
     /// Decodes video stream data to a canvas.
     ///
     /// Note that the provided data might contain enough information for several frames in which
-    /// case 1 is returned. Call multiple times with \c NULL for \p data until 0 (or 2) is
+    /// case 1 is returned. Call multiple times with \c nullptr for \p data until 0 (or 2) is
     /// returned. If the data is not enough for a complete frame then 2 is returned in which case
     /// decode_canvas() must be called with more data before the frame can be decoded.
     ///
@@ -279,10 +280,10 @@ class IVideo_codec_factory : public
 public:
     /// Creates a video encoder for a given codec.
     ///
-    /// Returns a video encoder for the requested codec, or \c NULL if unsupported.
+    /// Returns a video encoder for the requested codec, or \c nullptr if unsupported.
     virtual IVideo_encoder* create_video_encoder( const char* codec_name) = 0;
 
-    /// Returns a video decoder for the requested codec, or \c NULL if unsupported.
+    /// Returns a video decoder for the requested codec, or \c nullptr if unsupported.
     virtual IVideo_decoder* create_video_decoder( const char* codec_name) = 0;
 };
 

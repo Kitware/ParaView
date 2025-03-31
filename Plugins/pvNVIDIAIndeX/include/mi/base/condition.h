@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file       mi/base/condition.h
 /// \brief      Multithreading condition.
@@ -37,10 +37,10 @@ public:
     {
 #ifndef MI_PLATFORM_WINDOWS
         m_signaled = false;
-        pthread_mutex_init( &m_mutex, NULL);
-        pthread_cond_init( &m_condvar, NULL);
+        pthread_mutex_init( &m_mutex, nullptr);
+        pthread_cond_init( &m_condvar, nullptr);
 #else
-        m_handle = CreateEvent( NULL, false, false, NULL);
+        m_handle = CreateEvent( nullptr, false, false, nullptr);
 #endif
     }
 
@@ -62,7 +62,7 @@ public:
     {
 #ifndef MI_PLATFORM_WINDOWS
         pthread_mutex_lock( &m_mutex);
-        while( !m_signaled) //-V776 PVS
+        while( !m_signaled)
             pthread_cond_wait( &m_condvar, &m_mutex);
         m_signaled = false;
         pthread_mutex_unlock( &m_mutex);
@@ -81,7 +81,7 @@ public:
     bool timed_wait( Float64 timeout) {
 #ifndef MI_PLATFORM_WINDOWS
         struct timeval now;
-        gettimeofday( &now, NULL);
+        gettimeofday( &now, nullptr);
         struct timespec timeout_abs;
         timeout_abs.tv_sec = now.tv_sec + static_cast<long>( floor( timeout));
         timeout_abs.tv_nsec
@@ -106,8 +106,8 @@ public:
 #else
         DWORD timeout_ms = static_cast<DWORD>( 1000 * timeout);
         DWORD result = WaitForSingleObject( m_handle, timeout_ms);
-        return result == WAIT_TIMEOUT;   
-#endif    
+        return result == WAIT_TIMEOUT;
+#endif
     }
 
     /// Signals the condition.

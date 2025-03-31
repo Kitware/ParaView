@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Support for remote DMA transfers.
@@ -85,7 +85,7 @@ public:
     /// \param size     The size of the data in the returned RDMA buffer. The data in the returned
     ///                 RDMA buffer ends at \p offset plus \p size (excluding) in the original RDMA
     ///                 buffer.
-    /// \return         The RDMA buffer or \c NULL if \p offset and \p size result in a memory
+    /// \return         The RDMA buffer or \c nullptr if \p offset and \p size result in a memory
     ///                 region not completely in the original buffer.
     virtual const IRDMA_buffer* duplicate( Size offset, Size size) const = 0;
 
@@ -104,7 +104,7 @@ public:
     /// \param size     The size of the data in the returned RDMA buffer. The data in the returned
     ///                 RDMA buffer ends at \p offset plus \p size (excluding) in the original RDMA
     ///                 buffer.
-    /// \return         The RDMA buffer or \c NULL if \p offset and \p size result in a memory
+    /// \return         The RDMA buffer or \c nullptr if \p offset and \p size result in a memory
     ///                 region not completely in the original buffer.
     virtual IRDMA_buffer* duplicate( Size offset, Size size) = 0;
 
@@ -126,8 +126,8 @@ public:
     /// \param size               The size of the RDMA buffer.
     /// \param gpu_id            -1 for main memory, or the ID of the GPU on which the RDMA buffer
     ///                           should be allocated.
-    /// \return                   The RDMA buffer or \c NULL in case of an allocation failure. The
-    ///                           method also returns \c NULL if called from
+    /// \return                   The RDMA buffer or \c nullptr in case of an allocation failure.
+    ///                           The method also returns \c nullptr if called from
     ///                           #mi::neuraylib::IFragmented_job::execute_fragment_remote_rdma()
     ///                           and \p size exceeds the size of the RDMA buffer on the receiver
     ///                           side.
@@ -139,7 +139,7 @@ public:
     /// \param size               The size of the RDMA buffer.
     /// \param gpu_id            -1 for main memory, or the ID of the GPU on which the RDMA buffer
     ///                           should be allocated.
-    /// \return                   The RDMA buffer or \c NULL in case of an allocation failure.
+    /// \return                   The RDMA buffer or \c nullptr in case of an allocation failure.
     virtual IRDMA_buffer* get_read_memory( Size size, Sint32 gpu_id = -1) = 0;
 
     /// Creates an RDMA buffer that is a wrapper for a buffer provided by users.
@@ -152,7 +152,7 @@ public:
     ///
     /// \param gpu_id            -1 for main memory, or the ID of the GPU on
     ///                           which the user's buffer is allocated.
-    /// \return                   The RDMA buffer or \c NULL in case of failure.
+    /// \return                   The RDMA buffer or \c nullptr in case of failure.
     virtual IRDMA_buffer* wrap_user_buffer(
         Uint8* data, Size size, Sint32 gpu_id = -1) = 0;
 
@@ -161,7 +161,7 @@ public:
     /// \param buffer         The RDMA buffer to be sent.
     /// \return
     ///                       -  0: Success
-    ///                       - -1: Invalid parameters (e.g., buffer is \c NULL).
+    ///                       - -1: Invalid parameters (e.g., buffer is \c nullptr).
     ///                       - -2: Operation not supported outside of
     ///                             #mi::neuraylib::IFragmented_job::execute_fragment_remote_rdma().
     virtual Sint32 flush( IRDMA_buffer* buffer) = 0;

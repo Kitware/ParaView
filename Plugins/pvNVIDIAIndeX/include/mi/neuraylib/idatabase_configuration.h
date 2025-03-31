@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component that provides access to the database configuration.
@@ -69,7 +69,7 @@ public:
     /// default. It is only needed if memory limits are enabled (\see set_memory_limits()), or for
     /// debugging.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \see #get_memory_usage_tracking()
     ///
@@ -105,7 +105,7 @@ public:
     ///
     /// \if DICE_API \see #mi::neuraylib::IElement::get_offload_to_disk() \endif
     ///
-    /// \return                  The configured directory, or \c NULL if disabled.
+    /// \return                  The configured directory, or \c nullptr if disabled.
     virtual const char* get_disk_swapping() const = 0;
 };
 

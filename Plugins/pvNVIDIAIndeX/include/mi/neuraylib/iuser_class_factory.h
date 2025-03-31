@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for factories for user-defined class.
@@ -33,8 +33,8 @@ public:
     /// Creates an instance of the class for which the factory was registered.
     ///
     /// Each class factory is free to decide which values and types of \p argc and \p argv are
-    /// valid. However, it must handle the case \p transaction = \c NULL, \p argc = 0, and
-    /// \p argv = \c NULL which is needed for deserialization. \if IRAY_API In that case, the
+    /// valid. However, it must handle the case \p transaction = \c nullptr, \p argc = 0, and
+    /// \p argv = \c nullptr which is needed for deserialization. \if IRAY_API In that case, the
     /// method #mi::neuraylib::ISerializable::deserialize() is called afterwards. \endif
     ///
     /// \param transaction   The transaction in which the instance is created. The transaction can
@@ -45,7 +45,7 @@ public:
     ///                      another transaction). \endif
     /// \param argc          The size of the \p argv array.
     /// \param argv          An array of optional arguments.
-    /// \return              An instance of the class, or \c NULL on failure.
+    /// \return              An instance of the class, or \c nullptr on failure.
     virtual base::IInterface* create(
         ITransaction* transaction,
         Uint32 argc,
@@ -73,7 +73,7 @@ public:
     /// \param transaction   The transaction (ignored).
     /// \param argc          The size of the \p argv array (must be 0).
     /// \param argv          An array of optional arguments (ignored).
-    /// \return              An instance of the class, or \c NULL on failure.
+    /// \return              An instance of the class, or \c nullptr on failure.
     base::IInterface* create(
         ITransaction* transaction,
         Uint32 argc,
@@ -85,7 +85,7 @@ public:
         (void) argv;
 
         if( argc != 0)
-            return 0;
+            return nullptr;
         return new T;
     }
 };

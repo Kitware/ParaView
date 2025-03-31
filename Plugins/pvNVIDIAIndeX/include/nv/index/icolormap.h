@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Database element for a colormap
@@ -74,11 +74,13 @@ public:
     ///
     /// The domain is normalized to support different types of
     /// source values: The default domain [0.0, 1.0] corresponds to
-    /// raw data values in the range [0, 255] for 8-bit integer
-    /// data, [0, 65535] for 16-bit integer data, or [0.0, 1.0] for
-    /// normalized float data. For non-normalized float data the
+    /// raw data values in the range [0, 255] for 8-bit unsigned integer
+    /// data, [0, 65535] for 16-bit unsigned integer data, or [0.0, 1.0]
+    /// for normalized float data. For non-normalized float data the
     /// domain should be set to the actual value range found in the
-    /// data.
+    /// data. When using signed integer data, the domain [-1.0, 1.0]
+    /// would need to be used to cover the full value range, e.g.
+    /// [-128, 127] for 8-bit signed integer.
     ///
     /// The domain may also be outside of the actual value range of
     /// the data, or just cover part of the value range. Data values

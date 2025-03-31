@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/version.h
 /// \brief Major and minor version number and an optional qualifier.
@@ -73,6 +73,16 @@
 #else
 #define MI_BASE_VERSION_QUALIFIED_STRING  MI_BASE_VERSION_STRING "-" MI_BASE_VERSION_QUALIFIER
 #endif // MI_BASE_VERSION_QUALIFIER_EMPTY
+
+
+// Re-enables the removed FORCE_32_BIT enumerators.
+// #define MI_BASE_DEPRECATED_FORCE_32_BIT
+
+#ifdef MI_BASE_DEPRECATED_FORCE_32_BIT
+#define MI_BASE_DEPRECATED_ENUM_VALUE(X,Y) , X = Y
+#else
+#define MI_BASE_DEPRECATED_ENUM_VALUE(X,Y)
+#endif
 
 
 /**@}*/ // end group mi_base_version

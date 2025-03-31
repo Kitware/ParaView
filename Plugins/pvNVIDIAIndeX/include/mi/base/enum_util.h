@@ -1,11 +1,11 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 
 #ifndef MI_BASE_ENUM_UTIL_H
 #define MI_BASE_ENUM_UTIL_H
 
-#if (__cplusplus >= 201103L)
+#if (__cplusplus >= 201402L)
 #include "config.h"
 
 #include <type_traits>

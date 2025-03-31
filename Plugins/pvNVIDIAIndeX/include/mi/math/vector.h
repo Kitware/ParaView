@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/vector.h
 /// \brief Math vector class template of fixed dimension with arithmetic operators and generic
@@ -285,31 +285,31 @@ template < class T, Size DIM>
 class Vector : public Vector_struct<T, DIM> //-V690 PVS
 {
 public:
-    typedef Vector_struct<T,DIM> Pod_type;      ///< POD class corresponding to this vector.
-    typedef Vector_struct<T,DIM> storage_type;  ///< Storage class used by this vector.
+    using Pod_type        = Vector_struct<T, DIM>;  ///< POD class corresponding to this vector.
+    using storage_type    = Vector_struct<T, DIM>;  ///< Storage class used by this vector.
 
-    typedef T           value_type;             ///< Element type.
-    typedef Size        size_type;              ///< Size type, unsigned.
-    typedef Difference  difference_type;        ///< Difference type, signed.
-    typedef T *         pointer;                ///< Mutable pointer to element.
-    typedef const T *   const_pointer;          ///< Const pointer to element.
-    typedef T &         reference;              ///< Mutable reference to element.
-    typedef const T &   const_reference;        ///< Const reference to element.
+    using value_type      = T;                      ///< Element type.
+    using size_type       = Size;                   ///< Size type, unsigned.
+    using difference_type = Difference;             ///< Difference type, signed.
+    using pointer         = T*;                     ///< Mutable pointer to element.
+    using const_pointer   = const T*;               ///< Const pointer to element.
+    using reference       = T&;                     ///< Mutable reference to element.
+    using const_reference = const T&;               ///< Const reference to element.
 
-    static const Size DIMENSION = DIM;          ///< Constant dimension of the vector.
-    static const Size SIZE      = DIM;          ///< Constant size of the vector.
+    static constexpr Size DIMENSION = DIM;          ///< Constant dimension of the vector.
+    static constexpr Size SIZE      = DIM;          ///< Constant size of the vector.
 
      /// Constant size of the vector.
-    static inline Size size()     { return SIZE; }
+    static constexpr inline Size size()     { return SIZE; }
 
      /// Constant maximum size of the vector.
-    static inline Size max_size() { return SIZE; }
+    static constexpr inline Size max_size() { return SIZE; }
 
     /// Returns the pointer to the first vector element.
-    inline T* begin() { return mi::math::vector_base_ptr( *this); }
+    inline T* begin() { return vector_base_ptr( *this); }
 
     /// Returns the pointer to the first vector element.
-    inline const T* begin() const { return mi::math::vector_base_ptr( *this); }
+    inline const T* begin() const { return vector_base_ptr( *this); }
 
     /// Returns the past-the-end pointer.
     ///
@@ -324,14 +324,11 @@ public:
     /// The default constructor leaves the vector elements uninitialized.
     inline Vector()
     {
-#if defined(DEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
+#ifndef NDEBUG
         // In debug mode, default-constructed vectors are initialized with signaling NaNs or, if not
         // applicable, with a maximum value to increase the chances of diagnosing incorrect use of
         // an uninitialized vector.
-        //
-        // When compiling with Visual C++ 7.1 or earlier, this code is enabled in all variants to
-        // work around a very obscure compiler bug that causes the compiler to crash.
-        typedef mi::base::numeric_traits<T> Traits;
+        using Traits = mi::base::numeric_traits<T>;
         T v = (Traits::has_signaling_NaN) ? Traits::signaling_NaN()
                                           : Traits::max MI_PREVENT_MACRO_EXPAND ();
         for( Size i(0u); i < DIM; ++i)
@@ -339,24 +336,50 @@ public:
 #endif
     }
 
-#if (__cplusplus >= 201103L)
     /// Default copy constructor.
     Vector( const Vector<T,DIM>& vec ) = default;
-#endif
 
     /// Constructor from underlying storage type.
     inline Vector( const Vector_struct<T,DIM>& vec )
     {
         for( Size i(0u); i < DIM; ++i)
-            (*this)[i] = mi::math::vector_base_ptr(vec)[i];
+            begin()[i] = vector_base_ptr(vec)[i];
     }
 
+#if (__cplusplus >= 201402L)
+private:
+    template<Size s>
+    constexpr inline void init( std::integral_constant<Size,s>, T v)
+    {
+        for( Size i = 0; i < DIM; ++i)
+            Pod_type::elements[i] = v;
+    }
+
+    constexpr inline void init( std::integral_constant<Size,1>, T v)
+    { Pod_type::x = v; }
+
+    constexpr inline void init( std::integral_constant<Size,2>, T v)
+    { Pod_type::x = Pod_type::y = v; }
+
+    constexpr inline void init( std::integral_constant<Size,3>, T v)
+    { Pod_type::x = Pod_type::y = Pod_type::z = v; }
+
+    constexpr inline void init( std::integral_constant<Size,4>, T v)
+    { Pod_type::x = Pod_type::y = Pod_type::z = Pod_type::w = v; }
+
+public:
     /// Constructor initializes all vector elements to the value \p v.
+    constexpr inline explicit Vector(T v)
+    {
+        init( std::integral_constant<Size,DIM>(), v);
+    }
+#else
     inline explicit Vector(T v)
     {
         for( Size i(0u); i < DIM; ++i)
-            (*this)[i] = v;
+            begin()[i] = v;
     }
+#endif
 
     /** Constructor requires the #mi::math::FROM_ITERATOR tag as first argument and initializes the
         vector elements with the first \c DIM elements from the sequence starting at the iterator
@@ -375,7 +398,7 @@ public:
     inline Vector(From_iterator_tag, Iterator p)
     {
         for( Size i(0u); i < DIM; ++i, ++p)
-            (*this)[i] = *p;
+            begin()[i] = *p;
     }
 
     /** Constructor initializes the vector elements from an \c array of dimension \c DIM.
@@ -393,7 +416,7 @@ public:
     inline explicit Vector( T2 const (& array)[DIM])
     {
         for( Size i(0u); i < DIM; ++i)
-            (*this)[i] = array[i];
+            begin()[i] = array[i];
     }
 
     /// Template constructor that allows explicit conversions from other vectors with assignment
@@ -402,7 +425,7 @@ public:
     inline explicit Vector( const Vector<T2,DIM>& other)
     {
         for( Size i(0u); i < DIM; ++i)
-            (*this)[i] = T(other[i]);
+            begin()[i] = T(other[i]);
     }
 
     /// Template constructor that allows explicit conversions from underlying storage type with
@@ -411,191 +434,184 @@ public:
     inline explicit Vector( const Vector_struct<T2,DIM>& other)
     {
         for( Size i(0u); i < DIM; ++i)
-            (*this)[i] = T(mi::math::vector_base_ptr(other)[i]);
+            begin()[i] = T(vector_base_ptr(other)[i]);
     }
 
     /// Dedicated constructor, for dimension 2 only, that initializes the vector elements from the
     /// two elements \c (v1,v2).
     ///
     /// \pre <tt>DIM == 2</tt>
-    inline Vector(T v1, T v2)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(T v1, T v2) : Vector_struct<T, DIM>{v1,v2}
     {
         mi_static_assert(DIM == 2);
-        begin()[0] = v1;
-        begin()[1] = v2;
     }
 
     /// Dedicated constructor, for dimension 3 only, that initializes the vector elements from the
     /// three elements \c (v1,v2,v3).
     ///
     /// \pre <tt>DIM == 3</tt>
-    inline Vector(T v1, T v2, T v3)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(T v1, T v2, T v3) : Vector_struct<T, DIM>{v1,v2,v3}
     {
         mi_static_assert(DIM == 3);
-        begin()[0] = v1;
-        begin()[1] = v2;
-        begin()[2] = v3;
     }
 
     /// Dedicated constructor, for dimension 3 only, that initializes the vector elements from the
     /// three elements \c (v1,v2.x,v2.y).
     ///
     /// \pre <tt>DIM == 3</tt>
-    inline Vector(T v1, const Vector<T,2>& v2)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(T v1, const Vector<T,2>& v2) : Vector_struct<T, DIM>{v1,v2.x,v2.y}
     {
         mi_static_assert(DIM == 3);
-        begin()[0] = v1;
-        begin()[1] = v2.x;
-        begin()[2] = v2.y;
     }
 
     /// Dedicated constructor, for dimension 3 only, that initializes the vector elements from the
     /// three elements \c (v1.x,v1.y,v2).
     ///
     /// \pre <tt>DIM == 3</tt>
-    inline Vector(const Vector<T,2>& v1, T v2)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(const Vector<T,2>& v1, T v2) : Vector_struct<T, DIM>{v1.x,v1.y,v2}
     {
         mi_static_assert(DIM == 3);
-        begin()[0] = v1.x;
-        begin()[1] = v1.y;
-        begin()[2] = v2;
     }
 
     /// Dedicated constructor, for dimension 4 only, that initializes the vector elements from the
     /// four elements \c (v1,v2,v3,v4).
     ///
     /// \pre <tt>DIM == 4</tt>
-    inline Vector(T v1, T v2, T v3, T v4)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(T v1, T v2, T v3, T v4) : Vector_struct<T, DIM>{v1,v2,v3,v4}
     {
         mi_static_assert(DIM == 4);
-        begin()[0] = v1;
-        begin()[1] = v2;
-        begin()[2] = v3;
-        begin()[3] = v4;
     }
 
     /// Dedicated constructor, for dimension 4 only, that initializes the vector elements from the
     /// four elements \c (v1,v2,v3.x,v3.y).
     ///
     /// \pre <tt>DIM == 4</tt>
-    inline Vector(T v1, T v2, const Vector<T,2>& v3)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(T v1, T v2, const Vector<T,2>& v3) : Vector_struct<T, DIM>{v1,v2,v3.x,v3.y}
     {
         mi_static_assert(DIM == 4);
-        begin()[0] = v1;
-        begin()[1] = v2;
-        begin()[2] = v3.x;
-        begin()[3] = v3.y;
     }
-
 
     /// Dedicated constructor, for dimension 4 only, that initializes the vector elements from the
     /// four elements \c (v1,v2.x,v2.y,v3).
     ///
     /// \pre <tt>DIM == 4</tt>
-    inline Vector(T v1, const Vector<T,2>& v2, T v3)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(T v1, const Vector<T,2>& v2, T v3) : Vector_struct<T, DIM>{v1,v2.x,v2.y,v3}
     {
         mi_static_assert(DIM == 4);
-        begin()[0] = v1;
-        begin()[1] = v2.x;
-        begin()[2] = v2.y;
-        begin()[3] = v3;
     }
 
     /// Dedicated constructor, for dimension 4 only, that initializes the vector elements from the
     /// four elements \c (v1.x,v1.y,v2,v3).
     ///
     /// \pre <tt>DIM == 4</tt>
-    inline Vector(const Vector<T,2>& v1, T v2, T v3)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(const Vector<T,2>& v1, T v2, T v3) : Vector_struct<T, DIM>{v1.x,v1.y,v2,v3}
     {
         mi_static_assert(DIM == 4);
-        begin()[0] = v1.x;
-        begin()[1] = v1.y;
-        begin()[2] = v2;
-        begin()[3] = v3;
     }
 
     /// Dedicated constructor, for dimension 4 only, that initializes the vector elements from the
     /// four elements \c (v1.x,v1.y,v2.x,v2.y).
     ///
     /// \pre <tt>DIM == 4</tt>
-    inline Vector(const Vector<T,2>& v1, const Vector<T,2>& v2)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(const Vector<T,2>& v1, const Vector<T,2>& v2) : Vector_struct<T, DIM>{v1.x,v1.y,v2.x,v2.y}
     {
         mi_static_assert(DIM == 4);
-        begin()[0] = v1.x;
-        begin()[1] = v1.y;
-        begin()[2] = v2.x;
-        begin()[3] = v2.y;
     }
 
     /// Dedicated constructor, for dimension 4 only, that initializes the vector elements from the
     /// four elements \c (v1,v2.x,v2.y,v2.z).
     ///
     /// \pre <tt>DIM == 4</tt>
-    inline Vector(T v1, const Vector<T,3>& v2)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(T v1, const Vector<T,3>& v2) : Vector_struct<T, DIM>{v1,v2.x,v2.y,v2.z}
     {
         mi_static_assert(DIM == 4);
-        begin()[0] = v1;
-        begin()[1] = v2.x;
-        begin()[2] = v2.y;
-        begin()[3] = v2.z;
     }
 
     /// Dedicated constructor, for dimension 4 only, that initializes the vector elements from the
     /// four elements \c (v1.x,v1.y,v1.z,v2).
     ///
     /// \pre <tt>DIM == 4</tt>
-    inline Vector(const Vector<T,3>& v1, T v2)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline Vector(const Vector<T,3>& v1, T v2) : Vector_struct<T, DIM>{v1.x,v1.y,v1.z,v2}
     {
         mi_static_assert(DIM == 4);
-        begin()[0] = v1.x;
-        begin()[1] = v1.y;
-        begin()[2] = v1.z;
-        begin()[3] = v2;
     }
 
     /// Dedicated constructor, for dimension 4 only, that initializes the vector elements from a
     /// color interpreted as a vector (r,g,b,a).
     ///
     /// \pre <tt>DIM == 4</tt>
-    inline explicit Vector( const Color_struct& color)
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
+    inline explicit Vector( const Color_struct& color) : Vector_struct<T, DIM>{static_cast<T>(color.r),static_cast<T>(color.g),static_cast<T>(color.b),static_cast<T>(color.a)}
     {
         mi_static_assert(DIM == 4);
-        this->x = color.r;
-        this->y = color.g;
-        this->z = color.b;
-        this->w = color.a;
     }
 
     /// Assignment.
-#if (__cplusplus >= 201103L)
     Vector& operator= ( const Vector& other) = default;
-#else
-    inline Vector& operator= ( const Vector& other)
-    {
-        for( Size i(0u); i < DIM; ++i)
-            (*this)[i] = other[i];
-        return *this;
-    }
-#endif
 
     /// Assignment from a scalar, setting all elements to \p s.
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
     inline Vector& operator= ( T s)
     {
+#if (__cplusplus >= 201402L)
+        init(std::integral_constant<Size,DIM>(), s);
+#else
         for( Size i(0u); i < DIM; ++i)
-            (*this)[i] = s;
+            begin()[i] = s;
+#endif
         return *this;
     }
     /// Assignment, for dimension 4 only, that assigns color interpreted as a vector (r,g,b,a) to
     /// this vector.
     ///
     /// \pre <tt>DIM == 4</tt>
+#if (__cplusplus >= 201402L)
+    constexpr
+#endif
     inline Vector& operator= ( const Color_struct& color)
     {
         mi_static_assert(DIM == 4);
-        this->x = color.r;
-        this->y = color.g;
-        this->z = color.b;
-        this->w = color.a;
+        Pod_type::x = color.r;
+        Pod_type::y = color.g;
+        Pod_type::z = color.b;
+        Pod_type::w = color.a;
         return *this;
     }
 
@@ -706,33 +722,147 @@ public:
 /// Adds \p rhs elementwise to \p lhs and returns the modified \p lhs.
 template <typename T, Size DIM>
 inline Vector<T,DIM>& operator+=(
-    Vector<T,DIM>&       lhs,
+    Vector<T,DIM>&              lhs,
     const Vector_struct<T,DIM>& rhs)
 {
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(lhs)[i] += vector_base_ptr(rhs)[i];
+        lhs.elements[i] += rhs.elements[i];
+    return lhs;
+}
+template <typename T>
+inline Vector<T,1>& operator+=(
+    Vector<T,1>&              lhs,
+    const Vector_struct<T,1>& rhs)
+{
+    lhs.x += rhs.x;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,2>& operator+=(
+    Vector<T,2>&              lhs,
+    const Vector_struct<T,2>& rhs)
+{
+    lhs.x += rhs.x;
+    lhs.y += rhs.y;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,3>& operator+=(
+    Vector<T,3>&              lhs,
+    const Vector_struct<T,3>& rhs)
+{
+    lhs.x += rhs.x;
+    lhs.y += rhs.y;
+    lhs.z += rhs.z;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,4>& operator+=(
+    Vector<T,4>&              lhs,
+    const Vector_struct<T,4>& rhs)
+{
+    lhs.x += rhs.x;
+    lhs.y += rhs.y;
+    lhs.z += rhs.z;
+    lhs.w += rhs.w;
     return lhs;
 }
 
 /// Subtracts \p rhs elementwise from \p lhs and returns the modified \p lhs.
 template <typename T, Size DIM>
 inline Vector<T,DIM>& operator-=(
-    Vector<T,DIM>&       lhs,
+    Vector<T,DIM>&              lhs,
     const Vector_struct<T,DIM>& rhs)
 {
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(lhs)[i] -= vector_base_ptr(rhs)[i];
+        lhs.elements[i] -= rhs.elements[i];
+    return lhs;
+}
+template <typename T>
+inline Vector<T,1>& operator-=(
+    Vector<T,1>&              lhs,
+    const Vector_struct<T,1>& rhs)
+{
+    lhs.x -= rhs.x;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,2>& operator-=(
+    Vector<T,2>&              lhs,
+    const Vector_struct<T,2>& rhs)
+{
+    lhs.x -= rhs.x;
+    lhs.y -= rhs.y;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,3>& operator-=(
+    Vector<T,3>&              lhs,
+    const Vector_struct<T,3>& rhs)
+{
+    lhs.x -= rhs.x;
+    lhs.y -= rhs.y;
+    lhs.z -= rhs.z;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,4>& operator-=(
+    Vector<T,4>&              lhs,
+    const Vector_struct<T,4>& rhs)
+{
+    lhs.x -= rhs.x;
+    lhs.y -= rhs.y;
+    lhs.z -= rhs.z;
+    lhs.w -= rhs.w;
     return lhs;
 }
 
 /// Multiplies \p rhs elementwise with \p lhs and returns the modified \p lhs.
 template <typename T, Size DIM>
 inline Vector<T,DIM>& operator*=(
-    Vector<T,DIM>&       lhs,
+    Vector<T,DIM>&              lhs,
     const Vector_struct<T,DIM>& rhs)
 {
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(lhs)[i] *= vector_base_ptr(rhs)[i];
+        lhs.elements[i] *= rhs.elements[i];
+    return lhs;
+}
+template <typename T>
+inline Vector<T,1>& operator*=(
+    Vector<T,1>&              lhs,
+    const Vector_struct<T,1>& rhs)
+{
+    lhs.x *= rhs.x;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,2>& operator*=(
+    Vector<T,2>&              lhs,
+    const Vector_struct<T,2>& rhs)
+{
+    lhs.x *= rhs.x;
+    lhs.y *= rhs.y;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,3>& operator*=(
+    Vector<T,3>&              lhs,
+    const Vector_struct<T,3>& rhs)
+{
+    lhs.x *= rhs.x;
+    lhs.y *= rhs.y;
+    lhs.z *= rhs.z;
+    return lhs;
+}
+template <typename T>
+inline Vector<T,4>& operator*=(
+    Vector<T,4>&              lhs,
+    const Vector_struct<T,4>& rhs)
+{
+    lhs.x *= rhs.x;
+    lhs.y *= rhs.y;
+    lhs.z *= rhs.z;
+    lhs.w *= rhs.w;
     return lhs;
 }
 
@@ -740,22 +870,22 @@ inline Vector<T,DIM>& operator*=(
 /// Only defined for typenames \p T having the % operator.
 template <typename T, Size DIM>
 inline Vector<T,DIM>& operator%=(
-    Vector<T,DIM>&       lhs,
+    Vector<T,DIM>&              lhs,
     const Vector_struct<T,DIM>& rhs)
 {
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(lhs)[i] %= vector_base_ptr(rhs)[i];
+        lhs[i] %= vector_base_ptr(rhs)[i];
     return lhs;
 }
 
 /// Divides \p lhs elementwise by \p rhs and returns the modified \p lhs.
 template <typename T, typename U, Size DIM>
 inline Vector<T,DIM>& operator/=(
-    Vector<T,DIM>&       lhs,
+    Vector<T,DIM>&              lhs,
     const Vector_struct<U,DIM>& rhs)
 {
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(lhs)[i] = T(vector_base_ptr(lhs)[i] / vector_base_ptr(rhs)[i]);
+        lhs[i] = T(lhs[i] / vector_base_ptr(rhs)[i]);
     return lhs;
 }
 
@@ -816,8 +946,28 @@ inline Vector<T,DIM> operator-( const Vector_struct<T,DIM>& v)
 {
     Vector<T,DIM> tmp;
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(tmp)[i] = -vector_base_ptr(v)[i];
+        tmp.elements[i] = -v.elements[i];
     return tmp;
+}
+template <typename T>
+inline Vector<T,1> operator-( const Vector_struct<T,1>& v)
+{
+    return Vector<T,1>( -v.x);
+}
+template <typename T>
+inline Vector<T,2> operator-( const Vector_struct<T,2>& v)
+{
+    return Vector<T,2>( -v.x, -v.y);
+}
+template <typename T>
+inline Vector<T,3> operator-( const Vector_struct<T,3>& v)
+{
+    return Vector<T,3>( -v.x, -v.y, -v.z);
+}
+template <typename T>
+inline Vector<T,4> operator-( const Vector_struct<T,4>& v)
+{
+    return Vector<T,4>( -v.x, -v.y, -v.z, -v.w);
 }
 
 
@@ -850,6 +1000,34 @@ inline Vector<T,DIM>& operator*=(
     const Vector<T,DIM>& rhs)
 {
     return lhs *= static_cast<const Vector_struct<T,DIM>&>(rhs);
+}
+template <typename T>
+inline Vector<T,1>& operator*=(
+    Vector<T,1>&       lhs,
+    const Vector<T,1>& rhs)
+{
+    return lhs *= static_cast<const Vector_struct<T,1>&>(rhs);
+}
+template <typename T>
+inline Vector<T,2>& operator*=(
+    Vector<T,2>&       lhs,
+    const Vector<T,2>& rhs)
+{
+    return lhs *= static_cast<const Vector_struct<T,2>&>(rhs);
+}
+template <typename T>
+inline Vector<T,3>& operator*=(
+    Vector<T,3>&       lhs,
+    const Vector<T,3>& rhs)
+{
+    return lhs *= static_cast<const Vector_struct<T,3>&>(rhs);
+}
+template <typename T>
+inline Vector<T,4>& operator*=(
+    Vector<T,4>&       lhs,
+    const Vector<T,4>& rhs)
+{
+    return lhs *= static_cast<const Vector_struct<T,4>&>(rhs);
 }
 
 /// Computes \p lhs modulo \p rhs elementwise and returns the modified \p lhs.
@@ -935,7 +1113,45 @@ inline Vector<T,DIM>& operator*=(
     TT             s)
 {
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(v)[i] = T(vector_base_ptr(v)[i] * s);
+        v.elements[i] = T(v.elements[i] * s);
+    return v;
+}
+template <typename T, typename TT>
+inline Vector<T,1>& operator*=(
+    Vector<T,1>& v,
+    TT           s)
+{
+    v.x = T(v.x * s);
+    return v;
+}
+template <typename T, typename TT>
+inline Vector<T,2>& operator*=(
+    Vector<T,2>& v,
+    TT           s)
+{
+    v.x = T(v.x * s);
+    v.y = T(v.y * s);
+    return v;
+}
+template <typename T, typename TT>
+inline Vector<T,3>& operator*=(
+    Vector<T,3>& v,
+    TT           s)
+{
+    v.x = T(v.x * s);
+    v.y = T(v.y * s);
+    v.z = T(v.z * s);
+    return v;
+}
+template <typename T, typename TT>
+inline Vector<T,4>& operator*=(
+    Vector<T,4>& v,
+    TT           s)
+{
+    v.x = T(v.x * s);
+    v.y = T(v.y * s);
+    v.z = T(v.z * s);
+    v.w = T(v.w * s);
     return v;
 }
 
@@ -948,7 +1164,7 @@ inline Vector<T,DIM>& operator%=(
     TT             s)
 {
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(v)[i] = T(vector_base_ptr(v)[i] % s);
+        v[i] = T(v[i] % s);
     return v;
 }
 
@@ -959,7 +1175,7 @@ inline Vector<T,DIM>& operator/=(
     TT              s)
 {
     for( Size i(0u); i < DIM; ++i)
-        vector_base_ptr(v)[i] = T(vector_base_ptr(v)[i] / s);
+        v[i] = T(v[i] / s);
     return v;
 }
 
@@ -967,7 +1183,7 @@ inline Vector<T,DIM>& operator/=(
 template <typename T, typename TT, Size DIM>
 inline Vector<T,DIM> operator*(
     const Vector_struct<T,DIM>& v,
-    TT                   s)
+    TT                          s)
 {
     Vector<T,DIM> tmp( v);
     return tmp *= s;
@@ -976,10 +1192,10 @@ inline Vector<T,DIM> operator*(
 /// Multiplies the vector \p v elementwise with the scalar \p s and returns the new result.
 template <typename T, typename TT, Size DIM>
 inline Vector<T,DIM> operator*(
-    TT                   s,
+    TT                          s,
     const Vector_struct<T,DIM>& v)
 {
-    Vector<T,DIM> tmp(v);
+    Vector<T,DIM> tmp( v);
     return tmp *= s;
 }
 
@@ -989,9 +1205,9 @@ inline Vector<T,DIM> operator*(
 template <typename T, typename TT, Size DIM>
 inline Vector<T,DIM> operator%(
     const Vector_struct<T,DIM>& v,
-    TT                   s)
+    TT                          s)
 {
-    Vector<T,DIM> tmp(v);
+    Vector<T,DIM> tmp( v);
     return tmp %= s;
 }
 
@@ -999,7 +1215,7 @@ inline Vector<T,DIM> operator%(
 template <typename T, typename TT, Size DIM>
 inline Vector<T,DIM> operator/(
     const Vector_struct<T,DIM>& v,
-    TT                   s)
+    TT                          s)
 {
     Vector<T,DIM> tmp( v);
     return tmp /= s;
@@ -1233,7 +1449,7 @@ template <typename T, Size DIM>
 inline bool all( const Vector_struct<T,DIM>& v)
 {
     for( Size i = 0; i != DIM; ++i)
-        if( !all(vector_base_ptr(v)[i]))
+        if( !all( vector_base_ptr(v)[i]))
             return false;
     return true;
 }
@@ -1243,7 +1459,7 @@ template <typename T, Size DIM>
 inline bool any( const Vector_struct<T,DIM>& v)
 {
     for( Size i = 0; i != DIM; ++i)
-        if( any(vector_base_ptr(v)[i]))
+        if( any( vector_base_ptr(v)[i]))
            return true;
     return false;
 }
@@ -1272,7 +1488,7 @@ inline Vector<T,DIM> atan( const Vector_struct<T,DIM>& v)
 ///
 /// The signs of the elements of \p v and \p w are used to determine the quadrant of the results.
 template <typename T, Size DIM>
-inline Vector<T,DIM> atan2( const Vector_struct<T,DIM>& v,  const Vector_struct<T,DIM>& w)
+inline Vector<T,DIM> atan2( const Vector_struct<T,DIM>& v, const Vector_struct<T,DIM>& w)
 {
     Vector<T,DIM> result;
     for( Size i = 0; i != DIM; ++i)
@@ -1372,7 +1588,7 @@ inline Vector<T,DIM> elementwise_max(
 {
     Vector<T,DIM> r;
     for( Size i(0u); i < Vector<T,DIM>::DIMENSION; ++i)
-        vector_base_ptr(r)[i] = base::max MI_PREVENT_MACRO_EXPAND (
+        r[i] = base::max MI_PREVENT_MACRO_EXPAND (
             vector_base_ptr(lhs)[i], vector_base_ptr(rhs)[i] );
     return r;
 }
@@ -1385,7 +1601,7 @@ inline Vector<T,DIM> elementwise_min(
 {
     Vector<T,DIM> r;
     for( Size i(0u); i < Vector<T,DIM>::DIMENSION; ++i)
-        vector_base_ptr(r)[i] = base::min MI_PREVENT_MACRO_EXPAND (
+        r[i] = base::min MI_PREVENT_MACRO_EXPAND (
             vector_base_ptr(lhs)[i], vector_base_ptr(rhs)[i] );
     return r;
 }
@@ -1538,7 +1754,7 @@ inline Vector<T,DIM> modf( const Vector_struct<T,DIM>& v, Vector<T,DIM>& i)
 {
     Vector<T,DIM> result;
     for( Size j = 0; j != DIM; ++j)
-        result[j] = modf( vector_base_ptr(v)[j], vector_base_ptr(i)[j]);
+        result[j] = modf( vector_base_ptr(v)[j], i[j]);
     return result;
 }
 
@@ -1629,7 +1845,7 @@ template <typename T, Size DIM>
 inline void sincos( const Vector_struct<T,DIM>& a, Vector<T,DIM>& s, Vector<T,DIM>& c)
 {
     for( Size i = 0; i != DIM; ++i)
-        sincos( vector_base_ptr(a)[i], vector_base_ptr(s)[i], vector_base_ptr(c)[i]);
+        sincos( vector_base_ptr(a)[i], s[i], c[i]);
 }
 
 /// Returns 0 if \p v is less than \p a and 1 if \p v is greater than \p b in an elementwise
@@ -1728,17 +1944,17 @@ inline Vector<T,3> cross(
 template <typename T>
 inline void make_basis(
     const Vector<T,3>& n,  ///< input, normal vector
-    Vector<T,3>*       u,  ///< output, first vector in tangent plane
-    Vector<T,3>*       v)  ///< output, second vector in tangent plane
+    Vector<T,3>* const u,  ///< output, first vector in tangent plane
+    Vector<T,3>* const v)  ///< output, second vector in tangent plane
 {
 #ifdef mi_base_assert_enabled
-    const T eps    = 1e-6f;       // smallest resolvable factor
+    constexpr T eps = 1e-6f;       // smallest resolvable factor
 #endif
 
     mi_math_assert_msg( u != 0, "precondition");
     mi_math_assert_msg( v != 0, "precondition");
     // Sanity check: the normal vector must be unit length.
-    mi_math_assert_msg( abs( length(n) - 1.0f) < eps, "precondition");
+    mi_math_assert_msg( abs( length(n) - T(1)) < eps, "precondition");
 
     // Compute u.
     if( abs(n.x) < abs(n.y)) {
@@ -1778,19 +1994,20 @@ inline void make_basis(
     const Vector<T,3>& n,     ///< input, normal vector
     const Vector<T,3>& u,     ///< input, first direction vector
     const Vector<T,3>& v,     ///< input, second direction vector
-    Vector<T,3>*       t,     ///< output, first vector in tangent plane
-    Vector<T,3>*       b)     ///< output, second vector in tangent plane
+    Vector<T,3>* const t,     ///< output, first vector in tangent plane
+    Vector<T,3>* const b)     ///< output, second vector in tangent plane
 {
-    const T eps    = 1e-6f;       // smallest resolvable factor
-    (void)eps;
+#ifdef mi_base_assert_enabled
+    constexpr T eps = 1e-6f;       // smallest resolvable factor
+#endif
 
     mi_math_assert_msg( t != 0, "precondition");
     mi_math_assert_msg( b != 0, "precondition");
     // Sanity check: the normal vector must be unit length.
-    mi_math_assert_msg( abs( length( n) - 1.0f) < eps, "precondition");
+    mi_math_assert_msg( abs( length( n) - T(1)) < eps, "precondition");
     // Sanity check: the other vector lengths should be finite and non-zero
-    mi_math_assert_msg( length( u) > 0., "precondition");
-    mi_math_assert_msg( length( v) > 0., "precondition");
+    mi_math_assert_msg( length( u) > 0, "precondition");
+    mi_math_assert_msg( length( v) > 0, "precondition");
     mi_math_assert_msg( isfinite( length( u)), "precondition");
     mi_math_assert_msg( isfinite( length( v)), "precondition");
 

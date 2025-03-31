@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component that allows to start timers to elapse at configured timer
@@ -54,7 +54,7 @@ class ITimer_class_factory : public
 {
 public:
     /// Creates an instance of the class for which the factory was registered.
-    /// \return              An instance of the class, or \c NULL on failure.
+    /// \return              An instance of the class, or \c nullptr on failure.
     virtual ITimer* create() = 0;
 };
 
@@ -69,7 +69,7 @@ public:
     ///
     /// This default implementation simply calls the default constructor of T without arguments.
     ///
-    /// \return              An instance of the class, or \c NULL on failure.
+    /// \return              An instance of the class, or \c nullptr on failure.
     ITimer* create() { return new T; }
 };
 
@@ -107,7 +107,7 @@ public:
     ///                 only on the local node.
     /// \return
     ///                 -  0: Success.
-    ///                 - -1: Invalid parameters (\c NULL pointer).
+    ///                 - -1: Invalid parameters (\c nullptr).
     ///                 - -2: The timer class is not registered.
     ///                 - -3: The method cannot be called at this point of time.
     virtual Sint32 start_timer(

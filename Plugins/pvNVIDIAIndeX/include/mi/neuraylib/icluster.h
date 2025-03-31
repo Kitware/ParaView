@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Additional clusters.
@@ -60,7 +60,7 @@ public:
     /// - #mi::neuraylib::IDistributed_cache: the cluster-specific distributed cache.
     ///
     /// \param uuid        The interface ID of the corresponding interface.
-    /// \return            A pointer to the API component or \c NULL if the API component is not
+    /// \return            A pointer to the API component or \c nullptr if the API component is not
     ///                    supported or currently not available.
     virtual base::IInterface* get_api_component( const base::Uuid& uuid) const = 0;
 
@@ -76,7 +76,7 @@ public:
     /// - #mi::neuraylib::IDistributed_cache: the cluster-specific distributed cache.
     ///
     /// \tparam T          The type of the API components to be queried.
-    /// \return            A pointer to the API component or \c NULL if the API component is not
+    /// \return            A pointer to the API component or \c nullptr if the API component is not
     ///                    supported or currently not available.
     template<class T>
     T* get_api_component() const
@@ -113,13 +113,13 @@ public:
     virtual neuraylib::INeuray::Status get_status() const = 0;
 
     /// Returns the host properties for this host.
-    ////
+    ///
     /// The host properties returned by this method are specific for this cluster. The host
     /// properties handled in #mi::neuraylib::IGeneral_configuration apply only to the main cluster.
     ///
     /// Host properties are only available after the additional cluster has been started.
     ///
-    /// \return            The host properties for this host, or \c NULL on error.
+    /// \return            The host properties for this host, or \c nullptr on error.
     virtual const IHost_properties* get_host_properties() const = 0;
 
     /// Sets a host property for this host.
