@@ -67,18 +67,19 @@ Please remove this comment.
           git remote add gitlab <vtk fork url>
           ```
         - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
-              (ask @ben.boeckel if you do not have one)
+              (ask `@utils/maintainers/release` if you do not have one)
         - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
               `Developer` privileges (so it can open MRs)
 <!-- endif -->
         - [ ] Merge the VTK `paraview/release` update MR
-        - [ ] Update kwrobot with the new `paraview/release` branch rules (@ben.boeckel)
+        - [ ] Update kwrobot with the new `paraview/release` branch rules
+              (`@utils/maintainers/ghostflow`)
       - [ ] `.gitmodules` to track the `paraview/release` branch of VTK
       - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
             groups
     - Create a merge request targeting `release`
       - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
-            (ask @ben.boeckel if you do not have one)
+            (ask `@utils/maintainers/release` if you do not have one)
       - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
             `Developer` privileges (so it can open MRs)
       - [ ] Use [the `release-mr`][release-mr] script to open the create the
@@ -105,7 +106,7 @@ Please remove this comment.
     - [ ] Setup your `~/.ssh/config` and add the web host (@vbolea).
     - [ ] `rsync -rptv $tarballs web:ParaView_Release/v@MAJOR@.@MINOR@/`
   - Software process updates (these can all be done independently)
-    - [ ] Update kwrobot with the new `release` branch rules (@ben.boeckel)
+    - [ ] Update kwrobot with the new `release` branch rules (`@utils/maintainers/ghostflow`)
     - [ ] Run [this script][cdash-update-groups] to update the CDash groups
       - This must be done after a nightly run to ensure all builds are in the
         `release` group
@@ -309,8 +310,6 @@ If making a non-RC release:
 /cc @ben.boeckel
 
 /cc @cory.quammen
-
-/cc @charles.gueunet
 
 /cc @mwestphal
 
