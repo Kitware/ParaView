@@ -21,6 +21,7 @@ Variable | Description
 `PV_TRANSLATIONS_DIR` | Additional directories containing translations binary files.
 `PV_TRANSLATIONS_LOCALE` | Override the default language to load (needed for testing purposes).
 `QT_MAC_NO_NATIVE_MENUBAR` | Qt flag to force the Qt menu bar rather than the native mac menu bar.
+`VTK_XWINDOW_BORDERLESS_COVERABLE` | Allow X Windows to be covered by other windows (do not force always-on-top)
 `VTK_DISABLE_OSPRAY` | Skip rendering support tests to enable OSPRay.
 `VTK_DISABLE_VISRTX` | Skip rendering support tests to enable VisRTX.
 `PARAVIEW_DEPRECATION_EXCEPTION` | Instead of printing a warning for a deprecated method call in Python, the method will raise an exception. This is useful when testing deprecation and ensuring the current code base has been fully migrated to the new syntax.
