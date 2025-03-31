@@ -479,11 +479,18 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         new vtknvindex_irregular_volume_importer(scalar_type);
 
       assert(volume_importer);
+      volume_importer->set_cluster_properties(m_cluster_properties);
 
       // Create a scene element that represents an irregular volume.
-      volume_importer->set_cluster_properties(m_cluster_properties);
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 372500)
+      const mi::math::Matrix<mi::Float32, 4, 4> identity(1.f);
+#endif
       mi::base::Handle<nv::index::IIrregular_volume_scene_element> volume_scene_element(
-        scene->create_irregular_volume(ivol_bbox, -1.0f, volume_importer, dice_transaction.get()));
+        scene->create_irregular_volume(ivol_bbox,
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 372500)
+          identity,
+#endif
+          -1.f, volume_importer, dice_transaction.get()));
       assert(volume_scene_element.is_valid_interface());
 
       if (volume_scene_element)
@@ -981,11 +988,18 @@ void vtknvindex_scene::update_volume(
         new vtknvindex_irregular_volume_importer(scalar_type);
 
       assert(volume_importer);
+      volume_importer->set_cluster_properties(m_cluster_properties);
 
       // Create a scene element that represents an irregular volume.
-      volume_importer->set_cluster_properties(m_cluster_properties);
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 372500)
+      const mi::math::Matrix<mi::Float32, 4, 4> identity(1.f);
+#endif
       mi::base::Handle<nv::index::IIrregular_volume_scene_element> volume_scene_element(
-        scene->create_irregular_volume(ivol_bbox, -1.0f, volume_importer, dice_transaction.get()));
+        scene->create_irregular_volume(ivol_bbox,
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 372500)
+          identity,
+#endif
+          -1.f, volume_importer, dice_transaction.get()));
       assert(volume_scene_element.is_valid_interface());
 
       if (volume_scene_element)
@@ -1397,14 +1411,6 @@ void vtknvindex_scene::update_config_settings(
     sparse_volume_render_properties->set_voxel_offsets(mi::math::Vector<mi::Float32, 3>(0.5f));
   }
 
-  // Set sparse volume brick size and border size.
-  // For performance reasons is best to have (BD + 2*BS) to be power of 2.
-  nv::index::IConfig_settings::Sparse_volume_config sparse_volume_config;
-  sparse_volume_config.brick_dimensions = mi::math::Vector<mi::Uint32, 3>(60u);
-  sparse_volume_config.brick_shared_border_size = 2u;
-
-  config_settings->set_sparse_volume_configuration(sparse_volume_config);
-
   if (m_only_init)
   {
     m_only_init = false;
@@ -1467,6 +1473,13 @@ void vtknvindex_scene::update_config_settings(
 
     config_settings->set_subdivision_configuration(subdiv_config);
 #endif
+
+    // Set sparse volume brick size and border size.
+    // For performance reasons is best to have (BD + 2*BS) to be power of 2.
+    nv::index::IConfig_settings::Sparse_volume_config sparse_volume_config;
+    sparse_volume_config.brick_dimensions = mi::math::Vector<mi::Uint32, 3>(60u);
+    sparse_volume_config.brick_shared_border_size = 2u;
+    config_settings->set_sparse_volume_configuration(sparse_volume_config);
 
 #if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
     // Import all data subsets immediately, even when they are initially invisible.
