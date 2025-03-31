@@ -14,6 +14,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
@@ -392,7 +393,8 @@ public:
 
           if (jsonValue.asBool())
           {
-            proxyListDomain->SetDefaultIndex(ip);
+            vtkSMPropertyHelper helper(property);
+            helper.Set(listProxy);
           }
         }
       }
