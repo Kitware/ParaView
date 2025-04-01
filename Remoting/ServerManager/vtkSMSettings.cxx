@@ -68,6 +68,14 @@ void TransformJSON(std::string& settingsJSON)
 class vtkSMSettings::vtkSMSettingsInternal
 {
 public:
+  vtkSMSettingsInternal()
+    : SettingCollectionsAreSorted(false)
+    , IsModified(false)
+  {
+    // starts with a UserPriority collection
+    this->CreateCollectionIfNeeded();
+  }
+
   std::vector<::SettingsCollection> SettingCollections;
   bool SettingCollectionsAreSorted;
   bool IsModified;
@@ -938,13 +946,13 @@ public:
   // Description:
   // Ensure that at least one collection exists so that when settings are set,
   // there is a place to store them. If a collection needs to be created, its
-  // priority is set to DOUBLE_MAX.
+  // priority is set to UserPriority, as it should be writeable.
   void CreateCollectionIfNeeded()
   {
     if (this->SettingCollections.empty())
     {
       ::SettingsCollection newCollection;
-      newCollection.Priority = VTK_DOUBLE_MAX;
+      newCollection.Priority = vtkSMSettings::GetUserPriority();
       this->SettingCollections.push_back(newCollection);
       this->IsModified = true;
     }
@@ -970,8 +978,7 @@ vtkStandardNewMacro(vtkSMSettings);
 vtkSMSettings::vtkSMSettings()
 {
   this->Internal = new vtkSMSettingsInternal();
-  this->Internal->SettingCollectionsAreSorted = false;
-  this->Internal->IsModified = false;
+
   if (vtksys::SystemTools::GetEnv("PV_SETTINGS_DEBUG") != nullptr)
   {
     vtkWarningMacro("`PV_SETTINGS_DEBUG` environment variable has been deprecated."
