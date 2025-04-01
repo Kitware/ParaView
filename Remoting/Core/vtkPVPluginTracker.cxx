@@ -483,6 +483,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
       // Check if plugin is already known
       vtkPluginsList::iterator iter =
         this->PluginsList->LocateUsingFileName(plugin_filename.c_str());
+      bool isPluginLoaded = false;
       if (iter == this->PluginsList->end())
       {
         iter = this->PluginsList->LocateUsingPluginName(name.c_str());
@@ -562,9 +563,12 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
         version = iter->Version;
         description = iter->Description;
         xmls = iter->XMLs;
+
+        // Check if the plugin already loaded
+        isPluginLoaded = iter->Plugin != nullptr;
       }
 
-      if ((autoLoad || forceLoad) && iter->Plugin == nullptr)
+      if ((autoLoad || forceLoad) && !isPluginLoaded)
       {
         // load the plugin.
         vtkNew<vtkPVPluginLoader> loader;
