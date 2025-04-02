@@ -557,6 +557,7 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
   MODULES   VTK::IOAMR
+            VTK::IOAvmesh
             VTK::IOCellGrid
             VTK::IOCityGML
             VTK::IOCONVERGECFD
