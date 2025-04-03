@@ -495,7 +495,7 @@ void outputFunction(FILE* fp, ClassInfo* data)
         ((currentFunction->ArgTypes[i] & VTK_PARSE_BASE_TYPE) == VTK_PARSE_STRING))
       {
         /* explicit construction avoids possible ambiguity */
-        fprintf(fp, "vtkStdString(temp%i)", i);
+        fprintf(fp, "static_cast<std::string>(vtkStdString(temp%i))", i);
       }
       else
       {

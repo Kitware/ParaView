@@ -1294,6 +1294,12 @@ def GetProxy(module, key, **kwargs):
     if compatibility_version <= (5, 12):
         if key in ["ParticlePath", "StreakLine"]:
             return builtins.getattr(module, 'Legacy' + key)(**kwargs)
+    if compatibility_version <= (5, 13):
+        # In 5.13, in OpenFOAMReader we changed the default value of Createcelltopointfiltereddata to 0
+        if key == "OpenFOAMReader":
+            reader = builtins.getattr(module, key)(**kwargs)
+            reader.Createcelltopointfiltereddata = 0
+            return reader
 
     # deprecation case
     if type(key) == tuple and len(key) == 2:
