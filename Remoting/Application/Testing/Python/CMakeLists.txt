@@ -10,7 +10,6 @@ endif ()
 vtk_module_test_data(
   "${paraview_test_data_directory_input}/Data/StateWithHiddenRepresentations.pvsm")
 
-
 # Add python script names here.
 set(PY_TESTS
   Animation.py
@@ -86,6 +85,12 @@ if (NOT BUILD_SHARED_LIBS)
   list(APPEND PY_TESTS
     ZIPImport.py,NO_VALID)
 endif()
+
+if (VTK_MODULE_ENABLE_VTK_IOAvmesh)
+  list(APPEND PY_TESTS AvmeshReader.py,NO_VALID)
+  vtk_module_test_data(
+    Data/vwing_hexle.avm)
+endif ()
 
 set(SMSTATE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(ParaView::RemotingApplication_ARGS
