@@ -102,17 +102,6 @@
           is AMR. Set this to 0 to imply no limit. Default is 0.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetMergeParts"
-                         name="MergeParts"
-                         default_values="1"
-                         number_of_elements="1"
-                         panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Make the reader merge parts in the input data set. If false, the reader
-          will output a partitioned data set.
-        </Documentation>
-      </IntVectorProperty>
       <IntVectorProperty command="SetUseCache"
                          name="UseCache"
                          default_values="0"
@@ -121,7 +110,7 @@
         <BooleanDomain name="bool" />
         <Documentation>
           Enable the internal reader cache allowing to not re-read data from previous
-          time step if possible. Best used with MergeParts disabled for memory efficiency.
+          time step if possible.
         </Documentation>
       </IntVectorProperty>
       <!-- End HDFReaderCore -->
@@ -156,7 +145,6 @@
             <Property name="PointArrayStatus" />
           </PropertyGroup>
           <Property name="MaximumLevelsToReadByDefaultForAMR" />
-          <Property name="MergeParts" />
           <Property name="UseCache" />
         </ExposedProperties>
       </SubProxy>
