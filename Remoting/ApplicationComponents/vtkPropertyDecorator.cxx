@@ -22,11 +22,10 @@ void vtkPropertyDecorator::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPropertyDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy* proxy)
+void vtkPropertyDecorator::Initialize(vtkPVXMLElement* xml_, vtkSMProxy* proxy_)
 {
-  // TODO
-  this->xml = config;
-  this->proxy = proxy;
+  this->xml = xml_;
+  this->proxy = proxy_;
 }
 //-----------------------------------------------------------------------------
 vtkPVXMLElement* vtkPropertyDecorator::XML() const
@@ -52,7 +51,7 @@ std::string vtkPropertyDecorator::GetDecoratorType() const
   if (this->xml == nullptr || strcmp(this->xml->GetName(), "PropertyDecorator") != 0 ||
     this->xml->GetAttribute("type") == nullptr)
   {
-    vtkLogF(WARNING, "Invalid xml config specified. Cannot create a decorator.");
+    vtkWarningMacro("Invalid xml config specified. Cannot create a decorator.");
     return "";
   }
   return this->xml->GetAttribute("type");

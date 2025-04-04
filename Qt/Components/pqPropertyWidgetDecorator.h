@@ -5,6 +5,7 @@
 #define pqPropertyWidgetDecorator_h
 
 #include "pqPropertyWidget.h"
+#include "vtkPropertyDecorator.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
 class vtkPVXMLElement;
@@ -46,11 +47,7 @@ public:
    * Thus subclasses typically override this method only to force the widget
    * invisible given the current state.
    */
-  virtual bool canShowWidget(bool show_advanced) const
-  {
-    Q_UNUSED(show_advanced);
-    return true;
-  }
+  virtual bool canShowWidget(bool show_advanced) const;
 
   /**
    * Override this method to override the enable state of the widget in the
@@ -60,7 +57,7 @@ public:
    * Thus subclasses typically override this method only to force the widget
    * disabled given the current state.
    */
-  virtual bool enableWidget() const { return true; }
+  virtual bool enableWidget() const;
 
   /**
    * Creates a new decorator, given the xml config and the parent
@@ -84,6 +81,7 @@ private:
   Q_DISABLE_COPY(pqPropertyWidgetDecorator)
 
   vtkSmartPointer<vtkPVXMLElement> XML;
+  vtkNew<vtkPropertyDecorator> decoratorLogic;
 };
 
 #endif

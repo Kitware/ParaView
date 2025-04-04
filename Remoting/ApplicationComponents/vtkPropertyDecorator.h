@@ -39,9 +39,10 @@ public:
    * @param xml The XML element from the `<Hints/>` section for the proxy/property that
    * resulted in the creation of the decorator. Decorators can be provided
    * configuration parameters from the XML.
+   *
+   * @param proxy The proxy that owns the property of this decorator
    */
-
-  void virtual Initialize(vtkPVXMLElement* config, vtkSMProxy* proxy);
+  void virtual Initialize(vtkPVXMLElement* xml, vtkSMProxy* proxy);
 
   /**
    * Override this method to override the visibility of the widget in the
