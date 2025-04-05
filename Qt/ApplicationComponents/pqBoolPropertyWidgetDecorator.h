@@ -6,6 +6,7 @@
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"
+#include "vtkBoolPropertyDecorator.h"
 #include "vtkWeakPointer.h"
 
 /**
@@ -23,30 +24,18 @@ public:
   pqBoolPropertyWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
   ~pqBoolPropertyWidgetDecorator() override;
 
-  bool isBoolProperty() const { return this->BoolProperty; }
+  bool isBoolProperty() const;
 
 Q_SIGNALS:
   void boolPropertyChanged();
 
-protected:
-  vtkWeakPointer<vtkSMProperty> Property;
-  QString Function;
-  int Index;
-  unsigned long ObserverId;
-  bool BoolProperty;
-  QString Value;
-
 private:
   Q_DISABLE_COPY(pqBoolPropertyWidgetDecorator)
 
-  /**
-   * updates the enabled state.
-   */
-  void updateBoolPropertyState();
-  /**
-   * update this->BoolProperty and fires boolPropertyChanged
-   */
-  void setBoolProperty(bool val);
+  void emitUpdateBoolPropertyState();
+
+  vtkNew<vtkBoolPropertyDecorator> decoratorLogic;
+  unsigned long ObserverId;
 };
 
 #endif
