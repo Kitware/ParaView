@@ -8,5 +8,12 @@ pqEnableWidgetDecorator::pqEnableWidgetDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
   : Superclass(config, parentObject)
 {
-  QObject::connect(this, SIGNAL(boolPropertyChanged()), this, SIGNAL(enableStateChanged()));
+  this->decoratorLogic->Initialize(config, parentObject->proxy());
+  this->decoratorLogic->AddObserver(vtkEnableDecorator::EnableStateChangedEvent, this,
+    &pqEnableWidgetDecorator::emitEnableStateChanged);
+}
+
+void pqEnableWidgetDecorator::emitEnableStateChanged()
+{
+  Q_EMIT enableStateChanged();
 }

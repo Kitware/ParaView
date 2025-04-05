@@ -6,6 +6,7 @@
 
 #include "pqApplicationComponentsModule.h"
 #include "pqBoolPropertyWidgetDecorator.h"
+#include "vtkEnableDecorator.h"
 #include "vtkWeakPointer.h"
 
 /**
@@ -23,10 +24,14 @@ public:
   /**
    * overridden from pqPropertyWidget.
    */
-  bool enableWidget() const override { return this->isBoolProperty(); }
+  bool enableWidget() const override { return this->decoratorLogic->IsBoolProperty(); }
 
 private:
   Q_DISABLE_COPY(pqEnableWidgetDecorator)
+
+  vtkNew<vtkEnableDecorator> decoratorLogic;
+
+  void emitEnableStateChanged();
 };
 
 #endif
