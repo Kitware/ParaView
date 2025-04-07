@@ -749,11 +749,6 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
     (menu.addAction(QCoreApplication::translate("pqHelpMenu", "ParaView Web Site"))
       << pqSetName("actionWebSite")));
 
-  // ParaView Wiki
-  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/Wiki/ParaView"),
-    (menu.addAction(QCoreApplication::translate("pqHelpMenu", "ParaView Wiki"))
-      << pqSetName("actionWiki")));
-
   // ParaView Community Support
   new pqDesktopServicesReaction(QUrl("https://discourse.paraview.org/c/paraview-support"),
     (menu.addAction(QCoreApplication::translate("pqHelpMenu", "ParaView Community Support"))
