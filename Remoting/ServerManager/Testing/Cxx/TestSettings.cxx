@@ -14,14 +14,10 @@
 #include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
 
-#include <cassert>
-#include <sstream>
 #include <vtk_jsoncpp.h>
-extern int TestSettings(int argc, char* argv[])
-{
-  (void)argc;
-  vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
 
+int DoTests()
+{
   // Set up settings
   const char* settingString = "{\n"
                               "  \"sources\" : {\n"
@@ -51,7 +47,7 @@ extern int TestSettings(int argc, char* argv[])
   vtkNew<vtkSMParaViewPipelineController> controller;
 
   // Create a new session.
-  vtkSMSession* session = vtkSMSession::New();
+  vtkNew<vtkSMSession> session;
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   if (!controller->InitializeSession(session))
   {
@@ -137,11 +133,11 @@ extern int TestSettings(int argc, char* argv[])
     settings->GetProxySettings(contour);
     contour->ResetPropertiesToDefault();
 
-    if (strcmp(contourLocatorProperty->GetProxy(0)->GetXMLName(), locator1->GetXMLName()) != 0)
+    if (strcmp(contourLocatorProperty->GetProxy(0)->GetXMLName(), locator0->GetXMLName()) != 0)
     {
       std::cerr << "Wrong selected locator. Has "
                 << contourLocatorProperty->GetProxy(0)->GetXMLName() << " instead of "
-                << locator1->GetXMLName() << std::endl;
+                << locator0->GetXMLName() << std::endl;
       std::cerr << *settings << std::endl;
       return EXIT_FAILURE;
     }
@@ -159,9 +155,19 @@ extern int TestSettings(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // avoid writing our test settings on disk.
-  settings->ClearAllSettings();
-  session->Delete();
-  vtkInitializationHelper::Finalize();
   return EXIT_SUCCESS;
+}
+
+extern int TestSettings(int argc, char* argv[])
+{
+  (void)argc;
+  vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
+
+  int ret = DoTests();
+
+  // avoid writing our test settings on disk.
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  settings->ClearAllSettings();
+  vtkInitializationHelper::Finalize();
+  return ret;
 }
