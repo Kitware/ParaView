@@ -130,6 +130,11 @@ vtkSpyPlotUniReader* vtkSpyPlotReaderMap::GetReader(
     it->second->SetFileName(it->first.c_str());
     // cout << parent->GetController()->GetLocalProcessId()
     // << "Create reader: " << it->second << endl;
+
+    // Set properties from parent class on the new reader. They can be overridden
+    // by later calls to the property setters on the vtkSpyPlotReader object.
+    it->second->SetDownConvertVolumeFraction(parent->GetDownConvertVolumeFraction());
+    it->second->SetGenerateMarkers(parent->GetGenerateMarkers());
   }
   return it->second;
 }
