@@ -170,8 +170,11 @@ void vtkDSPTableIterator::GoToFirstItem()
 void vtkDSPTableIterator::GoToNextItem()
 {
   this->Internals->CurrentIdx++;
-  std::for_each(this->Internals->Workers.begin(), this->Internals->Workers.end(),
-    [&](std::shared_ptr<::Worker>& worker) { worker->SetIndex(this->Internals->CurrentIdx); });
+  if (!this->IsDoneWithTraversal())
+  {
+    std::for_each(this->Internals->Workers.begin(), this->Internals->Workers.end(),
+      [&](std::shared_ptr<::Worker>& worker) { worker->SetIndex(this->Internals->CurrentIdx); });
+  }
 }
 
 //-----------------------------------------------------------------------------
