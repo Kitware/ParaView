@@ -11,8 +11,8 @@
 #include <QTimer>
 
 //-----------------------------------------------------------------------------
-pqMyApplicationStarter::pqMyApplicationStarter(QObject* p /*=0*/)
-  : QObject(p)
+pqMyApplicationStarter::pqMyApplicationStarter(QObject* parent)
+  : QObject(parent)
 {
 }
 

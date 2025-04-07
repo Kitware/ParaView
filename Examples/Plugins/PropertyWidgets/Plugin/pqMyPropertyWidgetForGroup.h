@@ -15,7 +15,7 @@ class pqMyPropertyWidgetForGroup : public pqPropertyWidget
 
 public:
   pqMyPropertyWidgetForGroup(
-    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject = 0);
+    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject = nullptr);
   virtual ~pqMyPropertyWidgetForGroup();
 
 private:

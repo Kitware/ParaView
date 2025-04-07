@@ -13,7 +13,7 @@ class pqMyPropertyWidgetForProperty : public pqPropertyWidget
 
 public:
   pqMyPropertyWidgetForProperty(
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = nullptr);
   virtual ~pqMyPropertyWidgetForProperty();
 
 private:
