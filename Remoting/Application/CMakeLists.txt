@@ -189,6 +189,10 @@ _paraview_remoting_application_optional_xml(
   FILES   Resources/filters_filtersverdict.xml)
 
 _paraview_remoting_application_optional_xml(
+  TARGETS VTK::IOAvmesh
+  FILES   Resources/readers_ioavmesh.xml)
+
+_paraview_remoting_application_optional_xml(
   TARGETS VTK::IOCellGrid
   FILES   Resources/readers_iocellgrid.xml)
 

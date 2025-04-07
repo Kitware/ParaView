@@ -1,0 +1,33 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="AvmeshReader" class="vtkAvmeshReader" label="Avmesh Reader">
+      <Documentation
+        long_help="Read an AVMESH file"
+        short_help="Read an AVMESH file">
+      </Documentation>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+       <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the AVMESH reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="SurfaceOnly"
+                         command="SetSurfaceOnly"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="avm"
+                       file_description="AVMESH volume grid" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
