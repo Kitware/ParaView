@@ -10,8 +10,7 @@
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/test_transient_poly_data.vtkhdf" />
 
-  <!-- Activate UseCache and deactivate MergeParts-->
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/MergeParts/CheckBox" command="set_boolean" arguments="false" />
+  <!-- Activate UseCache -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/UseCache/CheckBox" command="set_boolean" arguments="true" />
 
   <!-- Look at Warping -->
