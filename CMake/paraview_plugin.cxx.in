@@ -76,6 +76,10 @@ vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
 }
 
 //-----------------------------------------------------------------------------
+#if _paraview_add_plugin_with_python
+#include "vtkPVPythonAlgorithmPlugin.h"
+@_paraview_add_plugin_python_includes@
+#endif
 void @_paraview_build_plugin@Plugin::GetXMLs(std::vector<std::string> &xmls)
 {
   (void)xmls;
@@ -84,6 +88,25 @@ void @_paraview_build_plugin@Plugin::GetXMLs(std::vector<std::string> &xmls)
 #endif
 #if _paraview_add_plugin_MODULES
   @_paraview_build_plugin@_server_manager_modules_initialize(xmls);
+#endif
+#if _paraview_add_plugin_with_python
+  const char *moduleNames[] = {
+@_paraview_add_plugin_python_modules@
+  };
+  char *moduleSources[] = {
+@_paraview_add_plugin_python_module_sources@
+  };
+  for (int cc=0; moduleNames[cc]; cc++)
+  {
+    auto* plugin = new vtkPVPythonAlgorithmPlugin();
+    plugin->InitializeFromString(moduleNames[cc], moduleSources[cc]);
+    plugin->GetXMLs(xmls);
+
+    // free allocated memory.
+    delete plugin;
+    delete[] moduleSources[cc];
+    moduleSources[cc] = nullptr;
+  }
 #endif
 }
 #endif

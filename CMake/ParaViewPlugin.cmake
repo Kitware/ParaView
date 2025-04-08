@@ -1490,8 +1490,12 @@ function (paraview_add_plugin name)
   set(_paraview_add_plugin_python_modules)
   set(_paraview_add_plugin_python_module_sources)
   set(_paraview_add_plugin_python_package_flags)
+  set(_paraview_add_plugin_python_libraries)
   if (_paraview_add_plugin_PYTHON_MODULES)
     set(_paraview_add_plugin_with_python 1)
+    # python code may include servermanager XML
+    set(_paraview_add_plugin_with_xml 1)
+    set(_paraview_add_plugin_python_libraries "ParaView::RemotingServerManagerPython")
     foreach (_paraview_add_plugin_python_module IN LISTS _paraview_add_plugin_PYTHON_MODULES)
       set(_paraview_add_plugin_python_path
         "${CMAKE_CURRENT_SOURCE_DIR}/${_paraview_add_plugin_python_module}")
@@ -1618,9 +1622,11 @@ function (paraview_add_plugin name)
       PRIVATE
         QT_STATICPLUGIN)
   endif ()
+  message("python libraries: ${_paraview_build_plugin}: ${_paraview_add_plugin_python_libraries}")
   target_link_libraries("${_paraview_build_plugin}"
     PRIVATE
       ParaView::RemotingCore
+      ${_paraview_add_plugin_python_libraries}
       ${_paraview_add_plugin_required_libraries})
   target_include_directories("${_paraview_build_plugin}"
     PRIVATE

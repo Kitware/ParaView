@@ -27,7 +27,9 @@ class VTKREMOTINGSERVERMANAGERPYTHON_EXPORT vtkPVPythonAlgorithmPlugin
   , public vtkPVServerManagerPluginInterface
 {
 public:
-  vtkPVPythonAlgorithmPlugin(const char* pythonmodule);
+  vtkPVPythonAlgorithmPlugin();
+  void InitializeFromFile(const char* filePath);
+  void InitializeFromString(const char* moduleName, const char* pythonCode);
   ~vtkPVPythonAlgorithmPlugin() override;
 
   ///@{
@@ -64,6 +66,8 @@ private:
    * refers to a Python plugin package, this method will attempt to load it.
    */
   static bool LoadPlugin(const char* pname);
+  void Initialize(
+    const char* moduleOrFileName, const char* loadPluginFunction, const char* pythonCode);
 };
 
 // Schwartz counter idiom to register loader for Python plugins (based on Python

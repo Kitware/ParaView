@@ -42,10 +42,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
-vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* modulefile)
+vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin()
   : Internals(new vtkPVPythonAlgorithmPlugin::vtkInternals())
 {
-  assert(modulefile != nullptr);
+}
+
+void vtkPVPythonAlgorithmPlugin::InitializeFromFile(const char* fileName)
+{
+  this->Initialize(fileName, "load_plugin", nullptr);
+}
+
+void vtkPVPythonAlgorithmPlugin::InitializeFromString(
+  const char* moduleName, const char* pythonCode)
+{
+  this->Initialize(moduleName, "load_plugin_from_string", pythonCode);
+}
+
+void vtkPVPythonAlgorithmPlugin::Initialize(
+  const char* moduleOrFileName, const char* loadPlugin, const char* pythonCode)
+{
+  assert(moduleOrFileName != nullptr);
 
   // Initialize Python environment, if not already.
   vtkPythonInterpreter::Initialize();
@@ -60,18 +76,31 @@ vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* modulefile)
     throw std::runtime_error("Failed to import `paraview.detail.pythonalgorithm`.");
   }
 
-  vtkSmartPyObject load_plugin(PyObject_GetAttrString(pvdetail, "load_plugin"));
+  vtkSmartPyObject load_plugin(PyObject_GetAttrString(pvdetail, loadPlugin));
   if (!load_plugin)
   {
-    throw std::runtime_error("Failed to locate `paraview.detail.pythonalgorithm.load_plugin`.");
+    throw std::runtime_error(
+      std::string("Failed to locate `paraview.detail.pythonalgorithm.") + loadPlugin + "`.");
   }
 
-  vtkSmartPyObject filename(PyUnicode_FromString(modulefile));
-  vtkSmartPyObject module(
-    PyObject_CallFunctionObjArgs(load_plugin, filename.GetPointer(), nullptr));
+  PyObject* obj = nullptr;
+  if (pythonCode)
+  {
+    vtkSmartPyObject moduleName(PyUnicode_FromString(moduleOrFileName));
+    vtkSmartPyObject python_code(PyUnicode_FromString(pythonCode));
+    obj = PyObject_CallFunctionObjArgs(
+      load_plugin, moduleName.GetPointer(), python_code.GetPointer(), nullptr);
+  }
+  else
+  {
+    vtkSmartPyObject fileName(PyUnicode_FromString(moduleOrFileName));
+    obj = PyObject_CallFunctionObjArgs(load_plugin, fileName.GetPointer(), nullptr);
+  }
+  vtkSmartPyObject module(obj);
   if (!module)
   {
-    throw std::runtime_error("Failed to call `paraview.detail.pythonalgorithm.load_plugin`.");
+    throw std::runtime_error(
+      std::string("Failed to call `paraview.detail.pythonalgorithm.") + loadPlugin + "`");
   }
 
   vtkSmartPyObject get_plugin_xmls(PyObject_GetAttrString(pvdetail, "get_plugin_xmls"));
@@ -131,7 +160,7 @@ vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* modulefile)
 
   internals.PluginVersion = PyUnicode_AsUTF8(result);
 
-  this->SetFileName(modulefile);
+  this->SetFileName(moduleOrFileName);
 }
 
 //----------------------------------------------------------------------------
@@ -165,7 +194,8 @@ bool vtkPVPythonAlgorithmPlugin::LoadPlugin(const char* pname)
   {
     try
     {
-      auto* plugin = new vtkPVPythonAlgorithmPlugin(pname);
+      auto* plugin = new vtkPVPythonAlgorithmPlugin();
+      plugin->InitializeFromFile(pname);
       return vtkPVPlugin::ImportPlugin(plugin);
     }
     catch (const std::runtime_error& err)
