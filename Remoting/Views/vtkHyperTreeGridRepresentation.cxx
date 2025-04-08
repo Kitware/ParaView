@@ -151,6 +151,10 @@ int vtkHyperTreeGridRepresentation::RequestData(
       }
     }
     this->Mapper->SetInputConnection(this->GetInternalOutputPort());
+
+    // Needed so that the mapper can update its bounds based on the data during the first render
+    vtkDataObject* input = vtkDataObject::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    this->Mapper->SetInputDataObject(input);
   }
 
   this->Mapper->SetScalarModeToUseCellData();
