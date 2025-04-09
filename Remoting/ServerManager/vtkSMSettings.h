@@ -51,10 +51,12 @@
  * values (int, double, and string) are available through this interface;
  * access to non-leaf nodes in the JSON format is not provided.
  *
- * This class supports setting setting values. Settings modified through the
- * "Set*" methods modify thet setting collection that has priority
+ * This class supports setting values. Settings modified through the
+ * "Set*" methods modify the setting collection that has priority
  * over all other collections. This collection can be saved to a text file in
  * JSON format using the SaveSettingsToFile() method.
+ * By default a collection is added with the highest priority, GetUserPriority().
+ * But if you ClearAllSettings be careful to recreate one.
  *
  * Some convenience methods for getting and setting proxy property values are
  * provided. GetProxySettings() sets the values of proxy properties that are
@@ -91,17 +93,23 @@ public:
    * in more than one setting collections. If two setting collections
    * contain values for the same setting, then the setting from the
    * collection with higher priority will be used.
+   * @see GetUserPriority(), GetApplicationPriority()
    */
   bool AddCollectionFromString(const std::string& settings, double priority);
 
   /**
    * The same as AddCollectionFromString, but this method reads the settings
    * string from the named file. The fileName should be a full path.
+   * @see GetUserPriority(), GetApplicationPriority()
    */
   bool AddCollectionFromFile(const std::string& fileName, double priority);
 
   /**
    * Clear out all settings, deleting all collections.
+   * Warning: after that, be sure to AddCollectionFrom(File/String)
+   * with a high, "writeable" priority. Because the highest will
+   * be considered as writeable anyway.
+   * @see GetUserPriority(), GetApplicationPriority()
    */
   void ClearAllSettings();
 
@@ -262,6 +270,18 @@ public:
    * XML state.
    */
   static bool DeserializeFromJSON(vtkSMProxy* proxy, const Json::Value& value);
+
+  /**
+   * Get the priority value used for UserPriority.
+   * This is the highest priority.
+   */
+  static double GetUserPriority();
+
+  /**
+   * Get the priority for application settings.
+   * This is just lower than UserPriority.
+   */
+  static double GetApplicationPriority();
 
 protected:
   vtkSMSettings();

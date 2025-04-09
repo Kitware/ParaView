@@ -14,6 +14,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
@@ -30,6 +31,7 @@
 
 #include <algorithm>
 #include <cfloat>
+#include <cmath>
 #include <memory>
 #include <string>
 
@@ -66,6 +68,14 @@ void TransformJSON(std::string& settingsJSON)
 class vtkSMSettings::vtkSMSettingsInternal
 {
 public:
+  vtkSMSettingsInternal()
+    : SettingCollectionsAreSorted(false)
+    , IsModified(false)
+  {
+    // starts with a UserPriority collection
+    this->CreateCollectionIfNeeded();
+  }
+
   std::vector<::SettingsCollection> SettingCollections;
   bool SettingCollectionsAreSorted;
   bool IsModified;
@@ -123,7 +133,7 @@ public:
   // ".[0][1][2].name1[3]"
   const Json::Value& GetSetting(const char* settingName)
   {
-    return this->GetSettingAtOrBelowPriority(settingName, VTK_DOUBLE_MAX);
+    return this->GetSettingAtOrBelowPriority(settingName, vtkSMSettings::GetUserPriority());
   }
 
   //----------------------------------------------------------------------------
@@ -391,7 +401,8 @@ public:
 
           if (jsonValue.asBool())
           {
-            proxyListDomain->SetDefaultIndex(ip);
+            vtkSMPropertyHelper helper(property);
+            helper.Set(listProxy);
           }
         }
       }
@@ -501,7 +512,7 @@ public:
     this->SeparateBranchFromLeaf(settingName, root, leaf);
 
     std::vector<T> previousValues;
-    this->GetSetting(settingName, previousValues, VTK_DOUBLE_MAX);
+    this->GetSetting(settingName, previousValues, vtkSMSettings::GetUserPriority());
 
     Json::Path settingPath(root);
     Json::Value& jsonValue = settingPath.make(this->SettingCollections[0].Value);
@@ -676,7 +687,7 @@ public:
         vtkSMProxy* listProxy = proxyListDomain->GetProxy(ip);
         if (listProxy)
         {
-          if (!this->SetProxySettings(settingName, listProxy, nullptr, true))
+          if (!this->SetProxySettings(settingName, listProxy, nullptr, false))
           {
             return false;
           }
@@ -935,13 +946,13 @@ public:
   // Description:
   // Ensure that at least one collection exists so that when settings are set,
   // there is a place to store them. If a collection needs to be created, its
-  // priority is set to DOUBLE_MAX.
+  // priority is set to UserPriority, as it should be writeable.
   void CreateCollectionIfNeeded()
   {
     if (this->SettingCollections.empty())
     {
       ::SettingsCollection newCollection;
-      newCollection.Priority = VTK_DOUBLE_MAX;
+      newCollection.Priority = vtkSMSettings::GetUserPriority();
       this->SettingCollections.push_back(newCollection);
       this->IsModified = true;
     }
@@ -967,8 +978,7 @@ vtkStandardNewMacro(vtkSMSettings);
 vtkSMSettings::vtkSMSettings()
 {
   this->Internal = new vtkSMSettingsInternal();
-  this->Internal->SettingCollectionsAreSorted = false;
-  this->Internal->IsModified = false;
+
   if (vtksys::SystemTools::GetEnv("PV_SETTINGS_DEBUG") != nullptr)
   {
     vtkWarningMacro("`PV_SETTINGS_DEBUG` environment variable has been deprecated."
@@ -1175,7 +1185,7 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
 //----------------------------------------------------------------------------
 bool vtkSMSettings::HasSetting(const char* settingName)
 {
-  return this->Internal->HasSetting(settingName, VTK_DOUBLE_MAX);
+  return this->Internal->HasSetting(settingName, vtkSMSettings::GetUserPriority());
 }
 
 //----------------------------------------------------------------------------
@@ -1193,7 +1203,7 @@ unsigned int vtkSMSettings::GetSettingNumberOfElements(const char* settingName)
     return value.size();
   }
 
-  return 0;
+  return value.isNull() ? 0 : 1;
 }
 
 //----------------------------------------------------------------------------
@@ -1219,7 +1229,7 @@ std::string vtkSMSettings::GetSettingAsString(
 int vtkSMSettings::GetSettingAsInt(const char* settingName, unsigned int index, int defaultValue)
 {
   std::vector<int> values;
-  bool success = this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
+  bool success = this->Internal->GetSetting(settingName, values, vtkSMSettings::GetUserPriority());
 
   if (success && index < values.size())
   {
@@ -1234,7 +1244,7 @@ double vtkSMSettings::GetSettingAsDouble(
   const char* settingName, unsigned int index, double defaultValue)
 {
   std::vector<double> values;
-  bool success = this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
+  bool success = this->Internal->GetSetting(settingName, values, vtkSMSettings::GetUserPriority());
 
   if (success && index < values.size())
   {
@@ -1249,7 +1259,7 @@ std::string vtkSMSettings::GetSettingAsString(
   const char* settingName, unsigned int index, const std::string& defaultValue)
 {
   std::vector<std::string> values;
-  bool success = this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
+  bool success = this->Internal->GetSetting(settingName, values, vtkSMSettings::GetUserPriority());
 
   if (success && index < values.size())
   {
@@ -1279,7 +1289,7 @@ std::string vtkSMSettings::GetSettingDescription(const char* settingName)
 //----------------------------------------------------------------------------
 bool vtkSMSettings::GetPropertySetting(vtkSMProperty* property)
 {
-  return this->GetPropertySetting(property, VTK_DOUBLE_MAX);
+  return this->GetPropertySetting(property, vtkSMSettings::GetUserPriority());
 }
 
 //----------------------------------------------------------------------------
@@ -1301,7 +1311,7 @@ bool vtkSMSettings::GetPropertySetting(vtkSMProperty* property, double maxPriori
 //----------------------------------------------------------------------------
 bool vtkSMSettings::GetPropertySetting(const char* prefix, vtkSMProperty* property)
 {
-  return this->GetPropertySetting(prefix, property, VTK_DOUBLE_MAX);
+  return this->GetPropertySetting(prefix, property, vtkSMSettings::GetUserPriority());
 }
 
 //----------------------------------------------------------------------------
@@ -1350,7 +1360,7 @@ bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy, double maxPriority)
 //----------------------------------------------------------------------------
 bool vtkSMSettings::GetProxySettings(const char* prefix, vtkSMProxy* proxy)
 {
-  return this->GetProxySettings(prefix, proxy, VTK_DOUBLE_MAX);
+  return this->GetProxySettings(prefix, proxy, vtkSMSettings::GetUserPriority());
 }
 
 //----------------------------------------------------------------------------
@@ -1381,7 +1391,7 @@ void vtkSMSettings::SetSetting(const char* settingName, const std::string& value
 void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, int value)
 {
   std::vector<int> values;
-  this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
+  this->Internal->GetSetting(settingName, values, vtkSMSettings::GetUserPriority());
   if (values.size() <= index)
   {
     values.resize(index + 1, 0);
@@ -1395,7 +1405,7 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, int 
 void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, double value)
 {
   std::vector<double> values;
-  this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
+  this->Internal->GetSetting(settingName, values, vtkSMSettings::GetUserPriority());
   if (values.size() <= index)
   {
     values.resize(index + 1, 0);
@@ -1410,7 +1420,7 @@ void vtkSMSettings::SetSetting(
   const char* settingName, unsigned int index, const std::string& value)
 {
   std::vector<std::string> values;
-  this->Internal->GetSetting(settingName, values, VTK_DOUBLE_MAX);
+  this->Internal->GetSetting(settingName, values, vtkSMSettings::GetUserPriority());
   if (values.size() <= index)
   {
     values.resize(index + 1, "");
@@ -1668,4 +1678,16 @@ void vtkSMSettings::PrintSelf(ostream& os, vtkIndent indent)
       os << indent << indent << indent << line << "\n";
     }
   }
+}
+
+//----------------------------------------------------------------------------
+double vtkSMSettings::GetUserPriority()
+{
+  return 1000.;
+}
+
+//----------------------------------------------------------------------------
+double vtkSMSettings::GetApplicationPriority()
+{
+  return vtkSMSettings::GetUserPriority() / 2;
 }

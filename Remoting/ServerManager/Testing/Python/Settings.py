@@ -39,8 +39,8 @@ settingsString = """
 
 settings = paraview.servermanager.vtkSMSettings.GetInstance()
 settings.ClearAllSettings()
-settings.AddCollectionFromString(settingsString, 2000000.0)
-settings.AddCollectionFromString("{}", 1500000.0)
+settings.AddCollectionFromString(settingsString, servermanager.vtkSMSettings.GetUserPriority() - 1)
+settings.AddCollectionFromString("{}", servermanager.vtkSMSettings.GetUserPriority() - 2)
 
 def check_comment(expected, settings, field):
   actual = settings.GetSettingDescription(field)

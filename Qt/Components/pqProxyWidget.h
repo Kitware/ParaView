@@ -242,6 +242,23 @@ private:
    */
   bool shouldPreservePropertyValues() const;
 
+  /**
+   * Reset property to its default and look for settings at given priority.
+   * Return true if the property value has changed.
+   * If warn is true, emit signal on changes.
+   */
+  bool resetProperty(vtkSMProperty* prop, double settingsPriority, bool warn);
+
+  /**
+   * Reset property to its default, and use site settings.
+   */
+  void resetPropertyToAppDefault(pqPropertyWidget* propWidget);
+
+  /**
+   * Reset property to its default, and use user settings.
+   */
+  void resetPropertyToUserDefault(pqPropertyWidget* propWidget);
+
   Q_DISABLE_COPY(pqProxyWidget);
 
   QSet<QString> DefaultVisibilityLabels;

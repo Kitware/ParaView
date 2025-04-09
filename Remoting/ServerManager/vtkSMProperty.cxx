@@ -15,6 +15,7 @@
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
 
 #include <sstream>
@@ -555,6 +556,13 @@ void vtkSMProperty::ResetToDefault()
   {
     this->ResetToXMLDefaults();
   }
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProperty::ResetToSettings(double priority)
+{
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  return settings->GetPropertySetting(this, priority);
 }
 
 //---------------------------------------------------------------------------

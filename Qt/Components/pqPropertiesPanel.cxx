@@ -660,13 +660,13 @@ void pqPropertiesPanel::updateButtonState()
       continue;
     }
 
+    ui.PropertiesRestoreDefaults->setEnabled(true);
     if (proxy->modifiedState() == pqProxy::UNINITIALIZED)
     {
       vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), previous_apply_state == false,
         "`Apply` button enabled since `%s` became uninitialized.",
         proxy->getProxy()->GetLogNameOrDefault());
       ui.Accept->setEnabled(true);
-      ui.PropertiesRestoreDefaults->setEnabled(true);
       ui.PropertiesSaveAsDefaults->setEnabled(true);
     }
     else if (proxy->modifiedState() == pqProxy::MODIFIED)
@@ -676,7 +676,6 @@ void pqPropertiesPanel::updateButtonState()
         proxy->getProxy()->GetLogNameOrDefault());
       ui.Accept->setEnabled(true);
       ui.Reset->setEnabled(true);
-      ui.PropertiesRestoreDefaults->setEnabled(true);
       ui.PropertiesSaveAsDefaults->setEnabled(true);
     }
   }
@@ -708,11 +707,10 @@ void pqPropertiesPanel::updateButtonEnableState()
   // Update PropertiesSaveAsDefaults and PropertiesRestoreDefaults state.
   // If the source's properties are yet to be applied, we disable the two
   // buttons (see BUG #15338).
-  bool canSaveRestoreSourcePropertyDefaults = internals.Source != nullptr
+  bool canSaveSourcePropertyDefaults = internals.Source != nullptr
     ? (internals.Source->modifiedState() == pqProxy::UNMODIFIED)
     : false;
-  ui.PropertiesSaveAsDefaults->setEnabled(canSaveRestoreSourcePropertyDefaults);
-  ui.PropertiesRestoreDefaults->setEnabled(canSaveRestoreSourcePropertyDefaults);
+  ui.PropertiesSaveAsDefaults->setEnabled(canSaveSourcePropertyDefaults);
 
   ui.DisplayRestoreDefaults->setEnabled(internals.DisplayWidgets != nullptr);
   ui.DisplaySaveAsDefaults->setEnabled(internals.DisplayWidgets != nullptr);
@@ -849,15 +847,7 @@ void pqPropertiesPanel::propertiesRestoreDefaults()
     this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : nullptr;
   if (widgets && widgets->Panel)
   {
-    if (widgets->Panel->restoreDefaults())
-    {
-      // If defaults were restored, we're going to pretend that the user hit
-      // apply for the source, so that the property changes are "accepted" and
-      // rest of the application updates.
-      widgets->apply(this->view());
-      Q_EMIT this->applied(widgets->Proxy);
-      Q_EMIT this->applied();
-    }
+    widgets->Panel->restoreDefaults();
   }
 }
 

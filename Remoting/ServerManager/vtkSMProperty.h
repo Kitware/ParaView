@@ -409,6 +409,13 @@ public:
    */
   virtual bool ResetToDomainDefaults(bool use_unchecked_values = false);
 
+  /**
+   * Reset property value with settings. If not found at given priority,
+   * fallback to lower priority value.
+   * @see vtkSMSettings::GetUserPriority, vtkSMSettings::GetApplicationPriority
+   */
+  bool ResetToSettings(double priority);
+
   ///@{
   /**
    * The label assigned by the xml parser.

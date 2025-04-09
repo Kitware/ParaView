@@ -165,6 +165,10 @@ set(classes
   pqXYChartViewBoundsPropertyWidget
   vtkPVColorTransferControlPointsItem)
 
+set(private_classes
+  "Private/pqProxyWidgetItem"
+)
+
 set_property(SOURCE pqComponentsInit.cxx APPEND
   PROPERTY
     COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>")
@@ -293,6 +297,7 @@ endif ()
 
 vtk_module_add_module(ParaView::pqComponents
   CLASSES ${classes}
+  PRIVATE_CLASSES ${private_classes}
   HEADERS ${headers}
   SOURCES ${ui_files}
           ${resource_files})

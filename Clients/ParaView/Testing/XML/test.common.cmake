@@ -645,8 +645,6 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PythonAlgorithmPlugin.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PythonAlgorithmReadersAndWriters.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PythonShellRunScript.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PropertyContextMenu1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PropertyContextMenu2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PVCellCentersHyperTreeGrid.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea_1.png}"
@@ -1022,6 +1020,11 @@ list (APPEND TESTS_WITHOUT_BASELINES
   RescaleVisibleRangeOption.xml
   SearchBox.xml
   ServerConnectDialog.xml
+  SettingsNoCustomDefault.xml
+  SettingsOverrideDomain.xml
+  SettingsProxyProperty.xml
+  SettingsRestoreProxyAppDefault.xml
+  SettingsSubProxy.xml
   SliceBackwardsCompatibility.xml
   SpatioTemporalHarmonicsAttribute.xml
   SpatioTemporalHarmonicsSource.xml
