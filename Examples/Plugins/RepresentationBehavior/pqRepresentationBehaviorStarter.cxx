@@ -11,8 +11,8 @@
 #include "pqSurfaceRepresentationBehavior.h"
 
 //-----------------------------------------------------------------------------
-pqRepresentationBehaviorStarter::pqRepresentationBehaviorStarter(QObject* p /*=0*/)
-  : QObject(p)
+pqRepresentationBehaviorStarter::pqRepresentationBehaviorStarter(QObject* parent)
+  : QObject(parent)
 {
 }
 

@@ -18,7 +18,7 @@ class pqSurfaceRepresentationBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqSurfaceRepresentationBehavior(QObject* parent = 0);
+  pqSurfaceRepresentationBehavior(QObject* parent = nullptr);
 
 protected Q_SLOTS:
   void onRepresentationAdded(pqRepresentation*);

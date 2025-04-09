@@ -7,13 +7,14 @@ class ExampleDockPanel : public QDockWidget
   typedef QDockWidget Superclass;
 
 public:
-  ExampleDockPanel(const QString& t, QWidget* p = 0, Qt::WindowFlags f = 0)
-    : Superclass(t, p, f)
+  ExampleDockPanel(
+    const QString& title, QWidget* parent = nullptr, Qt::WindowFlags flag = Qt::WindowFlags())
+    : Superclass(title, parent, flag)
   {
     this->constructor();
   }
-  ExampleDockPanel(QWidget* p = 0, Qt::WindowFlags f = 0)
-    : Superclass(p, f)
+  ExampleDockPanel(QWidget* parent = nullptr, Qt::WindowFlags flag = Qt::WindowFlags())
+    : Superclass(parent, flag)
   {
     this->constructor();
   }

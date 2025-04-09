@@ -12,7 +12,7 @@ class pqRepresentationBehaviorStarter : public QObject
   typedef QObject Superclass;
 
 public:
-  pqRepresentationBehaviorStarter(QObject* p = 0);
+  pqRepresentationBehaviorStarter(QObject* parent = nullptr);
   ~pqRepresentationBehaviorStarter();
 
   // Callback for shutdown.
