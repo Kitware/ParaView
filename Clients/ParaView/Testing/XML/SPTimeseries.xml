@@ -12,6 +12,14 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrayStatus/ArraySelectionWidget" command="openContextMenu" arguments="0.0" />
   <pqevent object="TreeViewCheckMenu" command="activate" arguments="Check highlighted items" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Check that volume fraction is down converted to type unsigned char by default. -->
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="5.1,unsigned char" />
+  <!-- Disable down conversion of material fraction and check that it is read as type float. -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DownConvertVolumeFraction/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="5.1,float" />
+
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="CTHPart" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/VolumeArrays/ArraySelectionWidget" command="setCheckState" arguments="4.0,2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/VolumeArrays/ArraySelectionWidget" command="setCheckState" arguments="5.0,2" />
