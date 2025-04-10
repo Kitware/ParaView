@@ -13,6 +13,7 @@
 #include "vtkSmartPyObject.h"
 #include "vtksys/SystemTools.hxx"
 
+#include <memory>
 #include <stdexcept>
 
 //============================================================================
@@ -194,9 +195,9 @@ bool vtkPVPythonAlgorithmPlugin::LoadPlugin(const char* pname)
   {
     try
     {
-      auto* plugin = new vtkPVPythonAlgorithmPlugin();
+      auto plugin = std::make_unique<vtkPVPythonAlgorithmPlugin>();
       plugin->InitializeFromFile(pname);
-      return vtkPVPlugin::ImportPlugin(plugin);
+      return vtkPVPlugin::ImportPlugin(plugin.get());
     }
     catch (const std::runtime_error& err)
     {
@@ -209,6 +210,31 @@ bool vtkPVPythonAlgorithmPlugin::LoadPlugin(const char* pname)
       }
       return false;
     }
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVPythonAlgorithmPlugin::InitializeFromStringAndGetXMLs(
+  const char* moduleName, const char* pythonCode, std::vector<std::string>& xmls)
+{
+  try
+  {
+    auto plugin = std::make_unique<vtkPVPythonAlgorithmPlugin>();
+    plugin->InitializeFromString(moduleName, pythonCode);
+    plugin->GetXMLs(xmls);
+    return true;
+  }
+  catch (const std::runtime_error& err)
+  {
+    vtkGenericWarningMacro("Failed to load Python plugin:\n" << err.what());
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    if (PyErr_Occurred() != nullptr)
+    {
+      PyErr_Print();
+      PyErr_Clear();
+    }
+    return false;
   }
   return false;
 }

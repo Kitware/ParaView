@@ -2,7 +2,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVPluginLoader.h"
-#include <memory>
 
 #cmakedefine01 _paraview_add_plugin_EULA
 #cmakedefine01 _paraview_add_plugin_SERVER_MANAGER_XML
@@ -101,9 +100,7 @@ void @_paraview_build_plugin@Plugin::GetXMLs(std::vector<std::string> &xmls)
   };
   for (int cc=0; moduleNames[cc]; cc++)
   {
-    auto plugin = std::make_shared<vtkPVPythonAlgorithmPlugin>();
-    plugin->InitializeFromString(moduleNames[cc], moduleSources[cc]);
-    plugin->GetXMLs(xmls);
+    vtkPVPythonAlgorithmPlugin::InitializeFromStringAndGetXMLs(moduleNames[cc], moduleSources[cc], xmls);
 
     // free allocated memory.
     delete[] moduleSources[cc];

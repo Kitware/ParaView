@@ -52,6 +52,8 @@ public:
     return nullptr;
   }
   ///@}
+  static bool InitializeFromStringAndGetXMLs(
+    const char* moduleName, const char* pythonCode, std::vector<std::string>& xmls);
 
 private:
   vtkPVPythonAlgorithmPlugin(const vtkPVPythonAlgorithmPlugin&) = delete;
