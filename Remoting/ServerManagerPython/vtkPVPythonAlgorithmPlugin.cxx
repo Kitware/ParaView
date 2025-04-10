@@ -43,18 +43,15 @@ public:
 };
 
 //----------------------------------------------------------------------------
-vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin()
+vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* fileName)
   : Internals(new vtkPVPythonAlgorithmPlugin::vtkInternals())
-{
-}
-
-void vtkPVPythonAlgorithmPlugin::InitializeFromFile(const char* fileName)
 {
   this->Initialize(fileName, "load_plugin", nullptr);
 }
 
-void vtkPVPythonAlgorithmPlugin::InitializeFromString(
+vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(
   const char* moduleName, const char* pythonCode)
+  : Internals(new vtkPVPythonAlgorithmPlugin::vtkInternals())
 {
   this->Initialize(moduleName, "load_plugin_from_string", pythonCode);
 }
@@ -195,8 +192,7 @@ bool vtkPVPythonAlgorithmPlugin::LoadPlugin(const char* pname)
   {
     try
     {
-      auto plugin = std::make_unique<vtkPVPythonAlgorithmPlugin>();
-      plugin->InitializeFromFile(pname);
+      auto plugin = std::make_unique<vtkPVPythonAlgorithmPlugin>(pname);
       return vtkPVPlugin::ImportPlugin(plugin.get());
     }
     catch (const std::runtime_error& err)
@@ -220,8 +216,7 @@ bool vtkPVPythonAlgorithmPlugin::InitializeFromStringAndGetXMLs(
 {
   try
   {
-    auto plugin = std::make_unique<vtkPVPythonAlgorithmPlugin>();
-    plugin->InitializeFromString(moduleName, pythonCode);
+    auto plugin = std::make_unique<vtkPVPythonAlgorithmPlugin>(moduleName, pythonCode);
     plugin->GetXMLs(xmls);
     return true;
   }

@@ -27,9 +27,8 @@ class VTKREMOTINGSERVERMANAGERPYTHON_EXPORT vtkPVPythonAlgorithmPlugin
   , public vtkPVServerManagerPluginInterface
 {
 public:
-  vtkPVPythonAlgorithmPlugin();
-  void InitializeFromFile(const char* filePath);
-  void InitializeFromString(const char* moduleName, const char* pythonCode);
+  vtkPVPythonAlgorithmPlugin(const char* filePath);
+  vtkPVPythonAlgorithmPlugin(const char* moduleName, const char* pythonCode);
   ~vtkPVPythonAlgorithmPlugin() override;
 
   ///@{
