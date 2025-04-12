@@ -104,7 +104,6 @@ void @_paraview_build_plugin@Plugin::GetXMLs(std::vector<std::string> &xmls)
 
     // free allocated memory.
     delete[] moduleSources[cc];
-    moduleSources[cc] = nullptr;
   }
 #endif
 }
@@ -155,7 +154,6 @@ void @_paraview_build_plugin@Plugin::GetPythonSourceList(std::vector<std::string
 
     // free allocated memory.
     delete[] moduleSources[cc];
-    moduleSources[cc] = nullptr;
   }
 }
 #endif
