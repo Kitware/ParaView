@@ -192,8 +192,8 @@ bool vtkPVPythonAlgorithmPlugin::LoadPlugin(const char* pname)
   {
     try
     {
-      auto plugin = std::make_unique<vtkPVPythonAlgorithmPlugin>(pname);
-      return vtkPVPlugin::ImportPlugin(plugin.get());
+      auto plugin = new vtkPVPythonAlgorithmPlugin(pname);
+      return vtkPVPlugin::ImportPlugin(plugin);
     }
     catch (const std::runtime_error& err)
     {
