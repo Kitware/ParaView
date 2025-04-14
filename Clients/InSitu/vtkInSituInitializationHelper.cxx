@@ -43,6 +43,8 @@ extern "C"
 {
   void vtkPVInitializePythonModules();
 }
+
+#include "vtkPythonInterpreter.h"
 #endif
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
@@ -131,7 +133,8 @@ vtkInSituInitializationHelper::vtkInSituInitializationHelper() = default;
 vtkInSituInitializationHelper::~vtkInSituInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
-void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
+void vtkInSituInitializationHelper::Initialize(
+  vtkTypeUInt64 comm, const std::vector<std::string>& python_paths)
 {
   vtkInSituInitializationHelper::Internals = new vtkInternals();
   auto& internals = (*vtkInSituInitializationHelper::Internals);
@@ -185,6 +188,21 @@ void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
 #if VTK_MODULE_ENABLE_ParaView_PythonInitializer
   // register static Python modules built, if any.
   vtkPVInitializePythonModules();
+
+  // Since vtkPythonInterpreter offers onlu prepend and not append, we add the
+  // paths in reverse order to keep the same order of precedence.
+  for (auto iter = python_paths.crbegin(); iter != python_paths.crend(); iter++)
+  {
+    // remove any trailing slashes, not required but makes debuggin easier
+    const std::string& path = *iter;
+    std::string resolved_path =
+      vtksys::SystemTools::ConvertToOutputPath(vtksys::SystemTools::GetFilenamePath(path));
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Adding PYTHONPATH %s", resolved_path.c_str());
+    vtkPythonInterpreter::PrependPythonPath(resolved_path.c_str());
+  }
+
+#else
+  (void)python_paths;
 #endif
 
   // skipping for now

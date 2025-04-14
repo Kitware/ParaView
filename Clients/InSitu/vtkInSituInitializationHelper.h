@@ -64,8 +64,17 @@ public:
    * the Fortran handle without having to include 'mpi.h' in this public header.
    * The Fortran MPI communicator handle can be obtained from a `MPI_Comm` using
    * `MPI_Comm_c2f()`. Refer to MPI specification for details.
+   *
+   * 'python_paths' is used to update the PYTHONPATH visible to catalyst scripts. In
+   * particular, in Python-enabled builds, the `python_paths` are prepended
+   * into the current path of the vtkPythonInterpreter that executes the
+   * catalyst script. This allows to add paths to python packages  that a
+   * catalyst script can use. A prime example for this is path to custom
+   * scripts or CATALYST_PYTHONPATH which at the time of writing holds the
+   * necessary package to access the conduit node used in each of the
+   * `catalyst_*1 calls i.e. `node = info.catalyst_params`.
    */
-  static void Initialize(vtkTypeUInt64 comm);
+  static void Initialize(vtkTypeUInt64 comm, const std::vector<std::string>& python_paths);
 
   /**
    * Finalizes the engine. This can be called only once in the lifetime of the
