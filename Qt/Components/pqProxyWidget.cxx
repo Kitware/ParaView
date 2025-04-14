@@ -1248,6 +1248,12 @@ void pqProxyWidget::showContextMenu(const QPoint& pt, pqPropertyWidget* propWidg
   });
   useDefault->setObjectName("UseDefault");
 
+  auto pqproxy = pqProxy::findProxy(this->proxy());
+  if (pqproxy)
+  {
+    useDefault->setEnabled(pqproxy->modifiedState() == pqProxy::UNMODIFIED);
+  }
+
   QAction* resetToAppDefault = menu.addAction(tr("Reset to Application Default"), propWidget,
     [this, propWidget]() { this->resetPropertyToAppDefault(propWidget); });
   resetToAppDefault->setObjectName("ResetToDefault");
