@@ -154,8 +154,8 @@ Typically, one addresses issues by writing code. To start contributing to ParaVi
 10. Monitor the related issue for any `triage:needinfo` label additions to provide
     the customer with any details necessary to test the fix.
 
-Our [Wiki][] is used to document features, flesh out designs and host other
-documentation. We have a [ParaView Discourse][] forum to coordinate development
+
+We have a [ParaView Discourse][] forum to coordinate development
 and to provide support.
 
 [ParaView Git README]: Documentation/dev/git/README.md
@@ -176,7 +176,6 @@ and to provide support.
 [Merge Requests]: https://gitlab.kitware.com/paraview/paraview/-/merge_requests
 [Labels]: https://gitlab.kitware.com/paraview/paraview/-/labels
 [Milestones]: https://gitlab.kitware.com/paraview/paraview/-/milestones
-[Wiki]: http://www.paraview.org/Wiki/ParaView
 [ParaView Discourse]: https://discourse.paraview.org/
 [Gitlab Markdown]: https://gitlab.kitware.com/help/markdown/markdown
 [new issue]: https://gitlab.kitware.com/paraview/paraview/-/issues/new

@@ -443,7 +443,7 @@ to`pqResetScalarRangeReaction::CUSTOM` when instantiating
 `pqProxyPanel` and its subclasses that formed the default mechanism for providing
 custom panels for filters, displays, views, etc. before ParaView 3.98 has now
 been removed. Refer to the
-[wiki](http://www.paraview.org/Wiki/ParaView/Properties_Panel) for getting
+[wiki](https://web.archive.org/web/20250113090238/https://www.paraview.org/Wiki/ParaView/Properties_Panel) for getting
 oriented with the currently supported way for customizing the properties panel.
 This also removes plugin macros `ADD_PARAVIEW_OBJECT_PANEL()`, and
 `ADD_PARAVIEW_DISPLAY_PANEL()`.

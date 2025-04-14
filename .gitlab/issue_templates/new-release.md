@@ -290,8 +290,6 @@ If making a non-RC release:
   - [ ] Go to readthedocs.org and activate
   - [ ] Head to [ParaView developer docs](github.com/Kitware/paraview-docs) and generate the new developer documentation, following the directions in the README.
   - [ ] Write and publish blog post with release notes.
-  - [ ] Update release notes
-    (https://www.paraview.org/Wiki/ParaView_Release_Notes)
 -->
 
 # Post-release
