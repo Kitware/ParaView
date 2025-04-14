@@ -240,6 +240,14 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
       return false;
     }
   }
+  if (n.has_child("python_path"))
+  {
+    if (!n["python_path"].dtype().is_string())
+    {
+      vtkLogF(ERROR, "'python_path' must be a string");
+      return false;
+    }
+  }
   return true;
 }
 
