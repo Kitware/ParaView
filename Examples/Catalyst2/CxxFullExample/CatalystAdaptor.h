@@ -45,6 +45,10 @@ void Initialize(int argc, char* argv[])
     conduit_cpp::Node list_entry = node["catalyst/scripts/script/args"].append();
     list_entry.set(argv[cc]);
   }
+  // Extends the PYTHONPATH of catalyst to look into PARAVIEW_EXTRA_PYTHONPATH.
+  // For this example this is required because catalyst_pipeline.py uses
+  // info.catalyst_params which required CATALYST_PYTHONPATH to be part of it.
+  node["catalyst/python_path"] = PARAVIEW_EXTRA_PYTHONPATH;
 
   // For this example we hardcode the implementation name to "paraview" and
   // define the "PARAVIEW_IMPL_DIR" during compilation time (see the

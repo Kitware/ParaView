@@ -37,6 +37,7 @@ if (USE_CATALYST)
   target_compile_definitions(CxxFullExampleV2
     PRIVATE
       "PARAVIEW_IMPL_DIR=\"${ParaView_CATALYST_DIR}\""
+      "PARAVIEW_EXTRA_PYTHONPATH=\"${CATALYST_PYTHONPATH}\""
       USE_CATALYST=1)
   target_link_libraries(CxxFullExampleV2
     PRIVATE
@@ -44,11 +45,9 @@ if (USE_CATALYST)
 
   include(CTest)
   if (BUILD_TESTING)
-    # once we update to cmake >= 3.25 we should use --modify PYTHONPATH=path_list_prepend:${CATALYST_PYTHONPATH}
     add_test(
       NAME CxxFullExampleV2::SimplePipeline
-      COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${CATALYST_PYTHONPATH}:$ENV{PYTHONPATH}" 
-              $<TARGET_FILE:CxxFullExampleV2>
+      COMMAND CxxFullExampleV2
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
 
     set(_vtk_fail_regex
