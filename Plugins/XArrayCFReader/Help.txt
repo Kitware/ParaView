@@ -1,0 +1,18 @@
+XArrayCFReader Plugin
+
+This plugin needs the xarray python package not shipped with the ParaView binary. You'll need to create a python environment in a directory DIR using:
+
+cd DIR
+uv venv --python 3.12
+
+where 3.12 is the version of Python used by ParaView (see Help / About and change that version if needed) and then install xarray in that environment with:
+
+source .venv/bin/activate
+uv pip install xarray netcdf4 cftime cfgrib zarr h5netcdf
+deactivate
+
+After that, you can start ParaView using:
+
+paraview --venv DIR/.venv
+
+See 'Interactive Visualization of scientific data using VTK-XArray interoperability' blog post for more information about this plugin.
