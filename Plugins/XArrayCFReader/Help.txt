@@ -1,11 +1,15 @@
 XArrayCFReader Plugin
 
-This plugin needs the xarray python package not shipped with the ParaView binary. You'll need to create a python environment in a directory DIR using:
+This plugin needs the xarray python module which is not shipped with the ParaView binary.
+
+If you are building ParaView yourself, please ensure it is installed in the python you are building against.
+
+If not, a solution is to create a python environment in a directory DIR using:
 
 cd DIR
-uv venv --python 3.12
+uv venv --python VERSION
 
-where 3.12 is the version of Python used by ParaView (see Help / About and change that version if needed) and then install xarray in that environment with:
+where VERSION is the version of Python used by ParaView (please see Help / About for the current version) and then install xarray in that environment with:
 
 source .venv/bin/activate
 uv pip install xarray netcdf4 cftime cfgrib zarr h5netcdf
