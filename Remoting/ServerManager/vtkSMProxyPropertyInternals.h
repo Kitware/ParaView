@@ -3,13 +3,14 @@
 #ifndef vtkSMProxyPropertyInternals_h
 #define vtkSMProxyPropertyInternals_h
 
-#include "vtkCommand.h"        // for vtkCommand enums
-#include "vtkSMMessage.h"      // for paraview_protobuf
-#include "vtkSMProxy.h"        // for vtkSMProxy
-#include "vtkSMProxyLocator.h" // for vtkSMProxyLocator
-#include "vtkSMSession.h"      // for vtkSMSession
-#include "vtkSmartPointer.h"   // for vtkSmartPointer
-#include "vtkWeakPointer.h"    // for vtkWeakPointer
+#include "vtkCommand.h"            // for vtkCommand enums
+#include "vtkSMMessage.h"          // for paraview_protobuf
+#include "vtkSMPropertyIterator.h" // for vtkSMPropertyIterator
+#include "vtkSMProxy.h"            // for vtkSMProxy
+#include "vtkSMProxyLocator.h"     // for vtkSMProxyLocator
+#include "vtkSMSession.h"          // for vtkSMSession
+#include "vtkSmartPointer.h"       // for vtkSmartPointer
+#include "vtkWeakPointer.h"        // for vtkWeakPointer
 
 #include <algorithm> //for std::set_difference
 #include <map>       // for std::map
@@ -37,10 +38,12 @@ private:
                                         // and break producer/consumer links
                                         // whenever the value is changed.
   WeakVectorOfProxies UncheckedProxies;
+  WeakVectorOfProxies DefaultProxies;
 
   VectorOfUInts Ports;
   VectorOfUInts PreviousPorts;
   VectorOfUInts UncheckedPorts;
+  VectorOfUInts DefaultPorts;
 
   std::map<void*, unsigned long> ObserverIds;
 
@@ -193,6 +196,61 @@ public:
       return true;
     }
     return false;
+  }
+
+  //------------------------------------------------------------------------------------
+  void ResetDefaultsToCurrent()
+  {
+    this->DefaultProxies.clear();
+    this->DefaultPorts.clear();
+
+    size_t count = this->Proxies.size();
+    this->DefaultProxies.resize(count);
+    this->DefaultPorts.resize(count);
+
+    for (size_t i = 0; i < count; ++i)
+    {
+      this->DefaultProxies[i] = this->Proxies[i].Get();
+      this->DefaultPorts[i] = this->Ports[i];
+    }
+  }
+
+  //------------------------------------------------------------------------------------
+  bool IsValueDefault(bool recursive)
+  {
+    size_t count = this->Proxies.size();
+    if (this->DefaultProxies.size() != count || this->DefaultPorts.size() != count)
+    {
+      return false;
+    }
+
+    for (size_t i = 0; i < count; ++i)
+    {
+      // If the proxies or ports don't match, it is not default
+      if (this->Proxies[i].Get() != this->DefaultProxies[i].Get() ||
+        this->Ports[i] != this->DefaultPorts[i])
+      {
+        return false;
+      }
+
+      if (recursive)
+      {
+        // This is recursive, so verify that all properties of each proxy
+        // are default too
+        vtkSmartPointer<vtkSMPropertyIterator> iter;
+        iter.TakeReference(this->Proxies[i]->NewPropertyIterator());
+        for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+        {
+          auto* prop = iter->GetProperty();
+          if (!prop->IsValueDefault() && !prop->GetIsInternal())
+          {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
   }
 
   //------------------------------------------------------------------------------------

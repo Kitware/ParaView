@@ -481,10 +481,23 @@ bool vtkSMProxyProperty::CanCreateProxy()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyProperty::ResetDefaultsToCurrent()
+{
+  this->PPInternals->ResetDefaultsToCurrent();
+}
+
+//---------------------------------------------------------------------------
 bool vtkSMProxyProperty::IsValueDefault()
 {
-  // proxy properties are default only if they contain no proxies
-  return this->GetNumberOfProxies() == 0;
+  static constexpr bool recursive = true;
+  return this->PPInternals->IsValueDefault(recursive);
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProxyProperty::IsValueDefaultNonRecursive()
+{
+  static constexpr bool recursive = false;
+  return this->PPInternals->IsValueDefault(recursive);
 }
 
 //---------------------------------------------------------------------------

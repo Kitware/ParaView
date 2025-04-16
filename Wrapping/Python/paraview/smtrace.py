@@ -920,7 +920,24 @@ class ProxyFilter(object):
             return False
         trace_props_with_default_values = True \
             if setting == sm.vtkSMTrace.RECORD_ALL_PROPERTIES else False
-        return (trace_props_with_default_values or not prop.get_object().IsValueDefault())
+
+        if trace_props_with_default_values:
+            # We are writing out every property
+            return True
+
+        obj = prop.get_object()
+        if isinstance(obj, sm.ProxyProperty):
+            # We already check every property when writing out the trace,
+            # so we don't need to recursively check proxy properties. We only
+            # need to check if the proxies themselves are the default ones.
+            # For example, for a clipping plane, this prevents arguments such
+            # as `ClipType='Plane'` from showing up in the trace when the
+            # clip type in fact was not modified, but some of the plane's
+            # properties were modified. This also applies to transfer
+            # functions and many other proxy properties.
+            return not obj.IsValueDefaultNonRecursive()
+
+        return not obj.IsValueDefault()
 
     def should_trace_in_ctor(self, prop):
         return False if not self.trace_all_in_ctor else \
