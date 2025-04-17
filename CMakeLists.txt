@@ -372,7 +372,8 @@ set(paraview_default_plugins
   StreamingParticles
   ThickenLayeredCells
   VTKmFilters
-  pvblot)
+  pvblot
+  XArrayCFReader)
 
 if (PARAVIEW_BUILD_TRANSLATIONS)
   list(APPEND paraview_default_plugins TranslationsTesting)

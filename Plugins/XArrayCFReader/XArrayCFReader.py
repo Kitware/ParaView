@@ -6,6 +6,15 @@ from vtkmodules.vtkCommonExecutionModel import vtkStreamingDemandDrivenPipeline
 @smproxy.reader(name="XArrayCFReader", label="XArrayCF Reader",
                 extensions="nc h5 zgroup grib", file_description="XArray files")
 class XArrayCFReader(vtkXArrayCFReader):
+    '''Reads data from a file using the XArray readers and then connects
+    the XArray data to the vtkNetCDFCFREader (using zero-copy when
+    possible). At the moment, data is copied for coordinates (because
+    they are converted to double in the reader) and for certain data
+    that is subset either in XArray or in VTK.  Lazy loading in XArray
+    is respected, that is data is accessed only when it is needed.
+    Time is passed to VTK either as an int64 for datetime64 or
+    timedelta64, or as a double (using cftime.toordinal) for cftime.
+    '''
     def __init__(self):
         super().__init__()
 

@@ -27,7 +27,16 @@ class VTKREMOTINGSERVERMANAGERPYTHON_EXPORT vtkPVPythonAlgorithmPlugin
   , public vtkPVServerManagerPluginInterface
 {
 public:
-  vtkPVPythonAlgorithmPlugin(const char* pythonmodule);
+  ///@{
+  /**
+   * Constructors for the object. The first version reads the python
+   * plugin from the .py file at 'filePath'. The second version is
+   * used for plugins that include both C++ and Python filters (the
+   * Python source code is included in the .so in this case)
+   */
+  vtkPVPythonAlgorithmPlugin(const char* filePath);
+  vtkPVPythonAlgorithmPlugin(const char* moduleName, const char* pythonSourceCode);
+  ///@}
   ~vtkPVPythonAlgorithmPlugin() override;
 
   ///@{
@@ -50,6 +59,12 @@ public:
     return nullptr;
   }
   ///@}
+  /**
+   * Creates the object from Python source code and gets the servermanager XMLs
+   * from all the Python filters included in the 'moduleName'.
+   */
+  static bool InitializeFromStringAndGetXMLs(
+    const char* moduleName, const char* pythonSourceCode, std::vector<std::string>& xmls);
 
 private:
   vtkPVPythonAlgorithmPlugin(const vtkPVPythonAlgorithmPlugin&) = delete;
@@ -64,6 +79,17 @@ private:
    * refers to a Python plugin package, this method will attempt to load it.
    */
   static bool LoadPlugin(const char* pname);
+  /**
+   * Initialize function for the object called by the constructors.
+   * 'loadPluginFunction' specifies the function to call either
+   * pythonalgorithm.load_plugin or
+   * pythonalgorithm.load_plugin_from_string. These two function corespond to
+   * the two constructors.
+   * 'pythonSourceCode' should be nullptr for the first function, and point to
+   * the plugin python source code for the second.
+   */
+  void Initialize(
+    const char* moduleNameOrFilePath, const char* loadPluginFunction, const char* pythonSourceCode);
 };
 
 // Schwartz counter idiom to register loader for Python plugins (based on Python

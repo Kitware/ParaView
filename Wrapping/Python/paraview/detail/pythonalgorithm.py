@@ -4,7 +4,7 @@ from functools import wraps
 from xml.dom.minidom import parseString
 from xml.parsers.expat import ExpatError
 from inspect import signature
-
+import importlib.abc, importlib.util
 import sys
 
 
@@ -515,6 +515,31 @@ def get_plugin_version(module_or_package):
         return "(unknown)"
 
 
+def load_plugin_from_string(module_name, s):
+    """helper function called by vtkPVPythonAlgorithmPlugin to load
+    python code from a string. This is used for C++ plugins that use
+    python modules and include the python code in the .so"""
+    class StringLoader(importlib.abc.SourceLoader):
+        def __init__(self, data):
+            self.data = data
+
+        def get_source(self, fullname):
+            return self.data
+
+        def get_data(self, path):
+            return self.data.encode("utf-8")
+
+        def get_filename(self, fullname):
+            return "<not a real path>/" + fullname + ".py"
+
+    loader = StringLoader(s)
+    spec = importlib.util.spec_from_loader(module_name, loader, origin="built-in")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 def load_plugin(filepath, default_modulename=None):
     """helper function called by vtkPVPythonAlgorithmPlugin to load
     a python file."""
@@ -526,18 +551,11 @@ def load_plugin(filepath, default_modulename=None):
         import os.path
         modulename = "%s" % os.path.splitext(os.path.basename(filepath))[0]
 
-    try:
-        # for Python 3.5+
-        from importlib.util import spec_from_file_location, module_from_spec
-        spec = spec_from_file_location(modulename, filepath)
-        module = module_from_spec(spec)
-        spec.loader.exec_module(module)
-    except ImportError:
-        # for Python 3.3 and 3.4
-        import imp
-        module = imp.load_source(modulename, filepath)
-
-    import sys
+    # for Python 3.5+
+    from importlib.util import spec_from_file_location, module_from_spec
+    spec = spec_from_file_location(modulename, filepath)
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
     sys.modules[modulename] = module
     return module
 
