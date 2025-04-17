@@ -127,7 +127,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "vtkmoverride")
     list(APPEND test_exclusions
       # https://gitlab.kitware.com/paraview/paraview/-/issues/22801
-      "^paraviewPython-TestCatalystClient$")
+      "^paraviewPython-TestCatalystClient$"
+
+      # https://gitlab.kitware.com/paraview/paraview/-/issues/22941
+      "^pv\\.AdaptiveResampleToImage$"
+      "^pvcs\\.AdaptiveResampleToImage$")
   endif ()
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_qt")
