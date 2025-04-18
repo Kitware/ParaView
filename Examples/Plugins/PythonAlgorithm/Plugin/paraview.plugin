@@ -1,0 +1,7 @@
+NAME
+  PythonAlgorithm
+CONDITION
+  PARAVIEW_USE_PYTHON
+DESCRIPTION
+  An example plugin that adds python algorithms to the ParaView GUI.
+  It adds a source, a filter and a writer.

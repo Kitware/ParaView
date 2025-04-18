@@ -285,7 +285,7 @@ paraview_add_test_python(
 )
 
 set_tests_properties(paraviewPython-TestPV_PLUGIN_PATH
-        PROPERTIES ENVIRONMENT "PV_PLUGIN_PATH=${CMAKE_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/")
+        PROPERTIES ENVIRONMENT "PV_PLUGIN_PATH=${CMAKE_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/Plugin")
 
 #------------------------------------------------------------------------------
 # Add HTG rendering tests
