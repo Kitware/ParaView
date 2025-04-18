@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file   idistributed_data_subset.h
 /// \brief  Distributed subset interaces for a large-scale distributed datasets.
@@ -68,7 +68,7 @@ enum Distributed_data_attribute_format
 /// aggregated by a data subset. Typically, a dataset can have multiple attributes.
 ///
 /// \note   Typically, an instance of \c IDistributed_data_attribute_set_descriptor implementation is exposed by 
-///         data subset interfaces. Please note that an attribute set descriptor mandatory.
+///         data subset interfaces. Please note that an attribute set descriptor is mandatory.
 ///
 class IDistributed_data_attribute_set_descriptor :
     public mi::base::Interface_declare<0x88b4168a,0xde56,0x4f18,0x96,0xca,0xd6,0x4d,0xef,0x0,0x4b,0x94>
@@ -80,6 +80,77 @@ public:
     ///             Otherwise it returns \c false.
     ///
     virtual bool is_valid() const = 0;
+};
+
+
+/// ISimple_attribute_set_descriptor extends the \c IDistributed_data_attribute_set_descriptor interface
+/// to add simple attributes of format \c Distributed_data_attribute_format.
+///
+class ISimple_attribute_set_descriptor :
+    public mi::base::Interface_declare<0x5696afa4,0xcea9,0x4688,0xbb,0x87,0xc9,0x89,0xfa,0x7a,0xb3,0xc4,
+                                       nv::index::IDistributed_data_attribute_set_descriptor>
+{
+public:
+    /// This structure defines the basic parameters of a single attribute associated with the volume dataset.
+    ///
+    struct Attribute_parameters
+    {
+        Distributed_data_attribute_format   format;     ///< Attribute format. See \c Distributed_data_attribute_format.
+    };
+
+    /// Configure the parameters for an attribute for a triangle mesh subset.
+    ///
+    /// \param[in]  attrib_index    The storage index of the attribute.
+    /// \param[in]  attrib_params   The attribute parameters for the given index.
+    ///
+    /// \return                     True when the attribute according to the passed index could be set up, false otherwise.
+    ///
+    virtual bool    setup_attribute(
+        mi::Uint32                  attrib_index,
+        const Attribute_parameters& attrib_params) = 0;
+
+    /// Get the attribute parameters of a currently valid attribute for a given index.
+    ///
+    /// \param[in]  attrib_index    The storage index of the attribute.
+    /// \param[out] attrib_params   The attribute parameters for the given index.
+    ///
+    /// \return                     True when the attribute according to the passed index could be found, false otherwise.
+    ///
+    virtual bool    get_attribute_parameters(
+        mi::Uint32                  attrib_index,
+        Attribute_parameters&       attrib_params) const = 0;
+
+    /// Get maximum number of attributes.
+    virtual mi::Uint32  get_attribute_count_limit() const = 0;
+};
+
+
+inline bool is_valid_attr_params(const ISimple_attribute_set_descriptor::Attribute_parameters& p) { return p.format != nv::index::ATTRIB_FORMAT_INVALID; }
+inline void invalidate_attr_params(ISimple_attribute_set_descriptor::Attribute_parameters& p) { p.format = nv::index::ATTRIB_FORMAT_INVALID; }
+
+/// Subset data identifiers allow differentiation of \c IDistributed_data_subset instances.
+/// 
+/// This interface class can be used for differentiating instances of \c IDistributed_data_subset in
+/// e.g. compute techniques (\c IDistributed_compute_technique). The exposed methods allow for using
+/// the subset-id in associative containers for e.g. caching subset related information.
+///
+class IDistributed_data_subset_id :
+    public mi::base::Interface_declare<0x3c322b75,0x42ae,0x4b7f,0xaa,0xc0,0x8b,0xde,0x2b,0x92,0xc7,0x31>
+{
+public:
+    /// Comparison to another instance of \c IDistributed_data_subset_id.
+    ///
+    /// \param[in]  rhs     The instance of \c IDistributed_data_subset_id to compare to.
+    ///
+    /// \return             True when the other instance references the same subset-id, false otherwise.
+    /// 
+    virtual bool        equals(const IDistributed_data_subset_id* rhs) const = 0;
+
+    /// Returns a hash value for the referenced subset-id.
+    ///
+    /// \return A hash value for the referenced subset-id.
+    ///
+    virtual mi::Size    get_hash_value() const = 0;
 };
 
 /// Subset data descriptors communicate the structural data representations about a subset data to an application.
@@ -197,6 +268,12 @@ public:
     ///             the set up data subset representation. 
     ///
     virtual bool finalize() = 0;
+
+    /// Query the subset-id of the referenced distributed data-subset.
+    ///
+    /// \returns The subset-id of the referenced distributed data-subset
+    ///
+    virtual IDistributed_data_subset_id* get_subset_id() const = 0;
 };
 
 class IDistributed_data_subset_device :
@@ -226,6 +303,12 @@ public:
     ///          that the data is currently not stored on any device.
     ///
     virtual mi::Sint32  get_device_id() const = 0;
+
+    /// Query the subset-id of the referenced distributed data-subset.
+    ///
+    /// \returns The subset-id of the referenced distributed data-subset
+    ///
+    virtual IDistributed_data_subset_id* get_subset_id() const = 0;
 
     // #todo required for device subsets?
     // * maybe a place to gather data and update internal structures once 

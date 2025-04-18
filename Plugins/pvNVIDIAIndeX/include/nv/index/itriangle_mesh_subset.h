@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Sub-meshes of a triangle mesh.
@@ -14,15 +14,27 @@
 #include <nv/index/idistributed_data_subset.h>
 
 namespace nv {
-
 namespace index {
+
+
+/// Attribute-set descriptor for triangle mesh subsets. This interface is used to configure a set of
+/// attributes for a triangle mesh subset to input into the NVIDIA IndeX library.
+///
+/// \ingroup nv_index_data_subsets
+///
+class ITriangle_mesh_attribute_set_descriptor :
+    public mi::base::Interface_declare<0x25cdb1b,0x87a,0x4edd,0x97,0x53,0x34,0xd5,0xea,0x98,0x31,0x19,
+                                       ISimple_attribute_set_descriptor>
+{};
+
+
 
 /// Defines the vertices and per-vertex attributes of a subset of a triangle mesh.
 ///
 /// \ingroup nv_index_data_subsets
 ///
 class ITriangle_mesh_subset :
-    public mi::base::Interface_declare<0x19fa1bbf,0xcda6,0x43d5,0x89,0x40,0x57,0x95,0x78,0x99,0xb5,0x3d,
+    public mi::base::Interface_declare<0x28da2c2,0xc15b,0x4ead,0x9e,0x60,0x57,0xba,0xee,0x7,0xe6,0xcd,
                                        IDistributed_data_subset>
 {
 public:
@@ -38,6 +50,37 @@ public:
         TRIFLAGS_VISIBLE_EDGE_12   = 2,
         TRIFLAGS_VISIBLE_EDGE_20   = 4,
         TRIFLAGS_VISIBLE_EDGE_ALL  = 7
+    };
+
+    enum Attribute_affiliation
+    {
+        ATTRIB_AFFIL_PER_VERTEX = 0x00,     ///< Per vertex attribute.
+        ATTRIB_AFFIL_PER_FACE   = 0x01      ///< Per face attribute.
+    };
+
+    struct Triangle_mesh_data_ref
+    {
+        mi::Uint32                                          nb_vertices;
+        mi::Uint32                                          nb_indices;
+        mi::Uint64                                          nb_global_triangle_ids;
+        mi::Uint32                                          nb_normals;
+        mi::Uint32                                          nb_texture_coordinates;
+        mi::Uint32                                          nb_colors;
+        mi::Uint32                                          nb_materials;
+        mi::Uint32                                          nb_triangle_flags;
+
+        const mi::math::Vector_struct<mi::Float32, 3>*      vertices;
+        const mi::Uint32*                                   vertex_indices;
+        const mi::Uint64*                                   global_triangle_ids;
+        const mi::math::Vector_struct<mi::Float32, 3>*      normals;
+        const mi::math::Vector_struct<mi::Float32, 2>*      texture_coordinates;
+        const mi::math::Color_struct*                       colors;
+        const mi::Uint32*                                   normal_indices;
+        const mi::Uint32*                                   tex_coord_indices;
+        const mi::Uint32*                                   color_indices;
+        const mi::Uint32*                                   colormap_indices;
+        const mi::Uint16*                                   materials;
+        const mi::Uint32*                                   triangle_flags;    // ITriangle_mesh_subset::Triflags bit combination
     };
 
     /// Initializes the triangle mesh subset by assigning vertices and
@@ -128,6 +171,10 @@ public:
     /// \return Tri-vertex to vertex position index array
     virtual const mi::Uint32* get_vertex_indices() const = 0;
 
+
+    //----------------------------------------------------------------------------------------------------
+    //              Predefined triangle mesh attribute types.
+
     /// Returns the number of vertex normals.
     /// \return Length of the vertex normal array
     virtual mi::Uint32  get_nb_normals() const = 0;
@@ -188,6 +235,9 @@ public:
     /// \return Triangle flag array
     virtual const ITriangle_mesh_subset::Triflags* get_triangle_flags() const = 0;
 
+    //----------------------------------------------------------------------------------------------------
+
+
     /// Returns the IDs of the triangles in the sub-mesh.
     /// The array length is number of triangles.
     /// \return Triangle ID array
@@ -198,9 +248,48 @@ public:
     /// \return Bounding box in the local coordinate system.
     ///
     virtual const mi::math::Bbox_struct<mi::Float32, 3>& get_bounding_box() const = 0;
+
+
+
+    /// Returns the attribute-set descriptor of the subset, or nullptr if no attributes.
+    ///
+    virtual const ITriangle_mesh_attribute_set_descriptor* get_attribute_set_descriptor() const = 0;
+
+    /// Set attribute set data.
+    ///
+    /// If invalid attribute index is specified then no data is copied to the subset.
+    /// 
+    /// \param[in]  attrib_index            The storage index of the requested attribute.
+    /// \param[in]  affiliation             Attribute affiliation (per vertex, per face).
+    /// \param[in]  data                    Pointer to attribute data.
+    /// \param[in]  byte_size_of_data       Size in bytes of provided attribute data. 
+    /// 
+    /// \return     true if data was copied successfully.
+    /// 
+    virtual bool    set_attribute_data(
+                        mi::Uint32              attrib_index,
+                        Attribute_affiliation   affiliation,
+                        const void*             data,
+                        mi::Size                byte_size_of_data) = 0;
+
+    /// Get attribute data.
+    ///
+    /// If invalid attribute index is specified then nullptr is returned.
+    /// If internal attribute storage is not accessible, then nullptr is returned.
+    ///
+    /// \param[in]  attrib_index            The storage index of the requested attribute.
+    ///
+    /// \return     Pointer to the internal attribute set buffer. Data format is in ITriangle_mesh_attribute_set_descriptor.
+    ///
+    virtual bool get_attribute_data(
+                        mi::Uint32              attrib_index,
+                        Attribute_affiliation&  affiliation,
+                        const void*&            data,
+                        mi::Size&               byte_size_of_data) const = 0;
+
 };
 
-
-}} // namespace index / nv
+} // namespace index
+} // namespace nv
 
 #endif // NVIDIA_INDEX_ITRIANGLE_MESH_SUBSET_H

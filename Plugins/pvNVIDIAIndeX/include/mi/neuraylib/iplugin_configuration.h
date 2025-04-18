@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for plugin related settings.
@@ -53,7 +53,7 @@ public:
 
     /// Returns a descriptor for the \p index -th loaded plugin.
     ///
-    /// \return         A descriptor for the \p index -th loaded plugin, or \c NULL in
+    /// \return         A descriptor for the \p index -th loaded plugin, or \c nullptr in
     ///                 case of failure.
     virtual base::IPlugin_descriptor* get_plugin_descriptor( Size index) const = 0;
 };

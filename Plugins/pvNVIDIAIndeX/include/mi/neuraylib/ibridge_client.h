@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief  Bridge client
@@ -10,6 +10,7 @@
 #include <mi/base/enums.h>
 #include <mi/base/interface_implement.h>
 #include <mi/neuraylib/iserializer.h>
+#include <mi/neuraylib/version.h> // for MI_NEURAYLIB_DEPRECATED_ENUM_VALUE
 
 namespace mi {
 
@@ -35,10 +36,10 @@ class IClient_video_context;
     \endif
     \ingroup mi_neuray
 
-    The Bridge is a feature of \NeurayProductName that allows simple and efficient use of the
+    The Bridge is a feature of \neurayProductName that allows simple and efficient use of the
     resources of a remote cluster with minimal integration effort. Data is transferred to the remote
     cluster in a way suitable for comparably low-bandwidth, high-latency connections such as an
-    Internet connection, where normal \NeurayProductName clustering would not work.
+    Internet connection, where normal \neurayProductName clustering would not work.
 
     The Bridge supports server-side caching of data and incremental changes to minimize the amount
     of data sent, as well as low-latency, hardware H.264 video to efficiently use the available
@@ -91,7 +92,7 @@ class IClient_video_context;
 /// updated, it will also query the cache status and start uploading data for cache misses, etc.
 ///
 /// \see mi::bridge::IClient_job_progress::get_state()
-enum Client_job_state
+enum Client_job_state : Uint32
 {
     /// Detecting which database elements needs to be updated before executing the job.
     CLIENT_JOB_DETECTING_CHANGES = 0,
@@ -123,12 +124,10 @@ enum Client_job_state
     CLIENT_JOB_PENDING = 4,
 
     /// The result has been received and deserialized by the client-side job and the job is done.
-    CLIENT_JOB_DONE = 5,
+    CLIENT_JOB_DONE = 5
 
-    CLIENT_JOB_FORCE_32_BIT = 0xffffffffU
+    MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(CLIENT_JOB_FORCE_32_BIT, 0xffffffffU)
 };
-
-mi_static_assert( sizeof( Client_job_state) == sizeof( Uint32));
 
 /// Provides detailed information about the progress of a Bridge job.
 class IClient_job_progress : public
@@ -186,7 +185,7 @@ public:
     /// and is 0 in all later states.
     virtual Size get_pending_data_serialization_count() const = 0;
 
-    /// Returns the name of the currently uploaded element or \c NULL if no element is
+    /// Returns the name of the currently uploaded element or \c nullptr if no element is
     /// currently being uploaded.
     virtual const char* get_currently_uploaded_element_name() const = 0;
 
@@ -336,10 +335,10 @@ class Client_job : public base::Interface_implement<I>
 {
 public:
     /// Own type.
-    typedef Client_job<i_id1,i_id2,i_id3,i_id4,i_id5,i_id6,i_id7,i_id8,i_id9,i_id10,i_id11,I> Self;
+    using Self = Client_job<i_id1,i_id2,i_id3,i_id4,i_id5,i_id6,i_id7,i_id8,i_id9,i_id10,i_id11,I>;
 
     /// Declares the interface ID
-    typedef base::Uuid_t<i_id1,i_id2,i_id3,i_id4,i_id5,i_id6,i_id7,i_id8,i_id9,i_id10,i_id11> IID;
+    using IID = base::Uuid_t<i_id1,i_id2,i_id3,i_id4,i_id5,i_id6,i_id7,i_id8,i_id9,i_id10,i_id11>;
 
     /// Compares the interface ID \p iid against the interface ID of this interface and its
     /// ancestors.
@@ -356,11 +355,11 @@ public:
     /// Acquires a const interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL \c const #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr \c const #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
     /// interface pointer, whose reference count has been retained once. The caller must
     /// release the returned interface pointer at the end to prevent a memory leak.
     virtual const base::IInterface* get_interface( const base::Uuid& interface_id) const
@@ -376,11 +375,11 @@ public:
     /// Acquires a mutable interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
     /// interface pointer, whose reference count has been retained once. The caller must
     /// release the returned interface pointer at the end to prevent a memory leak.
     virtual base::IInterface* get_interface( const base::Uuid& interface_id)
@@ -452,7 +451,7 @@ class Update_job : public mi::bridge::Client_job<
 /// The different states a client session can be in.
 ///
 /// \see #mi::bridge::IClient_session::get_state()
-enum Client_session_state
+enum Client_session_state : Uint32
 {
     /// The session is trying to establish a connection to the remote Bridge application for the
     /// first time.
@@ -479,8 +478,6 @@ enum Client_session_state
     /// session must be opened.
     CLIENT_SESSION_CLOSED
 };
-
-mi_static_assert( sizeof( Client_session_state) == sizeof( Uint32));
 
 /// Abstract interface for callbacks for session state changes.
 ///
@@ -566,15 +563,15 @@ public:
     /// Jobs are executed asynchronously, but sequentially (per transaction) on the server in the
     /// same order as execution is requested by this method. A job is only executed after its
     /// referenced database elements have been updated from the Bridge client to the Bridge server.
-    /// 
-    /// Note that the same IClient_job instance must not be executed several times in parallel. 
+    ///
+    /// Note that the same IClient_job instance must not be executed several times in parallel.
     /// This is true both within a single transaction and in multiple transactions.
     ///
     /// \param job   The job to execute.
     /// \param transaction The transaction in which context the job will be executed.
     /// \return
     ///              -     0: Success.
-    ///              -    -1: Invalid arguments (\p job or transaction is \c NULL).
+    ///              -    -1: Invalid arguments (\p job or transaction is \c nullptr).
     ///              -    -2: Invalid transaction state (already committed or aborted).
     ///              -    -3: Network error.
     ///              -    -4: The job reference elements that can't be accessed.
@@ -582,21 +579,21 @@ public:
     virtual Sint32 execute(IClient_job* job, neuraylib::ITransaction* transaction) = 0;
 
     /// Marks the provided job to be canceled and returns immediately. A job progress callback
-    /// will be made to inform when the job is canceled or completed. Note that it is not always 
-    /// possible to cancel a job depending on the timing so a job can still be completed 
+    /// will be made to inform when the job is canceled or completed. Note that it is not always
+    /// possible to cancel a job depending on the timing so a job can still be completed
     /// even after successfully calling this method.
     ///
-    /// Known limitation: Canceling jobs doing uploads doesn't cancel the upload itself and 
+    /// Known limitation: Canceling jobs doing uploads doesn't cancel the upload itself and
     /// even if the job is canceled successfully some or all uploaded elements might be
-    /// stored in the database. To make sure that elements from a job is not persisted in 
-    /// the server side database the transaction must be aborted. This will automatically 
+    /// stored in the database. To make sure that elements from a job is not persisted in
+    /// the server side database the transaction must be aborted. This will automatically
     /// cancel all Bridge jobs running in that transaction.
-    /// 
+    ///
     /// \param job   The job to cancel.
     /// \return
     ///              -     0: Job canceled.
     ///              -     1: Job not executing or already canceled.
-    ///              -    -1: Invalid arguments (\p job is \c NULL).
+    ///              -    -1: Invalid arguments (\p job is \c nullptr).
     ///              -    -3: Network error.
     ///              - <= -4: Unspecified error.
     virtual Sint32 cancel(IClient_job* job) = 0;
@@ -609,7 +606,7 @@ public:
     /// the client. The recommended way of transferring the id to the server is by executing a
     /// Bridge job.
     ///
-    /// \return The created video context, or \c NULL in case of failure.
+    /// \return The created video context, or \c nullptr in case of failure.
     virtual IClient_video_context* create_video_context() = 0;
 
     /// Measures the bandwidth to the Bridge server.
@@ -636,20 +633,20 @@ public:
 
     /// Sets the receiving logger for log messages forwarded from the Bridge server.
     ///
-    /// If the provided logger is \c NULL then forwarded log entries will be written to the general
-    /// configured logger as if they were generated locally, but with a prefix identifying the
-    /// server that they originated from (default behavior).
+    /// If the provided logger is \c nullptr then forwarded log entries will be written to the
+    /// general configured logger as if they were generated locally, but with a prefix identifying
+    /// the server that they originated from (default behavior).
     ///
     /// \see #set_receiving_logger()
     ///
-    /// \param logger      The receiving logger. It is valid to pass \c NULL in which case logging
-    ///                    is reset to be done to the general configured logger.
+    /// \param logger      The receiving logger. It is valid to pass \c nullptr in which case
+    ///                    logging is reset to be done to the general configured logger.
     virtual void set_receiving_logger( base::ILogger* logger) = 0;
 
     /// Returns the receiving logger for log messages forwarded from the Bridge server.
     ///
-    /// Note that if no receiving logger has been set, this method returns \c NULL and logging is
-    /// done using the currently general configured logger.
+    /// Note that if no receiving logger has been set, this method returns \c nullptr and logging
+    /// is done using the currently general configured logger.
     ///
     /// \see #set_receiving_logger()
     virtual base::ILogger* get_receiving_logger() const = 0;
@@ -679,40 +676,40 @@ public:
     /// \see #get_bytes_written()
     virtual Size get_bytes_read() const = 0;
 
-    /// Allows the data for specific elements to be overridden by specifying the hash of the 
+    /// Allows the data for specific elements to be overridden by specifying the hash of the
     /// data to use regardless of the actual data stored in the db. The replacements will only be
-    /// done when executing a bridge job that returns the provided top_level_element in its 
-    /// get_references() method and only when executed in the same scope as the scope of the 
+    /// done when executing a bridge job that returns the provided top_level_element in its
+    /// get_references() method and only when executed in the same scope as the scope of the
     /// provided transaction. When an edited element is detected for the job the overrides
-    /// map will be consulted to see if an override for the element with that name exists. If 
+    /// map will be consulted to see if an override for the element with that name exists. If
     /// it does the element won't be serialized and the override hash from the map will
     /// be used instead. The server then use the hash when loading the data from the cache, meaning
     /// that it can be different than the actual data on the client. For this to work, the data
-    /// for the hash must be guaranteed to already be in the server side cache. This can be 
-    /// achieved by storing snapshots in the server side cache with all required data before 
+    /// for the hash must be guaranteed to already be in the server side cache. This can be
+    /// achieved by storing snapshots in the server side cache with all required data before
     /// rendering the scene containing hash overrides.
     ///
     /// \param overrides An IMap with the name of the element to override as key and the hash
-    ///                  as string value. The map must be of type Map\<String\>. Call this 
-    ///                  method with a \c NULL override map to release it or replace it with a 
+    ///                  as string value. The map must be of type Map\<String\>. Call this
+    ///                  method with a \c nullptr override map to release it or replace it with a
     ///                  new one. The map instance is retained by bridge to avoid expensive copying
     ///                  and must not be modified after this call.
     /// \param transaction The hash overrides will be applied only for jobs executing in the same
-    ///                    scope as this transaction. The top level element must be visible in 
+    ///                    scope as this transaction. The top level element must be visible in
     ///                    this transaction.
-    /// \param top_level_element The top level element. The overrides applies to this element 
+    /// \param top_level_element The top level element. The overrides applies to this element
     ///                          and all elements it reference when executing a job that returns
     ///                          the specified top level element in its get_references() method.
     /// \return
     ///              -     0: Success.
-    ///              -    -1: Invalid arguments (\p job or transaction is \c NULL).
+    ///              -    -1: Invalid arguments (\p job or transaction is \c nullptr).
     ///              -    -2: Invalid transaction state (already committed or aborted).
     ///              - <= -2: Unspecified error.
     virtual Sint32 set_hash_overrides(
-        const IMap* overrides, 
+        const IMap* overrides,
         const char* top_level_element,
         neuraylib::ITransaction* transaction) = 0;
-    
+
 };
 
 /// API component that serves as entry point for the client-side Bridge API.
@@ -750,7 +747,7 @@ public:
     ///                         application to decide whether the session should be accepted or
     ///                         rejected.
     virtual IClient_session* get_session(
-        const char* application_url, const char* security_token = 0) = 0;
+        const char* application_url, const char* security_token = nullptr) = 0;
 
     /// Returns the Bridge protocol version.
     virtual const char* get_bridge_protocol_version() const = 0;

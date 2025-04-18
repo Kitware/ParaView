@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief \NeurayApiName for implementing distributed parallel computing algorithms.
@@ -13,6 +13,7 @@
 #include <mi/base/interface_implement.h>
 #include <mi/neuraylib/iserializer.h>
 #include <mi/neuraylib/iuser_class_factory.h>
+#include <mi/neuraylib/version.h> // for MI_NEURAYLIB_DEPRECATED_ENUM_VALUE
 
 /** \defgroup mi_neuray_dice DiCE Interfaces
     \ingroup mi_neuray
@@ -49,7 +50,7 @@
 #define MI_NEURAYLIB_DICE_VERSION_QUALIFIER_EMPTY
 
 /// DiCE product version number in a string representation, such as \c "2016".
-#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING  "2023"
+#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING  "2025"
 
 /**@}*/ // end group mi_neuray_dice
 
@@ -153,7 +154,7 @@ public:
     /// By default, GPU detection is enabled. GPU detection can be disabled in case it causes
     /// problems (hangs, crashes) or GPU usage is not desired at all.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \param value                \c true if GPUs are to be detected, \c false otherwise.
     /// \return                     0, in case of success, -1 in case of failure.
@@ -192,7 +193,7 @@ public:
     ///                 host otherwise. See
     ///                 #mi::neuraylib::INetwork_configuration::register_host_callback() for
     ///                 details about host IDs of other machines in the cluster.
-    /// \return         A description of the GPU with that ID, or \c NULL if \p gpu_id is not a
+    /// \return         A description of the GPU with that ID, or \c nullptr if \p gpu_id is not a
     ///                 valid GPU ID for the host \p host_id.
     virtual const IGpu_description* get_gpu_description( Uint32 gpu_id, Uint32 host_id = 0) = 0;
 
@@ -220,7 +221,7 @@ public:
 /// The privacy level is an unsigned 8 bit integer. The privacy level is an integer in the range
 /// from 0 to 255. The privacy level 0 is used to identify the global scope. Thus the higher the
 /// privacy level is, the more private the corresponding scope.
-typedef Uint8 Privacy_level;
+using Privacy_level = Uint8;
 
 /**@}*/ // end group mi_neuray_dice
 
@@ -238,6 +239,7 @@ typedef Uint8 Privacy_level;
 /// #mi::neuraylib::IScope::create_transaction<mi::neuraylib::IDice_transaction>().
 ///
 /// \par Concurrent accesses to database elements within a transaction
+///
 /// Access to database elements is provided by #access() (read-only) and #edit() (for modification).
 /// The interface pointers returned by these methods must be released when you are done, in
 /// particular before the transaction is committed or aborted. Releasing the last interface pointer
@@ -263,6 +265,7 @@ typedef Uint8 Privacy_level;
 /// </ul>
 ///
 /// \par Concurrent transactions
+///
 /// If the same database element is edited in multiple overlapping transactions, the changes from
 /// the transaction created last survive, independent of the order in which the transactions are
 /// committed. If needed, the lifetime of transactions can be serialized across hosts (see
@@ -315,15 +318,15 @@ public:
     ///
     /// \param element         The database element to be stored in the database.
     /// \param tag             An optional tag used to identify the database element in the
-    ///                        database. The tag must be #NULL_TAG (the default) or must have been
-    ///                        obtained from previous calls to #store(),
+    ///                        database. The tag must be #NULL_TAG (the default) or must have
+    ///                        been obtained from previous calls to #store(),
     ///                        #store_for_reference_counting(), #name_to_tag(), or #reserve_tag().
     ///                        An existing database element/job associated with this tag will be
     ///                        replaced. See also the documentation of the return value and the note
     ///                        below.
     /// \param name            An optional name used to identify the database element in the
     ///                        database. An existing database element/job associated with this name
-    ///                        will be replaced.
+    ///                        will be replaced. The empty string is \em not a valid name.
     /// \param privacy_level   The privacy level under which to store \p db_element (in the range
     ///                        from 0 to the privacy level of the scope of this transaction). In
     ///                        addition, the constant #LOCAL_SCOPE can be used as a shortcut to
@@ -347,7 +350,7 @@ public:
     virtual Tag_struct store(
         IElement* element,
         Tag_struct tag = NULL_TAG,
-        const char* name = 0,
+        const char* name = nullptr,
         Privacy_level privacy_level = LOCAL_SCOPE) = 0;
 
     /// Stores a new database job in the database.
@@ -365,7 +368,7 @@ public:
     ///                        of the return value and the note below.
     /// \param name            An optional name used to identify the database job in the database.
     ///                        An existing database element/job associated with this name will be
-    ///                        replaced.
+    ///                        replaced. The empty string is \em not a valid name.
     /// \param privacy_level   The privacy level under which to store \p job (in the range from 0 to
     ///                        the privacy level of the scope of this transaction). In addition, the
     ///                        constant #LOCAL_SCOPE can be used as a shortcut to indicate the
@@ -389,7 +392,7 @@ public:
     virtual Tag_struct store(
         IJob* job,
         Tag_struct tag = NULL_TAG,
-        const char* name = 0,
+        const char* name = nullptr,
         Privacy_level privacy_level = LOCAL_SCOPE) = 0;
 
     /// Stores a new database element in the database (for reference counting).
@@ -403,7 +406,7 @@ public:
     virtual Tag_struct store_for_reference_counting(
         IElement* element,
         Tag_struct tag = NULL_TAG,
-        const char* name = 0,
+        const char* name = nullptr,
         Privacy_level privacy_level = LOCAL_SCOPE) = 0;
 
     /// Stores a new database job in the database (for reference counting).
@@ -417,7 +420,7 @@ public:
     virtual Tag_struct store_for_reference_counting(
         IJob* job,
         Tag_struct tag = NULL_TAG,
-        const char* name = 0,
+        const char* name = nullptr,
         Privacy_level privacy_level = LOCAL_SCOPE) = 0;
 
     /// Retrieves an element from the database.
@@ -429,7 +432,7 @@ public:
     /// returns the result of the job.
     ///
     /// \param tag      The tag that identifies the requested database element.
-    /// \return         The requested element in the database, or \c NULL if the transaction is
+    /// \return         The requested element in the database, or \c nullptr if the transaction is
     ///                 already closed.
     virtual const base::IInterface* access( Tag_struct tag) = 0;
 
@@ -449,7 +452,7 @@ public:
     ///
     /// \param tag      The tag that identifies the requested database element.
     /// \tparam T       The interface type of the element to retrieve.
-    /// \return         The requested element in the database, or \c NULL if the transaction is
+    /// \return         The requested element in the database, or \c nullptr if the transaction is
     ///                 already closed, or the element is not of type \c T.
     template<class T>
     const T* access( Tag_struct tag)
@@ -471,7 +474,7 @@ public:
     /// Note that database jobs including their resulting database elements cannot be edited.
     ///
     /// \param tag      The tag that identifies the requested database element.
-    /// \return         The requested element in the database, or \c NULL if the transaction is
+    /// \return         The requested element in the database, or \c nullptr if the transaction is
     ///                 already closed.
     virtual base::IInterface* edit( Tag_struct tag) = 0;
 
@@ -491,7 +494,7 @@ public:
     ///
     /// \param tag      The tag that identifies the requested database element.
     /// \tparam T       The interface type of the element to retrieve.
-    /// \return         The requested element in the database, or \c NULL if the transaction is
+    /// \return         The requested element in the database, or \c nullptr if the transaction is
     ///                 already closed, or the element is not of type \c T.
     template<class T>
     T* edit( Tag_struct tag)
@@ -521,25 +524,48 @@ public:
     ///                        - -5: Invalid privacy level.
     virtual Sint32 localize( Tag_struct tag, Privacy_level privacy_level) = 0;
 
-    /// Marks a \p tag for removal from the database.
+    /// Marks a tag for removal from the database.
     ///
-    /// Note that the element continues to be stored in the database as long as it is referenced by
-    /// other elements (or jobs). If it is no longer referenced, it will be lazily removed by the
-    /// garbage collection of the database. There is no guarantee when this will happen. This
-    /// implies that a #remove() call might actually remove an element that was stored later under
-    /// the same tag.
+    /// \par Global removals
     ///
-    /// \param tag            The tag that identifies the database element to be marked for removal.
-    /// \param only_localized If \c true, the element is only removed if it exists in the scope
-    ///                       of the transaction; parent scopes are not considered.
+    /// The purpose of global removals is to mark all versions of a tag for garbage collection.
+    /// Such a marker has no effect while the tag is still referenced (in any scope) by other
+    /// database elements or while the transaction where the removal request was made is still open.
+    /// When these conditions do no longer apply, the tag becomes eligible for garbage collection
+    /// and must no longer be used in any way. There is no guarantee when the garbage collection
+    /// will actually remove the tag. See also \ref mi_neuray_database_reuse_of_names.
+    ///
+    /// This implies that a #remove() call might actually remove an element that was stored later
+    /// under the same tag. This can potentially lead to invalid tag accesses. Those cases can be
+    /// avoided by using #mi::neuraylib::IDatabase::garbage_collection() after a transaction was
+    /// committed and before starting the next one to force garbage collection of all possible
+    /// elements.
+    ///
+    /// \par Local removals
+    ///
+    /// The purpose of local removals is to undo the effects of an earlier localization via
+    /// #mi::neuraylib::IDice_transaction::localize(). A local removal request requires that a tag
+    /// version exists in the scope of the transaction, and at least one more tag version exists in
+    /// one of the parent scopes. The effect of a local removal request is to immediately hide the
+    /// tag version in the scope of the transaction (the \em local copy), and to make the next tag
+    /// version in one of the parent scopes accessible from the very same transaction. The hidden
+    /// local copy will be lazily removed by the garbage collection of the database. There is no
+    /// guarantee when this will happen.
+    ///
+    /// \param tag              The tag to be marked for removal.
+    /// \param only_localized   \c false for global removals (the default) or \c true for local
+    ///                         removals. The flag is ignored in favor of global removals if the
+    ///                         transaction belongs to the global scope.
     /// \return
-    ///                       -  0: Success.
-    ///                       - -1: There is no database element with tag \p tag visible in this
-    ///                             transaction (\p only_localize is \c false) or there is no
-    ///                             database element with tag \p tag in the scope of this
-    ///                             transaction (\p only_localized is \c true).
-    ///                       - -2: Invalid parameters (\p tag is invalid).
-    ///                       - -3: The transaction is not open.
+    ///                         -  0: Success (including subsequent global removals on elements
+    ///                               already marked for global removal).
+    ///                         - -1: For global removals: there is no database element with tag
+    ///                               \p tag visible in this transaction. For local removals: there
+    ///                               is no database element with tag \p tag in the scope of this
+    ///                               transaction or there is no version of that database element in
+    ///                               one of the parent scopes.
+    ///                         - -2: Invalid parameters (\p tag is invalid).
+    ///                         - -3: The transaction is not open.
     virtual Sint32 remove( Tag_struct tag, bool only_localized = false) = 0;
 
     /// Returns the time stamp describing the current "time".
@@ -607,7 +633,7 @@ public:
     /// \param time_stamp  The time stamp obtained from #get_time_stamp() or
     ///                    #get_time_stamp(mi::neuraylib::Tag_struct)const.
     /// \return            The set of elements that have been changed since the time stamp, or
-    ///                    \c NULL in case of failure, i.e., the time stamp is invalid or there
+    ///                    \c nullptr in case of failure, i.e., the time stamp is invalid or there
     ///                    have been too many changes since the given time stamp.
     virtual const ITag_set* get_changed_elements_since_time_stamp(
         const char* time_stamp) const = 0;
@@ -655,8 +681,8 @@ public:
     ///
     /// \note       A tag can be associated with different names in different scopes.
     ///
-    /// \return     The name associated with \p tag, or \c NULL if there is no name associated with
-    ///             \p tag.
+    /// \return     The name associated with \p tag, or \c nullptr if there is no name associated
+    ///             with \p tag.
     virtual const char* tag_to_name( Tag_struct tag) = 0;
 
     /// Returns the tag associated with a name in the database.
@@ -695,7 +721,7 @@ public:
     ///              means "as many fragments as remote hosts in the cluster".
     /// \return
     ///              -  0: Success.
-    ///              - -1: Invalid parameters (\p job is \c NULL or \c count is zero but the
+    ///              - -1: Invalid parameters (\p job is \c nullptr or \c count is zero but the
     ///                    scheduling mode is not #mi::neuraylib::IFragmented_job::ONCE_PER_HOST).
     ///              - -3: Invalid job priority (negative value).
     ///
@@ -716,10 +742,10 @@ public:
     ///                 #mi::neuraylib::IFragmented_job::ONCE_PER_HOST. In that case a value of zero
     ///                 means "as many fragments as remote hosts in the cluster".
     /// \param listener The \c job_finished() method of this callback is called when the job has
-    ///                 been completed (might be \c NULL).
+    ///                 been completed (might be \c nullptr).
     /// \return
     ///                 -  0: Success.
-    ///                 - -1: Invalid parameters (\p job is \c NULL or \c count is zero).
+    ///                 - -1: Invalid parameters (\p job is \c nullptr or \c count is zero).
     ///                 - -2: Invalid scheduling mode (asynchronous execution is restricted to local
     ///                       jobs).
     ///                 - -3: Invalid job priority (negative value).
@@ -758,7 +784,7 @@ public:
     /// This method is similar to
     /// #mi::neuraylib::IDice_transaction::execute_fragmented(). The difference is that here
     /// no transaction is involved, i.e., all methods of #mi::neuraylib::IFragmented_job with a
-    /// transaction argument will pass \c NULL for that argument.
+    /// transaction argument will pass \c nullptr for that argument.
     ///
     /// \note Currently, this method is restricted to local jobs (see
     ///       #mi::neuraylib::IFragmented_job::get_scheduling_mode()).
@@ -770,7 +796,7 @@ public:
     /// This method is similar to
     /// #mi::neuraylib::IDice_transaction::execute_fragmented_async(). The difference is that here
     /// no transaction is involved, i.e., all methods of #mi::neuraylib::IFragmented_job with a
-    /// transaction argument will pass \c NULL for that argument.
+    /// transaction argument will pass \c nullptr for that argument.
     ///
     /// \note Currently, this method is restricted to local jobs (see
     ///       #mi::neuraylib::IFragmented_job::get_scheduling_mode()).
@@ -1112,7 +1138,7 @@ public:
     /// \param transaction  The transaction in which the fragmented job is executed. The transaction
     ///                     can be used to access database elements and database jobs required for
     ///                     execution but should not be used to edit or create tags. Might be
-    ///                     \c NULL if the fragmented job was started without transaction.
+    ///                     \c nullptr if the fragmented job was started without transaction.
     /// \param index        The index of the fragment to be executed. The value is in the range from
     ///                     0 to \p count-1.
     /// \param count        The number of fragments into which the fragmented job is split.
@@ -1221,7 +1247,7 @@ public:
     ///
     /// \param rdma_context RDMA context to acquire buffers from for this host.
     /// \param index        The index of the fragment to be executed.
-    /// \return             The RDMA buffer or \c NULL if RDMA should not be used.
+    /// \return             The RDMA buffer or \c nullptr if RDMA should not be used.
     virtual IRDMA_buffer* get_rdma_result_buffer( IRDMA_context* rdma_context, Size index) = 0;
 
     /// Executes one of many fragments of the fragmented job on a remote host (RDMA variant).
@@ -1247,7 +1273,7 @@ public:
     /// \param rdma_context The RDMA context to acquire RDMA buffers from for this host.
     /// \param context      The context in which the fragmented job is executed.
     /// \return             The RDMA buffer with the result of this fragment (allocated from \p
-    ///                     rdma_context) or \c NULL if no result is to be send back from this
+    ///                     rdma_context) or \c nullptr if no result is to be send back from this
     ///                     fragment. The same RDMA buffer can be returned from multiple fragments
     ///                     and from different jobs, in that case it will be sent back as the result
     ///                     of all the fragments using it. \n
@@ -1316,7 +1342,7 @@ public:
     /// the objects get transferred to the requesting remote host.
     ///
     /// \param serializer   The serializer to which to write the job content to.
-    virtual void serialize( ISerializer* serializer) const = 0;
+    void serialize( ISerializer* serializer) const = 0;
 
     /// Deserializes the fragmented job to enable remote job execution of fragments.
     ///
@@ -1326,7 +1352,7 @@ public:
     /// class may additionally generate data required by all fragments, like caches, etc.
     ///
     /// \param deserializer   The deserializer from which to read the job content.
-    virtual void deserialize( IDeserializer* deserializer) = 0;
+    void deserialize( IDeserializer* deserializer) = 0;
 
     /// Static assignment of fragments to hosts in the cluster.
     ///
@@ -1361,14 +1387,14 @@ public:
     /// Constants for possible scheduling modes.
     ///
     /// \see #mi::neuraylib::IFragmented_job::get_scheduling_mode()
-    enum Scheduling_mode {
+    enum Scheduling_mode : Uint32 {
         /// All fragments will be done on the local host. In consequence, dummy implementations for
         /// #serialize() and #deserialize() as well as for execute_fragment_remote() and
         /// #receive_remote_result() suffice.
         LOCAL = 0,
         /// The fragments will be spread across all hosts in the cluster. If a fragment fails to
         /// execute on a given host (for example, due to a host leaving the cluster), it is
-        /// re-assinged to a different host such that fragments are guaranteed to be executed.
+        /// re-assigned to a different host such that fragments are guaranteed to be executed.
         ///
         /// \note Although DiCE tries to distribute fragments in a fair manner to the cluster nodes,
         ///       there is no guarantee that this will be the case.
@@ -1385,9 +1411,9 @@ public:
         /// The job implements an explicit assignment of fragments to hosts and must implement the
         /// #assign_fragments_to_hosts() function to fill out all slots. Fragments assigned to hosts
         /// which are unknown will be skipped. If a host fails during fragment execution, its
-        /// workload will \em not be re-assinged to a different host
-        USER_DEFINED = 3,
-        SCHEDULING_MODE_FORCE_32_BIT = 0xffffffffU
+        /// workload will \em not be re-assigned to a different host
+        USER_DEFINED = 3
+        MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(SCHEDULING_MODE_FORCE_32_BIT, 0xffffffffU)
     };
 
     /// Returns the scheduling mode.
@@ -1444,8 +1470,6 @@ public:
 
 };
 
-mi_static_assert( sizeof( IFragmented_job::Scheduling_mode) == sizeof( Uint32));
-
 /// This mixin class can be used to implement the #mi::base::IInterface interface.
 ///
 /// This mixin class provides a default implementation of some of the pure virtual methods of the
@@ -1462,10 +1486,10 @@ class Base : public base::Interface_implement<I>
 {
 public:
     /// Own type.
-    typedef Base<id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11,I> Self;
+    using Self = Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>;
 
     /// Declares the interface ID
-    typedef base::Uuid_t<id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11> IID;
+    using IID = base::Uuid_t<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11>;
 
     /// Compares the interface ID \p iid against the interface ID of this interface and its
     /// ancestors.
@@ -1482,11 +1506,11 @@ public:
     /// Acquires a const interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL \c const #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr \c const #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
     /// interface pointer, whose reference count has been retained once. The caller must
     /// release the returned interface pointer at the end to prevent a memory leak.
     virtual const base::IInterface* get_interface( const base::Uuid& interface_id) const
@@ -1502,11 +1526,11 @@ public:
     /// Acquires a mutable interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
     /// interface pointer, whose reference count has been retained once. The caller must
     /// release the returned interface pointer at the end to prevent a memory leak.
     virtual base::IInterface* get_interface( const base::Uuid& interface_id)
@@ -1542,10 +1566,10 @@ class Element :  public Base<id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11,I>
 {
 public:
     /// Default constructor
-    Element() : m_pointer( 0) { }
+    Element() = default;
 
     /// Copy constructor
-    Element( const Element& /*other*/) : m_pointer( 0) { }
+    Element( const Element& /*other*/) { }
 
     /// Assignment operator
     Element& operator=( const Element& other)
@@ -1573,7 +1597,7 @@ public:
         }
         if(( count == 2) && m_pointer) {
             m_pointer->release();
-            m_pointer = 0;
+            m_pointer = nullptr;
         }
         return base::Interface_implement<I>::release();
     }
@@ -1633,7 +1657,7 @@ private:
     //  The embedded pointer.
     //
     //  The embedded pointer is used for internal purposes. Users must not access the pointer.
-    mutable const base::IInterface* m_pointer;
+    mutable const base::IInterface* m_pointer = nullptr;
 
     //  The lock that protects the embedded pointer.
     mutable base::Lock m_pointer_lock;
@@ -1754,7 +1778,7 @@ public:
         // avoid warnings
         (void) rdma_context;
         (void) index;
-        return 0;
+        return nullptr;
     }
 
     /// Empty body. Not used since #get_scheduling_mode() requests local execution.
@@ -1771,7 +1795,7 @@ public:
         (void) count;
         (void) rdma_context;
         (void) context;
-        return 0;
+        return nullptr;
     }
 
     /// Empty body. Not used since #get_scheduling_mode() requests local execution.

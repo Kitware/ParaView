@@ -1,4 +1,4 @@
-/* Copyright 2023 NVIDIA Corporation. All rights reserved.
+/* Copyright 2025 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-// SPDX-FileCopyrightText: Copyright 2023 NVIDIA Corporation
+// SPDX-FileCopyrightText: Copyright 2025 NVIDIA Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "vtknvindex_instance.h"
@@ -743,9 +743,14 @@ mi::Sint32 vtknvindex_instance::authenticate_nvindex()
     return 0;
   }
 
-  return m_nvindex_interface->authenticate(index_vendor_key.c_str(),
-    static_cast<mi::Sint32>(index_vendor_key.length()), index_secret_key.c_str(),
-    static_cast<mi::Sint32>(index_secret_key.length()), nullptr, 0);
+  return m_nvindex_interface->authenticate(
+    index_vendor_key.c_str(), static_cast<mi::Sint32>(index_vendor_key.length()),
+    index_secret_key.c_str(), static_cast<mi::Sint32>(index_secret_key.length())
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR < 372500)
+                                ,
+    nullptr, 0
+#endif
+  );
 }
 
 namespace
@@ -1454,5 +1459,5 @@ void vtknvindex_instance::init_scene_graph()
 //-------------------------------------------------------------------------------------------------
 const char* vtknvindex_instance::get_version() const
 {
-  return "5.12";
+  return "6.0.0";
 }

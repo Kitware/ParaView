@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Generic camera
@@ -11,8 +11,10 @@
 #include <mi/base/interface_declare.h>
 
 namespace nv {
-
 namespace index {
+
+// forward declarations
+class ICamera_projection;
 
 /// Abstract interface class representing a generic camera.
 ///
@@ -32,12 +34,12 @@ namespace index {
 ///
 /// Instances of \c ICamera implementations are created by \c IScene::create_camera().
 ///
-/// Note: ICamera is not a IScene_element.
+/// Note: \c ICamera is not an \c IScene_element.
 ///
 /// \ingroup nv_index_scene_description
 ///
 class ICamera :
-    public mi::base::Interface_declare<0x1247f2e7,0x1725,0x47e1,0x81,0x57,0x1b,0x63,0xa4,0x85,0x64,0x29,
+    public mi::base::Interface_declare<0x9ec1179e,0x1b9,0x4bc8,0xb0,0x54,0xef,0x79,0x8a,0x17,0x27,0x3f,
                                        mi::neuraylib::IElement>
 {
 public:
@@ -79,6 +81,87 @@ public:
     /// Returns the normalized up vector.
     /// \return Normalized up vector
     virtual mi::math::Vector_struct<mi::Float32, 3> get_up_direction() const = 0;
+
+    /// Set camera projection center offset.
+    ///
+    /// Normally the camera viewing plane is centered on the eye point and viewing direction.
+    /// For use cases where asymmetric project is needed, like multi-tile rendering or stereographic projection,
+    /// we can specify a two-dimensional offset to shift the viewing plane relative to the eye point.
+    /// If the offset value is (0,0), the viewing plane is centered, this is the default.
+    ///
+    /// The offset value range is relative to \c aperture (aperture defines the width of the viewing plane).
+    /// If \c aperture is 1, then offset values of 0.5 define half of the viewing plane extent.
+    /// A negative offset moves the viewing plane to the left or down relative to the eye point.
+    /// For example, in multi-tile rendering, the lower left tile of four would use an offset of (-0.5, -0.5) assuming aperture = 1.
+    ///
+    ///
+    /// The camera parameters for general tiling are derived as follows:
+    ///
+    /// The task is to subdivide a given camera projection into a number of horizontal and vertical tiles ( \c nb_tiles ).
+    /// All tiles have the same format, their resolution is a fraction of the original resolution.
+    /// (We assume that original resolution and number of tiles are integer divisible.)
+    /// If the tiled images should represent an upscaled version of the original,
+    /// then we scale up the original resolution for the sake of this parameter derivation.
+    ///
+    /// The input camera parameters are the original \c aspect, \c aperture, \c resolution,
+    /// for both perspective and orthographic projection.
+    /// Note that for square pixels, \c aspect could be derived from \c resolution (aspect = resolution.x / resolution.y).
+    ///
+    /// The camera parameters for tile projection are: \c aspect, \c resolution, \c aperture and \c base_offset, \c tile_index.
+    /// Pseudo code:
+    ///
+    ///    tiling_aspect       = nb_tiles.x / nb_tiles.y
+    ///    tile_aspect         = aspect / tiling_aspect
+    ///    tile_aperture       = aperture / nb_tiles.x
+    ///    tile_resolution.x   = resolution.x / nb_tiles.x
+    ///    tile_resolution.y   = resolution.y / nb_tiles.y
+    ///
+    ///    base_offset.x = -aperture/2 + tile_aperture/2
+    ///    base_offset.y = -aperture/(2*tiling_aspect) + tile_aperture/2)
+    ///
+    /// For rendering tiles, each tile should use adapted camera parameters as follows:
+    ///
+    ///    camera.aspect        := tile_aspect
+    ///    camera.aperture      := tile_aperture
+    ///    (camera.)resolution  := tile_resolution
+    ///
+    ///    [for xi in nb_tiles.x; for yi in nb_tiles.y]
+    ///    camera.center_offset.x := xi * tile_aperture + base_offset.x
+    ///    camera.center_offset.y := yi * tile_aperture + base_offset.y
+    ///
+    //
+    /// \param [in] offset  Two-dimensional offset of viewing plane.
+    virtual void set_center_offset(const mi::math::Vector_struct<mi::Float32, 2>& offset) = 0;
+
+    /// Get camera projection center offset.
+    /// \return Current camera projection center offset, default is (0,0).
+    virtual mi::math::Vector_struct<mi::Float32, 2> get_center_offset() const = 0;
+
+
+    /// \name Advanced camera projection (VR/XR)
+    /// @{
+
+    /// Create a new camera projection object.
+    /// This object can be connected to an \c ICamera for advanced camera projection like VR/XR setups.
+    /// \return The new \c ICamera_projection
+    virtual ICamera_projection* create_advanced_camera_projection() const = 0;
+
+    /// Access current advanced camera projection settings.
+    /// \return Tag of \c ICamera_projection element.
+    virtual mi::neuraylib::Tag_struct get_advanced_camera_projection() const = 0;
+
+    /// Update current advanced camera projection settings.
+    /// \param cam_projection  Tag of I\c Camera_projection element.
+    virtual void set_advanced_camera_projection(mi::neuraylib::Tag_struct cam_projection) = 0;
+
+    /// Check if advanced camera projection is enabled.
+    /// \return True if advanced camera projection is enabled.
+    virtual bool is_advanced_camera_projection_enabled() const = 0;
+
+    /// Enable or disable advanced camera projection.
+    /// \param[in]  enable  Enable advanced projection.
+    virtual void enable_advanced_camera_projection(bool enable) = 0;
+    /// @}
 };
 
 /// Interface class for a camera implementing the perspective camera model.
@@ -96,8 +179,7 @@ public:
 /// product of the aspect ratio and the focal length.
 ///
 /// Other attributes stored in the IPerspective_camera class include
-/// the near and far clipping planes and the canvas resolution (width
-/// and height).
+/// the near and far clipping planes.
 ///
 /// \ingroup nv_index_scene_description
 ///
@@ -118,7 +200,7 @@ public:
     virtual void set_aperture(mi::Float64 aperture_width) = 0;
 
     /// Returns the aspect ratio, defined as width/height.
-    /// 
+    ///
     /// \note This does not take the canvas size controlled by \c set_resolution_x() and \c
     /// set_resolution_y() into account.
     ///
@@ -130,14 +212,14 @@ public:
     virtual void set_aspect(mi::Float64 aspect_ratio) = 0;
 
     /// Returns the distance to the near clipping plane (\em hither).
-    /// \return near clipping plane distance 
+    /// \return near clipping plane distance
     virtual mi::Float64 get_clip_min() const = 0;
     /// Sets the distance to the near clipping plane (\em hither).
     /// \param[in]  clip_min Distance
     virtual void set_clip_min(mi::Float64 clip_min) = 0;
 
     /// Returns the distance to the far clipping plane (\em yon).
-    /// \return far clipping plane distance 
+    /// \return far clipping plane distance
     virtual mi::Float64 get_clip_max() const = 0;
     /// Sets the distance to the far clipping plane (\em yon).
     /// \param[in]  clip_max Distance
@@ -187,7 +269,7 @@ public:
     virtual void set_aperture(mi::Float64 aperture_width) = 0;
 
     /// Returns the aspect ratio, defined as width/height.
-    /// 
+    ///
     /// \note This does not take the canvas size controlled by \c set_resolution_x() and \c
     /// set_resolution_y() into account.
     ///
@@ -199,14 +281,14 @@ public:
     virtual void set_aspect(mi::Float64 aspect_ratio) = 0;
 
     /// Returns the distance to the near clipping plane (\em hither).
-    /// \return near clipping plane distance 
+    /// \return near clipping plane distance
     virtual mi::Float64 get_clip_min() const = 0;
     /// Sets the distance to the near clipping plane (\em hither).
     /// \param[in]  clip_min Distance
     virtual void set_clip_min(mi::Float64 clip_min) = 0;
 
     /// Returns the distance to the far clipping plane (\em yon).
-    /// \return far clipping plane distance 
+    /// \return far clipping plane distance
     virtual mi::Float64 get_clip_max() const = 0;
     /// Sets the distance to the far clipping plane (\em yon).
     /// \param[in]  clip_max Distance

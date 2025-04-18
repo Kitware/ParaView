@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for creation, assignment, and cloning of instances of types.
@@ -10,6 +10,7 @@
 #include <mi/base/interface_declare.h>
 #include <mi/neuraylib/idata.h>
 #include <mi/neuraylib/type_traits.h>
+#include <mi/neuraylib/version.h> // for MI_NEURAYLIB_DEPRECATED_ENUM_VALUE
 
 namespace mi {
 
@@ -56,11 +57,11 @@ public:
     /// \param argc         The number of elements in \p argv.
     /// \param argv         The array of arguments passed to the constructor.
     /// \return             A pointer to the created object on success,
-    ///                     or \c NULL on failure (e.g., invalid type name).
+    ///                     or \c nullptr on failure (e.g., invalid type name).
     virtual base::IInterface* create(
         const char* type_name,
         Uint32 argc = 0,
-        const base::IInterface* argv[] = 0) = 0;
+        const base::IInterface* argv[] = nullptr) = 0;
 
     /// Creates an object of the type \p type_name.
     ///
@@ -100,12 +101,12 @@ public:
     /// \param argv         The array of arguments passed to the constructor
     /// \tparam T           The interface type of the class to create
     /// \return             A pointer to the created object on success,
-    ///                     or \c NULL on failure (e.g., invalid type name).
+    ///                     or \c nullptr on failure (e.g., invalid type name).
     template<class T>
     T* create(
         const char* type_name,
         Uint32 argc = 0,
-        const base::IInterface* argv[] = 0)
+        const base::IInterface* argv[] = nullptr)
     {
         base::IInterface* ptr_iinterface = create( type_name, argc, argv);
         if ( !ptr_iinterface)
@@ -148,7 +149,7 @@ public:
     ///
     /// \tparam T           The interface type of the class to create
     /// \return             A pointer to the created object on success,
-    ///                     or \c NULL on failure (e.g., invalid type name).
+    ///                     or \c nullptr on failure (e.g., invalid type name).
     template<class T>
     T* create()
     {
@@ -159,10 +160,10 @@ public:
     ///
     /// The enum values are powers of two such that they can be combined in a bitmask. Such a
     /// bitmask is returned by #assign_from_to().
-    enum Assign_result
+    enum Assign_result : Uint32
     {
-        /// One of the arguments \p source or \p target is \c NULL. Alternatively, a deep assignment
-        /// to an instance of #mi::IPointer failed due to a \c NULL value.
+        /// One of the arguments \p source or \p target is \c nullptr. Alternatively, a deep
+        /// assignment to an instance of #mi::IPointer failed due to a \c nullptr value.
         NULL_POINTER                     =  1,
 
         /// There is a structural mismatch between \p source and \p target.
@@ -213,17 +214,15 @@ public:
         INCOMPATIBLE_ENUM_TYPES          = 2048,
 
         /// The assignment failed due to incompatible options.
-        INCOMPATIBLE_OPTIONS             = 4096,
-
-        //  Undocumented, for alignment only
-        FORCE_32_BIT_RESULT              = 0xffffffffU
+        INCOMPATIBLE_OPTIONS             = 4096
+        MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(FORCE_32_BIT_RESULT, 0xffffffffU)
     };
 
     /// This enum represents various options for the assignment or cloning of types.
     ///
     /// The enum values are powers of two such that they can be combined in a bitmask. Such a
     /// bitmask van be is passed to #assign_from_to() and #clone().
-    enum Assign_clone_options
+    enum Assign_clone_options : Uint32
     {
         /// By default, assignment or cloning of instances of #mi::IPointer and #mi::IConst_pointer
         /// is shallow, i.e., the pointer represented by these interfaces is assigned or cloned as a
@@ -234,10 +233,8 @@ public:
 
         /// By default, assignment might change the set of keys if the for target is a dynamic array
         /// or map.  If this option is given the set of keys in the target remains fixed.
-        FIX_SET_OF_TARGET_KEYS = 4,
-
-        //  Undocumented, for alignment only
-        FORCE_32_BIT_OPTIONS     = 0xffffffffU
+        FIX_SET_OF_TARGET_KEYS = 4
+        MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(FORCE_32_BIT_OPTIONS, 0xffffffffU)
     };
 
     /// Assigns the value(s) of \p source to \p target.
@@ -300,7 +297,7 @@ public:
     /// Compares two instances of #mi::IData.
     ///
     /// The comparison operator for instances of #mi::IData is defined as follows:
-    /// - If \p lhs or \p rhs is \c NULL, the result is the lexicographic comparison of
+    /// - If \p lhs or \p rhs is \c nullptr, the result is the lexicographic comparison of
     ///   the pointer addresses themselves.
     /// - Otherwise, the type names of \p lhs and \p rhs are considered. If they are different,
     ///   the result is determined by \c strcmp() on the type names. For example, this method
@@ -308,14 +305,15 @@ public:
     ///   the same element type, length, and equal element values.
     /// - Finally, the values of the elements are compared lexicographically, as defined by
     ///   \c operator< or \c strcmp() with the following special cases for selected interfaces:
-    ///   - #mi::IRef: If #mi::IRef::get_reference_name() returns \c NULL for at least one operand,
-    ///     the result is the lexicographic comparison of the pointer addresses. Otherwise, the
-    ///     result is determined by \c strcmp() on the names of the referenced DB elements.
+    ///   - #mi::IRef: If #mi::IRef::get_reference_name() returns \c nullptr for at least one
+    ///     operand, the result is the lexicographic comparison of the pointer addresses.
+    ///     Otherwise, the result is determined by \c strcmp() on the names of the referenced DB
+    ///     elements.
     ///   - #mi::IPointer and #mi::IConst_pointer: If #mi::IPointer::get_pointer() or
-    ///     #mi::IConst_pointer::get_pointer() returns \c NULL for at least one operand, the result
-    ///     is the lexicographic comparison of the pointer addresses. Otherwise, if at least one
-    ///     pointer is not of the type #mi::IData, the result is the lexicographic comparison of the
-    ///     pointer addresses. Finally (both pointers are of type #mi::IData), the result is
+    ///     #mi::IConst_pointer::get_pointer() returns \c nullptr for at least one operand, the
+    ///     result is the lexicographic comparison of the pointer addresses. Otherwise, if at least
+    ///     one pointer is not of the type #mi::IData, the result is the lexicographic comparison
+    ///     of the pointer addresses. Finally (both pointers are of type #mi::IData), the result is
     ///     determined by the recursive invocation of this method on these pointers.
     ///   - #mi::IData_collection: First, if the collections have different length, this decides
     ///     the comparison. Next, the elements are compared pairwise in lexicographic order of
@@ -333,8 +331,8 @@ public:
 
     /// Returns a textual representation of a type.
     ///
-    /// The textual representation is of the form "type name = value" if \p name is not \c NULL,
-    /// and of the form "value" if \p name is \c NULL. The representation of the value might
+    /// The textual representation is of the form "type name = value" if \p name is not \c nullptr,
+    /// and of the form "value" if \p name is \c nullptr. The representation of the value might
     /// contain line breaks, for example for structures and arrays. Subsequent lines have a
     /// suitable indentation. The assumed indentation level of the first line is specified by
     /// \p depth.
@@ -342,7 +340,7 @@ public:
     /// \ifnot DICE_API
     /// \see #mi::neuraylib::IFactory::dump(ITransaction*,const IData*,const char*,Size)
     /// \endif
-    virtual const IString* dump( const IData* data, const char* name = 0, Size depth = 0) = 0;
+    virtual const IString* dump( const IData* data, const char* name = nullptr, Size depth = 0) = 0;
 
     /// Returns a textual representation of a type.
     ///
@@ -352,26 +350,23 @@ public:
     virtual const IString* dump(
         neuraylib::ITransaction* transaction,
         const IData* data,
-        const char* name = 0,
+        const char* name = nullptr,
         Size depth = 0) = 0;
 
     /// Returns a registered structure declaration.
     ///
     /// \param structure_name   The name of the structure declaration to return.
-    /// \return                 The structure declaration for \p name, or \c NULL if there is no
+    /// \return                 The structure declaration for \p name, or \c nullptr if there is no
     ///                         structure declaration for that name.
     virtual const IStructure_decl* get_structure_decl( const char* structure_name) const = 0;
 
     /// Returns a registered enum declaration.
     ///
     /// \param enum_name        The name of the enum declaration to return.
-    /// \return                 The enum declaration for \p name, or \c NULL if there is no
+    /// \return                 The enum declaration for \p name, or \c nullptr if there is no
     ///                         enum declaration for that name.
     virtual const IEnum_decl* get_enum_decl( const char* enum_name) const = 0;
 };
-
-mi_static_assert( sizeof( IFactory::Assign_result) == sizeof( Uint32));
-mi_static_assert( sizeof( IFactory::Assign_clone_options) == sizeof( Uint32));
 
 /**@}*/ // end group mi_neuray_types
 

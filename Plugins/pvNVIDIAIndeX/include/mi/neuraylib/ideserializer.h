@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief      Deserialization of objects from a byte stream.
@@ -14,7 +14,7 @@ namespace mi {
 
 namespace neuraylib {
 
-/** 
+/**
 \if IRAY_API \addtogroup mi_neuray_plugins
 \elseif MDL_SDK_API \addtogroup mi_neuray_plugins
 \else \addtogroup mi_neuray_dice
@@ -48,7 +48,7 @@ public:
     /// specified as template parameter.
     ///
     /// \tparam T     The interface type of the element to return
-    /// \return       The deserialized object, or \c NULL if the element is not of type \c T.
+    /// \return       The deserialized object, or \c nullptr if the element is not of type \c T.
     template <class T>
     T* deserialize()
     {

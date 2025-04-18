@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file       mi/base/lock.h
 /// \brief      Multithreading locks.
@@ -35,7 +35,7 @@ namespace base {
 /** \addtogroup mi_base_threads
 @{
 */
-    
+
 /// %Non-recursive lock class.
 ///
 /// The lock implements a critical region that only one thread can enter at a time. The lock is
@@ -51,6 +51,12 @@ public:
     /// Constructor.
     Lock();
 
+    // This class is non-copyable.
+    Lock( Lock const &) = delete;
+
+    // This class is non-assignable.
+    Lock& operator=( Lock const &) = delete;
+
     /// Destructor.
     ~Lock();
 
@@ -62,9 +68,9 @@ public:
     public:
         /// Constructor.
         ///
-        /// \param lock   If not \c NULL, this lock is acquired. If \c NULL, #set() can be used to
-        ///               explicitly acquire a lock later.
-        explicit Block( Lock* lock = 0);
+        /// \param lock   If not \c nullptr, this lock is acquired. If \c nullptr, #set() can be
+        ///               used to explicitly acquire a lock later.
+        explicit Block( Lock* lock = nullptr);
 
         /// Destructor.
         ///
@@ -114,12 +120,6 @@ protected:
     void unlock();
 
 private:
-    // This class is non-copyable.
-    Lock( Lock const &);
-
-    // This class is non-assignable.
-    Lock& operator=( Lock const &);
-
 #ifndef MI_PLATFORM_WINDOWS
     // The mutex implementing the lock.
     pthread_mutex_t m_mutex;
@@ -145,6 +145,12 @@ public:
     /// Constructor.
     Recursive_lock();
 
+    // This class is non-copyable.
+    Recursive_lock( Recursive_lock const &) = delete;
+
+    // This class is non-assignable.
+    Recursive_lock& operator=( Recursive_lock const &) = delete;
+
     /// Destructor.
     ~Recursive_lock();
 
@@ -156,9 +162,9 @@ public:
     public:
         /// Constructor.
         ///
-        /// \param lock   If not \c NULL, this lock is acquired. If \c NULL, #set() can be used to
-        ///               explicitly acquire a lock later.
-        explicit Block( Recursive_lock* lock = 0);
+        /// \param lock   If not \c nullptr, this lock is acquired. If \c nullptr, #set() can be
+        ///               used to explicitly acquire a lock later.
+        explicit Block( Recursive_lock* lock = nullptr);
 
         /// Destructor.
         ///
@@ -208,12 +214,6 @@ protected:
     void unlock();
 
 private:
-    // This class is non-copyable.
-    Recursive_lock( Recursive_lock const &);
-
-    // This class is non-assignable.
-    Recursive_lock& operator=( Recursive_lock const &);
-
 #ifndef MI_PLATFORM_WINDOWS
     // The mutex implementing the lock.
     pthread_mutex_t m_mutex;
@@ -287,7 +287,7 @@ inline bool Lock::try_lock()
         return false;
     }
     m_locked = true;
-    return true;     
+    return true;
 #endif
 }
 
@@ -336,15 +336,15 @@ inline bool Lock::Block::try_set( Lock* lock)
     m_lock = lock;
     if( m_lock && m_lock->try_lock())
         return true;
-    m_lock = 0;
+    m_lock = nullptr;
     return false;
 }
 
 inline void Lock::Block::release()
 {
-    if( m_lock) 
+    if( m_lock)
         m_lock->unlock();
-    m_lock = 0;
+    m_lock = nullptr;
 }
 
 inline Recursive_lock::Recursive_lock()
@@ -438,15 +438,15 @@ inline bool Recursive_lock::Block::try_set( Recursive_lock* lock)
     m_lock = lock;
     if( m_lock && m_lock->try_lock())
         return true;
-    m_lock = 0;
+    m_lock = nullptr;
     return false;
 }
 
 inline void Recursive_lock::Block::release()
 {
-    if( m_lock) 
+    if( m_lock)
         m_lock->unlock();
-    m_lock = 0;
+    m_lock = nullptr;
 }
 
 #endif // MI_FOR_DOXYGEN_ONLY

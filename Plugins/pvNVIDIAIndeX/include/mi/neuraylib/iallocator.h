@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for allocators.
@@ -36,13 +36,13 @@ public:
     /// The memory must be aligned to an address which can accommodate any type of object on the
     /// current platform.
     ///
-    /// An allocation of zero bytes returns a valid non- \c NULL pointer which must be freed in the
-    /// end. However, dereferencing this pointer gives undefined behavior.
+    /// An allocation of zero bytes returns a valid non- \c nullptr pointer which must be freed in
+    /// the end. However, dereferencing this pointer gives undefined behavior.
     ///
     /// This function can be called at any time from any thread, including concurrent calls from
     /// several threads at the same time.
     ///
-    /// If the requested memory is not available this function must return \c NULL. In this case
+    /// If the requested memory is not available this function must return \c nullptr. In this case
     /// \neurayProductName will try to reduce the memory it uses and retry the allocation. If
     /// allocation still fails \neurayProductName will give up. In this case \neurayProductName can
     /// not be used anymore and must be shut down. \NeurayProductName will try to release as much
@@ -63,7 +63,7 @@ public:
     /// several threads at the same time.
     ///
     /// \param memory   A memory block previously allocated by a call to #malloc().
-    ///                 If \c memory is \c NULL, no operation is performed.
+    ///                 If \c memory is \c nullptr, no operation is performed.
     virtual void free(void* memory) = 0;
 
     /// This function is used by \neurayProductName to inquire the amount of extra memory currently

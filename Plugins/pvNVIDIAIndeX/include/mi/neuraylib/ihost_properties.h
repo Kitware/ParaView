@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Information about a local or remote host.
@@ -28,9 +28,9 @@ class IHost_properties : public
  public:
      /// Returns the address of the host described by this property instance
      ///
-     /// The method always returns \c NULL if networking support is not available.
+     /// The method always returns \c nullptr if networking support is not available.
      ///
-     /// \return                The address, or \c NULL in case of failure.
+     /// \return                The address, or \c nullptr in case of failure.
      virtual const IString* get_address() const = 0;
 
      /// Returns the amount of RAM memory in MB.
@@ -71,12 +71,12 @@ class IHost_properties : public
      ///
      /// (*) These properties are only supported for the local host, not for remote hosts.
      ///
-     /// The method always returns \c NULL if networking support is not available.
+     /// The method always returns \c nullptr if networking support is not available.
      ///
      /// \param key             The key for the property wished for
-     /// \return                The value of the property, or \c NULL in case of failure.
+     /// \return                The value of the property, or \c nullptr in case of failure.
      virtual const IString* get_property( const char* key) const = 0;
-         
+
      /// Returns the host ID of this host.
      virtual Uint32 get_host_id() const = 0;
 };

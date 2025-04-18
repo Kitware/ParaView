@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Pointer type.
@@ -44,8 +44,8 @@ class IPointer :
 public:
     /// Sets the pointer.
     ///
-    /// Note that a \c NULL pointer is a valid parameter value that clears the previously set
-    /// pointer. Subsequent #get_pointer() calls will return \c NULL then.
+    /// Note that a \c nullptr is a valid parameter value that clears the previously set pointer.
+    /// Subsequent #get_pointer() calls will return \c nullptr then.
     ///
     /// \return
     ///                -  0: Success.
@@ -103,8 +103,8 @@ class IConst_pointer :
 public:
     /// Sets the const pointer.
     ///
-    /// Note that a \c NULL pointer is a valid parameter value that clears the previously set
-    /// pointer. Subsequent #get_pointer() calls will return \c NULL then.
+    /// Note that a \c nullptr is a valid parameter value that clears the previously set pointer.
+    /// Subsequent #get_pointer() calls will return \c nullptr then.
     ///
     /// \return
     ///                -  0: Success.

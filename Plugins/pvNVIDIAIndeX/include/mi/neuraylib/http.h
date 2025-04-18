@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief A lightweight HTTP server.
@@ -12,6 +12,7 @@
 
 #include <mi/base/interface_declare.h>
 #include <mi/neuraylib/idata.h>
+#include <mi/neuraylib/version.h> // for MI_NEURAYLIB_DEPRECATED_ENUM_VALUE
 
 namespace mi {
 
@@ -110,7 +111,7 @@ public:
     /// Returns a header from the request.
     ///
     /// \param key     The key of the header.
-    /// \return        The value of the header, or \c NULL if the header was not found.
+    /// \return        The value of the header, or \c nullptr if the header was not found.
     virtual const char* get_header( const char* key) const = 0;
 
     /// Returns the header with the given index.
@@ -177,7 +178,7 @@ public:
 
     /// Returns the body string.
     ///
-    /// \return The body, or \c NULL if there is no body.
+    /// \return The body, or \c nullptr if there is no body.
     virtual const char* get_body() const = 0;
 };
 
@@ -219,7 +220,7 @@ public:
     /// Returns a header from the response.
     ///
     /// \param key     The key of the header.
-    /// \return        The value of the header, or \c NULL if the header was not found.
+    /// \return        The value of the header, or \c nullptr if the header was not found.
     virtual const char* get_header( const char* key) const = 0;
 
     /// Returns the header with the given index.
@@ -244,7 +245,7 @@ public:
 ///
 /// It is called every time data is enqueued or printed to the connection. The buffer is passed
 /// through all installed data handlers which might replace the buffer by a different buffer. If a
-/// data handler returns \c NULL no data is printed or enqueued to the connection and the handler
+/// data handler returns \c nullptr no data is printed or enqueued to the connection and the handler
 /// is uninstalled and released.
 class IData_handler : public
     mi::base::Interface_declare<0x723054d8,0xdfa7,0x4475,0xbc,0xb4,0x44,0x23,0x25,0xea,0x52,0x50>
@@ -349,7 +350,7 @@ public:
     /// Adds a data handler to the connection.
     ///
     /// The handler is removed when the connection is closed or when the handler's \c handle()
-    /// method returns \c NULL.
+    /// method returns \c nullptr.
     ///
     /// \param handler   The data handler.
     virtual void add_data_handler( IData_handler* handler) = 0;
@@ -371,7 +372,7 @@ public:
     /// attachments.
     ///
     /// \param key     The key of the attachment.
-    /// \return        The value of the attachment, or \c NULL if there is no such attachment.
+    /// \return        The value of the attachment, or \c nullptr if there is no such attachment.
     virtual IData* get_data_attachment( const char* key) = 0;
 
     /// Returns an attachment from the connection.
@@ -388,7 +389,7 @@ public:
     ///
     /// \tparam T      The interface type of the requested element.
     /// \param key     The key of the attachment.
-    /// \return        The value of the attachment, or \c NULL if there is no such attachment.
+    /// \return        The value of the attachment, or \c nullptr if there is no such attachment.
     template<class T>
     T* get_data_attachment( const char* key)
     {
@@ -414,7 +415,7 @@ public:
     /// methods deals with string attachments. Use #get_data_attachment() for all other data types.
     ///
     /// \param key     The key of the attachment.
-    /// \return        The value of the attachment, or \c NULL if there is no such attachment.
+    /// \return        The value of the attachment, or \c nullptr if there is no such attachment.
     virtual const char* get_attachment( const char* key) = 0;
 
     /// Removes an attachment from the connection.
@@ -509,8 +510,7 @@ public:
     virtual const char* get_url_path() const = 0;
 
     /// This class represents different states that a WebSocket can be in.
-    enum State
-    {
+    enum State : Uint32 {
         /// The initial state.
         WS_STATE_INIT,
         /// The client has sent a request and awaits a response.
@@ -523,8 +523,8 @@ public:
         /// been closed.
         WS_STATE_CLOSED,
         /// An error has occurred.
-        WS_STATE_ERROR,
-        WS_STATE_FORCE_32_BIT = 0xffffffffU
+        WS_STATE_ERROR
+        MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(WS_STATE_FORCE_32_BIT, 0xffffffffU)
     };
 
     /// Returns the state of the connection.
@@ -611,18 +611,16 @@ public:
     /// Returns the HTTP connection associated with this WebSocket connection.
     virtual IConnection* get_http_connection() = 0;
 
-    /// Set the maximum payload that web socket messages can have. Defaults to 2 Gb.
+    /// Set the maximum payload that web socket messages can have. Defaults to 2 GB.
     ///
     /// \param bytes The maximum payload in bytes
     virtual void set_max_payload(Uint64 bytes) = 0;
 
-    /// Get the maximum payoad.
+    /// Get the maximum payload.
     ///
     /// \return The maximum payload.
     virtual Uint64 get_max_payload() = 0;
 };
-
-mi_static_assert( sizeof( IWeb_socket::State) == sizeof( Uint32));
 
 /// WebSocket handlers are responsible for handling WebSocket requests.
 ///
@@ -798,7 +796,7 @@ public:
     /// Returns the MIME type registered for a certain extension.
     ///
     /// \param extension   The file extension to lookup.
-    /// \return            The registered MIME type or \c NULL.
+    /// \return            The registered MIME type or \c nullptr.
     virtual const char* lookup_mime_type( const char* extension) = 0;
 
     /// Adds a new request handler to the server.
@@ -983,7 +981,7 @@ public:
     /// \param connect_timeout      The timeout interval in seconds when attempting to connect to a
     ///                             server.
     /// \return                     A valid WebSocket if a connection can be established to the
-    ///                             server, or \c NULL in case of failures.
+    ///                             server, or \c nullptr in case of failures.
     ///
     /// \note
     ///   The WebSocket address must have one of the following two formats:

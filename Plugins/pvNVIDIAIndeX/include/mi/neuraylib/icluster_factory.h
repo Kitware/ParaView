@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component to create additional clusters.
@@ -17,7 +17,7 @@ class ICluster;
 
 /** \defgroup mi_neuray_cluster Additional clusters
     \ingroup mi_neuray
-    
+
     This module provides functionality to join additional clusters.
 */
 
@@ -37,7 +37,7 @@ public:
     /// The cluster is initially not started or joined. The application can use the functionality in
     /// #mi::neuraylib::ICluster for configuration and then start the cluster.
     ///
-    /// \return A new cluster instance,  or \c NULL if no cluster could be created.
+    /// \return A new cluster instance,  or \c nullptr if no cluster could be created.
     virtual ICluster* create_cluster() = 0;
 };
 

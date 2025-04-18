@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Type that holds a reference to a database element.
@@ -26,8 +26,8 @@ class IRef :
 public:
     /// Sets the reference to \p db_element.
     ///
-    /// Note that a \c NULL pointer is a valid parameter value that clears the previously set
-    /// reference. Subsequent #get_reference() calls will return \c NULL then.
+    /// Note that a \c nullptr is a valid parameter value that clears the previously set reference.
+    /// Subsequent #get_reference() calls will return \c nullptr then.
     ///
     /// If a literal \c 0 is passed for \p db_element, the call is ambiguous. You need to explicitly
     /// cast the value to \c const \c IInterface* or \c const \c char*.
@@ -42,8 +42,8 @@ public:
 
     /// Sets the reference to the database element named \p name.
     ///
-    /// Note that a \c NULL pointer is a valid parameter value that clears the previously set
-    /// reference. Subsequent #get_reference() calls will return \c NULL then.
+    /// Note that a \c nullptr is a valid parameter value that clears the previously set reference.
+    /// Subsequent #get_reference() calls will return \c nullptr then.
     ///
     /// If a literal \c 0 is passed for \p name, the call is ambiguous. You need to explicitly
     /// cast the value to \c const \c IInterface* or \c const \c char*.

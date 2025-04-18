@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for a scene
@@ -189,6 +189,7 @@ public:
     ///             important bound for the renderer to consider for setting up internal resources.
     ///
     /// \param[in] ijk_bbox                     The local space bounding box.
+    /// \param[in] transform_matrix             Transformation matrix from IJK (local) to XYZ (global) space.
     /// \param[in] max_mesh_edge_length         The length of the longest edge in the irregular volume mesh.
     /// \param[in] importer_callback            Distributed data import callback function.
     /// \param[in] dice_transaction             The DiCE transaction.
@@ -197,6 +198,7 @@ public:
     ///
     virtual IIrregular_volume_scene_element* create_irregular_volume(
         const mi::math::Bbox_struct<mi::Float32, 3> &               ijk_bbox,
+        const mi::math::Matrix_struct<mi::Float32, 4, 4>&           transform_matrix,
         const mi::Float32                                           max_mesh_edge_length,
         nv::index::IDistributed_data_import_callback*               importer_callback,
         mi::neuraylib::IDice_transaction*                           dice_transaction) const = 0;

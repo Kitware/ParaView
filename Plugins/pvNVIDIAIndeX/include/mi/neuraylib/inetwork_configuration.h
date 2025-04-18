@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for networking related settings.
@@ -8,6 +8,7 @@
 #define MI_NEURAYLIB_INETWORK_CONFIGURATION_H
 
 #include <mi/base/interface_declare.h>
+#include <mi/neuraylib/version.h> // for MI_NEURAYLIB_DEPRECATED_ENUM_VALUE
 
 // X11/Xlib.h defines Status to int
 #if defined(_XLIB_H_) || defined(_X11_XLIB_H_)
@@ -38,7 +39,7 @@ public:
     /// unicast, multicast, or a combination of both after establishing a cluster.
     ///
     /// \see #set_mode(), #get_mode()
-    enum Mode
+    enum Mode : Uint32
     {
         /// Networking is switched off.
         MODE_OFF = 0,
@@ -54,9 +55,8 @@ public:
         /// Networking is using TCP/IP connections between hosts. Hosts can join dynamically after
         /// being started without being listed in the configuration. The method
         /// #set_discovery_address() controls which address to use for finding other hosts.
-        MODE_TCP_WITH_DISCOVERY = 3,
-        //  Undocumented, for alignment only
-        MODE_FORCE_32_BIT = 0xffffffffU
+        MODE_TCP_WITH_DISCOVERY = 3
+        MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(MODE_FORCE_32_BIT, 0xffffffffU)
     };
 
     /// Sets the networking mode.
@@ -83,7 +83,7 @@ public:
     /// The different states for the networking connection.
     ///
     /// \see #get_status()
-    enum Status
+    enum Status : Uint32
     {
         /// Networking is not enabled (see #set_mode()) or is not available, e.g., due to license
         /// restrictions.
@@ -97,9 +97,8 @@ public:
         /// \NeurayProductName has shut down
         CONNECTION_SHUTDOWN = 4,
         /// Networking has failed for some reason
-        CONNECTION_FAILURE = 5,
-        //  Undocumented, for alignment only
-        CONNECTION_FORCE_32_BIT = 0xffffffffU
+        CONNECTION_FAILURE = 5
+        MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(CONNECTION_FORCE_32_BIT, 0xffffffffU)
     };
 
     /// Returns the status of the networking connection.
@@ -118,7 +117,7 @@ public:
     /// multicast addresses are obtained by incrementing the last octet. Hence, the value
     /// configured here is called the \em %base multicast address.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \see #get_multicast_address()
     ///
@@ -138,7 +137,7 @@ public:
     ///
     /// The default value is 1.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \see #get_multicast_ttl()
     ///
@@ -174,7 +173,7 @@ public:
     /// from the interface. A single "*" wildcard may be used at the end of the requested name,
     /// in which case the first matching interface will be selected.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \see #get_cluster_interface()
     ///
@@ -203,7 +202,7 @@ public:
     /// #MODE_TCP_WITH_DISCOVERY is set. It must include a port, like ip:port.
     /// There is a default address which will be used if none is set, both for IPv4 and IPv6.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// Note that discovery mode will be disabled if any hosts are added using the
     /// add_configured_hosts method.
@@ -231,11 +230,11 @@ public:
     /// be used if none is set.
     ///
     /// \note This is an additional check on top of the discovery, it is not an alternative to
-    /// for example using different multicast addresses for different clusters. If two hosts with  
+    /// for example using different multicast addresses for different clusters. If two hosts with
     /// different identifiers see each other through the discovery mechanisms then an error will
     /// be issued and the hosts will not be able to join a cluster.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \see #get_discovery_identifier()
     ///
@@ -254,7 +253,7 @@ public:
 
     /// Sets the redundancy level to be used for storing objects in the database.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \see #get_redundancy_level()
     ///
@@ -306,13 +305,13 @@ public:
     /// \see #add_configured_host(), #remove_configured_host(), #get_number_of_configured_hosts()
     ///
     /// \param index                   The index of the host to be returned.
-    /// \return                        The address of the host, or \c NULL in case of invalid
+    /// \return                        The address of the host, or \c nullptr in case of invalid
     ///                                indices.
     virtual const IString* get_configured_host( Uint32 index) const = 0;
 
     /// Sets the compression level for network traffic.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \see #get_compression_level()
     ///
@@ -341,7 +340,7 @@ public:
     /// \param callback                The callback to be registered.
     /// \return
     ///                                -  0: Success.
-    ///                                - -1: Invalid parameters (\c NULL pointer).
+    ///                                - -1: Invalid parameters (\c nullptr).
     virtual Sint32 register_host_callback( IHost_callback* callback) = 0;
 
     /// Unregisters a callback for cluster changes.
@@ -351,7 +350,7 @@ public:
     /// \param callback                The callback to be unregistered.
     /// \return
     ///                                -  0: Success.
-    ///                                - -1: Invalid parameters (\c NULL pointer).
+    ///                                - -1: Invalid parameters (\c nullptr).
     ///                                - -2: \p callback is not a registered callback.
     virtual Sint32 unregister_host_callback( IHost_callback* callback) = 0;
 
@@ -360,10 +359,10 @@ public:
     /// \return                        The network statistics object.
     virtual const INetwork_statistics* get_network_statistics() const = 0;
 
-    /// Enables or disables the usage of RDMA InfiniBand. 
-    /// 
+    /// Enables or disables the usage of RDMA InfiniBand.
+    ///
     /// The default value is \c false (disabled).
-    /// 
+    ///
     /// \see #get_use_rdma()
     ///
     /// \param use_rdma   Indicates whether RDMA InfiniBand should be used (if it is available).
@@ -383,7 +382,7 @@ public:
     ///
     /// If unspecified, an arbitrary RDMA InfiniBand interface will be chosen.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \see #get_rdma_interface()
     ///
@@ -396,12 +395,10 @@ public:
     ///
     /// \see #get_rdma_interface()
     ///
-    /// \return                        The RDMA interface to be used, or \c NULL if none is found.
+    /// \return                        The RDMA interface to be used, or \c nullptr if none is
+    ///                                found.
     virtual const IString* get_rdma_interface() const = 0;
 };
-
-mi_static_assert( sizeof( INetwork_configuration::Status) == sizeof( Uint32));
-mi_static_assert( sizeof( INetwork_configuration::Mode) == sizeof( Uint32));
 
 /**@}*/ // end group mi_neuray_configuration
 

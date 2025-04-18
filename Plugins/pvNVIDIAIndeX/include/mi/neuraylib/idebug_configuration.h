@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for debugging settings.
@@ -20,7 +20,7 @@ namespace neuraylib {
 */
 
 /// This interface represents an interface to set debug options.
-class IDebug_configuration : public 
+class IDebug_configuration : public
     mi::base::Interface_declare<0x7938887b,0x57c6,0x422f,0x84,0x03,0xdc,0x06,0xf2,0x26,0xd6,0x04>
 {
 public:
@@ -36,7 +36,7 @@ public:
     /// Returns the value of a particular debug option.
     ///
     /// \param key       The key of the debug option.
-    /// \return          The value of the debug option, or \c NULL if the option is not set.
+    /// \return          The value of the debug option, or \c nullptr if the option is not set.
     virtual const IString* get_option( const char* key) const = 0;
 };
 

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/ilogger.h
 /// \brief Logger interface class that supports message logging
@@ -14,6 +14,7 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include <mi/base/config.h>
 #include <mi/base/enums.h>
@@ -41,7 +42,7 @@ namespace details {
 /// Tags which help categorize log messages.
 ///
 // Tags may be combined.
-enum Message_tag
+enum Message_tag : Uint32
 {
     TAG_NONE                    = 0u,      ///< no tags
     TAG_COMPATIBILITY           = 1u << 0, ///< hardware or library compatibility
@@ -69,8 +70,8 @@ using namespace details;
 /// This type uses named constructors (which can be chained) to allow for clearer construction code.
 struct Message_details
 {
-    enum { HOST_ID_LOCAL = 0 };
-    enum {
+    enum : Uint32 { HOST_ID_LOCAL = 0 };
+    enum : Sint32 {
         DEVICE_ID_CPU = -1,
         DEVICE_ID_UNKNOWN_CUDA = -2,
         DEVICE_ID_ALL_CUDA = -3
@@ -238,7 +239,7 @@ public:
 #else
         = 0;
 #endif
-    
+
     /// Emits a message to the application's log.
     ///
     /// The application can decide to output the message to any channel or to drop it.
@@ -328,24 +329,22 @@ public:
     // \param default_details    The default message details. Used if no other details are set.
     Log_streambuf(
         Log_stream& stream,
-        const std::string& module_category,
+        std::string  module_category,
         Message_severity default_level = MESSAGE_SEVERITY_INFO,
         const Message_details& default_details = Message_details())
       : std::stringbuf( std::ios::out),
         m_stream( stream),
         m_default_level( default_level),
         m_default_details( default_details),
-        m_module_category( module_category),
+        m_module_category(std::move( module_category)),
         m_details( default_details)
     {
         set_log_level( m_default_level);
     }
 
     // Destructor.
-    ~Log_streambuf() throw()
-    {
-    }
-    
+    ~Log_streambuf() noexcept override = default;
+
     // Flushes the string buffer if not empty, and sets the log level of the next message to the
     // given log level.
     void set_log_level( Message_severity level);
@@ -358,7 +357,7 @@ protected:
 
     // Sends the contents of the string buffer to the logger, clears the string buffer, and resets
     // the log level and details to their defaults.
-    int sync();
+    int sync() override;
 
 private:
 
@@ -403,7 +402,7 @@ public:
         const char* module_category,
         Message_severity default_level = MESSAGE_SEVERITY_INFO,
         const Message_details& default_details = Message_details())
-      : std::ostream( 0),
+      : std::ostream( nullptr),
         m_buffer( *this, module_category ? module_category : "APP:MAIN",
                 default_level, default_details),
         m_logger( logger, DUP_INTERFACE)
@@ -428,7 +427,7 @@ public:
         const std::string& module_category,
         Message_severity default_level = MESSAGE_SEVERITY_INFO,
         const Message_details& default_details = Message_details())
-      : std::ostream( 0),
+      : std::ostream( nullptr),
         m_buffer( *this, module_category, default_level, default_details),
         m_logger( logger, DUP_INTERFACE)
     {
@@ -441,7 +440,7 @@ public:
     /// Destructor.
     ///
     /// Flushes the buffer.
-    ~Log_stream() throw()
+    ~Log_stream() noexcept override
     {
         flush();
     }
@@ -449,7 +448,7 @@ public:
     /// Flushes the buffer if not empty, and sets the log level of the next message to the given
     /// log level.
     void set_log_level( Message_severity level) { m_buffer.set_log_level( level); }
-    
+
     /// Flushes the buffer if not empty, and sets the message details of the next message.
     void set_details( const Message_details& details) { m_buffer.set_details( details); }
 
@@ -646,8 +645,8 @@ std::basic_ostream<C, T>& operator<<( std::basic_ostream<C, T>& ostream, const M
 namespace msg {
 
 using namespace details;
-typedef Message_tag Tag;
-typedef Message_details Details;
+using Tag = Message_tag;
+using Details = Message_details;
 
 inline Details tag_details(const Uint32 tags)
 {

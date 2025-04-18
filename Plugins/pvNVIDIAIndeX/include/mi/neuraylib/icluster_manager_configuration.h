@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component to interact with the cluster manager
@@ -43,7 +43,7 @@ public:
     /// reserved or released.
     virtual void status_change_callback() = 0;
 
-    /// This callback will be called when the user's cluster changed. It will be called 
+    /// This callback will be called when the user's cluster changed. It will be called
     /// after a cluster reservation succeeded and after the cluster got released.
     virtual void cluster_change_callback() = 0;
 
@@ -67,8 +67,8 @@ public:
     /// Returns the IP address of the node.
     virtual const char* get_ip_address() = 0;
 
-    /// Returns the name of a user which has currently reserved the node, or \c NULL if the node is
-    /// free.
+    /// Returns the name of a user which has currently reserved the node, or \c nullptr if the node
+    /// is free.
     virtual const char* get_user_name() = 0;
 
     /// Returns the number of CPU cores installed in the node.
@@ -113,7 +113,7 @@ public:
     /// Returns the name of the head node of the cluster.
     virtual const char* get_head_node() = 0;
 
-    /// Returns the ID of software package which was started on the cluster, or \c NULL if no
+    /// Returns the ID of software package which was started on the cluster, or \c nullptr if no
     /// software was started.
     virtual const char* get_software_package_id() = 0;
 
@@ -144,8 +144,8 @@ public:
     /// \see #get_number_of_cluster_nodes()
     ///
     /// \param index   The index of the cluster node.
-    /// \return        A description of the \p index-th cluster node, or \c NULL if \p index is out
-    ///                of bounds.
+    /// \return        A description of the \p index-th cluster node, or \c nullptr if \p index is
+    ///                out of bounds.
     virtual ICluster_manager_node* get_cluster_node( Size index) = 0;
 
     /// Indicates if the cluster can be closed by the application through this API.
@@ -154,7 +154,7 @@ public:
     /// Returns the address of the head node of the cluster.
     virtual const char* get_head_node_address() = 0;
 
-    /// Returns a descriptor of the head node of the cluster. 
+    /// Returns a descriptor of the head node of the cluster.
     virtual ICluster_manager_node* get_head_node_descriptor() = 0;
 
     /// Grows the cluster by one node.
@@ -169,15 +169,15 @@ public:
     ///                      - -3: The connection to the cluster manager broke down.
     ///                      - -4: The request timed out. Please check if the cluster
     ///                            manager is working properly.
-    /// \return              The descriptor of the node that has been added to the cluster, or 
-    ///                      \c NULL if no node was available to be added.
+    /// \return              The descriptor of the node that has been added to the cluster, or
+    ///                      \c nullptr if no node was available to be added.
     virtual ICluster_manager_node* grow_cluster(Sint32* errors) = 0;
 
     /// Shrinks the cluster by one node.
     ///
-    /// Shrinking the cluster if there's only one node remaining is not allowed. Removing the 
-    /// head node of the cluster is not prevented but should be avoided when calling this. 
-    /// There's no built-in way after the cluster has been started to tell a head node process 
+    /// Shrinking the cluster if there's only one node remaining is not allowed. Removing the
+    /// head node of the cluster is not prevented but should be avoided when calling this.
+    /// There's no built-in way after the cluster has been started to tell a head node process
     /// that is has been selected as the new head node.
     ///
     /// \see #grow_cluster
@@ -213,7 +213,7 @@ public:
     /// \see #get_number_of_nodes()
     ///
     /// \param index    The index of the node.
-    /// \return         A description of the \p index-th pool node, or \c NULL if \p index is out
+    /// \return         A description of the \p index-th pool node, or \c nullptr if \p index is out
     ///                 of bounds.
     virtual ICluster_manager_node* get_node( Size index) const = 0;
 };
@@ -265,7 +265,7 @@ public:
     /// \see #get_number_of_compatible_software_packages()
     ///
     /// \param index   The index of the software package.
-    /// \return        The \p index-th software package or \c NULL if \p index is out of bounds.
+    /// \return        The \p index-th software package or \c nullptr if \p index is out of bounds.
     virtual const ISoftware_package* get_compatible_software_package( Size index) const = 0;
 
     /// Returns the number of software packages.
@@ -278,7 +278,7 @@ public:
     /// \see #get_number_of_software_packages()
     ///
     /// \param index   The index of the software package.
-    /// \return        The \p index-th software package or \c NULL if \p index is out of bounds.
+    /// \return        The \p index-th software package or \c nullptr if \p index is out of bounds.
     virtual const ISoftware_package* get_software_package( Size index) const = 0;
 
     /// Returns information about the pool.
@@ -296,8 +296,8 @@ public:
     ///                              maximum number of nodes. The returned cluster may contain fewer
     ///                              nodes.
     /// \param software_package_id   The ID of the software package which should be started. The
-    ///                              value \c NULL can be used to specify that no software package
-    ///                              should be started as part of the reservation process.
+    ///                              value \c nullptr can be used to specify that no software
+    ///                              package should be started as part of the reservation process.
     /// \param[out] errors           An optional pointer to an #mi::Sint32 to which an error code
     ///                              will be written. The error codes have the following meaning:
     ///                              -  0: Success.
@@ -307,12 +307,12 @@ public:
     ///                              - -4: The selected software package is not available
     ///                              - -5: The request timed out. Please check if the cluster
     ///                                    manager is working properly.
-    /// \return                      The reserved cluster or \c NULL in case of failure.
+    /// \return                      The reserved cluster or \c nullptr in case of failure.
     ///
     /// \note Releasing the returned interface will \em not release the reserved cluster. Use
     ///       #release_cluster() to release the reserved cluster.
     virtual ICluster_manager_cluster* reserve_cluster(
-       Size requested_nodes, const char* software_package_id, Sint32* errors = 0) = 0;
+       Size requested_nodes, const char* software_package_id, Sint32* errors = nullptr) = 0;
 
     /// Releases the reserved cluster for this user.
     ///
@@ -324,7 +324,7 @@ public:
     ///                         - -2: No cluster is running at the moment.
     virtual Sint32 release_cluster() = 0;
 
-    /// Returns the reserved cluster for this user, or \c NULL if there is none.
+    /// Returns the reserved cluster for this user, or \c nullptr if there is none.
     ///
     /// \note This method also returns the cluster if it was reserved by other means than via
     ///       #reserve_cluster(), e.g., via a GUI.
@@ -358,7 +358,10 @@ public:
     /// \return                     \c true, if the user could be authenticated, or \c false
     ///                             otherwise.
     virtual bool authenticate_user(
-        const char* user_name, const char* password, bool* is_admin = 0, Sint32* errors = 0) = 0;
+        const char* user_name,
+        const char* password,
+        bool* is_admin = nullptr,
+        Sint32* errors = nullptr) = 0;
 
     /// Sets if a reserved cluster should be auto-released, if this connection is closed / lost
     /// for example because of a network outage or a crash of the client process. If set, then
@@ -400,9 +403,12 @@ public:
     ///                     - -3: Streaming is disabled.
     ///                     - -5: The request timed out. Please check if the cluster manager is
     ///                           working properly.
-    /// \return             The cluster manager connection, or \c NULL in case of failures.
+    /// \return             The cluster manager connection, or \c nullptr in case of failures.
     virtual ICluster_manager_connection* connect(
-        const char* address, const char* user_name, const char* password, Sint32* errors = 0) = 0;
+        const char* address,
+        const char* user_name,
+        const char* password,
+        Sint32* errors = nullptr) = 0;
 };
 
 /**@}*/ // end group mi_neuray_cluster_manager

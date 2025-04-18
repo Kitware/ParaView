@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/default_allocator.h
 /// \brief Default allocator implementation based on global new and delete.
@@ -27,7 +27,7 @@ namespace base
 /** A default allocator implementation based on global new and delete.
 
     This implementation realizes the singleton pattern. An instance of the
-    default allocator can be obtained through the static inline method 
+    default allocator can be obtained through the static inline method
     #mi::base::Default_allocator::get_instance().
 
        \par Include File:
@@ -36,7 +36,7 @@ namespace base
 */
 class Default_allocator : public Interface_implement_singleton<IAllocator>
 {
-    Default_allocator() {}
+    Default_allocator() = default;
     Default_allocator( const Default_allocator&) {}
 public:
 
@@ -48,20 +48,20 @@ public:
         \param size   The requested size of memory in bytes. It may be zero.
         \return       The allocated memory block.
     */
-    virtual void* malloc(Size size) {
-        // Use non-throwing new call, which may return NULL instead
+    void* malloc(Size size) override {
+        // Use non-throwing new call, which may return nullptr instead
         return ::new(std::nothrow) char[size];
     }
 
-    /** Releases the given memory block. 
+    /** Releases the given memory block.
 
-        Implements #mi::base::IAllocator::free through a global 
+        Implements #mi::base::IAllocator::free through a global
         \c operator \c delete call.
 
         \param  memory   A memory block previously allocated by a call to #malloc().
-                         If \c memory is \c NULL, no operation is performed.
+                         If \c memory is \c nullptr, no operation is performed.
     */
-    virtual void free(void* memory) {
+    void free(void* memory) override {
         ::delete[] reinterpret_cast<char*>(memory);
     }
 

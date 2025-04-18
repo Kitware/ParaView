@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/interface_implement.h
 /// \brief Mixin class template for deriving interface implementations.
@@ -40,7 +40,7 @@ template <class I>
 class Interface_implement : public I
 {
 public:
-    typedef I Interface;
+    using Interface = I;
 
     /// Constructor.
     ///
@@ -71,7 +71,6 @@ public:
         return *this;
     }
 
-#if (__cplusplus >= 201103L)
     /// Move constructor.
     Interface_implement(Interface_implement&& other)
         : m_refcnt{other.m_refcnt.swap(0)}
@@ -84,13 +83,12 @@ public:
         other.m_refcnt = m_refcnt.swap(other.m_refcnt);
         return *this;
     }
-#endif
 
     /// Increments the reference count.
     ///
     /// Increments the reference count of the object referenced through this interface
     /// and returns the new reference count. The operation is thread-safe.
-    virtual Uint32 retain() const
+    Uint32 retain() const override
     {
         return ++m_refcnt;
     }
@@ -100,7 +98,7 @@ public:
     /// Decrements the reference count of the object referenced through this interface
     /// and returns the new reference count. If the reference count dropped to
     /// zero, the object will be deleted. The operation is thread-safe.
-    virtual Uint32 release() const
+    Uint32 release() const override
     {
         Uint32 cnt = --m_refcnt;
         if( !cnt)
@@ -111,14 +109,14 @@ public:
     /// Acquires a const interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL \c const #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr \c const #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the
     /// new interface pointer, whose reference count has been retained once. The caller
     /// must release the returned interface pointer at the end to prevent a memory leak.
-    virtual const IInterface* get_interface( const Uuid& interface_id) const
+    const IInterface* get_interface( const Uuid& interface_id) const override
     {
         return I::get_interface_static( this, interface_id);
     }
@@ -126,14 +124,14 @@ public:
     /// Acquires a mutable interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the
     /// new interface pointer, whose reference count has been retained once. The caller
     /// must release the returned interface pointer at the end to prevent a memory leak.
-    virtual IInterface* get_interface( const Uuid& interface_id)
+    IInterface* get_interface( const Uuid& interface_id) override
     {
         return I::get_interface_static( this, interface_id);
     }
@@ -141,7 +139,7 @@ public:
     using I::get_interface;
 
     /// Returns the interface ID of the most derived interface.
-    Uuid get_iid() const
+    Uuid get_iid() const override
     {
         return typename I::IID();
     }
@@ -151,7 +149,7 @@ protected:
     Atom32& refcount() const { return m_refcnt; }
 
 protected:
-    virtual ~Interface_implement() {}
+    virtual ~Interface_implement() = default;
 
 private:
     mutable Atom32 m_refcnt;
@@ -233,38 +231,40 @@ public:
     /// Acquires a const interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL \c const #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr \c const #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the
     /// new interface pointer, whose reference count has been retained once. The caller
     /// must release the returned interface pointer at the end to prevent a memory leak.
     virtual const IInterface* get_interface( const Uuid& interface_id) const
     {
-        const IInterface* iptr = I1::get_interface_static( static_cast<const I1*>(this),
-                                                           interface_id);
-        if ( iptr == 0)
-            iptr = I2::get_interface_static( static_cast<const I2*>(this), interface_id);
-        return iptr;
+        const IInterface* iptr = I1::get_interface_static(
+            static_cast<const I1*>( this), interface_id);
+        if( iptr)
+            return iptr;
+
+        return I2::get_interface_static( static_cast<const I2*>( this), interface_id);
     }
 
     /// Acquires a mutable interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the
     /// new interface pointer, whose reference count has been retained once. The caller
     /// must release the returned interface pointer at the end to prevent a memory leak.
     virtual IInterface* get_interface( const Uuid& interface_id)
     {
-        IInterface* iptr = I1::get_interface_static(static_cast<I1*>(this),interface_id);
-        if ( iptr == 0)
-            iptr = I2::get_interface_static( static_cast<I2*>(this), interface_id);
-        return iptr;
+        IInterface* iptr = I1::get_interface_static( static_cast<I1*>( this), interface_id);
+        if( iptr)
+            return iptr;
+
+        return I2::get_interface_static( static_cast<I2*>( this), interface_id);
     }
 
     using I1::get_interface;
@@ -276,7 +276,7 @@ public:
     }
 
 protected:
-    virtual ~Interface_implement_2() {}
+    virtual ~Interface_implement_2() = default;
 
 private:
     mutable Atom32 m_refcnt;
@@ -307,7 +307,7 @@ public:
     ///
     /// Implements #mi::base::IInterface::retain() with a constant reference
     /// count of one.
-    virtual Uint32 retain() const
+    Uint32 retain() const override
     {
         return 1;
     }
@@ -316,7 +316,7 @@ public:
     ///
     /// Implements #mi::base::IInterface::release() with a constant reference
     /// count of one. The object will never be deleted through a release call.
-    virtual Uint32 release() const
+    Uint32 release() const override
     {
         return 1;
     }
@@ -324,14 +324,14 @@ public:
     /// Acquires a const interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL \c const #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr \c const #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the
     /// new interface pointer, whose reference count has been retained once. The caller
     /// must release the returned interface pointer at the end to prevent a memory leak.
-    virtual const IInterface* get_interface( const Uuid& interface_id) const
+    const IInterface* get_interface( const Uuid& interface_id) const override
     {
         return I::get_interface_static( this, interface_id);
     }
@@ -339,14 +339,14 @@ public:
     /// Acquires a mutable interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the
     /// new interface pointer, whose reference count has been retained once. The caller
     /// must release the returned interface pointer at the end to prevent a memory leak.
-    virtual IInterface* get_interface( const Uuid& interface_id)
+    IInterface* get_interface( const Uuid& interface_id) override
     {
         return I::get_interface_static( this, interface_id);
     }
@@ -354,13 +354,13 @@ public:
     using I::get_interface;
 
     /// Returns the interface ID of the most derived interface.
-    Uuid get_iid() const
+    Uuid get_iid() const override
     {
         return typename I::IID();
     }
 
 protected:
-    virtual ~Interface_implement_singleton() {}
+    virtual ~Interface_implement_singleton() = default;
 };
 
 

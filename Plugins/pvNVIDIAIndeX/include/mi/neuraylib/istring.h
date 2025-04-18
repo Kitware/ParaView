@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief String type.
@@ -23,12 +23,12 @@ class IString :
 public:
     /// Returns the content as a C-style string.
     ///
-    /// \return      The stored string as a C-style string. Never returns \c NULL.
+    /// \return      The stored string as a C-style string. Never returns \c nullptr.
     virtual const char* get_c_str() const = 0;
 
     /// Sets the content via a C-style string.
     ///
-    /// \param str   The string to store as a C-style string. The value \c NULL is treated as the
+    /// \param str   The string to store as a C-style string. The value \c nullptr is treated as the
     ///              empty string.
     virtual void set_c_str( const char* str) = 0;
 };

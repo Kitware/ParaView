@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for general settings.
@@ -28,21 +28,22 @@ public:
     ///
     /// \NeurayProductName has a built-in administrative HTTP server which can be started. It is
     /// meant to be used to monitor the system at runtime. It allows one to inspect aspects of the
-    /// database of \NeurayProductName and thus is useful for debugging integrations. Usually it
+    /// database of \neurayProductName and thus is useful for debugging integrations. Usually it
     /// would not be enabled in customer builds. By default, the administrative HTTP server is
     /// disabled.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
-    /// \param listen_address       The address and port to listen on. \c NULL disables the server.
+    /// \param listen_address       The address and port to listen on. \c nullptr disables the
+    ///                             server.
     /// \return                     0, in case of success, -1 in case of failure.
     virtual Sint32 set_admin_http_address(const char* listen_address) = 0;
 
     /// Returns the host properties for this host.
     ///
-    /// Host properties are only available while \NeurayProductName is running.
+    /// Host properties are only available while \neurayProductName is running.
     ///
-    /// \return                     The host properties for this host, or \c NULL on error.
+    /// \return                     The host properties for this host, or \c nullptr on error.
     virtual const IHost_properties* get_host_properties() const = 0;
 
     /// Sets a host property for this host.
@@ -57,7 +58,7 @@ public:
 
     /// Sets the path for temporary files.
     ///
-    /// This can only be configured before \NeurayProductName has been started.
+    /// This can only be configured before \neurayProductName has been started.
     ///
     /// \param path                The path to be set.
     /// \return                    0, in case of success, -1 in case of failure.
@@ -71,7 +72,7 @@ public:
     /// Enables or disables the usage of HTTP proxy for WebSocket. In case of
     /// enabling, this function also sets the HTTP proxy address for WebSocket.
     ///
-    /// \param proxy_address       If proxy_address is \c NULL, the usage of HTTP
+    /// \param proxy_address       If proxy_address is \c nullptr, the usage of HTTP
     ///                            proxy is disabled. Otherwise, this parameter
     ///                            must contain the proxy address and port for
     ///                            WebSocket to use. In this case, the address
@@ -83,7 +84,7 @@ public:
     /// Gets the HTTP proxy address for WebSocket.
     ///
     /// \return                    The proxy address for WebSocket. If no proxy
-    ///                            is used, \c NULL is returned.
+    ///                            is used, \c nullptr is returned.
     virtual const char* get_http_proxy_address() const = 0;
 
     /// Sets username and password for authentication with the HTTP proxy address
@@ -93,10 +94,10 @@ public:
     /// for authentication.
     ///
     /// \param username            The username for connecting to the HTTP proxy address.
-    ///                            If this is parameter is \c NULL, no authentication
+    ///                            If this is parameter is \c nullptr, no authentication
     ///                            is required for connecting to an HTTP proxy.
     /// \param password            The password for connecting to the HTTP proxy address.
-    ///                            If no password is needed, \c NULL or an empty
+    ///                            If no password is needed, \c nullptr or an empty
     ///                            string must be provided.
     ///
     /// \return                    0, in case of success, -1 in case of failure.
@@ -107,7 +108,7 @@ public:
     ///
     ///
     /// \return                    The username for connecting to the HTTP proxy address.
-    ///                            If no username was previously provided, \c NULL
+    ///                            If no username was previously provided, \c nullptr
     ///                            is returned.
     virtual const char* get_http_proxy_username() const = 0;
 };

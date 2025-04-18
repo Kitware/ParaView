@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief  Bridge server
@@ -14,6 +14,7 @@
 #include <mi/neuraylib/iserializer.h>
 #include <mi/neuraylib/itransaction.h>
 #include <mi/neuraylib/iuser_class_factory.h>
+#include <mi/neuraylib/version.h> // for MI_NEURAYLIB_DEPRECATED_ENUM_VALUE
 
 namespace mi {
 
@@ -137,10 +138,10 @@ class Server_job : public base::Interface_implement<I>
 {
 public:
     /// Own type.
-    typedef Server_job<i_id1,i_id2,i_id3,i_id4,i_id5,i_id6,i_id7,i_id8,i_id9,i_id10,i_id11,I> Self;
+    using Self = Server_job<i_id1,i_id2,i_id3,i_id4,i_id5,i_id6,i_id7,i_id8,i_id9,i_id10,i_id11,I>;
 
     /// Declares the interface ID
-    typedef base::Uuid_t<i_id1,i_id2,i_id3,i_id4,i_id5,i_id6,i_id7,i_id8,i_id9,i_id10,i_id11> IID;
+    using IID = base::Uuid_t<i_id1,i_id2,i_id3,i_id4,i_id5,i_id6,i_id7,i_id8,i_id9,i_id10,i_id11>;
 
     /// Compares the interface ID \p iid against the interface ID of this interface and its
     /// ancestors.
@@ -157,11 +158,11 @@ public:
     /// Acquires a const interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL \c const #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr \c const #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
     /// interface pointer, whose reference count has been retained once. The caller must
     /// release the returned interface pointer at the end to prevent a memory leak.
     virtual const base::IInterface* get_interface( const base::Uuid& interface_id) const
@@ -177,11 +178,11 @@ public:
     /// Acquires a mutable interface.
     ///
     /// If this interface is derived from or is the interface with the passed
-    /// \p interface_id, then return a non-\c NULL #mi::base::IInterface* that
+    /// \p interface_id, then return a non-\c nullptr #mi::base::IInterface* that
     /// can be casted via \c static_cast to an interface pointer of the interface type
-    /// corresponding to the passed \p interface_id. Otherwise return \c NULL.
+    /// corresponding to the passed \p interface_id. Otherwise return \c nullptr.
     ///
-    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// In the case of a non-\c nullptr return value, the caller receives ownership of the new
     /// interface pointer, whose reference count has been retained once. The caller must
     /// release the returned interface pointer at the end to prevent a memory leak.
     virtual base::IInterface* get_interface( const base::Uuid& interface_id)
@@ -218,8 +219,8 @@ class IServer_job_info : public
     mi::base::Interface_declare<0xa28b5525,0x728b,0x447a,0x89,0x9f,0x15,0x64,0xdf,0x14,0xc7,0xdc>
 {
 public:
-    /// Returns the Bridge job instance. If the job has not been deserialized yet \c NULL is 
-    /// returned. This is the case if the job data contains tags in which case it can't be 
+    /// Returns the Bridge job instance. If the job has not been deserialized yet \c nullptr is
+    /// returned. This is the case if the job data contains tags in which case it can't be
     /// deserialized until the server-side database transaction has been started.
     virtual IServer_job* get_job() const = 0;
 
@@ -241,14 +242,14 @@ public:
         return ptr_T;
     }
 
-    /// Returns the id of this job. The id is only guaranteed to be unique among the 
+    /// Returns the id of this job. The id is only guaranteed to be unique among the
     /// currently active jobs of the transaction and is suitable only for log messages
     /// and the like.
     virtual const char* get_id() const = 0;
 
-    /// Returns the universally unique identifier (UUID or GUID) of the Bridge job. This 
+    /// Returns the universally unique identifier (UUID or GUID) of the Bridge job. This
     /// will always be available even if the job has not been deserialized yet. The UUID
-    /// defines the job class and client side and server side job implementations share 
+    /// defines the job class and client side and server side job implementations share
     /// the same class id.
     virtual base::Uuid get_job_uuid() = 0;
 };
@@ -262,7 +263,7 @@ public:
     /// Returns the number of jobs in the list.
     virtual Size get_size() = 0;
 
-    /// Returns the job at the given index, or 0 if the index is out of bounds. The job must 
+    /// Returns the job at the given index, or 0 if the index is out of bounds. The job must
     /// be released when not needed anymore.
     virtual IServer_job_info* get_job(Size index) = 0;
 };
@@ -315,13 +316,13 @@ public:
     virtual Sint32 create_snapshot( IServer_transaction* transaction, IString* snapshot_id) = 0;
 };
 
-/// Database transactions started on the client will be automatically mirrored to the server 
-/// and exposed as instances of this class to executing Bridge jobs. The relative start and 
-/// commit order of the mirrored server side transactions will always be the same as on the 
-/// client. Note however that the server side transactions are started and committed 
-/// asynchronously so even after committing the client side transaction the mirrored server 
-/// side transaction might not even have been started yet. For the client to know when a 
-/// server side transaction has finished it must wait for the last Bridge job executed in the 
+/// Database transactions started on the client will be automatically mirrored to the server
+/// and exposed as instances of this class to executing Bridge jobs. The relative start and
+/// commit order of the mirrored server side transactions will always be the same as on the
+/// client. Note however that the server side transactions are started and committed
+/// asynchronously so even after committing the client side transaction the mirrored server
+/// side transaction might not even have been started yet. For the client to know when a
+/// server side transaction has finished it must wait for the last Bridge job executed in the
 /// transaction to complete.
 class IServer_transaction : public
     mi::base::Interface_declare<0x67fd848e,0xce43,0x4675,0x8b,0x14,0xb2,0x54,0xd,0xd2,0x29,0x63>
@@ -330,13 +331,15 @@ public:
     /// Returns the session of the transaction.
     virtual IServer_session* get_session() const = 0;
 
-    /// Returns the local transaction corresponding to this Bridge transaction, or \c NULL if this
-    /// transaction has not yet been started on the client. The IServer_transaction instance 
-    /// passed to #mi::bridge::IServer_job::execute() will always be started. IServer_transaction 
-    /// instances returned by #mi::bridge::IServer_session::get_pending_transactions() are 
-    /// however not always started yet, in which case this method will return \c NULL.
+    /// Returns the local transaction corresponding to this Bridge transaction, or \c nullptr if
+    /// this transaction has not yet been started on the client.
     ///
-    /// \return the database transaction or \c NULL if this bridge transaction has not yet 
+    /// The IServer_transaction instance passed to #mi::bridge::IServer_job::execute() will always
+    /// be started. IServer_transaction instances returned by
+    /// #mi::bridge::IServer_session::get_pending_transactions() are however not always started
+    /// yet, in which case this method will return \c nullptr.
+    ///
+    /// \return the database transaction or \c nullptr if this bridge transaction has not yet
     ///         been started.
     virtual neuraylib::ITransaction* get_database_transaction() const = 0;
 
@@ -368,7 +371,7 @@ public:
     /// \param callback   The callback to be added.
     /// \return
     ///                   -     0: Success.
-    ///                   -    -1: Invalid argument (\p callback is \c NULL).
+    ///                   -    -1: Invalid argument (\p callback is \c nullptr).
     ///                   -    -2: The transaction is not open.
     ///                   -    -3: The transaction callback was already added.
     ///                   - <= -4: Unspecified error.
@@ -381,7 +384,7 @@ public:
     /// \param callback   The callback to be removed.
     /// \return
     ///                   -     0: Success.
-    ///                   -    -1: Invalid argument (\p callback is \c NULL).
+    ///                   -    -1: Invalid argument (\p callback is \c nullptr).
     ///                   -    -2: There is no such callback.
     ///                   - <= -3: Unspecified error.
     virtual Sint32 remove_transaction_callback( IServer_transaction_callback* callback) = 0;
@@ -402,7 +405,7 @@ public:
     /// \return
     ///                           -     0: Success.
     ///                           -    -1: Invalid arguments (\p element or \p snapshot_id is
-    ///                                    \c NULL).
+    ///                                    \c nullptr).
     ///                           -    -2: The specified element does not exist.
     ///                           -    -3: Failed to create the snapshot.
     ///                           - <= -4: Unspecified error.
@@ -432,7 +435,7 @@ public:
     /// \return
     ///                           -     0: Success.
     ///                           -    -1: Invalid parameters (\p element, \p snapshot_id, or
-    ///                                    \p context is \c NULL).
+    ///                                    \p context is \c nullptr).
     ///                           -    -2: The specified element does not exist.
     ///                           -    -3: Failed to create the snapshot.
     ///                           - <= -4: Unspecified error.
@@ -445,22 +448,22 @@ public:
     /// elements that also have been replicated in the database.
     virtual Size get_updated_element_count() const = 0;
 
-    /// Returns the list of currently pending jobs for this transaction in the order they will 
-    /// be executed. Note that jobs added after the call to this method won't be present in the 
+    /// Returns the list of currently pending jobs for this transaction in the order they will
+    /// be executed. Note that jobs added after the call to this method won't be present in the
     /// list and that jobs might have completed execution when this list is processed.
-    /// Also note that jobs within this transaction will execute in sequence but jobs belonging 
+    /// Also note that jobs within this transaction will execute in sequence but jobs belonging
     /// to other transactions might execute in parallel if the transactions execute in parallel.
     ///
-    /// Two transactions will execute in sequence if the second transaction is started after  
-    /// the previous transaction was committed. Example: start A, commit A, start B commit B. 
-    /// They will execute in parallel if the second transaction is started before the previous 
+    /// Two transactions will execute in sequence if the second transaction is started after
+    /// the previous transaction was committed. Example: start A, commit A, start B commit B.
+    /// They will execute in parallel if the second transaction is started before the previous
     /// transaction is committed. For instance start A, start B, commit A, commit B.
     ///
     /// \return A list of pending jobs in the order they will be executed.
     virtual IServer_job_list* get_pending_jobs() const = 0;
 
-    /// Returns the id of this Bridge transaction. The id is only guaranteed to be unique among 
-    /// the currently active transactions and is suitable only for log messages and the like. 
+    /// Returns the id of this Bridge transaction. The id is only guaranteed to be unique among
+    /// the currently active transactions and is suitable only for log messages and the like.
     /// Note that the Bridge transaction id is not the same as the id of the database transaction
     /// returned by get_database_transaction().
     virtual const char* get_id() const = 0;
@@ -469,7 +472,7 @@ public:
 /// The different states a server session can be in.
 ///
 /// \see #mi::bridge::IServer_session::get_state()
-enum Server_session_state
+enum Server_session_state : Uint32
 {
     /// A client has connected to the application but has not yet been approved.
     SERVER_SESSION_CONNECTING = 0,
@@ -481,12 +484,9 @@ enum Server_session_state
     SERVER_SESSION_PENDING    = 2,
 
     /// The session has been closed.
-    SERVER_SESSION_CLOSED     = 3,
-
-    SERVER_SESSION_FORCE_32_BIT = 0xffffffffU
+    SERVER_SESSION_CLOSED     = 3
+    MI_NEURAYLIB_DEPRECATED_ENUM_VALUE(SERVER_SESSION_FORCE_32_BIT, 0xffffffffU)
 };
-
-mi_static_assert( sizeof( Server_session_state) == sizeof( Uint32));
 
 /// Abstract interface for callbacks for session state changes.
 ///
@@ -538,7 +538,7 @@ public:
     /// the video source and to start producing frames.
     ///
     /// \param context_id   The video context ID.
-    /// \return             The video context or \c NULL if no video context with the provided ID
+    /// \return             The video context or \c nullptr if no video context with the provided ID
     /// exists.
     virtual IServer_video_context* get_video_context( Sint32 context_id) = 0;
 
@@ -568,28 +568,28 @@ public:
     /// Returns build number of the client.
     virtual const char* get_client_build_number() = 0;
 
-    /// Returns the client Bridge protocol version. This is usually the same as the server 
-    /// Bridge protocol version, but can differ if the server for instance accepts older 
+    /// Returns the client Bridge protocol version. This is usually the same as the server
+    /// Bridge protocol version, but can differ if the server for instance accepts older
     /// clients.
     virtual const char* get_client_bridge_protocol_version() = 0;
 
     /// Returns a list of the currently pending Bridge transactions for this session in the
     /// order they were started on the client. This is also the order the transactions will
-    /// be started on the server, but some transactions in the list might not have been 
+    /// be started on the server, but some transactions in the list might not have been
     /// started yet on the server which means there won't be a database transaction yet.
     ///
-    /// Note that even though transactions will be started in the order specified by this 
-    /// list some transactions will execute in sequence and others in parallel, depending 
+    /// Note that even though transactions will be started in the order specified by this
+    /// list some transactions will execute in sequence and others in parallel, depending
     /// on how the transactions were started on the client.
     ///
-    /// Also note that even though all transactions in the list were pending 
-    /// when this call was made they might have been already committed or aborted when the 
-    /// list is processed and that any transactions added after this call won't be present 
+    /// Also note that even though all transactions in the list were pending
+    /// when this call was made they might have been already committed or aborted when the
+    /// list is processed and that any transactions added after this call won't be present
     /// in the list.
     ///
-    /// Two transactions will execute in sequence if the second transaction is started after  
-    /// the previous transaction was committed. Example: start A, commit A, start B commit B. 
-    /// They will execute in parallel if the second transaction is started before the previous 
+    /// Two transactions will execute in sequence if the second transaction is started after
+    /// the previous transaction was committed. Example: start A, commit A, start B commit B.
+    /// They will execute in parallel if the second transaction is started before the previous
     /// transaction is committed. For instance start A, start B, commit A, commit B.
     ///
     /// \return A list of pending transactions in the order they were started on the client.
@@ -694,7 +694,7 @@ public:
     ///                   (prefix \c "address:").
     /// \return
     ///                   -     0: Success.
-    ///                   -    -1: Invalid argument (\p disk_cache is \c NULL or has an incorrect
+    ///                   -    -1: Invalid argument (\p disk_cache is \c nullptr or has an incorrect
     ///                            format).
     ///                   -    -2: No disk cache found at the specified location.
     ///                   -    -3: The disk cache was already set.
@@ -735,10 +735,10 @@ public:
     /// connected to the application and their state by adding an
     /// #mi::bridge::IServer_session_state_callback to the session.
     ///
-    /// \param handler The handler to be set or \c NULL to remove the current handler.
+    /// \param handler The handler to be set or \c nullptr to remove the current handler.
     virtual Sint32 set_session_handler( IApplication_session_handler* handler) = 0;
 
-    /// Returns the current session handler, or \c NULL if no session handler has been set.
+    /// Returns the current session handler, or \c nullptr if no session handler has been set.
     virtual IApplication_session_handler* get_session_handler() const = 0;
 
     /// Sets the maximum verbosity of log messages that will be forwarded to the client.
@@ -780,7 +780,7 @@ public:
     ///
     /// In the case of incremental snapshots the base snapshot must be loaded first, and then each
     /// incremental snapshot in sequence.
-    /// 
+    ///
     /// Currently no importer options are supported.
     ///
     /// \param transaction        The transaction into which to import the elements.
@@ -798,7 +798,7 @@ public:
     virtual neuraylib::IImport_result* import_snapshot(
         neuraylib::ITransaction* transaction,
         const char* snapshot_id,
-        const IMap* importer_options = 0) = 0;
+        const IMap* importer_options = nullptr) = 0;
 
     /// Removes a snapshot from the disk cache.
     ///
@@ -824,8 +824,8 @@ public:
     /// \param transaction         The transaction to use for the export.
     /// \param elements            The elements to export. Only supports element names as IString.
     /// \param exporter_options    The exporter options.
-    /// \param[in,out] snapshot_id The ID of the snapshot to use. If an empty string is passed an 
-    ///                            automatically generated unique identifier will be assigned to 
+    /// \param[in,out] snapshot_id The ID of the snapshot to use. If an empty string is passed an
+    ///                            automatically generated unique identifier will be assigned to
     ///                            this string.
     /// \return                    Result of the export operation with the following error codes:
     ///                            -       0: Success.
@@ -861,7 +861,7 @@ public:
     ///                           slash.
     /// \param http_server        The HTTP server instance that handles WebSocket requests for
     ///                           this application.
-    /// \return                   The created Bridge application, or \c NULL in case of failure
+    /// \return                   The created Bridge application, or \c nullptr in case of failure
     ///                           (invalid arguments, \p application_path does not start with a
     ///                           slash, or an application for these arguments exists already).
     virtual IApplication* create_application(

@@ -1,5 +1,5 @@
  /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Asynchronous texture generation for use with shapes.
@@ -14,7 +14,7 @@
 
 #include <nv/index/iirregular_volume_subset.h>
 #include <nv/index/iparticle_volume_subset.h>
-#include <nv/index/isparse_volume_subset.h>
+#include <nv/index/ipipe_set_subset.h>
 #include <nv/index/isparse_volume_subset.h>
 #include <nv/index/ivdb_subset.h>
 
@@ -219,13 +219,13 @@ public:
 /// Compute-destination buffer for particle volumes (point sets).
 ///
 /// Upon applying an \c IDistributed_compute_technique attribute to a \c IParticle_volume_scene_element scene element
-/// a \c IDistributed_compute_destination_buffer_VDB is passed to the \c IDistributed_compute_technique::launch_compute()
+/// a \c IDistributed_compute_destination_buffer_particle_volume is passed to the \c IDistributed_compute_technique::launch_compute()
 /// method.
 ///
 /// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_particle_volume :
-    public mi::base::Interface_declare<0x131bc471, 0xb557, 0x4e80, 0x8e, 0x71, 0xa1, 0x3a, 0x58, 0xd5, 0xa5, 0x1f,
+    public mi::base::Interface_declare<0x131bc471,0xb557,0x4e80,0x8e,0x71,0xa1,0x3a,0x58,0xd5,0xa5,0x1f,
                                        nv::index::IDistributed_compute_destination_buffer>
 {
 public:
@@ -245,6 +245,38 @@ public:
     /// \return     An interface pointer to an instance of \c IParticle_volume_subset.
     ///
     virtual IParticle_volume_subset*                get_distributed_data_subset() = 0;
+};
+
+
+/// Compute-destination buffer for pipe sets.
+///
+/// Upon applying an \c IDistributed_compute_technique attribute to a \c IPipe_set scene element
+/// a \c IDistributed_compute_destination_buffer_pipe_set is passed to the \c IDistributed_compute_technique::launch_compute()
+/// method.
+///
+/// \ingroup nv_index_data_computing
+///
+class IDistributed_compute_destination_buffer_pipe_set :
+    public mi::base::Interface_declare<0x8d8c4112,0xf27f,0x4b14,0x8b,0x78,0x46,0x2d,0x21,0x29,0x58,0xf4,
+                                       nv::index::IDistributed_compute_destination_buffer>
+{
+public:
+    /// Returns the bounding box of the volume subset for which the compute technique
+    /// is required to generate values.
+    ///
+    /// The rendering system computes and initializes the bounding box of the volume subset.
+    ///
+    /// \return     The bounding box of the volume subset, defined in non-normalized
+    ///             volume coordinates.
+    ///
+    virtual mi::math::Bbox_struct<mi::Float32, 3>   get_volume_subset_data_bbox() const = 0;
+
+    /// Returns the pipe set data-subset for which the compute technique is required to
+    /// generate data values.
+    ///
+    /// \return     An interface pointer to an instance of \c IPipe_set_subset.
+    ///
+    virtual IPipe_set_subset*                       get_distributed_data_subset() = 0;
 };
 
 

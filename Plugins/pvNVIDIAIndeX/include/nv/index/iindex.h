@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Main API of the NVIDIA IndeX library.
@@ -921,7 +921,7 @@ public:
 /// \ingroup nv_index
 ///
 class IIndex :
-    public mi::base::Interface_declare<0x3beb46c0,0xb77d,0x4c90,0xbc,0xc3,0x1d,0xb1,0xa5,0xd5,0xb8,0xd5>
+    public mi::base::Interface_declare<0x36ede897,0xc751,0x44c7,0xa1,0x8b,0x23,0xad,0x17,0x9d,0xb7,0x12>
 {
 public:
     /// Authenticates the NVIDIA IndeX library.
@@ -933,8 +933,6 @@ public:
     /// \param[in] vendor_key_length    Length of the vendor key.
     /// \param[in] secret_key           Secret key string.
     /// \param[in] secret_key_length    Length of the secret key.
-    /// \param[in] flexnet_license_path Deprecated, will be ignored.
-    /// \param[in] flexnet_license_path_length Deprecated, will be ignored.
     ///
     /// \return Result of the NVIDIA IndeX library authentication
     ///         attempt, 0 means success.
@@ -943,9 +941,7 @@ public:
         const char* vendor_key,
         mi::Sint32  vendor_key_length,
         const char* secret_key,
-        mi::Sint32  secret_key_length,
-        const char* flexnet_license_path = 0,
-        mi::Sint32  flexnet_license_path_length = 0) = 0;
+        mi::Sint32  secret_key_length) = 0;
 
     /// Starts the operation of the IndeX library.
     //

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2023 NVIDIA Corporation. All rights reserved.
+ * Copyright 2025 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for library authentication functionality.
@@ -109,25 +109,19 @@ public:
 
     /// Indicates whether the license provided for authentication is a time-limited license.
     ///
-    /// This method can only be called after \NeurayProductName has been started or after
-    /// #mi::neuraylib::ILibrary_authenticator::is_flexnet_license_available().
-    ///
     /// \note A time-limited license might be either a trial license or a long-running license.
     ///
     /// \return                  \c true if license is a time-limited license, \c false otherwise
-    ///                          (including \NeurayProductName has not yet been started)
+    ///                          (including \neurayProductName has not yet been started)
     virtual bool is_trial_license() const = 0;
 
     /// Returns the number of seconds left for time-limited licenses.
-    ///
-    /// This method returns sensible data only when called after \NeurayProductName has been
-    /// started or after #mi::neuraylib::ILibrary_authenticator::is_flexnet_license_available().
     ///
     /// \note A time-limited license might be either a trial license or a long-running license.
     ///
     /// \return                 The number of seconds left before a time-limited license expires,
     ///                         or #mi::base::numeric_traits<mi::base::Uint64>::max() for permanent
-    ///                         licenses (or \NeurayProductName has not yet been started).
+    ///                         licenses (or \neurayProductName has not yet been started).
     virtual Uint64 get_trial_seconds_left() const = 0;
 
     /// Returns the host ID of the machine the program is running on.
@@ -138,41 +132,8 @@ public:
 
     /// Returns the last error message related to authentication.
     ///
-    /// For example, if authentication via FlexNet failed, i.e., #mi::neuraylib::INeuray::start()
-    /// returns -6, then there might be a message providing a more detailed error description,
-    /// originating from the FlexNet utilities.
-    ///
-    /// \return   The last error message, or \c NULL if there is no such error message available.
+    /// \return   The last error message, or \c nullptr if there is no such error message available.
     virtual const IString* get_last_error_message() const = 0;
-
-    /// Sets the expected FlexNet license file location.
-    ///
-    /// To check out a feature, a FlexNet enabled application must first locate the license file.
-    /// This function sets the default location where to start looking for the license file. The @
-    /// symbol cannot be used for file paths, as it is used for specifying FlexNet server addresses.
-    /// Please note that this function should only be used after the response was submitted using
-    /// #mi::neuraylib::ILibrary_authenticator::authenticate(), otherwise the return value is
-    /// meaningless.
-    ///
-    /// \return    \c true if a valid FlexNet (non-trial) license was found in this path or
-    ///            eventually configured environment variables.
-    virtual bool set_flexnet_default_license_path( const char* path) = 0;
-
-    /// Sets the content of the FlexNet trial license.
-    ///
-    /// Similar to #set_flexnet_default_license_path(), except that for trial licenses the license
-    /// data is passed in memory.
-    virtual void set_flexnet_trial_license_data( const Uint8* data, Size size) = 0;
-
-    /// Indicates whether a valid FlexNet license for the submitted response is available.
-    ///
-    /// Please note that this function can only be used after the response was submitted with the
-    /// call #mi::neuraylib::ILibrary_authenticator::authenticate().
-    ///
-    /// \return    \c true if a valid FlexNet license is available, \c false if no valid FlexNet
-    ///            license is available, no response has been submitted yet, or the license has
-    ///            already been checked out.
-    virtual bool is_flexnet_license_available() const = 0;
 };
 
 /**@}*/ // end group mi_neuray_configuration
@@ -254,7 +215,7 @@ void calculate_response(
 
 void generate_nonce( char* buffer)
 {
-    if( buffer == 0)
+    if( !buffer)
         return;
     Uint64 number = 0;
 #ifdef MI_PLATFORM_WINDOWS
@@ -265,9 +226,9 @@ void generate_nonce( char* buffer)
 #else
     // Note: icc 13.1 report warning here as an implicit conversion,
     // but this is an explicit conversion.
-    srand( static_cast<unsigned>( time(  0)));
+    srand( static_cast<unsigned>( time( nullptr)));
     struct timeval tv;
-    gettimeofday( &tv, 0);
+    gettimeofday( &tv, nullptr);
     number += static_cast<Uint64>( tv.tv_sec + tv.tv_usec);
 #endif
     char buf[sizeof( Uint32) + 3*sizeof( Uint64)] = {0};
@@ -308,7 +269,7 @@ static Uint32 rightrotate( Uint32 x, Uint32 y)
 
 void sha256( const char* input, unsigned int input_length, char* buffer)
 {
-    if( (input_length <= 0) || (input == 0) || (buffer == 0))
+    if( (input_length <= 0) || !input || !buffer)
        return;
 
     // First 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
@@ -323,7 +284,7 @@ void sha256( const char* input, unsigned int input_length, char* buffer)
     for( unsigned int chunk = 0; k != 0; ++chunk) {
 
         Uint32 W[64] = {0};
-        Uint8* ptr = reinterpret_cast<Uint8*>( W);
+        auto* ptr = reinterpret_cast<Uint8*>( W);
         unsigned int to_copy = input_length - pos;
         to_copy = to_copy > 64 ? 64 : to_copy;
         if( to_copy > 0) {
@@ -394,8 +355,8 @@ void sha256( const char* input, unsigned int input_length, char* buffer)
     }
 
     // Flip to little endian
-    for( int i = 0; i < 8; ++i)
-        state[i] = flip32( state[i]);
+    for( unsigned int& s : state)
+        s = flip32( s);
 
     memcpy( buffer, reinterpret_cast<char*>( state), 32);
 }

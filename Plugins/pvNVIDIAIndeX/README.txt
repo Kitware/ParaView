@@ -20,10 +20,10 @@ The NVIDIA IndeX for ParaView Plugin is compatible with:
 * NVIDIA display driver that supports CUDA 12.
   Minimum driver version:
   - Linux:   525.60.13
-  - Windows: 527.41
-  Recommended driver version (CUDA 12.3):
-  - Linux:   545.23.06 or newer
-  - Windows: 545.84 or newer
+  - Windows: 528.33
+  Recommended driver version (CUDA 12.8):
+  - Linux:   570.33 or newer
+  - Windows: 570.84 or newer
 
 * Operating systems:
   - Red Hat Enterprise Linux (RHEL) or CentOS version 7 or newer.
@@ -127,4 +127,4 @@ NVIDIA IndeX for ParaView website: https://www.nvidia.com/en-us/data-center/inde
 NVIDIA IndeX website: https://developer.nvidia.com/index
 
 
-Copyright 2023 NVIDIA Corporation. All rights reserved.
+Copyright 2025 NVIDIA Corporation. All rights reserved.
