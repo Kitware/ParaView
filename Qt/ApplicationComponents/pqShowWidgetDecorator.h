@@ -6,6 +6,7 @@
 
 #include "pqApplicationComponentsModule.h"
 #include "pqBoolPropertyWidgetDecorator.h"
+#include "vtkShowDecorator.h"
 #include "vtkWeakPointer.h"
 
 /**
@@ -23,11 +24,15 @@ public:
   bool canShowWidget(bool show_advanced) const override
   {
     (void)show_advanced;
-    return this->isBoolProperty();
+    return decoratorLogic->IsBoolProperty();
   }
 
 private:
   Q_DISABLE_COPY(pqShowWidgetDecorator)
+
+  vtkNew<vtkShowDecorator> decoratorLogic;
+
+  void emitVisibilityChanged();
 };
 
 #endif

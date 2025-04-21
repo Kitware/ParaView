@@ -13,6 +13,7 @@ GROUPS
 DEPENDS
   ParaView::pqCore
   ParaView::qttesting
+  ParaView::RemotingApplicationComponents
   VTK::jsoncpp
   VTK::nlohmannjson
 PRIVATE_DEPENDS

@@ -8,5 +8,13 @@ pqShowWidgetDecorator::pqShowWidgetDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
   : Superclass(config, parentObject)
 {
-  QObject::connect(this, SIGNAL(boolPropertyChanged()), this, SIGNAL(visibilityChanged()));
+
+  this->decoratorLogic->Initialize(config, parentObject->proxy());
+  this->decoratorLogic->AddObserver(
+    vtkShowDecorator::VisibilityChangedEvent, this, &pqShowWidgetDecorator::emitVisibilityChanged);
+}
+
+void pqShowWidgetDecorator::emitVisibilityChanged()
+{
+  Q_EMIT visibilityChanged();
 }

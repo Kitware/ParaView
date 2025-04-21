@@ -1,0 +1,15 @@
+NAME
+  ParaView::RemotingApplicationComponents
+GROUPS
+  PARAVIEW_CORE
+LIBRARY_NAME
+  vtkRemotingApplicationComponents
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Kitware Inc.
+DEPENDS
+   ParaView::RemotingServerManager
+#KIT
+#  This module cannot be part of a kit because it links to ClientServer
+#  wrappings of all modules. This ends up with a cycle in a shared kit build.

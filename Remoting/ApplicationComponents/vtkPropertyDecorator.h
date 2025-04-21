@@ -1,43 +1,48 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
-#ifndef pqPropertyWidgetDecorator_h
-#define pqPropertyWidgetDecorator_h
+#ifndef vtkPropertyDecorator_h
+#define vtkPropertyDecorator_h
 
-#include "pqPropertyWidget.h"
-#include "vtkPropertyDecorator.h"
+#include "vtkRemotingApplicationComponentsModule.h"
+
+#include "vtkCommand.h"
+#include "vtkObject.h"
+#include "vtkSMProxy.h"
+
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkWeakPointer.h"
+
+#include <string>
 
 class vtkPVXMLElement;
+class vtkSMProxy;
 
 /**
- * pqPropertyWidgetDecorator provides a mechanism to decorate pqPropertyWidget
+ * vtkPropertyDecorator hold the logic of pqPropertyDecorator
+ * TODO provides a mechanism to decorate pqProperty
  * instances to add logic to the widget to add additional control logic.
  * Subclasses can be used to logic to control when the widget is
  * enabled/disabled, hidden/visible, etc. based on values of other properties
  * of UI elements.
  */
-class PQCOMPONENTS_EXPORT pqPropertyWidgetDecorator : public QObject
+class VTKREMOTINGAPPLICATIONCOMPONENTS_EXPORT vtkPropertyDecorator : public vtkObject
 {
-  Q_OBJECT
-  typedef QObject Superclass;
 
 public:
+  static vtkPropertyDecorator* New();
+  vtkTypeMacro(vtkPropertyDecorator, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
+
   /**
    * Constructor.
    *
    * @param xml The XML element from the `<Hints/>` section for the proxy/property that
    * resulted in the creation of the decorator. Decorators can be provided
    * configuration parameters from the XML.
-   * @param parent Parent widget
+   *
+   * @param proxy The proxy that owns the property of this decorator
    */
-  pqPropertyWidgetDecorator(vtkPVXMLElement* xml, pqPropertyWidget* parent);
-  ~pqPropertyWidgetDecorator() override;
-
-  /**
-   * Returns the pqPropertyWidget parent.
-   */
-  pqPropertyWidget* parentWidget() const;
+  void virtual Initialize(vtkPVXMLElement* xml, vtkSMProxy* proxy);
 
   /**
    * Override this method to override the visibility of the widget in the
@@ -47,7 +52,11 @@ public:
    * Thus subclasses typically override this method only to force the widget
    * invisible given the current state.
    */
-  virtual bool canShowWidget(bool show_advanced) const;
+  virtual bool CanShow(bool show_advanced) const
+  {
+    (void)show_advanced;
+    return true;
+  }
 
   /**
    * Override this method to override the enable state of the widget in the
@@ -57,31 +66,37 @@ public:
    * Thus subclasses typically override this method only to force the widget
    * disabled given the current state.
    */
-  virtual bool enableWidget() const;
+  virtual bool Enable() const { return true; }
 
   /**
-   * Creates a new decorator, given the xml config and the parent
-   * pqPropertyWidget for the decorator.
-   */
-  static pqPropertyWidgetDecorator* create(vtkPVXMLElement* xml, pqPropertyWidget* parent);
-
-Q_SIGNALS:
-  /**
-   * This signal is fired whenever the decorator has determined that the panel
+   * This event is fired whenever the decorator has determined that the panel
    * *may* need a refresh since the state of the system has changed which would
    * deem changes in the widget visibility or enable state.
    */
-  void visibilityChanged();
-  void enableStateChanged();
+  enum
+  {
+    VisibilityChangedEvent = vtkCommand::UserEvent + 1000,
+    EnableStateChangedEvent = vtkCommand::UserEvent + 1001
+  };
+
+  // returns "type" attribute of the xml config
+  std::string GetDecoratorType() const;
 
 protected:
-  vtkPVXMLElement* xml() const;
+  vtkPropertyDecorator();
+  ~vtkPropertyDecorator() override;
+  vtkPVXMLElement* XML() const;
+  vtkSMProxy* Proxy() const;
+
+  void InvokeVisibilityChangedEvent();
+  void InvokeEnableStateChangedEvent();
 
 private:
-  Q_DISABLE_COPY(pqPropertyWidgetDecorator)
+  vtkPropertyDecorator(const vtkPropertyDecorator&) = delete;
+  void operator=(const vtkPropertyDecorator&) = delete;
 
-  vtkSmartPointer<vtkPVXMLElement> XML;
-  vtkNew<vtkPropertyDecorator> decoratorLogic;
+  vtkWeakPointer<vtkPVXMLElement> xml;
+  vtkWeakPointer<vtkSMProxy> proxy;
 };
 
 #endif

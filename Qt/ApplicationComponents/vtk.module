@@ -18,6 +18,7 @@ DEPENDS
 PRIVATE_DEPENDS
   ParaView::RemotingAnimation
   ParaView::RemotingApplication
+  ParaView::RemotingApplicationComponents
   ParaView::RemotingCore
   ParaView::RemotingExport
   ParaView::RemotingImport
