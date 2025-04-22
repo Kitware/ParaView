@@ -112,5 +112,5 @@ fi
 
 if [ -f "${SSH_PRIVATE_KEY_PATH}" ]
 then
-  rsync -e "ssh -o StrictHostKeyChecking=accept-new -i $SSH_PRIVATE_KEY_PATH" -av --progress . kitware@web:
+  rsync -e "ssh -o StrictHostKeyChecking=accept-new -i $SSH_PRIVATE_KEY_PATH" -rtv --progress . kitware@web:
 fi
