@@ -612,7 +612,7 @@ void gmvread_data()
         }
       if (ftypeGlobal == ASCII) { int res = fscanf(gmvinGlobal,"%s",keyword); (void) res; }
 
-      if ((feof(gmvinGlobal) != 0) | (ferror(gmvinGlobal) != 0)) iend = 1;
+      if ((feof(gmvinGlobal) != 0) || (ferror(gmvinGlobal) != 0)) iend = 1;
 
       /*  If comments keyword, read through comments,  */
       /*  then read and process next keyword.           */
@@ -625,7 +625,7 @@ void gmvread_data()
             *(keyword+MAXKEYWORDLENGTH)=(char)0;
            }
          if (ftypeGlobal == ASCII) { int res = fscanf(gmvinGlobal,"%s",keyword); (void) res; }
-         if ((feof(gmvinGlobal) != 0) | (ferror(gmvinGlobal) != 0)) iend = 1;
+         if ((feof(gmvinGlobal) != 0) || (ferror(gmvinGlobal) != 0)) iend = 1;
         }
 
       if (strncmp(keyword,"endgmv",6) == 0)
@@ -1190,7 +1190,7 @@ int rdcellkeyword(FILE* gmvin, int ftype, char* keystring)
      {
       binread(ckeyword, charsize, CHAR, (long)MAXKEYWORDLENGTH, gmvin);
 
-      if ((feof(gmvin) != 0) | (ferror(gmvin) != 0))
+      if ((feof(gmvin) != 0) || (ferror(gmvin) != 0))
         return (-1);
 
       *(ckeyword+MAXKEYWORDLENGTH)=(char)0;
@@ -1775,7 +1775,7 @@ void readnodes(FILE* gmvin, int ftype)
         }
      }
 
-   if ((feof(gmvin) != 0) | (ferror(gmvin) != 0))
+   if ((feof(gmvin) != 0) || (ferror(gmvin) != 0))
      {
       fprintf(stderr,"I/O error while reading nodes.\n");
       gmv_data.errormsg = (char *)malloc(31 * sizeof(char));
@@ -2017,7 +2017,7 @@ void readcells(FILE* gmvin, int ftype)
       return;
      }
 
-   if ((feof(gmvin) != 0) | (ferror(gmvin) != 0))
+   if ((feof(gmvin) != 0) || (ferror(gmvin) != 0))
      {
       fprintf(stderr,"I/O error while reading cells.\n");
       gmv_data.errormsg = (char *)malloc(31 * sizeof(char));
@@ -2228,7 +2228,7 @@ void readcells(FILE* gmvin, int ftype)
         }
       if (ftype == ASCII) rdlongs(lcellnodenos,(long)ndat,gmvin);
 
-      if ((feof(gmvin) != 0) | (ferror(gmvin) != 0))
+      if ((feof(gmvin) != 0) || (ferror(gmvin) != 0))
         {
          fprintf(stderr,"I/O error while reading cells.\n");
          gmv_data.errormsg = (char *)malloc(31 * sizeof(char));
@@ -2341,7 +2341,7 @@ void readfaces(FILE* gmvin, int ftype)
       ioerrtst(gmvin);
      }
 
-   if ((feof(gmvin) != 0) | (ferror(gmvin) != 0))
+   if ((feof(gmvin) != 0) || (ferror(gmvin) != 0))
      {
       fprintf(stderr,"I/O error while reading faces.\n");
       gmv_data.errormsg = (char *)malloc(31 * sizeof(char));
@@ -2467,7 +2467,7 @@ void readvfaces(FILE* gmvin, int ftype)
       ioerrtst(gmvin);
      }
 
-   if ((feof(gmvin) != 0) | (ferror(gmvin) != 0))
+   if ((feof(gmvin) != 0) || (ferror(gmvin) != 0))
      {
       fprintf(stderr,"I/O error while reading faces.\n");
       gmv_data.errormsg = (char *)malloc(31 * sizeof(char));
@@ -3838,7 +3838,7 @@ void readsurface(FILE* gmvin, int ftype)
      }
    if (ftype == ASCII) rdlongs(vertsin,(long)nverts,gmvin);
 
-   if ((feof(gmvin) != 0) | (ferror(gmvin) != 0))
+   if ((feof(gmvin) != 0) || (ferror(gmvin) != 0))
      {
       fprintf(stderr,"I/O error while reading surfaces.\n");
       gmv_data.errormsg = (char *)malloc(34 * sizeof(char));
@@ -7166,7 +7166,7 @@ void gmvrayread_data()
         }
       if (ftypeGlobal == ASCII) { int res = fscanf(gmvrayinGlobal,"%s",keyword); (void) res; }
 
-      if ((feof(gmvrayinGlobal) != 0) | (ferror(gmvrayinGlobal) != 0)) iendLocal = 1;
+      if ((feof(gmvrayinGlobal) != 0) || (ferror(gmvrayinGlobal) != 0)) iendLocal = 1;
 
       if (strncmp(keyword,"endray",6) == 0)
         {
@@ -7477,7 +7477,7 @@ void readrays(FILE* gmvrayin, int ftype)
      }
    gmvray_data.gmvrays = gmvrays;
 
-   if ((feof(gmvrayin) != 0) | (ferror(gmvrayin) != 0))
+   if ((feof(gmvrayin) != 0) || (ferror(gmvrayin) != 0))
      {
       fprintf(stderr,"I/O error while reading rays.\n");
       gmv_data.errormsg = (char *)malloc(30 * sizeof(char));
