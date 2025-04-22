@@ -604,7 +604,7 @@ void vtkNIfTIWriter::WriteFileHeader(
 }
 
 void vtkNIfTIWriter::WriteFile(
-  ostream* vtkNotUsed(file), vtkImageData* data, int extent[6], int wholeExtent[])
+  ostream* vtkNotUsed(file), vtkImageData* data, int extent[6], int wholeExtent[6])
 {
   (void)wholeExtent; // Not used
   // struct nifti_1_header nhdr ;
