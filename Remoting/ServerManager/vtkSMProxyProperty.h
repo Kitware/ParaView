@@ -159,7 +159,28 @@ public:
    */
   void UpdateAllInputs() override;
 
+  /**
+   * Set all of the current proxies and ports to be the default ones
+   */
+  void ResetDefaultsToCurrent();
+
+  /**
+   * Check if the current proxies and ports match the default ones,
+   * and that each proxy has default properties as well (which is
+   * recursive, since properties of proxy properties can also be
+   * proxy properties).
+   *
+   * Note: internal properties are ignored. This is so that properties
+   * such as `Input` do not affect `IsValueDefault()`.
+   */
   bool IsValueDefault() override;
+
+  /**
+   * Check if the current proxies and ports match the default ones,
+   * but do not check that each proxy has default properties. This
+   * is essentially a non-recursive version of `IsValueDefault()`.
+   */
+  bool IsValueDefaultNonRecursive();
 
   /**
    * For properties that support specifying defaults in XML configuration, this
