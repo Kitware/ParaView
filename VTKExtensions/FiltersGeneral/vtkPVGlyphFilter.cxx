@@ -933,7 +933,6 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
   auto trans = vtkSmartPointer<vtkTransform>::New();
   vtkNew<vtkIdList> pointIdList;
   vtkIdType ptIncr = 0;
-  vtkIdType cellIncr = 0;
   for (vtkIdType inPtId = 0; inPtId < numPts; inPtId++)
   {
     double scalex(1.0), scaley(1.0), scalez(1.0);
@@ -1105,7 +1104,6 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
     }
 
     ptIncr += numSourcePts;
-    cellIncr += numSourceCells;
   }
 
   if (newNormals.GetPointer())
