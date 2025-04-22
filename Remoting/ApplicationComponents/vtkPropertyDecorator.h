@@ -79,8 +79,10 @@ public:
     EnableStateChangedEvent = vtkCommand::UserEvent + 1001
   };
 
-  // returns "type" attribute of the xml config
-  std::string GetDecoratorType() const;
+  /**
+   * Creates a new decorator, given the xml config and the proxy containing the property
+   */
+  static vtkSmartPointer<vtkPropertyDecorator> Create(vtkPVXMLElement* xml, vtkSMProxy* proxy);
 
 protected:
   vtkPropertyDecorator();
