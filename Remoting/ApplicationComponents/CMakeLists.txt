@@ -4,6 +4,7 @@ set(classes
   vtkPropertyDecorator
   vtkBoolPropertyDecorator
   vtkEnableDecorator
+  vtkGenericPropertyDecorator
   vtkShowDecorator)
 
 vtk_module_add_module(ParaView::RemotingApplicationComponents
