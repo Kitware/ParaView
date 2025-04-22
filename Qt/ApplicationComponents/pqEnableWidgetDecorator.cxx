@@ -13,6 +13,7 @@ pqEnableWidgetDecorator::pqEnableWidgetDecorator(
     &pqEnableWidgetDecorator::emitEnableStateChanged);
 }
 
+//-----------------------------------------------------------------------------
 void pqEnableWidgetDecorator::emitEnableStateChanged()
 {
   Q_EMIT enableStateChanged();

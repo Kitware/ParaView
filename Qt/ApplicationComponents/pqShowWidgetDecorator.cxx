@@ -14,6 +14,7 @@ pqShowWidgetDecorator::pqShowWidgetDecorator(
     vtkShowDecorator::VisibilityChangedEvent, this, &pqShowWidgetDecorator::emitVisibilityChanged);
 }
 
+//-----------------------------------------------------------------------------
 void pqShowWidgetDecorator::emitVisibilityChanged()
 {
   Q_EMIT visibilityChanged();
