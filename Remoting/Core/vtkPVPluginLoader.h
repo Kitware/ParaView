@@ -51,8 +51,7 @@ public:
    * The actual loading will take place the first time a VTK object for a XML proxy needs to be
    * created.
    */
-  PARAVIEW_DEPRECATED_IN_5_14_0(
-    "Use the overload of LoadDelayedLoadPlugin that uses versions and description instead")
+  PARAVIEW_DEPRECATED_IN_5_14_0("Use the overload with versions and description instead")
   bool LoadDelayedLoadPlugin(
     const std::string& name, const std::vector<std::string>& xmls, const std::string& filename);
 
