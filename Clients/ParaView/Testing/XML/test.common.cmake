@@ -989,6 +989,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   HTGVisibleLeavesSizeBackwardCompat.xml
   ImportCustomPresets.xml
   InformationPanel.xml
+  IntegrationStrategy.xml
   LogViewer.xml
   MergeTime.xml
   ModifyGUIWindowTitle.xml
