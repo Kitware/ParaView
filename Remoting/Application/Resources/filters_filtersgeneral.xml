@@ -783,6 +783,18 @@
         </RegistrationNamesDomain>
       </StringVectorProperty>
 
+      <IntVectorProperty
+              name="CombineFirstLayerMultiblock"
+              command="SetCombineFirstLayerMultiblock"
+              number_of_elements="1"
+              default_values="0"
+              panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>If on, for multiblock inputs if the output type is also multiblock,
+          the first level will be combined.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="Block Names">
         <Property name="BlockNames" />
         <Hints>
