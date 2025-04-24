@@ -395,7 +395,7 @@ public:
 
   ~pqInternals()
   {
-    Q_FOREACH (pqProxyWidgetItem* item, this->Items)
+    for (pqProxyWidgetItem* item : this->Items)
     {
       delete item;
     }
@@ -416,7 +416,7 @@ public:
     assert(gridLayout);
     item->appendToLayout(gridLayout, self->useDocumentationForLabels());
 
-    Q_FOREACH (pqPropertyWidgetDecorator* decorator, item->propertyWidget()->decorators())
+    for (pqPropertyWidgetDecorator* decorator : item->propertyWidget()->decorators())
     {
       this->RequestUpdatePanel.connect(decorator, SIGNAL(visibilityChanged()), SLOT(start()));
       this->RequestUpdatePanel.connect(decorator, SIGNAL(enableStateChanged()), SLOT(start()));
@@ -612,7 +612,7 @@ void pqProxyWidget::showEvent(QShowEvent* sevent)
   this->Superclass::showEvent(sevent);
   if (sevent == nullptr || !sevent->spontaneous())
   {
-    Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
+    for (const pqProxyWidgetItem* item : this->Internals->Items)
     {
       item->select();
     }
@@ -624,7 +624,7 @@ void pqProxyWidget::hideEvent(QHideEvent* hevent)
 {
   if (hevent == nullptr || !hevent->spontaneous())
   {
-    Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
+    for (const pqProxyWidgetItem* item : this->Internals->Items)
     {
       item->deselect();
     }
@@ -635,7 +635,7 @@ void pqProxyWidget::hideEvent(QHideEvent* hevent)
 //-----------------------------------------------------------------------------
 void pqProxyWidget::applyInternal() const
 {
-  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
+  for (const pqProxyWidgetItem* item : this->Internals->Items)
   {
     item->apply();
   }
@@ -656,7 +656,7 @@ void pqProxyWidget::apply() const
 //-----------------------------------------------------------------------------
 void pqProxyWidget::reset() const
 {
-  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
+  for (const pqProxyWidgetItem* item : this->Internals->Items)
   {
     item->reset();
   }
@@ -666,7 +666,7 @@ void pqProxyWidget::reset() const
 void pqProxyWidget::setView(pqView* view)
 {
   bool done = false;
-  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
+  for (const pqProxyWidgetItem* item : this->Internals->Items)
   {
     item->propertyWidget()->setView(view);
     // make sure the first widget shown has active keyboard shortcuts.
@@ -719,7 +719,7 @@ void pqProxyWidget::createWidgets(const QStringList& properties)
   {
     this->create3DWidgets();
   }
-  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
+  for (const pqProxyWidgetItem* item : this->Internals->Items)
   {
     QObject::connect(
       item->propertyWidget(), SIGNAL(changeAvailable()), this, SIGNAL(changeAvailable()));
@@ -1024,7 +1024,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
   pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
   QList<pqPropertyWidgetInterface*> interfaces =
     interfaceTracker->interfaces<pqPropertyWidgetInterface*>();
-  Q_FOREACH (pqPropertyWidgetInterface* interface, interfaces)
+  for (pqPropertyWidgetInterface* interface : interfaces)
   {
     widget = interface->createWidgetForProperty(smproxy, smproperty, parentObj);
     if (widget)
@@ -1115,7 +1115,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
 
   const pqProxyWidgetItem* prevItem = nullptr;
   vtkSMProxy* smProxy = this->Internals->Proxy;
-  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
+  for (const pqProxyWidgetItem* item : this->Internals->Items)
   {
     bool visible = item->canShowWidget(show_advanced, filterText, smProxy);
     if (visible)
@@ -1247,6 +1247,12 @@ void pqProxyWidget::showContextMenu(const QPoint& pt, pqPropertyWidget* propWidg
     settings->SetProxySettings(this->Internals->Proxy, propertyIt, false);
   });
   useDefault->setObjectName("UseDefault");
+
+  auto pqproxy = pqProxy::findProxy(this->proxy());
+  if (pqproxy)
+  {
+    useDefault->setEnabled(pqproxy->modifiedState() == pqProxy::UNMODIFIED);
+  }
 
   QAction* resetToAppDefault = menu.addAction(tr("Reset to Application Default"), propWidget,
     [this, propWidget]() { this->resetPropertyToAppDefault(propWidget); });

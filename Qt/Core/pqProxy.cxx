@@ -189,6 +189,29 @@ QList<vtkSMProxy*> pqProxy::getHelperProxies() const
 }
 
 //-----------------------------------------------------------------------------
+pqProxy* pqProxy::findProxy(vtkSMProxy* aproxy)
+{
+  if (!aproxy)
+  {
+    return nullptr;
+  }
+
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+  pqServer* server = smmodel->findServer(aproxy->GetSession());
+  QList<pqProxy*> proxies = smmodel->findItems<pqProxy*>(server);
+
+  for (pqProxy* pqproxy : proxies)
+  {
+    if (pqproxy->getProxy() == aproxy)
+    {
+      return pqproxy;
+    }
+  }
+
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 pqProxy* pqProxy::findProxyWithHelper(vtkSMProxy* aproxy, QString& key)
 {
   if (!aproxy)
@@ -198,7 +221,7 @@ pqProxy* pqProxy::findProxyWithHelper(vtkSMProxy* aproxy, QString& key)
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   pqServer* server = smmodel->findServer(aproxy->GetSession());
   QList<pqProxy*> proxies = smmodel->findItems<pqProxy*>(server);
-  Q_FOREACH (pqProxy* pqproxy, proxies)
+  for (pqProxy* pqproxy : proxies)
   {
     if (pqproxy->Internal->containsHelperProxy(aproxy, key))
     {

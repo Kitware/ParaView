@@ -148,6 +148,12 @@ public:
   static pqProxy* findProxyWithHelper(vtkSMProxy* aproxy, QString& key);
 
   /**
+   * Returns a pqProxy found under current pqServer and matching given vtkSMProxy.
+   * Returns nullptr if no such pqproxy is found.
+   */
+  static pqProxy* findProxy(vtkSMProxy* aproxy);
+
+  /**
    * Return whether or not the user has modified the GUI name of the source.
    * This is needed when reading in a dataset with Catalyst channel information
    * so that we can make sure that we don't overwrite any QUI name the user

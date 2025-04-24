@@ -24,9 +24,6 @@ class QPoint;
  * pqProxyWidget doesn't show any widgets in the panel by default (after
  * constructor). Use filterWidgets() or updatePanel() to show widgets matching
  * criteria.
- *
- * Note: This class replaces pqProxyPanel (and subclasses). pqProxyPanel is
- * still available (and supported) for backwards compatibility.
  */
 class PQCOMPONENTS_EXPORT pqProxyWidget : public QWidget
 {
