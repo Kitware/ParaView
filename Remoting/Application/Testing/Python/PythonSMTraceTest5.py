@@ -30,6 +30,10 @@ clip_sphere = Clip(wavelet)
 clip_sphere.Scalars = ['POINTS', 'RTData']
 clip_sphere.ClipType = 'Sphere'
 
+# Show these so we can test changes to rendering state features too
+Show(clip_plane)
+Show(clip_sphere)
+
 state_string = smstate.get_state()
 
 # For `clip_plane`, the ClipType should not be specified, since it
@@ -43,3 +47,10 @@ assert 'ClipType.Offset = 1' in state_string
 # For `clip_sphere`, the ClipType should show up, since it is not
 # the default
 assert "ClipType='Sphere'" in state_string.replace(' ', '')
+
+# 2D transfer functions used to always show up in state files, even
+# when they were not used at all. The recent changes to proxy properties
+# also allowed us to remove 2D transfer functions from state files when
+# they are not used. So verify that those are absent as well.
+assert "TransferFunction2D" not in state_string
+assert "TF2D" not in state_string
