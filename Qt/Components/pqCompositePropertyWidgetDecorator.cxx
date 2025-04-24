@@ -3,168 +3,94 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqCompositePropertyWidgetDecorator.h"
 
+#include "pqCoreUtilities.h"
 #include "pqPropertyWidget.h"
 #include "pqPropertyWidgetDecorator.h"
-#include "vtkLogger.h"
-#include "vtkPVXMLElement.h"
+#include "vtkObjectFactory.h"
+#include "vtkPropertyDecorator.h"
 
 #include <QPointer>
-
-#include <algorithm>
-#include <functional>
-#include <memory>
-#include <numeric>
-#include <sstream>
-#include <vector>
-
 #include <cassert>
 
-namespace
-{
-
-struct BaseOperation
-{
-  std::vector<QPointer<pqPropertyWidgetDecorator>> Decorators;
-  std::vector<std::shared_ptr<BaseOperation>> Expressions;
-
-  void add(std::shared_ptr<BaseOperation>& op) { this->Expressions.push_back(op); }
-
-  void add(pqPropertyWidgetDecorator* op) { this->Decorators.push_back(op); }
-
-  virtual bool canShowWidget(bool show_advanced) const = 0;
-  virtual bool enableWidget() const = 0;
-
-  virtual ~BaseOperation() = default;
-};
-
-template <typename BinaryOperation, bool init_value, bool default_value = init_value>
-struct Operation : public BaseOperation
-{
-  bool canShowWidget(bool show_advanced) const override
-  {
-    if (this->Expressions.empty() && this->Decorators.empty())
-    {
-      return default_value;
-    }
-
-    bool result = init_value;
-
-    result = std::accumulate(this->Decorators.begin(), this->Decorators.end(), result,
-      [=](const bool& lhs, const QPointer<pqPropertyWidgetDecorator>& rhs) {
-        return BinaryOperation()(lhs, rhs->canShowWidget(show_advanced));
-      });
-
-    result = std::accumulate(this->Expressions.begin(), this->Expressions.end(), result,
-      [=](const bool& lhs, const std::shared_ptr<BaseOperation>& rhs) {
-        return BinaryOperation()(lhs, rhs->canShowWidget(show_advanced));
-      });
-
-    return result;
-  }
-
-  bool enableWidget() const override
-  {
-    if (this->Expressions.empty() && this->Decorators.empty())
-    {
-      return default_value;
-    }
-
-    bool result = init_value;
-
-    result = std::accumulate(this->Decorators.begin(), this->Decorators.end(), result,
-      [](const bool& lhs, const QPointer<pqPropertyWidgetDecorator>& rhs) {
-        return BinaryOperation()(lhs, rhs->enableWidget());
-      });
-
-    result = std::accumulate(this->Expressions.begin(), this->Expressions.end(), result,
-      [=](const bool& lhs, const std::shared_ptr<BaseOperation>& rhs) {
-        return BinaryOperation()(lhs, rhs->enableWidget());
-      });
-
-    return result;
-  }
-};
-
-struct OperationAnd : public Operation<std::logical_and<bool>, true, true>
-{
-};
-
-struct OperationOr : public Operation<std::logical_or<bool>, false, true>
-{
-};
-}
-
-class pqCompositePropertyWidgetDecorator::pqInternals
+// A helper class that provides a vtkPropertyDecorator API for pqPropertyWidgetDecorator subclasses.
+// This allows to handle any decorators that do not encapsulate their logic yet
+// into a vtkPropertyDecorator subclass or for decorators loaded dynamically
+// via plugins.
+class vtkQtPropertyDecorator : public vtkPropertyDecorator
 {
 public:
-  std::shared_ptr<BaseOperation> Expression;
+  static vtkQtPropertyDecorator* New();
+  vtkTypeMacro(vtkQtPropertyDecorator, vtkPropertyDecorator);
+  // void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  std::shared_ptr<BaseOperation> Parse(
-    vtkPVXMLElement* expXML, pqCompositePropertyWidgetDecorator* self)
+  bool CanShow(bool show_advanced) const override
   {
-    if (expXML == nullptr)
-    {
-      return nullptr;
-    }
+    return this->decoratorLogic->canShowWidget(show_advanced);
+  }
 
-    std::shared_ptr<BaseOperation> expr;
-    if (strcmp(expXML->GetAttributeOrEmpty("type"), "and") == 0)
-    {
-      expr = std::make_shared<OperationAnd>();
-    }
-    else if (strcmp(expXML->GetAttributeOrEmpty("type"), "or") == 0)
-    {
-      expr = std::make_shared<OperationOr>();
-    }
-    else
-    {
-      return nullptr;
-    }
+  bool Enable() const override { return this->decoratorLogic->enableWidget(); }
 
-    for (unsigned int cc = 0, max = expXML->GetNumberOfNestedElements(); cc < max; ++cc)
+  vtkQtPropertyDecorator() = default;
+  ~vtkQtPropertyDecorator() override = default;
+
+  void SetLogic(pqPropertyWidgetDecorator* logic)
+  {
+    if (this->decoratorLogic != logic)
     {
-      vtkPVXMLElement* childXML = expXML->GetNestedElement(cc);
-      if (childXML->GetName() && strcmp(childXML->GetName(), "Expression") == 0)
+      // reset state
+      if (this->decoratorLogic)
       {
-        if (auto childExpr = this->Parse(childXML, self))
+        if (visibilityConnection)
         {
-          expr->add(childExpr);
+          QObject::disconnect(visibilityConnection);
+        }
+        if (enableStateConnection)
+        {
+          QObject::disconnect(enableStateConnection);
         }
       }
-      else if (auto decorator = pqPropertyWidgetDecorator::create(childXML, self->parentWidget()))
-      {
-        self->handleNestedDecorator(decorator);
-        expr->add(decorator);
-      }
+      this->decoratorLogic = logic;
+      this->visibilityConnection =
+        QObject::connect(logic, &pqPropertyWidgetDecorator::visibilityChanged,
+          [this]() { this->InvokeVisibilityChangedEvent(); });
+
+      this->enableStateConnection =
+        QObject::connect(logic, &pqPropertyWidgetDecorator::enableStateChanged,
+          [this]() { this->InvokeEnableStateChangedEvent(); });
     }
-    return expr;
   }
+
+private:
+  QPointer<pqPropertyWidgetDecorator> decoratorLogic;
+  QMetaObject::Connection visibilityConnection;
+  QMetaObject::Connection enableStateConnection;
 };
+
+vtkStandardNewMacro(vtkQtPropertyDecorator);
+//=============================================================================
 
 //-----------------------------------------------------------------------------
 pqCompositePropertyWidgetDecorator::pqCompositePropertyWidgetDecorator(
   vtkPVXMLElement* xmlConfig, pqPropertyWidget* parentObject)
   : Superclass(xmlConfig, parentObject)
-  , Internals(new pqCompositePropertyWidgetDecorator::pqInternals())
 {
   assert(xmlConfig);
 
-  auto expressionXML = xmlConfig->FindNestedElementByName("Expression");
-  this->Internals->Expression = this->Internals->Parse(expressionXML, this);
-  if (this->Internals->Expression == nullptr)
-  {
-    std::ostringstream stream;
-    if (expressionXML)
-    {
-      expressionXML->PrintXML(stream, vtkIndent());
-    }
-    else
-    {
-      stream << "(null)";
-    }
-    vtkLogIfF(
-      WARNING, (!this->Internals->Expression), "invalid expression `%s`", stream.str().c_str());
-  }
+  // provide callback to wrap pqPropertyWidgetDecorator subclasses
+  auto creator = [parentObject](vtkPVXMLElement* xml, vtkSMProxy* proxy) {
+    (void)(proxy);
+    auto decorator = pqPropertyWidgetDecorator::create(xml, parentObject);
+    auto vtkDecorator = vtkSmartPointer<vtkQtPropertyDecorator>::New();
+    vtkDecorator->SetLogic(decorator);
+    return vtkDecorator;
+  };
+  this->decoratorLogic->RegisterDecorator(creator);
+  this->decoratorLogic->Initialize(xmlConfig, parentObject->proxy());
+
+  pqCoreUtilities::connect(this->decoratorLogic, vtkPropertyDecorator::VisibilityChangedEvent, this,
+    SIGNAL(visibilityChanged()));
+  pqCoreUtilities::connect(this->decoratorLogic, vtkPropertyDecorator::EnableStateChangedEvent,
+    this, SIGNAL(enableStateChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -173,23 +99,11 @@ pqCompositePropertyWidgetDecorator::~pqCompositePropertyWidgetDecorator() = defa
 //-----------------------------------------------------------------------------
 bool pqCompositePropertyWidgetDecorator::canShowWidget(bool show_advanced) const
 {
-  auto internals = (*this->Internals);
-  return internals.Expression ? internals.Expression->canShowWidget(show_advanced)
-                              : this->Superclass::canShowWidget(show_advanced);
+  return this->decoratorLogic->CanShow(show_advanced);
 }
 
 //-----------------------------------------------------------------------------
 bool pqCompositePropertyWidgetDecorator::enableWidget() const
 {
-  auto internals = (*this->Internals);
-  return internals.Expression ? internals.Expression->enableWidget()
-                              : this->Superclass::enableWidget();
-}
-
-//-----------------------------------------------------------------------------
-void pqCompositePropertyWidgetDecorator::handleNestedDecorator(pqPropertyWidgetDecorator* other)
-{
-  this->parentWidget()->removeDecorator(other);
-  this->connect(other, SIGNAL(visibilityChanged()), SIGNAL(visibilityChanged()));
-  this->connect(other, SIGNAL(enableStateChanged()), SIGNAL(enableStateChanged()));
+  return this->decoratorLogic->Enable();
 }
