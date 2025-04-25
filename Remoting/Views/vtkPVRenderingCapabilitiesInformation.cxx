@@ -122,7 +122,7 @@ vtkSmartPointer<vtkRenderWindow> vtkPVRenderingCapabilitiesInformation::NewOffsc
 #if defined(VTK_OPENGL_HAS_EGL)
   // vtkEGLRenderWindow gets initialized with `VTK_DEFAULT_EGL_DEVICE_INDEX`
   // CMake variable. If the command line options overrode it, change it.
-  if (auto* eglWindow = vtkEGLRenderWindow::SafeDownCast(window))
+  if (vtkEGLRenderWindow::SafeDownCast(window))
   {
     int deviceIndex = GetEGLDeviceIndex();
     if (deviceIndex >= 0)

@@ -2456,7 +2456,6 @@ void vtkPEnSightReader::PrepareStructuredDimensionsForDistribution(int partId, i
     pointEndIndex = pointBeginIndex + newPointDimension;
 
     // generate ghost points/cells arrays
-    int index = 0;
     for (int k = 0; k < oldDimensions[2]; k++)
     {
       for (int j = 0; j < oldDimensions[1]; j++)
@@ -2481,13 +2480,11 @@ void vtkPEnSightReader::PrepareStructuredDimensionsForDistribution(int partId, i
             {
               pointGhostArray->InsertNextValue(0);
             }
-            index++;
           }
         }
       }
     }
 
-    index = 0;
     for (int k = 0; k < oldCellDimensions[2]; k++)
     {
       for (int j = 0; j < oldCellDimensions[1]; j++)
@@ -2512,7 +2509,6 @@ void vtkPEnSightReader::PrepareStructuredDimensionsForDistribution(int partId, i
             {
               cellGhostArray->InsertNextValue(0);
             }
-            index++;
           }
         }
       }
