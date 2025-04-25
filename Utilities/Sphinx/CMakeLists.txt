@@ -13,7 +13,7 @@ endif ()
 
 # Copy files referenced from docstrings.
 configure_file(
-  "${ParaView_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/PythonAlgorithmExamples.py"
+  "${ParaView_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/Plugin/PythonAlgorithmExamples.py"
   "${CMAKE_CURRENT_BINARY_DIR}/PythonAlgorithmExamples.py"
   @ONLY)
 
