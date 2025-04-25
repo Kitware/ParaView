@@ -67,6 +67,7 @@ import paraview.servermanager as sm
 import paraview.simple as simple
 from paraview.vtk import vtkTimeStamp
 from paraview.modules.vtkRemotingCore import vtkPVSession
+from paraview.decorator_utils import should_trace_based_on_decorators
 
 def _get_skip_rendering():
     return sm.vtkSMTrace.GetActiveTracer().GetSkipRenderingComponents()
@@ -926,6 +927,19 @@ class ProxyFilter(object):
             return True
 
         obj = prop.get_object()
+        if setting == sm.vtkSMTrace.RECORD_ACTIVE_MODIFIED_PROPERTIES:
+          # Check whether the property decorators logic consider this property "relevant".
+          # In this case relevant means that int the current state of paraview
+          # this property is enabled (not grayed-out) and is visible. Visibility
+          # is evaluated based on dependent properties and not "advanced" (i.e.
+          # gear icon) state.
+          proxy = prop.get_proxy()
+          sanitized_label = sm._make_name_valid(obj.GetXMLName())
+          should_trace = should_trace_based_on_decorators(proxy, sanitized_label)
+
+          if should_trace is False:
+            return False
+
         if isinstance(obj, sm.ProxyProperty):
             # We already check every property when writing out the trace,
             # so we don't need to recursively check proxy properties. We only

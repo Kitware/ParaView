@@ -16,7 +16,7 @@ def _get_decorators_from_hints(sm_proxy, hints):
 
 
 def get_decorators(proxy, property_name):
-    """ Get  a list of all vtkPropertyDecorators associated with this property.
+    """Get  a list of all vtkPropertyDecorators associated with this property.
     Decorators are defined in the xml definition of the property with the
     <PropertyWidgetDecorator> tag. A decorator can be assigned directly to a
     property or to a propertygroup that this property belongs to."""
@@ -44,7 +44,7 @@ def get_decorators(proxy, property_name):
 def should_trace_based_on_decorators(proxy, property_name):
     decorators = get_decorators(proxy, property_name)
     if not decorators:
-      return None
+        return True
     return all([d.CanShow(True) and d.Enable() for d in decorators])
 
 

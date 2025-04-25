@@ -138,11 +138,19 @@ public:
   {
     RECORD_ALL_PROPERTIES = 0,
     RECORD_MODIFIED_PROPERTIES = 1,
-    RECORD_USER_MODIFIED_PROPERTIES = 2
+    RECORD_USER_MODIFIED_PROPERTIES = 2,
+    /**
+     * These are only the properties currectly used by ParaView. For example a
+     * ClipFilter has both ClipType and Scalars propeties but only one of the two
+     * is active and use at any time. Similarly for representations, we trace
+     * only properties related to the active representation type instead of all
+     * of them. (default false)
+     */
+    RECORD_ACTIVE_MODIFIED_PROPERTIES = 3
   };
 
   vtkSetClampMacro(
-    PropertiesToTraceOnCreate, int, RECORD_ALL_PROPERTIES, RECORD_USER_MODIFIED_PROPERTIES);
+    PropertiesToTraceOnCreate, int, RECORD_ALL_PROPERTIES, RECORD_ACTIVE_MODIFIED_PROPERTIES);
   vtkGetMacro(PropertiesToTraceOnCreate, int);
 
   /**
