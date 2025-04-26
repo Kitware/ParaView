@@ -10,6 +10,7 @@
 #include "vtkEnableDecorator.h"
 #include "vtkGenericPropertyDecorator.h"
 #include "vtkInputDataTypeDecorator.h"
+#include "vtkMultiComponentsDecorator.h"
 #include "vtkShowDecorator.h"
 
 //-----------------------------------------------------------------------------
@@ -99,10 +100,10 @@ vtkSmartPointer<vtkPropertyDecorator> vtkPropertyDecorator::Create(
   //{
   //  decorator = vtk::TakeSmartPointer(vtkOSPRayHidingDecorator::New());
   //}
-  // if (type == "MultiComponentsDecorator")
-  //{
-  //  decorator = vtk::TakeSmartPointer(vtkMultiComponentsDecorator::New());
-  //}
+  if (type == "MultiComponentsDecorator")
+  {
+    decorator = vtk::TakeSmartPointer(vtkMultiComponentsDecorator::New());
+  }
   if (type == "CompositeDecorator")
   {
     decorator = vtk::TakeSmartPointer(vtkCompositePropertyDecorator::New());

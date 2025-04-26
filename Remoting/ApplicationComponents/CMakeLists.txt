@@ -6,6 +6,7 @@ set(classes
   vtkInputDataTypeDecorator
   vtkEnableDecorator
   vtkGenericPropertyDecorator
+  vtkMultiComponentsDecorator
   vtkCompositePropertyDecorator
   vtkShowDecorator)
 

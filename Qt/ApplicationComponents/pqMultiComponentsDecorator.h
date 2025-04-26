@@ -5,8 +5,7 @@
 #define pqMultiComponentsDecorator_h
 
 #include "pqPropertyWidgetDecorator.h"
-
-#include <vector>
+#include "vtkMultiComponentsDecorator.h"
 
 /**
  * pqMultiComponentsDecorator's purpose is to prevent the GUI from
@@ -29,8 +28,7 @@ public:
 
 private:
   Q_DISABLE_COPY(pqMultiComponentsDecorator)
-
-  std::vector<int> Components;
+  vtkNew<vtkMultiComponentsDecorator> decoratorLogic;
 };
 
 #endif
