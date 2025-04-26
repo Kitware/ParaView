@@ -9,6 +9,7 @@
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
@@ -113,6 +114,12 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
     {
       sof->UpdateVTKObjects();
       vtkSMPropertyHelper(proxy, "ScalarOpacityFunction").Set(sof);
+
+      // Since this function is initializing defaults for the lookup tables,
+      // including defaults for the proxy property transfer functions, get the
+      // proxy property to treat its current settings as the defaults.
+      auto* prop = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("ScalarOpacityFunction"));
+      prop->ResetDefaultsToCurrent();
     }
   }
   if (proxy->GetProperty("TransferFunction2D"))
@@ -122,6 +129,12 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
     {
       tf2d->UpdateVTKObjects();
       vtkSMPropertyHelper(proxy, "TransferFunction2D").Set(tf2d);
+
+      // Since this function is initializing defaults for the lookup tables,
+      // including defaults for the proxy property transfer functions, get the
+      // proxy property to treat its current settings as the defaults.
+      auto* prop = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("TransferFunction2D"));
+      prop->ResetDefaultsToCurrent();
     }
   }
   controller->PostInitializeProxy(proxy);
