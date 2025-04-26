@@ -3,75 +3,27 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqSessionTypeDecorator.h"
 
-#include "pqPropertyWidget.h"
-#include "vtkLogger.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSMProxy.h"
-#include "vtkSMSessionClient.h"
-
 //-----------------------------------------------------------------------------
 pqSessionTypeDecorator::pqSessionTypeDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
   : Superclass(config, parentObject)
-  , IsVisible(true)
-  , IsEnabled(true)
 {
   auto proxy = parentObject->proxy();
   Q_ASSERT(proxy != nullptr);
-
-  auto session = proxy->GetSession();
-  Q_ASSERT(session != nullptr);
-
-  bool condition_met = false;
-  const char* requiresAttr = config->GetAttributeOrEmpty("requires");
-  if (strcmp(requiresAttr, "remote") == 0)
-  {
-    condition_met = vtkSMSessionClient::SafeDownCast(session) != nullptr;
-  }
-  else if (strcmp(requiresAttr, "parallel") == 0)
-  {
-    condition_met =
-      session->GetNumberOfProcesses(vtkPVSession::DATA_SERVER | vtkPVSession::RENDER_SERVER) > 1;
-  }
-  else if (strcmp(requiresAttr, "parallel_data_server") == 0)
-  {
-    condition_met = session->GetNumberOfProcesses(vtkPVSession::DATA_SERVER) > 1;
-  }
-  else if (strcmp(requiresAttr, "parallel_render_server") == 0)
-  {
-    condition_met = session->GetNumberOfProcesses(vtkPVSession::RENDER_SERVER) > 1;
-  }
-  else
-  {
-    vtkLogF(ERROR, "Invalid 'requires' attribute specified: '%s'", requiresAttr);
-  }
-
-  const char* mode = config->GetAttributeOrEmpty("mode");
-  if (strcmp(mode, "visibility") == 0)
-  {
-    this->IsVisible = condition_met;
-  }
-  else if (strcmp(mode, "enabled_state") == 0)
-  {
-    this->IsEnabled = condition_met;
-  }
-  else
-  {
-    vtkLogF(ERROR, "Invalid 'mode' attribute specified: '%s'", mode);
-  }
+  this->decoratorLogic->Initialize(config, proxy);
 }
 
 //-----------------------------------------------------------------------------
 pqSessionTypeDecorator::~pqSessionTypeDecorator() = default;
 
 //-----------------------------------------------------------------------------
-bool pqSessionTypeDecorator::canShowWidget(bool) const
+bool pqSessionTypeDecorator::canShowWidget(bool show_advanced) const
 {
-  return this->IsVisible;
+  return this->decoratorLogic->CanShow(show_advanced);
 }
 
 //-----------------------------------------------------------------------------
 bool pqSessionTypeDecorator::enableWidget() const
 {
-  return this->IsEnabled;
+  return this->decoratorLogic->Enable();
 }

@@ -11,6 +11,7 @@
 #include "vtkGenericPropertyDecorator.h"
 #include "vtkInputDataTypeDecorator.h"
 #include "vtkMultiComponentsDecorator.h"
+#include "vtkSessionTypeDecorator.h"
 #include "vtkShowDecorator.h"
 
 //-----------------------------------------------------------------------------
@@ -108,10 +109,10 @@ vtkSmartPointer<vtkPropertyDecorator> vtkPropertyDecorator::Create(
   {
     decorator = vtk::TakeSmartPointer(vtkCompositePropertyDecorator::New());
   }
-  // if (type == "SessionTypeDecorator")
-  //{
-  //  // return new pqSessionTypeDecorator(config, widget);
-  //}
+  if (type == "SessionTypeDecorator")
+  {
+    decorator = vtk::TakeSmartPointer(vtkSessionTypeDecorator::New());
+  }
 
   if (decorator)
   {

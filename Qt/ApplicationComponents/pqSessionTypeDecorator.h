@@ -8,6 +8,8 @@
 #include "pqPropertyWidgetDecorator.h"
 #include <QObject>
 
+#include "vtkSessionTypeDecorator.h"
+
 /**
  * @class pqSessionTypeDecorator
  * @brief decorator to show/hide or enable/disable property widget based on the
@@ -17,14 +19,8 @@
  * used to show/hide or enable/disable a pqPropertyWidget based on the current
  * session.
  *
- * The XML config for this decorate takes two attributes 'requires' and 'mode'.
- * 'mode' can have values 'visibility' or 'enabled_state' which dictates whether
- * the decorator shows/hides or enables/disables the widget respectively.
+ * @see vtkSessionTypeDecorator
  *
- * 'requires' can have values 'remote', 'parallel', 'parallel_data_server', or
- * 'parallel_render_server' indicating if the session must be remote, or parallel
- * with either data server or render server having more than 1 rank, or parallel
- * data-server, or parallel render-server respectively.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSessionTypeDecorator : public pqPropertyWidgetDecorator
 {
@@ -46,8 +42,7 @@ public:
 private:
   Q_DISABLE_COPY(pqSessionTypeDecorator);
 
-  bool IsVisible;
-  bool IsEnabled;
+  vtkNew<vtkSessionTypeDecorator> decoratorLogic;
 };
 
 #endif
