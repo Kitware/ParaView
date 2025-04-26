@@ -11,6 +11,7 @@
 #include "vtkGenericPropertyDecorator.h"
 #include "vtkInputDataTypeDecorator.h"
 #include "vtkMultiComponentsDecorator.h"
+#include "vtkOSPRayHidingDecorator.h"
 #include "vtkSessionTypeDecorator.h"
 #include "vtkShowDecorator.h"
 
@@ -97,10 +98,10 @@ vtkSmartPointer<vtkPropertyDecorator> vtkPropertyDecorator::Create(
   {
     decorator = vtk::TakeSmartPointer(vtkGenericPropertyDecorator::New());
   }
-  // if (type == "OSPRayHidingDecorator")
-  //{
-  //  decorator = vtk::TakeSmartPointer(vtkOSPRayHidingDecorator::New());
-  //}
+  if (type == "OSPRayHidingDecorator")
+  {
+    decorator = vtk::TakeSmartPointer(vtkOSPRayHidingDecorator::New());
+  }
   if (type == "MultiComponentsDecorator")
   {
     decorator = vtk::TakeSmartPointer(vtkMultiComponentsDecorator::New());

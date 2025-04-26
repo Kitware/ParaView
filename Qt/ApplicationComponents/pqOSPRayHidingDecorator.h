@@ -6,6 +6,8 @@
 
 #include "pqPropertyWidgetDecorator.h"
 
+#include "vtkOSPRayHidingDecorator.h"
+
 /**
  * pqOSPRayHidingDecorator's purpose is to prevent the GUI from
  * showing any of the RayTracing specific rendering controls when
@@ -27,6 +29,7 @@ public:
 
 private:
   Q_DISABLE_COPY(pqOSPRayHidingDecorator)
+  vtkNew<vtkOSPRayHidingDecorator> decoratorLogic;
 };
 
 #endif
