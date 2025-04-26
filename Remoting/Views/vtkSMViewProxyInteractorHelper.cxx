@@ -112,7 +112,7 @@ void vtkSMViewProxyInteractorHelper::Execute(vtkObject* caller, unsigned long ev
   assert(iren);
   switch (event)
   {
-    case vtkCommand::WindowResizeEvent:
+    case vtkCommand::ConfigureEvent:
     {
       this->Resize();
 
