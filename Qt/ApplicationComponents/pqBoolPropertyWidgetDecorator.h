@@ -7,7 +7,6 @@
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "vtkBoolPropertyDecorator.h"
-#include "vtkWeakPointer.h"
 
 /**
  * pqBoolPropertyWidgetDecorator is a base class for enable/disable
@@ -22,7 +21,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBoolPropertyWidgetDecorator
 
 public:
   pqBoolPropertyWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
-  ~pqBoolPropertyWidgetDecorator() override;
+  ~pqBoolPropertyWidgetDecorator() override = default;
 
   bool isBoolProperty() const;
 
@@ -32,10 +31,7 @@ Q_SIGNALS:
 private:
   Q_DISABLE_COPY(pqBoolPropertyWidgetDecorator)
 
-  void emitUpdateBoolPropertyState();
-
   vtkNew<vtkBoolPropertyDecorator> decoratorLogic;
-  unsigned long ObserverId;
 };
 
 #endif

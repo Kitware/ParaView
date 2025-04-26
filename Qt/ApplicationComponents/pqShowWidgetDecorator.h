@@ -20,6 +20,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqShowWidgetDecorator : public pqBoolProper
 
 public:
   pqShowWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
+  ~pqShowWidgetDecorator() override = default;
 
   bool canShowWidget(bool show_advanced) const override
   {
@@ -31,8 +32,6 @@ private:
   Q_DISABLE_COPY(pqShowWidgetDecorator)
 
   vtkNew<vtkShowDecorator> decoratorLogic;
-
-  void emitVisibilityChanged();
 };
 
 #endif
