@@ -3,6 +3,7 @@
 set(classes
   vtkPropertyDecorator
   vtkBoolPropertyDecorator
+  vtkInputDataTypeDecorator
   vtkEnableDecorator
   vtkGenericPropertyDecorator
   vtkCompositePropertyDecorator

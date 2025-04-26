@@ -9,6 +9,7 @@
 #include "vtkCompositePropertyDecorator.h"
 #include "vtkEnableDecorator.h"
 #include "vtkGenericPropertyDecorator.h"
+#include "vtkInputDataTypeDecorator.h"
 #include "vtkShowDecorator.h"
 
 //-----------------------------------------------------------------------------
@@ -78,10 +79,10 @@ vtkSmartPointer<vtkPropertyDecorator> vtkPropertyDecorator::Create(
   //{
   //  // return new pqCTHArraySelectionDecorator(config, widget);
   //}
-  // if (type == "InputDataTypeDecorator")
-  //{
-  //  //decorator = vtk::TakeSmartPointer(vtkInputDataTypeDecorator::New());
-  //}
+  if (type == "InputDataTypeDecorator")
+  {
+    decorator = vtk::TakeSmartPointer(vtkInputDataTypeDecorator::New());
+  }
   if (type == "EnableWidgetDecorator")
   {
     decorator = vtk::TakeSmartPointer(vtkEnableDecorator::New());

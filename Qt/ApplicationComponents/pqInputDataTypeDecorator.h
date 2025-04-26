@@ -6,9 +6,7 @@
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"
-#include "vtkWeakPointer.h"
-
-class vtkObject;
+#include "vtkInputDataTypeDecorator.h"
 
 /**
  * pqInputDataTypeDecorator is a pqPropertyWidgetDecorator subclass.
@@ -37,14 +35,10 @@ public:
    */
   bool canShowWidget(bool show_advanced) const override;
 
-protected:
-  virtual bool processState() const;
-
 private:
   Q_DISABLE_COPY(pqInputDataTypeDecorator)
 
-  vtkWeakPointer<vtkObject> ObservedObject;
-  unsigned long ObserverId;
+  vtkNew<vtkInputDataTypeDecorator> decoratorLogic;
 };
 
 #endif
