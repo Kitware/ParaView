@@ -739,6 +739,18 @@
           This property specifies the input to the Integrate Attributes filter.
         </Documentation>
       </InputProperty>
+
+      <ProxyProperty command="SetIntegrationStrategy"
+                     name="IntegrationStrategy">
+        <ProxyListDomain name="proxy_list">
+          <Group name="integration_strategies" default="IntegrationLinearStrategy"/>
+        </ProxyListDomain>
+        <Documentation>
+          This property determines which integration strategy
+          to use for the data integration.
+        </Documentation>
+      </ProxyProperty>
+
       <IntVectorProperty command="SetDivideAllCellDataByVolume"
                          name="DivideCellDataByVolume"
                          default_values="0"

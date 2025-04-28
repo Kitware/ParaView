@@ -2167,6 +2167,17 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="integration_strategies">
+    <Proxy class="vtkIntegrationLinearStrategy"
+           name="IntegrationLinearStrategy"
+           label="Linear Strategy">
+    </Proxy>
+    <Proxy class="vtkIntegrationGaussianStrategy"
+           name="IntegrationGaussianStrategy"
+           label="Gaussian Strategy">
+    </Proxy>
+  </ProxyGroup>
+
   <ProxyGroup name="polyline_decimation_strategies">
     <Proxy class="vtkDecimatePolylineDistanceStrategy"
                name="DecimationDistanceStrategy">
