@@ -1897,6 +1897,7 @@ set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TestHTGHoverOnCell_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
+set (TextSourceBorder_FORCE_SERIAL TRUE) # Seems to work better in serial
 set (TimeKeeper_FORCE_SERIAL TRUE) # since this uses popup window
 set (TooltipCopy_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
