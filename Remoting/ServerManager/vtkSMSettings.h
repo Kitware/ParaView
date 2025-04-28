@@ -119,9 +119,21 @@ public:
   bool DistributeSettings();
 
   /**
-   * Save highest priority setting collection to file.
+   * Save highest priority setting collections to file.
+   * If no collection exists, the file is not written.
+   * Return false if an error occurs when writing file.
    */
   bool SaveSettingsToFile(const std::string& filePath);
+
+  /**
+   * Save given priority setting collections to file.
+   *
+   * If no such collection exists, the file is not written.
+   * Intermediate directories are created as needed.
+   *
+   * Return false if an error occurs when writing file.
+   */
+  bool SaveSettingsToFile(const std::string& filePath, double priority);
 
   /**
    * Check whether a setting is defined for the requested names.

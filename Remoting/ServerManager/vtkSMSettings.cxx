@@ -41,6 +41,16 @@ namespace
 class SettingsCollection
 {
 public:
+  SettingsCollection()
+    : SettingsCollection(vtkSMSettings::GetUserPriority())
+  {
+  }
+
+  SettingsCollection(double priority)
+    : Priority(priority)
+  {
+  }
+
   Json::Value Value;
   double Priority;
 };
@@ -68,17 +78,12 @@ void TransformJSON(std::string& settingsJSON)
 class vtkSMSettings::vtkSMSettingsInternal
 {
 public:
-  vtkSMSettingsInternal()
-    : SettingCollectionsAreSorted(false)
-    , IsModified(false)
-  {
-    // starts with a UserPriority collection
-    this->CreateCollectionIfNeeded();
-  }
+  vtkSMSettingsInternal() = default;
 
-  std::vector<::SettingsCollection> SettingCollections;
-  bool SettingCollectionsAreSorted;
-  bool IsModified;
+  std::vector<::SettingsCollection> SettingCollections{ ::SettingsCollection{
+    vtkSMSettings::GetUserPriority() } };
+  bool SettingCollectionsAreSorted = false;
+  bool IsModified = false;
 
   void Modified() { this->IsModified = true; }
 
@@ -944,18 +949,21 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Ensure that at least one collection exists so that when settings are set,
-  // there is a place to store them. If a collection needs to be created, its
-  // priority is set to UserPriority, as it should be writeable.
+  // Looks for a collection that has a priority greater or equal to UserPriority.
+  // If no one exists, create a collection at UserPriority.
   void CreateCollectionIfNeeded()
   {
-    if (this->SettingCollections.empty())
+    for (const auto& collection : this->SettingCollections)
     {
-      ::SettingsCollection newCollection;
-      newCollection.Priority = vtkSMSettings::GetUserPriority();
-      this->SettingCollections.push_back(newCollection);
-      this->IsModified = true;
+      if (collection.Priority >= vtkSMSettings::GetUserPriority())
+      {
+        return;
+      }
     }
+
+    ::SettingsCollection newCollection(vtkSMSettings::GetUserPriority());
+    this->SettingCollections.push_back(newCollection);
+    this->IsModified = true;
   }
 
   //----------------------------------------------------------------------------
@@ -1010,8 +1018,7 @@ vtkSMSettings* vtkSMSettings::GetInstance()
 //----------------------------------------------------------------------------
 bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double priority)
 {
-  ::SettingsCollection collection;
-  collection.Priority = priority;
+  ::SettingsCollection collection(priority);
 
   vtkVLogF(
     PARAVIEW_LOG_APPLICATION_VERBOSITY(), "loading settings JSON string '%s'", settings.c_str());
@@ -1038,6 +1045,7 @@ bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double 
   {
     this->Internal->SettingCollections.push_back(collection);
     this->Internal->SettingCollectionsAreSorted = false;
+    this->Internal->Modified();
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "successfully parsed settings string");
     return true;
   }
@@ -1144,6 +1152,20 @@ bool vtkSMSettings::DistributeSettings()
 //----------------------------------------------------------------------------
 bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
 {
+  if (this->Internal->SettingCollections.empty())
+  {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "settings empty, hence not saved.");
+    return true;
+  }
+
+  this->Internal->SortCollectionsIfNeeded();
+
+  return this->SaveSettingsToFile(filePath, this->Internal->SettingCollections[0].Priority);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath, double priority)
+{
   if (this->Internal->SettingCollections.empty() || !this->Internal->IsModified)
   {
     // No settings to save, so we'll always succeed.
@@ -1168,8 +1190,14 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
   vtksys::ofstream settingsFile(filePath.c_str(), ios::out | ios::binary);
   if (settingsFile.is_open())
   {
-    std::string output = this->Internal->SettingCollections[0].Value.toStyledString();
-    settingsFile << output;
+    for (const auto& collection : this->Internal->SettingCollections)
+    {
+      if (collection.Priority == priority)
+      {
+        std::string output = collection.Value.toStyledString();
+        settingsFile << output;
+      }
+    }
 
     this->Internal->IsModified = false;
 
