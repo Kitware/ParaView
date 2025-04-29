@@ -21,6 +21,12 @@ vtkBoolPropertyDecorator::vtkBoolPropertyDecorator() = default;
 void vtkBoolPropertyDecorator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Index : " << this->Index << "\n";
+  os << indent << "BoolProperty : " << this->BoolProperty << "\n";
+  os << indent << "Property : " << this->Property << "\n";
+  os << indent << "ObserverId : " << this->ObserverId << "\n";
+  os << indent << "Function : " << this->Function << "\n";
+  os << indent << "Value : " << this->Value << "\n";
 }
 
 //-----------------------------------------------------------------------------

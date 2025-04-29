@@ -47,8 +47,6 @@ private:
   friend class pqBoolPropertyWidgetDecorator;
   void UpdateBoolPropertyState();
 
-  // MOVE THEM
-
   vtkWeakPointer<vtkSMProperty> Property;
   std::string Function;
   int Index;
