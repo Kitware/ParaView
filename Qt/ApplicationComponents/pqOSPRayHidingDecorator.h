@@ -12,6 +12,8 @@
  * pqOSPRayHidingDecorator's purpose is to prevent the GUI from
  * showing any of the RayTracing specific rendering controls when
  * Paraview is not configured with PARAVIEW_ENABLE_RAYTRACING
+ *
+ * @see vtkOSPRayHidingDecorator
  */
 class pqOSPRayHidingDecorator : public pqPropertyWidgetDecorator
 {

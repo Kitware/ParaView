@@ -11,6 +11,8 @@
 /**
  * pqEnableWidgetDecorator can be used to enable/disable a widget based on the
  * status of another property not directly controlled by the widget.
+ *
+ * @see vtkEnableDecorator
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqEnableWidgetDecorator : public pqBoolPropertyWidgetDecorator
 {

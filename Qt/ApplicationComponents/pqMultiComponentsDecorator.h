@@ -11,6 +11,8 @@
  * pqMultiComponentsDecorator's purpose is to prevent the GUI from
  * showing Multi Components Mapping checkbox when the representation is not Volume,
  * the number of components is not valid or MapScalars is not checked.
+ *
+ * @see vtkMultiComponentsDecorator
  */
 class pqMultiComponentsDecorator : public pqPropertyWidgetDecorator
 {

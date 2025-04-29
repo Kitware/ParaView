@@ -13,6 +13,8 @@
  * pqGenericPropertyWidgetDecorator is a pqPropertyWidgetDecorator that
  * supports multiple common use cases from a pqPropertyWidgetDecorator.
  * For a complete list see @see vtkGenericPropertyDecorator.
+ *
+ * @see vtkGenericPropertyDecorator
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqGenericPropertyWidgetDecorator
   : public pqPropertyWidgetDecorator

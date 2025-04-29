@@ -15,6 +15,8 @@
  * For example, "Computer Gradients" in Contour filter should only
  * be enabled when an input data type is a StructuredData. Please see
  * vtkPVDataInformation::IsDataStructured() for structured types.
+ *
+ * @see vtkInputDataTypeDecorator
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqInputDataTypeDecorator : public pqPropertyWidgetDecorator
 {

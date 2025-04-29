@@ -12,6 +12,8 @@
 /**
  * pqShowWidgetDecorator can be used to show/hide a widget based on the
  * status of another property not directly controlled by the widget.
+ *
+ * @see vtkShowDecorator
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqShowWidgetDecorator : public pqBoolPropertyWidgetDecorator
 {

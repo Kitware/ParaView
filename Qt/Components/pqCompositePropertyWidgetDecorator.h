@@ -12,6 +12,8 @@
  * @class pqCompositePropertyWidgetDecorator
  * @brief pqPropertyWidgetDecorator subclass that can combine multiple
  *        decorators using boolean operations.
+ *
+ * @see vtkCompositePropertyDecorator
  */
 class vtkPropertyDecorator;
 class PQCOMPONENTS_EXPORT pqCompositePropertyWidgetDecorator : public pqPropertyWidgetDecorator

@@ -12,6 +12,8 @@
  * pqBoolPropertyWidgetDecorator is a base class for enable/disable
  * or show/hide widgets based on the status of another property not
  * directly controlled by the widget.
+ *
+ * @see vtkBoolPropertyDecorator
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqBoolPropertyWidgetDecorator
   : public pqPropertyWidgetDecorator
