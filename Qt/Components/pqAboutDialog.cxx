@@ -260,6 +260,7 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
     ::addItem(tree, tr("OpenGL Vendor"), QString::fromStdString(OpenGLInfo->GetVendor()));
     ::addItem(tree, tr("OpenGL Version"), QString::fromStdString(OpenGLInfo->GetVersion()));
     ::addItem(tree, tr("OpenGL Renderer"), QString::fromStdString(OpenGLInfo->GetRenderer()));
+    ::addItem(tree, tr("Window Backend"), QString::fromStdString(OpenGLInfo->GetWindowBackend()));
 
     if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING))
     {
