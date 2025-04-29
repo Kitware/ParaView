@@ -71,17 +71,13 @@ vtkSmartPointer<vtkPropertyDecorator> vtkPropertyDecorator::Create(
   if (xmlconfig == nullptr || strcmp(xmlconfig->GetName(), "PropertyWidgetDecorator") != 0 ||
     xmlconfig->GetAttribute("type") == nullptr)
   {
-    vtkGenericWarningMacro("Invalid xml config specified. Cannot create a decorator.");
+    // vtkGenericWarningMacro("Invalid xml config specified. Cannot create a decorator.");
     return nullptr;
   }
 
   vtkSmartPointer<vtkPropertyDecorator> decorator;
   const std::string type = xmlconfig->GetAttribute("type");
   // *** NOTE: When adding new types, please update the header documentation ***
-  // if (type == "CTHArraySelectionDecorator")
-  //{
-  //  // return new pqCTHArraySelectionDecorator(config, widget);
-  //}
   if (type == "InputDataTypeDecorator")
   {
     decorator = vtk::TakeSmartPointer(vtkInputDataTypeDecorator::New());

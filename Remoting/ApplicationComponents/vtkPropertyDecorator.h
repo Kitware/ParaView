@@ -81,6 +81,17 @@ public:
 
   /**
    * Creates a new decorator, given the xml config and the proxy containing the property
+   * For unsupported/unknown, implementations should simply return nullptr without
+   * raising any errors (or messages).
+   * Supported types are:
+   * \li \c EnableWidgetDecorator : vtkEnableWidgetDecorator
+   * \li \c ShowWidgetDecorator : vtkShowWidgetDecorator
+   * \li \c InputDataTypeDecorator : vtkInputDataTypeDecorator
+   * \li \c GenericDecorator: vtkGenericPropertyWidgetDecorator
+   * \li \c OSPRayHidingDecorator: vtkOSPRayHidingDecorator
+   * \li \c MultiComponentsDecorator: vtkMultiComponentsDecorator
+   * \li \c CompositeDecorator: vtkCompositePropertyWidgetDecorator
+   * \li \c SessionTypeDecorator: vtkSessionTypeDecorator
    */
   static vtkSmartPointer<vtkPropertyDecorator> Create(vtkPVXMLElement* xml, vtkSMProxy* proxy);
 
