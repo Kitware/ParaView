@@ -272,11 +272,11 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
       {
         headlessModes << "OSMesa";
       }
-      ::addItem(tree, tr("Headless support"), QString::fromStdString(headlessModes.str()));
+      ::addItem(tree, tr("Headless Support"), QString::fromStdString(headlessModes.str()));
     }
     else
     {
-      ::addItem(tree, tr("Headless support"), tr("None"));
+      ::addItem(tree, tr("Headless Support"), tr("None"));
     }
   }
   else
@@ -284,7 +284,7 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
     ::addItem(tree, "OpenGL", tr("Not supported"));
   }
 
-  ::addItem(tree, tr("Accelerated filters overrides available"),
+  ::addItem(tree, tr("Accelerated Filters Overrides Available"),
     serverInfo->GetAcceleratedFiltersOverrideAvailable() ? tr("Yes") : tr("No"));
 }
 
