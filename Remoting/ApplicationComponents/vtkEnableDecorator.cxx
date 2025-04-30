@@ -20,9 +20,9 @@ void vtkEnableDecorator::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-void vtkEnableDecorator::Initialize(vtkPVXMLElement* xml_, vtkSMProxy* proxy_)
+void vtkEnableDecorator::Initialize(vtkPVXMLElement* xml, vtkSMProxy* proxy)
 {
-  this->Superclass::Initialize(xml_, proxy_);
+  this->Superclass::Initialize(xml, proxy);
   this->AddObserver(vtkBoolPropertyDecorator::BoolPropertyChangedEvent, this,
     &vtkEnableDecorator::InvokeEnableStateChangedEvent);
 }

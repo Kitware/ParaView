@@ -97,8 +97,8 @@ private:
   vtkPropertyDecorator(const vtkPropertyDecorator&) = delete;
   void operator=(const vtkPropertyDecorator&) = delete;
 
-  vtkWeakPointer<vtkPVXMLElement> xml;
-  vtkWeakPointer<vtkSMProxy> proxy;
+  vtkWeakPointer<vtkPVXMLElement> xml_;
+  vtkWeakPointer<vtkSMProxy> proxy_;
 };
 
 #endif

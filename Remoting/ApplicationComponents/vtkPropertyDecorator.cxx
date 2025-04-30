@@ -24,29 +24,29 @@ vtkPropertyDecorator::~vtkPropertyDecorator() = default;
 void vtkPropertyDecorator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Proxy " << this->proxy << std::endl;
-  os << indent << "XML " << this->xml << std::endl;
-  if (this->xml)
+  os << indent << "Proxy: " << this->proxy_ << std::endl;
+  os << indent << "XML: " << this->xml_ << std::endl;
+  if (this->xml_)
   {
-    this->xml->PrintXML(os, indent);
+    this->xml_->PrintXML(os, indent);
   }
 }
 
 //-----------------------------------------------------------------------------
-void vtkPropertyDecorator::Initialize(vtkPVXMLElement* xml_, vtkSMProxy* proxy_)
+void vtkPropertyDecorator::Initialize(vtkPVXMLElement* xml, vtkSMProxy* proxy)
 {
-  this->xml = xml_;
-  this->proxy = proxy_;
+  this->xml_ = xml;
+  this->proxy_ = proxy;
 }
 //-----------------------------------------------------------------------------
 vtkPVXMLElement* vtkPropertyDecorator::XML() const
 {
-  return this->xml.GetPointer();
+  return this->xml_.GetPointer();
 }
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkPropertyDecorator::Proxy() const
 {
-  return this->proxy.GetPointer();
+  return this->proxy_.GetPointer();
 }
 //-----------------------------------------------------------------------------
 void vtkPropertyDecorator::InvokeVisibilityChangedEvent()
