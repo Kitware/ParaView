@@ -633,29 +633,25 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input, vtkDataObject*
   this->Buffers = nullptr;
   this->ClearBuffer();
 
-  if (myId == 0)
-  {
-    // Allocate arrays used by the AllGatherV call.
-    this->BufferLengths = new vtkIdType[numProcs];
-    this->BufferOffsets = new vtkIdType[numProcs];
-  }
+  // Allocate arrays used by the AllGatherV call.
+  this->BufferLengths = new vtkIdType[numProcs];
+  this->BufferOffsets = new vtkIdType[numProcs];
 
   // Compute the degenerate input offsets and lengths.
-  // Broadcast our size to process 0.
-  com->Gather(&inBufferLength, this->BufferLengths, 1, 0);
+  // Broadcast our size to all processes.
+  // Note: this has to be done as the GatherV function
+  // needs to know the offsets and lengths for all processes.
+  com->AllGather(&inBufferLength, this->BufferLengths, 1);
 
   // Compute the displacements.
   this->BufferTotalLength = 0;
-  if (myId == 0)
+  for (idx = 0; idx < numProcs; ++idx)
   {
-    for (idx = 0; idx < numProcs; ++idx)
-    {
-      this->BufferOffsets[idx] = this->BufferTotalLength;
-      this->BufferTotalLength += this->BufferLengths[idx];
-    }
-    // Gather the marshaled data sets to 0.
-    this->Buffers = new char[this->BufferTotalLength];
+    this->BufferOffsets[idx] = this->BufferTotalLength;
+    this->BufferTotalLength += this->BufferLengths[idx];
   }
+  // Gather the marshaled data sets to 0.
+  this->Buffers = new char[this->BufferTotalLength];
   com->GatherV(
     inBuffer, this->Buffers, inBufferLength, this->BufferLengths, this->BufferOffsets, 0);
   this->NumberOfBuffers = numProcs;
