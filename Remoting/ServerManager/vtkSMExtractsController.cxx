@@ -28,29 +28,14 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
 #include "vtkTable.h"
-
-// clang-format off
-#include "vtk_doubleconversion.h"
-#include VTK_DOUBLECONVERSION_HEADER(double-conversion.h)
-// clang-format on
 
 #include <sstream>
 #include <vtksys/SystemTools.hxx>
 
 namespace
 {
-std::string ConvertToString(const double val)
-{
-  char buf[256];
-  const double_conversion::DoubleToStringConverter& converter =
-    double_conversion::DoubleToStringConverter::EcmaScriptConverter();
-  double_conversion::StringBuilder builder(buf, sizeof(buf));
-  builder.Reset();
-  converter.ToShortest(val, &builder);
-  return builder.Finalize();
-}
-
 std::string RelativePath(const std::string& root, const std::string& target)
 {
   // vtksys::SystemTools::RelativePath() does not work unless both paths are
@@ -536,7 +521,7 @@ bool vtkSMExtractsController::AddSummaryEntry(
   SummaryParametersT params(inparams);
 
   // add time, if not already present.
-  params.insert({ "time", ::ConvertToString(this->Time) });
+  params.insert({ "time", vtk::to_string(this->Time) });
   // removing timestep from Cinema. I'm told only time (or timestep) should be
   // written; opting to use time.
   // params.insert({ "timestep", std::to_string(this->TimeStep) });

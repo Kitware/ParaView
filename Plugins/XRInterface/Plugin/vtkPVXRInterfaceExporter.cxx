@@ -10,7 +10,6 @@
 #include "vtkJPEGWriter.h"
 #include "vtkLight.h"
 #include "vtkMapper.h"
-#include "vtkNumberToString.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVXRInterfaceHelper.h"
@@ -23,6 +22,7 @@
 #include "vtkScalarsToColors.h"
 #include "vtkShaderProperty.h"
 #include "vtkSkybox.h"
+#include "vtkStringFormatter.h"
 #include "vtkTexture.h"
 #include "vtkVRCamera.h"
 #include "vtkWindowToImageFilter.h"
@@ -75,14 +75,13 @@ template <typename T>
 void setVectorAttribute(vtkXMLDataElement* el, const char* name, int count, T* data)
 {
   std::ostringstream o;
-  vtkNumberToString converter;
   for (int i = 0; i < count; ++i)
   {
     if (i)
     {
       o << " ";
     }
-    o << converter.Convert(data[i]);
+    o << vtk::to_string(data[i]);
   }
   el->SetAttribute(name, o.str().c_str());
 }

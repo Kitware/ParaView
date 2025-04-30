@@ -5,9 +5,9 @@
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkNumberToString.h"
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 
 #include <algorithm>
 #include <cmath>
@@ -113,10 +113,9 @@ int vtkPVTrivialProducer::ProcessRequest(
       // satisfy. In that case, let's report a warning.
       if (internals.FindNearestTime(uTime) != internals.TimeSteps.back())
       {
-        vtkNumberToString converter;
         vtkWarningMacro("Cannot produce requested time '"
-          << converter.Convert(uTime) << "', only '"
-          << converter.Convert(internals.TimeSteps.back()) << "' is available.");
+          << vtk::to_string(uTime) << "', only '" << vtk::to_string(internals.TimeSteps.back())
+          << "' is available.");
       }
 
       dobj->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), internals.TimeSteps.back());

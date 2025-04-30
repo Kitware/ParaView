@@ -39,7 +39,6 @@
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkMatrixToLinearTransform.h"
-#include "vtkNumberToString.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLFramebufferObject.h"
 #include "vtkOpenGLPolyDataMapper.h"
@@ -69,6 +68,7 @@
 #include "vtkShaderProgram.h"
 #include "vtkShaderProperty.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
 #include "vtkVRFollower.h"
@@ -897,14 +897,13 @@ template <typename T>
 void addVectorAttribute(vtkPVXMLElement* el, const char* name, T* data, int count)
 {
   std::ostringstream o;
-  vtkNumberToString converter;
   for (int i = 0; i < count; ++i)
   {
     if (i)
     {
       o << " ";
     }
-    o << converter.Convert(data[i]);
+    o << vtk::to_string(data[i]);
   }
   el->AddAttribute(name, o.str().c_str());
 }
