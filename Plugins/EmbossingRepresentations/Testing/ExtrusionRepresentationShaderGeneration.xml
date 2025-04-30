@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Test steps
+   - Add a sphere to the scene.
+   - Switch to extrusion representation (previously loaded).
+   - Disable lighting.
+   The test passes if the messages don't log any shader generation errors. -->
+
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/localPlugins" command="setCurrent" arguments="AcceleratedAlgorithms" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/localPlugins/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,136,152" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/localPlugins" command="setCurrent" arguments="EmbossingRepresentations" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/loadSelected_Local" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Geometric Shapes" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/GeometricShapes" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Extrusion Surface" />
+  <pqevent object="pqClientMainWindow/lightingToolbar/actionActiveLightKit" command="set_boolean" arguments="false" />
+</pqevents>

@@ -67,10 +67,19 @@ void vtkOpenGLBatchedBumpMapMapper::AppendOneBufferObject(vtkRenderer* ren, vtkA
   if (asso == vtkDataObject::FIELD_ASSOCIATION_POINTS)
   {
     vtkDataArray* scalars = this->GetInputArrayToProcess(0, this->CurrentInput);
+
     if (scalars)
     {
-      // create "scalar" attribute on vertex buffer
-      this->VBOs->AppendDataArray("scalar", scalars, scalars->GetDataType());
+      if (scalars->GetDataType() != VTK_ID_TYPE)
+      {
+        // create "scalar" attribute on vertex buffer
+        this->VBOs->AppendDataArray("scalar", scalars, scalars->GetDataType());
+      }
+      else
+      {
+        vtkErrorMacro(<< "Data type selected for extrusion is currently ID type which is not "
+                         "supported (64bit type)");
+      }
     }
   }
 
