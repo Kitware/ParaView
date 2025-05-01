@@ -2,6 +2,12 @@
 <!-- SPDX-License-Identifier: BSD-3-Clause -->
 <RCC>
   <qresource prefix="/pqApplicationComponents">
+    <file>Thumbnails/Mandelbrot.png</file>
+    <file>Thumbnails/RectilinearGridTimesteps.png</file>
+    <file>Thumbnails/UnstructuredGridParallel.png</file>
+    <file>ExampleVisualizations/Mandelbrot.pvsm</file>
+    <file>ExampleVisualizations/RectilinearGrid.pvsm</file>
+    <file>ExampleVisualizations/UnstructuredGridParallel.pvsm</file>
     <file>ExampleVisualizations/CanExample.pvsm</file>
     <file>ExampleVisualizations/DiskOutRefExample.pvsm</file>
     <file>ExampleVisualizations/HeadSQExample.pvsm</file>

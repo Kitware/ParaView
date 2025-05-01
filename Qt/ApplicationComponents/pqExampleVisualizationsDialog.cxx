@@ -36,6 +36,12 @@ pqExampleVisualizationsDialog::pqExampleVisualizationsDialog(QWidget* parentObje
     this->ui->TosExampleButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
   QObject::connect(
     this->ui->WaveletExampleButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
+  QObject::connect(
+    this->ui->RectilinearGridTimestepsButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
+  QObject::connect(
+    this->ui->UnstructuredGridParallelButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
+  QObject::connect(
+    this->ui->MandelbrotButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
 }
 
 //-----------------------------------------------------------------------------
@@ -82,6 +88,21 @@ void pqExampleVisualizationsDialog::onButtonPressed()
     {
       stateFile = ":/pqApplicationComponents/ExampleVisualizations/TosExample.pvsm";
       needsData = true;
+    }
+    else if (button == this->ui->RectilinearGridTimestepsButton)
+    {
+      stateFile = ":/pqApplicationComponents/ExampleVisualizations/RectilinearGrid.pvsm";
+      needsData = true;
+    }
+    else if (button == this->ui->UnstructuredGridParallelButton)
+    {
+      stateFile = ":/pqApplicationComponents/ExampleVisualizations/UnstructuredGridParallel.pvsm";
+      needsData = true;
+    }
+    else if (button == this->ui->MandelbrotButton)
+    {
+      stateFile = ":/pqApplicationComponents/ExampleVisualizations/Mandelbrot.pvsm";
+      needsData = false;
     }
     else
     {
