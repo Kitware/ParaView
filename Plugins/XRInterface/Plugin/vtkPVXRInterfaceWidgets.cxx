@@ -39,6 +39,7 @@
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkStringArray.h"
+#include "vtkStringScanner.h"
 #include "vtkTextActor3D.h"
 #include "vtkTextProperty.h"
 #include "vtkTexture.h"
@@ -1539,20 +1540,11 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
     vtkDataArray* darray = vtkDataArray::SafeDownCast(array);
     if (darray)
     {
-      char* pEnd;
       double d1;
-      d1 = strtod(value.c_str(), &pEnd);
-      if (pEnd == value.c_str() + value.size())
+      VTK_FROM_CHARS_IF_ERROR_RETURN(value, d1, );
+      for (vtkIdType cidx : this->Internals->SelectedCells)
       {
-        for (vtkIdType cidx : this->Internals->SelectedCells)
-        {
-          darray->SetTuple1(cidx, d1);
-        }
-      }
-      else
-      {
-        vtkErrorMacro("unable to convert field value " << value << " to double.");
-        return;
+        darray->SetTuple1(cidx, d1);
       }
     }
   }

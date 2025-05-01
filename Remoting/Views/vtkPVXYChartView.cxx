@@ -23,6 +23,7 @@
 #include "vtkPVStringFormatter.h"
 #include "vtkPen.h"
 #include "vtkStringArray.h"
+#include "vtkStringScanner.h"
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
 
@@ -742,21 +743,12 @@ void vtkPVXYChartView::SetAxisLabels(
 {
   if (axis >= 0 && axis < 4)
   {
-    double dv = 0.;
-    bool conversionStatus = false;
-    try
+    double pos = 0.;
+    if (!value.empty())
     {
-      dv = std::stod(value);
-      conversionStatus = true;
+      VTK_FROM_CHARS_IF_ERROR_BREAK(value, pos);
     }
-    catch (const std::invalid_argument&)
-    {
-    }
-    catch (const std::out_of_range&)
-    {
-    }
-
-    this->Internals->CustomLabelPositions[axis]->SetValue(i, conversionStatus ? dv : 0.);
+    this->Internals->CustomLabelPositions[axis]->SetValue(i, pos);
 
     std::string text = label.empty() ? value : label;
     this->Internals->CustomLabelTexts[axis]->SetValue(i, text);

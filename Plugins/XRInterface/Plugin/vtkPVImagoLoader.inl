@@ -12,6 +12,7 @@
 // da = dataset name
 
 #include "vtkTIFFReader.h"
+#include "vtkStringScanner.h"
 #include <future>
 #include <iostream>
 #include <list>
@@ -432,7 +433,8 @@ bool vtkImagoLoader::IsCellImageDifferent(std::string const& /*oldimg*/, std::st
   {
     return true;
   }
-  double depth = std::stod(args["dp"].c_str());
+  double depth;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args["dp"], depth, false);
 
   // is this depth a new image?
   if (depth >= this->LastStartDepth && depth < this->LastEndDepth)
@@ -818,7 +820,8 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
       std::string imageTypeID;
       std::string imageryTypeID;
       Json::Value imageryJSON;
-      double targetDepth = std::stod(depth.c_str());
+      double targetDepth;
+      VTK_FROM_CHARS_IF_ERROR_RETURN(depth, targetDepth, false);
       for (size_t i = 0; i < imageryTypeIDs.size(); ++i)
       {
         Json::Value tmpJSON;
@@ -860,7 +863,7 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
         if (targetDepth >= startDepth && targetDepth < endDepth)
         {
           std::string sFileSize = i["images"][0]["fileSize"].asString();
-          fileSize = std::atol(sFileSize.c_str());
+          VTK_FROM_CHARS_IF_ERROR_RETURN(sFileSize, fileSize, nullptr);
           imageryID = i["id"].asString();
           mimeType = i["images"][0]["mimeType"].asString();
           // finally get the image

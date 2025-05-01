@@ -13,6 +13,7 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkStringArray.h"
+#include "vtkStringScanner.h"
 #include "vtkTriangle.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -101,7 +102,8 @@ vtkNastranBDFReader::vtkNastranBDFReader()
 //------------------------------------------------------------------------------
 vtkIdType vtkNastranBDFReader::GetVTKPointId(const std::string& arg)
 {
-  vtkIdType elt = std::stol(arg);
+  vtkIdType elt;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(arg, elt, -1);
   return this->PointsIds.find(elt) != this->PointsIds.end() ? this->PointsIds.find(elt)->second
                                                             : -1;
 }
@@ -121,7 +123,9 @@ bool vtkNastranBDFReader::AddTimeInfo(const std::vector<std::string>& args)
 {
   vtkNew<vtkDoubleArray> data;
   data->SetName(::TIME_KEY.c_str());
-  data->InsertNextValue(std::stod(args[0]));
+  double time;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args[0], time, false);
+  data->InsertNextValue(time);
   this->GetOutput()->GetFieldData()->AddArray(data);
   return true;
 }
@@ -141,9 +145,13 @@ bool vtkNastranBDFReader::AddPoint(const std::vector<std::string>& args)
     return false;
   }
 
-  vtkIdType originalId = std::stod(args[0]);
-  vtkIdType id =
-    this->Points->InsertNextPoint(std::stod(args[2]), std::stod(args[3]), std::stod(args[4]));
+  vtkIdType originalId;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args[0], originalId, false);
+  double x1, x2, x3;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args[2], x1, false);
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args[3], x2, false);
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args[4], x3, false);
+  const vtkIdType id = this->Points->InsertNextPoint(x1, x2, x3);
   this->OriginalPointIds->InsertNextValue(originalId);
   this->PointsIds[originalId] = id;
 
@@ -187,7 +195,9 @@ bool vtkNastranBDFReader::AddTriangle(const std::vector<std::string>& args)
   }
 
   vtkIdType id = this->Cells->InsertNextCell(tri);
-  this->CellsIds[std::stol(args[0])] = id;
+  vtkIdType index;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args[0], index, false);
+  this->CellsIds[index] = id;
 
   return true;
 }
@@ -219,7 +229,11 @@ bool vtkNastranBDFReader::AddPload2Data(const std::vector<std::string>& args)
     this->Pload2->SetName(::PLOAD2_KEY.c_str());
   }
 
-  this->Pload2->InsertValue(this->CellsIds[std::stol(args[2])], std::stod(args[1]));
+  vtkIdType index;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args[2], index, false);
+  double pressure;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(args[1], pressure, false);
+  this->Pload2->InsertValue(this->CellsIds[index], pressure);
   return true;
 }
 

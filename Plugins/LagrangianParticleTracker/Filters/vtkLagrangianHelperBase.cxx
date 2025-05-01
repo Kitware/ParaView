@@ -6,6 +6,7 @@
 
 #include "vtkLagrangianMatidaIntegrationModel.h"
 #include "vtkObjectFactory.h"
+#include "vtkStringScanner.h"
 
 vtkCxxSetObjectMacro(vtkLagrangianHelperBase, IntegrationModel, vtkLagrangianBasicIntegrationModel);
 
@@ -32,24 +33,25 @@ void vtkLagrangianHelperBase::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkLagrangianHelperBase::ParseDoubleValues(
   const char*& arrayString, int numberOfComponents, double* array)
 {
-  const char* constants = arrayString;
-  char* tmp;
+  std::string_view constants(arrayString);
   bool success = true;
   for (int i = 0; i < numberOfComponents; i++)
   {
-    if (strncmp(constants, "None", 4) == 0)
+    if (constants.substr(0, 4) == "None")
     {
       success = false;
-      constants += 5;
-      continue;
+      constants = constants.substr(5);
     }
     else
     {
-      double value = strtod(constants, &tmp);
-      constants = tmp + 1;
-      array[i] = value;
+      auto result = vtk::from_chars(constants, array[i]);
+      if (result.ec != std::errc{})
+      {
+        array[i] = 0.0;
+      }
+      constants = std::string_view(result.ptr + 1);
     }
   }
-  arrayString = constants;
+  arrayString = constants.data();
   return success;
 }

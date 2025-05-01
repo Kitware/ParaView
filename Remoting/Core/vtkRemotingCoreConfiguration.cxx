@@ -8,6 +8,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringScanner.h"
 
 #include <vtk_cli11.h>
 #include <vtksys/SystemInformation.hxx>
@@ -163,15 +164,9 @@ int vtkRemotingCoreConfiguration::GetEGLDeviceIndex()
   const auto display = this->GetDisplay();
   if (!display.empty())
   {
-    try
-    {
-      this->EGLDeviceIndex = std::stoi(display);
-      vtkLogF(TRACE, "Setting EGLDeviceIndex to %d", this->EGLDeviceIndex);
-      return this->EGLDeviceIndex;
-    }
-    catch (std::invalid_argument&)
-    {
-    }
+    VTK_FROM_CHARS_IF_ERROR_RETURN(display, this->EGLDeviceIndex, -1);
+    vtkLogF(TRACE, "Setting EGLDeviceIndex to %d", this->EGLDeviceIndex);
+    return this->EGLDeviceIndex;
   }
   return -1;
 }

@@ -7,7 +7,9 @@
 #include <iostream>
 
 #include "hdf5Reader.h" // same directory
+
 #include <vtkLogger.h>
+#include <vtkStringScanner.h>
 #include <vtksys/SystemTools.hxx>
 
 namespace H5CFS
@@ -252,8 +254,9 @@ void Hdf5Reader::GetNumberOfMultiSequenceSteps(
     // cut away "MultiStep_"-substring and convert  into int
     // we don't want to use boost::erase_all and std has no nice replacement
     char* no_str = vtksys::SystemTools::RemoveChars(actName.c_str(), "MultiStep_");
-    std::string numOnly(no_str);
-    msStepNumbers.insert(std::stoi(numOnly));
+    int step;
+    VTK_FROM_CHARS_IF_ERROR_RETURN(no_str, step, );
+    msStepNumbers.insert(step);
     delete[] no_str;
 
     // try to find all single multisequence steps and related analysis strings

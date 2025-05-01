@@ -7,6 +7,7 @@
 #include "FEAdaptor.h"
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 #endif
 
 // Example of a C++ adaptor for a simulation code
@@ -44,7 +45,10 @@ int main(int argc, char* argv[])
   {
     doCoProcessing = true;
     // pass in the number of time steps and base file name.
-    FEAdaptor::Initialize(atoi(argv[1]), argv[2]);
+    int numberOfTimeSteps;
+    std::stringstream ss(argv[1]);
+    ss >> numberOfTimeSteps;
+    FEAdaptor::Initialize(numberOfTimeSteps, argv[2]);
   }
   else
   {

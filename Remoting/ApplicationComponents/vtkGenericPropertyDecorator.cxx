@@ -14,6 +14,7 @@
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStringScanner.h"
 #include "vtkWeakPointer.h"
 
 #include "vtkSMProxy.h"
@@ -227,7 +228,8 @@ void vtkGenericPropertyDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy
 
   if (config->GetAttribute("number_of_components"))
   {
-    this->Internals->NumberOfComponents = atoi(config->GetAttribute("number_of_components"));
+    VTK_FROM_CHARS_IF_ERROR_RETURN(
+      config->GetAttribute("number_of_components"), this->Internals->NumberOfComponents, );
   }
 
   this->Internals->ObserverId = this->Internals->Property->AddObserver(

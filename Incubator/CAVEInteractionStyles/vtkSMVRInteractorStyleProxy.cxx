@@ -19,6 +19,7 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkStringList.h"
+#include "vtkStringScanner.h"
 #include "vtkVRQueue.h"
 
 #include <algorithm>
@@ -417,7 +418,9 @@ unsigned int vtkSMVRInteractorStyleProxy::GetChannelIndexForValuatorRole(const s
 
   std::vector<std::string> eventTokens = vtkSMVRInteractorStyleProxy::Tokenize(eventIter->second);
 
-  return static_cast<unsigned int>(std::stoul(eventTokens[1]));
+  unsigned int channelIndex;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(eventTokens[0], channelIndex, 0);
+  return channelIndex;
 }
 
 // ----------------------------------------------------------------------------

@@ -13,6 +13,7 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSelectionNode.h"
+#include "vtkStringScanner.h"
 #include "vtkWeakPointer.h"
 
 #include <set>
@@ -2444,9 +2445,9 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
   vtkSMVersion version(0, 0, 0);
   if (const char* str_version = root->GetAttribute("version"))
   {
-    int v[3];
-    sscanf(str_version, "%d.%d.%d", &v[0], &v[1], &v[2]);
-    version = vtkSMVersion(v[0], v[1], v[2]);
+    auto result = vtk::scan<int, int, int>(std::string_view(str_version), "{:d}.{:d}.{:d}");
+    const auto& [major, minor, patch] = result->values();
+    version = vtkSMVersion(major, minor, patch);
   }
 
   bool status = true;

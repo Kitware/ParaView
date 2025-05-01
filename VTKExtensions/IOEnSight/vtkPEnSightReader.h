@@ -30,6 +30,7 @@
 #include <string>           // For ivars
 #include <vector>           // For ivars
 
+class vtkCellArray;
 class vtkDataSet;
 class vtkIdList;
 class vtkMultiBlockDataSet;
@@ -702,7 +703,7 @@ protected:
    */
   void InsertNextCellAndId(vtkUnstructuredGrid*, int vtkCellType, vtkIdType numPoints,
     vtkIdType* points, int partId, int ensightCellType, vtkIdType globalId, vtkIdType numElements,
-    const std::vector<vtkIdType>& faces = {});
+    vtkCellArray* faces = nullptr);
   void InsertVariableComponent(vtkFloatArray* array, int i, int component, float* content,
     int partId, int ensightCellType, int insertionType);
   ///@}

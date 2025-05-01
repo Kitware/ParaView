@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "FEDataStructures.h"
 #include <mpi.h>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -49,7 +50,8 @@ int main(int argc, char* argv[])
     {
       if (i + 1 < argc)
       {
-        startTimeStep = static_cast<unsigned int>(atoi(argv[2]));
+        std::stringstream ss(argv[2]);
+        ss >> startTimeStep;
         i++;
       }
     }

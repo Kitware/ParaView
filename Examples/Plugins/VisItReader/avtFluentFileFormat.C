@@ -7,6 +7,7 @@
 #include <string>
 #include <vtkFloatArray.h>
 #include <vtkRectilinearGrid.h>
+#include <vtkStringScanner.h>
 #include <vtkUnstructuredGrid.h>
 #include <avtDatabaseMetaData.h>
 #include <Expression.h>
@@ -441,12 +442,13 @@ int avtFluentFileFormat::GetCaseIndex()
 {
   string sindex;
 
-  int i = 1;
+  int i = 1, caseIndex;
   while (CaseBuffer.at(i) != ' ')
     {
     sindex.push_back(CaseBuffer.at(i++));
     }
-  return atoi(sindex.c_str());
+  VTK_FROM_CHARS_IF_ERROR_RETURN(sindex, caseIndex, 0);
+  return caseIndex;
 }
 
 //----------------------------------------------------------------------------
@@ -484,12 +486,13 @@ int avtFluentFileFormat::GetDataIndex()
 {
   string sindex;
 
-  int i = 1;
+  int i = 1, dataIndex;
   while (DataBuffer.at(i) != ' ')
     {
     sindex.push_back(DataBuffer.at(i++));
     }
-  return atoi(sindex.c_str());
+  VTK_FROM_CHARS_IF_ERROR_RETURN(sindex, dataIndex, 0);
+  return dataIndex;
 }
 
 //----------------------------------------------------------------------------
@@ -2270,7 +2273,9 @@ int avtFluentFileFormat::GetDimension()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+4, 1 );
-  return atoi(info.c_str());
+  int dim;
+  VTK_FROM_CHARS_IF_ERROR_RETURN(info, dim, 0);
+  return dim;
 }
 
 //----------------------------------------------------------------------------
@@ -2279,8 +2284,7 @@ void avtFluentFileFormat::GetLittleEndianFlag()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int flag;
-  sscanf(info.c_str(), "%d", &flag);
+  int flag = vtk::scan_int<int>(info)->value();
 
   if (flag == 60)
     {
@@ -2298,8 +2302,8 @@ void avtFluentFileFormat::GetNodesAscii()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int zoneId, firstIndex, lastIndex, type, nd;
-  sscanf(info.c_str(), "%x %x %x %d %d", &zoneId, &firstIndex, &lastIndex, &type, &nd);
+  auto result = vtk::scan<int, int, int, int, int>(info, "{:x} {:x} {:x} {:d} {:d}");
+  auto& [zoneId, firstIndex, lastIndex, type, nd] = result->values();
 
   if (CaseBuffer.at(5) == '0')
     {
@@ -2342,8 +2346,8 @@ void avtFluentFileFormat::GetNodesSinglePrecision()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int zoneId, firstIndex, lastIndex, type;
-  sscanf(info.c_str(), "%x %x %x %d", &zoneId, &firstIndex, &lastIndex, &type);
+  auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:d}");
+  auto& [zoneId, firstIndex, lastIndex, type] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int ptr = dstart + 1;
@@ -2387,8 +2391,8 @@ void avtFluentFileFormat::GetNodesDoublePrecision()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int zoneId, firstIndex, lastIndex, type;
-  sscanf(info.c_str(), "%x %x %x %d", &zoneId, &firstIndex, &lastIndex, &type);
+  auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:d}");
+  auto& [zoneId, firstIndex, lastIndex, type] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int ptr = dstart+1;
@@ -2433,8 +2437,8 @@ void avtFluentFileFormat::GetCellsAscii()
     int start = CaseBuffer.find('(', 1);
     int end = CaseBuffer.find(')',1);
     string info = CaseBuffer.substr(start+1,end-start-1 );
-    int zoneId, firstIndex, lastIndex, type;
-    sscanf(info.c_str(), "%x %x %x %d", &zoneId, &firstIndex, &lastIndex, &type);
+    auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:d}");
+    auto& [zoneId, firstIndex, lastIndex, type] = result->values();
     Cells.resize(lastIndex);
     }
   else
@@ -2442,8 +2446,8 @@ void avtFluentFileFormat::GetCellsAscii()
     int start = CaseBuffer.find('(', 1);
     int end = CaseBuffer.find(')',1);
     string info = CaseBuffer.substr(start+1,end-start-1 );
-    int zoneId, firstIndex, lastIndex, type, elementType;
-    sscanf(info.c_str(), "%x %x %x %d %d", &zoneId, &firstIndex, &lastIndex, &type, &elementType);
+    auto result = vtk::scan<int, int, int, int, int>(info, "{:x} {:x} {:x} {:d} {:d}");
+    auto& [zoneId, firstIndex, lastIndex, type, elementType] = result->values();
 
     if (elementType == 0)
       {
@@ -2479,8 +2483,8 @@ void avtFluentFileFormat::GetCellsBinary()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int zoneId, firstIndex, lastIndex, type, elementType;
-  sscanf(info.c_str(), "%x %x %x %x %x", &zoneId, &firstIndex, &lastIndex, &type, &elementType);
+  auto result = vtk::scan<int, int, int, int, int>(info, "{:x} {:x} {:x} {:x} {:x}");
+  auto& [zoneId, firstIndex, lastIndex, type, elementType] = result->values();
 
   if (elementType == 0)
     {
@@ -2516,8 +2520,8 @@ void avtFluentFileFormat::GetFacesAscii()
     int start = CaseBuffer.find('(', 1);
     int end = CaseBuffer.find(')',1);
     string info = CaseBuffer.substr(start+1,end-start-1 );
-    int zoneId, firstIndex, lastIndex, bcType;
-    sscanf(info.c_str(), "%x %x %x %x", &zoneId, &firstIndex, &lastIndex, &bcType);
+    auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:x}");
+    auto& [zoneId, firstIndex, lastIndex, bcType] = result->values();
 
     Faces.resize(lastIndex);
     }
@@ -2526,8 +2530,8 @@ void avtFluentFileFormat::GetFacesAscii()
     int start = CaseBuffer.find('(', 1);
     int end = CaseBuffer.find(')',1);
     string info = CaseBuffer.substr(start+1,end-start-1 );
-    int zoneId, firstIndex, lastIndex, bcType, faceType;
-    sscanf(info.c_str(), "%x %x %x %x %x", &zoneId, &firstIndex, &lastIndex, &bcType, &faceType);
+    auto result = vtk::scan<int, int, int, int, int>(info, "{:x} {:x} {:x} {:x} {:x}");
+    auto& [zoneId, firstIndex, lastIndex, bcType, faceType] = result->values();
 
     int dstart = CaseBuffer.find('(', 7);
     int dend = CaseBuffer.find(')', dstart+1);
@@ -2583,8 +2587,8 @@ void avtFluentFileFormat::GetFacesBinary()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int zoneId, firstIndex, lastIndex, bcType, faceType;
-  sscanf(info.c_str(), "%x %x %x %x %x", &zoneId, &firstIndex, &lastIndex, &bcType, &faceType);
+  auto result = vtk::scan<int, int, int, int, int>(info, "{:x} {:x} {:x} {:x} {:x}");
+  auto& [zoneId, firstIndex, lastIndex, bcType, faceType] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2643,8 +2647,8 @@ void avtFluentFileFormat::GetPeriodicShadowFacesAscii()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int firstIndex, lastIndex, periodicZone, shadowZone;
-  sscanf(info.c_str(), "%x %x %x %x", &firstIndex, &lastIndex, &periodicZone, &shadowZone);
+  auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:x}");
+  auto& [firstIndex, lastIndex, periodicZone, shadowZone] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2667,8 +2671,8 @@ void avtFluentFileFormat::GetPeriodicShadowFacesBinary()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int firstIndex, lastIndex, periodicZone, shadowZone;
-  sscanf(info.c_str(), "%x %x %x %x", &firstIndex, &lastIndex, &periodicZone, &shadowZone);
+  auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:x}");
+  auto& [firstIndex, lastIndex, periodicZone, shadowZone] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2690,8 +2694,8 @@ void avtFluentFileFormat::GetCellTreeAscii()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int cellId0, cellId1, parentZoneId, childZoneId;
-  sscanf(info.c_str(), "%x %x %x %x", &cellId0, &cellId1, &parentZoneId, &childZoneId);
+  auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:x}");
+  auto& [cellId0, cellId1, parentZoneId, childZoneId] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2719,8 +2723,8 @@ void avtFluentFileFormat::GetCellTreeBinary()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int cellId0, cellId1, parentZoneId, childZoneId;
-  sscanf(info.c_str(), "%x %x %x %x", &cellId0, &cellId1, &parentZoneId, &childZoneId);
+  auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:x}");
+  auto& [cellId0, cellId1, parentZoneId, childZoneId] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2747,8 +2751,8 @@ void avtFluentFileFormat::GetFaceTreeAscii()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int faceId0, faceId1, parentZoneId, childZoneId;
-  sscanf(info.c_str(), "%x %x %x %x", &faceId0, &faceId1, &parentZoneId, &childZoneId);
+  auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:x}");
+  auto& [faceId0, faceId1, parentZoneId, childZoneId] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2775,8 +2779,8 @@ void avtFluentFileFormat::GetFaceTreeBinary()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int faceId0, faceId1, parentZoneId, childZoneId;
-  sscanf(info.c_str(), "%x %x %x %x", &faceId0, &faceId1, &parentZoneId, &childZoneId);
+  auto result = vtk::scan<int, int, int, int>(info, "{:x} {:x} {:x} {:x}");
+  auto& [faceId0, faceId1, parentZoneId, childZoneId] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2803,8 +2807,8 @@ void avtFluentFileFormat::GetInterfaceFaceParentsAscii()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int faceId0, faceId1;
-  sscanf(info.c_str(), "%x %x", &faceId0, &faceId1);
+  auto result = vtk::scan<int, int>(info, "{:x} {:x}");
+  auto& [faceId0, faceId1] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2827,12 +2831,11 @@ void avtFluentFileFormat::GetInterfaceFaceParentsAscii()
 //----------------------------------------------------------------------------
 void avtFluentFileFormat::GetInterfaceFaceParentsBinary()
 {
-
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int faceId0, faceId1;
-  sscanf(info.c_str(), "%x %x", &faceId0, &faceId1);
+  auto result = vtk::scan<int, int>(info, "{:x} {:x}");
+  auto& [faceId0, faceId1] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2858,8 +2861,8 @@ void avtFluentFileFormat::GetNonconformalGridInterfaceFaceInformationAscii()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int KidId, ParentId, NumberOfFaces;
-  sscanf(info.c_str(), "%d %d %d", &KidId, &ParentId, &NumberOfFaces);
+  auto result = vtk::scan<int, int, int>(info, "{:d} {:d} {:d}");
+  auto& [KidId, ParentId, NumberOfFaces] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);
@@ -2884,8 +2887,8 @@ void avtFluentFileFormat::GetNonconformalGridInterfaceFaceInformationBinary()
   int start = CaseBuffer.find('(', 1);
   int end = CaseBuffer.find(')',1);
   string info = CaseBuffer.substr(start+1,end-start-1 );
-  int KidId, ParentId, NumberOfFaces;
-  sscanf(info.c_str(), "%d %d %d", &KidId, &ParentId, &NumberOfFaces);
+  auto result = vtk::scan<int, int, int>(info, "{:d} {:d} {:d}");
+  auto& [KidId, ParentId, NumberOfFaces] = result->values();
 
   int dstart = CaseBuffer.find('(', 7);
   int dend = CaseBuffer.find(')', dstart+1);

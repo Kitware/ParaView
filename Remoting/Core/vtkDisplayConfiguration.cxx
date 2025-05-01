@@ -3,6 +3,7 @@
 #include "vtkDisplayConfiguration.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkStringScanner.h"
 
 #include <sstream>
 #include <string>
@@ -44,9 +45,13 @@ public:
       {
         return true;
       }
-      int matches = sscanf(value.c_str(), "%dx%d+%d+%d", &this->Geometry[2], &this->Geometry[3],
-        &this->Geometry[0], &this->Geometry[1]);
-      return (matches == 4);
+      auto result = vtk::scan<int, int, int, int>(value, "{:d}x{:d}+{:d}+{:d}");
+      if (result)
+      {
+        std::tie(this->Geometry[2], this->Geometry[3], this->Geometry[0], this->Geometry[1]) =
+          result->values();
+      }
+      return result.has_value();
     }
 
     bool SetCorners(const std::string& ll, const std::string& lr, const std::string& ur)

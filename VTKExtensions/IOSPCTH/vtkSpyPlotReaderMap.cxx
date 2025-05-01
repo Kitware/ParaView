@@ -4,6 +4,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkSpyPlotReader.h"
 #include "vtkSpyPlotUniReader.h"
+#include "vtkStringScanner.h"
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
@@ -27,9 +28,8 @@ bool HasNumericalExtension(const char* filename, int& number)
     a++; // to exclude the "."
     if (isdigit(*a))
     {
-      char* ep;
-      number = static_cast<int>(strtol(a, &ep, 10));
-      if (ep[0] == '\0')
+      auto result = vtk::from_chars(a, number);
+      if (result.ptr[0] == '\0')
       {
         return true;
       }

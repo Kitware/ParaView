@@ -26,6 +26,7 @@
 #include "vtkNew.h"                // For vtkNew
 #include "vtkPrismReadersModule.h" // For export macro
 
+#include <array>  // for array
 #include <map>    // for map
 #include <vector> // for vector
 
@@ -191,7 +192,7 @@ private:
   bool OpenFile(std::FILE*& file);
   bool ReadTableHeader(char* buffer, int& tableId);
   bool ReadTableHeader(std::FILE* file, int& tableId);
-  int ReadTableValueLine(std::FILE* file, float* v1, float* v2, float* v3, float* v4, float* v5);
+  int ReadTableValueLine(std::FILE* file, std::array<float, 5>& values);
   int JumpToTable(std::FILE* file, int tableId);
 
   /**

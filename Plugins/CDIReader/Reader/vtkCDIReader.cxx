@@ -20,6 +20,7 @@
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
+#include "vtkStringScanner.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "vtksys/FStream.hxx"
@@ -3075,16 +3076,14 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
     //  0    1      	2     		3      	4       	5      	6 7		  8
     //  th  L 	name   	#calls 	t_min 	t_ave	t_max 	t_total	   t_total2
     // 00   L		physics   251    	0.4222s  0.9178s  10.52s    03m50s     230.21174
-    // for (int l=0; l<6 ; l++)
-    //  temp[l] = atof(wordVec.at(2+l).c_str());
 
     if (wordVec.at(1) != "L")
     {
-      temp[0] = atof(wordVec.at(7).c_str());
+      temp[0] = vtk::scan_value<float>(wordVec.at(7))->value();
     }
     else
     {
-      temp[0] = atof(wordVec.at(8).c_str());
+      temp[0] = vtk::scan_value<float>(wordVec.at(8))->value();
     }
 
     // for now, we just use t_average

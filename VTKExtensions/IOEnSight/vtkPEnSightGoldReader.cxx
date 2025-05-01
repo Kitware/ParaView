@@ -12,6 +12,7 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkStringScanner.h"
 #include "vtkStructuredGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
@@ -52,11 +53,39 @@ vtkPEnSightGoldReader::~vtkPEnSightGoldReader()
   delete UndefPartial;
 }
 
+//------------------------------------------------------------------------------
+static void vtkPEnSightGoldReaderRead4(
+  const char* line, int& pointId, float& point1, float& point2, float& point3)
+{
+  const std::string_view lineView(line);
+  pointId = vtk::scan_int<int>(lineView.substr(0, 8))->value();
+  point1 = vtk::scan_value<float>(lineView.substr(8, 12))->value();
+  point2 = vtk::scan_value<float>(lineView.substr(20, 12))->value();
+  point3 = vtk::scan_value<float>(lineView.substr(32, 12))->value();
+}
+
+static void vtkPEnSightGoldReaderRead6(const char* line, float& point1, float& point2,
+  float& point3, float& point4, float& point5, float& point6)
+{
+  const std::string_view lineView(line);
+  point1 = vtk::scan_value<float>(lineView.substr(0, 12))->value();
+  point2 = vtk::scan_value<float>(lineView.substr(12, 12))->value();
+  point3 = vtk::scan_value<float>(lineView.substr(24, 12))->value();
+  point4 = vtk::scan_value<float>(lineView.substr(36, 12))->value();
+  point5 = vtk::scan_value<float>(lineView.substr(48, 12))->value();
+  point6 = vtk::scan_value<float>(lineView.substr(60, 12))->value();
+}
+
+static void vtkPEnSightGoldReaderRead1(const char* line, float& point1)
+{
+  point1 = vtk::scan_value<float>(std::string_view(line))->value();
+}
+
 //----------------------------------------------------------------------------
 int vtkPEnSightGoldReader::ReadGeometryFile(
   const char* fileName, int timeStep, vtkMultiBlockDataSet* output)
 {
-  char line[256], subLine[256];
+  char line[256];
   int partId, realId, i;
   int lineRead;
 
@@ -67,7 +96,6 @@ int vtkPEnSightGoldReader::ReadGeometryFile(
   // makes the first sscanf(...) below fail to assign 'subLine' that is
   // though then accessed by strnmp(..) for comparing two char arrays.
   line[0] = '\0';
-  subLine[0] = '\0';
 
   // Initialize
   //
@@ -104,12 +132,17 @@ int vtkPEnSightGoldReader::ReadGeometryFile(
   }
 
   this->ReadNextDataLine(line);
-  sscanf(line, " %*s %s", subLine);
-  if (strncmp(subLine, "Binary", 6) == 0)
+  auto resultSubLine0 =
+    vtk::scan<std::string_view, std::string_view>(std::string_view(line), " {:s} {:s}");
+  if (resultSubLine0)
   {
-    vtkErrorMacro("This is a binary data set. Try "
-      << "vtkEnSightGoldBinaryReader.");
-    return 0;
+    auto subLine = std::get<1>(resultSubLine0->values());
+    if (subLine == "Binary")
+    {
+      vtkErrorMacro("This is a binary data set. Try "
+        << "vtkEnSightGoldBinaryReader.");
+      return 0;
+    }
   }
 
   if (this->UseFileSets)
@@ -158,12 +191,14 @@ int vtkPEnSightGoldReader::ReadGeometryFile(
 
   // Read the node id and element id lines.
   this->ReadNextDataLine(line);
-  sscanf(line, " %*s %*s %s", subLine);
-  if (strncmp(subLine, "given", 5) == 0)
+  auto resultSubLine1 = vtk::scan<std::string_view, std::string_view, std::string_view>(
+    std::string_view(line), " {:s} {:s} {:s}");
+  auto subLine = std::get<2>(resultSubLine1->values());
+  if (subLine == "given")
   {
     this->NodeIdsListed = 1;
   }
-  else if (strncmp(subLine, "ignore", 6) == 0)
+  else if (subLine == "ignore")
   {
     this->NodeIdsListed = 1;
   }
@@ -173,12 +208,14 @@ int vtkPEnSightGoldReader::ReadGeometryFile(
   }
 
   this->ReadNextDataLine(line);
-  sscanf(line, " %*s %*s %s", subLine);
-  if (strncmp(subLine, "given", 5) == 0)
+  auto resultSubLine2 = vtk::scan<std::string_view, std::string_view, std::string_view>(
+    std::string_view(line), " {:s} {:s} {:s}");
+  subLine = std::get<2>(resultSubLine2->values());
+  if (subLine == "given")
   {
     this->ElementIdsListed = 1;
   }
-  else if (strncmp(subLine, "ignore", 6) == 0)
+  else if (subLine == "ignore")
   {
     this->ElementIdsListed = 1;
   }
@@ -201,8 +238,7 @@ int vtkPEnSightGoldReader::ReadGeometryFile(
   {
     this->NumberOfGeometryParts++;
     this->ReadNextDataLine(line);
-    partId = atoi(line) - 1; // EnSight starts #ing at 1.
-
+    partId = vtk::scan_int<int>(std::string_view(line))->value() - 1; // EnSight starts #ing at 1.
     realId = this->InsertNewPartId(partId);
 
     this->ReadNextDataLine(line); // part description line
@@ -216,14 +252,17 @@ int vtkPEnSightGoldReader::ReadGeometryFile(
 
     if (strncmp(line, "block", 5) == 0)
     {
-      if (sscanf(line, " %*s %s", subLine) == 1)
+      auto resultSubLine3 =
+        vtk::scan<std::string_view, std::string_view>(std::string_view(line), " {:s} {:s}");
+      if (resultSubLine3)
       {
-        if (strncmp(subLine, "rectilinear", 11) == 0)
+        subLine = std::get<1>(resultSubLine3->values());
+        if (subLine == "rectilinear")
         {
           // block rectilinear
           lineRead = this->CreateRectilinearGridOutput(realId, line, name, output);
         }
-        else if (strncmp(subLine, "uniform", 7) == 0)
+        else if (subLine == "uniform")
         {
           // block uniform
           lineRead = this->CreateImageDataOutput(realId, line, name, output);
@@ -263,7 +302,7 @@ int vtkPEnSightGoldReader::ReadGeometryFile(
 int vtkPEnSightGoldReader::ReadMeasuredGeometryFile(
   const char* fileName, int timeStep, vtkMultiBlockDataSet* output)
 {
-  char line[256], subLine[256];
+  char line[256];
   vtkPoints* newPoints;
   int i;
   int tempId;
@@ -307,9 +346,12 @@ int vtkPEnSightGoldReader::ReadMeasuredGeometryFile(
   // because the description line could be blank.
   this->ReadLine(line);
 
-  if (sscanf(line, " %*s %s", subLine) == 1)
+  auto resultSubLine =
+    vtk::scan<std::string_view, std::string_view>(std::string_view(line), " {:s} {:s}");
+  if (resultSubLine)
   {
-    if (strncmp(subLine, "Binary", 6) == 0)
+    auto subLine = std::get<1>(resultSubLine->values());
+    if (subLine == "Binary")
     {
       vtkErrorMacro("This is a binary data set. Try "
         << "vtkEnSight6BinaryReader.");
@@ -359,7 +401,7 @@ int vtkPEnSightGoldReader::ReadMeasuredGeometryFile(
 
   this->ReadLine(line); // "particle coordinates"
   this->ReadLine(line);
-  this->NumberOfMeasuredPoints = atoi(line);
+  this->NumberOfMeasuredPoints = vtk::scan_int<int>(std::string_view(line))->value();
 
   this->UnstructuredPartIds->InsertNextId(this->NumberOfGeometryParts);
   int partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
@@ -399,7 +441,7 @@ int vtkPEnSightGoldReader::ReadMeasuredGeometryFile(
   for (i = 0; i < this->NumberOfMeasuredPoints; i++)
   {
     this->ReadLine(line);
-    sscanf(line, " %8d %12e %12e %12e", &tempId, &coords[0], &coords[1], &coords[2]);
+    vtkPEnSightGoldReaderRead4(line, tempId, coords[0], coords[1], coords[2]);
 
     // It seems EnSight always enumerate point indices from 1 to N
     // (not from 0 to N-1) and therefore there is no need to determine
@@ -429,7 +471,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerNode(const char* fileName, const char* 
   int timeStep, vtkMultiBlockDataSet* compositeOutput, int measured, int numberOfComponents,
   int component)
 {
-  char line[256], formatLine[256], tempLine[256];
+  char line[256];
   int partId, realId, numPts, i, j, numLines, moreScalars;
   vtkFloatArray* scalars;
   float scalarsRead[6];
@@ -521,15 +563,14 @@ int vtkPEnSightGoldReader::ReadScalarsPerNode(const char* fileName, const char* 
 
       scalars = vtkFloatArray::New();
       scalars->SetNumberOfComponents(numberOfComponents);
-      scalars->SetNumberOfTuples(this->GetPointIds(partId)->GetLocalNumberOfIds());
-      // scalars->Allocate(numPts * numberOfComponents);
+      scalars->SetNumberOfTuples(numPts);
 
       this->ReadNextDataLine(line);
 
       for (i = 0; i < numLines; i++)
       {
-        sscanf(line, " %12e %12e %12e %12e %12e %12e", &scalarsRead[0], &scalarsRead[1],
-          &scalarsRead[2], &scalarsRead[3], &scalarsRead[4], &scalarsRead[5]);
+        vtkPEnSightGoldReaderRead6(line, scalarsRead[0], scalarsRead[1], scalarsRead[2],
+          scalarsRead[3], scalarsRead[4], scalarsRead[5]);
         for (j = 0; j < 6; j++)
         {
           // scalars->InsertComponent(i*6 + j, component, scalarsRead[j]);
@@ -538,17 +579,11 @@ int vtkPEnSightGoldReader::ReadScalarsPerNode(const char* fileName, const char* 
         }
         this->ReadNextDataLine(line);
       }
-      strcpy(formatLine, "");
-      strcpy(tempLine, "");
       for (j = 0; j < moreScalars; j++)
       {
-        strcat(formatLine, " %12e");
-        sscanf(line, formatLine, &scalarsRead[j]);
-        // scalars->InsertComponent(i*6 + j, component, scalarsRead[j]);
+        vtkPEnSightGoldReaderRead1(line + j * 12, scalarsRead[j]);
         this->InsertVariableComponent(
           scalars, i * 6 + j, component, &(scalarsRead[j]), partId, 0, SCALAR_PER_NODE);
-        strcat(tempLine, " %*12e");
-        strcpy(formatLine, tempLine);
       }
       scalars->SetName(description);
       output->GetPointData()->AddArray(scalars);
@@ -566,7 +601,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerNode(const char* fileName, const char* 
   while (this->ReadNextDataLine(line) && strncmp(line, "part", 4) == 0)
   {
     this->ReadNextDataLine(line);
-    partId = atoi(line) - 1; // EnSight starts #ing with 1.
+    partId = vtk::scan_int<int>(std::string_view(line))->value() - 1; // EnSight starts #ing with 1.
     realId = this->InsertNewPartId(partId);
     output = this->GetDataSetFromBlock(compositeOutput, realId);
     // numPts = output->GetNumberOfPoints();
@@ -600,7 +635,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerNode(const char* fileName, const char* 
           if (i == this->UndefPartial->PartialCoordinates[l])
           {
             this->ReadNextDataLine(line);
-            val = atof(line);
+            val = vtk::scan_value<float>(std::string_view(line))->value();
           }
           else
           {
@@ -617,8 +652,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerNode(const char* fileName, const char* 
         for (i = 0; i < numPts; i++)
         {
           this->ReadNextDataLine(line);
-          val = atof(line);
-          // scalars->InsertComponent(i, component, atof(line));
+          val = vtk::scan_value<float>(std::string_view(line))->value();
           this->InsertVariableComponent(scalars, i, component, &val, realId, 0, SCALAR_PER_NODE);
         }
       }
@@ -649,7 +683,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerNode(const char* fileName, const char* 
 int vtkPEnSightGoldReader::ReadVectorsPerNode(const char* fileName, const char* description,
   int timeStep, vtkMultiBlockDataSet* compositeOutput, int measured)
 {
-  char line[256], formatLine[256], tempLine[256];
+  char line[256];
   int partId, realId, numPts, i, j, numLines, moreVectors;
   vtkFloatArray* vectors;
   float vector1[3], vector2[3];
@@ -741,29 +775,24 @@ int vtkPEnSightGoldReader::ReadVectorsPerNode(const char* fileName, const char* 
       moreVectors = ((numPts * 3) % 6) / 3;
       vectors = vtkFloatArray::New();
       vectors->SetNumberOfComponents(3);
-      // vectors->SetNumberOfTuples(numPts);
-      vectors->SetNumberOfTuples(this->GetPointIds(partId)->GetNumberOfIds());
+      vectors->SetNumberOfTuples(numPts);
       // vectors->Allocate(numPts*3);
       for (i = 0; i < numLines; i++)
       {
-        sscanf(line, " %12e %12e %12e %12e %12e %12e", &vector1[0], &vector1[1], &vector1[2],
-          &vector2[0], &vector2[1], &vector2[2]);
+        vtkPEnSightGoldReaderRead6(
+          line, vector1[0], vector1[1], vector1[2], vector2[0], vector2[1], vector2[2]);
         // vectors->InsertTuple(i*2, vector1);
         this->InsertVariableComponent(vectors, i * 2, 0, vector1, partId, 0, VECTOR_PER_NODE);
         // vectors->InsertTuple(i*2 + 1, vector2);
         this->InsertVariableComponent(vectors, i * 2 + 1, 0, vector2, partId, 0, VECTOR_PER_NODE);
         this->ReadNextDataLine(line);
       }
-      strcpy(formatLine, "");
-      strcpy(tempLine, "");
       for (j = 0; j < moreVectors; j++)
       {
-        strcat(formatLine, " %12e %12e %12e");
-        sscanf(line, formatLine, &vector1[0], &vector1[1], &vector1[2]);
-        // vectors->InsertTuple(i*2 + j, vector1);
+        vtkPEnSightGoldReaderRead1(line + j * 36, vector1[0]);
+        vtkPEnSightGoldReaderRead1(line + j * 36 + 12, vector1[1]);
+        vtkPEnSightGoldReaderRead1(line + j * 36 + 24, vector1[2]);
         this->InsertVariableComponent(vectors, i * 2 + j, 0, vector1, partId, 0, VECTOR_PER_NODE);
-        strcat(tempLine, " %*12e %*12e %*12e");
-        strcpy(formatLine, tempLine);
       }
       vectors->SetName(description);
       output->GetPointData()->AddArray(vectors);
@@ -781,7 +810,7 @@ int vtkPEnSightGoldReader::ReadVectorsPerNode(const char* fileName, const char* 
   while (this->ReadNextDataLine(line) && strncmp(line, "part", 4) == 0)
   {
     this->ReadNextDataLine(line);
-    partId = atoi(line) - 1; // EnSight starts #ing with 1.
+    partId = vtk::scan_int<int>(std::string_view(line))->value() - 1; // EnSight starts #ing with 1.
     realId = this->InsertNewPartId(partId);
     output = this->GetDataSetFromBlock(compositeOutput, realId);
     // numPts = output->GetNumberOfPoints();
@@ -800,8 +829,7 @@ int vtkPEnSightGoldReader::ReadVectorsPerNode(const char* fileName, const char* 
         for (j = 0; j < numPts; j++)
         {
           this->ReadNextDataLine(line);
-          val = atof(line);
-          // vectors->InsertComponent(j, i, atof(line));
+          val = vtk::scan_value<float>(std::string_view(line))->value();
           // Here we use the SCALAR_PER_NODE behaviour of the
           // InsertVariableComponent method, as components of the vectors
           // are far, far away from each other: we inject data as component,
@@ -911,7 +939,7 @@ int vtkPEnSightGoldReader::ReadTensorsPerNode(const char* fileName, const char* 
   while (this->ReadNextDataLine(line) && strncmp(line, "part", 4) == 0)
   {
     this->ReadNextDataLine(line);
-    partId = atoi(line) - 1; // EnSight starts #ing with 1.
+    partId = vtk::scan_int<int>(std::string_view(line))->value() - 1; // EnSight starts #ing with 1.
     realId = this->InsertNewPartId(partId);
     output = this->GetDataSetFromBlock(compositeOutput, realId);
     // numPts = output->GetNumberOfPoints();
@@ -930,8 +958,7 @@ int vtkPEnSightGoldReader::ReadTensorsPerNode(const char* fileName, const char* 
         for (j = 0; j < numPts; j++)
         {
           this->ReadNextDataLine(line);
-          val = atof(line);
-          // tensors->InsertComponent(j, i, atof(line));
+          val = vtk::scan_value<float>(std::string_view(line))->value();
           // Same behaviour as Vector Per Node variables: we inject data as component,
           // and not as tuple.
           this->InsertVariableComponent(
@@ -1038,7 +1065,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerElement(const char* fileName, const cha
   while (lineRead && strncmp(line, "part", 4) == 0)
   {
     this->ReadNextDataLine(line);
-    partId = atoi(line) - 1; // EnSight starts #ing with 1.
+    partId = vtk::scan_int<int>(std::string_view(line))->value() - 1; // EnSight starts #ing with 1.
     realId = this->InsertNewPartId(partId);
     output = this->GetDataSetFromBlock(compositeOutput, realId);
     // numCells = output->GetNumberOfCells();
@@ -1065,8 +1092,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerElement(const char* fileName, const cha
         for (i = 0; i < numCells; i++)
         {
           this->ReadNextDataLine(line);
-          scalar = atof(line);
-          // scalars->InsertComponent(i, component, scalar);
+          scalar = vtk::scan_value<float>(std::string_view(line))->value();
           this->InsertVariableComponent(
             scalars, i, component, &scalar, realId, 0, SCALAR_PER_ELEMENT);
         }
@@ -1102,7 +1128,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerElement(const char* fileName, const cha
               if (i == this->UndefPartial->PartialElementTypes[j])
               {
                 this->ReadNextDataLine(line);
-                scalar = atof(line);
+                scalar = vtk::scan_value<float>(std::string_view(line))->value();
               }
               else
               {
@@ -1120,9 +1146,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerElement(const char* fileName, const cha
             for (i = 0; i < numCellsPerElement; i++)
             {
               this->ReadNextDataLine(line);
-              scalar = atof(line);
-              // scalars->InsertComponent( this->GetCellIds(idx,
-              //  elementType)->GetId(i), component, scalar);
+              scalar = vtk::scan_value<float>(std::string_view(line))->value();
               this->InsertVariableComponent(
                 scalars, i, component, &scalar, idx, elementType, SCALAR_PER_ELEMENT);
             }
@@ -1245,7 +1269,7 @@ int vtkPEnSightGoldReader::ReadVectorsPerElement(const char* fileName, const cha
   while (lineRead && strncmp(line, "part", 4) == 0)
   {
     this->ReadNextDataLine(line);
-    partId = atoi(line) - 1; // EnSight starts #ing with 1.
+    partId = vtk::scan_int<int>(std::string_view(line))->value() - 1; // EnSight starts #ing with 1.
     realId = this->InsertNewPartId(partId);
     output = this->GetDataSetFromBlock(compositeOutput, realId);
     // numCells = output->GetNumberOfCells();
@@ -1268,8 +1292,7 @@ int vtkPEnSightGoldReader::ReadVectorsPerElement(const char* fileName, const cha
           for (j = 0; j < numCells; j++)
           {
             this->ReadNextDataLine(line);
-            value = atof(line);
-            // vectors->InsertComponent(j, i, value);
+            value = vtk::scan_value<float>(std::string_view(line))->value();
             this->InsertVariableComponent(vectors, j, i, &value, realId, 0, SCALAR_PER_ELEMENT);
           }
         }
@@ -1295,9 +1318,7 @@ int vtkPEnSightGoldReader::ReadVectorsPerElement(const char* fileName, const cha
             for (j = 0; j < numCellsPerElement; j++)
             {
               this->ReadNextDataLine(line);
-              value = atof(line);
-              // vectors->InsertComponent(this->GetCellIds(idx, elementType)->GetId(j),
-              //                         i, value);
+              value = vtk::scan_value<float>(std::string_view(line))->value();
               this->InsertVariableComponent(
                 vectors, j, i, &value, idx, elementType, SCALAR_PER_ELEMENT);
             }
@@ -1414,7 +1435,7 @@ int vtkPEnSightGoldReader::ReadTensorsPerElement(const char* fileName, const cha
   while (lineRead && strncmp(line, "part", 4) == 0)
   {
     this->ReadNextDataLine(line);
-    partId = atoi(line) - 1; // EnSight starts #ing with 1.
+    partId = vtk::scan_int<int>(std::string_view(line))->value() - 1; // EnSight starts #ing with 1.
     realId = this->InsertNewPartId(partId);
     output = this->GetDataSetFromBlock(compositeOutput, realId);
     // numCells = output->GetNumberOfCells();
@@ -1437,8 +1458,7 @@ int vtkPEnSightGoldReader::ReadTensorsPerElement(const char* fileName, const cha
           for (j = 0; j < numCells; j++)
           {
             this->ReadNextDataLine(line);
-            value = atof(line);
-            // tensors->InsertComponent(j, i, value);
+            value = vtk::scan_value<float>(std::string_view(line))->value();
             this->InsertVariableComponent(
               tensors, j, symmTensorOrder[i], &value, realId, 0, SCALAR_PER_ELEMENT);
           }
@@ -1465,9 +1485,7 @@ int vtkPEnSightGoldReader::ReadTensorsPerElement(const char* fileName, const cha
             for (j = 0; j < numCellsPerElement; j++)
             {
               this->ReadNextDataLine(line);
-              value = atof(line);
-              // tensors->InsertComponent(this->GetCellIds(idx, elementType)->GetId(j),
-              //                         i, value);
+              value = vtk::scan_value<float>(std::string_view(line))->value();
               this->InsertVariableComponent(
                 tensors, j, symmTensorOrder[i], &value, idx, elementType, SCALAR_PER_ELEMENT);
             }
@@ -1495,10 +1513,7 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
   int partId, char line[256], const char* name, vtkMultiBlockDataSet* compositeOutput)
 {
   int lineRead = 1;
-  char subLine[256];
   int i, j, k;
-  vtkIdType* nodeIds;
-  int* intIds;
   int numElements;
   int idx, cellType;
 
@@ -1557,30 +1572,30 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
     }
     else if (strncmp(line, "point", 5) == 0)
     {
-      int* elementIds;
       vtkDebugMacro("point");
 
-      nodeIds = new vtkIdType[1];
+      vtkIdType nodeIds;
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
-      elementIds = new int[numElements];
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
+      std::vector<int> elementIds(numElements);
 
       for (i = 0; i < numElements; i++)
       {
         this->ReadNextDataLine(line);
-        elementIds[i] = atoi(line);
+        elementIds[i] = vtk::scan_int<int>(std::string_view(line))->value();
       }
       lineRead = this->ReadNextDataLine(line);
-      sscanf(line, " %s", subLine);
+      auto subLine = vtk::scan_value<std::string_view>(std::string_view(line))->value();
       if (isdigit(subLine[0]))
       {
         for (i = 0; i < numElements; i++)
         {
-          nodeIds[0] = atoi(line) - 1; // because EnSight ids start at 1
+          nodeIds = vtk::scan_int<int>(std::string_view(line))->value() -
+            1; // because EnSight ids start at 1
           // cellId = output->InsertNextCell(VTK_VERTEX, 1, nodeIds);
           // this->GetCellIds(idx, vtkPEnSightReader::POINT)->InsertNextId(cellId);
           this->InsertNextCellAndId(
-            output, VTK_VERTEX, 1, nodeIds, idx, vtkPEnSightReader::POINT, i, numElements);
+            output, VTK_VERTEX, 1, &nodeIds, idx, vtkPEnSightReader::POINT, i, numElements);
           lineRead = this->ReadNextDataLine(line);
         }
       }
@@ -1588,16 +1603,13 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         for (i = 0; i < numElements; i++)
         {
-          nodeIds[0] = elementIds[i] - 1;
+          nodeIds = elementIds[i] - 1;
           // cellId = output->InsertNextCell(VTK_VERTEX, 1, nodeIds);
           // this->GetCellIds(idx, vtkPEnSightReader::POINT)->InsertNextId(cellId);
           this->InsertNextCellAndId(
-            output, VTK_VERTEX, 1, nodeIds, idx, vtkPEnSightReader::POINT, i, numElements);
+            output, VTK_VERTEX, 1, &nodeIds, idx, vtkPEnSightReader::POINT, i, numElements);
         }
       }
-
-      delete[] nodeIds;
-      delete[] elementIds;
     }
     else if (strncmp(line, "g_point", 7) == 0)
     {
@@ -1605,14 +1617,14 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       vtkDebugMacro("g_point");
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
 
       for (i = 0; i < numElements; i++)
       {
         this->ReadNextDataLine(line);
       }
       lineRead = this->ReadNextDataLine(line);
-      sscanf(line, " %s", subLine);
+      auto subLine = vtk::scan_value<std::string_view>(std::string_view(line))->value();
       if (isdigit(subLine[0]))
       {
         for (i = 0; i < numElements; i++)
@@ -1625,13 +1637,13 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
     {
       vtkDebugMacro("bar2");
 
-      nodeIds = new vtkIdType[2];
-      intIds = new int[2];
+      vtkIdType nodeIds[2];
+      int intIds[2];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d", &intIds[0], &intIds[1]) != 2)
+      if (!vtk::scan<int, int>(std::string_view(line), " {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1641,7 +1653,8 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d", &intIds[0], &intIds[1]);
+        auto resultInt2 = vtk::scan<int, int>(std::string_view(line), " {:d} {:d}");
+        std::tie(intIds[0], intIds[1]) = resultInt2->values();
         for (j = 0; j < 2; j++)
         {
           intIds[j]--;
@@ -1653,20 +1666,16 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_LINE, 2, nodeIds, idx, vtkPEnSightReader::BAR2, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "g_bar2", 6) == 0)
     {
       // skipping ghost cells
       vtkDebugMacro("g_bar2");
 
-      intIds = new int[2];
-
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d", &intIds[0], &intIds[1]) != 2)
+      if (!vtk::scan<int, int>(std::string_view(line), " {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1678,18 +1687,17 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] intIds;
     }
     else if (strncmp(line, "bar3", 4) == 0)
     {
       vtkDebugMacro("bar3");
-      nodeIds = new vtkIdType[3];
-      intIds = new int[3];
+      vtkIdType nodeIds[3];
+      int intIds[3];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d", &intIds[0], &intIds[1], &intIds[2]) != 3)
+      if (!vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1699,7 +1707,8 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d", &intIds[0], &intIds[1], &intIds[2]);
+        auto resultInt3 = vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2]) = resultInt3->values();
         for (j = 0; j < 3; j++)
         {
           intIds[j]--;
@@ -1714,19 +1723,16 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_QUADRATIC_EDGE, 3, nodeIds, idx, vtkPEnSightReader::BAR3, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "g_bar3", 6) == 0)
     {
       // skipping ghost cells
       vtkDebugMacro("g_bar3");
-      intIds = new int[2];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %*d %d", &intIds[0], &intIds[1]) != 2)
+      if (!vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1738,18 +1744,11 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] intIds;
     }
     else if (strncmp(line, "nsided", 6) == 0)
     {
-      int* numNodesPerElement;
-      int numNodes;
-      std::stringstream* lineStream = new std::stringstream(std::stringstream::out);
-      std::stringstream* formatStream = new std::stringstream(std::stringstream::out);
-      std::stringstream* tempStream = new std::stringstream(std::stringstream::out);
-
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       if (this->ElementIdsListed)
       {
         for (i = 0; i < numElements; i++)
@@ -1759,60 +1758,48 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         }
       }
 
-      numNodesPerElement = new int[numElements];
+      std::vector<int> numNodesPerElement(numElements);
       for (i = 0; i < numElements; i++)
       {
         this->ReadNextDataLine(line);
-        numNodesPerElement[i] = atoi(line);
+        numNodesPerElement[i] = vtk::scan_int<int>(std::string_view(line))->value();
       }
 
       lineRead = this->ReadNextDataLine(line);
       for (i = 0; i < numElements; i++)
       {
-        numNodes = numNodesPerElement[i];
-        nodeIds = new vtkIdType[numNodes];
-        intIds = new int[numNodesPerElement[i]];
+        const auto& numNodes = numNodesPerElement[i];
+        std::vector<vtkIdType> nodeIds(numNodes);
 
-        formatStream->str("");
-        tempStream->str("");
-        lineStream->str(line);
-        lineStream->seekp(0, std::stringstream::end);
+        std::stringstream lineStream;
+        lineStream.str(line);
+        lineStream.seekp(0, std::stringstream::end);
         while (!lineRead)
         {
           lineRead = this->ReadNextDataLine(line);
-          lineStream->write(line, strlen(line));
-          lineStream->seekp(0, std::stringstream::end);
+          lineStream.write(line, strlen(line));
+          lineStream.seekp(0, std::stringstream::end);
         }
+        const std::string fullLine = lineStream.str();
+        std::string_view current(fullLine.data(), fullLine.size());
         for (j = 0; j < numNodes; j++)
         {
-          formatStream->write(" %d", 3);
-          formatStream->seekp(0, std::stringstream::end);
-          sscanf(lineStream->str().c_str(), formatStream->str().c_str(), &intIds[numNodes - j - 1]);
-          tempStream->write(" %*d", 4);
-          tempStream->seekp(0, std::stringstream::end);
-          formatStream->str(tempStream->str());
-          formatStream->seekp(0, std::stringstream::end);
-          intIds[numNodes - j - 1]--;
-          nodeIds[numNodes - j - 1] = intIds[numNodes - j - 1];
+          auto resultInt = vtk::scan_int<vtkIdType>(current);
+          nodeIds[numNodes - j - 1] = resultInt->value() - 1; // EnSight ids start at 1
+          current = std::string_view(resultInt->range().data(), resultInt->range().size());
         }
         // cellId = output->InsertNextCell(VTK_POLYGON, numNodes, nodeIds);
         // this->GetCellIds(idx, vtkPEnSightReader::NSIDED)->InsertNextId(cellId);
-        this->InsertNextCellAndId(output, VTK_POLYGON, numNodesPerElement[i], nodeIds, idx,
+        this->InsertNextCellAndId(output, VTK_POLYGON, numNodesPerElement[i], nodeIds.data(), idx,
           vtkPEnSightReader::NSIDED, i, numElements);
         lineRead = this->ReadNextDataLine(line);
-        delete[] nodeIds;
-        delete[] intIds;
       }
-      delete lineStream;
-      delete formatStream;
-      delete tempStream;
-      delete[] numNodesPerElement;
     }
     else if (strncmp(line, "g_nsided", 8) == 0)
     {
       // skipping ghost cells
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       for (i = 0; i < numElements * 2; i++)
       {
         this->ReadNextDataLine(line);
@@ -1820,14 +1807,14 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       lineRead = this->ReadNextDataLine(line);
       if (lineRead)
       {
-        sscanf(line, " %s", subLine);
-      }
-      if (lineRead && isdigit(subLine[0]))
-      {
-        // We still need to read in the node ids for each element.
-        for (i = 0; i < numElements; i++)
+        auto subLine = vtk::scan_value<std::string_view>(std::string_view(line))->value();
+        if (isdigit(subLine[0]))
         {
-          lineRead = this->ReadNextDataLine(line);
+          // We still need to read in the node ids for each element.
+          for (i = 0; i < numElements; i++)
+          {
+            lineRead = this->ReadNextDataLine(line);
+          }
         }
       }
     }
@@ -1836,13 +1823,13 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       vtkDebugMacro("tria3");
       cellType = vtkPEnSightReader::TRIA3;
 
-      nodeIds = new vtkIdType[3];
-      intIds = new int[3];
+      vtkIdType nodeIds[3];
+      int intIds[3];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d", &intIds[0], &intIds[1], &intIds[2]) != 3)
+      if (!vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1852,7 +1839,8 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d", &intIds[0], &intIds[1], &intIds[2]);
+        auto resultInt3 = vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2]) = resultInt3->values();
         for (j = 0; j < 3; j++)
         {
           intIds[j]--;
@@ -1863,22 +1851,20 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         this->InsertNextCellAndId(output, VTK_TRIANGLE, 3, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "tria6", 5) == 0)
     {
       vtkDebugMacro("tria6");
       cellType = vtkPEnSightReader::TRIA6;
 
-      nodeIds = new vtkIdType[6];
-      intIds = new int[6];
+      vtkIdType nodeIds[6];
+      int intIds[6];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-            &intIds[4], &intIds[5]) != 6)
+      if (!vtk::scan<int, int, int, int, int, int>(
+            std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1888,8 +1874,10 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-          &intIds[4], &intIds[5]);
+        auto resultInt6 = vtk::scan<int, int, int, int, int, int>(
+          std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4], intIds[5]) =
+          resultInt6->values();
         for (j = 0; j < 6; j++)
         {
           intIds[j]--;
@@ -1901,8 +1889,6 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_QUADRATIC_TRIANGLE, 6, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "g_tria3", 7) == 0 || strncmp(line, "g_tria6", 7) == 0)
     {
@@ -1918,12 +1904,10 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         cellType = vtkPEnSightReader::TRIA3;
       }
 
-      intIds = new int[3];
-
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d", &intIds[0], &intIds[1], &intIds[2]) != 3)
+      if (!vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1935,20 +1919,19 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] intIds;
     }
     else if (strncmp(line, "quad4", 5) == 0)
     {
       vtkDebugMacro("quad4");
       cellType = vtkPEnSightReader::QUAD4;
 
-      nodeIds = new vtkIdType[4];
-      intIds = new int[4];
+      vtkIdType nodeIds[4];
+      int intIds[4];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3]) != 4)
+      if (!vtk::scan<int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1958,7 +1941,9 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3]);
+        auto resultInt4 =
+          vtk::scan<int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3]) = resultInt4->values();
         for (j = 0; j < 4; j++)
         {
           intIds[j]--;
@@ -1969,22 +1954,20 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         this->InsertNextCellAndId(output, VTK_QUAD, 4, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "quad8", 5) == 0)
     {
       vtkDebugMacro("quad8");
       cellType = vtkPEnSightReader::QUAD8;
 
-      nodeIds = new vtkIdType[8];
-      intIds = new int[8];
+      vtkIdType nodeIds[8];
+      int intIds[8];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-            &intIds[4], &intIds[5], &intIds[6], &intIds[7]) != 8)
+      if (!vtk::scan<int, int, int, int, int, int, int, int>(
+            std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -1994,8 +1977,10 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-          &intIds[4], &intIds[5], &intIds[6], &intIds[7]);
+        auto resultInt8 = vtk::scan<int, int, int, int, int, int, int, int>(
+          std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4], intIds[5], intIds[6],
+          intIds[7]) = resultInt8->values();
         for (j = 0; j < 8; j++)
         {
           intIds[j]--;
@@ -2007,8 +1992,6 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_QUADRATIC_QUAD, 8, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "g_quad4", 7) == 0 || strncmp(line, "g_quad8", 7) == 0)
     {
@@ -2024,12 +2007,10 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         cellType = vtkPEnSightReader::QUAD4;
       }
 
-      intIds = new int[4];
-
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3]) != 4)
+      if (!vtk::scan<int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2041,24 +2022,17 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] intIds;
     }
     else if (strncmp(line, "nfaced", 6) == 0)
     {
-      int* numFacesPerElement;
-      int* numNodesPerFace;
-      int* nodeMarker;
       int numPts = 0;
       int numFaces = 0;
       int numNodes = 0;
       int faceCount = 0;
       int elementNodeCount = 0;
-      std::stringstream* lineStream = new std::stringstream(std::stringstream::out);
-      std::stringstream* formatStream = new std::stringstream(std::stringstream::out);
-      std::stringstream* tempStream = new std::stringstream(std::stringstream::out);
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       if (this->ElementIdsListed)
       {
         for (i = 0; i < numElements; i++)
@@ -2068,19 +2042,19 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         }
       }
 
-      numFacesPerElement = new int[numElements];
+      std::vector<int> numFacesPerElement(numElements);
       for (i = 0; i < numElements; i++)
       {
         this->ReadNextDataLine(line);
-        numFacesPerElement[i] = atoi(line);
+        numFacesPerElement[i] = vtk::scan_int<int>(std::string_view(line))->value();
         numFaces += numFacesPerElement[i];
       }
 
-      numNodesPerFace = new int[numFaces];
+      std::vector<int> numNodesPerFace(numFaces);
       for (i = 0; i < numFaces; i++)
       {
         this->ReadNextDataLine(line);
-        numNodesPerFace[i] = atoi(line);
+        numNodesPerFace[i] = vtk::scan_int<int>(std::string_view(line))->value();
       }
 
       // numPts = output->GetNumberOfPoints();
@@ -2088,7 +2062,7 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       // but we have an estimation in ReadOrSkipCoordinates( .... , skip = true )
       numPts = this->GetPointIds(idx)->GetNumberOfIds();
 
-      nodeMarker = new int[numPts];
+      std::vector<int> nodeMarker(numPts);
       for (i = 0; i < numPts; i++)
       {
         nodeMarker[i] = -1;
@@ -2102,57 +2076,53 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         {
           numNodes += numNodesPerFace[faceCount + j];
         }
-        intIds = new int[numNodes];
+        std::vector<int> intIds(numNodes);
 
         // Read element node ids
         elementNodeCount = 0;
         for (j = 0; j < numFacesPerElement[i]; j++)
         {
-          formatStream->str("");
-          tempStream->str("");
-          lineStream->str(line);
-          lineStream->seekp(0, std::stringstream::end);
+          std::stringstream lineStream;
+          lineStream.str(line);
+          lineStream.seekp(0, std::stringstream::end);
           while (!lineRead)
           {
             lineRead = this->ReadNextDataLine(line);
-            lineStream->write(line, strlen(line));
-            lineStream->seekp(0, std::stringstream::end);
+            lineStream.write(line, strlen(line));
+            lineStream.seekp(0, std::stringstream::end);
           }
+          const std::string fullLine = lineStream.str();
+          std::string_view current(fullLine.data(), fullLine.size());
           for (k = 0; k < numNodesPerFace[faceCount + j]; k++)
           {
-            formatStream->write(" %d", 3);
-            formatStream->seekp(0, std::stringstream::end);
-            sscanf(
-              lineStream->str().c_str(), formatStream->str().c_str(), &intIds[elementNodeCount]);
-            tempStream->write(" %*d", 4);
-            tempStream->seekp(0, std::stringstream::end);
-            formatStream->str(tempStream->str());
-            formatStream->seekp(0, std::stringstream::end);
+            auto resultInt = vtk::scan_int<int>(current);
+            intIds[elementNodeCount] = resultInt->value();
             elementNodeCount += 1;
+            current = std::string_view(resultInt->range().data(), resultInt->range().size());
           }
           lineRead = this->ReadNextDataLine(line);
         }
 
-        // prepare an array of Ids describing the vtkPolyhedron object
-        int nodeIndx = 0; // indexing the raw array of point Ids
-        // vtkPolyhedron's info of faces
-        std::vector<vtkIdType> faceArray(elementNodeCount + numFacesPerElement[i]);
-        vtkIdType faceArrayIdx = 0;
+        // prepare an array of Ids describing the vtkPolyhedron object yyy begin
+        int nodeIndx = 0;              // indexing the raw array of point Ids
+        vtkNew<vtkCellArray> theFaces; // vtkPolyhedron's info of faces
         for (j = 0; j < numFacesPerElement[i]; j++)
         {
           // number of points constituting this face
-          faceArray[faceArrayIdx++] = numNodesPerFace[faceCount + j];
+          theFaces->InsertNextCell(numNodesPerFace[faceCount + j]);
+
           for (k = 0; k < numNodesPerFace[faceCount + j]; k++)
           {
             // convert EnSight 1-based indexing to VTK 0-based indexing
-            faceArray[faceArrayIdx++] = intIds[nodeIndx++] - 1;
+            theFaces->InsertCellPoint(intIds[nodeIndx++] - 1);
           }
         }
+        // yyy end
 
         faceCount += numFacesPerElement[i];
 
         // Build element
-        nodeIds = new vtkIdType[numNodes];
+        std::vector<vtkIdType> nodeIds(numNodes);
         elementNodeCount = 0;
         for (j = 0; j < numNodes; j++)
         {
@@ -2163,37 +2133,29 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
             elementNodeCount += 1;
           }
         }
-        /*cellId = output->InsertNextCell(VTK_CONVEX_POINT_SET,
-          elementNodeCount,
-          nodeIds);
-          this->GetCellIds(idx, vtkPEnSightReader::NFACED)->InsertNextId(cellId);*/
-        this->InsertNextCellAndId(output, VTK_POLYHEDRON, elementNodeCount, nodeIds, idx,
-          vtkPEnSightReader::NFACED, i, numElements, faceArray);
+        // xxx begin
+        // cellId = output->InsertNextCell( VTK_CONVEX_POINT_SET,
+        //                                 elementNodeCount, nodeIds );
+        // xxx end
 
-        delete[] nodeIds;
-        delete[] intIds;
+        // insert the cell as a vtkPolyhedron object yyy begin
+        this->InsertNextCellAndId(output, VTK_POLYHEDRON, elementNodeCount, nodeIds.data(), idx,
+          vtkPEnSightReader::NFACED, i, numElements, theFaces);
+        // yyy end
       }
-
-      delete lineStream;
-      delete formatStream;
-      delete tempStream;
-
-      delete[] nodeMarker;
-      delete[] numNodesPerFace;
-      delete[] numFacesPerElement;
     }
     else if (strncmp(line, "tetra4", 6) == 0)
     {
       vtkDebugMacro("tetra4");
       cellType = vtkPEnSightReader::TETRA4;
 
-      nodeIds = new vtkIdType[4];
-      intIds = new int[4];
+      vtkIdType nodeIds[4];
+      int intIds[4];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3]) != 4)
+      if (!vtk::scan<int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2203,7 +2165,9 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3]);
+        auto resultInt4 =
+          vtk::scan<int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3]) = resultInt4->values();
         for (j = 0; j < 4; j++)
         {
           intIds[j]--;
@@ -2214,23 +2178,20 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         this->InsertNextCellAndId(output, VTK_TETRA, 4, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "tetra10", 7) == 0)
     {
       vtkDebugMacro("tetra10");
       cellType = vtkPEnSightReader::TETRA10;
 
-      nodeIds = new vtkIdType[10];
-      intIds = new int[10];
+      vtkIdType nodeIds[10];
+      int intIds[10];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2],
-            &intIds[3], &intIds[4], &intIds[5], &intIds[6], &intIds[7], &intIds[8],
-            &intIds[9]) != 10)
+      if (!vtk::scan<int, int, int, int, int, int, int, int, int, int>(
+            std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2240,8 +2201,10 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2],
-          &intIds[3], &intIds[4], &intIds[5], &intIds[6], &intIds[7], &intIds[8], &intIds[9]);
+        auto resultInt10 = vtk::scan<int, int, int, int, int, int, int, int, int, int>(
+          std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4], intIds[5], intIds[6],
+          intIds[7], intIds[8], intIds[9]) = resultInt10->values();
         for (j = 0; j < 10; j++)
         {
           intIds[j]--;
@@ -2253,8 +2216,6 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_QUADRATIC_TETRA, 10, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "g_tetra4", 8) == 0 || strncmp(line, "g_tetra10", 9) == 0)
     {
@@ -2270,12 +2231,10 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         cellType = vtkPEnSightReader::TETRA4;
       }
 
-      intIds = new int[4];
-
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3]) != 4)
+      if (!vtk::scan<int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2287,21 +2246,19 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] intIds;
     }
     else if (strncmp(line, "pyramid5", 8) == 0)
     {
       vtkDebugMacro("pyramid5");
       cellType = vtkPEnSightReader::PYRAMID5;
 
-      nodeIds = new vtkIdType[5];
-      intIds = new int[5];
+      vtkIdType nodeIds[5];
+      int intIds[5];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-            &intIds[4]) != 5)
+      if (!vtk::scan<int, int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2311,7 +2268,9 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3], &intIds[4]);
+        auto resultInt5 =
+          vtk::scan<int, int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4]) = resultInt5->values();
         for (j = 0; j < 5; j++)
         {
           intIds[j]--;
@@ -2322,23 +2281,21 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         this->InsertNextCellAndId(output, VTK_PYRAMID, 5, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "pyramid13", 9) == 0)
     {
       vtkDebugMacro("pyramid13");
       cellType = vtkPEnSightReader::PYRAMID13;
 
-      nodeIds = new vtkIdType[13];
-      intIds = new int[13];
+      vtkIdType nodeIds[13];
+      int intIds[13];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1],
-            &intIds[2], &intIds[3], &intIds[4], &intIds[5], &intIds[6], &intIds[7], &intIds[8],
-            &intIds[9], &intIds[10], &intIds[11], &intIds[12]) != 13)
+      if (!vtk::scan<int, int, int, int, int, int, int, int, int, int, int, int, int>(
+            std::string_view(line),
+            " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2348,9 +2305,13 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2],
-          &intIds[3], &intIds[4], &intIds[5], &intIds[6], &intIds[7], &intIds[8], &intIds[9],
-          &intIds[10], &intIds[11], &intIds[12]);
+        auto resultInt13 =
+          vtk::scan<int, int, int, int, int, int, int, int, int, int, int, int, int>(
+            std::string_view(line),
+            " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4], intIds[5], intIds[6],
+          intIds[7], intIds[8], intIds[9], intIds[10], intIds[11], intIds[12]) =
+          resultInt13->values();
         for (j = 0; j < 13; j++)
         {
           intIds[j]--;
@@ -2362,8 +2323,6 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_QUADRATIC_PYRAMID, 13, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "g_pyramid5", 10) == 0 || strncmp(line, "g_pyramid13", 11) == 0)
     {
@@ -2379,13 +2338,10 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         cellType = vtkPEnSightReader::PYRAMID5;
       }
 
-      intIds = new int[5];
-
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-            &intIds[4]) != 5)
+      if (!vtk::scan<int, int, int, int, int>(std::string_view(line), " {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2397,21 +2353,20 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] intIds;
     }
     else if (strncmp(line, "hexa8", 5) == 0)
     {
       vtkDebugMacro("hexa8");
       cellType = vtkPEnSightReader::HEXA8;
 
-      nodeIds = new vtkIdType[8];
-      intIds = new int[8];
+      vtkIdType nodeIds[8];
+      int intIds[8];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-            &intIds[4], &intIds[5], &intIds[6], &intIds[7]) != 8)
+      if (!vtk::scan<int, int, int, int, int, int, int, int>(
+            std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2421,8 +2376,10 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-          &intIds[4], &intIds[5], &intIds[6], &intIds[7]);
+        auto resultInt8 = vtk::scan<int, int, int, int, int, int, int, int>(
+          std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4], intIds[5], intIds[6],
+          intIds[7]) = resultInt8->values();
         for (j = 0; j < 8; j++)
         {
           intIds[j]--;
@@ -2434,24 +2391,22 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_HEXAHEDRON, 8, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "hexa20", 6) == 0)
     {
       vtkDebugMacro("hexa20");
       cellType = vtkPEnSightReader::HEXA20;
 
-      nodeIds = new vtkIdType[20];
-      intIds = new int[20];
+      vtkIdType nodeIds[20];
+      int intIds[20];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &intIds[0],
-            &intIds[1], &intIds[2], &intIds[3], &intIds[4], &intIds[5], &intIds[6], &intIds[7],
-            &intIds[8], &intIds[9], &intIds[10], &intIds[11], &intIds[12], &intIds[13], &intIds[14],
-            &intIds[15], &intIds[16], &intIds[17], &intIds[18], &intIds[19]) != 20)
+      if (!vtk::scan<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int,
+            int, int, int, int>(std::string_view(line),
+            " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} "
+            "{:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2461,10 +2416,14 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &intIds[0],
-          &intIds[1], &intIds[2], &intIds[3], &intIds[4], &intIds[5], &intIds[6], &intIds[7],
-          &intIds[8], &intIds[9], &intIds[10], &intIds[11], &intIds[12], &intIds[13], &intIds[14],
-          &intIds[15], &intIds[16], &intIds[17], &intIds[18], &intIds[19]);
+        auto resultInt20 = vtk::scan<int, int, int, int, int, int, int, int, int, int, int, int,
+          int, int, int, int, int, int, int, int>(std::string_view(line),
+          " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} "
+          "{:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4], intIds[5], intIds[6],
+          intIds[7], intIds[8], intIds[9], intIds[10], intIds[11], intIds[12], intIds[13],
+          intIds[14], intIds[15], intIds[16], intIds[17], intIds[18], intIds[19]) =
+          resultInt20->values();
         for (j = 0; j < 20; j++)
         {
           intIds[j]--;
@@ -2476,8 +2435,6 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_QUADRATIC_HEXAHEDRON, 20, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "g_hexa8", 7) == 0 || strncmp(line, "g_hexa20", 8) == 0)
     {
@@ -2493,13 +2450,11 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         cellType = vtkPEnSightReader::HEXA8;
       }
 
-      intIds = new int[8];
-
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-            &intIds[4], &intIds[5], &intIds[6], &intIds[7]) != 8)
+      if (!vtk::scan<int, int, int, int, int, int, int, int>(
+            std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2511,21 +2466,22 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] intIds;
     }
     else if (strncmp(line, "penta6", 6) == 0)
     {
+      const unsigned char wedgeMap[6] = { 0, 2, 1, 3, 5, 4 };
+
       vtkDebugMacro("penta6");
       cellType = vtkPEnSightReader::PENTA6;
 
-      nodeIds = new vtkIdType[6];
-      intIds = new int[6];
+      vtkIdType nodeIds[6];
+      int intIds[6];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-            &intIds[4], &intIds[5]) != 6)
+      if (!vtk::scan<int, int, int, int, int, int>(
+            std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2535,35 +2491,37 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-          &intIds[4], &intIds[5]);
+        auto resultInt6 = vtk::scan<int, int, int, int, int, int>(
+          std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4], intIds[5]) =
+          resultInt6->values();
         for (j = 0; j < 6; j++)
         {
           intIds[j]--;
-          nodeIds[j] = intIds[j];
+          nodeIds[wedgeMap[j]] = intIds[j];
         }
         // cellId = output->InsertNextCell(VTK_WEDGE, 6, nodeIds);
         // this->GetCellIds(idx, cellType)->InsertNextId(cellId);
         this->InsertNextCellAndId(output, VTK_WEDGE, 6, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "penta15", 7) == 0)
     {
+      const unsigned char wedgeMap[15] = { 0, 2, 1, 3, 5, 4, 8, 7, 6, 11, 10, 9, 12, 14, 13 };
+
       vtkDebugMacro("penta15");
       cellType = vtkPEnSightReader::PENTA15;
 
-      nodeIds = new vtkIdType[15];
-      intIds = new int[15];
+      vtkIdType nodeIds[15];
+      int intIds[15];
 
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1],
-            &intIds[2], &intIds[3], &intIds[4], &intIds[5], &intIds[6], &intIds[7], &intIds[8],
-            &intIds[9], &intIds[10], &intIds[11], &intIds[12], &intIds[13], &intIds[14]) != 15)
+      if (!vtk::scan<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int>(
+            std::string_view(line),
+            " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2573,13 +2531,17 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       }
       for (i = 0; i < numElements; i++)
       {
-        sscanf(line, " %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &intIds[0], &intIds[1],
-          &intIds[2], &intIds[3], &intIds[4], &intIds[5], &intIds[6], &intIds[7], &intIds[8],
-          &intIds[9], &intIds[10], &intIds[11], &intIds[12], &intIds[13], &intIds[14]);
+        auto resultInt15 =
+          vtk::scan<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int>(
+            std::string_view(line),
+            " {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d} {:d}");
+        std::tie(intIds[0], intIds[1], intIds[2], intIds[3], intIds[4], intIds[5], intIds[6],
+          intIds[7], intIds[8], intIds[9], intIds[10], intIds[11], intIds[12], intIds[13],
+          intIds[14]) = resultInt15->values();
         for (j = 0; j < 15; j++)
         {
           intIds[j]--;
-          nodeIds[j] = intIds[j];
+          nodeIds[wedgeMap[j]] = intIds[j];
         }
         // cellId = output->InsertNextCell(VTK_QUADRATIC_WEDGE, 15, nodeIds);
         // this->GetCellIds(idx, cellType)->InsertNextId(cellId);
@@ -2587,8 +2549,6 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
           output, VTK_QUADRATIC_WEDGE, 15, nodeIds, idx, cellType, i, numElements);
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] nodeIds;
-      delete[] intIds;
     }
     else if (strncmp(line, "g_penta6", 8) == 0 || strncmp(line, "g_penta15", 9) == 0)
     {
@@ -2604,13 +2564,11 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
         cellType = vtkPEnSightReader::PENTA6;
       }
 
-      intIds = new int[6];
-
       this->ReadNextDataLine(line);
-      numElements = atoi(line);
+      numElements = vtk::scan_int<int>(std::string_view(line))->value();
       this->ReadNextDataLine(line);
-      if (sscanf(line, " %d %d %d %d %d %d", &intIds[0], &intIds[1], &intIds[2], &intIds[3],
-            &intIds[4], &intIds[5]) != 6)
+      if (!vtk::scan<int, int, int, int, int, int>(
+            std::string_view(line), " {:d} {:d} {:d} {:d} {:d} {:d}"))
       {
         for (i = 0; i < numElements; i++)
         {
@@ -2622,7 +2580,6 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
       {
         lineRead = this->ReadNextDataLine(line);
       }
-      delete[] intIds;
     }
     else if (strncmp(line, "END TIME STEP", 13) == 0)
     {
@@ -2661,7 +2618,6 @@ int vtkPEnSightGoldReader::CreateUnstructuredGridOutput(
 int vtkPEnSightGoldReader::CreateStructuredGridOutput(
   int partId, char line[256], const char* name, vtkMultiBlockDataSet* compositeOutput)
 {
-  char subLine[256];
   int lineRead;
   int iblanked = 0;
   int dimensions[3];
@@ -2688,16 +2644,20 @@ int vtkPEnSightGoldReader::CreateStructuredGridOutput(
 
   this->SetBlockName(compositeOutput, partId, name);
 
-  if (sscanf(line, " %*s %s", subLine) == 1)
+  auto resultSubLine =
+    vtk::scan<std::string_view, std::string_view>(std::string_view(line), " {:s} {:s}");
+  if (resultSubLine)
   {
-    if (strncmp(subLine, "iblanked", 8) == 0)
+    auto subLine = std::get<1>(resultSubLine->values());
+    if (subLine == "iblanked")
     {
       iblanked = 1;
     }
   }
 
   this->ReadNextDataLine(line);
-  sscanf(line, " %d %d %d", &dimensions[0], &dimensions[1], &dimensions[2]);
+  auto resultDimensions = vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}");
+  std::tie(dimensions[0], dimensions[1], dimensions[2]) = resultDimensions->values();
 
   numPts = dimensions[0] * dimensions[1] * dimensions[2];
 
@@ -2733,7 +2693,7 @@ int vtkPEnSightGoldReader::CreateStructuredGridOutput(
     int realPointId = this->GetPointIds(partId)->GetId(i);
     if (realPointId != -1)
     {
-      points->InsertNextPoint(atof(line), 0.0, 0.0);
+      points->InsertNextPoint(vtk::scan_value<float>(std::string_view(line))->value(), 0.0, 0.0);
     }
   }
   for (i = 0; i < numPts; i++)
@@ -2743,7 +2703,8 @@ int vtkPEnSightGoldReader::CreateStructuredGridOutput(
     if (realPointId != -1)
     {
       points->GetPoint(realPointId, point);
-      points->SetPoint(realPointId, point[0], atof(line), point[2]);
+      points->SetPoint(
+        realPointId, point[0], vtk::scan_value<float>(std::string_view(line))->value(), point[2]);
     }
   }
   for (i = 0; i < numPts; i++)
@@ -2753,7 +2714,8 @@ int vtkPEnSightGoldReader::CreateStructuredGridOutput(
     if (realPointId != -1)
     {
       points->GetPoint(realPointId, point);
-      points->SetPoint(realPointId, point[0], point[1], atof(line));
+      points->SetPoint(
+        realPointId, point[0], point[1], vtk::scan_value<float>(std::string_view(line))->value());
     }
   }
 
@@ -2765,7 +2727,7 @@ int vtkPEnSightGoldReader::CreateStructuredGridOutput(
     {
       this->ReadNextDataLine(line);
       int realPointId = this->GetPointIds(partId)->GetId(i);
-      if ((realPointId != -1) && (!atoi(line)))
+      if ((realPointId != -1) && (!vtk::scan_int<int>(std::string_view(line))->value()))
         output->BlankPoint(realPointId);
     }
   }
@@ -2788,7 +2750,6 @@ int vtkPEnSightGoldReader::CreateStructuredGridOutput(
 int vtkPEnSightGoldReader::CreateRectilinearGridOutput(
   int partId, char line[256], const char* name, vtkMultiBlockDataSet* compositeOutput)
 {
-  char subLine[256];
   int lineRead;
   int iblanked = 0;
   int dimensions[3];
@@ -2817,16 +2778,20 @@ int vtkPEnSightGoldReader::CreateRectilinearGridOutput(
 
   this->SetBlockName(compositeOutput, partId, name);
 
-  if (sscanf(line, " %*s %*s %s", subLine) == 1)
+  auto resultSubLine = vtk::scan<std::string_view, std::string_view, std::string_view>(
+    std::string_view(line), " {:s} {:s} {:s}");
+  if (resultSubLine)
   {
-    if (strncmp(subLine, "iblanked", 8) == 0)
+    auto subLine = std::get<2>(resultSubLine->values());
+    if (subLine == "iblanked")
     {
       iblanked = 1;
     }
   }
 
   this->ReadNextDataLine(line);
-  sscanf(line, " %d %d %d", &dimensions[0], &dimensions[1], &dimensions[2]);
+  auto resultDimensions = vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}");
+  std::tie(dimensions[0], dimensions[1], dimensions[2]) = resultDimensions->values();
 
   int newDimensions[3];
   int splitDimension;
@@ -2868,7 +2833,7 @@ int vtkPEnSightGoldReader::CreateRectilinearGridOutput(
     this->ReadNextDataLine(line);
     if ((i >= beginDimension[0]) && (i < (beginDimension[0] + newDimensions[0])))
     {
-      val = atof(line);
+      val = vtk::scan_value<float>(std::string_view(line))->value();
       xCoords->InsertNextTuple(&val);
     }
   }
@@ -2877,7 +2842,7 @@ int vtkPEnSightGoldReader::CreateRectilinearGridOutput(
     this->ReadNextDataLine(line);
     if ((i >= beginDimension[1]) && (i < (beginDimension[1] + newDimensions[1])))
     {
-      val = atof(line);
+      val = vtk::scan_value<float>(std::string_view(line))->value();
       yCoords->InsertNextTuple(&val);
     }
   }
@@ -2886,7 +2851,7 @@ int vtkPEnSightGoldReader::CreateRectilinearGridOutput(
     this->ReadNextDataLine(line);
     if ((i >= beginDimension[2]) && (i < (beginDimension[2] + newDimensions[2])))
     {
-      val = atof(line);
+      val = vtk::scan_value<float>(std::string_view(line))->value();
       zCoords->InsertNextTuple(&val);
     }
   }
@@ -2924,7 +2889,6 @@ int vtkPEnSightGoldReader::CreateRectilinearGridOutput(
 int vtkPEnSightGoldReader::CreateImageDataOutput(
   int partId, char line[256], const char* name, vtkMultiBlockDataSet* compositeOutput)
 {
-  char subLine[256];
   int lineRead;
   int iblanked = 0;
   int dimensions[3];
@@ -2950,16 +2914,20 @@ int vtkPEnSightGoldReader::CreateImageDataOutput(
 
   this->SetBlockName(compositeOutput, partId, name);
 
-  if (sscanf(line, " %*s %*s %s", subLine) == 1)
+  auto resultSubLine = vtk::scan<std::string_view, std::string_view, std::string_view>(
+    std::string_view(line), " {:s} {:s} {:s}");
+  if (resultSubLine)
   {
-    if (strncmp(subLine, "iblanked", 8) == 0)
+    auto subLine = std::get<2>(resultSubLine->values());
+    if (subLine == "iblanked")
     {
       iblanked = 1;
     }
   }
 
   this->ReadNextDataLine(line);
-  sscanf(line, " %d %d %d", &dimensions[0], &dimensions[1], &dimensions[2]);
+  auto resultDimensions = vtk::scan<int, int, int>(std::string_view(line), " {:d} {:d} {:d}");
+  std::tie(dimensions[0], dimensions[1], dimensions[2]) = resultDimensions->values();
 
   int newDimensions[3];
   int splitDimension;
@@ -2989,12 +2957,12 @@ int vtkPEnSightGoldReader::CreateImageDataOutput(
   for (i = 0; i < 3; i++)
   {
     this->ReadNextDataLine(line);
-    sscanf(line, " %f", &origin[i]);
+    origin[i] = vtk::scan_value<float>(std::string_view(line))->value();
   }
   for (i = 0; i < 3; i++)
   {
     this->ReadNextDataLine(line);
-    sscanf(line, " %f", &delta[i]);
+    delta[i] = vtk::scan_value<float>(std::string_view(line))->value();
   }
 
   // Compute new origin
@@ -3032,17 +3000,17 @@ int vtkPEnSightGoldReader::CreateImageDataOutput(
 //----------------------------------------------------------------------------
 int vtkPEnSightGoldReader::CheckForUndefOrPartial(const char* line)
 {
-  char undefvar[16];
   // Look for keyword 'partial' or 'undef':
-  int r = sscanf(line, "%*s %s", undefvar);
-  if (r == 1)
+  auto result = vtk::scan<std::string_view, std::string_view>(std::string_view(line), " {:s} {:s}");
+  if (result)
   {
+    auto& undefvar = std::get<1>(result->values());
     char subline[80];
-    if (strcmp(undefvar, "undef") == 0)
+    if (undefvar == "undef")
     {
       vtkDebugMacro("undef: " << line);
       this->ReadNextDataLine(subline);
-      double val = atof(subline);
+      double val = vtk::scan_value<float>(std::string_view(subline))->value();
       switch (this->GetSectionType(line))
       {
         case vtkPEnSightReader::COORDINATES:
@@ -3059,11 +3027,11 @@ int vtkPEnSightGoldReader::CheckForUndefOrPartial(const char* line)
       }
       return 0; // meaning 'undef', so no other steps is necesserary
     }
-    else if (strcmp(undefvar, "partial") == 0)
+    else if (undefvar == "partial")
     {
       vtkDebugMacro("partial: " << line);
       this->ReadNextDataLine(subline);
-      int nLines = atoi(subline);
+      int nLines = vtk::scan_int<int>(std::string_view(subline))->value();
       vtkIdType val;
       int i;
       switch (this->GetSectionType(line))
@@ -3072,7 +3040,7 @@ int vtkPEnSightGoldReader::CheckForUndefOrPartial(const char* line)
           for (i = 0; i < nLines; ++i)
           {
             this->ReadNextDataLine(subline);
-            val = atoi(subline) - 1; // EnSight start at 1
+            val = vtk::scan_int<int>(std::string_view(subline))->value() - 1; // EnSight start at 1
             this->UndefPartial->PartialCoordinates.push_back(val);
           }
           break;
@@ -3080,7 +3048,7 @@ int vtkPEnSightGoldReader::CheckForUndefOrPartial(const char* line)
           for (i = 0; i < nLines; ++i)
           {
             this->ReadNextDataLine(subline);
-            val = atoi(subline) - 1; // EnSight start at 1
+            val = vtk::scan_int<int>(std::string_view(subline))->value() - 1; // EnSight start at 1
             this->UndefPartial->PartialBlock.push_back(val);
           }
           break;
@@ -3088,7 +3056,7 @@ int vtkPEnSightGoldReader::CheckForUndefOrPartial(const char* line)
           for (i = 0; i < nLines; ++i)
           {
             this->ReadNextDataLine(subline);
-            val = atoi(subline) - 1; // EnSight start at 1
+            val = vtk::scan_int<int>(std::string_view(subline))->value() - 1; // EnSight start at 1
             this->UndefPartial->PartialElementTypes.push_back(val);
           }
           break;
@@ -3106,7 +3074,6 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
   vtkPoints* points, long offset, int partId, int* lineRead, char line[256], bool skip)
 {
   int numPts, i;
-  char subLine[256];
   double point[3];
 
   if (offset == -1)
@@ -3119,7 +3086,7 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
   this->IS->seekg(offset);
 
   this->ReadNextDataLine(line);
-  numPts = atoi(line);
+  numPts = vtk::scan_int<int>(std::string_view(line))->value();
 
   if (skip)
   {
@@ -3136,11 +3103,9 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
       this->ReadNextDataLine(line);
     }
     *lineRead = this->ReadNextDataLine(line);
-    sscanf(line, " %s", subLine);
-    char* endptr;
-    double value = strtod(subLine, &endptr); // Testing if we can convert this string to double
-    (void)value;                             // Prevent Warning to show up
-    if (subLine != endptr)
+    auto subline = vtk::scan_value<std::string_view>(std::string_view(line))->value();
+    auto resultValue = vtk::scan_value<double>(subline);
+    if (resultValue)
     { // necessary if node ids were listed
       for (i = 0; i < numPts; i++)
       {
@@ -3161,11 +3126,9 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
         this->ReadNextDataLine(line);
       }
       *lineRead = this->ReadNextDataLine(line);
-      sscanf(line, " %s", subLine);
-      char* endptr;
-      double value = strtod(subLine, &endptr); // Testing if we can convert this string to double
-      (void)value;                             // Prevent Warning to show up
-      if (subLine != endptr)
+      auto subline = vtk::scan_value<std::string_view>(std::string_view(line))->value();
+      auto resultValue = vtk::scan_value<double>(subline);
+      if (resultValue)
       { // necessary if node ids were listed
         for (i = 0; i < numPts; i++)
         {
@@ -3187,7 +3150,7 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
         int id = this->GetPointIds(partId)->GetId(i);
         if (id != -1)
         {
-          points->SetPoint(id, atof(line), 0, 0);
+          points->SetPoint(id, vtk::scan_value<float>(std::string_view(line))->value(), 0, 0);
         }
       }
       for (i = 0; i < numPts; i++)
@@ -3197,7 +3160,8 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
         if (id != -1)
         {
           points->GetPoint(id, point);
-          points->SetPoint(id, point[0], atof(line), 0);
+          points->SetPoint(
+            id, point[0], vtk::scan_value<float>(std::string_view(line))->value(), 0);
         }
       }
       for (i = 0; i < numPts; i++)
@@ -3207,17 +3171,15 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
         if (id != -1)
         {
           points->GetPoint(id, point);
-          points->SetPoint(id, point[0], point[1], atof(line));
+          points->SetPoint(
+            id, point[0], point[1], vtk::scan_value<float>(std::string_view(line))->value());
         }
       }
 
       *lineRead = this->ReadNextDataLine(line);
-      sscanf(line, " %s", subLine);
-
-      char* endptr;
-      double value = strtod(subLine, &endptr); // Testing if we can convert this string to double
-      (void)value;                             // Prevent Warning to show up
-      if (subLine != endptr)
+      auto subline = vtk::scan_value<std::string_view>(std::string_view(line))->value();
+      auto resultValue = vtk::scan_value<double>(subline);
+      if (resultValue)
       { // necessary if node ids were listed
         for (i = 0; i < numPts; i++)
         {
@@ -3225,7 +3187,8 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
           if (id != -1)
           {
             points->GetPoint(id, point);
-            points->SetPoint(id, point[1], point[2], atof(line));
+            points->SetPoint(
+              id, point[1], point[2], vtk::scan_value<float>(std::string_view(line))->value());
           }
           *lineRead = this->ReadNextDataLine(line);
         }

@@ -24,6 +24,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringScanner.h"
 #include "vtkWeakPointer.h"
 
 #include <cassert>
@@ -53,14 +54,8 @@ pqInteractivePropertyWidgetAbstract::pqInteractivePropertyWidgetAbstract(
   {
     if (const char* portIndex = visLink->GetAttribute("port"))
     {
-      try
-      {
-        this->LinkedPortIndex = std::stoi(portIndex);
-      }
-      catch (const std::exception&)
-      {
-        this->LinkedPortIndex = -1;
-      }
+      this->LinkedPortIndex = -1;
+      VTK_FROM_CHARS_IF_ERROR_BREAK(portIndex, this->LinkedPortIndex);
     }
   }
 }

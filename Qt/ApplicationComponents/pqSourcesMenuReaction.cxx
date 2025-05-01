@@ -4,7 +4,6 @@
 #include "pqSourcesMenuReaction.h"
 
 #include "pqActiveObjects.h"
-#include "pqCollaborationManager.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqProxyGroupMenuManager.h"
@@ -21,6 +20,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkStringScanner.h"
 
 #include <QCoreApplication>
 
@@ -124,7 +124,9 @@ bool pqSourcesMenuReaction::warnOnCreate(
 
           // Compare with the input size
           vtkTypeInt64 inputSize = port->getDataInformation()->GetMemorySize();
-          double relative = std::stod(memoryUsage->GetAttributeOrDefault("relative", "1"));
+          double relative;
+          VTK_FROM_CHARS_IF_ERROR_RETURN(
+            memoryUsage->GetAttributeOrDefault("relative", "1"), relative, true);
           if (inputSize * relative < worstRemainingMemory)
           {
             shouldWarn = false;
