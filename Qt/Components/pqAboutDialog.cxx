@@ -272,11 +272,12 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
       {
         headlessModes << "OSMesa";
       }
-      ::addItem(tree, tr("Headless Support"), QString::fromStdString(headlessModes.str()));
+      ::addItem(
+        tree, tr("Supported Headless Backends"), QString::fromStdString(headlessModes.str()));
     }
     else
     {
-      ::addItem(tree, tr("Headless Support"), tr("None"));
+      ::addItem(tree, tr("Supported Headless Backends"), tr("None"));
     }
   }
   else
