@@ -881,14 +881,11 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
     return true;
   }
 
-  vtkIdType* rcvcounts = nullptr;
-  vtkIdType* offSet = nullptr;
-  int rbufsize = 0;
-  unsigned char* rcvbuffer = nullptr;
-
   // STEP 1: Initialize data-structures for all ranks
-  rcvcounts = new vtkIdType[nranks];
-  offSet = new vtkIdType[nranks];
+  std::vector<vtkIdType> rcvcounts(nranks);
+  std::vector<vtkIdType> offSet(nranks);
+  std::vector<unsigned char> rcvbuffer;
+  int rbufsize = 0;
 
   // STEP 2: Serialize the vtkPVInformation object
   vtkClientServerStream stream;
@@ -903,7 +900,7 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
   vtkIdType local_length = static_cast<vtkIdType>(length);
 
   // STEP 3: Get number of bytes that each process will send for all ranks
-  this->ParallelController->AllGather(&local_length, rcvcounts, 1);
+  this->ParallelController->AllGather(&local_length, rcvcounts.data(), 1);
 
   // STEP 4: Allocate temporary arrays for all ranks
   // Note: this must be calculated for all ranks because the GatherV method
@@ -914,7 +911,7 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
   {
     rbufsize += rcvcounts[i];
   }
-  rcvbuffer = new unsigned char[rbufsize];
+  rcvbuffer.resize(rbufsize);
 
   // STEP 4.2: populate offset array
   offSet[0] = 0;
@@ -924,7 +921,8 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
   }
 
   // STEP 5: GatherV all data from satellites
-  this->ParallelController->GatherV(data, rcvbuffer, local_length, rcvcounts, offSet, 0);
+  this->ParallelController->GatherV(
+    data, rcvbuffer.data(), local_length, rcvcounts.data(), offSet.data(), 0);
 
   // STEP 6: Deserialize data from other ranks at rank 0 and add them to
   // the information object associated with rank 0.
@@ -940,16 +938,6 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
       tempInfo->Delete();
     } // END for all remote ranks
   }   // END if rank == 0
-
-  // STEP 7: De-allocate temporary arrays at rank 0
-  SafeDeleteArray(rcvcounts);
-  SafeDeleteArray(offSet);
-  SafeDeleteArray(rcvbuffer);
-
-  // Sanity checks -- ensure we return all dynamically allocated memory
-  assert("post: rcvcounts should be nullptr" && (rcvcounts == nullptr));
-  assert("post: offSet should be nullptr" && (offSet == nullptr));
-  assert("post: rcvbuffer should be nullptr" && (rcvbuffer == nullptr));
 
   // STEP 8: Barrier synchronization
   this->ParallelController->Barrier();
