@@ -375,10 +375,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
   {
     if (this->ReductionMode == vtkReductionFilter::REDUCE_ALL_TO_ALL)
     {
-      for (int i = 0; i < controller->GetNumberOfProcesses(); i++)
-      {
-        controller->Gather(preOutput, receiveData, i);
-      }
+      controller->AllGather(preOutput, receiveData);
     }
     else
     {
