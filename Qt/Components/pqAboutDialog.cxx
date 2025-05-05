@@ -260,6 +260,7 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
     ::addItem(tree, tr("OpenGL Vendor"), QString::fromStdString(OpenGLInfo->GetVendor()));
     ::addItem(tree, tr("OpenGL Version"), QString::fromStdString(OpenGLInfo->GetVersion()));
     ::addItem(tree, tr("OpenGL Renderer"), QString::fromStdString(OpenGLInfo->GetRenderer()));
+    ::addItem(tree, tr("Window Backend"), QString::fromStdString(OpenGLInfo->GetWindowBackend()));
 
     if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING))
     {
@@ -272,11 +273,12 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
       {
         headlessModes << "OSMesa";
       }
-      ::addItem(tree, tr("Headless support"), QString::fromStdString(headlessModes.str()));
+      ::addItem(
+        tree, tr("Supported Headless Backends"), QString::fromStdString(headlessModes.str()));
     }
     else
     {
-      ::addItem(tree, tr("Headless support"), tr("None"));
+      ::addItem(tree, tr("Supported Headless Backends"), tr("None"));
     }
   }
   else
@@ -284,7 +286,7 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
     ::addItem(tree, "OpenGL", tr("Not supported"));
   }
 
-  ::addItem(tree, tr("Accelerated filters overrides available"),
+  ::addItem(tree, tr("Accelerated Filters Overrides Available"),
     serverInfo->GetAcceleratedFiltersOverrideAvailable() ? tr("Yes") : tr("No"));
 }
 

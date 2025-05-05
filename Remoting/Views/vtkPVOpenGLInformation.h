@@ -51,6 +51,7 @@ public:
   const std::string& GetVendor() const { return this->Vendor; }
   const std::string& GetVersion() const { return this->Version; }
   const std::string& GetRenderer() const { return this->Renderer; }
+  const std::string& GetWindowBackend() const { return this->WindowBackend; }
   const std::string& GetCapabilities() const { return this->Capabilities; }
   ///@}
 
@@ -65,6 +66,7 @@ private:
   std::string Vendor;
   std::string Version;
   std::string Renderer;
+  std::string WindowBackend;
   std::string Capabilities;
 };
 

@@ -28,9 +28,11 @@ QString openGLVersionInfo(vtkSMSession* session, vtkPVSession::ServerFlags serve
 {
   vtkNew<vtkPVOpenGLInformation> glinfo;
   session->GatherInformation(server_flag, glinfo.GetPointer(), 0);
-  return QString(QCoreApplication::translate("pqDefaultViewBehavior",
-                   ("OpenGL Vendor: %1\nOpenGL Version: %2\nOpenGL Renderer: %3")))
-    .arg(glinfo->GetVendor().c_str(), glinfo->GetVersion().c_str(), glinfo->GetRenderer().c_str());
+  return QString(
+    QCoreApplication::translate("pqDefaultViewBehavior",
+      ("OpenGL Vendor: %1\nOpenGL Version: %2\nOpenGL Renderer: %3\nWindow Backend: %4")))
+    .arg(glinfo->GetVendor().c_str(), glinfo->GetVersion().c_str(), glinfo->GetRenderer().c_str(),
+      glinfo->GetWindowBackend().c_str());
 }
 }
 

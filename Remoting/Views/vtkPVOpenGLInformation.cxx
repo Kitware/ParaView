@@ -11,12 +11,27 @@
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
+#include <unordered_map>
+
+namespace
+{
+// Map from OpenGL render window class names to human-readable window backend names.
+std::unordered_map<std::string, std::string> WindowBackendMap{
+  { "vtkCocoaRenderWindow", "Cocoa" },
+  { "vtkEGLRenderWindow", "EGL" },
+  { "vtkOSOpenGLRenderWindow", "OSMesa" },
+  { "vtkXOpenGLRenderWindow", "GLX" },
+  { "vtkWin32OpenGLRenderWindow", "Win32" },
+};
+}
+
 vtkStandardNewMacro(vtkPVOpenGLInformation);
 //----------------------------------------------------------------------------
 vtkPVOpenGLInformation::vtkPVOpenGLInformation()
 {
   this->RootOnly = 1;
-  this->Vendor = this->Version = this->Renderer = this->Capabilities = "Information Unavailable";
+  this->Vendor = this->Version = this->Renderer = this->Capabilities = this->WindowBackend =
+    "Information Unavailable";
 }
 
 //----------------------------------------------------------------------------
@@ -25,7 +40,8 @@ vtkPVOpenGLInformation::~vtkPVOpenGLInformation() = default;
 //-----------------------------------------------------------------------------
 void vtkPVOpenGLInformation::CopyFromObject(vtkObject* obj)
 {
-  this->Vendor = this->Version = this->Renderer = this->Capabilities = "Information Unavailable";
+  this->Vendor = this->Version = this->Renderer = this->Capabilities = this->WindowBackend =
+    "Information Unavailable";
 
   vtkPVView* view = vtkPVView::SafeDownCast(obj);
   vtkSmartPointer<vtkRenderWindow> renWin =
@@ -61,6 +77,10 @@ void vtkPVOpenGLInformation::CopyFromObject(vtkObject* obj)
 
     this->Capabilities = opengl_capabilities;
   }
+  if (const auto it = WindowBackendMap.find(renWin->GetClassName()); it != WindowBackendMap.end())
+  {
+    this->WindowBackend = it->second;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -81,6 +101,7 @@ void vtkPVOpenGLInformation::AddInformation(vtkPVInformation* pvinfo)
   this->Version = info->Version;
   this->Renderer = info->Renderer;
   this->Capabilities = info->Capabilities;
+  this->WindowBackend = info->WindowBackend;
 }
 
 //-----------------------------------------------------------------------------
@@ -88,7 +109,7 @@ void vtkPVOpenGLInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply << this->Vendor << this->Version << this->Renderer
-       << this->Capabilities << vtkClientServerStream::End;
+       << this->Capabilities << this->WindowBackend << vtkClientServerStream::End;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,6 +127,7 @@ void vtkPVOpenGLInformation::CopyFromStream(const vtkClientServerStream* css)
   PARSE_NEXT_VALUE(Version);
   PARSE_NEXT_VALUE(Renderer);
   PARSE_NEXT_VALUE(Capabilities);
+  PARSE_NEXT_VALUE(WindowBackend);
   this->Modified();
 #undef PARSE_NEXT_VALUE
 }
