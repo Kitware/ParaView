@@ -205,6 +205,7 @@ public:
     this->Widget->setEnableHiDPI(true);
     this->Widget->setObjectName("1QVTKWidget0");
     this->Widget->setRenderWindow(this->Window);
+    this->Widget->setEnableTouchEventProcessing(false);
     this->ContextView->SetRenderWindow(this->Window);
 
     this->ChartXY->SetAutoSize(true);
