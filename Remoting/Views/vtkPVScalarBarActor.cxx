@@ -26,6 +26,7 @@
 #include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 #include "vtkTexture.h"
@@ -36,14 +37,6 @@
 
 #include <algorithm>
 #include <sstream>
-
-#include <cstdio> // for snprintf
-
-#if defined(_WIN32) && !defined(__CYGWIN__)
-#define SNPRINTF _snprintf
-#else
-#define SNPRINTF snprintf
-#endif
 
 #define COLOR_TEXTURE_MAP_SIZE 256
 
@@ -61,7 +54,7 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
   this->DrawSubTickMarks = 1;
   this->AddRangeLabels = 1;
   this->RangeLabelFormat = nullptr;
-  this->SetRangeLabelFormat("%4.3e");
+  this->SetRangeLabelFormat("{:4.3e}");
   this->TitleJustification = VTK_TEXT_CENTERED;
   this->AddRangeAnnotations = 1;
   this->AnnotationTextScaling = 1;
@@ -236,8 +229,10 @@ int vtkPVScalarBarActor::CreateLabel(
     {
       char format[512];
       char string2[1024];
-      SNPRINTF(format, 511, "%%-0.%dg", i);
-      SNPRINTF(string2, 1023, format, value);
+      auto result = vtk::format_to_n(format, 511, "{{-0.{:d}g}}", i);
+      *result.out = '\0';
+      result = vtk::format_to_n(string2, 1023, std::string_view(format), value);
+      *result.out = '\0';
 
       // we want the reduced size used so that we can get better fitting
       // Extra filter: Used to remove unwanted 0 after e+ or e-
@@ -274,7 +269,8 @@ int vtkPVScalarBarActor::CreateLabel(
   else
   {
     // Potential of buffer overrun (onto the stack) here.
-    SNPRINTF(string, 1023, this->LabelFormat, value);
+    auto result = vtk::format_to_n(string, 1023, this->LabelFormat, value);
+    *result.out = '\0';
   }
 
   // Set the txt label
@@ -1095,9 +1091,11 @@ void vtkPVScalarBarActor::AddValueLabelIfUnoccluded(double value, double pos, do
   // How many digits of precision are required
   int dig = (most == VTK_INT_MIN) ? 3 : (most - least);
   // Label
-  char label[64], fmt[64];
-  SNPRINTF(fmt, 63, "%%.%dg", dig < 3 ? 3 : dig);
-  SNPRINTF(label, 63, fmt, value);
+  char label[64], format[64];
+  auto result = vtk::format_to_n(format, 63, "{{:.{:d}g}}", dig);
+  *result.out = '\0';
+  result = vtk::format_to_n(label, 63, std::string_view(format), value);
+  *result.out = '\0';
   vtkColor4d fltCol;
   vtkColor3ub col;
   this->LookupTable->GetColor(value, fltCol.GetData());

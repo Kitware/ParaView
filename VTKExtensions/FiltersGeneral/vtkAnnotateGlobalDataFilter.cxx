@@ -15,6 +15,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
 #include "vtkTable.h"
 
 #include <algorithm>
@@ -143,7 +144,9 @@ struct Printer
       const auto numComps = array->GetNumberOfComponents();
       if (numComps == 1)
       {
-        std::snprintf(buffer, 256, self->GetFormat(), accessor.Get(this->ChosenTuple, 0));
+        auto result = vtk::format_to_n(
+          buffer, sizeof(buffer), self->GetFormat(), accessor.Get(this->ChosenTuple, 0));
+        *result.out = '\0';
         stream << buffer;
       }
       else if (numComps > 1)
@@ -151,7 +154,9 @@ struct Printer
         stream << "(";
         for (int cc = 0; cc < numComps; ++cc)
         {
-          std::snprintf(buffer, 256, self->GetFormat(), accessor.Get(this->ChosenTuple, cc));
+          auto result = vtk::format_to_n(
+            buffer, sizeof(buffer), self->GetFormat(), accessor.Get(this->ChosenTuple, cc));
+          *result.out = '\0';
           stream << (cc > 0 ? ", " : " ");
           stream << buffer;
         }
@@ -187,7 +192,9 @@ struct Printer
       const auto numComps = array->GetNumberOfComponents();
       if (numComps == 1)
       {
-        std::snprintf(buffer, 256, self->GetFormat(), array->GetValue(this->ChosenTuple).c_str());
+        auto result = vtk::format_to_n(
+          buffer, sizeof(buffer), self->GetFormat(), array->GetValue(this->ChosenTuple));
+        *result.out = '\0';
         stream << buffer;
       }
       else if (numComps > 1)
@@ -195,8 +202,9 @@ struct Printer
         stream << "(";
         for (int cc = 0; cc < numComps; ++cc)
         {
-          std::snprintf(buffer, 256, self->GetFormat(),
-            array->GetValue(this->ChosenTuple * numComps + cc).c_str());
+          auto result = vtk::format_to_n(buffer, sizeof(buffer), self->GetFormat(),
+            array->GetValue(this->ChosenTuple * numComps + cc));
+          *result.out = '\0';
           stream << (cc > 0 ? ", " : " ");
           stream << buffer;
         }
@@ -227,7 +235,7 @@ vtkAnnotateGlobalDataFilter::vtkAnnotateGlobalDataFilter()
   , Format(nullptr)
   , Controller(nullptr)
 {
-  this->SetFormat("%7.5g");
+  this->SetFormat("{:7.5g}");
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -238,6 +246,21 @@ vtkAnnotateGlobalDataFilter::~vtkAnnotateGlobalDataFilter()
   this->SetPostfix(nullptr);
   this->SetFieldArrayName(nullptr);
   this->SetController(nullptr);
+}
+
+//----------------------------------------------------------------------------
+void vtkAnnotateGlobalDataFilter::SetFormat(const char* formatArg)
+{
+  std::string format = formatArg ? formatArg : "";
+  if (vtk::is_printf_format(format))
+  {
+    // PARAVIEW_DEPRECATED_IN_6_1_0
+    vtkWarningMacro(<< "The given format " << format << " is a printf format. The format will be "
+                    << "converted to std::format. This conversion has been deprecated in 6.1.0");
+    format = vtk::printf_to_std_format(format);
+  }
+  const char* formatStr = format.c_str();
+  vtkSetStringBodyMacro(Format, formatStr);
 }
 
 //----------------------------------------------------------------------------

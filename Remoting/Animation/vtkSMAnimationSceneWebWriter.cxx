@@ -13,6 +13,7 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkStringFormatter.h"
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
@@ -123,7 +124,7 @@ bool vtkSMAnimationSceneWebWriter::SaveFrame(double time)
   vtkJSONSceneExporter* exporter = this->Internals->Exporter;
 
   // Export a folder containing data for the current timestep
-  const std::string filename = this->GetFileName() + std::string(".") + std::to_string(counter);
+  const std::string filename = this->GetFileName() + std::string(".") + vtk::to_string(counter);
   exporter->SetRenderWindow(this->RenderView->GetRenderWindow());
   exporter->SetFileName(filename.c_str());
   exporter->Write();

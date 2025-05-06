@@ -318,7 +318,7 @@
         <Domain name="bool" id="4533.CubeAxesXGridLines.bool"/>
       </Property>
       <Property name="CubeAxesXLabelFormat" id="4533.CubeAxesXLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesXTitle" id="4533.CubeAxesXTitle" number_of_elements="1">
         <Element index="0" value="X-Axis"/>
@@ -340,7 +340,7 @@
         <Domain name="bool" id="4533.CubeAxesYGridLines.bool"/>
       </Property>
       <Property name="CubeAxesYLabelFormat" id="4533.CubeAxesYLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesYTitle" id="4533.CubeAxesYTitle" number_of_elements="1">
         <Element index="0" value="Y-Axis"/>
@@ -362,7 +362,7 @@
         <Domain name="bool" id="4533.CubeAxesZGridLines.bool"/>
       </Property>
       <Property name="CubeAxesZLabelFormat" id="4533.CubeAxesZLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesZTitle" id="4533.CubeAxesZTitle" number_of_elements="1">
         <Element index="0" value="Z-Axis"/>
@@ -901,7 +901,7 @@
         <Domain name="bool" id="4622.CubeAxesXGridLines.bool"/>
       </Property>
       <Property name="CubeAxesXLabelFormat" id="4622.CubeAxesXLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesXTitle" id="4622.CubeAxesXTitle" number_of_elements="1">
         <Element index="0" value="X-Axis"/>
@@ -923,7 +923,7 @@
         <Domain name="bool" id="4622.CubeAxesYGridLines.bool"/>
       </Property>
       <Property name="CubeAxesYLabelFormat" id="4622.CubeAxesYLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesYTitle" id="4622.CubeAxesYTitle" number_of_elements="1">
         <Element index="0" value="Y-Axis"/>
@@ -945,7 +945,7 @@
         <Domain name="bool" id="4622.CubeAxesZGridLines.bool"/>
       </Property>
       <Property name="CubeAxesZLabelFormat" id="4622.CubeAxesZLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesZTitle" id="4622.CubeAxesZTitle" number_of_elements="1">
         <Element index="0" value="Z-Axis"/>
@@ -1484,7 +1484,7 @@
         <Domain name="bool" id="4711.CubeAxesXGridLines.bool"/>
       </Property>
       <Property name="CubeAxesXLabelFormat" id="4711.CubeAxesXLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesXTitle" id="4711.CubeAxesXTitle" number_of_elements="1">
         <Element index="0" value="X-Axis"/>
@@ -1506,7 +1506,7 @@
         <Domain name="bool" id="4711.CubeAxesYGridLines.bool"/>
       </Property>
       <Property name="CubeAxesYLabelFormat" id="4711.CubeAxesYLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesYTitle" id="4711.CubeAxesYTitle" number_of_elements="1">
         <Element index="0" value="Y-Axis"/>
@@ -1528,7 +1528,7 @@
         <Domain name="bool" id="4711.CubeAxesZGridLines.bool"/>
       </Property>
       <Property name="CubeAxesZLabelFormat" id="4711.CubeAxesZLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="CubeAxesZTitle" id="4711.CubeAxesZTitle" number_of_elements="1">
         <Element index="0" value="Z-Axis"/>

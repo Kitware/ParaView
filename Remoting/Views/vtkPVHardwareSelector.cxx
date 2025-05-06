@@ -11,6 +11,7 @@
 #include "vtkProcessModule.h"
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
+#include "vtkStringFormatter.h"
 #include "vtkWeakPointer.h"
 
 #include <map>
@@ -195,7 +196,7 @@ void vtkPVHardwareSelector::SavePixelBuffer(int passNo)
 
   // hard-coded path with threadname which ensures a good process-specific name.
   const std::string fname =
-    "/tmp/buffer-" + vtkLogger::GetThreadName() + "-pass-" + std::to_string(passNo) + ".pnm";
+    "/tmp/buffer-" + vtkLogger::GetThreadName() + "-pass-" + vtk::to_string(passNo) + ".pnm";
   vtkNew<vtkPNMWriter> pw;
   pw->SetInputConnection(ii->GetOutputPort());
   pw->SetFileName(fname.c_str());

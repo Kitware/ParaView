@@ -10,6 +10,7 @@
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -157,12 +158,12 @@ vtkRenderWindow* vtkPVProcessWindow::NewWindow()
     case vtkProcessModule::PROCESS_SERVER:
     case vtkProcessModule::PROCESS_RENDER_SERVER:
       window->SetWindowName(
-        (std::string("ParaView Server #") + std::to_string(pm->GetPartitionId())).c_str());
+        (std::string("ParaView Server #") + vtk::to_string(pm->GetPartitionId())).c_str());
       break;
 
     case vtkProcessModule::PROCESS_BATCH:
       window->SetWindowName(
-        (std::string("ParaView Batch #") + std::to_string(pm->GetPartitionId())).c_str());
+        (std::string("ParaView Batch #") + vtk::to_string(pm->GetPartitionId())).c_str());
       break;
     default:
       break;

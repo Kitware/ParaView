@@ -720,13 +720,13 @@
 
       <StringVectorProperty animateable="0"
                             command="SetDateFormat"
-                            default_values="%Y-%m-%d %H:%M:%S"
+                            default_values="{:%Y-%m-%d %H:%M:%S}"
                             name="DateFormat"
                             number_of_elements="1"
                             panel_visibility="default">
         <Documentation>
           This property specifies the first format to try using to parse dates. It
-          follows the standards of std::get_time.
+          follows the standards of std::format.
         </Documentation>
       </StringVectorProperty>
     </SourceProxy>

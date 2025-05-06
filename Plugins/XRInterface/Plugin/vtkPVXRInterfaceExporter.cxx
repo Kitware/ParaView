@@ -626,12 +626,12 @@ void vtkPVXRInterfaceExporter::ExportLocationsAsView(vtkPVXRInterfaceHelper* hel
       vtkNew<vtkJPEGWriter> jpeg;
       jpeg->SetInputConnection(texture->GetInputConnection(0, 0));
       std::string fname = "data/skyboxImage";
-      fname += std::to_string(count);
+      fname += vtk::to_string(count);
       fname += ".jpg";
       flagel->SetAttribute("TextureFile", fname.c_str());
       defaultSkyboxes[it.second[0]] = fname;
       fname = datadir + "skyboxImage";
-      fname += std::to_string(count);
+      fname += vtk::to_string(count);
       fname += ".jpg";
       jpeg->SetFileName(fname.c_str());
       jpeg->Write();

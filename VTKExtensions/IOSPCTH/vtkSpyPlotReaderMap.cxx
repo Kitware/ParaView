@@ -4,6 +4,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkSpyPlotReader.h"
 #include "vtkSpyPlotUniReader.h"
+#include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 
 #include "vtksys/FStream.hxx"
@@ -181,14 +182,18 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   int maximum = currentNum;
   while (true)
   {
-    snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+    auto result =
+      vtk::format_to_n(buffer, sizeof(buffer), "{:s}/{:s}.{:d}", filePath, fileNoExt, idx);
+    *result.out = '\0';
     // cerr << "buffer1 == " << buffer << endl;
     if (!vtksys::SystemTools::FileExists(buffer))
     {
       int next = idx;
       for (idx = last; idx > next; idx--)
       {
-        snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+        result =
+          vtk::format_to_n(buffer, sizeof(buffer), "{:s}/{:s}.{:d}", filePath, fileNoExt, idx);
+        *result.out = '\0';
         if (!vtksys::SystemTools::FileExists(buffer))
         {
           break;
@@ -209,14 +214,17 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   found = currentNum;
   while (true)
   {
-    snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-    // cerr << "buffer2 == " << buffer << endl;
+    auto result =
+      vtk::format_to_n(buffer, sizeof(buffer), "{:s}/{:s}.{:d}", filePath, fileNoExt, idx);
+    *result.out = '\0';
     if (!vtksys::SystemTools::FileExists(buffer))
     {
       int next = idx;
       for (idx = last; idx < next; idx++)
       {
-        snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+        result =
+          vtk::format_to_n(buffer, sizeof(buffer), "{:s}/{:s}.{:d}", filePath, fileNoExt, idx);
+        *result.out = '\0';
         if (!vtksys::SystemTools::FileExists(buffer))
         {
           break;
@@ -234,9 +242,8 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   maximum = found;
   for (idx = minimum; idx <= maximum; ++idx)
   {
-    snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-    // cerr << "buffer3 == " << buffer << endl;
-    this->Files[buffer] = nullptr;
+    auto file = vtk::format("{:s}/{:s}.{:d}", filePath, fileNoExt, idx);
+    this->Files[file] = nullptr;
   }
   // Okay now open just the first file to get meta data
   // cerr << "updating meta... " << endl;

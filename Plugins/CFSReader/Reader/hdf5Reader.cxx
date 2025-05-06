@@ -9,6 +9,7 @@
 #include "hdf5Reader.h" // same directory
 
 #include <vtkLogger.h>
+#include <vtkStringFormatter.h>
 #include <vtkStringScanner.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -70,7 +71,7 @@ void Hdf5Reader::LoadFile(const std::string& fileName)
   // check if we have results or if this is pure mesh file (e.g. generated via cfs -g)
   // to check this, we may not read "Results/Mesh" but need to check layers manually
   bool PureGeometry = !H5CFS::TestGroupChild(this->MainRoot, "Results", "Mesh");
-  vtkLog(INFO, "Hdf5Reader::LoadFile: PureGeometry=" + std::to_string(PureGeometry));
+  vtkLog(INFO, "Hdf5Reader::LoadFile: PureGeometry=" + vtk::to_string(PureGeometry));
 
   // check for use of external files (uint to bool)
   this->HasExternalFiles = PureGeometry
@@ -438,8 +439,8 @@ void Hdf5Reader::GetMeshResult(unsigned int sequenceStep, unsigned int stepNum, 
       groupName += "Elements";
       break;
     default:
-      throw std::runtime_error(
-        "unknown mesh result type " + std::to_string(result->resultInfo->listType));
+      throw std::runtime_error("unknown mesh result type " +
+        vtk::to_string(static_cast<int>(result->resultInfo->listType)));
   }
 
   hid_t resGroup = H5CFS::OpenGroup(stepGroup, groupName);

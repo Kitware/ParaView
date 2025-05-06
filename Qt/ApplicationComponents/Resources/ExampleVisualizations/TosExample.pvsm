@@ -1394,7 +1394,7 @@
         </Domain>
       </Property>
       <Property name="PolarLabelFormat" id="21740.PolarLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="PolarLabelOffset" id="21740.PolarLabelOffset" number_of_elements="1">
         <Element index="0" value="10"/>
@@ -1424,7 +1424,7 @@
         <Domain name="bool" id="21740.RadialAxesVisibility.bool"/>
       </Property>
       <Property name="RadialLabelFormat" id="21740.RadialLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#3.1f"/>
+        <Element index="0" value="{:&lt;#3.1f}"/>
       </Property>
       <Property name="RadialLabelLocation" id="21740.RadialLabelLocation" number_of_elements="1">
         <Element index="0" value="0"/>
@@ -2620,7 +2620,7 @@
         </Domain>
       </Property>
       <Property name="PolarLabelFormat" id="22000.PolarLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="PolarLabelOffset" id="22000.PolarLabelOffset" number_of_elements="1">
         <Element index="0" value="10"/>
@@ -2650,7 +2650,7 @@
         <Domain name="bool" id="22000.RadialAxesVisibility.bool"/>
       </Property>
       <Property name="RadialLabelFormat" id="22000.RadialLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#3.1f"/>
+        <Element index="0" value="{:&lt;#3.1f}"/>
       </Property>
       <Property name="RadialLabelLocation" id="22000.RadialLabelLocation" number_of_elements="1">
         <Element index="0" value="0"/>
@@ -5639,7 +5639,7 @@
       </Property>
       <Property name="CustomLabels" id="21888.CustomLabels"/>
       <Property name="DataRangeLabelFormat" id="21888.DataRangeLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.1e"/>
+        <Element index="0" value="{:&lt;#6.1e}"/>
       </Property>
       <Property name="DataRangeMax" id="21888.DataRangeMax" number_of_elements="1">
         <Element index="0" value="100000002004087730000"/>
@@ -5709,7 +5709,7 @@
         <Domain name="range" id="21888.LabelFontSize.range"/>
       </Property>
       <Property name="LabelFormat" id="21888.LabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="LabelItalic" id="21888.LabelItalic" number_of_elements="1">
         <Element index="0" value="0"/>
@@ -5750,7 +5750,7 @@
         <Element index="1" value="0.02"/>
       </Property>
       <Property name="RangeLabelFormat" id="21888.RangeLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.1e"/>
+        <Element index="0" value="{:&lt;#6.1e}"/>
       </Property>
       <Property name="Repositionable" id="21888.Repositionable" number_of_elements="1">
         <Element index="0" value="1"/>

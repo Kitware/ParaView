@@ -38,7 +38,7 @@
       write image data as a PNG file. It supports 1 to 4 component data of
       unsigned char or unsigned short.
       This Writer can also generate a stack of images when the FileName is in
-      the form of /path/file_%03d.png and that the input data is a 3D image
+      the form of /path/file_{:03d}.png and that the input data is a 3D image
       data.
       </Documentation>
       <InputProperty command="SetInputConnection"
@@ -117,7 +117,7 @@
       Writer to write image data as a JPEG file. It supports 1 to 3 component
       data of unsigned char or unsigned short.
       This Writer can also generate a stack of images when the FileName is in
-      the form of /path/file_%03d.jpg and that the input data is a 3D image
+      the form of /path/file_{:03d}.jpg and that the input data is a 3D image
       data.
       </Documentation>
       <InputProperty command="SetInputConnection"

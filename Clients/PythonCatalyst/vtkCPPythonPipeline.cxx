@@ -11,6 +11,7 @@
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonUtil.h"
 #include "vtkSmartPyObject.h"
+#include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 
 #include <vtksys/RegularExpression.hxx>
@@ -265,7 +266,8 @@ void vtkCPPythonPipeline::FixEOL(std::string& str)
 std::string vtkCPPythonPipeline::GetPythonAddress(void* pointer)
 {
   char addressOfPointer[1024];
-  snprintf(addressOfPointer, sizeof(addressOfPointer), "%p", pointer);
+  auto result = vtk::format_to_n(addressOfPointer, sizeof(addressOfPointer), "{:p}", pointer);
+  *result.out = '\0';
   char* aplus = addressOfPointer;
   if ((addressOfPointer[0] == '0') && ((addressOfPointer[1] == 'x') || addressOfPointer[1] == 'X'))
   {

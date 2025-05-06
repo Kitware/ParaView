@@ -3,6 +3,7 @@
 #include "vtkCatalystBlueprint.h"
 
 #include "vtkPVLogger.h"
+#include "vtkStringFormatter.h"
 
 #include <catalyst_conduit_blueprint.hpp>
 #include <cinttypes>
@@ -105,7 +106,7 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
       }
 
       vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "script (%s): '%s'",
-        n.dtype().is_object() ? script.name().c_str() : std::to_string(index).c_str(),
+        n.dtype().is_object() ? script.name().c_str() : vtk::to_string(index).c_str(),
         script["filename"].as_string().c_str());
 
       // let's verify "args", if any.

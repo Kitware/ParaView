@@ -27,9 +27,9 @@
       <StringVectorProperty name="FilePattern"
                             command="SetFilePattern"
                             number_of_elements="1"
-                            default_values="%s">
+                            default_values="{:s}">
         <Documentation>
-          The sprintf format used to build filename from FilePrefix and number.
+          The std::format style format used to build filename from FilePrefix and number.
         </Documentation>
       </StringVectorProperty>
 

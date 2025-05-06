@@ -5,6 +5,7 @@
 #include "vtkInSituInitializationHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLogger.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
@@ -114,23 +115,31 @@ bool vtkInSituPipelineIO::Finalize()
 std::string vtkInSituPipelineIO::GetCurrentFileName(const char* fname, int timestep, double time)
 {
   assert(fname != nullptr);
-
-  vtksys::RegularExpression regex(R"=((%[.0-9]*)((ts)|(t)))=");
+  // define scope of arguments
+  PV_STRING_FORMATTER_SCOPE(fmt::arg("timestep", timestep), fmt::arg("time", time));
 
   std::string name{ fname };
+  // check for old format for ts and t
+  bool oldFormatUsed = false;
+  vtksys::RegularExpression regex(R"=((%[.0-9]*)((ts)|(t)))=");
+  std::string possibleOldFormatString1 = name;
   while (regex.find(name))
   {
     if (regex.match(2) == "ts")
     {
-      char buffer[256];
-      std::snprintf(buffer, 256, (regex.match(1) + "d").c_str(), timestep);
-      name.replace(regex.start(), regex.end() - regex.start(), buffer);
+      oldFormatUsed = true;
+      // assume that precision information will always have the format, eg %.[0-9]*
+      std::string formatString = "0" + regex.match(1).substr(2) + "d";
+      std::string replacement = "{timestep:" + formatString + "}";
+      name.replace(regex.start(), regex.end() - regex.start(), replacement);
     }
     else if (regex.match(2) == "t")
     {
-      char buffer[256];
-      std::snprintf(buffer, 256, (regex.match(1) + "f").c_str(), time);
-      name.replace(regex.start(), regex.end() - regex.start(), buffer);
+      oldFormatUsed = true;
+      // remove the % symbol from the formatString
+      std::string formatString = regex.match(1).substr(1) + "f";
+      std::string replacement = "{time:" + formatString + "}";
+      name.replace(regex.start(), regex.end() - regex.start(), replacement);
     }
     else
     {
@@ -141,8 +150,16 @@ std::string vtkInSituPipelineIO::GetCurrentFileName(const char* fname, int times
     }
   }
 
-  vtkLogF(TRACE, "%s --> %s", fname, name.c_str());
-  return name;
+  // check for old format for cm
+  std::string possibleOldFormatString2 = name;
+  vtksys::SystemTools::ReplaceString(name, "%cm", "{camera}");
+  if (possibleOldFormatString2 != name || oldFormatUsed)
+  {
+    vtkLogF(WARNING, "Legacy formatting pattern detected. Please replace '%s' with '%s'.",
+      possibleOldFormatString1.c_str(), name.c_str());
+  }
+
+  return vtkPVStringFormatter::Format(name);
 }
 
 //----------------------------------------------------------------------------

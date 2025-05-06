@@ -19,6 +19,7 @@
 #include <vtkPointData.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkStringFormatter.h>
 #include <vtkStringScanner.h>
 #include <vtkTemporalDataSetCache.h>
 #include <vtkTemporalStatistics.h>
@@ -56,7 +57,7 @@ public:
     auto dsw = vtkSmartPointer<vtkXMLDataSetWriter>::New();
     dsw->SetInputData(gridNow);
     // Output the volume at each timestep like you might do normally.
-    std::string fname = "tcache_ex_time_" + std::to_string(this->OutputCounter) + ".vti";
+    std::string fname = "tcache_ex_time_" + vtk::to_string(this->OutputCounter) + ".vti";
     dsw->SetFileName(fname.c_str());
     dsw->Write();
 
@@ -68,7 +69,7 @@ public:
     vtkDataObject* pointsNow = idd2->GetGrid();
     dsw->SetInputData(pointsNow);
     // Ditto for the points at each timestep.
-    fname = "tcache_ex_pts_time_" + std::to_string(this->OutputCounter) + ".vtu";
+    fname = "tcache_ex_pts_time_" + vtk::to_string(this->OutputCounter) + ".vtu";
     dsw->SetFileName(fname.c_str());
     dsw->Write();
 
@@ -98,7 +99,7 @@ public:
         tstats->SetInputConnection(cache->GetOutputPort());
         auto dsw = vtkSmartPointer<vtkXMLDataSetWriter>::New();
         dsw->SetInputConnection(tstats->GetOutputPort());
-        std::string fname = "tcache_ex_tstats_" + std::to_string(tdumpcounter) + ".vti";
+        std::string fname = "tcache_ex_tstats_" + vtk::to_string(tdumpcounter) + ".vti";
         dsw->SetFileName(fname.c_str());
         dsw->Write();
       }

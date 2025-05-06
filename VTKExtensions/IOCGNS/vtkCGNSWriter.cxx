@@ -26,6 +26,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridToPointSet.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkStructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
 #include <vtksys/SystemTools.hxx>
@@ -37,6 +38,7 @@
 
 #include <algorithm>
 #include <map>
+#include <regex>
 #include <set>
 #include <sstream>
 #include <string>
@@ -48,7 +50,7 @@
 #define cg_check_operation(op)                                                                     \
   if (CG_OK != (op))                                                                               \
   {                                                                                                \
-    error = std::string(__FUNCTION__) + ":" + std::to_string(__LINE__) + "> " + cg_get_error();    \
+    error = std::string(__FUNCTION__) + ":" + vtk::to_string(__LINE__) + "> " + cg_get_error();    \
     return false;                                                                                  \
   }
 
@@ -854,7 +856,7 @@ void vtkCGNSWriter::vtkPrivate::SetNameToLength(
       }
       while (objectName && objectName == name && j < 100)
       {
-        name = name.substr(0, j < 10 ? 31 : 30) + std::to_string(j);
+        name = name.substr(0, j < 10 ? 31 : 30) + vtk::to_string(j);
         ++j;
       }
       // if there are 100 duplicate zones after truncation, give up.
@@ -883,7 +885,7 @@ void vtkCGNSWriter::vtkPrivate::Flatten(vtkCompositeDataSet* composite,
     append->SetMergePoints(true);
     if (name.empty())
     {
-      name = "Zone " + std::to_string(zoneOffset);
+      name = "Zone " + vtk::to_string(zoneOffset);
     }
 
     for (unsigned i = 0; i < partitioned->GetNumberOfPartitions(); ++i)
@@ -926,7 +928,7 @@ void vtkCGNSWriter::vtkPrivate::Flatten(vtkCompositeDataSet* composite,
   int i(0);
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), ++i)
   {
-    name = "Zone " + std::to_string(i + zoneOffset);
+    name = "Zone " + vtk::to_string(i + zoneOffset);
     if (iter->HasCurrentMetaData() && iter->GetCurrentMetaData()->Has(vtkCompositeDataSet::NAME()))
     {
       name = iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
@@ -1119,6 +1121,21 @@ void vtkCGNSWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "WasWritingSuccessful " << (this->WasWritingSuccessful ? "Yes" : "No") << endl;
 }
 
+//-----------------------------------------------------------------------------
+void vtkCGNSWriter::SetFileNameSuffix(const char* suffix)
+{
+  std::string format = suffix ? suffix : "";
+  if (vtk::is_printf_format(format))
+  {
+    // PARAVIEW_DEPRECATED_IN_6_1_0
+    vtkWarningMacro(<< "The given format " << format << " is a printf format. The format will be "
+                    << "converted to std::format. This conversion has been deprecated in 6.1.0");
+    format = vtk::printf_to_std_format(format);
+  }
+  const char* formatStr = format.c_str();
+  vtkSetStringBodyMacro(FileNameSuffix, formatStr);
+}
+
 //------------------------------------------------------------------------------
 int vtkCGNSWriter::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
@@ -1246,33 +1263,11 @@ int vtkCGNSWriter::RequestData(vtkInformation* request, vtkInformationVector** i
 //-----------------------------------------------------------------------------
 static bool SuffixValidation(char* fileNameSuffix)
 {
-  std::string suffix(fileNameSuffix);
-  // Only allow this format: ABC%.Xd
-  // ABC is an arbitrary string which may or may not exist
-  // % and d must exist and d must be the last char
-  // . and X may or may not exist, X must be an integer if it exists
-  if (suffix.empty() || suffix[suffix.size() - 1] != 'd')
-  {
-    return false;
-  }
-  std::string::size_type lastPercentage = suffix.find_last_of('%');
-  if (lastPercentage == std::string::npos)
-  {
-    return false;
-  }
-  if (suffix.size() - lastPercentage > 2 && !isdigit(suffix[lastPercentage + 1]) &&
-    suffix[lastPercentage + 1] != '.')
-  {
-    return false;
-  }
-  for (std::string::size_type i = lastPercentage + 2; i < suffix.size() - 1; ++i)
-  {
-    if (!isdigit(suffix[i]))
-    {
-      return false;
-    }
-  }
-  return true;
+  // Only allow this format: ABC{:Xd} where ABC is an arbitrary string which may
+  // or may not exist and d must exist and X may or may not exist,
+  // X must be an integer if it exists.
+  static const std::regex pattern{ R"(.*\{\d*:\d*d\}$)" };
+  return std::regex_match(fileNameSuffix, pattern);
 }
 
 //------------------------------------------------------------------------------
@@ -1302,7 +1297,8 @@ void vtkCGNSWriter::WriteData()
       if (this->FileNameSuffix && SuffixValidation(this->FileNameSuffix))
       {
         char suffix[100];
-        snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
+        auto result = vtk::format_to_n(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
+        *result.out = '\0';
         if (!fileNamePath.empty())
         {
           fileNameWithTimeStep << fileNamePath << "/";
@@ -1316,7 +1312,7 @@ void vtkCGNSWriter::WriteData()
       {
         vtkErrorMacro(
           "Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
-                                 << ". Expected valid % format specifiers!");
+                                 << ". Expected valid std::format style format specifiers!");
         return;
       }
     }

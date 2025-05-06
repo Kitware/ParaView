@@ -1946,9 +1946,9 @@ std::string vtkPVXRInterfaceHelper::GetOpenXRRuntimeVersionString() const
   }
   else
   {
-    output += std::to_string(version.Major) += '.';
-    output += std::to_string(version.Minor) += '.';
-    output += std::to_string(version.Patch);
+    output += vtk::to_string(version.Major) += '.';
+    output += vtk::to_string(version.Minor) += '.';
+    output += vtk::to_string(version.Patch);
   }
 #endif
 

@@ -13,6 +13,7 @@
 #include <pqView.h>
 
 #include <vtkLogger.h>
+#include <vtkStringFormatter.h>
 
 #include <QPainter>
 
@@ -80,12 +81,12 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
       std::string sOutputPorts = "";
       for (size_t i = 0; i < it.second->getOutputPorts().size(); i++)
       {
-        sOutputPorts += "<o" + std::to_string(i) + ">|";
+        sOutputPorts += "<o" + vtk::to_string(i) + ">|";
       }
 
       for (size_t i = 0; i < it.second->getInputPorts().size(); i++)
       {
-        sInputPorts += "<i" + std::to_string(i) + ">|";
+        sInputPorts += "<i" + vtk::to_string(i) + ">|";
       }
 
       nodeString << proxyId << "["
@@ -138,7 +139,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
       }
 
       Agnode_t* n = agnode(G,
-        const_cast<char*>(std::to_string(pqNodeEditorUtils::getID(it.second->getProxy())).data()),
+        const_cast<char*>(vtk::to_string(pqNodeEditorUtils::getID(it.second->getProxy())).data()),
         0);
       if (n != nullptr)
       {

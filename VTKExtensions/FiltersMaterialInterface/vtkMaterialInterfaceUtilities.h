@@ -8,9 +8,12 @@
 // Vtk
 #include "vtkCommunicator.h" // for vtkCommunicator
 // Vtk containers
-#include "vtkDoubleArray.h"      // for vtkDoubleArray
-#include "vtkFloatArray.h"       // for vtkFloatArray
-#include "vtkIntArray.h"         // for vtkIntArray
+#include "vtkDoubleArray.h" // for vtkDoubleArray
+#include "vtkFloatArray.h"  // for vtkFloatArray
+#include "vtkIntArray.h"    // for vtkIntArray
+#ifdef vtkMaterialInterfaceFilterDEBUG
+#include "vtkStringFormatter.h" // for vtkStringFormatter
+#endif
 #include "vtkUnsignedIntArray.h" // for vtkUnsignedIntArray
 // STL
 #include <fstream> // for file operations
@@ -281,15 +284,14 @@ int WritePidFile(vtkCommunicator* comm, string pidFileName)
   gethostname(hostname, hostNameSize);
   int pid = getpid();
   const int hrpSize = 512;
-  char hrp[hrpSize] = { '\0' };
-  sprintf(hrp, "%s : %d : %d", hostname, myProcId, pid);
+  auto hrp = vtk::format("{} : {} : {}", hostname, myProcId, pid);
   // move all identifiers to controller
   char* hrpBuffer = 0;
   if (myProcId == 0)
   {
     hrpBuffer = new char[nProcs * hrpSize];
   }
-  comm->Gather(hrp, hrpBuffer, hrpSize, 0);
+  comm->Gather(hrp.c_str(), hrpBuffer, hrpSize, 0);
   // put identifiers into a file
   if (myProcId == 0)
   {

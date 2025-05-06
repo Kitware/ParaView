@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "cdi_tools.h"
+#include "vtkStringFormatter.h"
 #include "vtk_netcdf.h"
 #include "vtksys/SystemTools.hxx"
 
@@ -62,8 +63,8 @@ std::string GuessGridFileFromUri(const std::string& FileName)
 //----------------------------------------------------------------------------
 std::string ParseTimeUnits(const int& vdate, const int& vtime)
 {
-  std::string date = std::to_string(vdate);
-  std::string time = std::to_string(vtime);
+  std::string date = vtk::to_string(vdate);
+  std::string time = vtk::to_string(vtime);
   std::string time_units;
   if (date.size() < 8)
   {

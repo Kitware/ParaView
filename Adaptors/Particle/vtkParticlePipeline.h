@@ -35,7 +35,7 @@ public:
 
   // Description:
   // name of the image file to output
-  vtkSetStringMacro(Filename);
+  virtual void SetFilename(const char* filename);
   vtkGetStringMacro(Filename);
 
   // Description:

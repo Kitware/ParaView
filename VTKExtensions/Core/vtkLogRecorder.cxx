@@ -8,6 +8,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLogger.h"
+#include "vtkStringFormatter.h"
 
 vtkStandardNewMacro(vtkLogRecorder);
 
@@ -59,7 +60,7 @@ void vtkLogRecorder::EnableLoggingCallback()
   {
     vtkErrorMacro("Logging callback " << this->CallbackName << " already added.");
   }
-  this->CallbackName = "log-grabber_" + std::to_string(RankEnabled) + "_" + std::to_string(rand());
+  this->CallbackName = "log-grabber_" + vtk::to_string(RankEnabled) + "_" + vtk::to_string(rand());
   vtkLogger::AddCallback(
     this->CallbackName.c_str(),
     [](void* user_data, const vtkLogger::Message& message)

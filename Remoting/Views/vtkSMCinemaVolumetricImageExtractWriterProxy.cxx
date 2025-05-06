@@ -14,6 +14,7 @@
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
+#include "vtkStringFormatter.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -404,7 +405,7 @@ bool vtkSMCinemaVolumetricImageExtractWriterProxy::WriteInternal(
         colorTFProxy, opacityTFProxy, "cinemavolume", name.c_str());
     }
 
-    tparams["opacity_transfer_function"] = std::to_string(otf_index);
+    tparams["opacity_transfer_function"] = vtk::to_string(otf_index);
     status = this->Superclass::WriteInternal(extractor, tparams);
   }
 

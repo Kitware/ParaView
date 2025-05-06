@@ -20,6 +20,7 @@
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -3039,19 +3040,19 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
     std::string filename;
     if (i < 10)
     {
-      filename = this->PerformanceDataFile + "000" + std::to_string(i);
+      filename = this->PerformanceDataFile + "000" + vtk::to_string(i);
     }
     else if (i < 100)
     {
-      filename = this->PerformanceDataFile + "00" + std::to_string(i);
+      filename = this->PerformanceDataFile + "00" + vtk::to_string(i);
     }
     else if (i < 1000)
     {
-      filename = this->PerformanceDataFile + "0" + std::to_string(i);
+      filename = this->PerformanceDataFile + "0" + vtk::to_string(i);
     }
     else
     {
-      filename = this->PerformanceDataFile + std::to_string(i);
+      filename = this->PerformanceDataFile + vtk::to_string(i);
     }
 
     std::vector<std::string> wordVec;
@@ -3119,7 +3120,7 @@ int vtkCDIReader::FillGridDimensions()
   {
     int i = vlistInqVarGrid(this->Internals->DataFile.getVListID(), k);
     int j = vlistInqVarZaxis(this->Internals->DataFile.getVListID(), k);
-    hits.insert(std::to_string(i) + "x" + std::to_string(j));
+    hits.insert(vtk::to_string(i) + "x" + vtk::to_string(j));
     // IDs are not 0 to n-1 but can be 30-ish for a file with 3 grids.
     // they map to the gridID_l and zaxisID_l values below.
     // Thus we need to a map to catch rather unpredictable values.
@@ -3142,7 +3143,7 @@ int vtkCDIReader::FillGridDimensions()
       dimEncoding += nameLev;
       dimEncoding += ")";
 
-      if (hits.count(std::to_string(gridID_l) + "x" + std::to_string(zaxisID_l)) == 0)
+      if (hits.count(vtk::to_string(gridID_l) + "x" + vtk::to_string(zaxisID_l)) == 0)
       {
         vtkDebugMacro("vtkCDIReader::FillGridDimensions: i, j, dimEncoding: "
           << i << '\t' << j << "\t" << gridID_l << '\t' << zaxisID_l << "\t" << dimEncoding

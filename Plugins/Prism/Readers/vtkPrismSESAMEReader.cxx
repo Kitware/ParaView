@@ -17,6 +17,7 @@
 #include "vtkSMPTools.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 
 #include "vtksys/SystemTools.hxx"
@@ -203,7 +204,7 @@ vtkStringArray* vtkPrismSESAMEReader::GetFlatArraysOfTables()
   this->FlatArraysOfTables->Initialize();
   for (auto& arraysOfTable : this->ArraysOfTables)
   {
-    this->FlatArraysOfTables->InsertNextValue(std::to_string(arraysOfTable.first));
+    this->FlatArraysOfTables->InsertNextValue(vtk::to_string(arraysOfTable.first));
     auto tableArrays = arraysOfTable.second;
     for (auto i = 0; i < tableArrays->GetNumberOfValues(); ++i)
     {
@@ -1096,7 +1097,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
       {
         const std::string arrayName = j < numVarNames
           ? TablesInformation::TablesInfo[tableIndex].ArrayNames[j]
-          : "Variable " + std::to_string(j + 1);
+          : "Variable " + vtk::to_string(j + 1);
         tableArrays->InsertNextValue(arrayName);
       }
       this->ArraysOfTables[tableId] = tableArrays;
@@ -1364,7 +1365,7 @@ void vtkPrismSESAMEReader::RequestCurvesData(
       }
     }
     // set partitioned dataset name
-    const auto curveName = "Table " + std::to_string(tableId);
+    const auto curveName = "Table " + vtk::to_string(tableId);
     curves->GetMetaData(curveIndex)->Set(vtkCompositeDataSet::NAME(), curveName.c_str());
   }
 }
@@ -1392,7 +1393,7 @@ int vtkPrismSESAMEReader::RequestData(
       {
         const int tableId = this->CurveTableIds->GetValue(static_cast<int>(curveIndex));
         curvesOutput->SetNumberOfPartitions(curveIndex, tableId != 401 ? 1 : 2);
-        const auto curveName = "Table " + std::to_string(tableId);
+        const auto curveName = "Table " + vtk::to_string(tableId);
         curvesOutput->GetMetaData(curveIndex)->Set(vtkCompositeDataSet::NAME(), curveName.c_str());
       }
     }

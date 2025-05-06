@@ -26,6 +26,7 @@
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringFormatter.h"
 #include "vtkTexture.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -201,7 +202,7 @@ nlohmann::json to_json(vtkLightCollection* lights)
   int lightId = 0;
   while (auto light = vtkLight::SafeDownCast(lights->GetNextLight(pit)))
   {
-    const std::string name = "Light" + std::to_string(lightId++);
+    const std::string name = "Light" + vtk::to_string(lightId++);
     lightsJson.push_back(to_json(light, name));
   }
   return lightsJson;

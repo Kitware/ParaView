@@ -1355,7 +1355,7 @@
         </Domain>
       </Property>
       <Property name="PolarLabelFormat" id="5044.PolarLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="PolarLabelVisibility" id="5044.PolarLabelVisibility" number_of_elements="1">
         <Element index="0" value="1"/>
@@ -1380,7 +1380,7 @@
         <Domain name="bool" id="5044.RadialAxesVisibility.bool"/>
       </Property>
       <Property name="RadialLabelFormat" id="5044.RadialLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#3.1f"/>
+        <Element index="0" value="{:&lt;#3.1f}"/>
       </Property>
       <Property name="RadialLabelLocation" id="5044.RadialLabelLocation" number_of_elements="1">
         <Element index="0" value="0"/>
@@ -2464,7 +2464,7 @@
         </Domain>
       </Property>
       <Property name="PolarLabelFormat" id="5288.PolarLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#6.3g"/>
+        <Element index="0" value="{:&lt;#6.3g}"/>
       </Property>
       <Property name="PolarLabelVisibility" id="5288.PolarLabelVisibility" number_of_elements="1">
         <Element index="0" value="1"/>
@@ -2489,7 +2489,7 @@
         <Domain name="bool" id="5288.RadialAxesVisibility.bool"/>
       </Property>
       <Property name="RadialLabelFormat" id="5288.RadialLabelFormat" number_of_elements="1">
-        <Element index="0" value="%-#3.1f"/>
+        <Element index="0" value="{:&lt;#3.1f}"/>
       </Property>
       <Property name="RadialLabelLocation" id="5288.RadialLabelLocation" number_of_elements="1">
         <Element index="0" value="0"/>

@@ -27,6 +27,7 @@
 #include <vtkQuadraticTriangle.h>
 #include <vtkQuadraticWedge.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkStringFormatter.h>
 #include <vtkTetra.h>
 #include <vtkTriQuadraticHexahedron.h>
 #include <vtkTriangle.h>
@@ -165,7 +166,7 @@ void vtkCFSReader::SetTimeStep(unsigned int step)
   {
     this->TimeStep = step;
     this->TimeOrFrequencyValue = this->StepVals[step - 1];
-    this->TimeOrFrequencyValueStr = std::to_string(this->TimeOrFrequencyValue);
+    this->TimeOrFrequencyValueStr = vtk::to_string(this->TimeOrFrequencyValue);
 
     // update pipeline
     this->Modified();
@@ -559,7 +560,7 @@ int vtkCFSReader::RequestData(vtkInformation* vtkNotUsed(request),
       outInfo->Set(vtkDataObject::DATA_TIME_STEP(), this->StepVals[timeI]);
       this->TimeStep = timeI + 1;
       this->TimeOrFrequencyValue = this->StepVals[timeI];
-      this->TimeOrFrequencyValueStr = std::to_string(this->TimeOrFrequencyValue);
+      this->TimeOrFrequencyValueStr = vtk::to_string(this->TimeOrFrequencyValue);
     }
   }
 
@@ -802,7 +803,7 @@ void vtkCFSReader::ReadNodeCellData(vtkMultiBlockDataSet* output, bool isNode)
     if (MeshResultInfos.find(this->MultiSequenceStep) == this->MeshResultInfos.end())
     {
       vtkWarningMacro(
-        "Multisequence step index " + std::to_string(this->MultiSequenceStep) + " is invalid.");
+        "Multisequence step index " + vtk::to_string(this->MultiSequenceStep) + " is invalid.");
       return;
     }
 

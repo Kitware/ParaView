@@ -55,7 +55,7 @@ SaveData(plyfilenamewithpadding,
 #        ColorArrayName=['POINTS', 'RTData'],
 #        LookupTable=rTDataLUT
     WriteTimeSteps=1,
-    Filenamesuffix='_%.3d'
+    Filenamesuffix='_{:03d}'
 )
 
 # destroy contour1

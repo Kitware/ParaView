@@ -30,6 +30,7 @@
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
@@ -221,7 +222,7 @@ bool vtkSMSelectionHelper::CombineSelection(vtkSMSourceProxy* appendSelections1,
     // compute new selection name id
     VTK_FROM_CHARS_IF_ERROR_RETURN(newSelectionName, id, false);
     int selectionNameId = id + maxId + 1;
-    newSelectionName = vtkSMSelectionHelper::SubSelectionBaseName + std::to_string(selectionNameId);
+    newSelectionName = vtkSMSelectionHelper::SubSelectionBaseName + vtk::to_string(selectionNameId);
     // save new selection name
     newSelectionNamesAP2.push_front(newSelectionName);
     // update the expression

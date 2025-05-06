@@ -739,7 +739,7 @@
 
       <StringVectorProperty command="SetPolarLabelFormat"
                             name="PolarLabelFormat"
-                            default_values="%-#6.3g"
+                            default_values="{:&lt;#6.3g}"
                             panel_visibility="advanced"
                             number_of_elements="1">
         <Hints>
@@ -808,7 +808,7 @@
         <Documentation>Set radial title visibility.</Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetRadialAngleFormat"
-                            default_values="%-#3.1f"
+                            default_values="{:&lt;#3.1f}"
                             name="RadialLabelFormat"
                             panel_visibility="advanced"
                             number_of_elements="1">

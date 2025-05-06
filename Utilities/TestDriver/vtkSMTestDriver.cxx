@@ -4,6 +4,7 @@
 
 #include "vtkSMTestDriver.h"
 #include "vtkSMTestDriverConfig.h"
+#include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 
 #include <vtksys/RegularExpression.hxx>
@@ -149,12 +150,8 @@ void vtkSMTestDriver::CollectConfiguredOptions()
     this->SeparateArguments(
       vtksys::SystemTools::GetEnv("SMTESTDRIVER_MPI_POSTFLAGS"), this->MPIPostFlags);
   }
-  char buf[1024];
-  sprintf(buf, "%d", serverNumProc);
-  this->MPIServerNumProcessFlag = buf;
-  this->MPIScriptNumProcessFlag = buf;
-  sprintf(buf, "%d", renderNumProc);
-  this->MPIRenderServerNumProcessFlag = buf;
+  this->MPIServerNumProcessFlag = vtk::to_string(serverNumProc);
+  this->MPIRenderServerNumProcessFlag = vtk::to_string(renderNumProc);
 
 #endif
 

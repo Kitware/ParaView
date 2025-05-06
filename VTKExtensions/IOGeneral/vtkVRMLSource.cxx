@@ -15,6 +15,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
+#include "vtkStringFormatter.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkUnsignedCharArray.h"
@@ -169,7 +170,8 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         {
           if (array->GetName() == nullptr)
           {
-            snprintf(name, sizeof(name), "VRMLArray%d", ++arrayCount);
+            auto result = vtk::format_to_n(name, sizeof(name), "VRMLArray{:d}", ++arrayCount);
+            *result.out = '\0';
             array->SetName(name);
           }
           output->GetPointData()->AddArray(array);
@@ -185,7 +187,8 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         {
           if (array->GetName() == nullptr)
           {
-            snprintf(name, sizeof(name), "VRMLArray%d", ++arrayCount);
+            auto result = vtk::format_to_n(name, sizeof(name), "VRMLArray{:d}", ++arrayCount);
+            *result.out = '\0';
             array->SetName(name);
           }
           output->GetCellData()->AddArray(array);

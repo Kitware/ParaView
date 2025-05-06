@@ -373,7 +373,7 @@ void pqTransferFunctionWidget::initialize(
       cpItem->SetColorFill(true);
       cpItem->SetEndPointsXMovable(false);
       cpItem->SetEndPointsYMovable(false);
-      cpItem->SetLabelFormat("%.3f");
+      cpItem->SetLabelFormat("{:.3f}");
       this->Internals->ControlPointsItem = cpItem;
 
       this->Internals->CurrentPointEditEventId =
@@ -394,7 +394,7 @@ void pqTransferFunctionWidget::initialize(
       cpItem->SetPiecewiseFunction(pwf);
       cpItem->SetEndPointsXMovable(false);
       cpItem->SetEndPointsYMovable(true);
-      cpItem->SetLabelFormat("%.3f: %.3f");
+      cpItem->SetLabelFormat("{:.3f}: {:.3f}");
       this->Internals->ControlPointsItem = cpItem;
     }
   }
@@ -420,7 +420,7 @@ void pqTransferFunctionWidget::initialize(
       cpItem->SetEndPointsXMovable(false);
       cpItem->SetEndPointsYMovable(true);
       cpItem->SetUseOpacityPointHandles(true);
-      cpItem->SetLabelFormat("%.3f: %.3f");
+      cpItem->SetLabelFormat("{:.3f}: {:.3f}");
       this->Internals->ControlPointsItem = cpItem;
     }
     else if (pwf_editable)
@@ -432,7 +432,7 @@ void pqTransferFunctionWidget::initialize(
       cpItem->SetEndPointsXMovable(false);
       cpItem->SetEndPointsYMovable(true);
       cpItem->SetUseOpacityPointHandles(true);
-      cpItem->SetLabelFormat("%.3f: %.3f");
+      cpItem->SetLabelFormat("{:.3f}: {:.3f}");
       this->Internals->ControlPointsItem = cpItem;
     }
   }

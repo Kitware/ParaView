@@ -5,6 +5,7 @@
 #include "vtkCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringFormatter.h"
 
 vtkStandardNewMacro(vtkPVXMLElement);
 
@@ -12,11 +13,6 @@ vtkStandardNewMacro(vtkPVXMLElement);
 #include <sstream>
 #include <string>
 #include <vector>
-#if defined(_WIN32) && !defined(__CYGWIN__)
-#define SNPRINTF _snprintf
-#else
-#define SNPRINTF snprintf
-#endif
 
 struct vtkPVXMLElementInternals
 {
@@ -608,7 +604,9 @@ std::string vtkPVXMLElement::Encode(const char* plaintext)
     if (*escape_char)
     {
       char temp[20];
-      SNPRINTF(temp, 20, "&#x%x;", static_cast<int>(*escape_char));
+      auto result =
+        vtk::format_to_n(temp, sizeof(temp), "&#x{:x};", static_cast<int>(*escape_char));
+      *result.out = '\0';
       sanitized += temp;
     }
     else

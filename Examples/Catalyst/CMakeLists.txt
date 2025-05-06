@@ -7,6 +7,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Use /utf-8 so that MSVC uses utf-8 in source files and object files
+if (MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /utf-8")
+endif ()
+
 include(CMakeDependentOption)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../../VTK/CMake")
 cmake_dependent_option(USE_CATALYST "Link the simulator with Catalyst" ON

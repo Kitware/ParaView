@@ -9,6 +9,7 @@
 #include <vtkLogger.h>
 #include <vtkMPIController.h>
 #include <vtkNew.h>
+#include <vtkStringFormatter.h>
 #include <vtkTable.h>
 #include <vtkTesting.h>
 
@@ -103,11 +104,11 @@ bool ReadAndVerifyCSV(const std::string& fname, int rank, int numRanks)
       auto value2 = table->GetValueByName(row, "Column2");
       auto value3 = table->GetValueByName(row, "Column4-implicit");
       VERITFY_EQ(value1.ToDouble(), row + 1.5,
-        std::string("incorrect column1  values at row ") + std::to_string(row));
+        std::string("incorrect column1  values at row ") + vtk::to_string(row));
       VERITFY_EQ(value2.ToInt(), row * 100,
-        std::string("incorrect column2  values at row ") + std::to_string(row));
+        std::string("incorrect column2  values at row ") + vtk::to_string(row));
       VERITFY_EQ(
-        value3.ToInt(), 42, std::string("incorrect column4  values at row ") + std::to_string(row));
+        value3.ToInt(), 42, std::string("incorrect column4  values at row ") + vtk::to_string(row));
     }
   }
   return true;

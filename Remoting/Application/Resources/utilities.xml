@@ -1541,7 +1541,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.pvti">
+                            default_values="filename_{:t}.pvti">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"

@@ -11,6 +11,7 @@
 #include "vtkSMProxyIterator.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkStringFormatter.h"
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
@@ -103,7 +104,7 @@ void pqSelectionListPropertyWidget::populateRowLabels(pqSMProxy appendSelection)
     QStringList horHeaderList;
     for (unsigned int i = 0; i < numInputs; i++)
     {
-      std::string str = "s" + std::to_string(i);
+      std::string str = "s" + vtk::to_string(i);
       QString name = QString::fromStdString(str);
       horHeaderList.push_back(name);
       defaultValues.push_back(QVariant());

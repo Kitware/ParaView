@@ -21,6 +21,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkStringFormatter.h"
 
 #include <vtk_pugixml.h>
 #include <vtksys/RegularExpression.hxx>
@@ -225,12 +226,12 @@ public:
   std::string GetProxyRegistrationName(int id) const
   {
     const auto query =
-      std::string("//ServerManagerState/ProxyCollection/Item[@id=") + std::to_string(id) + "]";
+      std::string("//ServerManagerState/ProxyCollection/Item[@id=") + vtk::to_string(id) + "]";
     if (auto xpath_node = this->StateXML.select_node(query.c_str()))
     {
       return xpath_node.node().attribute("name").value();
     }
-    return std::to_string(id);
+    return vtk::to_string(id);
   }
 
 private:
@@ -303,7 +304,7 @@ private:
       return;
     }
     const auto query =
-      std::string("//ServerManagerState/ProxyCollection/Item[@id=") + std::to_string(id) + "]";
+      std::string("//ServerManagerState/ProxyCollection/Item[@id=") + vtk::to_string(id) + "]";
     if (auto xpath_node = this->StateXML.select_node(query.c_str()))
     {
       xpath_node.node().attribute("name") = name.c_str();
@@ -346,7 +347,7 @@ private:
     baseName.erase(std::remove(baseName.begin(), baseName.end(), '.'), baseName.end());
     if (this->ProxyNamesUsed.find(baseName) != this->ProxyNamesUsed.end())
     {
-      baseName.append(std::to_string(this->ProxyNamesUsed[baseName]++));
+      baseName.append(vtk::to_string(this->ProxyNamesUsed[baseName]++));
     }
     else
     {
@@ -614,7 +615,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
     case CHOOSE_FILES_EXPLICITLY:
       for (auto& pair1 : internals.PropertiesMap)
       {
-        vtkSMProxy* subProxy = this->GetSubProxy(std::to_string(pair1.first).c_str());
+        vtkSMProxy* subProxy = this->GetSubProxy(vtk::to_string(pair1.first).c_str());
         for (auto& pair2 : pair1.second)
         {
           vtkInternals::PropertyInfo& info = pair2.second;
