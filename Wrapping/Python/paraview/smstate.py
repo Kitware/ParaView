@@ -116,7 +116,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
     """Returns the state string"""
     if options:
         options = sm._getPyProxy(options)
-        propertiesToTraceOnCreate = options.PropertiesToTraceOnCreate
+        propertiesToTraceOnCreate = options.PropertiesToTraceOnCreate.ConvertValue(options.PropertiesToTraceOnCreate.GetElement(0))
         skipHiddenRepresentations = options.SkipHiddenDisplayProperties
         skipRenderingComponents = options.SkipRenderingComponents
         skipActiveComponents = options.SkipActiveComponents
@@ -169,6 +169,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         # this ensures that lookup tables/scalar bars etc. are fully traced.
         tracer.config.SetFullyTraceSupplementalProxies(True)
         tracer.config.SetSkipRenderingComponents(skipRenderingComponents)
+        tracer.config.SetPropertiesToTraceOnCreate(propertiesToTraceOnCreate)
 
         trace = smtrace.TraceOutput()
         if preamble is None:
