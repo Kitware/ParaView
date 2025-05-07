@@ -601,18 +601,33 @@ input port.
 ### Adding *Categories* to the *Filters* Menu
 
 Now suppose we want to add a new category to the *Filters* menu, called
-*Extensions* and then show this filter in that menu. In that case we need to
-add a hint to the XML file that tells ParaView what category to display this
-filter in. In this case, the `Hints` element of the XML file can contain:
+*Plugin* containing an *Custom Extensions* submenu, and then show this filter in that submenu.
+In that case we need to add a `ParaViewFilters` tag inside the root `ServerManagerConfiguration`
+to describe categories.
+
+If the name of the category is the same as an already existing category such as
+*Data Analysis*, then the filter gets added to the existing category.
+
+Otherwise a new category is created. Categories can be nested.
+
+```xml
+<ParaViewFilters>
+   <Category name="Plugins">
+     <Category name="Extensions" menu_label="Custom Extensions">
+       <Proxy group="filters" name="MyElevationFilter" />
+     </Category>
+   </Category>
+</ParaViewFilters>
+```
+
+A previous method was to add a hint to the XML file that tells ParaView in which category to display this.
+In this case, the `Hints` element of the XML file can contain:
 
 ```xml
 <Hints>
   <ShowInMenu category="Extensions" />
 </Hints>
 ```
-
-If the name of the category is same as an already existing category such as
-*Data Analysis*, then the filter gets added to the existing category.
 
 ### Adding Icons
 
