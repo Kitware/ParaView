@@ -136,15 +136,6 @@ public:
 
   ///@{
   /**
-   * Get the name of the last preset that was applied (if any).
-   * Note that the transfer function points may have been modified in different
-   * ways (including manually by the user) since the last preset was applied.
-   */
-  vtkGetMacro(NameOfLastPresetApplied, std::string);
-  ///@}
-
-  ///@{
-  /**
    * Saves the transfer function state as a preset. This is simply a subset of the
    * state of the transfer function proxy.
    */
@@ -390,13 +381,6 @@ protected:
    * available, then the application XML defaults are used.
    */
   void RestoreFromSiteSettingsOrXML(const char* arrayName);
-
-  /**
-   * Stores the name of the last preset that was applied, if any.
-   * Note that the transfer function points may have been modified in different
-   * ways (including manually by the user) since the last preset was applied.
-   */
-  std::string NameOfLastPresetApplied;
 
   /*
    * Stores the last range used to rescale to transfer function

@@ -1602,6 +1602,20 @@
         </Hints>
       </IntVectorProperty>
 
+      <StringVectorProperty name="NameOfLastPresetApplied"
+                            animateable="0"
+                            no_custom_default="1"
+                            default_values=""
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>
+          Stores the name of the last preset that was applied, if any.
+          Note that the transfer function points may have been modified in
+          different ways (including manually by the user) since the last preset
+          was applied.
+        </Documentation>
+      </StringVectorProperty>
+
       <DoubleVectorProperty default_values="0"
                             name="ScalarRangeInitialized"
                             number_of_elements="1"

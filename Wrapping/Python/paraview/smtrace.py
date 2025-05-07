@@ -614,7 +614,7 @@ class RGBPointsFormatter(TabulatedVectorFormatter):
             # Defaults worked!
             return format_out(kwargs)
 
-        last_preset_name = lut.SMProxy.name_of_last_preset_applied
+        last_preset_name = lut.NameOfLastPresetApplied
         if last_preset_name:
             kwargs['preset_name'] = last_preset_name
             if matches(lut, kwargs):
@@ -1150,8 +1150,18 @@ class TransferFunctionProxyFilter(ProxyFilter):
         return False
 
     def should_never_trace(self, prop):
-        if ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False): return True
-        if prop.get_property_name() in ["ScalarOpacityFunction"]: return True
+        blacklist = [
+            "ScalarOpacityFunction",
+            # We apply this to the RGBPoints explicitly, so no need to
+            # record it here.
+            "NameOfLastPresetApplied",
+        ]
+        if ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False):
+            return True
+
+        if prop.get_property_name() in blacklist:
+            return True
+
         return False
 
 
