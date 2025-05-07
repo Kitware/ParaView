@@ -1392,6 +1392,7 @@ list(APPEND TESTS_WITH_BASELINES
   AMRCutPlane.xml
   AMReXParticlesReader.xml
   AxisAlignedSliceBackwardCompat.xml
+  AxisAlignedTransform.xml
   AnimationCache.xml
   AnimationCameraExportImport.xml
   AnimationFollowPath.xml
@@ -2063,6 +2064,10 @@ set(CGNSReaderSurfacePatches_DISABLE_CRS TRUE)
 # RegionIds is not implemented for Distributed context
 set (RegionIds_DISABLE_CS TRUE)
 set (RegionIds_DISABLE_CRS TRUE)
+
+# AxisAlignedTransform is not implemented for Distributed context yet : issue (https://gitlab.kitware.com/paraview/paraview/-/issues/22949)
+set (AxisAlignedTransform_DISABLE_CS TRUE)
+set (AxisAlignedTransform_DISABLE_CRS TRUE)
 
 # Add image method overrides for tests.
 
