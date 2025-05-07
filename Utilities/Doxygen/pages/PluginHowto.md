@@ -1245,9 +1245,9 @@ The `CMakeLists.txt` looks as follows:
 
 ```cmake
 # Macro for adding the location callback. We specify the class name and the
-# method to call with the filesystem location as `CLASS_NAME` and `STORE`
+# method to call with the filesystem location as "CLASS_NAME" and "STORE"
 # arguments. It returns the interface and sources created in the variables
-# passed to the `INTERFACES` and `SOURCES` arguments.
+# passed to the "INTERFACES" and "SOURCES" arguments.
 paraview_plugin_add_location(
   CLASS_NAME pqMyPluginLocation  # the class name for our class
   STORE  StoreLocation           # the method to call when the plugin is loaded
