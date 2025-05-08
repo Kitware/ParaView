@@ -7,6 +7,7 @@
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkStringFormatter.h"
 
 #include "vtkFieldData.h"
 #include "vtkUnsignedCharArray.h"
@@ -82,7 +83,7 @@ static int nifti_write_extensions(znzFile fp, nifti_image* nim)
     extdr[0] = 1;
   if (vtknifti1_io::nifti_write_buffer(fp, extdr, 4) != 4)
   {
-    fprintf(stderr, "** failed to write extender\n");
+    vtk::print(stderr, "** failed to write extender\n");
     return -1;
   }
 
@@ -104,7 +105,7 @@ static int nifti_write_extensions(znzFile fp, nifti_image* nim)
 
     if (!ok)
     {
-      fprintf(stderr, "** failed while writing extension #%d\n", c);
+      vtk::print(stderr, "** failed while writing extension #{:d}\n", c);
       return -1;
     }
 

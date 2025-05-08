@@ -5,6 +5,8 @@
 
 #include <cstdio>
 
+#include "vtkStringFormatter.h"
+
 #include <QDebug>
 #include <QTimer>
 #include <QWidget>
@@ -49,28 +51,27 @@ int QTestApp::exec()
 void QTestApp::messageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
   QByteArray localMsg = msg.toUtf8();
+  const char* message = !localMsg.isEmpty() ? localMsg.data() : "";
+  const char* file = context.file ? context.file : "";
+  const int line = context.line;
+  const char* function = context.function ? context.function : "";
   switch (type)
   {
     case QtDebugMsg:
-      fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.data(), context.file, context.line,
-        context.function);
+      vtk::print(stderr, "Debug: {:s} ({:s}:{:d}, {:s})\n", message, file, line, function);
       break;
     case QtInfoMsg:
-      fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.data(), context.file, context.line,
-        context.function);
+      vtk::print(stderr, "Info: {:s} ({:s}:{:d}, {:s})\n", message, file, line, function);
       break;
     case QtWarningMsg:
-      fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.data(), context.file, context.line,
-        context.function);
+      vtk::print(stderr, "Warning: {:s} ({:s}:{:d}, {:s})\n", message, file, line, function);
       break;
     case QtCriticalMsg:
-      fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.data(), context.file, context.line,
-        context.function);
+      vtk::print(stderr, "Critical: {:s} ({:s}:{:d}, {:s})\n", message, file, line, function);
       Error++;
       break;
     case QtFatalMsg:
-      fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.data(), context.file, context.line,
-        context.function);
+      vtk::print(stderr, "Fatal: {:s} ({:s}:{:d}, {:s})\n", message, file, line, function);
       abort();
   }
 }

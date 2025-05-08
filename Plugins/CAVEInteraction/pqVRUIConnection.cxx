@@ -18,6 +18,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 #include "vtkTransform.h"
 #include "vtkVRQueue.h"
@@ -117,7 +118,7 @@ public:
     hp = gethostbyname(address.c_str());
     if (hp == 0)
     {
-      fprintf(stderr, "%s: unknown host\n", address.c_str());
+      vtk::print(stderr, "{:s}: unknown host\n", address);
       return;
     }
     bcopy(hp->h_addr, &client_addr.sin_addr, hp->h_length);

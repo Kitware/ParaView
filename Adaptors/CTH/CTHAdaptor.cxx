@@ -9,11 +9,10 @@
 #include "vtkCTHSource.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkStringFormatter.h"
 
 #include <csignal>
 #include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <fstream>
 
 namespace
@@ -31,7 +30,7 @@ void handler(int sig)
   void* array[100];
   size_t size;
   size = backtrace(array, 100);
-  fprintf(stderr, "Error: signal %d\n", sig);
+  vtk::print(stderr, "Error: signal {:d}\n", sig);
   backtrace_symbols_fd(array, size, 2);
   exit(1);
 }

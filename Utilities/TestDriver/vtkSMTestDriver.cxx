@@ -200,7 +200,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
     if (strcmp(argv[i], "--test-remote-rendering") == 0)
     {
       this->TestRemoteRendering = 1;
-      fprintf(stderr, "Test Render Server.\n");
+      vtk::print(stderr, "Test Render Server.\n");
     }
     if (strcmp(argv[i], "--render-server") == 0)
     {
@@ -208,7 +208,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->RenderServerExecutable.Executable = ::FixExecutablePath(argv[i + 1]);
       this->RenderServerExecutable.ArgStart = i + 2;
       this->RenderServerExecutable.ArgEnd = FindLastExecutableArg(i + 2, argc, argv);
-      fprintf(stderr, "Test Render Server.\n");
+      vtk::print(stderr, "Test Render Server.\n");
     }
     if (strcmp(argv[i], "--data-server") == 0)
     {
@@ -216,7 +216,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->DataServerExecutable.Executable = ::FixExecutablePath(argv[i + 1]);
       this->DataServerExecutable.ArgStart = i + 2;
       this->DataServerExecutable.ArgEnd = FindLastExecutableArg(i + 2, argc, argv);
-      fprintf(stderr, "Test Render Server.\n");
+      vtk::print(stderr, "Test Render Server.\n");
     }
     if (strcmp(argv[i], "--server") == 0)
     {
@@ -224,7 +224,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->ServerExecutable.Executable = ::FixExecutablePath(argv[i + 1]);
       this->ServerExecutable.ArgStart = i + 2;
       this->ServerExecutable.ArgEnd = FindLastExecutableArg(i + 2, argc, argv);
-      fprintf(stderr, "Test Server.\n");
+      vtk::print(stderr, "Test Server.\n");
     }
     if (strcmp(argv[i], "--script") == 0)
     {
@@ -232,58 +232,59 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->ScriptExecutable.Executable = ::FixExecutablePath(argv[i + 1]);
       this->ScriptExecutable.ArgStart = i + 2;
       this->ScriptExecutable.ArgEnd = FindLastExecutableArg(i + 2, argc, argv);
-      fprintf(stderr, "Test Script.\n");
+      vtk::print(stderr, "Test Script.\n");
     }
     if (strcmp(argv[i], "--test-multi-clients") == 0)
     {
       this->TestMultiClient = 1;
-      fprintf(stderr, "Test collaboration.\n");
+      vtk::print(stderr, "Test collaboration.\n");
     }
     if (strcmp(argv[i], "--test-multi-servers") == 0)
     {
       VTK_FROM_CHARS_IF_ERROR_RETURN(argv[i + 1], this->NumberOfServers, 0);
-      fprintf(stderr, "Test multi-servers with %d servers.\n", this->NumberOfServers);
+      vtk::print(stderr, "Test multi-servers with {:d} servers.\n", this->NumberOfServers);
     }
     if (strcmp(argv[i], "--script-np") == 0)
     {
       this->MPIScriptNumProcessFlag = argv[i + 1];
-      fprintf(stderr, "Test script with %s servers.\n", argv[i + 1]);
+      vtk::print(stderr, "Test script with {:s} servers.\n", argv[i + 1]);
     }
     if (strcmp(argv[i], "--one-mpi-np") == 0)
     {
       this->MPIServerNumProcessFlag = this->MPIRenderServerNumProcessFlag = "1";
-      fprintf(stderr, "Test with one mpi process.\n");
+      vtk::print(stderr, "Test with one mpi process.\n");
     }
     if (strcmp(argv[i], "--test-rc") == 0)
     {
       this->ReverseConnection = 1;
-      fprintf(stderr, "Test reverse connection.\n");
+      vtk::print(stderr, "Test reverse connection.\n");
     }
     if (strncmp(argv[i], "--server-exit-timeout", strlen("--server-exit-timeout")) == 0)
     {
       VTK_FROM_CHARS_IF_ERROR_RETURN(argv[i + 1], this->NumberOfServers, 0);
-      fprintf(stderr, "The server exit timeout was set to %f.\n", this->ServerExitTimeOut);
+      vtk::print(stderr, "The server exit timeout was set to {:f}.\n", this->ServerExitTimeOut);
     }
     if (strncmp(argv[i], "--server-preflags", 17) == 0)
     {
-      fprintf(stderr, "Server preflags are no longer supported.\n");
+      vtk::print(stderr, "Server preflags are no longer supported.\n");
     }
     if (strncmp(argv[i], "--allow-errors", strlen("--allow-errors")) == 0)
     {
       this->AllowErrorInOutput = 1;
-      fprintf(stderr, "The allow errors in output flag was set to %d.\n", this->AllowErrorInOutput);
+      vtk::print(
+        stderr, "The allow errors in output flag was set to {:d}.\n", this->AllowErrorInOutput);
     }
     if (strcmp(argv[i], "--script-ignore-output-errors") == 0)
     {
       this->ScriptIgnoreOutputErrors = 1;
-      fprintf(stderr, "The ScriptIgnoreOutputErrors flag was set to %d.\n",
+      vtk::print(stderr, "The ScriptIgnoreOutputErrors flag was set to {:d}.\n",
         this->ScriptIgnoreOutputErrors);
     }
   }
 
   if (this->TestMultiClient && (!this->TestServer || this->TestRenderServer))
   {
-    fprintf(stderr, "Multi-client tests require --server.\n");
+    vtk::print(stderr, "Multi-client tests require --server.\n");
     abort();
   }
 

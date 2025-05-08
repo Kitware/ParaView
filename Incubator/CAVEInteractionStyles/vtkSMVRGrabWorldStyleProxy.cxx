@@ -10,6 +10,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkStringFormatter.h"
 #include "vtkTransform.h"
 #include "vtkVRQueue.h"
 
@@ -73,8 +74,9 @@ void vtkSMVRGrabWorldStyleProxy::HandleButton(const vtkVREvent& event)
     this->CachedRotMatrix->Identity();
 
 #ifdef GRABSTYLE_DEBUG
-    printf("pos 0 %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n", 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-      0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+    vtk::print(
+      "pos 0 {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f}\n",
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
     fflush(stdout);
 #endif
 
@@ -195,9 +197,10 @@ void vtkSMVRGrabWorldStyleProxy::HandleTracker(const vtkVREvent& event)
 #ifdef GRABSTYLE_DEBUG
 // Output to control a graphical representation
 #if 0
-printf("loc 0 %f %f %f\n", transformMatrix->Element[0][3], transformMatrix->Element[1][3], transformMatrix->Element[2][3]);
+printf("loc 0 {:f} {:f} {:f}\n", transformMatrix->Element[0][3], transformMatrix->Element[1][3], transformMatrix->Element[2][3]);
 #else
-        printf("pos 0 %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+        printf(
+          "pos 0 {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f}\n",
           transformMatrix->Element[0][0], transformMatrix->Element[0][1],
           transformMatrix->Element[0][2], transformMatrix->Element[0][3],
           transformMatrix->Element[1][0], transformMatrix->Element[1][1],
