@@ -369,9 +369,9 @@ private:
         vtkNamedArgument newArg(fmtArg.name, fmtArg.value);
         this->Arguments.push_back(newArg);
       }
-      else // else print warning
+      else // else print message
       {
-        vtkLogF(WARNING, "Argument %s already exists. Try to add another one.", fmtArg.name);
+        vtkLogF(TRACE, "Argument %s already exists. Try to add another one.", fmtArg.name);
       }
     }
 
