@@ -5,13 +5,16 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqEventDispatcher.h"
 #include "pqLoadStateReaction.h"
 #include "vtkPVFileInformation.h"
 
 #include <QFile>
 #include <QFileInfo>
+#include <QMainWindow>
 #include <QMessageBox>
+#include <QStatusBar>
 
 #include <cassert>
 
@@ -133,13 +136,11 @@ void pqExampleVisualizationsDialog::onButtonPressed()
     QFile qfile(stateFile);
     if (qfile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-      QMessageBox box(this);
-      box.setText(tr("Loading example visualization, please wait ..."));
-      box.setStandardButtons(QMessageBox::NoButton);
-      box.show();
-
-      // without this, the message box doesn't paint properly.
-      pqEventDispatcher::processEventsAndWait(100);
+      QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+      if (mainWindow)
+      {
+        mainWindow->statusBar()->showMessage(tr("Loading example visualization."), 2000);
+      }
 
       QString xmldata(qfile.readAll());
       xmldata.replace("$PARAVIEW_EXAMPLES_DATA", dataPath);
