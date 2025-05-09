@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- open the OpenFOAM data -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/squareBend/squareBend.foam" />
+
+  <!-- Check that restart files are not listed -->
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrays/ArraySelectionWidget" property="modelRowCount" arguments="4" />
+
+  <!-- Uncheck the ignore restart file option, and check again the available cell data results -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/IgnoreRestartFiles/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrays/ArraySelectionWidget" property="modelRowCount" arguments="5" />
+</pqevents>
