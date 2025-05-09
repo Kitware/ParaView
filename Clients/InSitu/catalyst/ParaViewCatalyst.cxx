@@ -24,6 +24,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtksys/SystemTools.hxx"
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
@@ -35,6 +36,12 @@
 
 #if VTK_MODULE_ENABLE_VTK_IOFides
 #include "vtkFidesReader.h"
+#endif
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+const char SPLIT_PATH_CHAR = ';';
+#else
+const char SPLIT_PATH_CHAR = ':';
 #endif
 
 #include "catalyst_impl_paraview.h"
@@ -261,7 +268,13 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
 #else
   const vtkTypeUInt64 comm = 0;
 #endif
-  vtkInSituInitializationHelper::Initialize(comm);
+  std::vector<std::string> python_paths;
+  if (cpp_params.has_path("catalyst/python_path"))
+  {
+    std::string pythonPath = cpp_params["catalyst/python_path"].as_string();
+    python_paths = vtksys::SystemTools::SplitString(pythonPath, SPLIT_PATH_CHAR);
+  }
+  vtkInSituInitializationHelper::Initialize(comm, python_paths);
 
   if (cpp_params.has_path("catalyst/scripts"))
   {
