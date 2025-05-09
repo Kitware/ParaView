@@ -350,3 +350,45 @@ def ListColorPresetNames():
     return [
         presets.GetPresetName(index) for index in range(presets.GetNumberOfPresets())
     ]
+
+
+# -----------------------------------------------------------------------------
+
+
+def GenerateRGBPoints(preset_name=None, range_min=None, range_max=None):
+    """Create and return a list of RGB points by using the provided arguments.
+    The returned RGB points are intended to be used by transfer functions.
+
+    This function is used by Python state files so that they do not have to
+    write out every single RGB point for a transfer function if those RGB
+    points can be easily re-created.
+
+    :param preset_name: A preset name to apply, if any.
+    :type preset_name: str or None
+    :param range_min: The minimum value for rescaling the RGBPoints range
+    :type range_min: float or None
+    :param range_min: The maximum value for rescaling the RGBPoints range
+    :type range_max: float or None
+    :return: A list of RGBPoints which can be used in transfer functions
+    :rtype: list[float]
+
+    NOTE: this function might be used by old state files.
+    As such, we must not break backward-compatibility with it.
+    """
+    # Create a default PVLookupTable
+    lut = servermanager.rendering.PVLookupTable()
+
+    # If a preset name was provided, apply the preset
+    if preset_name is not None:
+        lut.SMProxy.ApplyPreset(preset_name)
+
+    any_rescale = any(x is not None for x in (range_min, range_max))
+    if any_rescale:
+        if range_min is None:
+            range_min = lut.RGBPoints[0]
+        if range_max is None:
+            range_max = lut.RGBPoints[-4]
+
+        lut.SMProxy.RescaleTransferFunction([range_min, range_max])
+
+    return lut.RGBPoints

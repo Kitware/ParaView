@@ -62,6 +62,7 @@ garbage collected since there's no reference to it.
 """
 from __future__ import absolute_import, division, print_function
 
+import math
 import weakref
 import paraview.servermanager as sm
 import paraview.simple as simple
@@ -513,12 +514,12 @@ class Accessor(object):
 
 
 class PropertyFormatter:
-    def format(self, data):
+    def format(self, data, proxy):
         raise NotImplementedError
 
 
 class DefaultFormatter(PropertyFormatter):
-    def format(self, data):
+    def format(self, data, proxy):
         return repr(data)
 
 
@@ -526,7 +527,7 @@ class TabulatedVectorFormatter(PropertyFormatter):
     def __init__(self, col_names):
         self.col_names = col_names
 
-    def format(self, data):
+    def format(self, data, proxy):
         if len(data) == 0:
             return "[]"
 
@@ -553,12 +554,91 @@ class TabulatedVectorFormatter(PropertyFormatter):
         return "\n".join(lines)
 
 
+class RGBPointsFormatter(TabulatedVectorFormatter):
+    def __init__(self):
+        # Initialize the tabulated vector formatter
+        # We will fall back on using this if we can't figure out any
+        # other way to re-generate the RGBPoints.
+        super().__init__(["scalar", "red", "green", "blue"])
+
+    def _is_default_preset(self, name: str) -> bool:
+        # Check if `name` is one of the default presets
+        presets = sm.vtkSMTransferFunctionPresets.GetInstance()
+        preset_idx = -1
+        for i in range(presets.GetNumberOfPresets()):
+            if last_preset_name == presets.GetPresetName(i):
+                preset_idx = i
+                break
+
+        return preset_idx != -1 and presets.IsPresetBuiltin(preset_idx)
+
+    def _rgb_points_match(self, lut, kwargs: dict) -> bool:
+        # Check if using the provided `kwargs` in `GenerateRGBPoints()`
+        # produces the same RGBPoints as those on `lut`.
+        new_points = simple.color.GenerateRGBPoints(**kwargs)
+        current_points = lut.RGBPoints
+
+        # Due to the unreliability of direct comparison between floating point
+        # numbers, instead of doing `new_points == current_points`, use
+        # `math.isclose()` between every pair of numbers.
+        if len(new_points) != len(current_points):
+            return False
+
+        for v1, v2 in zip(new_points, current_points):
+            # `math.isclose()` by default uses an absolute tolerance of 0
+            # and a relative tolerance of 1e-09.
+            if not math.isclose(v1, v2):
+                return False
+
+        return True
+
+    def _format_generate_rgb_points(self, kwargs: dict) -> str:
+        # Format `GenerateRGBPoints()`, along with its `kwargs`, as it will
+        # appear in the Python state file or Python trace.
+        indent = ' ' * 4
+        kwargs_str = (
+            f'\n{indent}' +
+            f',\n{indent}'.join([f'{k}={repr(v)}' for k, v in kwargs.items()])
+        )
+        return f'GenerateRGBPoints({kwargs_str},\n)'
+
+    def format(self, data, proxy):
+        lut = proxy
+
+        # Make aliases for the long function names
+        matches = self._rgb_points_match
+        format_out = self._format_generate_rgb_points
+
+        kwargs = {}
+        if matches(lut, kwargs):
+            # Defaults worked!
+            return format_out(kwargs)
+
+        last_preset_name = lut.NameOfLastPresetApplied
+        if last_preset_name:
+            kwargs['preset_name'] = last_preset_name
+            if matches(lut, kwargs):
+                # Applying preset with no range specified worked!
+                return format_out(kwargs)
+
+        # Try to make the range match
+        rgb_points = lut.RGBPoints
+        if len(rgb_points) > 3:
+            kwargs['range_min'] = lut.RGBPoints[0]
+            kwargs['range_max'] = lut.RGBPoints[-4]
+            if matches(lut, kwargs):
+                # Specifying range, possibly with a preset, worked!
+                return format_out(kwargs)
+
+        # If all else fails, revert to writing them all out
+        return super().format(data, proxy)
+
+
 DEFAULT_FORMATTER = DefaultFormatter()
 PROPERTY_FORMATTERS = {
-    "RGBPoints": TabulatedVectorFormatter(
-        ["scalar", "red", "green", "blue"]
-    ),
+    "RGBPoints": RGBPointsFormatter(),
 }
+
 
 def get_property_formatter(property_trace_helper):
     return PROPERTY_FORMATTERS.get(
@@ -839,11 +919,12 @@ class PropertyTraceHelper(object):
 
     def format_object(self, obj):
         formatter = get_property_formatter(self)
+        proxy = self.get_proxy()
 
         try:
-            return formatter.format(obj)
+            return formatter.format(obj, proxy)
         except Exception:
-            return DEFAULT_FORMATTER.format(obj)
+            return DEFAULT_FORMATTER.format(obj, proxy)
 
     def has_proxy_list_domain(self):
         """Returns True if this property has a ProxyListDomain, else False."""
@@ -1069,8 +1150,18 @@ class TransferFunctionProxyFilter(ProxyFilter):
         return False
 
     def should_never_trace(self, prop):
-        if ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False): return True
-        if prop.get_property_name() in ["ScalarOpacityFunction"]: return True
+        blacklist = [
+            "ScalarOpacityFunction",
+            # We apply this to the RGBPoints explicitly, so no need to
+            # record it here.
+            "NameOfLastPresetApplied",
+        ]
+        if ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False):
+            return True
+
+        if prop.get_property_name() in blacklist:
+            return True
+
         return False
 
 

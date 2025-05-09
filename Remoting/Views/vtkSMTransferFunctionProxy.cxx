@@ -850,6 +850,16 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
   }
   if (vtkSMSettings::DeserializeFromJSON(this, preset))
   {
+    if (this->GetProperty("NameOfLastPresetApplied"))
+    {
+      // We are currently only using `NameOfLastPresetApplied` for
+      // `vtkPVDiscretizableColorTransferFunction`. We could use it for other
+      // transfer function types too, but we'll need to copy the property to
+      // their XML first.
+      auto presetName = preset.get("Name", "").asString();
+      vtkSMPropertyHelper(this, "NameOfLastPresetApplied").Set(presetName.c_str());
+    }
+
     this->UpdateVTKObjects();
     return true;
   }

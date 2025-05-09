@@ -147,6 +147,7 @@ from paraview.simple.layout import (
 )
 from paraview.simple.color import (
     LoadPalette,
+    GenerateRGBPoints,
     GetColorTransferFunction,
     GetBlockColorTransferFunction,
     GetOpacityTransferFunction,
@@ -357,6 +358,7 @@ __all__ = [
     "EqualizeViewsBoth",
     # -- color
     "LoadPalette",
+    "GenerateRGBPoints",
     "GetColorTransferFunction",
     "GetBlockColorTransferFunction",
     "GetOpacityTransferFunction",
