@@ -2067,7 +2067,7 @@
         Options proxy used to prompt user for python state options.
       </Documentation>
       <IntVectorProperty name="PropertiesToTraceOnCreate"
-                         default_values="1"
+                         default_values="3"
                          number_of_elements="1">
         <Documentation>
           Select which properties to save in state
@@ -2080,6 +2080,7 @@
               are user-modified when saving state.
           <Entry text="only *user-modified* properites" value="2" />
           -->
+          <Entry text="only *actively used* modified properties" value="3"/>
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty name="SkipRenderingComponents"

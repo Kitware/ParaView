@@ -1,9 +1,16 @@
 # SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
-  vtkPropertyDecorator
   vtkBoolPropertyDecorator
+  vtkCompositePropertyDecorator
   vtkEnableDecorator
+  vtkGenericPropertyDecorator
+  vtkInputDataTypeDecorator
+  vtkMultiComponentsDecorator
+  vtkOSPRayHidingDecorator
+  vtkPropertyDecorator
+  vtkSessionTypeDecorator
   vtkShowDecorator)
 
 vtk_module_add_module(ParaView::RemotingApplicationComponents

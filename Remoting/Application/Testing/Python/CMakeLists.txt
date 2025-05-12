@@ -54,6 +54,7 @@ set(PY_TESTS
   PythonSMTraceTest5.py,NO_VALID
   PythonSMTraceTest6.py,NO_VALID
   PythonSMScopedTrace.py,NO_VALID
+  PythonDecorators.py,NO_VALID
   PythonTestBenchmark.py,NO_VALID
   ReaderReload.py,NO_VALID
   RecolorableImageExtractor.py

@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkBoolPropertyDecorator.h"
 
@@ -21,6 +22,12 @@ vtkBoolPropertyDecorator::vtkBoolPropertyDecorator() = default;
 void vtkBoolPropertyDecorator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Index : " << this->Index << "\n";
+  os << indent << "BoolProperty : " << this->BoolProperty << "\n";
+  os << indent << "Property : " << this->Property << "\n";
+  os << indent << "ObserverId : " << this->ObserverId << "\n";
+  os << indent << "Function : " << this->Function << "\n";
+  os << indent << "Value : " << this->Value << "\n";
 }
 
 //-----------------------------------------------------------------------------
@@ -34,14 +41,14 @@ vtkBoolPropertyDecorator::~vtkBoolPropertyDecorator()
 }
 
 //-----------------------------------------------------------------------------
-void vtkBoolPropertyDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy* proxy_)
+void vtkBoolPropertyDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy* proxy)
 {
-  this->Superclass::Initialize(config, proxy_);
+  this->Superclass::Initialize(config, proxy);
   this->Index = 0;
   this->ObserverId = 0;
   this->BoolProperty = true;
 
-  assert(proxy_ != nullptr);
+  assert(proxy != nullptr);
 
   for (unsigned int cc = 0; cc < config->GetNumberOfNestedElements(); cc++)
   {
@@ -62,7 +69,7 @@ void vtkBoolPropertyDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy* p
                       "supports 'boolean', 'boolean_invert', 'greaterthan', "
                       "'lessthan', 'equals' and 'contains'.");
       }
-      this->Property = proxy_->GetProperty(name);
+      this->Property = this->Proxy()->GetProperty(name);
       this->Index = index;
       this->Function = function;
       this->Value = value;
@@ -71,7 +78,7 @@ void vtkBoolPropertyDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy* p
       {
         vtkDebugMacro(<< "Property '" << (name ? name : "(null)")
                       << "' specified in vtkBoolPropertyDecorator not found in proxy '"
-                      << proxy_->GetXMLName() << "'.");
+                      << this->Proxy()->GetXMLName() << "'.");
         break;
       }
 

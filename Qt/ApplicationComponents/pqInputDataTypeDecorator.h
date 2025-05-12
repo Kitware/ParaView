@@ -6,9 +6,7 @@
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"
-#include "vtkWeakPointer.h"
-
-class vtkObject;
+#include "vtkInputDataTypeDecorator.h"
 
 /**
  * pqInputDataTypeDecorator is a pqPropertyWidgetDecorator subclass.
@@ -17,6 +15,8 @@ class vtkObject;
  * For example, "Computer Gradients" in Contour filter should only
  * be enabled when an input data type is a StructuredData. Please see
  * vtkPVDataInformation::IsDataStructured() for structured types.
+ *
+ * @see vtkInputDataTypeDecorator
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqInputDataTypeDecorator : public pqPropertyWidgetDecorator
 {
@@ -37,14 +37,10 @@ public:
    */
   bool canShowWidget(bool show_advanced) const override;
 
-protected:
-  virtual bool processState() const;
-
 private:
   Q_DISABLE_COPY(pqInputDataTypeDecorator)
 
-  vtkWeakPointer<vtkObject> ObservedObject;
-  unsigned long ObserverId;
+  vtkNew<vtkInputDataTypeDecorator> decoratorLogic;
 };
 
 #endif

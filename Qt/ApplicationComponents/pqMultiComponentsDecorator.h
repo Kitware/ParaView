@@ -5,13 +5,14 @@
 #define pqMultiComponentsDecorator_h
 
 #include "pqPropertyWidgetDecorator.h"
-
-#include <vector>
+#include "vtkMultiComponentsDecorator.h"
 
 /**
  * pqMultiComponentsDecorator's purpose is to prevent the GUI from
  * showing Multi Components Mapping checkbox when the representation is not Volume,
  * the number of components is not valid or MapScalars is not checked.
+ *
+ * @see vtkMultiComponentsDecorator
  */
 class pqMultiComponentsDecorator : public pqPropertyWidgetDecorator
 {
@@ -29,8 +30,7 @@ public:
 
 private:
   Q_DISABLE_COPY(pqMultiComponentsDecorator)
-
-  std::vector<int> Components;
+  vtkNew<vtkMultiComponentsDecorator> decoratorLogic;
 };
 
 #endif

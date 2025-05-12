@@ -12,6 +12,8 @@
 /**
  * pqShowWidgetDecorator can be used to show/hide a widget based on the
  * status of another property not directly controlled by the widget.
+ *
+ * @see vtkShowDecorator
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqShowWidgetDecorator : public pqBoolPropertyWidgetDecorator
 {
@@ -20,6 +22,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqShowWidgetDecorator : public pqBoolProper
 
 public:
   pqShowWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
+  ~pqShowWidgetDecorator() override = default;
 
   bool canShowWidget(bool show_advanced) const override
   {
@@ -31,8 +34,6 @@ private:
   Q_DISABLE_COPY(pqShowWidgetDecorator)
 
   vtkNew<vtkShowDecorator> decoratorLogic;
-
-  void emitVisibilityChanged();
 };
 
 #endif

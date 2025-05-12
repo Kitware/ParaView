@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #ifndef vtkBoolPropertyDecorator_h
 #define vtkBoolPropertyDecorator_h
@@ -46,8 +47,6 @@ private:
 
   friend class pqBoolPropertyWidgetDecorator;
   void UpdateBoolPropertyState();
-
-  // MOVE THEM
 
   vtkWeakPointer<vtkSMProperty> Property;
   std::string Function;

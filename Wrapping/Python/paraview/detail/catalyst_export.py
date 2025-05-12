@@ -15,7 +15,7 @@ def _get_catalyst_state(options):
     # convert catalyst options to PythonStateOptions.
     soptions = servermanager.ProxyManager().NewProxy("pythontracing", "PythonStateOptions")
     soptions = servermanager._getPyProxy(soptions)
-    soptions.PropertiesToTraceOnCreate = smstate.RECORD_MODIFIED_PROPERTIES
+    soptions.PropertiesToTraceOnCreate = smstate.RECORD_ACTIVE_MODIFIED_PROPERTIES
     soptions.SkipHiddenDisplayProperties = True
     soptions.SkipRenderingComponents = False
     soptions.SkipActiveComponents = True

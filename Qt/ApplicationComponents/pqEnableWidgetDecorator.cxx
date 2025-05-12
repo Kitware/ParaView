@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqEnableWidgetDecorator.h"
+#include "pqCoreUtilities.h"
 
 //-----------------------------------------------------------------------------
 pqEnableWidgetDecorator::pqEnableWidgetDecorator(
@@ -9,11 +10,6 @@ pqEnableWidgetDecorator::pqEnableWidgetDecorator(
   : Superclass(config, parentObject)
 {
   this->decoratorLogic->Initialize(config, parentObject->proxy());
-  this->decoratorLogic->AddObserver(vtkEnableDecorator::EnableStateChangedEvent, this,
-    &pqEnableWidgetDecorator::emitEnableStateChanged);
-}
-
-void pqEnableWidgetDecorator::emitEnableStateChanged()
-{
-  Q_EMIT enableStateChanged();
+  pqCoreUtilities::connect(this->decoratorLogic, vtkEnableDecorator::EnableStateChangedEvent, this,
+    SIGNAL(enableStateChanged()));
 }

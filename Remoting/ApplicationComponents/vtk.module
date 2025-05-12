@@ -10,6 +10,9 @@ SPDX_COPYRIGHT_TEXT
   Copyright (c) Kitware Inc.
 DEPENDS
    ParaView::RemotingServerManager
+OPTIONAL_DEPENDS
+  ParaView::RemotingViews
+  VTK::RenderingRayTracing
 #KIT
 #  This module cannot be part of a kit because it links to ClientServer
 #  wrappings of all modules. This ends up with a cycle in a shared kit build.

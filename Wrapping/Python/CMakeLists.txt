@@ -23,6 +23,7 @@ set(python_files
   paraview/collaboration.py
   paraview/coprocessing.py
   paraview/cpstate.py
+  paraview/decorator_utils.py
   paraview/demos/__init__.py
   paraview/demos/export_catalyst_state.py
   paraview/demos/filedriver_miniapp.py
