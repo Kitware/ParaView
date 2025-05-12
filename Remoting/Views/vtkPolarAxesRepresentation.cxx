@@ -1,9 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 
-// Hide PARAVIEW_DEPRECATED_IN_5_13_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "vtkPolarAxesRepresentation.h"
 
 #include "vtkAlgorithmOutput.h"
@@ -434,9 +431,6 @@ void vtkPolarAxesRepresentation::UpdateBounds()
 
   this->PolarAxesActor->SetBounds(bds);
 
-  // PARAVIEW_DEPRECATED_IN_5_13_0(): following line should be removed
-  this->EnableCustomMinRadius = this->EnableCustomRadius;
-
   double pole[3] = { 0.0, 0.0, 0.0 };
   double center[2] = { (bds[0] + bds[1]) * 0.5, (bds[2] + bds[3]) * 0.5 };
   double maxRadius = this->EnableCustomMaxRadius ? this->MaxRadius : 0.0;
@@ -592,29 +586,6 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   {
     this->PolarAxesActor->SetRange(minRadius, maxRadius);
   }
-}
-
-//----------------------------------------------------------------------------
-// PARAVIEW_DEPRECATED_IN_5_13_0(): reimplement with vtkSetMacro(EnableCustomMinRadius, bool);
-void vtkPolarAxesRepresentation::SetEnableCustomMinRadius(bool enabled)
-{
-  this->EnableCustomRadius = enabled;
-  this->EnableCustomMinRadius = enabled;
-}
-
-//----------------------------------------------------------------------------
-// PARAVIEW_DEPRECATED_IN_5_13_0()
-void vtkPolarAxesRepresentation::SetEnableCustomRadius(bool enabled)
-{
-  this->SetEnableCustomMinRadius(enabled);
-}
-
-//----------------------------------------------------------------------------
-// PARAVIEW_DEPRECATED_IN_5_13_0()
-bool vtkPolarAxesRepresentation::GetEnableCustomRadius()
-{
-  this->EnableCustomMinRadius = this->EnableCustomRadius;
-  return this->GetEnableCustomMinRadius();
 }
 
 //----------------------------------------------------------------------------

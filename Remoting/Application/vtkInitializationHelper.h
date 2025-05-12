@@ -164,13 +164,6 @@ public:
   static bool InitializeOthers();
 
   /**
-   * Initialize everything that needs to be initialized in the paraview engine after the options.
-   * Returns `true` on success, `false` otherwise.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use InitializeSettings and InitializeOthers instead")
-  static bool InitializeMiscellaneous(int type);
-
-  /**
    * Initialize Python virtual environment from --venv command-line argument if any was provided.
    *
    * Make sure that the vtkPythonInterpreter has been initialized before calling this function.
@@ -226,19 +219,6 @@ public:
   static void SetApplicationName(const std::string& appName);
   static const std::string& GetApplicationName();
   ///@}
-
-  /**
-   * Get directory for user settings file. The last character is always the
-   * file path separator appropriate for the system.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkPVStandardPaths::GetUserSettingsDirectory instead")
-  static std::string GetUserSettingsDirectory();
-
-  /**
-   * Get file path for the user settings file.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkPVStandardPaths::GetUserSettingsFilePath instead")
-  static std::string GetUserSettingsFilePath();
 
 protected:
   vtkInitializationHelper() = default;

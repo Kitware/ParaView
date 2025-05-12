@@ -44,24 +44,6 @@ public:
   pqLiveSourceBehavior(QObject* parent = nullptr);
   ~pqLiveSourceBehavior() override;
 
-  /**
-   * Pause live updates.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Please use pqLiveSourceManager::pause() instead")
-  static void pause();
-
-  /**
-   * Resume live updates.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Please use pqLiveSourceManager::resume() instead")
-  static void resume();
-
-  /**
-   * Returns true if live updates are paused.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Please use pqLiveSourceManager::isPaused() instead")
-  static bool isPaused();
-
 private:
   Q_DISABLE_COPY(pqLiveSourceBehavior);
 };

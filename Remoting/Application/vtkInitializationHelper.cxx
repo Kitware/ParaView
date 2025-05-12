@@ -397,14 +397,6 @@ elif not os.path.exists(VENV_BASE):
 }
 
 //----------------------------------------------------------------------------
-bool vtkInitializationHelper::InitializeMiscellaneous(int type)
-{
-  bool status = vtkInitializationHelper::InitializeSettings(type, false);
-  status &= vtkInitializationHelper::InitializeOthers();
-  return status;
-}
-
-//----------------------------------------------------------------------------
 bool vtkInitializationHelper::InitializeSettings(int type, bool defaultCoreConfig)
 {
   auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
@@ -662,18 +654,6 @@ void vtkInitializationHelper::LoadSettings()
   settings->DistributeSettings();
 
   vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = true;
-}
-
-//----------------------------------------------------------------------------
-std::string vtkInitializationHelper::GetUserSettingsDirectory()
-{
-  return vtkPVStandardPaths::GetUserSettingsDirectory();
-}
-
-//----------------------------------------------------------------------------
-std::string vtkInitializationHelper::GetUserSettingsFilePath()
-{
-  return vtkPVStandardPaths::GetUserSettingsFilePath();
 }
 
 //----------------------------------------------------------------------------

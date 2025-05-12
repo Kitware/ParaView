@@ -65,12 +65,6 @@ public:
   void setEnableFavorites(bool enable) { this->EnableFavorites = enable; }
 
   /**
-   * Returns the prototype proxy for the action.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use pqProxyAction::GetProxyPrototype instead.")
-  vtkSMProxy* getPrototype(QAction* action) const;
-
-  /**
    * Provides mechanism to explicitly add a proxy to the menu.
    */
   void addProxy(const QString& xmlgroup, const QString& xmlname);
@@ -97,13 +91,6 @@ public:
    * Given a category name, return the category label.
    */
   QString categoryLabel(const QString& category);
-  /**
-   * Returns whether or not the category's toolbar should be hidden initially.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0(
-    "This was mostly unused. Also it is better to avoid test-dedicated code paths.")
-  bool hideForTests(const QString&) const { return false; };
-  ///@}
 
   /**
    * List actions.
@@ -199,9 +186,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void addProxyDefinitionUpdateObservers();
   ///@}
 
-  PARAVIEW_DEPRECATED_IN_5_13_0("Inner member is not used")
-  void setEnabled(bool){};
-
   /**
    * Forces a re-population of the menu.
    * Create the main submenu entries. Actions are mostly created on "aboutToShow" signal,
@@ -240,35 +224,14 @@ protected Q_SLOTS:
   /// Fill recently used submenu
   void populateRecentlyUsedMenu();
 
-  /**
-   * called when "favorites" menu is being shown.
-   * create the menu (and submenu) with actions for the filters in the favorites list.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0(
-    "Favorites are now a specific category, configurable as the others.")
-  void populateFavoritesMenu();
-
 protected: // NOLINT(readability-redundant-access-specifiers)
   QString ResourceTagName;
   vtkPVXMLElement* MenuRoot = nullptr;
   int RecentlyUsedMenuSize = 0;
-  PARAVIEW_DEPRECATED_IN_5_13_0("Inner member is not used")
-  bool Enabled;
   bool EnableFavorites = false;
 
   void loadRecentlyUsedItems();
   void saveRecentlyUsedItems();
-
-  /**
-   * Load the favorites from settings.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0(
-    "Favorites are now a specific category, configurable as the others.")
-  void loadFavoritesItems();
-
-  PARAVIEW_DEPRECATED_IN_5_13_0(
-    "Favorites are now a specific category, configurable as the others.")
-  QAction* getAddToFavoritesAction(const QString& path);
 
   /**
    * Return the action for a given proxy.

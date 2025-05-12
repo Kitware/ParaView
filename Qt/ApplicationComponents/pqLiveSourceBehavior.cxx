@@ -15,21 +15,3 @@ pqLiveSourceBehavior::pqLiveSourceBehavior(QObject* parentObject)
 
 //-----------------------------------------------------------------------------
 pqLiveSourceBehavior::~pqLiveSourceBehavior() = default;
-
-//-----------------------------------------------------------------------------
-void pqLiveSourceBehavior::pause()
-{
-  pqPVApplicationCore::instance()->liveSourceManager()->pause();
-}
-
-//-----------------------------------------------------------------------------
-void pqLiveSourceBehavior::resume()
-{
-  pqPVApplicationCore::instance()->liveSourceManager()->resume();
-}
-
-//-----------------------------------------------------------------------------
-bool pqLiveSourceBehavior::isPaused()
-{
-  return pqPVApplicationCore::instance()->liveSourceManager()->isPaused();
-}

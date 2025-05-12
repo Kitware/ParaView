@@ -41,15 +41,6 @@ protected Q_SLOTS:
    */
   void updateToolbars();
 
-  /**
-   * This slot gets attached to a pqEventDispatcher so that some toolbars
-   * can be hidden before each test starts (to prevent small test-image differences
-   * due to layout differences between machines).
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0(
-    "This was mostly unused. Also it is better to avoid test-dedicated code paths.")
-  void prepareForTest(){};
-
 private:
   Q_DISABLE_COPY(pqCategoryToolbarsBehavior)
 

@@ -23,10 +23,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAddToFavoritesReaction : public pqReactio
   typedef pqReaction Superclass;
 
 public:
-  PARAVIEW_DEPRECATED_IN_5_13_0("Favorites are integrated into the categories. Please initialize "
-                                "from a pqProxyCategory instead.")
-  pqAddToFavoritesReaction(QAction* parent, QVector<QString>& filters);
-
   pqAddToFavoritesReaction(QAction* parent, pqProxyGroupMenuManager* manager);
 
   ~pqAddToFavoritesReaction() override;

@@ -232,8 +232,6 @@ public:
   virtual void SetScale(double, double, double);
   virtual void SetTexture(vtkTexture*);
   virtual void SetUserTransform(const double[16]);
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use SetTextureTransform instead")
-  virtual void SetFlipTextures(bool);
   virtual void SetCoordinateSystem(int);
 
   //***************************************************************************

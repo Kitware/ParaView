@@ -1259,26 +1259,6 @@ void vtkGeometryRepresentation::SetSelection(vtkSelection* selection)
 }
 
 //----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetFlipTextures(bool flip)
-{
-  if (this->TextureTransform)
-  {
-    if (flip)
-    {
-      static constexpr double mat[] = { 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-      this->TextureTransform->SetMatrix(mat);
-      this->TextureTransform->Modified();
-    }
-    else
-    {
-      static constexpr double mat[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-      this->TextureTransform->SetMatrix(mat);
-      this->TextureTransform->Modified();
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetTexture(vtkTexture* val)
 {
   this->Actor->SetTexture(val);

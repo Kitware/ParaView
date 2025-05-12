@@ -13,7 +13,6 @@
 #define vtkSMColorMapEditorHelper_h
 
 #include "vtkObject.h"              // Superclass
-#include "vtkParaViewDeprecation.h" // For PARAVIEW_DEPRECATED_IN_5_13_0
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSmartPointer.h"        // For LastLUTProxy
 
@@ -127,18 +126,6 @@ public:
    * Returns the selectors that use a color array for this representation.
    */
   static std::vector<std::string> GetColorArraysBlockSelectors(vtkSMProxy* proxy);
-
-  ///@{
-  /**
-   * Returns the lut proxy of this representation in the given view.
-   *
-   * The methods with a `view` parameter will return `nullptr` if the view is not a render view.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use GetLookupTable instead")
-  static vtkSMProxy* GetLUTProxy(vtkSMProxy* proxy, vtkSMProxy* view)
-  {
-    return vtkSMColorMapEditorHelper::GetLookupTable(proxy, view);
-  }
   static vtkSMProxy* GetLookupTable(vtkSMProxy* proxy);
   static vtkSMProxy* GetLookupTable(vtkSMProxy* proxy, vtkSMProxy* view);
   static vtkSMProxy* GetBlockLookupTable(vtkSMProxy* proxy, const std::string& blockSelector)
