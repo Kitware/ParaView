@@ -1,0 +1,3233 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="views">
+    <!-- ================================================================== -->
+    <RenderViewProxy base_proxygroup="internal_views"
+                     base_proxyname="ViewBase"
+                     class="vtkPVRenderView"
+                     name="RenderView"
+                     label="Render View"
+                     processes="client|renderserver|dataserver">
+      <Documentation>View proxy for a 3D interactive render
+      view.</Documentation>
+      <IntVectorProperty command="SetShowAnnotation"
+                         default_values="0"
+                         number_of_elements="1"
+                         name="ShowAnnotation"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to see annotation providing advanced debugging and performance
+          information about each render.
+        </Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="ShowAnnotation"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetAnnotationColor"
+                            default_values="1 1 1"
+                            name="AnnotationColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="never"
+                            number_of_elements="3">
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseInteractiveRenderingForScreenshots"
+                         default_values="0"
+                         name="UseInteractiveRenderingForScreenshots"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether InteractiveRender() should be used during
+        CaptureWindow calls. Default is to use StillRender().</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInteractionMode"
+                         default_values="0"
+                         name="InteractionMode"
+                         number_of_elements="1"
+                         panel_visibility="never"
+                         state_ignored="1">
+        <EnumerationDomain name="enum">
+          <Entry text="3D"
+                 value="0" />
+          <Entry text="2D"
+                 value="1" />
+          <Entry text="Selection"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStillRenderImageReductionFactor"
+                         default_values="1"
+                         name="StillRenderImageReductionFactor"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <IntRangeDomain max="20"
+                        min="1"
+                        name="range" />
+        <Documentation>Get/Set the reduction-factor to use when for
+        StillRender(). This is typically set to 1, but in some cases with
+        terrible connectivity or really large displays, one may want to use a
+        sub-sampled image even for StillRender(). This is set it number of
+        pixels to be sub-sampled by. Note that image reduction factors have no
+        effect when in built-in mode.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="StillRenderImageReductionFactor"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty default_values="100.0"
+                            name="CollectGeometryThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>DEPRECATED: Simply set UseOutlineForLODRendering flag to
+        true, and whenever LOD rendering is employed, we rendering outlines, is
+        possible.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetInteractiveRenderImageReductionFactor"
+                         default_values="2"
+                         name="ImageReductionFactor"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <IntRangeDomain max="20"
+                        min="1"
+                        name="range" />
+        <Documentation>Get/Set the reduction-factor to use when for
+        InteractiveRender(). This is set it number of pixels to be sub-sampled
+        by. Note that image reduction factors have no effect when in built-in
+        mode.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="ImageReductionFactor"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSuppressRendering"
+                         default_values="0"
+                         name="SuppressRendering"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, this will suppress rendering
+        into a window yet still perform all the updates that normally
+        happen as a part of rendering.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRemoteRenderingThreshold"
+                            default_values="20.0"
+                            ignore_synchronization="1"
+                            name="RemoteRenderThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>The threshold used to determine if the compositing
+        should be used for rendering. The value is rendering-geometry size in
+        MBs.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="RemoteRenderThreshold"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLODRenderingThreshold"
+                            default_values="5"
+                            name="LODThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Set the memory size threshold above which LOD will be
+        used while rendering interactively. The value is rendering-geometry
+        size in MBs.</Documentation>
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="LODThreshold"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLODResolution"
+                            default_values="0.5"
+                            name="LODResolution"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0"
+                           name="range" />
+        <Documentation>Set the LOD resolution. 0 implies lowest level or
+        detail, while 1 implies maximum level of detail.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="LODResolution"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseOutlineForLODRendering"
+                         default_values="0"
+                         name="UseOutlineForLODRendering"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, this overrides the LODResolution. In
+        that case, when using LOD for rendering, if possible, the data is
+        rendered as outlines.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseOutlineForLODRendering"/>
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty command="ConfigureCompressor"
+                            default_values="vtkLZ4Compressor 0 3"
+                            name="CompressorConfig"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Used to configure the image compression used for
+        client-server image transfer when doing interactive
+        renders.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="CompressorConfig"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <ProxyProperty name="AxesGrid"
+                     command="SetGridAxes3DActor"
+                     panel_widget="proxy_editor">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="annotations" name="GridAxes3DActor" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility">
+            <!-- tell pqProxyEditorPropertyWidget that use the "Visibility"
+                 property on the GridAxes3DActor proxy for a checkbox
+                 on the UI -->
+          </ProxyEditorPropertyWidget>
+        </Hints>
+      </ProxyProperty>
+
+      <!-- Camera Orientation Widget -->
+      <IntVectorProperty command="SetCameraOrientationWidgetVisibility"
+                         name="CameraOrientationWidgetVisibility"
+                         label="Visible"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the camera orientation widget.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCameraOrientationWidgetSize"
+                         name="CameraOrientationWidgetSize"
+                         label="Size"
+                         default_values="100"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="10" max="512" name="range" resolution="10" />
+        <Documentation>Size of the camera orientation widget.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraOrientationWidgetVisibility" value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCameraOrientationWidgetAnchor"
+                         name="CameraOrientationWidgetAnchor"
+                         label="Location"
+                         default_values="3"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Top Left"     value="1" />
+          <Entry text="Top Right"    value="3" />
+          <Entry text="Bottom Left"  value="0" />
+          <Entry text="Bottom Right" value="2" />
+        </EnumerationDomain>
+        <Documentation>Location of the camera orientation widget.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraOrientationWidgetVisibility" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <!-- Center and Orientation Axes -->
+      <IntVectorProperty command="SetCenterAxesVisibility"
+                         default_values="0"
+                         name="CenterAxesVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Toggle the visibility of the axes showing the center of
+        rotation in the scene.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOrientationAxesVisibility"
+                         default_values="1"
+                         name="OrientationAxesVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Toggle the visibility of the axes showing the
+        viewing direction.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOrientationAxesInteractivity"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="OrientationAxesInteractivity"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Allows repositioning of the orientation
+        axes.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOrientationAxesLabelColor"
+                            default_values="1 1 1"
+                            name="OrientationAxesLabelColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced"
+                            number_of_elements="3">
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientationAxesOutlineColor"
+                            default_values="1 1 1"
+                            name="OrientationAxesOutlineColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced"
+                            number_of_elements="3">
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="OrientationAxesXVisibility"
+                         number_of_elements="1"
+                         default_values="1"
+                         command="SetOrientationAxesXVisibility"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="OrientationAxesYVisibility"
+                         number_of_elements="1"
+                         default_values="1"
+                         command="SetOrientationAxesYVisibility"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="OrientationAxesZVisibility"
+                         number_of_elements="1"
+                         default_values="1"
+                         command="SetOrientationAxesZVisibility"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="OrientationAxesXColor"
+                            number_of_elements="3"
+                            default_values="1 0 0"
+                            command="SetOrientationAxesXColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesXVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="OrientationAxesYColor"
+                            number_of_elements="3"
+                            default_values="1 1 0"
+                            command="SetOrientationAxesYColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesYVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="OrientationAxesZColor"
+                            number_of_elements="3"
+                            default_values="0 1 0"
+                            command="SetOrientationAxesZColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesZVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>        </Hints>
+      </DoubleVectorProperty>
+      <StringVectorProperty name="OrientationAxesXLabelText"
+                            number_of_elements="1"
+                            default_values="X"
+                            command="SetOrientationAxesXLabelText"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesXVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="OrientationAxesYLabelText"
+                            number_of_elements="1"
+                            default_values="Y"
+                            command="SetOrientationAxesYLabelText"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesYVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="OrientationAxesZLabelText"
+                            number_of_elements="1"
+                            default_values="Z"
+                            command="SetOrientationAxesZLabelText"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesZVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>        </Hints>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty command="SetCenterOfRotation"
+                            default_values="0 0 0"
+                            name="CenterOfRotation"
+                            panel_visibility="never"
+                            number_of_elements="3">
+        <Documentation>Center of rotation for the interactor.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRotationFactor"
+                            default_values="1"
+                            name="RotationFactor"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Rotation speed factor for the interactor. This default
+          rotation speed is multipied by this factor. Default value is 1.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0"
+                         name="NonInteractiveRenderDelay"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Set the delay (in seconds) after an interactive render
+          before switching to a full-res render.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="NonInteractiveRenderDelay"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="EnableRenderOnInteraction"
+                         default_values="1"
+                         panel_visibility="never"
+                         number_of_elements="1">
+                         <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether the view must render automatically on interaction. If application
+          wants to manage renders explicitly, set this to 0 (Off). 1 (On) by default.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty default_values="0.3"
+                         name="WindowResizeNonInteractiveRenderDelay"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Set the delay (in seconds) before doing a full resolution render after the last resize of the window.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="WindowResizeNonInteractiveRenderDelay"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Camera3DManipulators"
+        command="SetCamera3DManipulators"
+        argument_is_array="1"
+        number_of_elements="9"
+        default_values="4 1 2 3 4 7 2 4 6"
+        panel_visibility="never">
+        <Documentation>
+          Set the interactions mode for 3D interaction. The values are specified
+          in order as (left button, middle button, right button), and repeated for
+          shift key and control key modifiers.
+        </Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="Camera3DManipulators"/>
+        </Hints>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Pan" value="1" />
+          <Entry text="Zoom" value="2" />
+          <Entry text="Roll" value="3" />
+          <Entry text="Rotate" value="4" />
+          <Entry text="Multi-Rotate" value="5" />
+          <Entry text="ZoomToMouse" value="6" />
+          <Entry text="SkyboxRotate" value="7" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Camera2DManipulators"
+        command="SetCamera2DManipulators"
+        argument_is_array="1"
+        number_of_elements="9"
+        default_values="1 3 2 2 2 6 3 1 4"
+        panel_visibility="never">
+        <Documentation>
+          Set the interactions mode for 2D interaction. The values are specified
+          in order as (left button, middle button, right button), and repeated for
+          shift key and control key modifiers.
+        </Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="Camera2DManipulators"/>
+        </Hints>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Pan" value="1" />
+          <Entry text="Zoom" value="2" />
+          <Entry text="Roll" value="3" />
+          <Entry text="Rotate" value="4" />
+          <Entry text="ZoomToMouse" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCamera2DMouseWheelMotionFactor"
+                            default_values="1"
+                            name="Camera2DMouseWheelMotionFactor"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="Camera2DMouseWheelMotionFactor"/>
+        </Hints>
+        <Documentation>Set the wheel motion factor for 2D interaction.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetCamera3DMouseWheelMotionFactor"
+                            default_values="1"
+                            name="Camera3DMouseWheelMotionFactor"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="Camera3DMouseWheelMotionFactor"/>
+        </Hints>
+        <Documentation>Set the wheel motion factor for 3D interaction.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ReverseMouseWheelZoomDirection"
+                         command="SetReverseMouseWheelZoomDirection"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Reverse Mouse Wheel Zoom Direction"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="ReverseMouseWheelZoomDirection"/>
+        </Hints>
+        <Documentation>
+          This option changes the direction of the mouse wheel for zooming in and out.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="MouseWheelZoomsToCursor"
+                         command="SetMouseWheelZoomsToCursor"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Mouse Wheel Zooms To Cursor"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="MouseWheelZoomsToCursor"/>
+        </Hints>
+        <Documentation>
+          Zooms the renderer's camera to the projected point under the cursor position.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseLightKit"
+                         default_values="1"
+                         name="UseLight"
+                         number_of_elements="1">
+        <Documentation>Enable/Disable the LightKit.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- Key Light -->
+      <DoubleVectorProperty command="SetKeyLightWarmth"
+                            default_values="0.60"
+                            name="KeyLightWarmth"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetKeyLightIntensity"
+                            default_values="0.75"
+                            name="KeyLightIntensity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"
+                           resolution="0.05" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetKeyLightElevation"
+                            default_values="50.0"
+                            name="KeyLightElevation"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="90"
+                           min="0"
+                           name="range"
+                           resolution="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetKeyLightAzimuth"
+                            default_values="10.0"
+                            name="KeyLightAzimuth"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="90"
+                           min="-90"
+                           name="range"
+                           resolution="1" />
+      </DoubleVectorProperty>
+      <!-- Fill Light -->
+      <DoubleVectorProperty command="SetFillLightWarmth"
+                            default_values="0.40"
+                            name="FillLightWarmth"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetKeyToFillRatio"
+                            default_values="3.0"
+                            name="FillLightK:F Ratio"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="15"
+                           min="1"
+                           name="range"
+                           resolution="0.1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFillLightElevation"
+                            default_values="-75.0"
+                            name="FillLightElevation"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="-90"
+                           name="range"
+                           resolution="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFillLightAzimuth"
+                            default_values="-10.0"
+                            name="FillLightAzimuth"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="90"
+                           min="-90"
+                           name="range"
+                           resolution="1" />
+      </DoubleVectorProperty>
+      <!-- Back Light -->
+      <DoubleVectorProperty command="SetBackLightWarmth"
+                            default_values="0.50"
+                            name="BackLightWarmth"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetKeyToBackRatio"
+                            default_values="3.5"
+                            name="BackLightK:B Ratio"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="15"
+                           min="1"
+                           name="range"
+                           resolution="0.1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackLightElevation"
+                            default_values="0.0"
+                            name="BackLightElevation"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="45"
+                           min="-45"
+                           name="range"
+                           resolution="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackLightAzimuth"
+                            default_values="110.0"
+                            name="BackLightAzimuth"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="170"
+                           min="60"
+                           name="range"
+                           resolution="1" />
+      </DoubleVectorProperty>
+      <!-- Head Light -->
+      <DoubleVectorProperty command="SetHeadLightWarmth"
+                            default_values="0.50"
+                            name="HeadLightWarmth"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetKeyToHeadRatio"
+                            default_values="3.0"
+                            name="HeadLightK:H Ratio"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="15"
+                           min="1"
+                           name="range"
+                           resolution="0.1" />
+      </DoubleVectorProperty>
+      <!-- Maintain Luminance -->
+      <IntVectorProperty command="SetMaintainLuminance"
+                         default_values="0"
+                         name="MaintainLuminance"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseHiddenLineRemoval"
+                         default_values="0"
+                         name="HiddenLineRemoval"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use a hidden line removal technique to hide wireframe surfaces that
+          are occluded by other wireframe surfaces. Note that this is disabled
+          when rendering distributed geometry in parallel.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseDepthPeeling"
+                         default_values="1"
+                         name="DepthPeeling"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="DepthPeeling"/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseDepthPeelingForVolumes"
+                         default_values="1"
+                         name="DepthPeelingForVolumes"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="DepthPeelingForVolumes"/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetMaximumNumberOfPeels"
+                         default_values="4"
+                         name="MaximumNumberOfPeels"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>In case of depth peeling, define the maximum number of
+        peeling layers. Initial value is 4. A special value of 0 means no
+        maximum limit. It has to be a positive value.</Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="MaximumNumberOfPeels"/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseFXAA"
+                         default_values="0"
+                         name="UseFXAA"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseFXAA"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFXAARelativeContrastThreshold"
+                            default_values="0.125"
+                            name="FXAARelativeContrastThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAARelativeContrastThreshold" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFXAAHardContrastThreshold"
+                            default_values="0.0625"
+                            name="FXAAHardContrastThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAAHardContrastThreshold" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFXAASubpixelBlendLimit"
+                            default_values="0.75"
+                            name="FXAASubpixelBlendLimit"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAASubpixelBlendLimit" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFXAASubpixelContrastThreshold"
+                            default_values="0.25"
+                            name="FXAASubpixelContrastThreshold"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAASubpixelContrastThreshold" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetFXAAUseHighQualityEndpoints"
+                         default_values="1"
+                         name="FXAAUseHighQualityEndpoints"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAAUseHighQualityEndpoints" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFXAAEndpointSearchIterations"
+                         default_values="12"
+                         name="FXAAEndpointSearchIterations"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="FXAAEndpointSearchIterations" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseToneMapping"
+                         command="SetUseToneMapping"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable / Disable tone mapping. Tone mapping is a technique to preserve the colors when the scene is too dark or too bright.
+          Refer to the settings for more configuration.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Exposure"
+                            command="SetExposure"
+                            default_values="1.0"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0.0" max="10.0" />
+        <Documentation>
+          Set the exposure coefficient.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="UseToneMapping"
+                 value="1" />
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         mode="visibility"
+                                         property="ToneMappingType"
+                                         value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         mode="visibility"
+                                         property="ToneMappingType"
+                                         value="3" />
+              </Expression>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ToneMappingType"
+                         command="SetToneMappingType"
+                         number_of_elements="1"
+                         default_values="3"
+                         panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="ToneMappingType"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Contrast"
+                            command="SetContrast"
+                            default_values="1.6773"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Contrast"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Shoulder"
+                            command="SetShoulder"
+                            default_values="0.9714"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Shoulder"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MidIn"
+                            command="SetMidIn"
+                            default_values="0.18"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="MidIn"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MidOut"
+                            command="SetMidOut"
+                            default_values="0.18"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="MidOut"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="HdrMax"
+                            command="SetHdrMax"
+                            default_values="11.0785"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="HdrMax"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="UseACES"
+                         command="SetUseACES"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseACES"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="GenericFilmicPresets"
+                         command="SetGenericFilmicPresets"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="GenericFilmicPresets"/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseSSAO"
+                         command="SetUseSSAO"
+                         label="Use Ambient Occlusion"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable / Disable screen space ambient occlusion.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="UseSSAODefaultPresets"
+                            command="SetUseSSAODefaultPresets"
+                            default_values="1"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseSSAODefaultPresets"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Radius"
+                            command="SetRadius"
+                            default_values="0.5"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Radius"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Bias"
+                            command="SetBias"
+                            default_values="0.01"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Bias"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="KernelSize"
+                            command="SetKernelSize"
+                            default_values="32"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="KernelSize"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="Blur"
+                            command="SetBlur"
+                            default_values="0"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Blur"/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetStereoCapableWindow"
+                         default_values="none"
+                         name="StereoCapableWindow"
+                         number_of_elements="1"
+                         is_internal="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStereoRender"
+                         default_values="0"
+                         name="StereoRender"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStereoType"
+                         default_values="none"
+                         name="StereoType"
+                         number_of_elements="1">
+        <Documentation>
+          Set the stereo rendering mode to use. In client-server configurations,
+          you may also want to set the ServerStereoType.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Crystal Eyes"
+                 value="1" />
+          <Entry text="Red-Blue"
+                 value="2" />
+          <Entry text="Interlaced"
+                 value="3" />
+          <Entry text="Left"
+                 value="4" />
+          <Entry text="Right"
+                 value="5" />
+          <Entry text="Dresden"
+                 value="6" />
+          <Entry text="Anaglyph"
+                 value="7" />
+          <Entry text="Checkerboard"
+                 value="8" />
+          <Entry text="SplitViewportHorizontal"
+                 value="9" />
+          <Entry text="None"
+                 value="10" />
+        </EnumerationDomain>
+        <Hints>
+          <NoDefault />
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="StereoRender" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetServerStereoType"
+                         default_values="0"
+                         name="ServerStereoType"
+                         number_of_elements="1">
+        <Documentation>
+          This property allows you to set a different stereo mode for the server processes.
+          Note that the stereo type selected on the client and server must be *compatible*, i.e.
+          if the stereo type on the client side needs 2 renders each frame, the stereo type on the
+          server must do exactly the same, otherwise deadlocks may ensue.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Same As Client" value="0" />
+          <Entry text="Crystal Eyes" value="1" />
+          <Entry text="Red-Blue" value="2" />
+          <Entry text="Interlaced" value="3" />
+          <Entry text="Left" value="4" />
+          <Entry text="Right" value="5" />
+          <Entry text="Dresden" value="6" />
+          <Entry text="Anaglyph" value="7" />
+          <Entry text="Checkerboard" value="8" />
+          <Entry text="SplitViewportHorizontal" value="9" />
+          <Entry text="None" value="10" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="StereoRender" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMultiSamples"
+                         default_values="0"
+                         name="MultiSamples"
+                         panel_visibility="never"
+                         number_of_elements="1">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAlphaBitPlanes"
+                         default_values="1"
+                         name="AlphaBitPlanes"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStencilCapable"
+                         default_values="1"
+                         name="StencilCapable"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <ProxyProperty command="AddRepresentation"
+                     is_internal="1"
+                     name="HiddenRepresentations"
+                     remove_command="RemoveRepresentation"
+                     repeatable="1">
+        <Documentation>This property is meant for adding/removing
+        representation secretly. e.g. 3D widgets etc. This property is not
+        saved in states nor it recorded by undo-redo.</Documentation>
+      </ProxyProperty>
+      <ProxyProperty command="AddPropToRenderer"
+                     is_internal="1"
+                     name="HiddenProps"
+                     remove_command="RemovePropFromRenderer"
+                     repeatable="1">
+        <Documentation>This property is meant for adding/removing props
+        secretly. e.g. 3D widgets etc. This property is not saved in states nor
+        it recorded by undo-redo.</Documentation>
+      </ProxyProperty>
+      <SubProxy>
+        <Proxy name="ActiveCamera"
+               proxygroup="camera"
+               proxyname="Camera"></Proxy>
+        <ExposedProperties>
+          <Property name="CameraPositionInfo" panel_visibility="never"/>
+          <Property name="CameraPosition" panel_visibility="never"/>
+          <Property name="CameraFocalPointInfo" panel_visibility="never"/>
+          <Property name="CameraFocalPoint" panel_visibility="never"/>
+          <Property name="CameraViewUpInfo" panel_visibility="never"/>
+          <Property name="CameraViewUp" panel_visibility="never"/>
+          <Property name="CameraViewAngleInfo" panel_visibility="never"/>
+          <Property name="CameraViewAngle" panel_visibility="never"/>
+          <Property name="CameraFocalDiskInfo" panel_visibility="never"/>
+          <Property name="CameraFocalDisk" panel_visibility="never"/>
+          <Property name="CameraFocalDistanceInfo" panel_visibility="never"/>
+          <Property name="CameraFocalDistance" panel_visibility="never"/>
+          <Property name="CameraParallelScale" panel_visibility="never"/>
+          <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
+          <Property name="EyeAngle" panel_visibility="never"/>
+          <Property name="EyeTransformMatrix" />
+          <Property name="ModelTransformMatrix" />
+        </ExposedProperties>
+      </SubProxy>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetPhysicalToWorldMatrix"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            name="PhysicalToWorldMatrix"
+                            number_of_elements="16"
+                            panel_visibility="never">
+        <Documentation>
+          Get/Set the matrix mapping the physical coordinate system to the
+          world coordinate system.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="EnableSynchronizableActors"
+          label="Enable Synchronizable Actors"
+          command="SetEnableSynchronizableActors"
+          default_values="0"
+          animateable="0"
+          panel_visibility="never"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enables/disables synchronizable actors (e.g. OpenGLAvatars).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetParallelProjection"
+                         default_values="0"
+                         ignore_synchronization="1"
+                         name="CameraParallelProjection"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/disable parallel projection mode.
+        </Documentation>
+      </IntVectorProperty>
+      <ProxyProperty name="LegendGrid"
+                     command="SetLegendGridActor"
+                     panel_widget="proxy_editor">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="annotations" name="LegendGridActor" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility">
+            <!-- UI hint: pqProxyEditorPropertyWidget will display a checkbox
+              for the "Visibility" property next to the "Edit" button -->
+          </ProxyEditorPropertyWidget>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="CameraParallelProjection" value="1" />
+        </Hints>
+      </ProxyProperty>
+
+      <ProxyProperty name="PolarGrid"
+                     command="SetPolarGridActor"
+                     panel_widget="proxy_editor">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="annotations" name="PolarGridActor" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility">
+            <!-- UI hint: pqProxyEditorPropertyWidget will display a checkbox
+              for the "Visibility" property next to the "Edit" button -->
+          </ProxyEditorPropertyWidget>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="CameraParallelProjection" value="1" />
+        </Hints>
+      </ProxyProperty>
+
+      <IntVectorProperty command="SetUseRenderViewSettingsForBackground"
+                         name="UseColorPaletteForBackground"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+            When set, the view uses the background color settings as specified in
+            global color palette.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBackgroundColorMode"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Single Color" value="0" />
+          <Entry text="Gradient" value="1" />
+          <Entry text="Texture" value="2" />
+          <Entry text="Skybox" value="3" />
+          <Entry text="Stereo Skybox" value="4" />
+        </EnumerationDomain>
+        <Documentation>
+          Select the background for the view.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
+        </Hints>
+      </IntVectorProperty>
+      <ProxyProperty command="SetBackgroundTexture"
+                     name="BackgroundTexture" panel_widget="texture_selector">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <!-- hide widget unless mode is "Texture" or "Skybox" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+            property="BackgroundColorMode" values="2 3 4" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
+        </Hints>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetBackground2"
+                            default_values="0 0 0.165"
+                            name="Background2"
+                            label="Background 2"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Hints>
+          <!-- hide widget unless mode is "Gradient" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+            property="BackgroundColorMode" value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
+        </Hints>
+        <Documentation>
+          Specify the color to use for the upper half of the viewport when using **Gradient**
+          background color mode.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackground"
+                            default_values="0.329 0.349 0.427"
+                            name="Background"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseEnvironmentLighting"
+                         default_values="0"
+                         name="UseEnvironmentLighting"
+                         number_of_elements="1">
+        <Documentation>
+          Enable skybox light contribution. This feature is only compatible with PBR interpolation.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <!-- hide widget unless mode is "Skybox" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+            property="BackgroundColorMode" value="3" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
+        </Hints>
+      </IntVectorProperty>
+      <Property
+          name="CaptureZBuffer"
+          command="CaptureZBuffer"
+          >
+        <Documentation>A helper function to get the Z buffer from
+        a RenderView.</Documentation>
+      </Property>
+      <DoubleVectorProperty
+          command="SetMaxClipBounds"
+          default_values="0.0 -1.0 0.0 -1.0 0.0 -1.0"
+          name="MaxClipBounds"
+          number_of_elements="6"
+          argument_is_array="1"
+          animateable="0"
+          >
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set the most conservative clipping range.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty
+          name="LockBounds"
+          command="SetLockBounds"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1"
+          >
+        <BooleanDomain name="bool" />
+        <Documentation>A helper function to force consistent Z buffer
+        captures from a RenderView.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="EnableOSPRay"
+          label="Enable Ray Tracing"
+          command="SetEnableOSPRay"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Switches between rasterization and ray tracing.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty name="OSPRayRendererType"
+          command="SetOSPRayRendererType"
+          label="Back End"
+          default_values="scivis"
+          number_of_elements="1">
+        <RendererDomain name="list">
+        </RendererDomain>
+        <Documentation>Selects a specific ray traced rendering engine.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+          <WarnOnPropertyChange onlyonce="true">
+            <Text title="Warning: Potentially slow operation">
+OSPRay pathtracer may need to transfer default materials from client to server. This operation can take a few seconds in client-server mode.
+            </Text>
+          </WarnOnPropertyChange>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty
+          name="Shadows"
+          command="SetShadows"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Controls whether OSPRay raycaster back end casts shadow rays
+        or not.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                 <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+	  </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="AmbientSamples"
+          command="SetAmbientOcclusionSamples"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="0"
+            name="range"/>
+        <Documentation>Sets the number of occlusion query rays that
+        OSPRay raycaster sends at each intersection.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                 <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+	  </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="SamplesPerPixel"
+          command="SetSamplesPerPixel"
+          default_values="1"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="1"
+            name="range"/>
+        <Documentation>Set the number of primary rays that ray tracers
+        shoot per pixel.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="MaxFrames"
+          label="Progressive Passes"
+          command="SetMaxFrames"
+          default_values="1"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="1"
+            name="range"/>
+        <Documentation>Set the number of render passes ray tracers take to
+        improve image quality. Note, this requires turning on the
+        'Enable Streaming' setting in Edit->Preferences/Settings.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="RouletteDepth"
+          command="SetRouletteDepth"
+          default_values="5"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="0"
+            name="range"/>
+        <Documentation>Set the path traced recursion depth at which to start Russian roulette termination.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                 <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+          name="VolumeAnisotropy"
+          default_values="0.0"
+          panel_visibility="never"
+          animateable="0"
+          number_of_elements="1">
+        <Documentation>DEPRECATED_IN_5.11 (Use SetAnisotropy of vtkImageVolumeRepresentation instead):
+          Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty
+          name="Denoise"
+          command="SetDenoise"
+          default_values="1"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Controls whether to denoise images. This option will have no effect without a denoiser library and until progressive passes or samples per pixel exceeds four.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="MaxFrames" function="greaterthan" value="3"/>
+              </PropertyWidgetDecorator>
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="SamplesPerPixel" function="greaterthan" value="3" />
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+          name="LightScale"
+          command="SetLightScale"
+          default_values="1.0"
+          animateable="0"
+          number_of_elements="1">
+        <DoubleRangeDomain
+            min="0.0"
+            name="range"/>
+        <Documentation>Diminish or amplify all lights in the scene.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty
+          name="OSPRayTemporalCacheSize"
+          label="Temporal Cache Size"
+          command="SetTimeCacheSize"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="0"
+            name="range"/>
+        <Documentation>Set the size of the timestep cache that speeds up flip book animation in ray tracers.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBackgroundMode"
+                         label="Background mode"
+                         default_values="2"
+                         name="BackgroundMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <!--<Entry text="None"
+                 value="0" /> Disabled since needs more work. -->
+          <Entry text="Backplate"
+                 value="1" />
+          <Entry text="Environment"
+                 value="2" />
+          <Entry text="Both"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>
+          Background behavior for path tracers. Backplate does not move or affect materials. Environment does.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+          name="BackgroundNorth"
+          label="Environment North"
+          command="SetBackgroundNorth"
+          default_values="0.0 1.0 0.0"
+          animateable="0"
+          number_of_elements="3">
+        <Documentation>Sets north pole for gradient and image environmental background in path tracers.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="BackgroundEast"
+          command="SetBackgroundEast"
+          label="Environment East"
+          default_values="1.0 0.0 0.0"
+          animateable="0"
+          number_of_elements="3">
+        <Documentation>Sets east direction for image environmental background in path tracers.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEnvironmentalBG"
+                            default_values="0.329 0.349 0.427"
+                            name="EnvironmentalBG"
+                            panel_widget="color_selector_with_palette"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEnvironmentalBG2"
+                            default_values="0 0 0.165"
+                            name="EnvironmentalBG2"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGradientEnvironmentalBG"
+                         default_values="0"
+                         name="UseGradientEnvironmentalBG"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTexturedEnvironmentalBG"
+                         default_values="0"
+                         name="UseTexturedEnvironmentalBG"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <ProxyProperty command="SetEnvironmentalBGTexture"
+                     name="EnvironmentalBGTexture"
+                     panel_widget="texture_selector">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </ProxyProperty>
+      <ProxyProperty
+        name="AdditionalLights"
+        command="AddLight"
+        remove_command="RemoveLight"
+        repeatable="1">
+      </ProxyProperty>
+      <ProxyProperty command="SetMaterialLibrary"
+                     name="OSPRayMaterialLibrary"
+                     label="OSPRay Material Library"
+                     number_of_elements="1"
+                     panel_visibility="never"
+                     default_values="None">
+        <Documentation>Container for a set of material specifications.</Documentation>
+      </ProxyProperty>
+      <ProxyProperty command="SetHardwareSelector"
+                     name="SetHardwareSelector">
+        <ProxyGroupDomain name="groups">
+          <Group name="HardwareSelectors" />
+        </ProxyGroupDomain>
+        <Documentation>Set the hardware selector hold by the view.</Documentation>
+      </ProxyProperty>
+      <PropertyGroup label="Orientation Axes">
+        <Property name="OrientationAxesVisibility"/>
+        <Property name="OrientationAxesInteractivity"/>
+        <Property name="OrientationAxesLabelColor"/>
+        <Property name="OrientationAxesOutlineColor"/>
+      </PropertyGroup>
+      <PropertyGroup label="Camera Orientation Widget">
+        <Property name="CameraOrientationWidgetVisibility"/>
+        <Property name="CameraOrientationWidgetSize"/>
+        <Property name="CameraOrientationWidgetAnchor"/>
+      </PropertyGroup>
+      <PropertyGroup label="Render Passes">
+        <Property name="UseToneMapping"/>
+        <Property name="Exposure"/>
+        <Property name="UseSSAO"/>
+      </PropertyGroup>
+      <PropertyGroup name="Lights"
+                     label="Lights"
+                     panel_visibility="never">
+        <!-- Light Kit -->
+        <Property name="UseLight"/>
+        <!-- Key Light -->
+        <Property name="KeyLightWarmth"/>
+        <Property name="KeyLightIntensity"/>
+        <Property name="KeyLightElevation"/>
+        <Property name="KeyLightAzimuth"/>
+        <!-- Fill Light -->
+        <Property name="FillLightWarmth"/>
+        <Property name="FillLightK:F Ratio"/>
+        <Property name="FillLightElevation"/>
+        <Property name="FillLightAzimuth"/>
+        <!-- Back Light -->
+        <Property name="BackLightWarmth"/>
+        <Property name="BackLightK:B Ratio"/>
+        <Property name="BackLightElevation"/>
+        <Property name="BackLightAzimuth"/>
+        <!-- Head Light -->
+        <Property name="HeadLightWarmth"/>
+        <Property name="HeadLightK:H Ratio"/>
+        <Property name="MaintainLuminance"/>
+      </PropertyGroup>
+      <PropertyGroup label="Background" >
+        <Property name="UseColorPaletteForBackground" />
+        <Property name="BackgroundColorMode" />
+        <Property name="Background2"/>
+        <Property name="Background"/>
+        <Property name="BackgroundTexture"/>
+        <Property name="UseEnvironmentLighting"/>
+      </PropertyGroup>
+      <PropertyGroup label="Stereo">
+        <Property name="StereoCapableWindow" />
+        <Property name="StereoRender" />
+        <Property name="StereoType" />
+        <Property name="ServerStereoType" />
+      </PropertyGroup>
+      <PropertyGroup label="Cinema Export"
+                     panel_visibility="never">
+        <Property name="CaptureZBuffer"/>
+        <Property name="MaxClipBounds"/>
+        <Property name="LockBounds"/>
+      </PropertyGroup>
+      <PropertyGroup label="Ray Traced Rendering"
+                     panel_visibility="advanced">
+        <Property name="EnableOSPRay"/>
+        <Property name="Shadows"/>
+        <Property name="OSPRayRendererType"/>
+        <Property name="AmbientSamples"/>
+        <Property name="SamplesPerPixel"/>
+        <Property name="RouletteDepth"/>
+        <Property name="MaxFrames"/>
+        <Property name="Denoise"/>
+        <Property name="LightScale"/>
+        <Property name="OSPRayTemporalCacheSize"/>
+        <Property name="BackgroundNorth"/>
+        <Property name="BackgroundEast"/>
+        <Property name="BackgroundMode"/>
+      </PropertyGroup>
+      <PropertyGroup label="Path Traced Environment" panel_widget="EnvironmentalBGEditor" panel_visibility="default">
+        <Property name="EnvironmentalBG"/>
+        <Property name="EnvironmentalBG2"/>
+        <Property name="UseGradientEnvironmentalBG"/>
+        <Property name="UseTexturedEnvironmentalBG"/>
+        <Property name="EnvironmentalBGTexture"/>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </PropertyGroup>
+
+      <SubProxy command="SetDeliveryManager">
+        <Proxy name="DeliveryManager"
+          proxygroup="delivery_managers"
+          proxyname="RenderViewDeliveryManager"/>
+      </SubProxy>
+    </RenderViewProxy>
+
+    <!-- ================================================================== -->
+    <OrthographicSliceViewProxy base_proxygroup="views"
+                     base_proxyname="RenderView"
+                     class="vtkPVOrthographicSliceView"
+                     processes="client|renderserver|dataserver"
+                     label="Orthographic Slice View"
+                     name="OrthographicSliceView">
+      <DoubleVectorProperty name="SlicePosition"
+                            command="SetSlicePosition"
+                            number_of_elements="3"
+                            default_values="0 0 0">
+        <Documentation>
+          Set the slice position.
+        </Documentation>
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SliceIncrements"
+        command="SetSliceIncrements"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          When interacting using the thumb wheel, set the increments to use
+          to change the slice position.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ShowSliceAnnotations"
+        command="SetSliceAnnotationsVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+    </OrthographicSliceViewProxy>
+
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase4Axes"
+                      class="vtkPVXYChartView"
+                      name="XYChartView"
+                      label="Line Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="XYChartRepresentation"
+                      post_creation="SetChartTypeToLine" >
+      <Documentation>This is the proxy for the XY line chart
+      view.</Documentation>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase4Axes"
+                      class="vtkPVXYChartView"
+                      name="XYPointChartView"
+                      label="Point Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="XYPointChartRepresentation"
+                      post_creation="SetChartTypeToPoint" >
+      <Documentation>This is the proxy for the XY point chart
+      view.</Documentation>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase4Axes"
+                      class="vtkPVXYChartView"
+                      name="QuartileChartView"
+                      label="Quartile Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="QuartileChartRepresentation"
+                      post_creation="SetChartTypeToArea" >
+      <Documentation>This is the proxy for the Quartile chart view.</Documentation>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase4Axes"
+                      class="vtkPVXYChartView"
+                      name="XYBarChartView"
+                      label="Bar Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="XYBarChartRepresentation"
+                      post_creation="SetChartTypeToBar" >
+      <Documentation>This is the proxy for bar chart view.</Documentation>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase4Axes"
+                      class="vtkPVXYChartView"
+                      name="XYHistogramChartView"
+                      label="Histogram View"
+                      processes="client|renderserver|dataserver"
+                      post_creation="SetChartTypeToBar"
+                      representation_name="HistogramChartRepresentation"
+                      skip_plotable_check="1">
+      <Documentation>This is the proxy for the histogram chart view.</Documentation>
+      <Hints>
+        <ShowOneRepresentationAtATime type="HistogramChartRepresentation" />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewTitle"
+                      class="vtkPVXYChartView"
+                      name="BoxChartView"
+                      label="Box Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="BoxChartRepresentation"
+                      post_creation="SetChartTypeToBox" >
+      <Documentation>This is the proxy for box chart view.</Documentation>
+      <IntVectorProperty command="SetLegendVisibility"
+                         default_values="1"
+                         panel_visibility="never"
+                         name="ShowLegend"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLegendSymbolWidth"
+                         default_values="25"
+                         name="LegendSymbolWidth"
+                         number_of_elements="1"
+                         panel_visibility="never">
+      </IntVectorProperty>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="ViewBase"
+                      class="vtkPVXYChartView"
+                      name="ParallelCoordinatesChartView"
+                      label="Parallel Coordinates View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="ParallelCoordinatesRepresentation"
+                      post_creation="SetChartTypeToParallelCoordinates"
+                      skip_plotable_check="1">
+      <Documentation>
+        This is the proxy for parallel coordinates chart view.
+      </Documentation>
+      <SubProxy command="SetDeliveryManager">
+        <Proxy name="DeliveryManager"
+          proxygroup="delivery_managers"
+          proxyname="ContextViewDeliveryManager"/>
+      </SubProxy>
+      <Hints>
+        <ShowOneRepresentationAtATime type="ParallelCoordinatesRepresentation" />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase"
+                      class="vtkPVXYChartView"
+                      name="ImageChartView"
+                      processes="client|renderserver|dataserver"
+                      representation_name="ImageChartRepresentation"
+                      post_creation="SetChartTypeToImage"
+                      skip_plotable_check="1">
+      <Documentation>This is the proxy for image chart view.</Documentation>
+      <Hints>
+        <ShowOneRepresentationAtATime type="ImageChartRepresentation" />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <PlotMatrixViewProxy base_proxygroup="internal_views"
+                         base_proxyname="XYChartViewTitle"
+                         class="vtkPVPlotMatrixView"
+                         name="PlotMatrixView"
+                         label="Plot Matrix View"
+                         processes="client|renderserver|dataserver"
+                         representation_name="PlotMatrixRepresentation"
+                         skip_plotable_check="1">
+      <Documentation>This is the proxy for the plot matrix
+      view.</Documentation>
+      <IntVectorProperty command="SetBorderLeft"
+                         default_values="50"
+                         name="BorderLeft"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBorderBottom"
+                         default_values="40"
+                         name="BorderBottom"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBorderRight"
+                         default_values="50"
+                         name="BorderRight"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBorderTop"
+                         default_values="40"
+                         name="BorderTop"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGutterX"
+                         default_values="15"
+                         name="GutterX"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGutterY"
+                         default_values="15"
+                         name="GutterY"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPadding"
+                         default_values="0.05"
+                         name="Padding"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+      <DoubleRangeDomain min="0.0" max="0.25" name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetNumberOfAnimationFrames"
+                         default_values="25"
+                         name="NumberOfAnimationFrames"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+
+      <PropertyGroup label="Border">
+        <Property name="BorderLeft"/>
+        <Property name="BorderBottom"/>
+        <Property name="BorderRight"/>
+        <Property name="BorderTop"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Spacing (Gutter)">
+        <Property name="GutterX"/>
+        <Property name="GutterY"/>
+        <Property name="Padding"/>
+      </PropertyGroup>
+
+      <DoubleVectorProperty command="SetScatterPlotSelectedRowColumnColor"
+                            default_values="0.8 0 0 0.4"
+                            name="ScatterPlotSelectedRowColumnColor"
+                            number_of_elements="4"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetScatterPlotSelectedActiveColor"
+                            default_values="0 0.8 0 0.4"
+                            name="ScatterPlotSelectedActiveColor"
+                            number_of_elements="4"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <!-- activeplot -->
+      <DoubleVectorProperty command="SetActivePlotBackgroundColor"
+                            default_values="1 1 1 0"
+                            name="ActivePlotBackgroundColor"
+                            number_of_elements="4"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotAxisColor"
+                            default_values="0 0 0"
+                            name="ActivePlotAxisColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="ActivePlotGridColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetActivePlotGridVisibility"
+                         default_values="1"
+                         name="ActivePlotGridVisibility"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelVisibility"
+                         default_values="1"
+                         name="ActivePlotAxisLabelVisibility"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="ActivePlotAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="ActivePlotAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetActivePlotAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="ActivePlotAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+          <String value="File" />
+        </StringListDomain>
+        <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetActivePlotAxisLabelFontFile"
+                            name="ActivePlotAxisLabelFontFile"
+                            number_of_elements="1"
+                            default_values="">
+        <Documentation>Set the font file.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelFontSize"
+                            default_values="12"
+                            name="ActivePlotAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelBold"
+                            default_values="0"
+                            name="ActivePlotAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelItalic"
+                            default_values="0"
+                            name="ActivePlotAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotAxisLabelColor"
+                            default_values="0 0 0"
+                            name="ActivePlotAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="ActivePlot"
+                     panel_visibility="advanced">
+        <Property name="ActivePlotBackgroundColor"/>
+        <Property name="ActivePlotAxisColor"/>
+        <Property name="ActivePlotGridColor"/>
+        <Property name="ActivePlotGridVisibility"/>
+        <Property name="ActivePlotAxisLabelVisibility"/>
+        <Property name="ActivePlotAxisLabelNotation"/>
+        <Property name="ActivePlotAxisLabelPrecision"/>
+      </PropertyGroup>
+      <PropertyGroup label="ActivePlot Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="ActivePlotAxisLabelColor" function="Color"/>
+        <Property name="ActivePlotAxisLabelFontFamily" function="Family"/>
+        <Property name="ActivePlotAxisLabelFontFile" function="File"/>
+        <Property name="ActivePlotAxisLabelBold" function="Bold" />
+        <Property name="ActivePlotAxisLabelItalic" function="Italics"/>
+        <Property name="ActivePlotAxisLabelFontSize" function="Size" />
+      </PropertyGroup>
+
+      <!-- scatterplot -->
+      <DoubleVectorProperty command="SetScatterPlotBackgroundColor"
+                            default_values="1 1 1 0"
+                            name="ScatterPlotBackgroundColor"
+                            number_of_elements="4"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScatterPlotAxisColor"
+                            default_values="0 0 0"
+                            name="ScatterPlotAxisColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScatterPlotGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="ScatterPlotGridColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetScatterPlotGridVisibility"
+                         default_values="1"
+                         name="ScatterPlotGridVisibility"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelVisibility"
+                         default_values="1"
+                         name="ScatterPlotAxisLabelVisibility"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="ScatterPlotAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="ScatterPlotAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetScatterPlotAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="ScatterPlotAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+          <String value="File" />
+        </StringListDomain>
+        <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetScatterPlotAxisLabelFontFile"
+                            name="ScatterPlotAxisLabelFontFile"
+                            number_of_elements="1"
+                            default_values="">
+        <Documentation>Set the font file.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelFontSize"
+                            default_values="12"
+                            name="ScatterPlotAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelBold"
+                            default_values="0"
+                            name="ScatterPlotAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelItalic"
+                            default_values="0"
+                            name="ScatterPlotAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetScatterPlotAxisLabelColor"
+                            default_values="0 0 0"
+                            name="ScatterPlotAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="ScatterPlot"
+                     panel_visibility="advanced">
+        <Property name="ScatterPlotBackgroundColor"/>
+        <Property name="ScatterPlotAxisColor"/>
+        <Property name="ScatterPlotGridColor"/>
+        <Property name="ScatterPlotGridVisibility"/>
+        <Property name="ScatterPlotAxisLabelVisibility"/>
+        <Property name="ScatterPlotAxisLabelNotation"/>
+        <Property name="ScatterPlotAxisLabelPrecision"/>
+      </PropertyGroup>
+      <PropertyGroup label="ScatterPlot Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="ScatterPlotAxisLabelColor" function="Color"/>
+        <Property name="ScatterPlotAxisLabelFontFamily" function="Family"/>
+        <Property name="ScatterPlotAxisLabelFontFile" function="File"/>
+        <Property name="ScatterPlotAxisLabelBold" function="Bold" />
+        <Property name="ScatterPlotAxisLabelItalic" function="Italics"/>
+        <Property name="ScatterPlotAxisLabelFontSize" function="Size" />
+      </PropertyGroup>
+
+      <!-- histogram -->
+      <DoubleVectorProperty command="SetHistogramBackgroundColor"
+                            default_values="0.5 0.5 0.5 0.4"
+                            name="HistogramBackgroundColor"
+                            number_of_elements="4"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetHistogramAxisColor"
+                            default_values="0 0 0"
+                            name="HistogramAxisColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetHistogramGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="HistogramGridColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetHistogramGridVisibility"
+                         default_values="1"
+                         name="HistogramGridVisibility"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelVisibility"
+                         default_values="1"
+                         name="HistogramAxisLabelVisibility"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="HistogramAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="HistogramAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetHistogramAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="HistogramAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+          <String value="File" />
+        </StringListDomain>
+        <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetHistogramAxisLabelFontFile"
+                            name="HistogramAxisLabelFontFile"
+                            number_of_elements="1"
+                            default_values="">
+        <Documentation>Set the font file.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelFontSize"
+                            default_values="12"
+                            name="HistogramAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelBold"
+                            default_values="0"
+                            name="HistogramAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelItalic"
+                            default_values="0"
+                            name="HistogramAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetHistogramAxisLabelColor"
+                            default_values="0 0 0"
+                            name="HistogramAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Histogram"
+                     panel_visibility="advanced">
+        <Property name="HistogramBackgroundColor"/>
+        <Property name="HistogramAxisColor"/>
+        <Property name="HistogramGridColor"/>
+        <Property name="HistogramGridVisibility"/>
+        <Property name="HistogramAxisLabelVisibility"/>
+        <Property name="HistogramAxisLabelNotation"/>
+        <Property name="HistogramAxisLabelPrecision"/>
+      </PropertyGroup>
+      <PropertyGroup label="Histogram Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="HistogramAxisLabelColor" function="Color"/>
+        <Property name="HistogramAxisLabelFontFamily" function="Family"/>
+        <Property name="HistogramAxisLabelFontFile" function="File"/>
+        <Property name="HistogramAxisLabelBold" function="Bold" />
+        <Property name="HistogramAxisLabelItalic" function="Italics"/>
+        <Property name="HistogramAxisLabelFontSize" function="Size" />
+      </PropertyGroup>
+
+      <Hints>
+        <ShowOneRepresentationAtATime type="PlotMatrixRepresentation" />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+
+      <!-- end of PlotMatrixViewProxy -->
+    </PlotMatrixViewProxy>
+    <!-- ================================================================== -->
+    <SpreadSheetViewProxy base_proxygroup="internal_views"
+               base_proxyname="ViewBase"
+               class="vtkSpreadSheetView"
+               name="SpreadSheetView"
+               label="SpreadSheet View"
+               processes="client|dataserver|renderserver"
+               representation_name="SpreadSheetRepresentation">
+      <IntVectorProperty name="CellFontSize"
+                         default_values="9"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" max="48" name="range" />
+        <Documentation>Sets the font size for cells in the
+        spreadsheet.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="HeaderFontSize"
+                         default_values="9"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" max="48" name="range" />
+        <Documentation>Sets the font size for row and column headers
+        in the spreadsheet.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetShowExtractedSelection"
+                         default_values="0"
+                         name="SelectionOnly"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>When set to 1, this representations shows only the
+        selected cells (or points). The change will effect only after calling
+        Update(). Note that changing this will clean all cache.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateCellConnectivity"
+                         default_values="0"
+                         name="GenerateCellConnectivity"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Generation of the cell connectivity.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetShowFieldData"
+                         default_values="0"
+                         name="ShowFieldData"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Show the field data associated to the points / cells.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetColumnNameToSort"
+                            name="ColumnToSort"
+                            number_of_elements="1"
+                            panel_visibility="never">
+      </StringVectorProperty>
+      <IntVectorProperty command="SetInvertSortOrder"
+                         default_values="0"
+                         name="InvertOrder"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IdTypeVectorProperty command="SetBlockSize"
+                            default_values="1024"
+                            name="BlockSize"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>Get/Set the number of rows that fit within one block.
+        The output of this filter will have at most BlockSize
+        rows.</Documentation>
+      </IdTypeVectorProperty>
+      <StringVectorProperty command="HideColumnByLabel"
+                            clean_command="ClearHiddenColumnsByLabel"
+                            name="HiddenColumnLabels"
+                            number_of_elements_per_command="1"
+                            panel_visibility="never"
+                            default_values_delimiter=";"
+                            default_values="Block Number"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <Documentation>This is list of labels for columns that will be hidden
+          in the view i.e. these columns won't be show in the GUI or exported
+          when exporting the view.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>Select the attribute data to pass.</Documentation>
+        <FieldDataDomain enable_field_data="1"
+                         name="enum">
+        </FieldDataDomain>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowOneRepresentationAtATime />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+
+      <!-- End of SpreadSheetView -->
+    </SpreadSheetViewProxy>
+
+    <!-- ================================================================== -->
+    <RenderViewProxy name="RenderViewWithEDL" class="vtkPVRenderViewWithEDL"
+                     label="Eye Dome Lighting"
+                     processes="client|renderserver|dataserver"
+                     base_proxygroup="views"
+                     base_proxyname="RenderView">
+    <!-- End of EyeDomeLighting View -->
+    </RenderViewProxy>
+
+    <!-- ================================================================== -->
+    <ComparativeViewProxy base_proxygroup="internal_views"
+                          base_proxyname="ComparativeViewBase"
+                          class="vtkPVComparativeView"
+                          name="ComparativeRenderView"
+                          label="Render View (Comparative)">
+      <Documentation>The is comparative view comprising of individual
+      "RenderView" proxies for each panel in the comparative view
+      grid.</Documentation>
+      <SubProxy>
+        <Proxy name="RootView"
+               proxygroup="views"
+               proxyname="RenderView"></Proxy>
+        <ExposedProperties>
+          <Property name="HiddenRepresentations" />
+          <Property name="HiddenProps" />
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="AxesGrid" />
+          <Property name="PPI" />
+
+          <Property name="CenterAxesVisibility" />
+          <PropertyGroup label="Orientation Axes">
+            <Property name="OrientationAxesVisibility" />
+            <Property name="OrientationAxesInteractivity"
+                      panel_visibility="advanced"/>
+            <Property name="OrientationAxesLabelColor"
+                      panel_visibility="advanced"/>
+            <Property name="OrientationAxesOutlineColor"
+                      panel_visibility="advanced"/>
+          </PropertyGroup>
+          <PropertyGroup label="Camera Orientation Widget">
+            <Property name="CameraOrientationWidgetVisibility"/>
+            <Property name="CameraOrientationWidgetSize" panel_visibility="advanced"/>
+            <Property name="CameraOrientationWidgetAnchor" panel_visibility="advanced"/>
+          </PropertyGroup>
+          <PropertyGroup label="Lights" panel_visibility="never">
+            <!-- Light Kit -->
+            <Property name="UseLight"/>
+            <!-- Key Light -->
+            <Property name="KeyLightWarmth"/>
+            <Property name="KeyLightIntensity"/>
+            <Property name="KeyLightElevation"/>
+            <Property name="KeyLightAzimuth"/>
+            <!-- Fill Light -->
+            <Property name="FillLightWarmth"/>
+            <Property name="FillLightK:F Ratio"/>
+            <Property name="FillLightElevation"/>
+            <Property name="FillLightAzimuth"/>
+            <!-- Back Light -->
+            <Property name="BackLightWarmth"/>
+            <Property name="BackLightK:B Ratio"/>
+            <Property name="BackLightElevation"/>
+            <Property name="BackLightAzimuth"/>
+            <!-- Head Light -->
+            <Property name="HeadLightWarmth"/>
+            <Property name="HeadLightK:H Ratio"/>
+            <Property name="MaintainLuminance"/>
+          </PropertyGroup>
+
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" panel_visibility="never"/>
+          <Property name="CameraPosition" panel_visibility="never"/>
+          <Property name="CameraFocalPointInfo" panel_visibility="never"/>
+          <Property name="CameraFocalPoint" panel_visibility="never"/>
+          <Property name="CameraViewUpInfo" panel_visibility="never"/>
+          <Property name="CameraViewUp" panel_visibility="never"/>
+          <Property name="CameraViewAngle" panel_visibility="never"/>
+          <Property name="CameraFocalDiskInfo" panel_visibility="never"/>
+          <Property name="CameraFocalDisk" panel_visibility="never"/>
+          <Property name="CameraFocalDistanceInfo" panel_visibility="never"/>
+          <Property name="CameraFocalDistance" panel_visibility="never"/>
+          <Property name="CameraParallelScale" panel_visibility="never"/>
+          <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
+          <Property name="CameraParallelProjection"
+                    panel_visibility="advanced"/>
+          <Property name="EyeAngle" panel_visibility="never"/>
+
+          <PropertyGroup label="Background">
+            <Property name="UseColorPaletteForBackground" />
+            <Property name="BackgroundColorMode" />
+            <Property name="Background2"/>
+            <Property name="Background"/>
+            <Property name="BackgroundTexture"/>
+            <Property name="UseEnvironmentLighting"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Render Passes">
+            <Property name="UseToneMapping"/>
+            <Property name="Exposure"/>
+            <Property name="UseSSAO"/>
+            <Property name="UseSSAODefaultPresets"/>
+            <Property name="Radius"/>
+            <Property name="Bias"/>
+            <Property name="KernelSize"/>
+            <Property name="Blur"/>
+            <Property name="GenericFilmicPresets"/>
+            <Property name="ToneMappingType"/>
+            <Property name="Contrast"/>
+            <Property name="Shoulder"/>
+            <Property name="MidIn"/>
+            <Property name="MidOut"/>
+            <Property name="HdrMax"/>
+            <Property name="UseACES"/>
+          </PropertyGroup>
+
+          <!-- Interactor -->
+          <Property name="InteractionMode" panel_visibility="never"/>
+          <Property name="Camera3DManipulators" panel_visibility="never"/>
+          <Property name="Camera2DManipulators" panel_visibility="never"/>
+          <Property name="CenterOfRotation" panel_visibility="never"/>
+          <Property name="RotationFactor" panel_visibility="never"/>
+          <Property name="NonInteractiveRenderDelay" panel_visibility="never"/>
+          <Property name="EnableRenderOnInteraction" panel_visibility="never"/>
+          <Property name="WindowResizeNonInteractiveRenderDelay" panel_visibility="never"/>
+          <!-- Renderer -->
+          <PropertyGroup label="Stereo">
+            <Property name="StereoRender"/>
+            <Property name="StereoType"/>
+            <Property name="ServerStereoType"/>
+          </PropertyGroup>
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+      <!-- End of ComparativeRenderView -->
+    </ComparativeViewProxy>
+    <!-- ================================================================== -->
+    <ComparativeViewProxy base_proxygroup="internal_views"
+                          base_proxyname="ComparativeViewBase"
+                          class="vtkPVComparativeView"
+                          name="ComparativeXYChartView"
+                          label="Line Chart View (Comparative)">
+      <Documentation>The is comparative view comprising of individual
+      "XYChartView" proxies for each panel in the comparative view
+      grid.</Documentation>
+      <SubProxy>
+        <Proxy name="RootView"
+               proxygroup="views"
+               proxyname="XYChartView"></Proxy>
+        <ExposedProperties>
+          <Property name="PPI" />
+          <PropertyGroup label="Title">
+            <Property name="ChartTitle"/>
+            <Property name="ChartTitleAlignment"/>
+          </PropertyGroup>
+          <PropertyGroup label="Chart Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="ChartTitleColor" function="Color"/>
+            <Property name="ChartTitleFontFamily" function="Family"/>
+            <Property name="ChartTitleFontFile" function="File"/>
+            <Property name="ChartTitleBold" function="Bold" />
+            <Property name="ChartTitleItalic" function="Italics"/>
+            <Property name="ChartTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Legend">
+            <Property name="ShowLegend"/>
+            <Property name="LegendLocation"/>
+            <Property name="LegendPosition"/>
+            <Property name="LegendSymbolWidth"/>
+          </PropertyGroup>
+          <PropertyGroup label="Legend Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LegendFontFamily" function="Family"/>
+            <Property name="LegendFontFile" function="File"/>
+            <Property name="LegendBold" function="Bold"/>
+            <Property name="LegendItalic" function="Italics"/>
+            <Property name="LegendFontSize" function="Size"/>
+          </PropertyGroup>
+          <PropertyGroup label="Tooltip"
+                         panel_visibility="advanced">
+            <Property name="TooltipNotation"/>
+            <Property name="TooltipPrecision"/>
+          </PropertyGroup>
+
+          <!-- left axis -->
+          <PropertyGroup label="Left Axis">
+            <Property name="LeftAxisTitle"/>
+            <Property name="ShowLeftAxisGrid"/>
+            <Property name="LeftAxisGridColor"/>
+            <Property name="LeftAxisColor"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LeftAxisTitleColor" function="Color"/>
+            <Property name="LeftAxisTitleFontFamily" function="Family"/>
+            <Property name="LeftAxisTitleFontFile" function="File"/>
+            <Property name="LeftAxisTitleBold" function="Bold" />
+            <Property name="LeftAxisTitleItalic" function="Italics"/>
+            <Property name="LeftAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Range">
+            <Property name="LeftAxisLogScale"/>
+            <Property name="LeftAxisUseCustomRange"/>
+            <Property name="LeftAxisRangeMinimum"/>
+            <Property name="LeftAxisRangeMaximum"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Labels">
+            <Property name="ShowLeftAxisLabels"/>
+            <Property name="LeftAxisLabelNotation"/>
+            <Property name="LeftAxisLabelPrecision"/>
+            <Property name="LeftAxisUseCustomLabels"/>
+            <Property name="LeftAxisLabels"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LeftAxisLabelColor" function="Color"/>
+            <Property name="LeftAxisLabelFontFamily" function="Family"/>
+            <Property name="LeftAxisLabelFontFile" function="File"/>
+            <Property name="LeftAxisLabelBold" function="Bold" />
+            <Property name="LeftAxisLabelItalic" function="Italics"/>
+            <Property name="LeftAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+          <!-- bottom axis -->
+          <PropertyGroup label="Bottom Axis">
+            <Property name="BottomAxisTitle"/>
+            <Property name="ShowBottomAxisGrid"/>
+            <Property name="BottomAxisGridColor"/>
+            <Property name="BottomAxisColor"/>
+          </PropertyGroup>
+          <PropertyGroup label="Bottom Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="BottomAxisTitleColor" function="Color"/>
+            <Property name="BottomAxisTitleFontFamily" function="Family"/>
+            <Property name="BottomAxisTitleFontFile" function="File"/>
+            <Property name="BottomAxisTitleBold" function="Bold" />
+            <Property name="BottomAxisTitleItalic" function="Italics"/>
+            <Property name="BottomAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Bottom Axis Range">
+            <Property name="BottomAxisLogScale"/>
+            <Property name="BottomAxisUseCustomRange"/>
+            <Property name="BottomAxisRangeMinimum"/>
+            <Property name="BottomAxisRangeMaximum"/>
+          </PropertyGroup>
+          <PropertyGroup label="Bottom Axis Labels">
+            <Property name="ShowBottomAxisLabels"/>
+            <Property name="BottomAxisLabelNotation"/>
+            <Property name="BottomAxisLabelPrecision"/>
+            <Property name="BottomAxisUseCustomLabels"/>
+            <Property name="BottomAxisLabels"/>
+          </PropertyGroup>
+          <PropertyGroup label="Bottom Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="BottomAxisLabelColor" function="Color"/>
+            <Property name="BottomAxisLabelFontFamily" function="Family"/>
+            <Property name="BottomAxisLabelFontFile" function="File"/>
+            <Property name="BottomAxisLabelBold" function="Bold" />
+            <Property name="BottomAxisLabelItalic" function="Italics"/>
+            <Property name="BottomAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+          <!-- right axis -->
+          <PropertyGroup label="Right Axis">
+            <Property name="RightAxisTitle"/>
+            <Property name="ShowRightAxisGrid"/>
+            <Property name="RightAxisGridColor"/>
+            <Property name="RightAxisColor"/>
+          </PropertyGroup>
+          <PropertyGroup label="Right Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="RightAxisTitleColor" function="Color"/>
+            <Property name="RightAxisTitleFontFamily" function="Family"/>
+            <Property name="RightAxisTitleFontFile" function="File"/>
+            <Property name="RightAxisTitleBold" function="Bold" />
+            <Property name="RightAxisTitleItalic" function="Italics"/>
+            <Property name="RightAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Right Axis Range">
+            <Property name="RightAxisLogScale"/>
+            <Property name="RightAxisUseCustomRange"/>
+            <Property name="RightAxisRangeMinimum"/>
+            <Property name="RightAxisRangeMaximum"/>
+          </PropertyGroup>
+          <PropertyGroup label="Right Axis Labels">
+            <Property name="ShowRightAxisLabels"/>
+            <Property name="RightAxisLabelNotation"/>
+            <Property name="RightAxisLabelPrecision"/>
+            <Property name="RightAxisUseCustomLabels"/>
+            <Property name="RightAxisLabels"/>
+          </PropertyGroup>
+          <PropertyGroup label="Right Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="RightAxisLabelColor" function="Color"/>
+            <Property name="RightAxisLabelFontFamily" function="Family"/>
+            <Property name="RightAxisLabelFontFile" function="File"/>
+            <Property name="RightAxisLabelBold" function="Bold" />
+            <Property name="RightAxisLabelItalic" function="Italics"/>
+            <Property name="RightAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+          <!-- top axis -->
+          <PropertyGroup label="Top Axis">
+            <Property name="TopAxisTitle"/>
+            <Property name="ShowTopAxisGrid"/>
+            <Property name="TopAxisGridColor"/>
+            <Property name="TopAxisColor"/>
+          </PropertyGroup>
+          <PropertyGroup label="Top Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="TopAxisTitleColor" function="Color"/>
+            <Property name="TopAxisTitleFontFamily" function="Family"/>
+            <Property name="TopAxisTitleFontFile" function="File"/>
+            <Property name="TopAxisTitleBold" function="Bold" />
+            <Property name="TopAxisTitleItalic" function="Italics"/>
+            <Property name="TopAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Top Axis Range">
+            <Property name="TopAxisLogScale"/>
+            <Property name="TopAxisUseCustomRange"/>
+            <Property name="TopAxisRangeMinimum"/>
+            <Property name="TopAxisRangeMaximum"/>
+          </PropertyGroup>
+          <PropertyGroup label="Top Axis Labels">
+            <Property name="ShowTopAxisLabels"/>
+            <Property name="TopAxisLabelNotation"/>
+            <Property name="TopAxisLabelPrecision"/>
+            <Property name="TopAxisUseCustomLabels"/>
+            <Property name="TopAxisLabels"/>
+          </PropertyGroup>
+          <PropertyGroup label="Top Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="TopAxisLabelColor" function="Color"/>
+            <Property name="TopAxisLabelFontFamily" function="Family"/>
+            <Property name="TopAxisLabelFontFile" function="File"/>
+            <Property name="TopAxisLabelBold" function="Bold" />
+            <Property name="TopAxisLabelItalic" function="Italics"/>
+            <Property name="TopAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+      <!-- End of ComparativeXYChartView -->
+    </ComparativeViewProxy>
+    <!-- ================================================================== -->
+    <ComparativeViewProxy base_proxygroup="internal_views"
+                          base_proxyname="ComparativeViewBase"
+                          class="vtkPVComparativeView"
+                          name="ComparativeXYBarChartView"
+                          label="Bar Chart View (Comparative)">
+      <Documentation>The is comparative view comprising of individual
+      "XYBarChartView" proxies for each panel in the comparative view
+      grid.</Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView"
+               proxygroup="views"
+               proxyname="XYBarChartView"></Proxy>
+        <ExposedProperties>
+          <Property name="PPI" />
+          <PropertyGroup label="Title">
+            <Property name="ChartTitle"/>
+            <Property name="ChartTitleAlignment"/>
+          </PropertyGroup>
+          <PropertyGroup label="Chart Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="ChartTitleColor" function="Color"/>
+            <Property name="ChartTitleFontFamily" function="Family"/>
+            <Property name="ChartTitleFontFile" function="File"/>
+            <Property name="ChartTitleBold" function="Bold" />
+            <Property name="ChartTitleItalic" function="Italics"/>
+            <Property name="ChartTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Legend">
+            <Property name="ShowLegend"/>
+            <Property name="LegendLocation"/>
+            <Property name="LegendPosition"/>
+            <Property name="LegendSymbolWidth"/>
+          </PropertyGroup>
+          <PropertyGroup label="Legend Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+              <Property name="LegendFontFamily" function="Family"/>
+              <Property name="LegendFontFile" function="File"/>
+              <Property name="LegendBold" function="Bold"/>
+              <Property name="LegendItalic" function="Italics"/>
+              <Property name="LegendFontSize" function="Size"/>
+          </PropertyGroup>
+          <PropertyGroup label="Tooltip"
+                         panel_visibility="advanced">
+            <Property name="TooltipNotation"/>
+            <Property name="TooltipPrecision"/>
+          </PropertyGroup>
+
+          <!-- left axis -->
+          <PropertyGroup label="Left Axis">
+            <Property name="LeftAxisTitle"/>
+            <Property name="ShowLeftAxisGrid"/>
+            <Property name="LeftAxisGridColor"/>
+            <Property name="LeftAxisColor"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LeftAxisTitleColor" function="Color"/>
+            <Property name="LeftAxisTitleFontFamily" function="Family"/>
+            <Property name="LeftAxisTitleFontFile" function="File"/>
+            <Property name="LeftAxisTitleBold" function="Bold" />
+            <Property name="LeftAxisTitleItalic" function="Italics"/>
+            <Property name="LeftAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Range">
+            <Property name="LeftAxisLogScale"/>
+            <Property name="LeftAxisUseCustomRange"/>
+            <Property name="LeftAxisRangeMinimum"/>
+            <Property name="LeftAxisRangeMaximum"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Labels">
+            <Property name="ShowLeftAxisLabels"/>
+            <Property name="LeftAxisLabelNotation"/>
+            <Property name="LeftAxisLabelPrecision"/>
+            <Property name="LeftAxisUseCustomLabels"/>
+            <Property name="LeftAxisLabels"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LeftAxisLabelColor" function="Color"/>
+            <Property name="LeftAxisLabelFontFamily" function="Family"/>
+            <Property name="LeftAxisLabelFontFile" function="File"/>
+            <Property name="LeftAxisLabelBold" function="Bold" />
+            <Property name="LeftAxisLabelItalic" function="Italics"/>
+            <Property name="LeftAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+          <!-- bottom axis -->
+          <PropertyGroup label="Bottom Axis">
+            <Property name="BottomAxisTitle"/>
+            <Property name="ShowBottomAxisGrid"/>
+            <Property name="BottomAxisGridColor"/>
+            <Property name="BottomAxisColor"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Bottom Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="BottomAxisTitleColor" function="Color"/>
+            <Property name="BottomAxisTitleFontFamily" function="Family"/>
+            <Property name="BottomAxisTitleFontFile" function="File"/>
+            <Property name="BottomAxisTitleBold" function="Bold" />
+            <Property name="BottomAxisTitleItalic" function="Italics"/>
+            <Property name="BottomAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Bottom Axis Range">
+            <Property name="BottomAxisLogScale"/>
+            <Property name="BottomAxisUseCustomRange"/>
+            <Property name="BottomAxisRangeMinimum"/>
+            <Property name="BottomAxisRangeMaximum"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Bottom Axis Labels">
+            <Property name="ShowBottomAxisLabels"/>
+            <Property name="BottomAxisLabelNotation"/>
+            <Property name="BottomAxisLabelPrecision"/>
+            <Property name="BottomAxisUseCustomLabels"/>
+            <Property name="BottomAxisLabels"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Bottom Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="BottomAxisLabelColor" function="Color"/>
+            <Property name="BottomAxisLabelFontFamily" function="Family"/>
+            <Property name="BottomAxisLabelFontFile" function="File"/>
+            <Property name="BottomAxisLabelBold" function="Bold" />
+            <Property name="BottomAxisLabelItalic" function="Italics"/>
+            <Property name="BottomAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of ComparativeXYBarChartView -->
+    </ComparativeViewProxy>
+     <!-- ================================================================== -->
+     <MultiSliceViewProxy name="MultiSlice" class="vtkPVMultiSliceView"
+         processes="client|renderserver|dataserver"
+         base_proxygroup="views" base_proxyname="RenderView"
+         label="Slice View">
+        <DoubleVectorProperty name="XSlicesValues"
+          set_number_command="SetNumberOfXSlices"
+          command="SetXSlices"
+          argument_is_array="1"
+          panel_visibility="never">
+        </DoubleVectorProperty>
+        <DoubleVectorProperty name="YSlicesValues"
+          set_number_command="SetNumberOfYSlices"
+          command="SetYSlices"
+          argument_is_array="1"
+          panel_visibility="never">
+        </DoubleVectorProperty>
+        <DoubleVectorProperty name="ZSlicesValues"
+          set_number_command="SetNumberOfZSlices"
+          command="SetZSlices"
+          argument_is_array="1"
+          panel_visibility="never">
+        </DoubleVectorProperty>
+        <StringVectorProperty name="XTitle"
+          number_of_elements="1"
+          default_values="X"
+          panel_visibility="never" />
+        <StringVectorProperty name="YTitle"
+          number_of_elements="1"
+          default_values="Y"
+          panel_visibility="never" />
+        <StringVectorProperty name="ZTitle"
+          number_of_elements="1"
+          default_values="Z"
+          panel_visibility="never" />
+     </MultiSliceViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,1517 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+  <!-- ================================================================== -->
+  <RepresentationProxy class="vtkPVGridAxes3DRepresentation"
+                         name="GridAxesRepresentation"
+                         processes="client|renderserver|dataserver"
+                         si_class="vtkSIProxy">
+      <Documentation>Proxy to show a selection as geometry.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <InputArrayDomain name="input_array_any"></InputArrayDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGridAxesVisibility"
+                         name="GridAxesVisibility"
+                         default_values="0"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Show/hide an Axes Grid around the selected data.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            name="Position"
+                            panel_visibility="never"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Keeps axes synced with actor transforms.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            panel_visibility="never"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Keeps axes synced with actor transforms.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ProxyList>
+          <Link name="Scale" with_property="Scale" />
+          <Link name="Position" with_property="Position" />
+        </ProxyList>
+      </Hints>
+
+      <SubProxy command="SetGridAxes">
+        <Proxy name="GridAxes"
+               proxygroup="annotations"
+               proxyname="GridAxes3DActor" />
+        <ExposedProperties>
+          <PropertyGroup label="Title Texts">
+            <Property name="XTitle"/>
+            <Property name="YTitle"/>
+            <Property name="ZTitle"/>
+          </PropertyGroup>
+          <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+            <Property name="XTitleColor" function="Color"/>
+            <Property name="XTitleFontFamily" function="Family"/>
+            <Property name="XTitleFontFile" function="File"/>
+            <Property name="XTitleBold" function="Bold" />
+            <Property name="XTitleItalic" function="Italics"/>
+            <Property name="XTitleFontSize" function="Size" />
+            <Property name="XTitleShadow" function="Shadow" />
+            <Property name="XTitleOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+            <Property name="YTitleColor" function="Color"/>
+            <Property name="YTitleFontFamily" function="Family"/>
+            <Property name="YTitleFontFile" function="File"/>
+            <Property name="YTitleBold" function="Bold" />
+            <Property name="YTitleItalic" function="Italics"/>
+            <Property name="YTitleFontSize" function="Size" />
+            <Property name="YTitleShadow" function="Shadow" />
+            <Property name="YTitleOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+            <Property name="ZTitleColor" function="Color"/>
+            <Property name="ZTitleFontFamily" function="Family"/>
+            <Property name="ZTitleFontFile" function="File"/>
+            <Property name="ZTitleBold" function="Bold" />
+            <Property name="ZTitleItalic" function="Italics"/>
+            <Property name="ZTitleFontSize" function="Size" />
+            <Property name="ZTitleShadow" function="Shadow" />
+            <Property name="ZTitleOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Face Properties">
+            <Property name="FacesToRender" />
+            <Property name="CullBackface" />
+            <Property name="CullFrontface" />
+            <Property name="GridColor"/>
+          </PropertyGroup>
+          <Property name="ShowGrid"/>
+          <Property name="ShowEdges"/>
+          <Property name="ShowTicks"/>
+          <PropertyGroup label="Label Properties">
+            <Property name="LabelUniqueEdgesOnly" />
+            <Property name="AxesToLabel" />
+          </PropertyGroup>
+          <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+            <Property name="XLabelColor" function="Color"/>
+            <Property name="XLabelFontFamily" function="Family"/>
+            <Property name="XLabelFontFile" function="File"/>
+            <Property name="XLabelBold" function="Bold" />
+            <Property name="XLabelItalic" function="Italics"/>
+            <Property name="XLabelFontSize" function="Size" />
+            <Property name="XLabelShadow" function="Shadow" />
+            <Property name="XLabelOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+            <Property name="YLabelColor" function="Color"/>
+            <Property name="YLabelFontFamily" function="Family"/>
+            <Property name="YLabelFontFile" function="File"/>
+            <Property name="YLabelBold" function="Bold" />
+            <Property name="YLabelItalic" function="Italics"/>
+            <Property name="YLabelFontSize" function="Size" />
+            <Property name="YLabelShadow" function="Shadow" />
+            <Property name="YLabelOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+            <Property name="ZLabelColor" function="Color"/>
+            <Property name="ZLabelFontFamily" function="Family"/>
+            <Property name="ZLabelFontFile" function="File"/>
+            <Property name="ZLabelBold" function="Bold" />
+            <Property name="ZLabelItalic" function="Italics"/>
+            <Property name="ZLabelFontSize" function="Size" />
+            <Property name="ZLabelShadow" function="Shadow" />
+            <Property name="ZLabelOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="X Axis Label Properties">
+            <Property name="XAxisNotation" />
+            <Property name="XAxisPrecision" />
+            <Property name="XAxisUseCustomLabels" />
+            <Property name="XAxisLabels" />
+          </PropertyGroup>
+          <PropertyGroup label="Y Axis Label Properties">
+            <Property name="YAxisNotation" />
+            <Property name="YAxisPrecision" />
+            <Property name="YAxisUseCustomLabels" />
+            <Property name="YAxisLabels" />
+          </PropertyGroup>
+          <PropertyGroup label="Z Axis Label Properties">
+            <Property name="ZAxisNotation" />
+            <Property name="ZAxisPrecision" />
+            <Property name="ZAxisUseCustomLabels" />
+            <Property name="ZAxisLabels" />
+          </PropertyGroup>
+          <PropertyGroup label="Bounds">
+            <Property name="UseCustomBounds" />
+            <Property name="CustomBounds" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of GridAxesRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkPolarAxesRepresentation"
+                         name="PolarAxesRepresentation"
+                         processes="client|renderserver|dataserver">
+      <Documentation>PolarAxesRepresentation is a representation of Polar
+      axes on any kind of dataset.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input"/>
+          <ShareProperties parent_subproxy="SurfaceRepresentation">
+            <Exception name="Input" />
+            <Exception name="Visibility" />
+          </ShareProperties>
+        </ProxyList>
+      </Hints>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="0"
+                         name="Visibility"
+                         number_of_elements="1"
+                         animateable="0">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility of the representation.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            label="Translation"
+                            name="Position"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Translate the origin of the axes.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Scale the origin of the axes.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Rotate the origin of the axes around the scene origin.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Transform">
+        <Property name="Position"/>
+        <Property name="Scale"/>
+        <Property name="Orientation"/>
+      </PropertyGroup>
+
+      <DoubleVectorProperty command="GetDataBounds"
+                            default_values="0 1 0 1 0 1"
+                            information_only="1"
+                            name="DataBounds"
+                            number_of_elements="6">
+        <SimpleDoubleInformationHelper />
+        <Documentation>Get the polar axes transformed bounds.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableCustomBounds"
+                         default_values="0 0 0"
+                         name="EnableCustomBounds"
+                         panel_visibility="advanced"
+                         number_of_elements="3">
+        <Documentation>Activate the use of polar axes custom bounds.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomBounds"
+                            default_values="0 1 0 1 0 1"
+                            name="CustomBounds"
+                            panel_visibility="advanced"
+                            number_of_elements="6">
+        <Documentation>Set the polar axes custom bounds.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableCustomRange"
+                         default_values="0"
+                         name="EnableCustomRange"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of polar axes custom range.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomRange"
+                            default_values="0 1"
+                            name="CustomRange"
+                            number_of_elements="2">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the polar axes custom range.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableAutoPole"
+                         default_values="1"
+                         name="AutoPole"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the automatic placement of the pole (origin of the axes) at the center of the bounding box.
+        </Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="Custom Bounds and Range">
+        <Property name="EnableCustomBounds"/>
+        <Property name="CustomBounds"/>
+        <Property name="EnableCustomRange"/>
+        <Property name="CustomRange"/>
+        <Property name="AutoPole"/>
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetPolarAxisVisibility"
+                         default_values="1"
+                         name="PolarAxisVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility of polar axis.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRadialAxesVisibility"
+                         default_values="1"
+                         name="RadialAxesVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set all radial axes visibility.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDrawRadialGridlines"
+                         default_values="1"
+                         name="DrawRadialGridlines"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="RadialAxesVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the visibility of radial grid lines.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPolarArcsVisibility"
+                         default_values="1"
+                         name="PolarArcsVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set all polar arcs visibility.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDrawPolarArcsGridlines"
+                         default_values="1"
+                         name="DrawPolarArcsGridlines"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PolarArcsVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the visibility of polar arcs grid lines.</Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="Visibility Control">
+        <Property name="PolarAxisVisibility" />
+        <Property name="RadialAxesVisibility" />
+        <Property name="DrawRadialGridlines" />
+        <Property name="PolarArcsVisibility" />
+        <Property name="DrawPolarArcsGridlines" />
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetNumberOfRadialAxes"
+                         default_values="0"
+                         name="NumberOfRadialAxes"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        max="100"
+                        name="range" />
+        <Documentation>Set the number of radial axes,
+        If value is 0 (the default), the number of radial axes is automatically calculated.
+        Depends on the Delta Angle Radial Axes for automatic computation.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDeltaAngleRadialAxes"
+                         default_values="45"
+                         name="DeltaAngleRadialAxes"
+                         number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                        max="360"
+                        name="range" />
+        <Documentation>Set the angle (in degrees) between radial axes,
+        If value is 0, the angle between radial axes is automatically calculated.
+        Depends on the Number Of Radial Axes for automatic computation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetNumberOfPolarAxes"
+                         default_values="5"
+                         name="NumberOfArcs"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        max="100"
+                        name="range" />
+        <Documentation>Set the number of arcs,
+        If value is 0, the number of arcs is automatically calculated.
+        Depends on the Delta Range Arcs for automatic computation.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDeltaRangePolarAxes"
+                         name="DeltaRangeArcs"
+                         number_of_elements="1"
+                         default_values="0">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set the range between arcs,
+        If value is 0 (the default), the range between arcs is automatically calculated.
+        Depends on the Number Of Arcs for automatic computation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableCustomMinRadius"
+                         default_values="1"
+                         name="CustomMinRadius"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom minimum radius.
+        If off, Minimum Radius is computed relatively to pole position.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMinRadius"
+                            default_values="0"
+                            name="MinimumRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           max="100"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomMinRadius"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the minimum radius.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableCustomMaxRadius"
+                         default_values="0"
+                         name="CustomMaxRadius"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom maximum radius.
+        If off, Maximum Radius is computed relatively to pole position.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMaxRadius"
+                            default_values="1"
+                            name="MaximumRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           max="100"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomMaxRadius"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the maximum radius.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableCustomAngle"
+                         default_values="1"
+                         name="CustomAngles"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom min/max angle.
+        If off, Minimum/Maximum Angle are computed relatively to pole position.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMinAngle"
+                            default_values="0"
+                            name="MinimumAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="-180"
+                           max="180"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomAngles"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the minimum angle (in degrees).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMaxAngle"
+                            default_values="90"
+                            name="MaximumAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="-180"
+                           max="180"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomAngles"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the maximum angle (in degrees).</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetRadialAxesOriginToPolarAxis"
+                         default_values="1"
+                         name="RadialAxesOriginToPolarAxis"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+        <Documentation>If On, the radial axes are drawn from the angle of the polar Axis
+        (i.e. MinimumAngle) and continue counterclockwise with the step DeltaAngleRadialAxes.
+        if Off, the start angle is 0.0.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPolarArcResolutionPerDegree"
+                            default_values="0.2"
+                            name="PolarArcResolutionPerDegree"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10.0"
+                           min="0.05"
+                           name="range" />
+        <Documentation>Set the number of line drawn per degree.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRatio"
+                            default_values="1"
+                            name="Ratio"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="100.0"
+                           min="0.001"
+                           name="range" />
+        <Documentation>Set the polar ellipse ratio.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Aspect Control">
+        <Property name="NumberOfRadialAxes" />
+        <Property name="DeltaAngleRadialAxes" />
+        <Property name="NumberOfArcs" />
+        <Property name="DeltaRangeArcs" />
+        <Property name="CustomMinRadius" />
+        <Property name="MinimumRadius" />
+        <Property name="CustomMaxRadius" />
+        <Property name="MaximumRadius" />
+        <Property name="CustomAngles" />
+        <Property name="MinimumAngle" />
+        <Property name="MaximumAngle" />
+        <Property name="RadialAxesOriginToPolarAxis" />
+        <Property name="PolarArcResolutionPerDegree" />
+        <Property name="Ratio" />
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetEnableOverallColor"
+                         default_values="1"
+                         name="EnableOverallColor"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+        <Documentation>If On, the whole polar axes is unicolor.
+        If Off, you can specify a color for each feature.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOverallColor"
+                            default_values="1 1 1"
+                            name="OverallColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the overall color.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPolarAxisColor"
+                            default_values="1 1 1"
+                            name="PolarAxisColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the Polar Axis color.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPolarArcsColor"
+                            default_values="1 1 1"
+                            name="PolarArcsColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the Polar Arcs color.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLastRadialAxisColor"
+                            default_values="1 1 1"
+                            name="LastRadialAxisColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the Last Radial Axis color.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSecondaryPolarArcsColor"
+                            default_values="1 1 1"
+                            name="SecondaryPolarArcsColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the Secondary Polar Arcs color.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSecondaryRadialAxesColor"
+                            default_values="1 1 1"
+                            name="SecondaryRadialAxesColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the Secondary Radial Axes color.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Colors">
+        <Property name="EnableOverallColor"/>
+        <Property name="OverallColor"/>
+        <Property name="PolarAxisColor"/>
+        <Property name="PolarArcsColor"/>
+        <Property name="LastRadialAxisColor"/>
+        <Property name="SecondaryPolarArcsColor"/>
+        <Property name="SecondaryRadialAxesColor"/>
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetPolarTitleVisibility"
+                         default_values="1"
+                         name="PolarAxisTitleVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility of polar axis title.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetPolarAxisTitle"
+                            name="PolarAxisTitle"
+                            default_values="Radial Distance"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PolarAxisTitleVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the polar axis title.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetPolarAxisTitleLocation"
+                         default_values="0"
+                         name="PolarAxisTitleLocation"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Bottom"
+                 value="0" />
+          <Entry text="Extern"
+                 value="1" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PolarAxisTitleVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the location of polar axis title.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPolarTitleOffset"
+                            default_values="20 20"
+                            name="PolarTitleOffset"
+                            number_of_elements="2">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PolarAxisTitleVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the 2D text offset (in pixels) for polar title.
+        The X offset is not applied if the text should be centered.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetPolarLabelVisibility"
+                         default_values="1"
+                         name="PolarLabelVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility of polar axis label.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetPolarLabelFormat"
+                            name="PolarLabelFormat"
+                            default_values="%-#6.3g"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PolarLabelVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the polar axis label format.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetExponentLocation"
+                         default_values="2"
+                         name="PolarLabelExponentLocation"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Bottom"
+                 value="0" />
+          <Entry text="Extern"
+                 value="1" />
+          <Entry text="Labels"
+                 value="2" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PolarLabelVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the location of exponent.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPolarLabelOffset"
+                            default_values="10"
+                            name="PolarLabelOffset"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PolarLabelVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the Y text offset (in pixels) for polar labels.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPolarExponentOffset"
+                            default_values="5"
+                            name="PolarExponentOffset"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PolarLabelVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the Y text offset (in pixels) for polar exponent.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetRadialTitleVisibility"
+                         default_values="1"
+                         name="RadialLabelVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set radial title visibility.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetRadialAngleFormat"
+                            default_values="%-#3.1f"
+                            name="RadialLabelFormat"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="RadialLabelVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the polar radial label format.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetRadialAxisTitleLocation"
+                         default_values="0"
+                         name="RadialLabelLocation"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Bottom"
+                 value="0" />
+          <Entry text="Extern"
+                 value="1" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="RadialLabelVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the location of radial title.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRadialTitleOffset"
+                            default_values="20 0"
+                            name="RadialLabelOffset"
+                            number_of_elements="2">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="RadialLabelVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the 2D text offset (in pixels) for radial titles.
+        The X offset is not applied if the text should be centered.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetRadialUnits"
+                         default_values="1"
+                         name="RadialUnitsVisibility"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+      <Documentation>Show radial units in labels (degrees).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetScreenSize"
+                            default_values="10"
+                            name="ScreenSize"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="100"/>
+        <Documentation>Set the screen size to use, which impact label and title
+        relative location to the axes.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Title and Labels Control">
+        <Property name="PolarAxisTitle" />
+        <Property name="PolarAxisTitleVisibility" />
+        <Property name="PolarAxisTitleLocation" />
+        <Property name="PolarTitleOffset" />
+        <Property name="PolarLabelVisibility" />
+        <Property name="PolarLabelFormat" />
+        <Property name="PolarLabelExponentLocation" />
+        <Property name="PolarLabelOffset" />
+        <Property name="PolarExponentOffset" />
+        <Property name="RadialLabelVisibility" />
+        <Property name="RadialLabelFormat" />
+        <Property name="RadialLabelLocation" />
+        <Property name="RadialLabelOffset" />
+        <Property name="RadialUnitsVisibility" />
+        <Property name="ScreenSize" />
+      </PropertyGroup>
+
+      <SubProxy command="SetPolarAxisTitleTextProperty">
+        <Proxy name="PolarAxisTitleProperty" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="PolarAxisTitleColor" name="Color" />
+          <Property exposed_name="PolarAxisTitleOpacity" name="Opacity" />
+          <Property exposed_name="PolarAxisTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="PolarAxisTitleFontFile" name="FontFile" />
+          <Property exposed_name="PolarAxisTitleBold" name="Bold" />
+          <Property exposed_name="PolarAxisTitleItalic" name="Italic" />
+          <Property exposed_name="PolarAxisTitleShadow" name="Shadow" />
+          <Property exposed_name="PolarAxisTitleFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+      <PropertyGroup label="Polar Axis Title Font Properties" panel_widget="FontEditor">
+        <Property name="PolarAxisTitleColor" function="Color"/>
+        <Property name="PolarAxisTitleFontFamily" function="Family"/>
+        <Property name="PolarAxisTitleFontFile" function="File"/>
+        <Property name="PolarAxisTitleBold" function="Bold" />
+        <Property name="PolarAxisTitleItalic" function="Italics"/>
+        <Property name="PolarAxisTitleFontSize" function="Size" />
+        <Property name="PolarAxisTitleShadow" function="Shadow" />
+        <Property name="PolarAxisTitleOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetPolarAxisLabelTextProperty">
+        <Proxy name="PolarAxisLabelProperty" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="PolarAxisLabelColor" name="Color" />
+          <Property exposed_name="PolarAxisLabelOpacity" name="Opacity" />
+          <Property exposed_name="PolarAxisLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="PolarAxisLabelFontFile" name="FontFile" />
+          <Property exposed_name="PolarAxisLabelBold" name="Bold" />
+          <Property exposed_name="PolarAxisLabelItalic" name="Italic" />
+          <Property exposed_name="PolarAxisLabelShadow" name="Shadow" />
+          <Property exposed_name="PolarAxisLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+      <PropertyGroup label="Polar Axis Label Font Properties" panel_widget="FontEditor">
+        <Property name="PolarAxisLabelColor" function="Color"/>
+        <Property name="PolarAxisLabelFontFamily" function="Family"/>
+        <Property name="PolarAxisLabelFontFile" function="File"/>
+        <Property name="PolarAxisLabelBold" function="Bold" />
+        <Property name="PolarAxisLabelItalic" function="Italics"/>
+        <Property name="PolarAxisLabelFontSize" function="Size" />
+        <Property name="PolarAxisLabelShadow" function="Shadow" />
+        <Property name="PolarAxisLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetLastRadialAxisTextProperty">
+        <Proxy name="LastRadialAxisTextProperty" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="LastRadialAxisTextColor" name="Color" />
+          <Property exposed_name="LastRadialAxisTextOpacity" name="Opacity" />
+          <Property exposed_name="LastRadialAxisTextFontFamily" name="FontFamily" />
+          <Property exposed_name="LastRadialAxisTextFontFile" name="FontFile" />
+          <Property exposed_name="LastRadialAxisTextBold" name="Bold" />
+          <Property exposed_name="LastRadialAxisTextItalic" name="Italic" />
+          <Property exposed_name="LastRadialAxisTextShadow" name="Shadow" />
+          <Property exposed_name="LastRadialAxisTextFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+      <PropertyGroup label="Last Radial Axis Text Font Properties" panel_widget="FontEditor">
+        <Property name="LastRadialAxisTextColor" function="Color"/>
+        <Property name="LastRadialAxisTextFontFamily" function="Family"/>
+        <Property name="LastRadialAxisTextFontFile" function="File"/>
+        <Property name="LastRadialAxisTextBold" function="Bold" />
+        <Property name="LastRadialAxisTextItalic" function="Italics"/>
+        <Property name="LastRadialAxisTextFontSize" function="Size" />
+        <Property name="LastRadialAxisTextShadow" function="Shadow" />
+        <Property name="LastRadialAxisTextOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetSecondaryRadialAxesTextProperty">
+        <Proxy name="SecondaryRadialAxesTextProperty" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="SecondaryRadialAxesTextColor" name="Color" />
+          <Property exposed_name="SecondaryRadialAxesTextOpacity" name="Opacity" />
+          <Property exposed_name="SecondaryRadialAxesTextFontFamily" name="FontFamily" />
+          <Property exposed_name="SecondaryRadialAxesTextFontFile" name="FontFile" />
+          <Property exposed_name="SecondaryRadialAxesTextBold" name="Bold" />
+          <Property exposed_name="SecondaryRadialAxesTextItalic" name="Italic" />
+          <Property exposed_name="SecondaryRadialAxesTextShadow" name="Shadow" />
+          <Property exposed_name="SecondaryRadialAxesTextFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+      <PropertyGroup label="Secondary Radial Axes Text Font Properties" panel_widget="FontEditor">
+        <Property name="SecondaryRadialAxesTextColor" function="Color"/>
+        <Property name="SecondaryRadialAxesTextFontFamily" function="Family"/>
+        <Property name="SecondaryRadialAxesTextFontFile" function="File"/>
+        <Property name="SecondaryRadialAxesTextBold" function="Bold" />
+        <Property name="SecondaryRadialAxesTextItalic" function="Italics"/>
+        <Property name="SecondaryRadialAxesTextFontSize" function="Size" />
+        <Property name="SecondaryRadialAxesTextShadow" function="Shadow" />
+        <Property name="SecondaryRadialAxesTextOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetEnableDistanceLOD"
+                         default_values="1"
+                         name="EnableDistanceLOD"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable Level Of Details optimization based on distance.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDistanceLODThreshold"
+                            default_values="0.7"
+                            name="DistanceLODThreshold"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableDistanceLOD"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Distance, in proportion of visible scene, beyond which Level Of Details should apply. In range [0, 1]</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableViewAngleLOD"
+                         default_values="1"
+                         name="EnableViewAngleLOD"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable Level Of Details optimization based on the View Angle.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetViewAngleLODThreshold"
+                            default_values="0.7"
+                            name="ViewAngleLODThreshold"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableViewAngleLOD"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Angle until which Level Of Details should apply. In range [0, 1].</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSmallestVisiblePolarAngle"
+                            default_values="0.5"
+                            name="SmallestVisiblePolarAngle"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="2"
+                           min="0"
+                           name="range" />
+        <Documentation>Set the smallest radial angle distinguishable from polar axis.</Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="LOD and Details control">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="Use2DMode"
+                      inverse="1"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Property name="EnableDistanceLOD" />
+        <Property name="DistanceLODThreshold" />
+        <Property name="EnableViewAngleLOD" />
+        <Property name="ViewAngleLODThreshold" />
+        <Property name="SmallestVisiblePolarAngle" />
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetPolarTickVisibility"
+                         default_values="1"
+                         name="AllTicksVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set all ticks visibility.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetArcTicksOriginToPolarAxis"
+                         default_values="1"
+                         panel_visibility="advanced"
+                         name="ArcTicksOriginToPolarAxis"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AllTicksVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>If On, the ticks are drawn from the angle of the polar Axis
+        (MinimumAngle) and continue counterclockwise with the step Delta Angle Major/Minor.
+        If Off, the start angle is 0.0</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTickLocation"
+                         default_values="2"
+                         name="TickLocation"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Inside"
+                 value="0" />
+          <Entry text="Outside"
+                 value="1" />
+          <Entry text="Both"
+                 value="2" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AllTicksVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the location of ticks.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAxisTickVisibility"
+                         default_values="1"
+                         name="AxisTickVisibility"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AllTicksVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set polar axis and last radial axis tick visibility.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAxisMinorTickVisibility"
+                         default_values="0"
+                         name="AxisMinorTickVisibility"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set polar axis and last radial axis minor tick visibility.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAxisTickMatchesPolarAxes"
+                         default_values="1"
+                         name="AxisTickMatchesPolarAxes"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If On, major axes ticks matches polar axes.
+        Minor axes ticks are half of major ticks.
+        If Off, ticks use Delta Range Major/Minor.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDeltaRangeMajor"
+                            name="DeltaRangeMajor"
+                            number_of_elements="1"
+                            panel_visibility="advanced"
+                            default_values="1">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickMatchesPolarAxes" value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the range between major axes ticks.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDeltaRangeMinor"
+                            name="DeltaRangeMinor"
+                            number_of_elements="1"
+                            panel_visibility="advanced"
+                            default_values="0.5">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickMatchesPolarAxes" value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the range between minor axes ticks.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetArcTickVisibility"
+                         default_values="1"
+                         name="ArcTickVisibility"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AllTicksVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set polar arc tick visibility.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetArcMinorTickVisibility"
+                         default_values="0"
+                         name="ArcMinorTickVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set polar arc minor tick visibility.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetArcTickMatchesRadialAxes"
+                         default_values="1"
+                         name="ArcTickMatchesRadialAxes"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If On, major radial ticks matches radial axes.
+        Minor radial ticks are half of major ticks.
+        If Off, ticks use Delta Angle Major/Minor.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDeltaAngleMajor"
+                            default_values="10"
+                            name="DeltaAngleMajor"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="1"
+                           max="359"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickMatchesRadialAxes" value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the angle (in degrees) between major ticks on last arc.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDeltaAngleMinor"
+                            default_values="5"
+                            name="DeltaAngleMinor"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="1"
+                           max="359"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickMatchesRadialAxes" value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the angle (in degrees) between minor ticks on last arc.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetTickRatioRadiusSize"
+                            default_values="0.02"
+                            name="TickRatioRadiusSize"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0.01"
+                           max="0.1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AllTicksVisibility"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the maximum radius / tick size ratio.
+        Not used if a specific tick size was set.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPolarAxisMajorTickSize"
+                            default_values="0"
+                            name="PolarAxisMajorTickSize"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the polar axis major tick size,
+        If value is 0 (the default), tick size is automatically calculated.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPolarAxisTickRatioSize"
+                            default_values="0.3"
+                            name="PolarAxisTickRatioSize"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      <Documentation>Set the polar axis size ratio between major and minor ticks.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPolarAxisMajorTickThickness"
+                            default_values="1.0"
+                            name="PolarAxisMajorTickThickness"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="100"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the thickness of polar axis major ticks.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPolarAxisTickRatioThickness"
+                            default_values="0.5"
+                            name="PolarAxisTickRatioThickness"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the thickness ratio between major and minor ticks of polar axis.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLastRadialAxisMajorTickSize"
+                            default_values="0"
+                            name="LastRadialAxisMajorTickSize"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the last radial axis major tick size,
+        If value is 0 (the default), tick size is automatically calculated.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLastAxisTickRatioSize"
+                            default_values="0.3"
+                            name="LastRadialAxisTickRatioSize"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the last radial axis size ratio between major and minor ticks.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLastRadialAxisMajorTickThickness"
+                            default_values="1.0"
+                            name="LastRadialAxisMajorTickThickness"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="100"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the thickness of last radial axis major ticks.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLastAxisTickRatioThickness"
+                            default_values="0.5"
+                            name="LastRadialAxisTickRatioThickness"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the thickness ratio between major and minor ticks of last radial axis.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetArcMajorTickSize"
+                            default_values="0"
+                            name="ArcMajorTickSize"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the arc major tick size,
+        If value is 0 (the default), tick size is automatically calculated.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetArcTickRatioSize"
+                            default_values="0.3"
+                            name="ArcTickRatioSize"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcMinorTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the arc size ratio between major and minor ticks.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetArcMajorTickThickness"
+                            default_values="1.0"
+                            name="ArcMajorTickThickness"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="100"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the thickness of arc major ticks.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetArcTickRatioThickness"
+                            default_values="0.5"
+                            name="ArcTickRatioThickness"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"
+                           min="0"
+                           max="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcMinorTickVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the thickness ratio between major and minor ticks of arc.</Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Generic Ticks Control">
+        <Property name="AllTicksVisibility" />
+        <Property name="TickLocation" />
+        <Property name="TickRatioRadiusSize" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Radial Ticks Control">
+        <Property name="AxisTickVisibility" />
+        <Property name="AxisMinorTickVisibility" />
+        <Property name="AxisTickMatchesPolarAxes" />
+        <Property name="DeltaRangeMajor" />
+        <Property name="DeltaRangeMinor" />
+        <Property name="PolarAxisMajorTickSize" />
+        <Property name="PolarAxisTickRatioSize" />
+        <Property name="PolarAxisMajorTickThickness" />
+        <Property name="PolarAxisTickRatioThickness" />
+        <Property name="LastRadialAxisMajorTickSize" />
+        <Property name="LastRadialAxisTickRatioSize" />
+        <Property name="LastRadialAxisMajorTickThickness" />
+        <Property name="LastRadialAxisTickRatioThickness" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Arc Ticks Control">
+        <Property name="ArcTickVisibility" />
+        <Property name="ArcMinorTickVisibility" />
+        <Property name="ArcTicksOriginToPolarAxis" />
+        <Property name="ArcTickMatchesRadialAxes" />
+        <Property name="DeltaAngleMajor" />
+        <Property name="DeltaAngleMinor" />
+        <Property name="ArcMajorTickSize" />
+        <Property name="ArcTickRatioSize" />
+        <Property name="ArcMajorTickThickness" />
+        <Property name="ArcTickRatioThickness" />
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetUse2DMode"
+                         default_values="0"
+                         name="Use2DMode"
+                         label="Use 2D Mode"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the use of 2D Mode for all axes.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLog"
+                         default_values="0"
+                         name="UseLogAxis"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the use of Log axis.</Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Miscellaneous">
+        <Property name="Use2DMode" />
+        <Property name="UseLogAxis" />
+      </PropertyGroup>
+      <!-- End of PolarAxesRepresentation -->
+    </RepresentationProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
