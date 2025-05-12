@@ -1038,6 +1038,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   TensorPrincipalInvariants.xml
   TestCompositePropertyWidgetDecorator.xml
   TestFileListPropertyWidget.xml
+  TestOpenFOAMRestartFiles.xml
   TextSource.xml
   ThresholdBackwardsCompatibility.xml
   ThresholdTable.xml

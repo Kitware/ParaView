@@ -406,6 +406,17 @@
                                              value="1"/>
                 </Hints>
             </IntVectorProperty>
+            <IntVectorProperty animateable="0"
+                               command="SetIgnoreRestartFiles"
+                               default_values="1"
+                               label="Ignore restart files"
+                               name="IgnoreRestartFiles"
+                               number_of_elements="1">
+                <BooleanDomain name="bool"/>
+                <Documentation>
+                    Ignore restart files (filenames ending with '_0') when looking for results.
+                </Documentation>
+            </IntVectorProperty>
             <Hints>
                 <ReaderFactory extensions="foam"
                                file_description="OpenFOAM"/>
