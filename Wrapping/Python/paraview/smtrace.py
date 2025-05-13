@@ -1019,6 +1019,11 @@ class ProxyFilter(object):
           should_trace = should_trace_based_on_decorators(proxy, sanitized_label)
 
           if should_trace is False:
+              return False
+
+        # Skip writing out `None` strings
+        domain = prop.get_object().FindDomain("vtkSMArrayListDomain")
+        if domain and domain.GetNoneString() == prop.get_property_value():
             return False
 
         if isinstance(obj, sm.ProxyProperty):
