@@ -1,0 +1,16 @@
+{
+	"catalyst": {
+		"scripts": {
+			"script": {
+				"filename": "@CMAKE_CURRENT_SOURCE_DIR@/catalyst_pipeline_with_rendering.py"
+			}
+		},
+		"python_path" : "@CATALYST_PYTHONPATH@"
+	},
+	"catalyst_load": {
+		"implementation": "paraview",
+		"search_paths": {
+			"paraview": "@ParaView_CATALYST_DIR@"
+		}
+	}
+}

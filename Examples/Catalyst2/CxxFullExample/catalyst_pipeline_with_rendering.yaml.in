@@ -1,0 +1,13 @@
+---
+  catalyst:
+    scripts:
+      script:
+        # Filename refers to the ParaView Catalyst Pipeline to be used
+        filename: "@CMAKE_CURRENT_SOURCE_DIR@/catalyst_pipeline_with_rendering.py"
+    # This should be set where Catalyst's Python wrappers are located
+    python_path: "@CATALYST_PYTHONPATH@"
+  catalyst_load:
+    implementation: paraview
+    search_paths:
+      # This should be set to the directory where the ParaView Catalyst Libraries are located
+      paraview: "@ParaView_CATALYST_DIR@"
