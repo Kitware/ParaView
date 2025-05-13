@@ -881,17 +881,11 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
     return true;
   }
 
-  vtkIdType* rcvcounts = nullptr;     /* significant only at rank 0 */
-  vtkIdType* offSet = nullptr;        /* significant only at rank 0 */
-  int rbufsize = 0;                   /* significant only at rank 0 */
-  unsigned char* rcvbuffer = nullptr; /* significant only at rank 0 */
-
-  // STEP 1: Initialize data-structures at rank 0
-  if (rank == 0)
-  {
-    rcvcounts = new vtkIdType[nranks];
-    offSet = new vtkIdType[nranks];
-  } // END if rank == 0
+  // STEP 1: Initialize data-structures for all ranks
+  std::vector<vtkIdType> rcvcounts(nranks);
+  std::vector<vtkIdType> offSet(nranks);
+  std::vector<unsigned char> rcvbuffer;
+  int rbufsize = 0;
 
   // STEP 2: Serialize the vtkPVInformation object
   vtkClientServerStream stream;
@@ -905,30 +899,30 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
   stream.GetData(&data, &length);
   vtkIdType local_length = static_cast<vtkIdType>(length);
 
-  // STEP 3: Get number of bytes that each process will send
-  this->ParallelController->Gather(&local_length, rcvcounts, 1, 0);
+  // STEP 3: Get number of bytes that each process will send for all ranks
+  this->ParallelController->AllGather(&local_length, rcvcounts.data(), 1);
 
-  // STEP 4: Allocate temporary arrays at rank 0
-  if (rank == 0)
+  // STEP 4: Allocate temporary arrays for all ranks
+  // Note: this must be calculated for all ranks because the GatherV method
+  // needs to know the lengths and offsets information from all ranks
+  // STEP 4.1: Calculate rcvbuffer size & allocate rcvbuffer
+  rbufsize = rcvcounts[0];
+  for (int i = 1; i < nranks; ++i)
   {
-    // STEP 4.1: Calculate rcvbuffer size & allocate rcvbuffer
-    rbufsize = rcvcounts[0];
-    for (int i = 1; i < nranks; ++i)
-    {
-      rbufsize += rcvcounts[i];
-    }
-    rcvbuffer = new unsigned char[rbufsize];
+    rbufsize += rcvcounts[i];
+  }
+  rcvbuffer.resize(rbufsize);
 
-    // STEP 4.2: populate offset array
-    offSet[0] = 0;
-    for (int i = 1; i < nranks; ++i)
-    {
-      offSet[i] = offSet[i - 1] + rcvcounts[i - 1];
-    }
-  } // END if rank==0
+  // STEP 4.2: populate offset array
+  offSet[0] = 0;
+  for (int i = 1; i < nranks; ++i)
+  {
+    offSet[i] = offSet[i - 1] + rcvcounts[i - 1];
+  }
 
   // STEP 5: GatherV all data from satellites
-  this->ParallelController->GatherV(data, rcvbuffer, local_length, rcvcounts, offSet, 0);
+  this->ParallelController->GatherV(
+    data, rcvbuffer.data(), local_length, rcvcounts.data(), offSet.data(), 0);
 
   // STEP 6: Deserialize data from other ranks at rank 0 and add them to
   // the information object associated with rank 0.
@@ -944,16 +938,6 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
       tempInfo->Delete();
     } // END for all remote ranks
   }   // END if rank == 0
-
-  // STEP 7: De-allocate temporary arrays at rank 0
-  SafeDeleteArray(rcvcounts);
-  SafeDeleteArray(offSet);
-  SafeDeleteArray(rcvbuffer);
-
-  // Sanity checks -- ensure we return all dynamically allocated memory
-  assert("post: rcvcounts should be nullptr" && (rcvcounts == nullptr));
-  assert("post: offSet should be nullptr" && (offSet == nullptr));
-  assert("post: rcvbuffer should be nullptr" && (rcvbuffer == nullptr));
 
   // STEP 8: Barrier synchronization
   this->ParallelController->Barrier();
