@@ -196,7 +196,7 @@ void vtkInSituInitializationHelper::Initialize(
     // remove any trailing slashes, not required but makes debuggin easier
     const std::string& path = *iter;
     std::string resolved_path =
-      vtksys::SystemTools::ConvertToOutputPath(vtksys::SystemTools::GetFilenamePath(path));
+      vtksys::SystemTools::ConvertToOutputPath(vtksys::SystemTools::CollapseFullPath(path));
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Adding PYTHONPATH %s", resolved_path.c_str());
     vtkPythonInterpreter::PrependPythonPath(resolved_path.c_str());
   }
