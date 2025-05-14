@@ -43,6 +43,9 @@ set(python_files
   paraview/detail/catalyst_export.py
   paraview/incubator/__init__.py.in
   paraview/incubator/pythoninteractorbase.py
+  paraview/info/__init__.py
+  paraview/info/__main__.py
+  paraview/info/info.py
   paraview/inspect.py
   paraview/live.py
   paraview/modules/__init__.py.in

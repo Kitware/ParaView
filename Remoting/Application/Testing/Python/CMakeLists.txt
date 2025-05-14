@@ -44,6 +44,7 @@ set(PY_TESTS
   ProxyPropertyLinks.py
   PythonVersion.py,NO_VALID
   PythonAnimationTrack.py
+  PythonInfoModule.py,NO_VALID
   PythonProgrammableFilterParameters.py,NO_VALID
   PythonPVSimpleCone.py
   PythonPVSimpleExII.py
