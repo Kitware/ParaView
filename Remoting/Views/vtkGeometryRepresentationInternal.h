@@ -11,11 +11,11 @@
 // We'll use the VTKm decimation filter if TBB is enabled, otherwise we'll
 // fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
 // serial backend.
-#if VTK_MODULE_ENABLE_VTK_vtkm
-#include "vtkmConfigFilters.h" // for VTKM_ENABLE_TBB
+#if VTK_MODULE_ENABLE_VTK_vtkviskores
+#include "vtkmConfigFilters.h" // for VISKORES_ENABLE_TBB
 #endif
 
-#if defined(VTKM_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
+#if defined(VISKORES_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
 #include "vtkCellArray.h"         // for vtkCellArray
 #include "vtkQuadricClustering.h" // for vtkQuadricClustering
 #include "vtkmLevelOfDetail.h"
@@ -92,7 +92,7 @@ protected:
   vtkNew<vtkQuadricClustering> Fallback;
 };
 }
-#else // VTKM_ENABLE_TBB
+#else // VISKORES_ENABLE_TBB
 #include "vtkQuadricClustering.h"
 namespace vtkGeometryRepresentation_detail
 {
@@ -102,9 +102,9 @@ public:
   static DecimationFilterType* New();
   vtkTypeMacro(DecimationFilterType, vtkQuadricClustering);
 
-  // This version gets slower as the grid increases, while the VTKM version
+  // This version gets slower as the grid increases, while the VISKORES version
   // scales with number of points. This means we can get away with a much finer
-  // grid with the VTKM filter, so we'll just reduce the mesh quality a bit
+  // grid with the VISKORES filter, so we'll just reduce the mesh quality a bit
   // here.
   void SetLODFactor(double factor)
   {
@@ -127,7 +127,7 @@ protected:
   }
 };
 }
-#endif // VTKM_ENABLE_TBB
+#endif // VISKORES_ENABLE_TBB
 
 #endif
 

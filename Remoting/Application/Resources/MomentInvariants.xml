@@ -69,7 +69,7 @@
 There are 4 possibilities:
  - UseFFT and UseGPU: Use CUDA FFT as backend to FFTLIB
  - UseFFT and not UseGPU: Use DFFTLIB’s internal distributed FFT logic.
- - not UseFFT and UseGPU: Use vtk-m convolution
+ - not UseFFT and UseGPU: Use viskores convolution
  - not UseFFT and not UseGPU: Use vtk convolution
         </Documentation>
       </IntVectorProperty>
@@ -83,7 +83,7 @@ There are 4 possibilities:
 There are 4 possibilities:
  - UseFFT and UseGPU: Use CUDA FFT as backend to FFTLIB
  - UseFFT and not UseGPU: Use DFFTLIB’s internal distributed FFT logic.
- - not UseFFT and UseGPU: Use vtk-m convolution
+ - not UseFFT and UseGPU: Use viskores convolution
  - not UseFFT and not UseGPU: Use vtk convolution
         </Documentation>
       </IntVectorProperty>

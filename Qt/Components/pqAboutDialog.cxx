@@ -160,7 +160,7 @@ void pqAboutDialog::AddClientInformation()
     ::addItem(tree, tr("OpenGL Renderer"), glRenderer);
   }
 
-#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters && VTK_ENABLE_VTKM_OVERRIDES
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters && VTK_ENABLE_VISKORES_OVERRIDES
   ::addItem(tree, tr("Accelerated filters overrides available"), tr("Yes"));
 #else
   ::addItem(tree, tr("Accelerated filters overrides available"), tr("No"));

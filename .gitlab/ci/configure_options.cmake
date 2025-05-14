@@ -61,5 +61,5 @@ elseif ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
   set(PARAVIEW_BUILD_SHARED_LIBS OFF CACHE BOOL "")
 endif ()
 
-# vtkmoverride
-configuration_flag(VTK_ENABLE_VTKM_OVERRIDES "vtkmoverride")
+# viskoresoverride
+configuration_flag(VTK_ENABLE_VISKORES_OVERRIDES "viskoresoverride")

@@ -101,34 +101,34 @@ fedora35-shared-debug-mpi-python-qt:test:
         - fedora35-shared-debug-mpi-python-qt:build
     timeout: 240 minutes
 
-fedora35-shared-mpi-python-qt-vtkmoverride:build:
+fedora35-shared-mpi-python-qt-viskoresoverride:build:
     extends:
-        - .fedora35_shared_mpi_python_qt_vtkmoverride
+        - .fedora35_shared_mpi_python_qt_viskoresoverride
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-fedora35-shared-mpi-python-qt-vtkmoverride:test:
+fedora35-shared-mpi-python-qt-viskoresoverride:test:
     extends:
-        - .fedora35_shared_mpi_python_qt_vtkmoverride
+        - .fedora35_shared_mpi_python_qt_viskoresoverride
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     needs:
-        - fedora35-shared-mpi-python-qt-vtkmoverride:build
+        - fedora35-shared-mpi-python-qt-viskoresoverride:build
     timeout: 180 minutes
 
-fedora35-shared-mpi-offscreen-osmesa-python-qt-vtkmoverride:test:
+fedora35-shared-mpi-offscreen-osmesa-python-qt-viskoresoverride:test:
     extends:
-        - .fedora35_shared_mpi_offscreen_osmesa_python_qt_vtkmoverride
+        - .fedora35_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     needs:
-        - fedora35-shared-mpi-python-qt-vtkmoverride:build
+        - fedora35-shared-mpi-python-qt-viskoresoverride:build
     timeout: 180 minutes
 
 # Translations

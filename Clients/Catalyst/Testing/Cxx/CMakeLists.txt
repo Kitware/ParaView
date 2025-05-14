@@ -9,7 +9,7 @@ vtk_add_test_cxx(vtkPVCatalystCxxTests tests
   CPXMLPWriterPipeline.cxx
   )
 
-if (PARAVIEW_PLUGIN_ENABLE_VTKmFilters AND PARAVIEW_USE_VTKM)
+if (PARAVIEW_PLUGIN_ENABLE_VTKmFilters AND PARAVIEW_USE_VISKORES)
   set(LoadVTKmFilterPluginDriver_ARGS
         "--script"
         "${CMAKE_CURRENT_LIST_DIR}/LoadVTKmFilterPlugin.py")
