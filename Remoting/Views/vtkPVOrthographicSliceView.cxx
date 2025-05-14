@@ -5,6 +5,7 @@
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkGridAxesHelper.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCenterAxesActor.h"
@@ -451,11 +452,11 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
         this->GridAxes3DActors[cc]->SetLabelMask(0xff);
       }
       this->GridAxes3DActors[YZ_PLANE]->SetFaceMask(
-        vtkGridAxesActor3D::MAX_YZ | vtkGridAxesActor3D::MIN_YZ);
+        vtkGridAxesHelper::MAX_YZ | vtkGridAxesHelper::MIN_YZ);
       this->GridAxes3DActors[ZX_PLANE]->SetFaceMask(
-        vtkGridAxesActor3D::MAX_ZX | vtkGridAxesActor3D::MIN_ZX);
+        vtkGridAxesHelper::MAX_ZX | vtkGridAxesHelper::MIN_ZX);
       this->GridAxes3DActors[XY_PLANE]->SetFaceMask(
-        vtkGridAxesActor3D::MAX_XY | vtkGridAxesActor3D::MIN_XY);
+        vtkGridAxesHelper::MAX_XY | vtkGridAxesHelper::MIN_XY);
     }
   }
 
