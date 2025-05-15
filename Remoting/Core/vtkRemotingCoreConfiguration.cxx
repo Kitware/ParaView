@@ -422,6 +422,40 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
     ->excludes(ofnr)
     ->envname("PV_DEBUG_REMOTE_RENDERING");
 
+  group
+    ->add_option("--opengl-window-backend", this->OpenGLWindowBackend,
+      "Specify the OpenGL window backend to use. Supported values are 'GLX', 'EGL', 'OSMesa', "
+      "'Win32'. This option is only relevant for pvbatch, pvpython, pvserver, and pvrenderserver. "
+      "It is not applicable to the ParaView client. If not specified, the default "
+      "backend is used. The default backend is determined by the build configuration and the "
+      "hardware configuration the machine.")
+    ->transform([](const std::string& value) {
+      // no error when values are empty or accepted strings
+      if (value.empty())
+      {
+        return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_DEFAULT);
+      }
+      if (value == "GLX")
+      {
+        return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_GLX);
+      }
+      if (value == "EGL")
+      {
+        return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_EGL);
+      }
+      if (value == "OSMesa")
+      {
+        return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_OSMESA);
+      }
+      if (value == "Win32")
+      {
+        return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_WIN32);
+      }
+      else
+      {
+        throw CLI::ValidationError("Invalid OpenGL window backend specified.");
+      }
+    });
   // Display
   auto displayGroup =
     app->add_option_group("Display Environment", "Display/Device specific settings.");
@@ -574,6 +608,7 @@ void vtkRemotingCoreConfiguration::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "ForceOnscreenRendering: " << this->ForceOnscreenRendering << endl;
   os << indent << "ForceOffscreenRendering: " << this->ForceOffscreenRendering << endl;
+  os << indent << "OpenGLWindowBackend: " << this->OpenGLWindowBackend << endl;
   os << indent << "EGLDeviceIndex: " << this->EGLDeviceIndex << endl;
   os << indent << "DisplaysAssignmentMode: " << this->DisplaysAssignmentMode << endl;
   os << indent << "MultiServerMode: " << this->MultiServerMode << endl;

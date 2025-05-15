@@ -538,6 +538,39 @@ bool vtkInitializationHelper::InitializeOthers()
   }
 #endif
 
+  // This checks if the environment has VTK_DEFAULT_OPENGL_WINDOW set. If it is not set,
+  // it sets the environment variable to the OpenGL window backend specified in the
+  // vtkRemotingCoreConfiguration. This is done to ensure that VTK creates the correct OpenGL
+  // window, based on the configuration settings.
+  if (!vtksys::SystemTools::HasEnv("VTK_DEFAULT_OPENGL_WINDOW"))
+  {
+    // Set the OpenGL window backend to use based on the configuration
+    // settings. This is only done if the environment variable is not already set.
+    if (auto glWindowBackend = coreConfig->GetOpenGLWindowBackend();
+        glWindowBackend != vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_DEFAULT)
+    {
+      std::ostringstream putEnvStream;
+      putEnvStream << "VTK_DEFAULT_OPENGL_WINDOW=";
+      switch (glWindowBackend)
+      {
+        case vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_EGL:
+          putEnvStream << "vtkEGLRenderWindow";
+          break;
+        case vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_GLX:
+          putEnvStream << "vtkXOpenGLRenderWindow";
+          break;
+        case vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_OSMESA:
+          putEnvStream << "vtkOSOpenGLRenderWindow";
+          break;
+        case vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_WIN32:
+          putEnvStream << "vtkWin32OpenGLRenderWindow";
+          break;
+        default:
+          break;
+      }
+      vtksys::SystemTools::PutEnv(putEnvStream.str());
+    }
+  }
   vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
   return true;
 }
