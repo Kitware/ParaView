@@ -375,4 +375,121 @@
       </Hints>
     </SourceProxy>
   </ProxyGroup>
+  <ProxyGroup name="writers">
+    <PWriterProxy class="vtkFidesWriter"
+                  file_name_method="SetFileName"
+                  name="FidesWriter">
+      <Documentation short_help="Write ADIOS2 files using Fides.">
+        Write ADIOS2 files using the Fides library.
+      </Documentation>
+
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkPartitionedDataSetCollection"/>
+          <DataType value="vtkPartitionedDataSet"/>
+          <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1"/>
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1"/>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the file.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetChooseFieldsToWrite"
+                         default_values="1"
+                         name="ChooseArraysToWrite"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Property to control whether to choose arrays to write.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="PointArrays"
+                            command="GetPointDataArraySelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="point_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the point arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="point"/>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                   property="ChooseArraysToWrite" value="1"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrays"
+                            command="GetCellDataArraySelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the cell arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell"/>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                   property="ChooseArraysToWrite" value="1"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="TimeStepRange"
+                         command="SetTimeStepRange"
+                         number_of_elements="2"
+                         default_values="0 1"
+                         panel_visibility="advanced">
+        <TimeStepIndexDomain name="timestep_index_range" default_mode="min">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </TimeStepIndexDomain>
+        <Documentation>
+          To limit writing a subset of the timesteps, specify a valid range. You may also use **TimeStepStride** to step
+          over timesteps in this range.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TimeStepStride"
+                         command="SetTimeStepStride"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="1" max="100"/>
+        <Documentation>
+          Specify the stride to use when writing a subset of timesteps
+          as dictated by the **TimeStepRange**.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <WriterFactory extensions="bp" file_description="ADIOS2 BP File"/>
+      </Hints>
+    </PWriterProxy>
+  </ProxyGroup>
 </ServerManagerConfiguration>

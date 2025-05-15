@@ -426,6 +426,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FeatureEdgesRepresentationHTG.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FidesReader_cartesian.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FidesReader_blocks.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FidesWriter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FileSeries1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FileSeries2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataTrace.png}"
@@ -1687,10 +1688,12 @@ if (TARGET VTK::IOFides)
   if (PARAVIEW_ENABLE_ADIOS2)
     list(APPEND TESTS_WITH_INLINE_COMPARES
       FidesReaderADIOS2.xml
+      FidesWriterADIOS2.xml
       )
   else()
     list(APPEND TESTS_WITH_INLINE_COMPARES
       FidesReader.xml
+      FidesWriter.xml
       )
   endif()
 endif()
