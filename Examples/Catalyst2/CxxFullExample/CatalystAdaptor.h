@@ -5,8 +5,11 @@
 
 #include "FEDataStructures.h"
 #include <catalyst.hpp>
+#include <catalyst_conduit.hpp>
 
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 /**
@@ -30,32 +33,36 @@ namespace CatalystAdaptor
  */
 void Initialize(int argc, char* argv[])
 {
+  std::string temp;
+  if (argc < 2)
+  {
+    temp = "Usage: ";
+    temp.append(argv[0]).append(" inputfile");
+    throw std::runtime_error(temp);
+  }
+  // Use the contents of the input file to initialize Catalyst
+  std::ifstream input(argv[1]);
+  if (!input.is_open())
+  {
+    temp = "Could not open: ";
+    temp.append(argv[1]);
+    throw std::runtime_error(temp);
+  }
+  std::stringstream buffer;
+  buffer << input.rdbuf();
+
   // Populate the catalyst_initialize argument based on the "initialize" protocol [1].
   // [1] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-initialize
   conduit_cpp::Node node;
+  conduit_node_parse(conduit_cpp::c_node(&node), buffer.str().c_str(), "yaml");
+  node.print();
 
-  // Using the arguments given to the driver set the filename for the catalyst
-  // script and pass the rest of the arguments as arguments of the script
-  // itself. To retrieve these  arguments from the script  use the `get_args()`
-  // method of the paraview catalyst module [2]
-  // [2] https://www.paraview.org/paraview-docs/latest/python/paraview.catalyst.html
-  node["catalyst/scripts/script/filename"].set_string(argv[1]);
   for (int cc = 2; cc < argc; ++cc)
   {
     conduit_cpp::Node list_entry = node["catalyst/scripts/script/args"].append();
     list_entry.set(argv[cc]);
   }
-  // Extends the PYTHONPATH of catalyst to look into PARAVIEW_EXTRA_PYTHONPATH.
-  // For this example this is required because catalyst_pipeline.py uses
-  // info.catalyst_params which required CATALYST_PYTHONPATH to be part of it.
-  node["catalyst/python_path"] = PARAVIEW_EXTRA_PYTHONPATH;
 
-  // For this example we hardcode the implementation name to "paraview" and
-  // define the "PARAVIEW_IMPL_DIR" during compilation time (see the
-  // accompanying CMakeLists.txt). We could however defined them via
-  // environmental variables  see [1].
-  node["catalyst_load/implementation"] = "paraview";
-  node["catalyst_load/search_paths/paraview"] = PARAVIEW_IMPL_DIR;
   catalyst_status err = catalyst_initialize(conduit_cpp::c_node(&node));
   if (err != catalyst_status_ok)
   {

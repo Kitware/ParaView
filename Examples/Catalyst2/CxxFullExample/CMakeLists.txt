@@ -34,6 +34,10 @@ option(USE_CATALYST "Build example with Catalyst enabled" ON)
 if (USE_CATALYST)
   find_package(catalyst REQUIRED
     PATHS "${ParaView_DIR}/catalyst")
+
+  if (NOT ParaView_CATALYST_DIR)
+    find_path(ParaView_CATALYST_DIR libcatalyst.* DOC "Location to ParaView Catalyst Library")
+  endif()
   target_compile_definitions(CxxFullExampleV2
     PRIVATE
       "PARAVIEW_IMPL_DIR=\"${ParaView_CATALYST_DIR}\""
@@ -43,12 +47,40 @@ if (USE_CATALYST)
     PRIVATE
       catalyst::catalyst)
 
+  # configure input scripts
+  configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.json.in
+  ${CMAKE_CURRENT_BINARY_DIR}/catalyst_pipeline.json
+  @ONLY)
+  configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.yaml.in
+  ${CMAKE_CURRENT_BINARY_DIR}/catalyst_pipeline.yaml
+  @ONLY)
+  configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline_with_rendering.json.in
+  ${CMAKE_CURRENT_BINARY_DIR}/catalyst_pipeline_with_rendering.json
+  @ONLY)
+  configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline_with_rendering.yaml.in
+  ${CMAKE_CURRENT_BINARY_DIR}/catalyst_pipeline_with_rendering.yaml
+  @ONLY)
+  configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/gridwriter.json.in
+  ${CMAKE_CURRENT_BINARY_DIR}/gridwriter.json
+  @ONLY)
+  configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/gridwriter.yaml.in
+  ${CMAKE_CURRENT_BINARY_DIR}/gridwriter.yaml
+  @ONLY)
+
+#  find_path(ParaView_Build "Location of ParaView's Build Directory")
   include(CTest)
   if (BUILD_TESTING)
+    # Note that we only test the simple catalyst script
     add_test(
       NAME CxxFullExampleV2::SimplePipeline
       COMMAND CxxFullExampleV2
-              ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
+              ${CMAKE_CURRENT_BINARY_DIR}/catalyst_pipeline.json)
 
     set(_vtk_fail_regex
       # CatalystAdaptor
@@ -65,11 +97,11 @@ if (USE_CATALYST)
         PASS_REGULAR_EXPRESSION "executing catalyst_pipeline"
         SKIP_REGULAR_EXPRESSION "Python support not enabled"
         SKIP_RETURN_CODE 125)
-    
+
     add_test(
       NAME CxxFullExampleV2::SimplePipeline-WithRendering
       COMMAND CxxFullExampleV2
-              ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline_with_rendering.py)
+              ${CMAKE_CURRENT_BINARY_DIR}/catalyst_pipeline_with_rendering.json)
 
     set_tests_properties("CxxFullExampleV2::SimplePipeline-WithRendering"
       PROPERTIES
