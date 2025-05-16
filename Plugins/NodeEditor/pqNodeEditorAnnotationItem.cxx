@@ -246,9 +246,8 @@ void pqNodeEditorAnnotationItem::exportLayout(QSettings& settings, int id)
 {
   const QString prefix = "annotations." + QString::number(id);
 
-  auto exportProperty = [&](const char* prop, QVariant value) {
-    settings.setValue(prefix + prop, value);
-  };
+  auto exportProperty = [&](const char* prop, QVariant value)
+  { settings.setValue(prefix + prop, value); };
 
   exportProperty(".pos", this->pos());
 

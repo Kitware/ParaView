@@ -90,8 +90,9 @@ pqInputSelectorWidget::pqInputSelectorWidget(
   this->UpdateComboBoxTimer.connect(smmodel, SIGNAL(dataUpdated(pqPipelineSource*)), SLOT(start()));
   this->updateComboBox();
 
-  QObject::connect(
-    this->ComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+  QObject::connect(this->ComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [this](int index)
+    {
       auto changedData = this->ComboBox->itemData(index);
       auto ptr = reinterpret_cast<vtkSMProxy*>(changedData.value<void*>());
       this->ChosenPort = ptr;

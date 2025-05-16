@@ -182,7 +182,8 @@ public:
     QObject::connect(this->ChoosePresetReaction.data(), SIGNAL(presetApplied(const QString&)), self,
       SLOT(presetApplied()));
     QObject::connect(this->ChoosePresetReaction.data(), &pqChooseColorPresetReaction::presetApplied,
-      [=](const QString& presetName) {
+      [=](const QString& presetName)
+      {
         auto& defaultPresetsComboBox = this->Ui.DefaultPresetsComboBox;
         int newIndex = defaultPresetsComboBox->findText(presetName);
         this->SignalsBlocker->blockSignals(true);
@@ -246,8 +247,9 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   ui.DefaultPresetsComboBox->setItemDelegate(new pqColorMapDelegate(ui.DefaultPresetsComboBox));
   this->updateDefaultPresetsList();
 
-  QObject::connect(
-    ui.DefaultPresetsComboBox, &QComboBox::currentTextChanged, [=](const QString& presetName) {
+  QObject::connect(ui.DefaultPresetsComboBox, &QComboBox::currentTextChanged,
+    [=](const QString& presetName)
+    {
       if (ui.DefaultPresetsComboBox->currentIndex() == 0)
       {
         return;
@@ -446,7 +448,8 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     vtkNew<vtkCallbackCommand> show2DTfCmd;
     show2DTfCmd->SetClientData(this);
     show2DTfCmd->SetCallback(
-      [](vtkObject* using2DTFProperty, unsigned long, void* clientData, void*) -> void {
+      [](vtkObject* using2DTFProperty, unsigned long, void* clientData, void*) -> void
+      {
         if (auto prop = vtkSMProperty::SafeDownCast(using2DTFProperty))
         {
           auto self = reinterpret_cast<pqColorOpacityEditorWidget*>(clientData);
@@ -1022,10 +1025,12 @@ void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
     pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(nullptr);
   if (dialog)
   {
-    QObject::connect(dialog, &pqRescaleScalarRangeToDataOverTimeDialog::apply, [=]() {
-      this->Internals->render();
-      Q_EMIT this->changeFinished();
-    });
+    QObject::connect(dialog, &pqRescaleScalarRangeToDataOverTimeDialog::apply,
+      [=]()
+      {
+        this->Internals->render();
+        Q_EMIT this->changeFinished();
+      });
   }
 }
 
@@ -1083,11 +1088,13 @@ void pqColorOpacityEditorWidget::resetRangeToCustom()
 
   if (dialog)
   {
-    QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply, [=]() {
-      this->setHistogramOutdated();
-      this->Internals->render();
-      Q_EMIT this->changeFinished();
-    });
+    QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply,
+      [=]()
+      {
+        this->setHistogramOutdated();
+        this->Internals->render();
+        Q_EMIT this->changeFinished();
+      });
   }
 }
 

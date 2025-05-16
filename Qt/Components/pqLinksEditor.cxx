@@ -130,7 +130,8 @@ public:
     }
     RowIndex(void* p) { u.ptr = p; }
 
-    union {
+    union
+    {
       struct
       {
         size_t type : 7;
@@ -464,16 +465,14 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
 
   QObject::connect(
     this->Ui->interactiveViewLinkCheckBox, &QCheckBox::pqCheckBoxSignal, this,
-    [this](pqCheckState state) {
-      this->Ui->cameraWidgetViewLinkCheckBox->setEnabled(state == Qt::Unchecked);
-    },
+    [this](pqCheckState state)
+    { this->Ui->cameraWidgetViewLinkCheckBox->setEnabled(state == Qt::Unchecked); },
     Qt::QueuedConnection);
 
   QObject::connect(
     this->Ui->cameraWidgetViewLinkCheckBox, &QCheckBox::pqCheckBoxSignal, this,
-    [this](pqCheckState state) {
-      this->Ui->interactiveViewLinkCheckBox->setEnabled(state == Qt::Unchecked);
-    },
+    [this](pqCheckState state)
+    { this->Ui->interactiveViewLinkCheckBox->setEnabled(state == Qt::Unchecked); },
     Qt::QueuedConnection);
 
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();

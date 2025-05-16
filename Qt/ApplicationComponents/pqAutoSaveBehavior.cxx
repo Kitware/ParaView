@@ -87,8 +87,9 @@ void pqAutoSaveBehavior::updateConnections()
     this->ObservedStack = pqApplicationCore::instance()->getUndoStack();
     if (this->ObservedStack)
     {
-      QObject::connect(
-        this->ObservedStack, &pqUndoStack::canUndoChanged, this, [this](bool canUndo) {
+      QObject::connect(this->ObservedStack, &pqUndoStack::canUndoChanged, this,
+        [this](bool canUndo)
+        {
           this->HasChanges = canUndo;
           if (canUndo)
           {
@@ -97,13 +98,15 @@ void pqAutoSaveBehavior::updateConnections()
         });
     }
 
-    QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::viewUpdated, this, [this]() {
-      if (this->HasChanges)
+    QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::viewUpdated, this,
+      [this]()
       {
-        this->HasChanges = false;
-        this->saveState();
-      }
-    });
+        if (this->HasChanges)
+        {
+          this->HasChanges = false;
+          this->saveState();
+        }
+      });
 
     QDir directory = this->getStateDirectory();
     if (!directory.exists())

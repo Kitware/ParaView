@@ -27,8 +27,8 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
-#include "vtkVRCamera.h"       // for visibility of enum Pose
 #include "vtkOpenGLRenderer.h" // TODO should not be needed
+#include "vtkVRCamera.h"       // for visibility of enum Pose
 
 #include <array>  // for method sig
 #include <map>    // for map

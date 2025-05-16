@@ -89,13 +89,16 @@ void pqAnimatedExportReaction::Export(const QString& filename)
   progress.setWindowModality(Qt::ApplicationModal);
   progress.setWindowTitle(tr("Saving animated scene ..."));
   progress.show();
-  QObject::connect(&progress, &QProgressDialog::canceled, [scene, &progress]() {
-    progress.hide();
-    scene->pause();
-  });
+  QObject::connect(&progress, &QProgressDialog::canceled,
+    [scene, &progress]()
+    {
+      progress.hide();
+      scene->pause();
+    });
 
-  auto sceneConnection =
-    QObject::connect(scene, &pqAnimationScene::tick, [&progress](int progressInPercent) {
+  auto sceneConnection = QObject::connect(scene, &pqAnimationScene::tick,
+    [&progress](int progressInPercent)
+    {
       if (progress.isVisible())
       {
         progress.setValue(progressInPercent);

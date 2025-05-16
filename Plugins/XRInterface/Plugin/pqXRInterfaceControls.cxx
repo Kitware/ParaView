@@ -54,7 +54,8 @@ pqXRInterfaceControls::pqXRInterfaceControls(vtkPVXRInterfaceHelper* val, QWidge
   auto* toolbar = new pqCustomViewpointsToolbar(controller, this);
   toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-  const auto getAction = [toolbar](const QString& name) -> QAction* {
+  const auto getAction = [toolbar](const QString& name) -> QAction*
+  {
     for (auto action : toolbar->actions())
     {
       if (action->objectName() == name)
@@ -97,16 +98,18 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   QObject::connect(this->Internals->Ui.resetPositionsButton, &QPushButton::clicked, this,
     &pqXRInterfaceControls::resetPositions);
 
-  QObject::connect(this->Internals->Ui.rulerButton, &QPushButton::toggled, [&](bool checked) {
-    if (checked)
+  QObject::connect(this->Internals->Ui.rulerButton, &QPushButton::toggled,
+    [&](bool checked)
     {
-      this->Internals->Helper->TakeMeasurement();
-    }
-    else
-    {
-      this->Internals->Helper->RemoveMeasurement();
-    }
-  });
+      if (checked)
+      {
+        this->Internals->Helper->TakeMeasurement();
+      }
+      else
+      {
+        this->Internals->Helper->RemoveMeasurement();
+      }
+    });
 
   QObject::connect(this->Internals->Ui.comeToMeButton, &QPushButton::clicked,
     [this]() { this->Internals->Helper->ComeToMe(); });
@@ -129,7 +132,9 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
     tr("Teleportation"), QVariant(vtkPVXRInterfaceHelper::TELEPORTATION));
 
   QObject::connect(this->Internals->Ui.rightTrigger,
-    QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int index) {
+    QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [&](int index)
+    {
       this->Internals->Helper->SetRightTriggerMode(
         this->Internals->Ui.rightTrigger->itemData(index).toInt());
     });
@@ -141,7 +146,9 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
     tr("Grounded"), QVariant(vtkVRInteractorStyle::GROUNDED_STYLE));
 
   QObject::connect(this->Internals->Ui.movementStyle,
-    QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int index) {
+    QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [&](int index)
+    {
       this->Internals->Helper->SetMovementStyle(
         this->Internals->Ui.movementStyle->itemData(index).toInt());
     });
@@ -176,17 +183,19 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   this->Internals->ViewUpGroup->addButton(this->Internals->Ui.viewPlusZ, 5);
 
   QObject::connect(this->Internals->ViewUpGroup,
-    QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked), [this](QAbstractButton* button) {
-      this->Internals->Helper->SetViewUp(viewUpNames[this->Internals->ViewUpGroup->id(button)]);
-    });
+    QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked),
+    [this](QAbstractButton* button)
+    { this->Internals->Helper->SetViewUp(viewUpNames[this->Internals->ViewUpGroup->id(button)]); });
 
-  QObject::connect(this->Internals->Ui.showFloorButton, &QPushButton::toggled, [&](bool checked) {
-    auto ovrr = vtkVRRenderer::SafeDownCast(this->Internals->Helper->GetRenderer());
-    if (ovrr)
+  QObject::connect(this->Internals->Ui.showFloorButton, &QPushButton::toggled,
+    [&](bool checked)
     {
-      ovrr->SetShowFloor(checked);
-    }
-  });
+      auto ovrr = vtkVRRenderer::SafeDownCast(this->Internals->Helper->GetRenderer());
+      if (ovrr)
+      {
+        ovrr->SetShowFloor(checked);
+      }
+    });
 
   auto* scaleGroup = new QButtonGroup{ this };
   // use ID to store buttons' scale value
@@ -199,39 +208,44 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   scaleGroup->addButton(this->Internals->Ui.scaleButton_1000, 6);
 
   QObject::connect(scaleGroup, QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked),
-    [this, scaleGroup](QAbstractButton* button) {
+    [this, scaleGroup](QAbstractButton* button)
+    {
       if (!this->Internals->NoForward)
       {
         this->Internals->Helper->SetScaleFactor(sceneScaleButtonValues[scaleGroup->id(button)]);
       }
     });
 
-  QObject::connect(this->Internals->Ui.movementSpeedSlider, &QSlider::valueChanged, [=](int value) {
-    if (!this->Internals->NoForward)
+  QObject::connect(this->Internals->Ui.movementSpeedSlider, &QSlider::valueChanged,
+    [=](int value)
     {
-      const auto scale = std::pow(10.0, (value - 50.0) / 25.0); // [0; 100] -> [0.01; 100]
-      const auto precision = 2 - static_cast<int>(std::log(scale) / std::log(10.0));
-      this->Internals->Ui.movementSpeedLabel->setText(
-        tr("Movement speed: x%1").arg(scale, 0, 'f', precision));
-      this->Internals->Helper->SetMotionFactor(scale);
-    }
-  });
+      if (!this->Internals->NoForward)
+      {
+        const auto scale = std::pow(10.0, (value - 50.0) / 25.0); // [0; 100] -> [0.01; 100]
+        const auto precision = 2 - static_cast<int>(std::log(scale) / std::log(10.0));
+        this->Internals->Ui.movementSpeedLabel->setText(
+          tr("Movement speed: x%1").arg(scale, 0, 'f', precision));
+        this->Internals->Helper->SetMotionFactor(scale);
+      }
+    });
 
-  QObject::connect(this->Internals->Ui.cropThicknessSlider, &QSlider::valueChanged, [=](int value) {
-    if (!this->Internals->NoForward)
+  QObject::connect(this->Internals->Ui.cropThicknessSlider, &QSlider::valueChanged,
+    [=](int value)
     {
-      this->Internals->Helper->SetDefaultCropThickness(value);
+      if (!this->Internals->NoForward)
+      {
+        this->Internals->Helper->SetDefaultCropThickness(value);
 
-      if (value == 0)
-      {
-        this->Internals->Ui.cropThicknessLabel->setText(tr("Crop Thickness: Auto"));
+        if (value == 0)
+        {
+          this->Internals->Ui.cropThicknessLabel->setText(tr("Crop Thickness: Auto"));
+        }
+        else
+        {
+          this->Internals->Ui.cropThicknessLabel->setText(tr("Crop Thickness: x%1").arg(value));
+        }
       }
-      else
-      {
-        this->Internals->Ui.cropThicknessLabel->setText(tr("Crop Thickness: x%1").arg(value));
-      }
-    }
-  });
+    });
 
   // This centers the toolbar actions
   auto leftSpacer = new QWidget(this);

@@ -15,7 +15,8 @@ vtkAbstractObjectFactoryNewMacro(vtkAbstractAccumulator);
 //----------------------------------------------------------------------------
 vtkAbstractAccumulator::vtkAbstractAccumulator()
 {
-  this->ConvertVectorToScalar = [](const double* data, vtkIdType numberOfComponents) {
+  this->ConvertVectorToScalar = [](const double* data, vtkIdType numberOfComponents)
+  {
     double value = 0;
     for (vtkIdType i = 0; i < numberOfComponents; ++i)
     {

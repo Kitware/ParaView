@@ -292,10 +292,9 @@ int vtkMergeReduceTables::RequestData(vtkInformation* vtkNotUsed(request),
         auto meanRange = vtk::DataArrayValueRange(meanArray);
         using ArrayType = decltype(meanRange)::value_type;
 
-        vtkSMPTools::Transform(
-          meanRange.cbegin(), meanRange.cend(), meanRange.begin(), [&](ArrayType x) {
-            return ((allRanksNbIterations[0] / static_cast<double>(totalNbIterations)) * x);
-          });
+        vtkSMPTools::Transform(meanRange.cbegin(), meanRange.cend(), meanRange.begin(),
+          [&](ArrayType x)
+          { return ((allRanksNbIterations[0] / static_cast<double>(totalNbIterations)) * x); });
       }
     }
 
@@ -339,7 +338,8 @@ int vtkMergeReduceTables::RequestData(vtkInformation* vtkNotUsed(request),
         {
           using ArrayType = decltype(arrayRange)::value_type;
           vtkSMPTools::Transform(arrayRange.cbegin(), arrayRange.cend(), baseRange.cbegin(),
-            baseRange.begin(), [&](ArrayType x, ArrayType y) {
+            baseRange.begin(),
+            [&](ArrayType x, ArrayType y) {
               return (allRanksNbIterations[idx] / static_cast<double>(totalNbIterations)) * x + y;
             });
         }

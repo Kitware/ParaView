@@ -191,7 +191,8 @@ pqSeriesGeneratorDialog::pqSeriesGeneratorDialog(
   internals.Ui.buttonBox->button(QDialogButtonBox::Ok)->setText(tr("&Generate"));
 
   QObject::connect(internals.Ui.comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [&internals](int idx) {
+    [&internals](int idx)
+    {
       if (idx == pqInternals::GEOMETRIC_RATIO)
       {
         internals.Ui.max->setEnabled(false);
@@ -208,7 +209,8 @@ pqSeriesGeneratorDialog::pqSeriesGeneratorDialog(
       internals.validate();
     });
 
-  auto callback = [&internals]() {
+  auto callback = [&internals]()
+  {
     internals.validate();
     internals.highlightIfNeeded();
   };

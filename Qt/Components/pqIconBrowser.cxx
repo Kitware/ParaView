@@ -56,57 +56,69 @@ struct pqIconBrowser::pqInternal
     this->TypeFilter->setFilterRole(pqIconListModel::OriginRole);
     this->TypeFilter->setSortCaseSensitivity(Qt::CaseInsensitive);
     this->TypeFilter->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    QObject::connect(this->Ui.filterBox, QOverload<int>::of(&QComboBox::activated), [&]() {
-      auto type = this->Ui.filterBox->currentData().toString();
-      this->TypeFilter->setFilterRegularExpression(type);
-    });
+    QObject::connect(this->Ui.filterBox, QOverload<int>::of(&QComboBox::activated),
+      [&]()
+      {
+        auto type = this->Ui.filterBox->currentData().toString();
+        this->TypeFilter->setFilterRegularExpression(type);
+      });
 
     // set up connection to use icon
-    QObject::connect(this->Ui.listView, &QListView::doubleClicked, [&]() {
-      this->updateCurrentIconPath();
-      this->Self->accept();
-    });
+    QObject::connect(this->Ui.listView, &QListView::doubleClicked,
+      [&]()
+      {
+        this->updateCurrentIconPath();
+        this->Self->accept();
+      });
 
-    QObject::connect(applyBtn, &QPushButton::released, [&]() {
-      this->updateCurrentIconPath();
-      this->Self->accept();
-    });
+    QObject::connect(applyBtn, &QPushButton::released,
+      [&]()
+      {
+        this->updateCurrentIconPath();
+        this->Self->accept();
+      });
 
     // import icon
-    QObject::connect(this->Ui.importIcon, &QToolButton::released, [&]() {
-      auto iconPath = this->importIconToUserDir();
-      auto iconInfo = QFileInfo(iconPath);
-      if (iconInfo.exists())
+    QObject::connect(this->Ui.importIcon, &QToolButton::released,
+      [&]()
       {
-        this->IconModel->addIcon(iconInfo);
-        this->TypeFilter->sort(0);
-        auto index = this->IconModel->index(this->IconModel->rowCount() - 1);
-        auto viewIndex = this->mapFromSource(index);
-        this->Ui.listView->selectionModel()->setCurrentIndex(
-          viewIndex, QItemSelectionModel::ClearAndSelect);
-        this->Ui.listView->scrollTo(viewIndex);
-      }
-    });
+        auto iconPath = this->importIconToUserDir();
+        auto iconInfo = QFileInfo(iconPath);
+        if (iconInfo.exists())
+        {
+          this->IconModel->addIcon(iconInfo);
+          this->TypeFilter->sort(0);
+          auto index = this->IconModel->index(this->IconModel->rowCount() - 1);
+          auto viewIndex = this->mapFromSource(index);
+          this->Ui.listView->selectionModel()->setCurrentIndex(
+            viewIndex, QItemSelectionModel::ClearAndSelect);
+          this->Ui.listView->scrollTo(viewIndex);
+        }
+      });
 
     // remove icon
-    QObject::connect(this->Ui.remove, &QToolButton::released, [&]() {
-      this->updateCurrentIconPath();
-      this->removeIconFromUserDir(QFileInfo(this->CurrentIconPath));
-      this->resetIconList();
-    });
-
-    // remove icon
-    QObject::connect(this->Ui.removeAll, &QToolButton::released, [&]() {
-      QMessageBox::StandardButton ret = QMessageBox::question(pqCoreUtilities::mainWidget(),
-        QCoreApplication::translate("pqIconBrowser", "Delete All"),
-        QCoreApplication::translate(
-          "pqIconBrowser", "All custom icons will be deleted. Are you sure?"));
-      if (ret == QMessageBox::StandardButton::Yes)
+    QObject::connect(this->Ui.remove, &QToolButton::released,
+      [&]()
       {
-        this->removeAllIconsFromUserDir();
+        this->updateCurrentIconPath();
+        this->removeIconFromUserDir(QFileInfo(this->CurrentIconPath));
         this->resetIconList();
-      }
-    });
+      });
+
+    // remove icon
+    QObject::connect(this->Ui.removeAll, &QToolButton::released,
+      [&]()
+      {
+        QMessageBox::StandardButton ret = QMessageBox::question(pqCoreUtilities::mainWidget(),
+          QCoreApplication::translate("pqIconBrowser", "Delete All"),
+          QCoreApplication::translate(
+            "pqIconBrowser", "All custom icons will be deleted. Are you sure?"));
+        if (ret == QMessageBox::StandardButton::Yes)
+        {
+          this->removeAllIconsFromUserDir();
+          this->resetIconList();
+        }
+      });
 
     // selection changed
     QObject::connect(this->Ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged,

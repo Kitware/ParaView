@@ -105,9 +105,8 @@ void vtkSMMultiplexerSourceProxy::vtkInternals::Item::CollectLinksInformation(
 int vtkSMMultiplexerSourceProxy::vtkInternals::Item::IsInDomain(vtkSMInputProperty* requester) const
 {
   auto iter = std::find_if(this->Links.begin(), this->Links.end(),
-    [requester](const std::pair<vtkSMProperty*, vtkSMProperty*>& pair) {
-      return (pair.second == requester);
-    });
+    [requester](const std::pair<vtkSMProperty*, vtkSMProperty*>& pair)
+    { return (pair.second == requester); });
 
   if (auto target =
         vtkSMInputProperty::SafeDownCast(iter != this->Links.end() ? iter->first : nullptr))
@@ -377,8 +376,9 @@ int vtkSMMultiplexerSourceProxy::LoadXMLState(vtkPVXMLElement* element, vtkSMPro
           child->GetAttribute("group"), child->GetAttribute("type")));
       }
     }
-    auto iter = std::remove_if(
-      internals.Items.begin(), internals.Items.end(), [&available](const vtkInternals::Item& item) {
+    auto iter = std::remove_if(internals.Items.begin(), internals.Items.end(),
+      [&available](const vtkInternals::Item& item)
+      {
         const std::pair<std::string, std::string> pair(
           item.Proxy->GetXMLGroup(), item.Proxy->GetXMLName());
         return available.find(pair) == available.end();
@@ -418,9 +418,8 @@ void vtkSMMultiplexerSourceProxy::LoadState(const vtkSMMessage* msg, vtkSMProxyL
       chosen_proxynames.insert(subproxy_msg.name());
     }
     auto iter = std::remove_if(internals.Items.begin(), internals.Items.end(),
-      [&chosen_proxynames](const vtkInternals::Item& item) {
-        return (chosen_proxynames.find(item.Proxy->GetXMLName()) == chosen_proxynames.end());
-      });
+      [&chosen_proxynames](const vtkInternals::Item& item)
+      { return (chosen_proxynames.find(item.Proxy->GetXMLName()) == chosen_proxynames.end()); });
     internals.Items.erase(iter, internals.Items.end());
     this->SetupSubProxies();
   }

@@ -134,16 +134,18 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
 //-----------------------------------------------------------------------------
 void pqPythonFileIO::PythonFile::start()
 {
-  QObject::connect(this->Text, &QTextEdit::textChanged, [this]() {
-    if (this->Text)
+  QObject::connect(this->Text, &QTextEdit::textChanged,
+    [this]()
     {
-      const QString swapFilename = ::GetSwapFilename(this->Name);
-      if (!swapFilename.isEmpty())
+      if (this->Text)
       {
-        ::Write(swapFilename, vtkPVSession::CLIENT, this->Text->toPlainText());
+        const QString swapFilename = ::GetSwapFilename(this->Name);
+        if (!swapFilename.isEmpty())
+        {
+          ::Write(swapFilename, vtkPVSession::CLIENT, this->Text->toPlainText());
+        }
       }
-    }
-  });
+    });
 }
 
 //-----------------------------------------------------------------------------

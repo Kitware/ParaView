@@ -764,7 +764,8 @@ void vtkPVView::AllReduce(
   assert(this->Session);
   vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "all-reduce (op=%d)", operation);
 
-  auto evaluator = [operation](vtkTypeUInt64 a, vtkTypeUInt64 b) {
+  auto evaluator = [operation](vtkTypeUInt64 a, vtkTypeUInt64 b)
+  {
     switch (operation)
     {
       case vtkCommunicator::MAX_OP:

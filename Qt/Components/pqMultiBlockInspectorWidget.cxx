@@ -205,8 +205,9 @@ void pqMultiBlockInspectorWidget::pqInternals::update()
     // that have the panel visibility set to "multiblock_inspector". This way we instantiate a
     // pqDataAssemblyPropertyWidget which we later add to the container.
     this->HelperProxyWidget = new pqProxyWidget(repr->getProxy(), { "multiblock_inspector" }, {});
-    QObject::connect(
-      this->HelperProxyWidget.data(), &pqProxyWidget::changeFinished, [this, repr]() {
+    QObject::connect(this->HelperProxyWidget.data(), &pqProxyWidget::changeFinished,
+      [this, repr]()
+      {
         this->Ui.extractBlocks->setEnabled(pqInternals::isCompositeDataSet(repr));
         repr->renderViewEventually();
       });

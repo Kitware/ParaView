@@ -27,45 +27,47 @@ pqPythonTabWidget::pqPythonTabWidget(QWidget* parent)
   this->createNewEmptyTab();
   this->setMovable(false);
 
-  this->connect(this, &QTabWidget::tabCloseRequested, [this](int index) {
-    pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(index);
-    if (widget)
+  this->connect(this, &QTabWidget::tabCloseRequested,
+    [this](int index)
     {
-      // First focus to the tab the user wants to delete
-      // and update the QTabBar
-      const int widgetId = this->indexOf(widget);
-      this->setCurrentIndex(widgetId);
-      this->repaint();
-
-      // We stop all display updates
-      // to avoid segfaults
-      this->setUpdatesEnabled(false);
-      if (this->count() == 2)
+      pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(index);
+      if (widget)
       {
-        // Only delete the widget if it's not empty
-        if (widget->isEmpty())
+        // First focus to the tab the user wants to delete
+        // and update the QTabBar
+        const int widgetId = this->indexOf(widget);
+        this->setCurrentIndex(widgetId);
+        this->repaint();
+
+        // We stop all display updates
+        // to avoid segfaults
+        this->setUpdatesEnabled(false);
+        if (this->count() == 2)
         {
-          this->setUpdatesEnabled(true);
-          return;
+          // Only delete the widget if it's not empty
+          if (widget->isEmpty())
+          {
+            this->setUpdatesEnabled(true);
+            return;
+          }
+
+          this->createNewEmptyTab();
         }
 
-        this->createNewEmptyTab();
-      }
-
-      if (widget->saveOnClose())
-      {
-        if (this->currentIndex() == index)
+        if (widget->saveOnClose())
         {
-          this->setCurrentIndex((index + 1) % (this->count() - 1));
-          this->lastFocus = this->getWidget<pqPythonTextArea>(this->currentIndex());
-        }
+          if (this->currentIndex() == index)
+          {
+            this->setCurrentIndex((index + 1) % (this->count() - 1));
+            this->lastFocus = this->getWidget<pqPythonTextArea>(this->currentIndex());
+          }
 
-        this->removeTab(index);
-        widget->deleteLater();
+          this->removeTab(index);
+          widget->deleteLater();
+        }
+        this->setUpdatesEnabled(true);
       }
-      this->setUpdatesEnabled(true);
-    }
-  });
+    });
 }
 
 //-----------------------------------------------------------------------------
@@ -233,13 +235,15 @@ void pqPythonTabWidget::updateTab(QWidget* widget)
     pqClickableLabel* cLabel =
       new pqClickableLabel(widget, elidedTabName, tabName, unstyledTabName, nullptr, widget);
     this->tabBar()->setTabButton(idx, QTabBar::LeftSide, cLabel);
-    this->connect(cLabel, &pqClickableLabel::onClicked, [this](QWidget* clickedWidget) {
-      int tmpIdx = this->indexOf(clickedWidget);
-      if (tmpIdx >= 0 && tmpIdx < this->count() - 1)
+    this->connect(cLabel, &pqClickableLabel::onClicked,
+      [this](QWidget* clickedWidget)
       {
-        this->setCurrentIndex(tmpIdx);
-      }
-    });
+        int tmpIdx = this->indexOf(clickedWidget);
+        if (tmpIdx >= 0 && tmpIdx < this->count() - 1)
+        {
+          this->setCurrentIndex(tmpIdx);
+        }
+      });
   }
 }
 
@@ -276,13 +280,15 @@ void pqPythonTabWidget::setTabCloseButton(pqPythonTextArea* widget)
   pqClickableLabel* cLabel =
     new pqClickableLabel(widget, label, label, label, &closePixmap, widget);
   this->tabBar()->setTabButton(this->count() - 2, QTabBar::RightSide, cLabel);
-  this->connect(cLabel, &pqClickableLabel::onClicked, [this](QWidget* clickedWidget) {
-    int idx = this->indexOf(clickedWidget);
-    if (idx >= 0 && idx < this->count() - 1)
+  this->connect(cLabel, &pqClickableLabel::onClicked,
+    [this](QWidget* clickedWidget)
     {
-      Q_EMIT this->tabCloseRequested(idx);
-    }
-  });
+      int idx = this->indexOf(clickedWidget);
+      if (idx >= 0 && idx < this->count() - 1)
+      {
+        Q_EMIT this->tabCloseRequested(idx);
+      }
+    });
 }
 
 //-----------------------------------------------------------------------------
@@ -292,12 +298,14 @@ void pqPythonTabWidget::addNewTabWidget()
   this->addTab(newTabWidget, "+");
 
   // New tab widget is always the last one
-  this->connect(this, &QTabWidget::tabBarClicked, [this](int index) {
-    if (index == this->count() - 1)
+  this->connect(this, &QTabWidget::tabBarClicked,
+    [this](int index)
     {
-      this->createNewEmptyTab();
-    }
-  });
+      if (index == this->count() - 1)
+      {
+        this->createNewEmptyTab();
+      }
+    });
 }
 
 //-----------------------------------------------------------------------------
@@ -358,9 +366,8 @@ void pqPythonTabWidget::generateTabName(const pqPythonTextArea* widget, QString&
   QString& elidedTabName, QString& unstyledTabName) const
 {
   const auto QColorToString = [](const QColor& color) { return color.name(QColor::HexRgb); };
-  const auto ColorText = [&QColorToString](const QColor& color, const QString& text) {
-    return "<span style=\"color:" + QColorToString(color) + "\">" + text + "</span>";
-  };
+  const auto ColorText = [&QColorToString](const QColor& color, const QString& text)
+  { return "<span style=\"color:" + QColorToString(color) + "\">" + text + "</span>"; };
 
   QString fileName = widget->getFilename();
   const QFileInfo fileInfo(fileName);

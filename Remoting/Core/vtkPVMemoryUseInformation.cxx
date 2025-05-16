@@ -8,7 +8,7 @@
 
 #include <vtksys/SystemInformation.hxx>
 
-//#define vtkPVMemoryUseInformationDEBUG
+// #define vtkPVMemoryUseInformationDEBUG
 
 #define vtkVerifyParseMacro(_call, _field)                                                         \
   if (!(_call))                                                                                    \

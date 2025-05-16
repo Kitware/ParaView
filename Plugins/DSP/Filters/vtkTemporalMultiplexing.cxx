@@ -62,17 +62,19 @@ public:
   {
     vtkIdType nbOfArrays = input->GetNumberOfTuples();
 
-    vtkSMPTools::For(0, nbOfArrays, [&](vtkIdType begin, vtkIdType end) {
-      const vtkIdType valueIdx = currentTimeIndex * this->NbOfComponents;
-      for (vtkIdType arrayIdx = begin; arrayIdx < end; ++arrayIdx)
+    vtkSMPTools::For(0, nbOfArrays,
+      [&](vtkIdType begin, vtkIdType end)
       {
-        for (int comp = 0; comp < this->NbOfComponents; ++comp)
+        const vtkIdType valueIdx = currentTimeIndex * this->NbOfComponents;
+        for (vtkIdType arrayIdx = begin; arrayIdx < end; ++arrayIdx)
         {
-          (*this->Data)[arrayIdx + arrayOffset][valueIdx + comp] =
-            input->GetComponent(arrayIdx, comp);
+          for (int comp = 0; comp < this->NbOfComponents; ++comp)
+          {
+            (*this->Data)[arrayIdx + arrayOffset][valueIdx + comp] =
+              input->GetComponent(arrayIdx, comp);
+          }
         }
-      }
-    });
+      });
   }
 
   void InitData(vtkIdType nbOfArrays, vtkIdType nbOfTuples, int nbOfComponents,
@@ -87,12 +89,14 @@ public:
 
     const vtkIdType nbOfValues = nbOfTuples * nbOfComponents;
 
-    vtkSMPTools::For(0, nbOfArrays, [&](vtkIdType begin, vtkIdType end) {
-      for (vtkIdType arrayIdx = begin; arrayIdx < end; ++arrayIdx)
+    vtkSMPTools::For(0, nbOfArrays,
+      [&](vtkIdType begin, vtkIdType end)
       {
-        (*this->Data)[arrayIdx].resize(nbOfValues);
-      }
-    });
+        for (vtkIdType arrayIdx = begin; arrayIdx < end; ++arrayIdx)
+        {
+          (*this->Data)[arrayIdx].resize(nbOfValues);
+        }
+      });
   }
 
   vtkSmartPointer<vtkDataArray> ConstructMDArray() override

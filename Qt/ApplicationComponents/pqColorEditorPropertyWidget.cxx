@@ -158,13 +158,16 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(
     QObject::connect(this->Internals->StateWidget,
       &pqMultiBlockPropertiesStateWidget::selectedBlockSelectorsChanged, this,
       &pqColorEditorPropertyWidget::updateBlockBasedEnableState);
-    QObject::connect(
-      internals.StateWidget, &pqMultiBlockPropertiesStateWidget::startStateReset, this, [&]() {
+    QObject::connect(internals.StateWidget, &pqMultiBlockPropertiesStateWidget::startStateReset,
+      this,
+      [&]()
+      {
         this->Internals->OldLuts =
           this->Internals->Representation->getLookupTableProxies(vtkSMColorMapEditorHelper::Blocks);
       });
-    QObject::connect(
-      internals.StateWidget, &pqMultiBlockPropertiesStateWidget::endStateReset, this, [&]() {
+    QObject::connect(internals.StateWidget, &pqMultiBlockPropertiesStateWidget::endStateReset, this,
+      [&]()
+      {
         pqDisplayColorWidget::hideScalarBarsIfNotNeeded(
           this->Internals->Representation->getViewProxy(), this->Internals->OldLuts);
         this->Internals->Representation->renderViewEventually();

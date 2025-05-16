@@ -257,11 +257,13 @@ pqArraySelectorPropertyWidget::pqArraySelectorPropertyWidget(vtkSMProperty* smpr
     this->links().addPropertyLink(this, "arrayName", SIGNAL(arrayChanged()), smproxy, smproperty);
   }
 
-  QObject::connect(combobox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
-    this->Internals->pruneUnusedUnknownItems();
-    this->Internals->updateArrayToCurrent();
-    Q_EMIT this->arrayChanged();
-  });
+  QObject::connect(combobox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [this](int)
+    {
+      this->Internals->pruneUnusedUnknownItems();
+      this->Internals->updateArrayToCurrent();
+      Q_EMIT this->arrayChanged();
+    });
 }
 
 //-----------------------------------------------------------------------------

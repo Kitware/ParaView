@@ -1164,7 +1164,8 @@ struct Process_5_9_to_5_10
     //   - Property LowerThreshold for the lower threshold value
     //   - Property UpperThreshold for the upper threshold value
     //   - Property ThresholdMethod for the thresholding function
-    auto fixup_threshold = [](pugi::xml_node node) {
+    auto fixup_threshold = [](pugi::xml_node node)
+    {
       if (!node.select_nodes("./Property[@name='ThresholdBetween']").empty())
       {
         const std::string id(node.attribute("id").value());

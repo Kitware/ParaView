@@ -123,14 +123,16 @@ void pqAnimationScene::onCuesChanged()
     if (cue && cue->getServer() == this->getServer())
     {
       currentCues.insert(cue);
-      this->connect(cue, &pqAnimationCue::enabled, [&](bool enabled) {
-        if (enabled)
+      this->connect(cue, &pqAnimationCue::enabled,
+        [&](bool enabled)
         {
-          // force update
-          this->getProxy()->UpdateProperty("AnimationTime", 1);
-          this->getProxy()->UpdateVTKObjects();
-        }
-      });
+          if (enabled)
+          {
+            // force update
+            this->getProxy()->UpdateProperty("AnimationTime", 1);
+            this->getProxy()->UpdateVTKObjects();
+          }
+        });
     }
   }
 

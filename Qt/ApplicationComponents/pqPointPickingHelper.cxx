@@ -92,9 +92,8 @@ void pqPointPickingHelper::pickPoint()
           eventpos, position, normal, this->PickOnMesh) ||
       this->PickCameraFocalInfo)
     {
-      auto lambdaIsValidVector = [](const double x[3]) {
-        return (!std::isnan(x[0]) || !std::isnan(x[1]) || !std::isnan(x[2]));
-      };
+      auto lambdaIsValidVector = [](const double x[3])
+      { return (!std::isnan(x[0]) || !std::isnan(x[1]) || !std::isnan(x[2])); };
       switch (this->PickOpt)
       {
         case PickOption::Coordinates:

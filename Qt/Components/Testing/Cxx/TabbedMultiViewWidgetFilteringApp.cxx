@@ -38,8 +38,9 @@ public:
 
     this->setupPipeline();
 
-    QObject::connect(
-      this->ComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
+    QObject::connect(this->ComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+      [this](int)
+      {
         const QString filter = this->ComboBox->currentData().toString();
         if (filter.isEmpty())
         {

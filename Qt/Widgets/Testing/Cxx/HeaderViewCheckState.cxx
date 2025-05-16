@@ -54,7 +54,8 @@ extern int HeaderViewCheckState(int argc, char* argv[])
 
   auto* self = &model;
   QObject::connect(&model, &QStandardItemModel::headerDataChanged,
-    [=](Qt::Orientation orientation, int first, int last) {
+    [=](Qt::Orientation orientation, int first, int last)
+    {
       if (first <= checkable_column && last >= checkable_column && orientation == Qt::Horizontal)
       {
         QVariant checkState = self->headerData(checkable_column, orientation, Qt::CheckStateRole);

@@ -31,25 +31,29 @@ pqNodeEditorNView::pqNodeEditorNView(pqView* view, QGraphicsItem* parent)
   this->iPorts.push_back(iPort);
 
   // what to do once properties have changed
-  QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [this]() {
-    this->proxy->setModifiedState(pqProxy::MODIFIED);
-    this->proxyProperties->apply();
-    qobject_cast<pqView*>(this->proxy)->render();
-  });
+  QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this,
+    [this]()
+    {
+      this->proxy->setModifiedState(pqProxy::MODIFIED);
+      this->proxyProperties->apply();
+      qobject_cast<pqView*>(this->proxy)->render();
+    });
 
   // label events
   // left click : select as active view
   // right click : increment verbosity
-  this->getLabel()->setMousePressEventCallback([this, view](QGraphicsSceneMouseEvent* event) {
-    if (event->button() == Qt::MouseButton::RightButton)
+  this->getLabel()->setMousePressEventCallback(
+    [this, view](QGraphicsSceneMouseEvent* event)
     {
-      this->incrementVerbosity();
-    }
-    else if (event->button() == Qt::MouseButton::LeftButton)
-    {
-      pqActiveObjects::instance().setActiveView(view);
-    }
-  });
+      if (event->button() == Qt::MouseButton::RightButton)
+      {
+        this->incrementVerbosity();
+      }
+      else if (event->button() == Qt::MouseButton::LeftButton)
+      {
+        pqActiveObjects::instance().setActiveView(view);
+      }
+    });
 }
 
 // ----------------------------------------------------------------------------

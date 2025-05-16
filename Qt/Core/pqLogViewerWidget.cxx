@@ -188,7 +188,8 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
   internals.Ui.treeView->setModel(&internals.FilterModel);
 
   QObject::connect(internals.Ui.treeView->selectionModel(), &QItemSelectionModel::selectionChanged,
-    [&internals](const QItemSelection&, const QItemSelection&) {
+    [&internals](const QItemSelection&, const QItemSelection&)
+    {
       auto indexes = internals.Ui.treeView->selectionModel()->selectedRows();
       QString detailText;
       for (auto index : indexes)
@@ -203,8 +204,9 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
       internals.Ui.details->setText(detailText);
     });
 
-  QObject::connect(
-    internals.Ui.treeView->verticalScrollBar(), &QScrollBar::valueChanged, [&internals, this]() {
+  QObject::connect(internals.Ui.treeView->verticalScrollBar(), &QScrollBar::valueChanged,
+    [&internals, this]()
+    {
       if (this->signalsBlocked())
       {
         return;

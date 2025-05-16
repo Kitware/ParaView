@@ -43,25 +43,27 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
   this->connect(this->TextEdit->verticalScrollBar(), &QScrollBar::valueChanged,
     [this](int) { this->LineNumberArea->update(); });
 
-  this->connect(this->TextEdit.data(), &QTextEdit::textChanged, [this]() {
-    const QString text = this->TextEdit->toPlainText();
-    const int cursorPosition = this->TextEdit->textCursor().position();
+  this->connect(this->TextEdit.data(), &QTextEdit::textChanged,
+    [this]()
+    {
+      const QString text = this->TextEdit->toPlainText();
+      const int cursorPosition = this->TextEdit->textCursor().position();
 
-    // Push a new command to the stack (which calls redo, thus applying the command)
-    this->UndoStack.push(new pqPythonUndoCommand(
-      *this->TextEdit, this->SyntaxHighlighter, this->lastEntry, { text, cursorPosition }));
+      // Push a new command to the stack (which calls redo, thus applying the command)
+      this->UndoStack.push(new pqPythonUndoCommand(
+        *this->TextEdit, this->SyntaxHighlighter, this->lastEntry, { text, cursorPosition }));
 
-    // Save the last entry
-    this->lastEntry = { text, cursorPosition };
+      // Save the last entry
+      this->lastEntry = { text, cursorPosition };
 
-    const int vScrollBarValue = this->TextEdit->verticalScrollBar()->value();
-    this->TextEdit->verticalScrollBar()->setValue(vScrollBarValue);
+      const int vScrollBarValue = this->TextEdit->verticalScrollBar()->value();
+      this->TextEdit->verticalScrollBar()->setValue(vScrollBarValue);
 
-    const int hScrollBarValue = this->TextEdit->horizontalScrollBar()->value();
-    this->TextEdit->horizontalScrollBar()->setValue(hScrollBarValue);
+      const int hScrollBarValue = this->TextEdit->horizontalScrollBar()->value();
+      this->TextEdit->horizontalScrollBar()->setValue(hScrollBarValue);
 
-    this->FileIO->contentChanged();
-  });
+      this->FileIO->contentChanged();
+    });
 
   this->connect(
     this->FileIO.data(), &pqPythonFileIO::fileSaved, this, &pqPythonTextArea::fileSaved);

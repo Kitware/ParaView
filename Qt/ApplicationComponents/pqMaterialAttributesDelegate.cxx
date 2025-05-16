@@ -182,10 +182,9 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
         button->setChosenColor(c);
         button->setText(QString("%1, %2, %3").arg(c.red()).arg(c.green()).arg(c.blue()));
 
-        QObject::connect(
-          button, &pqColorChooserButton::chosenColorChanged, [button](const QColor& nc) {
-            button->setText(QString("%1, %2, %3").arg(nc.red()).arg(nc.green()).arg(nc.blue()));
-          });
+        QObject::connect(button, &pqColorChooserButton::chosenColorChanged,
+          [button](const QColor& nc)
+          { button->setText(QString("%1, %2, %3").arg(nc.red()).arg(nc.green()).arg(nc.blue())); });
 
         return button;
       }
@@ -360,110 +359,117 @@ QWidget* pqMaterialAttributesDelegate::createPropertiesEditor(
   auto editor = new QPushButton(parent);
   editor->setText("Edit");
 
-  QObject::connect(editor, &QPushButton::clicked, [editor, parent, list](bool) {
-    pqDialog* dialog = new pqDialog(editor);
-
-    dialog->setObjectName("map properties dialog");
-    dialog->setWindowTitle("Map Properties");
-    QGridLayout* layout = new QGridLayout(dialog);
-    dialog->setGeometry(0, 0, 300, 100);
-    layout->setSizeConstraint(QLayout::SetFixedSize);
-    dialog->setLayout(layout);
-
-    int currentLine = 0;
-    for (std::size_t i = 0; i < list.size(); i += 2)
+  QObject::connect(editor, &QPushButton::clicked,
+    [editor, parent, list](bool)
     {
-      QVariant variantName = list[i];
-      QPointer<QLabel> variableLabel = new QLabel(editor);
-      variableLabel->setText(variantName.toString());
-      layout->addWidget(variableLabel, currentLine, 0);
+      pqDialog* dialog = new pqDialog(editor);
 
-      QVariant variantValue = list[i + 1];
-      switch (variantValue.type())
+      dialog->setObjectName("map properties dialog");
+      dialog->setWindowTitle("Map Properties");
+      QGridLayout* layout = new QGridLayout(dialog);
+      dialog->setGeometry(0, 0, 300, 100);
+      layout->setSizeConstraint(QLayout::SetFixedSize);
+      dialog->setLayout(layout);
+
+      int currentLine = 0;
+      for (std::size_t i = 0; i < list.size(); i += 2)
       {
-        case QMetaType::Double:
+        QVariant variantName = list[i];
+        QPointer<QLabel> variableLabel = new QLabel(editor);
+        variableLabel->setText(variantName.toString());
+        layout->addWidget(variableLabel, currentLine, 0);
+
+        QVariant variantValue = list[i + 1];
+        switch (variantValue.type())
         {
-          QPointer<pqDoubleSpinBox> valEdit = new pqDoubleSpinBox(editor);
-          valEdit->setSingleStep(0.1);
-          valEdit->setRange(0.0, 1000.0);
-          valEdit->setValue(variantValue.value<double>());
-          layout->addWidget(valEdit, currentLine, 1);
-        }
-        break;
-        case QMetaType::QVector2D:
-        {
-          QPointer<pqVectorWidgetImpl<QVector2D, 2>> widget =
-            new pqVectorWidgetImpl<QVector2D, 2>(variantValue.value<QVector2D>(), editor);
-          layout->addWidget(widget, currentLine, 1);
-        }
-        break;
-        case QMetaType::QString:
-        {
-          QString btnTxt = variantValue.value<QString>();
-          if (btnTxt.isEmpty())
+          case QMetaType::Double:
           {
-            btnTxt = "Select the texture";
+            QPointer<pqDoubleSpinBox> valEdit = new pqDoubleSpinBox(editor);
+            valEdit->setSingleStep(0.1);
+            valEdit->setRange(0.0, 1000.0);
+            valEdit->setValue(variantValue.value<double>());
+            layout->addWidget(valEdit, currentLine, 1);
           }
-          else
-          {
-            btnTxt = vtksys::SystemTools::GetFilenameName(btnTxt.toStdString()).c_str();
-          }
-
-          auto btn = new QPushButton(editor);
-          btn->setText(btnTxt);
-          layout->addWidget(btn, currentLine, 1);
-
-          auto* hiddenLabelForTexture = new QLabel(editor);
-          hiddenLabelForTexture->setText(variantValue.value<QString>());
-          hiddenLabelForTexture->setHidden(true);
-          layout->addWidget(hiddenLabelForTexture, currentLine, 2);
-
-          QObject::connect(btn, &QPushButton::clicked, [btn, hiddenLabelForTexture](bool) {
-            const QString filters = tr("Image files") + " (*.png *.jpg *.bmp *.ppm)";
-            pqServer* server = pqActiveObjects::instance().activeServer();
-            pqFileDialog* dialog =
-              new pqFileDialog(server, btn, tr("Open Texture:"), QString(), filters);
-            dialog->setObjectName("LoadMaterialTextureDialog");
-            dialog->setFileMode(pqFileDialog::ExistingFile);
-            QObject::connect(dialog,
-              // Qt independant version of qOverload, for not having to deal with Qt's API
-              // breaks
-              static_cast<void (pqFileDialog::*)(const QList<QStringList>&)>(
-                &pqFileDialog::filesSelected),
-              [btn, hiddenLabelForTexture](const QList<QStringList>& files) {
-                if (!files.empty() && !files[0].empty())
-                {
-                  std::string fileFullPath = files[0][0].toStdString();
-                  btn->setText(vtksys::SystemTools::GetFilenameName(fileFullPath).c_str());
-                  hiddenLabelForTexture->setText(files[0][0]);
-                }
-              });
-
-            dialog->open();
-          });
-        }
-        break;
-        default:
-          qWarning() << "variant type: " << variantValue.typeName() << " isn't supported.";
           break;
+          case QMetaType::QVector2D:
+          {
+            QPointer<pqVectorWidgetImpl<QVector2D, 2>> widget =
+              new pqVectorWidgetImpl<QVector2D, 2>(variantValue.value<QVector2D>(), editor);
+            layout->addWidget(widget, currentLine, 1);
+          }
+          break;
+          case QMetaType::QString:
+          {
+            QString btnTxt = variantValue.value<QString>();
+            if (btnTxt.isEmpty())
+            {
+              btnTxt = "Select the texture";
+            }
+            else
+            {
+              btnTxt = vtksys::SystemTools::GetFilenameName(btnTxt.toStdString()).c_str();
+            }
+
+            auto btn = new QPushButton(editor);
+            btn->setText(btnTxt);
+            layout->addWidget(btn, currentLine, 1);
+
+            auto* hiddenLabelForTexture = new QLabel(editor);
+            hiddenLabelForTexture->setText(variantValue.value<QString>());
+            hiddenLabelForTexture->setHidden(true);
+            layout->addWidget(hiddenLabelForTexture, currentLine, 2);
+
+            QObject::connect(btn, &QPushButton::clicked,
+              [btn, hiddenLabelForTexture](bool)
+              {
+                const QString filters = tr("Image files") + " (*.png *.jpg *.bmp *.ppm)";
+                pqServer* server = pqActiveObjects::instance().activeServer();
+                pqFileDialog* dialog =
+                  new pqFileDialog(server, btn, tr("Open Texture:"), QString(), filters);
+                dialog->setObjectName("LoadMaterialTextureDialog");
+                dialog->setFileMode(pqFileDialog::ExistingFile);
+                QObject::connect(dialog,
+                  // Qt independant version of qOverload, for not having to deal with Qt's API
+                  // breaks
+                  static_cast<void (pqFileDialog::*)(const QList<QStringList>&)>(
+                    &pqFileDialog::filesSelected),
+                  [btn, hiddenLabelForTexture](const QList<QStringList>& files)
+                  {
+                    if (!files.empty() && !files[0].empty())
+                    {
+                      std::string fileFullPath = files[0][0].toStdString();
+                      btn->setText(vtksys::SystemTools::GetFilenameName(fileFullPath).c_str());
+                      hiddenLabelForTexture->setText(files[0][0]);
+                    }
+                  });
+
+                dialog->open();
+              });
+          }
+          break;
+          default:
+            qWarning() << "variant type: " << variantValue.typeName() << " isn't supported.";
+            break;
+        }
+
+        currentLine++;
       }
 
-      currentLine++;
-    }
+      QPointer<QPushButton> okBtn = new QPushButton(editor);
+      okBtn->setText("Ok");
+      layout->setContentsMargins(10, 10, 10, 10);
+      layout->setVerticalSpacing(10);
+      layout->setHorizontalSpacing(10);
+      layout->addWidget(okBtn, currentLine, 1);
+      QObject::connect(okBtn, &QPushButton::clicked,
+        [dialog, editor, parent](bool)
+        {
+          dialog->close();
+          editor->close();
+        });
 
-    QPointer<QPushButton> okBtn = new QPushButton(editor);
-    okBtn->setText("Ok");
-    layout->setContentsMargins(10, 10, 10, 10);
-    layout->setVerticalSpacing(10);
-    layout->setHorizontalSpacing(10);
-    layout->addWidget(okBtn, currentLine, 1);
-    QObject::connect(okBtn, &QPushButton::clicked, [dialog, editor, parent](bool) {
-      dialog->close();
-      editor->close();
+      dialog->open();
     });
-
-    dialog->open();
-  });
 
   return editor;
 }

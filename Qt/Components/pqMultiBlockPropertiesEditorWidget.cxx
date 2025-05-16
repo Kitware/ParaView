@@ -102,17 +102,19 @@ pqMultiBlockPropertiesEditorWidget::pqMultiBlockPropertiesEditorWidget(
   if (internals.MapScalarsWidget)
   {
     internals.MapScalarsWidget->setEnabled(false);
-    QObject::connect(internals.MapScalarsWidget, &pqPropertyWidget::changeFinished, this, [&]() {
-      const QString undoText = tr("Change ") +
-        QCoreApplication::translate(
-          "ServerManagerXML", this->proxy()->GetProperty("BlockMapScalars")->GetXMLLabel());
-      BEGIN_UNDO_SET(undoText);
-      const vtkSMUncheckedPropertyHelper mapScalarsHelper(internals.MapScalarsWidget->property());
-      internals.ColorMapEditorHelper->SetSelectedMapScalars(
-        this->proxy(), mapScalarsHelper.GetAsString());
-      Q_EMIT this->changeFinished();
-      END_UNDO_SET();
-    });
+    QObject::connect(internals.MapScalarsWidget, &pqPropertyWidget::changeFinished, this,
+      [&]()
+      {
+        const QString undoText = tr("Change ") +
+          QCoreApplication::translate(
+            "ServerManagerXML", this->proxy()->GetProperty("BlockMapScalars")->GetXMLLabel());
+        BEGIN_UNDO_SET(undoText);
+        const vtkSMUncheckedPropertyHelper mapScalarsHelper(internals.MapScalarsWidget->property());
+        internals.ColorMapEditorHelper->SetSelectedMapScalars(
+          this->proxy(), mapScalarsHelper.GetAsString());
+        Q_EMIT this->changeFinished();
+        END_UNDO_SET();
+      });
 
     internals.MapScalarsStateWidget = new pqMultiBlockPropertiesStateWidget(
       proxy, { "BlockMapScalars" }, iconSize, QString(), this);
@@ -134,7 +136,9 @@ pqMultiBlockPropertiesEditorWidget::pqMultiBlockPropertiesEditorWidget(
   {
     internals.InterpolateScalarsBeforeMappingWidget->setEnabled(false);
     QObject::connect(internals.InterpolateScalarsBeforeMappingWidget,
-      &pqPropertyWidget::changeFinished, this, [&]() {
+      &pqPropertyWidget::changeFinished, this,
+      [&]()
+      {
         const QString undoText = tr("Change ") +
           QCoreApplication::translate("ServerManagerXML",
             this->proxy()->GetProperty("BlockInterpolateScalarsBeforeMappings")->GetXMLLabel());
@@ -167,17 +171,19 @@ pqMultiBlockPropertiesEditorWidget::pqMultiBlockPropertiesEditorWidget(
   {
     internals.OpacityLabel->setEnabled(false);
     internals.OpacityWidget->setEnabled(false);
-    QObject::connect(internals.OpacityWidget, &pqPropertyWidget::changeFinished, this, [&]() {
-      const QString undoText = tr("Change ") +
-        QCoreApplication::translate(
-          "ServerManagerXML", this->proxy()->GetProperty("BlockOpacities")->GetXMLLabel());
-      BEGIN_UNDO_SET(undoText);
-      const vtkSMUncheckedPropertyHelper opacityHelper(internals.OpacityWidget->property());
-      internals.ColorMapEditorHelper->SetSelectedOpacity(
-        this->proxy(), opacityHelper.GetAsDouble());
-      Q_EMIT this->changeFinished();
-      END_UNDO_SET();
-    });
+    QObject::connect(internals.OpacityWidget, &pqPropertyWidget::changeFinished, this,
+      [&]()
+      {
+        const QString undoText = tr("Change ") +
+          QCoreApplication::translate(
+            "ServerManagerXML", this->proxy()->GetProperty("BlockOpacities")->GetXMLLabel());
+        BEGIN_UNDO_SET(undoText);
+        const vtkSMUncheckedPropertyHelper opacityHelper(internals.OpacityWidget->property());
+        internals.ColorMapEditorHelper->SetSelectedOpacity(
+          this->proxy(), opacityHelper.GetAsDouble());
+        Q_EMIT this->changeFinished();
+        END_UNDO_SET();
+      });
 
     internals.OpacityStateWidget =
       new pqMultiBlockPropertiesStateWidget(proxy, { "BlockOpacities" }, iconSize, QString(), this);

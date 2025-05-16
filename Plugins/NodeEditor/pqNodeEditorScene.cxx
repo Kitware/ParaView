@@ -210,9 +210,8 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
 
   // sort views by current x coord
   std::sort(viewXMap.begin(), viewXMap.end(),
-    [](const std::pair<pqNodeEditorNode*, qreal>& a, const std::pair<pqNodeEditorNode*, qreal>& b) {
-      return a.second < b.second;
-    });
+    [](const std::pair<pqNodeEditorNode*, qreal>& a, const std::pair<pqNodeEditorNode*, qreal>& b)
+    { return a.second < b.second; });
 
   // make sure all views have enough space
   qreal lastX = VTK_DOUBLE_MIN;

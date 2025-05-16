@@ -34,10 +34,9 @@ pqWelcomeDialog::pqWelcomeDialog(QWidget* parentObject)
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
-  QObject::connect(
-    this->ui->DoNotShowAgainButton, &QCheckBox::pqCheckBoxSignal, this, [&](pqCheckState state) {
-      this->onDoNotShowAgainStateChanged(static_cast<Qt::CheckState>(state));
-    });
+  QObject::connect(this->ui->DoNotShowAgainButton, &QCheckBox::pqCheckBoxSignal, this,
+    [&](pqCheckState state)
+    { this->onDoNotShowAgainStateChanged(static_cast<Qt::CheckState>(state)); });
   QObject::connect(this->ui->GettingStartedGuideButton, SIGNAL(clicked(bool)), this,
     SLOT(onGettingStartedGuideClicked()));
   QObject::connect(this->ui->ExampleVisualizationsButton, SIGNAL(clicked(bool)), this,

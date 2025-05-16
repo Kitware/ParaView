@@ -45,7 +45,8 @@ pqProxyWidgetItem* pqProxyWidgetItem::newItem(pqPropertyWidget* widget, const QS
     QPointer<QLabel> labelWdgPtr(labelWdg);
     QPointer<pqPropertyWidget> widgetPtr(widget);
     QObject::connect(labelWdg, &QLabel::customContextMenuRequested, parentObj,
-      [labelWdgPtr, widgetPtr, parentObj](const QPoint& pt) {
+      [labelWdgPtr, widgetPtr, parentObj](const QPoint& pt)
+      {
         if (!labelWdgPtr || !widgetPtr)
         {
           return;
@@ -59,7 +60,8 @@ pqProxyWidgetItem* pqProxyWidgetItem::newItem(pqPropertyWidget* widget, const QS
     widget->setContextMenuPolicy(Qt::CustomContextMenu);
     QPointer<pqPropertyWidget> widgetPtr(widget);
     QObject::connect(widget, &QLabel::customContextMenuRequested, parentObj,
-      [widgetPtr, parentObj](const QPoint& pt) {
+      [widgetPtr, parentObj](const QPoint& pt)
+      {
         if (!widgetPtr)
         {
           return;

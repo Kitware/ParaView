@@ -38,7 +38,7 @@
 #include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
 
-//#define vtkLiveInsituLinkDebugMacro(x) cerr x << endl;
+// #define vtkLiveInsituLinkDebugMacro(x) cerr x << endl;
 #define vtkLiveInsituLinkDebugMacro(x)
 
 namespace

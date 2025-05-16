@@ -525,9 +525,8 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
   std::ostringstream all_types;
   all_types << vtkSMReaderFactory::SUPPORTED_TYPES_DESCRIPTION << " (";
 
-  auto case_insensitive_comp = [](const std::string& s1, const std::string& s2) {
-    return vtksys::SystemTools::Strucmp(s1.c_str(), s2.c_str()) < 0;
-  };
+  auto case_insensitive_comp = [](const std::string& s1, const std::string& s2)
+  { return vtksys::SystemTools::Strucmp(s1.c_str(), s2.c_str()) < 0; };
   std::set<std::string, decltype(case_insensitive_comp)> sorted_types(case_insensitive_comp);
 
   for (auto& proto : this->Internals->Prototypes)
@@ -630,10 +629,9 @@ std::vector<FileTypeDetailed> vtkSMReaderFactory::GetSupportedFileTypesDetailed(
     vtksys::SystemTools::Split(patternsString, supportedFiles.FilenamePatterns, ' ');
   }
 
-  std::sort(
-    result.begin(), result.end(), [](FileTypeDetailed const& lhs, FileTypeDetailed const& rhs) {
-      return vtksys::SystemTools::Strucmp(lhs.Description.c_str(), rhs.Description.c_str()) < 0;
-    });
+  std::sort(result.begin(), result.end(),
+    [](FileTypeDetailed const& lhs, FileTypeDetailed const& rhs)
+    { return vtksys::SystemTools::Strucmp(lhs.Description.c_str(), rhs.Description.c_str()) < 0; });
 
   FileTypeDetailed allFiles;
   allFiles.Description = vtkSMReaderFactory::ALL_FILES_DESCRIPTION;

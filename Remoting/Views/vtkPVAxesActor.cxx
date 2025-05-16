@@ -328,7 +328,8 @@ void vtkPVAxesActor::GetBounds(double bounds[6])
 // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
 double* vtkPVAxesActor::GetBounds()
 {
-  auto updateMaxs = [this](double* bounds) {
+  auto updateMaxs = [this](double* bounds)
+  {
     for (int i = 0; i < 3; i++)
     {
       const int idx = 2 * i + 1;

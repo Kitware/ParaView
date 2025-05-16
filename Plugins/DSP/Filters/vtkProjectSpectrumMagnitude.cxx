@@ -151,7 +151,8 @@ int vtkProjectSpectrumMagnitude::RequestData(vtkInformation* vtkNotUsed(request)
   const double upperFrequency =
     this->FreqFromOctave ? this->ComputedUpperFrequency : this->UpperFrequency;
 
-  const std::array<vtkIdType, 2> freqRangeIndices = [&] {
+  const std::array<vtkIdType, 2> freqRangeIndices = [&]
+  {
     const vtkIdType nvalues = freqArray->GetNumberOfValues();
     vtkIdType idx = 0;
     while (idx < nvalues && freqArray->GetTuple1(idx) < lowerFrequency)

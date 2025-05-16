@@ -139,7 +139,8 @@ void pqSpreadSheetColumnsVisibility::populateMenu(
     {
       const std::string& label = pair.first;
       const bool& checked = pair.second;
-      auto callback = [proxy, label, checkboxes, allCheckbox](bool is_checked) {
+      auto callback = [proxy, label, checkboxes, allCheckbox](bool is_checked)
+      {
         auto vsvp =
           vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("HiddenColumnLabels"));
         std::vector<std::string> values;
@@ -173,7 +174,8 @@ void pqSpreadSheetColumnsVisibility::populateMenu(
 
   updateAllCheckState(allCheckbox, *checkboxes);
   QObject::connect(allCheckbox, &QCheckBox::pqCheckBoxSignal,
-    [proxy, checkboxes, allCheckbox](pqCheckState checkState) {
+    [proxy, checkboxes, allCheckbox](pqCheckState checkState)
+    {
       std::vector<std::string> hidden_columns;
       for (auto cb : (*checkboxes))
       {

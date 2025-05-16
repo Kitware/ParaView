@@ -375,10 +375,12 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
       QPushButton* pushButton = new QPushButton(this);
       pushButton->setIcon(this->style()->standardIcon(QStyle::SP_TitleBarMaxButton));
-      this->connect(pushButton, &QPushButton::clicked, [textEdit]() {
-        pqPythonScriptEditor::linkTo(textEdit);
-        pqPythonScriptEditor::bringFront();
-      });
+      this->connect(pushButton, &QPushButton::clicked,
+        [textEdit]()
+        {
+          pqPythonScriptEditor::linkTo(textEdit);
+          pqPythonScriptEditor::bringFront();
+        });
       hbox->addWidget(pushButton);
       vbox->addWidget(textEdit);
 #else

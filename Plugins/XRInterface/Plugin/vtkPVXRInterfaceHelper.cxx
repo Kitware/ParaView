@@ -2028,55 +2028,67 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     vriren->SetActionManifestDirectory(manifestDir);
     vriren->SetActionManifestFileName("pv_openxr_actions.json");
 
-    oxriren->AddAction("showmenu", [this](vtkEventData* ed) {
-      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    oxriren->AddAction("showmenu",
+      [this](vtkEventData* ed)
       {
-        this->ToggleShowControls();
-      }
-    });
+        vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+        if (edd && edd->GetAction() == vtkEventDataAction::Press)
+        {
+          this->ToggleShowControls();
+        }
+      });
 
-    oxriren->AddAction("thickcropstart", [this](vtkEventData* ed) {
-      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    oxriren->AddAction("thickcropstart",
+      [this](vtkEventData* ed)
       {
-        this->Widgets->MoveThickCrops(this->Internals->LeftTrackPadPosition[0] > 0.0);
-      }
-    });
+        vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+        if (edd && edd->GetAction() == vtkEventDataAction::Press)
+        {
+          this->Widgets->MoveThickCrops(this->Internals->LeftTrackPadPosition[0] > 0.0);
+        }
+      });
 
-    oxriren->AddAction("thickcropdirection", [this](vtkEventData* ed) {
-      vtkEventDataDevice3D* edd = ed->GetAsEventDataDevice3D();
-      if (edd)
+    oxriren->AddAction("thickcropdirection",
+      [this](vtkEventData* ed)
       {
-        edd->GetTrackPadPosition(this->Internals->LeftTrackPadPosition);
-      }
-    });
+        vtkEventDataDevice3D* edd = ed->GetAsEventDataDevice3D();
+        if (edd)
+        {
+          edd->GetTrackPadPosition(this->Internals->LeftTrackPadPosition);
+        }
+      });
 
-    oxriren->AddAction("forwardthickcrop", [this](vtkEventData* ed) {
-      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    oxriren->AddAction("forwardthickcrop",
+      [this](vtkEventData* ed)
       {
-        this->Widgets->MoveThickCrops(true);
-      }
-    });
+        vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+        if (edd && edd->GetAction() == vtkEventDataAction::Press)
+        {
+          this->Widgets->MoveThickCrops(true);
+        }
+      });
 
-    oxriren->AddAction("backthickcrop", [this](vtkEventData* ed) {
-      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    oxriren->AddAction("backthickcrop",
+      [this](vtkEventData* ed)
       {
-        this->Widgets->MoveThickCrops(false);
-      }
-    });
+        vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+        if (edd && edd->GetAction() == vtkEventDataAction::Press)
+        {
+          this->Widgets->MoveThickCrops(false);
+        }
+      });
 
-    oxriren->AddAction("shownavigationpanel", [this](vtkEventData* ed) {
-      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    oxriren->AddAction("shownavigationpanel",
+      [this](vtkEventData* ed)
       {
-        bool visibility = !this->Widgets->GetNavigationPanelVisibility();
-        this->SetShowNavigationPanel(visibility);
-        this->XRInterfaceControls->SetNavigationPanel(visibility);
-      }
-    });
+        vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+        if (edd && edd->GetAction() == vtkEventDataAction::Press)
+        {
+          bool visibility = !this->Widgets->GetNavigationPanelVisibility();
+          this->SetShowNavigationPanel(visibility);
+          this->XRInterfaceControls->SetNavigationPanel(visibility);
+        }
+      });
   }
   else
 #else
@@ -2092,29 +2104,35 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     vriren->SetActionManifestDirectory(manifestDir);
     vriren->SetActionManifestFileName("pv_openvr_actions.json");
 
-    ovriren->AddAction("/actions/vtk/in/ShowMenu", false, [this](vtkEventData* ed) {
-      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    ovriren->AddAction("/actions/vtk/in/ShowMenu", false,
+      [this](vtkEventData* ed)
       {
-        this->ToggleShowControls();
-      }
-    });
+        vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+        if (edd && edd->GetAction() == vtkEventDataAction::Press)
+        {
+          this->ToggleShowControls();
+        }
+      });
 
-    ovriren->AddAction("/actions/vtk/in/ForwardThickCrop", false, [this](vtkEventData* ed) {
-      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    ovriren->AddAction("/actions/vtk/in/ForwardThickCrop", false,
+      [this](vtkEventData* ed)
       {
-        this->Widgets->MoveThickCrops(true);
-      }
-    });
+        vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+        if (edd && edd->GetAction() == vtkEventDataAction::Press)
+        {
+          this->Widgets->MoveThickCrops(true);
+        }
+      });
 
-    ovriren->AddAction("/actions/vtk/in/BackThickCrop", false, [this](vtkEventData* ed) {
-      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    ovriren->AddAction("/actions/vtk/in/BackThickCrop", false,
+      [this](vtkEventData* ed)
       {
-        this->Widgets->MoveThickCrops(false);
-      }
-    });
+        vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+        if (edd && edd->GetAction() == vtkEventDataAction::Press)
+        {
+          this->Widgets->MoveThickCrops(false);
+        }
+      });
 #endif
   }
 

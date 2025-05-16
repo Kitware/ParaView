@@ -52,7 +52,10 @@ vtkStandardNewMacro(vtkXYChartRepresentation::SortTableFilter);
 
 //-----------------------------------------------------------------------------
 #define vtkCxxSetChartTypeMacro(_name, _value)                                                     \
-  void vtkXYChartRepresentation::SetChartTypeTo##_name() { this->SetChartType(_value); }
+  void vtkXYChartRepresentation::SetChartTypeTo##_name()                                           \
+  {                                                                                                \
+    this->SetChartType(_value);                                                                    \
+  }
 vtkCxxSetChartTypeMacro(Line, vtkChart::LINE);
 vtkCxxSetChartTypeMacro(Points, vtkChart::POINTS);
 vtkCxxSetChartTypeMacro(Bar, vtkChart::BAR);

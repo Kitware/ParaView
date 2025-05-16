@@ -41,9 +41,11 @@ pqAnglePropertyWidget::pqAnglePropertyWidget(
   if (vtkSMProperty* handlePositions = smgroup->GetProperty("HandlePositions"))
   {
     ui.labelPoint1->setText("Point 1");
-    auto connectPoint = [this](pqDoubleLineEdit* widget, int index) {
-      QObject::connect(
-        widget, &pqDoubleLineEdit::textChangedAndEditingFinished, [this, index, widget]() {
+    auto connectPoint = [this](pqDoubleLineEdit* widget, int index)
+    {
+      QObject::connect(widget, &pqDoubleLineEdit::textChangedAndEditingFinished,
+        [this, index, widget]()
+        {
           this->Internals->InlinedCoordinates[index] =
             widget->property("text").toString().toDouble();
           Q_EMIT this->pointsChanged();
@@ -71,7 +73,8 @@ pqAnglePropertyWidget::pqAnglePropertyWidget(
   using PickOption = pqPointPickingHelper::PickOption;
 
   // link shortcuts for P1
-  auto updateP1 = [this](double x, double y, double z) {
+  auto updateP1 = [this](double x, double y, double z)
+  {
     this->Internals->InlinedCoordinates[0] = x;
     this->Internals->InlinedCoordinates[1] = y;
     this->Internals->InlinedCoordinates[2] = z;
@@ -86,7 +89,8 @@ pqAnglePropertyWidget::pqAnglePropertyWidget(
   this->connect(pickHelperP1Coord, &pqPointPickingHelper::pick, updateP1);
 
   // link shortcuts for center
-  auto updateCn = [this](double x, double y, double z) {
+  auto updateCn = [this](double x, double y, double z)
+  {
     this->Internals->InlinedCoordinates[3] = x;
     this->Internals->InlinedCoordinates[4] = y;
     this->Internals->InlinedCoordinates[5] = z;
@@ -102,7 +106,8 @@ pqAnglePropertyWidget::pqAnglePropertyWidget(
   this->connect(pickHelperCenterCoord, &pqPointPickingHelper::pick, updateCn);
 
   // link shortcuts for P2
-  auto updateP2 = [this](double x, double y, double z) {
+  auto updateP2 = [this](double x, double y, double z)
+  {
     this->Internals->InlinedCoordinates[6] = x;
     this->Internals->InlinedCoordinates[7] = y;
     this->Internals->InlinedCoordinates[8] = z;

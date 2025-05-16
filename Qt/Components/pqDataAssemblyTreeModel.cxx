@@ -193,16 +193,16 @@ bool pqDataAssemblyTreeModel::pqInternals::setData(int node, int role, const QVa
   {
     // value is inherited down the whole tree.
     vtkNew<CallbackDataVisitor> visitor;
-    visitor->VisitCallback = [&](int id) {
-      role_map[id].setValue(actualValue, /*isInherited*/ clearValue || id != node);
-    };
+    visitor->VisitCallback = [&](int id)
+    { role_map[id].setValue(actualValue, /*isInherited*/ clearValue || id != node); };
     this->DataAssembly->Visit(node, visitor);
   }
   else if (rproperty == pqDataAssemblyTreeModel::InheritedUntilOverridden)
   {
     // value is inherited till explicitly overridden.
     vtkNew<CallbackDataVisitor> visitor;
-    visitor->GetTraverseSubtreeCallback = [&](int id) {
+    visitor->GetTraverseSubtreeCallback = [&](int id)
+    {
       auto& curItem = role_map[id];
       if (id == node || curItem.isDerived())
       {
@@ -498,7 +498,8 @@ void pqDataAssemblyTreeModel::fireDataChanged(const QModelIndex& indx, const QVe
   Q_EMIT this->dataChanged(indx, indx, roles);
 
   std::function<void(const QModelIndex&)> fire_data_changed_recursively;
-  fire_data_changed_recursively = [&](const QModelIndex& prnt) {
+  fire_data_changed_recursively = [&](const QModelIndex& prnt)
+  {
     const int num_rows = this->rowCount(prnt);
     if (num_rows > 0)
     {
@@ -543,7 +544,8 @@ QStringList pqDataAssemblyTreeModel::checkedNodes() const
   QStringList paths;
 
   vtkNew<CallbackDataVisitor> visitor;
-  visitor->GetTraverseSubtreeCallback = [&](int id) {
+  visitor->GetTraverseSubtreeCallback = [&](int id)
+  {
     auto iter = node_states.find(id);
     const Qt::CheckState state =
       iter == node_states.end() ? Qt::Unchecked : iter->second.value<Qt::CheckState>();

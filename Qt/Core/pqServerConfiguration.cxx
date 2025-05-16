@@ -519,7 +519,10 @@ QString pqServerConfiguration::command(double& processWait, double& delay) const
       }
     }
   }
-  else { stream << execCommand; }
+  else
+  {
+    stream << execCommand;
+  }
   return reply;
 }
 

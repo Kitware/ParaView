@@ -171,7 +171,7 @@ int vtkPythonRepresentation::FillInputPortInformation(int port, vtkInformation* 
   return 1;
 }
 
-//#define VTK_PYTHON_REPRESENTATION_DEBUG
+// #define VTK_PYTHON_REPRESENTATION_DEBUG
 
 #if defined(VTK_PYTHON_REPRESENTATION_DEBUG)
 #define vtkPythonRepresentationDebug(x)                                                            \

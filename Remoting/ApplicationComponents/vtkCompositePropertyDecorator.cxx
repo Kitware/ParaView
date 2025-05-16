@@ -44,14 +44,12 @@ struct Operation : public BaseOperation
     bool result = init_value;
 
     result = std::accumulate(this->Decorators.begin(), this->Decorators.end(), result,
-      [=](const bool& lhs, const vtkSmartPointer<vtkPropertyDecorator>& rhs) {
-        return BinaryOperation()(lhs, rhs->CanShow(show_advanced));
-      });
+      [=](const bool& lhs, const vtkSmartPointer<vtkPropertyDecorator>& rhs)
+      { return BinaryOperation()(lhs, rhs->CanShow(show_advanced)); });
 
     result = std::accumulate(this->Expressions.begin(), this->Expressions.end(), result,
-      [=](const bool& lhs, const std::shared_ptr<BaseOperation>& rhs) {
-        return BinaryOperation()(lhs, rhs->CanShow(show_advanced));
-      });
+      [=](const bool& lhs, const std::shared_ptr<BaseOperation>& rhs)
+      { return BinaryOperation()(lhs, rhs->CanShow(show_advanced)); });
 
     return result;
   }
@@ -66,14 +64,12 @@ struct Operation : public BaseOperation
     bool result = init_value;
 
     result = std::accumulate(this->Decorators.begin(), this->Decorators.end(), result,
-      [](const bool& lhs, const vtkSmartPointer<vtkPropertyDecorator>& rhs) {
-        return BinaryOperation()(lhs, rhs->Enable());
-      });
+      [](const bool& lhs, const vtkSmartPointer<vtkPropertyDecorator>& rhs)
+      { return BinaryOperation()(lhs, rhs->Enable()); });
 
     result = std::accumulate(this->Expressions.begin(), this->Expressions.end(), result,
-      [=](const bool& lhs, const std::shared_ptr<BaseOperation>& rhs) {
-        return BinaryOperation()(lhs, rhs->Enable());
-      });
+      [=](const bool& lhs, const std::shared_ptr<BaseOperation>& rhs)
+      { return BinaryOperation()(lhs, rhs->Enable()); });
 
     return result;
   }

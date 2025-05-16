@@ -155,7 +155,10 @@ typedef vtkPVPlugin*(C_DECL* pv_plugin_query_instance_fptr)();
 // verification is not necessary.
 #if PARAVIEW_PLUGIN_BUILT_SHARED
 #define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)                                                        \
-  C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance() { return pv_plugin_instance_##PLUGIN(); }
+  C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance()                                                \
+  {                                                                                                \
+    return pv_plugin_instance_##PLUGIN();                                                          \
+  }
 #else
 // define empty export. When building static, we don't want to define the global
 // functions.

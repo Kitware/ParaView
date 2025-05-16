@@ -57,18 +57,20 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
 
   if (lvItem->isEmulatedTimeAlgorithm())
   {
-    QObject::connect(internals.Ui.EmulatedTimePauseButton, &QPushButton::clicked, []() {
-      auto manager = pqPVApplicationCore::instance()->liveSourceManager();
-      bool paused = manager->isEmulatedTimePaused();
-      if (paused)
+    QObject::connect(internals.Ui.EmulatedTimePauseButton, &QPushButton::clicked,
+      []()
       {
-        manager->resumeEmulatedTime();
-      }
-      else
-      {
-        manager->pauseEmulatedTime();
-      }
-    });
+        auto manager = pqPVApplicationCore::instance()->liveSourceManager();
+        bool paused = manager->isEmulatedTimePaused();
+        if (paused)
+        {
+          manager->resumeEmulatedTime();
+        }
+        else
+        {
+          manager->pauseEmulatedTime();
+        }
+      });
 
     auto updateState = [&internals]() { internals.updatePauseButtonState(); };
     QObject::connect(internals.Ui.EmulatedTimePauseButton, &QPushButton::clicked, updateState);
@@ -76,10 +78,12 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
       internals.Ui.EmulatedTimePauseButton, updateState);
     internals.updatePauseButtonState();
 
-    QObject::connect(internals.Ui.EmulatedTimeResetButton, &QPushButton::clicked, []() {
-      auto manager = pqPVApplicationCore::instance()->liveSourceManager();
-      manager->setEmulatedCurrentTime(0.);
-    });
+    QObject::connect(internals.Ui.EmulatedTimeResetButton, &QPushButton::clicked,
+      []()
+      {
+        auto manager = pqPVApplicationCore::instance()->liveSourceManager();
+        manager->setEmulatedCurrentTime(0.);
+      });
   }
   else
   {

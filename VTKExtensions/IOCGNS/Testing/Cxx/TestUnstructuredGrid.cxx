@@ -116,7 +116,8 @@ void Create(vtkUnstructuredGrid* ug, vtkIdType N)
 
   ug->SetPoints(pts);
 
-  auto calc = [=](vtkIdType a, vtkIdType b, vtkIdType c) {
+  auto calc = [=](vtkIdType a, vtkIdType b, vtkIdType c)
+  {
     vtkIdType value = a + b * N + c * N * N;
     if (value < 0 || value >= N * N * N)
     {

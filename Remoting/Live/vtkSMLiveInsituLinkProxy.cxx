@@ -20,7 +20,7 @@
 #include "vtkSMStateLoader.h"
 #include <sstream>
 
-//#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr x << endl;
+// #define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr x << endl;
 #define vtkSMLiveInsituLinkProxyDebugMacro(x)
 
 class vtkSMLiveInsituLinkProxy::vtkInternals

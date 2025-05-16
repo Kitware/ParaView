@@ -199,27 +199,31 @@ vtkSmartPyObject ConvertCSArgsToPyTuple(const vtkClientServerStream& msg)
         break;
 
       case vtkClientServerStream::bool_value:
-        args.push_back(convert_value<bool>(msg, 0, cc, [](const bool& cval) {
-          vtkSmartPyObject obj;
-          obj = cval ? Py_True : Py_False;
-          return obj;
-        }));
+        args.push_back(convert_value<bool>(msg, 0, cc,
+          [](const bool& cval)
+          {
+            vtkSmartPyObject obj;
+            obj = cval ? Py_True : Py_False;
+            return obj;
+          }));
         break;
 
       case vtkClientServerStream::string_value:
-        args.push_back(convert_value<std::string>(msg, 0, cc, [](const std::string& cval) {
-          vtkSmartPyObject obj;
-          if (cval.empty())
+        args.push_back(convert_value<std::string>(msg, 0, cc,
+          [](const std::string& cval)
           {
-            obj = Py_None;
-          }
-          else
-          {
-            obj.TakeReference(PyUnicode_FromStringAndSize(cval.c_str(), cval.size()));
-          }
+            vtkSmartPyObject obj;
+            if (cval.empty())
+            {
+              obj = Py_None;
+            }
+            else
+            {
+              obj.TakeReference(PyUnicode_FromStringAndSize(cval.c_str(), cval.size()));
+            }
 
-          return obj;
-        }));
+            return obj;
+          }));
         break;
 
       case vtkClientServerStream::id_value:
@@ -228,10 +232,12 @@ vtkSmartPyObject ConvertCSArgsToPyTuple(const vtkClientServerStream& msg)
         break;
 
       case vtkClientServerStream::vtk_object_pointer:
-        args.push_back(convert_value<vtkObjectBase*>(msg, 0, cc, [](vtkObjectBase* cval) {
-          // note: this method returns a new reference.
-          return vtkPythonUtil::GetObjectFromPointer(cval);
-        }));
+        args.push_back(convert_value<vtkObjectBase*>(msg, 0, cc,
+          [](vtkObjectBase* cval)
+          {
+            // note: this method returns a new reference.
+            return vtkPythonUtil::GetObjectFromPointer(cval);
+          }));
         break;
 
       default:

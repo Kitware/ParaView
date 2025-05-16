@@ -572,15 +572,17 @@ void vtkPrismSESAMEReader::ReadSurfaceTable(std::FILE* file, vtkPolyData* output
 
   // 1st and 2nd scalar arrays are the x and y coordinates which need to be filled by taking the
   // point coordinates
-  vtkSMPTools::For(0, numPts, [&](vtkIdType begin, vtkIdType end) {
-    double p[3];
-    for (vtkIdType pointId = begin; pointId < end; ++pointId)
+  vtkSMPTools::For(0, numPts,
+    [&](vtkIdType begin, vtkIdType end)
     {
-      inPts->GetPoint(pointId, p);
-      xArray->SetValue(pointId, p[0]);
-      yArray->SetValue(pointId, p[1]);
-    }
-  });
+      double p[3];
+      for (vtkIdType pointId = begin; pointId < end; ++pointId)
+      {
+        inPts->GetPoint(pointId, p);
+        xArray->SetValue(pointId, p[0]);
+        yArray->SetValue(pointId, p[1]);
+      }
+    });
   xArray->Modified();
   yArray->Modified();
 }
@@ -678,15 +680,17 @@ void vtkPrismSESAMEReader::ReadCurveTable(std::FILE* file, vtkPolyData* output, 
     vtkNew<vtkFloatArray> coords;
     coords->SetNumberOfComponents(3);
     coords->SetNumberOfTuples(NR);
-    vtkSMPTools::For(0, NR, [&](vtkIdType begin, vtkIdType end) {
-      float* coordsPtr = coords->GetPointer(3 * begin);
-      for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+    vtkSMPTools::For(0, NR,
+      [&](vtkIdType begin, vtkIdType end)
       {
-        coordsPtr[0] = xArray->GetValue(pointId);
-        coordsPtr[1] = yArray->GetValue(pointId);
-        coordsPtr[2] = zArray->GetValue(pointId);
-      }
-    });
+        float* coordsPtr = coords->GetPointer(3 * begin);
+        for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+        {
+          coordsPtr[0] = xArray->GetValue(pointId);
+          coordsPtr[1] = yArray->GetValue(pointId);
+          coordsPtr[2] = zArray->GetValue(pointId);
+        }
+      });
     vtkNew<vtkPoints> points;
     points->SetData(coords);
     output->SetPoints(points);
@@ -694,22 +698,26 @@ void vtkPrismSESAMEReader::ReadCurveTable(std::FILE* file, vtkPolyData* output, 
     // create the connectivity array for the lines of the curve
     vtkNew<vtkIdTypeArray> connectivity;
     connectivity->SetNumberOfValues(2 * (NR - 1));
-    vtkSMPTools::For(0, NR - 1, [&](vtkIdType begin, vtkIdType end) {
-      for (vtkIdType pointId = begin; pointId < end; ++pointId)
+    vtkSMPTools::For(0, NR - 1,
+      [&](vtkIdType begin, vtkIdType end)
       {
-        connectivity->SetValue(2 * pointId, pointId);
-        connectivity->SetValue(2 * pointId + 1, pointId + 1);
-      }
-    });
+        for (vtkIdType pointId = begin; pointId < end; ++pointId)
+        {
+          connectivity->SetValue(2 * pointId, pointId);
+          connectivity->SetValue(2 * pointId + 1, pointId + 1);
+        }
+      });
     // create the offsets array for the lines of the curve
     vtkNew<vtkIdTypeArray> offsets;
     offsets->SetNumberOfValues(NR);
-    vtkSMPTools::For(0, NR, [&](vtkIdType begin, vtkIdType end) {
-      for (vtkIdType pointId = begin; pointId < end; ++pointId)
+    vtkSMPTools::For(0, NR,
+      [&](vtkIdType begin, vtkIdType end)
       {
-        offsets->SetValue(pointId, 2 * pointId);
-      }
-    });
+        for (vtkIdType pointId = begin; pointId < end; ++pointId)
+        {
+          offsets->SetValue(pointId, 2 * pointId);
+        }
+      });
     // create the lines of the curve
     vtkNew<vtkCellArray> lines;
     lines->SetData(offsets, connectivity);
@@ -815,15 +823,17 @@ void vtkPrismSESAMEReader::ReadVaporizationCurveTable(
     vtkNew<vtkFloatArray> coords;
     coords->SetNumberOfComponents(3);
     coords->SetNumberOfTuples(NT);
-    vtkSMPTools::For(0, NT, [&](vtkIdType begin, vtkIdType end) {
-      float* coordsPtr = coords->GetPointer(3 * begin);
-      for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+    vtkSMPTools::For(0, NT,
+      [&](vtkIdType begin, vtkIdType end)
       {
-        coordsPtr[0] = xArray->GetValue(pointId);
-        coordsPtr[1] = yArray->GetValue(pointId);
-        coordsPtr[2] = zArray->GetValue(pointId);
-      }
-    });
+        float* coordsPtr = coords->GetPointer(3 * begin);
+        for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+        {
+          coordsPtr[0] = xArray->GetValue(pointId);
+          coordsPtr[1] = yArray->GetValue(pointId);
+          coordsPtr[2] = zArray->GetValue(pointId);
+        }
+      });
     vtkNew<vtkPoints> points;
     points->SetData(coords);
     output->SetPoints(points);
@@ -831,22 +841,26 @@ void vtkPrismSESAMEReader::ReadVaporizationCurveTable(
     // create the connectivity array for the lines of the curve
     vtkNew<vtkIdTypeArray> connectivity;
     connectivity->SetNumberOfValues(2 * (NT - 1));
-    vtkSMPTools::For(0, NT - 1, [&](vtkIdType begin, vtkIdType end) {
-      for (vtkIdType pointId = begin; pointId < end; ++pointId)
+    vtkSMPTools::For(0, NT - 1,
+      [&](vtkIdType begin, vtkIdType end)
       {
-        connectivity->SetValue(2 * pointId, pointId);
-        connectivity->SetValue(2 * pointId + 1, pointId + 1);
-      }
-    });
+        for (vtkIdType pointId = begin; pointId < end; ++pointId)
+        {
+          connectivity->SetValue(2 * pointId, pointId);
+          connectivity->SetValue(2 * pointId + 1, pointId + 1);
+        }
+      });
     // create the offsets array for the lines of the curve
     vtkNew<vtkIdTypeArray> offsets;
     offsets->SetNumberOfValues(NT);
-    vtkSMPTools::For(0, NT, [&](vtkIdType begin, vtkIdType end) {
-      for (vtkIdType pointId = begin; pointId < end; ++pointId)
+    vtkSMPTools::For(0, NT,
+      [&](vtkIdType begin, vtkIdType end)
       {
-        offsets->SetValue(pointId, 2 * pointId);
-      }
-    });
+        for (vtkIdType pointId = begin; pointId < end; ++pointId)
+        {
+          offsets->SetValue(pointId, 2 * pointId);
+        }
+      });
     // create the lines of the curve
     vtkNew<vtkCellArray> lines;
     lines->SetData(offsets, connectivity);
@@ -1190,12 +1204,14 @@ void vtkPrismSESAMEReader::RequestCurvesData(
         if (auto array = vtkFloatArray::SafeDownCast(curve->GetPointData()->GetArray(i)))
         {
           const double conversionValue = conversionValues->GetValue(i);
-          vtkSMPTools::For(0, numberOfPoints, [&](vtkIdType begin, vtkIdType end) {
-            for (vtkIdType j = begin; j < end; ++j)
+          vtkSMPTools::For(0, numberOfPoints,
+            [&](vtkIdType begin, vtkIdType end)
             {
-              array->SetValue(j, static_cast<float>(array->GetValue(j) * conversionValue));
-            }
-          });
+              for (vtkIdType j = begin; j < end; ++j)
+              {
+                array->SetValue(j, static_cast<float>(array->GetValue(j) * conversionValue));
+              }
+            });
         }
       }
     }
@@ -1233,15 +1249,17 @@ void vtkPrismSESAMEReader::RequestCurvesData(
       // set the points based on the selected arrays
       const vtkIdType numberOfPoints = curve->GetNumberOfPoints();
       auto coords = vtkFloatArray::SafeDownCast(curve->GetPoints()->GetData());
-      vtkSMPTools::For(0, numberOfPoints, [&](vtkIdType begin, vtkIdType end) {
-        float* coordsPtr = coords->GetPointer(3 * begin);
-        for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+      vtkSMPTools::For(0, numberOfPoints,
+        [&](vtkIdType begin, vtkIdType end)
         {
-          coordsPtr[0] = xArray ? xArray->GetValue(pointId) : 0.0;
-          coordsPtr[1] = yArray ? yArray->GetValue(pointId) : 0.0;
-          coordsPtr[2] = zArray ? zArray->GetValue(pointId) : 0.0;
-        }
-      });
+          float* coordsPtr = coords->GetPointer(3 * begin);
+          for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+          {
+            coordsPtr[0] = xArray ? xArray->GetValue(pointId) : 0.0;
+            coordsPtr[1] = yArray ? yArray->GetValue(pointId) : 0.0;
+            coordsPtr[2] = zArray ? zArray->GetValue(pointId) : 0.0;
+          }
+        });
       curve->GetPoints()->Modified();
 
       // add curve number to the point data
@@ -1313,15 +1331,17 @@ void vtkPrismSESAMEReader::RequestCurvesData(
         coords->SetNumberOfComponents(3);
         coords->SetNumberOfTuples(numberOfPoints);
 
-        vtkSMPTools::For(0, numberOfPoints, [&](vtkIdType begin, vtkIdType end) {
-          float* coordsPtr = coords->GetPointer(3 * begin);
-          for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+        vtkSMPTools::For(0, numberOfPoints,
+          [&](vtkIdType begin, vtkIdType end)
           {
-            coordsPtr[0] = xArray[i] ? xArray[i]->GetValue(pointId) : 0.0;
-            coordsPtr[1] = yArray[i] ? yArray[i]->GetValue(pointId) : 0.0;
-            coordsPtr[2] = zArray[i] ? zArray[i]->GetValue(pointId) : 0.0;
-          }
-        });
+            float* coordsPtr = coords->GetPointer(3 * begin);
+            for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+            {
+              coordsPtr[0] = xArray[i] ? xArray[i]->GetValue(pointId) : 0.0;
+              coordsPtr[1] = yArray[i] ? yArray[i]->GetValue(pointId) : 0.0;
+              coordsPtr[2] = zArray[i] ? zArray[i]->GetValue(pointId) : 0.0;
+            }
+          });
 
         vtkNew<vtkPoints> points;
         points->SetData(coords);
@@ -1396,12 +1416,14 @@ int vtkPrismSESAMEReader::RequestData(
       if (auto array = vtkFloatArray::SafeDownCast(surfaceOutput->GetPointData()->GetArray(i)))
       {
         const double conversionValue = this->VariableConversionValues->GetValue(i);
-        vtkSMPTools::For(0, numberOfPoints, [&](vtkIdType begin, vtkIdType end) {
-          for (vtkIdType j = begin; j < end; ++j)
+        vtkSMPTools::For(0, numberOfPoints,
+          [&](vtkIdType begin, vtkIdType end)
           {
-            array->SetValue(j, static_cast<float>(array->GetValue(j) * conversionValue));
-          }
-        });
+            for (vtkIdType j = begin; j < end; ++j)
+            {
+              array->SetValue(j, static_cast<float>(array->GetValue(j) * conversionValue));
+            }
+          });
       }
     }
   }
@@ -1431,15 +1453,17 @@ int vtkPrismSESAMEReader::RequestData(
 
   // set the points based on the selected arrays
   auto coords = vtkFloatArray::SafeDownCast(surfaceOutput->GetPoints()->GetData());
-  vtkSMPTools::For(0, numberOfPoints, [&](vtkIdType begin, vtkIdType end) {
-    float* coordsPtr = coords->GetPointer(3 * begin);
-    for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+  vtkSMPTools::For(0, numberOfPoints,
+    [&](vtkIdType begin, vtkIdType end)
     {
-      coordsPtr[0] = xArray->GetValue(pointId);
-      coordsPtr[1] = yArray->GetValue(pointId);
-      coordsPtr[2] = zArray->GetValue(pointId);
-    }
-  });
+      float* coordsPtr = coords->GetPointer(3 * begin);
+      for (vtkIdType pointId = begin; pointId < end; ++pointId, coordsPtr += 3)
+      {
+        coordsPtr[0] = xArray->GetValue(pointId);
+        coordsPtr[1] = yArray->GetValue(pointId);
+        coordsPtr[2] = zArray->GetValue(pointId);
+      }
+    });
   surfaceOutput->GetPoints()->Modified();
 
   // This array is needed to be able to identify  if IsSimulationData is true or not for

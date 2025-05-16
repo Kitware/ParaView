@@ -30,7 +30,7 @@
 #include <sstream>
 #include <stdexcept>
 
-//#define DEBUG
+// #define DEBUG
 
 vtkStandardNewMacro(vtkACosmoReader);
 

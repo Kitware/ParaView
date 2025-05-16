@@ -320,14 +320,17 @@ public:
     hbox->addWidget(this->Operator, 0, Qt::AlignTop);
     hbox->addWidget(this->Value, 1, Qt::AlignTop);
 
-    QObject::connect(this->Term, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
-      this->populateOperators(this->currentTermType());
-      this->populateValue();
-      this->modified();
-    });
+    QObject::connect(this->Term, QOverload<int>::of(&QComboBox::currentIndexChanged),
+      [this](int)
+      {
+        this->populateOperators(this->currentTermType());
+        this->populateValue();
+        this->modified();
+      });
 
-    QObject::connect(
-      this->Operator, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
+    QObject::connect(this->Operator, QOverload<int>::of(&QComboBox::currentIndexChanged),
+      [this](int)
+      {
         this->populateValue();
         this->modified();
       });
@@ -773,10 +776,12 @@ pqSelectionQueryPropertyWidget::pqSelectionQueryPropertyWidget(
       domain, vtkCommand::DomainModifiedEvent, &internals.DomainTimer, SLOT(start()));
   }
 
-  QObject::connect(&internals.DomainTimer, &QTimer::timeout, [this, &internals]() {
-    const QSignalBlocker blocker(this);
-    internals.populateUI();
-  });
+  QObject::connect(&internals.DomainTimer, &QTimer::timeout,
+    [this, &internals]()
+    {
+      const QSignalBlocker blocker(this);
+      internals.populateUI();
+    });
 
   internals.populateUI();
   this->addPropertyLink(this, "query", SIGNAL(queryChanged()), smproperty);

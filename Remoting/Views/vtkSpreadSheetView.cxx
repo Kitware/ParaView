@@ -59,9 +59,8 @@ vtkSmartPointer<vtkAbstractArray> MapBlockNames(vtkAbstractArray* aa_ids, vtkStr
   mappedNames->SetNumberOfTuples(ids->GetNumberOfTuples());
   const auto range = vtk::DataArrayValueRange<1>(ids);
   std::transform(range.begin(), range.end(), mappedNames->WritePointer(0, ids->GetNumberOfTuples()),
-    [&names, &maxNames](vtkIdType idx) {
-      return (idx >= 0 && idx < maxNames) ? names->GetValue(idx) : vtkStdString();
-    });
+    [&names, &maxNames](vtkIdType idx)
+    { return (idx >= 0 && idx < maxNames) ? names->GetValue(idx) : vtkStdString(); });
   return mappedNames;
 }
 
@@ -272,9 +271,8 @@ public:
   {
     const auto& columns = this->ColumnMetaData;
     auto iter = std::find_if(columns.begin(), columns.end(),
-      [&aname](const std::tuple<std::string, std::string, int>& tuple) {
-        return (std::get<0>(tuple) == aname);
-      });
+      [&aname](const std::tuple<std::string, std::string, int>& tuple)
+      { return (std::get<0>(tuple) == aname); });
     return iter != columns.end() ? static_cast<vtkIdType>(std::distance(columns.begin(), iter))
                                  : -1;
   }
@@ -319,7 +317,8 @@ public:
     std::string a2Name = a2->GetName() ? a2->GetName() : "";
     unsigned int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
 
-    auto findFirstOrderOccurance = [&firstOrder](const std::string& name, unsigned int& index) {
+    auto findFirstOrderOccurance = [&firstOrder](const std::string& name, unsigned int& index)
+    {
       for (unsigned int i = 0; i < firstOrder.size(); i++)
       {
         if (index == VTK_INT_MAX && name == firstOrder[i])
@@ -344,7 +343,8 @@ public:
     // set or they are the same (which does happen, see BUG #9808).
     assert((a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX) || (a1Name == a2Name));
 
-    auto findLastOrderOccurance = [&lastOrder](const std::string& name, unsigned int& index) {
+    auto findLastOrderOccurance = [&lastOrder](const std::string& name, unsigned int& index)
+    {
       for (unsigned int i = 0; i < lastOrder.size(); i++)
       {
         if (name.find(lastOrder[i], 0) != std::string::npos)

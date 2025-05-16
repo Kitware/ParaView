@@ -390,9 +390,8 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
   // update `Remove` button enabled state based on selection.
   ui.Remove->setEnabled(false);
   QObject::connect(ui.Table->selectionModel(), &QItemSelectionModel::selectionChanged,
-    [&ui](const QItemSelection&, const QItemSelection&) {
-      ui.Remove->setEnabled(ui.Table->selectionModel()->selectedIndexes().empty() == false);
-    });
+    [&ui](const QItemSelection&, const QItemSelection&)
+    { ui.Remove->setEnabled(ui.Table->selectionModel()->selectedIndexes().empty() == false); });
 
   if (smProperty->GetInformationOnly())
   {

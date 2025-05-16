@@ -90,7 +90,8 @@ public:
     hlayout->setSpacing(PARAVIEW_DEFAULT_LAYOUT_SPACING);
 
     QObject::connect(this->Container.data(), &pqHierarchicalGridWidget::splitterMoved,
-      [self](int location, double fraction) {
+      [self](int location, double fraction)
+      {
         if (auto vlayout = self->layoutManager())
         {
           BEGIN_UNDO_SET(QCoreApplication::translate("pqInternals", "Resize Frame"));
@@ -611,7 +612,8 @@ void pqMultiViewWidget::reload()
 
   auto& all_frames = internals.Frames;
 
-  std::function<void(int)> builder = [&](int location) {
+  std::function<void(int)> builder = [&](int location)
+  {
     const auto vdirection = vlayout->GetSplitDirection(location);
     if (hitems.size() <= location)
     {

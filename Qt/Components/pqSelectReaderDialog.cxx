@@ -21,10 +21,12 @@ public:
   {
     this->setupUi(self);
     self->setObjectName("pqSelectReaderDialog"); // to avoid breaking old tests.
-    connect(this->setAsDefault, &QPushButton::clicked, [this, self] {
-      this->isSetAsDefault = true;
-      self->accept();
-    });
+    connect(this->setAsDefault, &QPushButton::clicked,
+      [this, self]
+      {
+        this->isSetAsDefault = true;
+        self->accept();
+      });
 
     this->okButton->setDefault(true);
   }

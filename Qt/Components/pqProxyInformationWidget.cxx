@@ -672,10 +672,12 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* parentWdg)
   ui.rawCompositeTree->hide();
   ui.rawAssemblyTree->hide();
 
-  QObject::connect(button, &QToolButton::toggled, [&ui](bool showRaw) {
-    ui.rawCompositeTree->setVisible(showRaw);
-    ui.rawAssemblyTree->setVisible(showRaw);
-  });
+  QObject::connect(button, &QToolButton::toggled,
+    [&ui](bool showRaw)
+    {
+      ui.rawCompositeTree->setVisible(showRaw);
+      ui.rawAssemblyTree->setVisible(showRaw);
+    });
   ui.dataGroupingTab->setCornerWidget(button);
 
   // monitor active port.

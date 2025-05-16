@@ -50,16 +50,14 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
 
   QObject::connect(
     this->InteractiveViewLinkCheckBox, &QCheckBox::pqCheckBoxSignal, this,
-    [this](pqCheckState state) {
-      this->CameraWidgetViewLinkCheckBox->setEnabled(state == Qt::Unchecked);
-    },
+    [this](pqCheckState state)
+    { this->CameraWidgetViewLinkCheckBox->setEnabled(state == Qt::Unchecked); },
     Qt::QueuedConnection);
 
   QObject::connect(
     this->CameraWidgetViewLinkCheckBox, &QCheckBox::pqCheckBoxSignal, this,
-    [this](pqCheckState state) {
-      this->InteractiveViewLinkCheckBox->setEnabled(state == Qt::Unchecked);
-    },
+    [this](pqCheckState state)
+    { this->InteractiveViewLinkCheckBox->setEnabled(state == Qt::Unchecked); },
     Qt::QueuedConnection);
 
   QPushButton* button = new QPushButton(this);

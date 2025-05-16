@@ -112,7 +112,8 @@ int vtkRemoteWriterHelper::RequestData(
   vtkThreadedCallbackQueue* callbackQueue =
     vtkProcessModule::GetProcessModule()->GetCallbackQueue();
 
-  auto writeLocally = [this, callbackQueue](vtkSmartPointer<vtkDataObject>&& input) {
+  auto writeLocally = [this, callbackQueue](vtkSmartPointer<vtkDataObject>&& input)
+  {
     if (!this->TryWritingInBackground)
     {
       this->WriteLocally(input);

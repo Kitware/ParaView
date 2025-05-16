@@ -264,7 +264,8 @@ public:
     , PixmapSize(pixmapSize)
   {
     QObject::connect(this, &QAbstractItemModel::dataChanged,
-      [this](const QModelIndex& topLeft, const QModelIndex&, const QVector<int>&) {
+      [this](const QModelIndex& topLeft, const QModelIndex&, const QVector<int>&)
+      {
         if (topLeft.row() == 0 && !topLeft.parent().isValid())
         {
           Q_EMIT this->headerDataChanged(Qt::Horizontal, topLeft.column(), topLeft.column());
@@ -309,7 +310,8 @@ public:
       // when data with custom roles on the source model change, we need to map
       // it to decorate role on appropriate column to ensure the view updates correctly.
       QObject::connect(smodel, &QAbstractItemModel::dataChanged,
-        [&](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
+        [&](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+        {
           for (int cc = 0; cc < static_cast<int>(this->ExtraColumns.size()); ++cc)
           {
             const auto& customRole = this->ExtraColumns[cc];
@@ -335,9 +337,8 @@ public:
     }
     this->resetStateWidgets();
     vtkNew<CallbackDataVisitor> visitor;
-    visitor->VisitCallback = [&](int nodeId) -> void {
-      this->StateWidgets[nodeId] = this->createStateWidget(nodeId);
-    };
+    visitor->VisitCallback = [&](int nodeId) -> void
+    { this->StateWidgets[nodeId] = this->createStateWidget(nodeId); };
     assembly->Visit(visitor);
   }
 
@@ -484,13 +485,15 @@ private:
     if (hasBlockColorArrayNames)
     {
       QObject::connect(widget, &pqMultiBlockPropertiesStateWidget::startStateReset, this,
-        [this, nodeId]() -> void {
+        [this, nodeId]() -> void
+        {
           this->OldLuts[nodeId] =
             this->Representation->getLookupTableProxies(vtkSMColorMapEditorHelper::Blocks);
         });
     }
     QObject::connect(widget, &pqMultiBlockPropertiesStateWidget::endStateReset, this,
-      [this, nodeId, hasBlockColorArrayNames]() -> void {
+      [this, nodeId, hasBlockColorArrayNames]() -> void
+      {
         if (hasBlockColorArrayNames)
         {
           pqDisplayColorWidget::hideScalarBarsIfNotNeeded(
@@ -499,7 +502,8 @@ private:
         Q_EMIT qobject_cast<pqDataAssemblyPropertyWidget*>(this->parent())->changeFinished();
       });
     QObject::connect(widget, &pqMultiBlockPropertiesStateWidget::stateChanged, this,
-      [this](pqMultiBlockPropertiesStateWidget::BlockPropertyState) {
+      [this](pqMultiBlockPropertiesStateWidget::BlockPropertyState)
+      {
         auto sourceModel = qobject_cast<pqDataAssemblyTreeModel*>(this->sourceModel());
         QModelIndex sourceModelIndex = sourceModel->index(0);
         // TODO: The above line forces the entire model to be updated, which is not great,
@@ -547,35 +551,38 @@ void hookupTableView(QTableView* view, TableSelectorsModel* model, QAbstractButt
   QAbstractButton* removeButton, QAbstractButton* removeAllButton)
 {
   // hookup add button
-  QObject::connect(addButton, &QAbstractButton::clicked, [=](bool) {
-    auto currentIndex = view->currentIndex();
-    const int row =
-      currentIndex.isValid() ? (currentIndex.row() + 1) : model->rowCount(QModelIndex());
-    if (model->insertRows(row, 1))
+  QObject::connect(addButton, &QAbstractButton::clicked,
+    [=](bool)
     {
-      currentIndex = model->index(row, view->horizontalHeader()->logicalIndex(0));
-      view->setCurrentIndex(currentIndex);
-      view->edit(currentIndex);
-    }
-  });
+      auto currentIndex = view->currentIndex();
+      const int row =
+        currentIndex.isValid() ? (currentIndex.row() + 1) : model->rowCount(QModelIndex());
+      if (model->insertRows(row, 1))
+      {
+        currentIndex = model->index(row, view->horizontalHeader()->logicalIndex(0));
+        view->setCurrentIndex(currentIndex);
+        view->edit(currentIndex);
+      }
+    });
 
   // enabled-state for remove button.
   QObject::connect(view->selectionModel(), &QItemSelectionModel::selectionChanged,
-    [=](const QItemSelection&, const QItemSelection&) {
-      removeButton->setEnabled(view->selectionModel()->hasSelection());
-    });
+    [=](const QItemSelection&, const QItemSelection&)
+    { removeButton->setEnabled(view->selectionModel()->hasSelection()); });
 
   // hookup remove button.
-  QObject::connect(removeButton, &QAbstractButton::clicked, [=](bool) {
-    auto rowIndexes = view->selectionModel()->selectedIndexes();
-    std::set<int> rows;
-    std::transform(rowIndexes.begin(), rowIndexes.end(), std::inserter(rows, rows.end()),
-      [](const QModelIndex& idx) { return idx.row(); });
-    for (auto iter = rows.rbegin(); iter != rows.rend(); ++iter)
+  QObject::connect(removeButton, &QAbstractButton::clicked,
+    [=](bool)
     {
-      model->removeRow(*iter);
-    }
-  });
+      auto rowIndexes = view->selectionModel()->selectedIndexes();
+      std::set<int> rows;
+      std::transform(rowIndexes.begin(), rowIndexes.end(), std::inserter(rows, rows.end()),
+        [](const QModelIndex& idx) { return idx.row(); });
+      for (auto iter = rows.rbegin(); iter != rows.rend(); ++iter)
+      {
+        model->removeRow(*iter);
+      }
+    });
 
   // hookup remove all
   QObject::connect(removeAllButton, &QAbstractButton::clicked,
@@ -652,7 +659,8 @@ void hookupActiveSelection(vtkSMProxy* repr, vtkSMProperty* selectedSelectors,
   // and vice-versa.
   selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", false);
   QObject::connect(selectionModel, &QItemSelectionModel::selectionChanged,
-    [=](const QItemSelection&, const QItemSelection&) {
+    [=](const QItemSelection&, const QItemSelection&)
+    {
       if (selectionModel->property("PQ_IGNORE_SELECTION_CHANGES").toBool())
       {
         return;
@@ -697,8 +705,9 @@ void hookupActiveSelection(vtkSMProxy* repr, vtkSMProperty* selectedSelectors,
   if (enableActiveSelectionProperty)
   {
     auto selManager = pqPVApplicationCore::instance()->selectionManager();
-    auto connection =
-      QObject::connect(selManager, &pqSelectionManager::selectionChanged, [=](pqOutputPort* port) {
+    auto connection = QObject::connect(selManager, &pqSelectionManager::selectionChanged,
+      [=](pqOutputPort* port)
+      {
         // When user creates selection in the application, reflect it in the
         // widget, if possible.
         if (selectionModel->property("PQ_IGNORE_SELECTION_CHANGES").toBool())
@@ -1071,44 +1080,48 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   if (header->count() > 1)
   {
     // hookup pressed to reset state.
-    QObject::connect(internals.Ui.hierarchy, &QTreeView::pressed, [&](const QModelIndex& idx) {
-      auto model = internals.Ui.hierarchy->model();
-      auto sourceIndex = qobject_cast<QAbstractProxyModel*>(model)->mapToSource(idx);
-      switch (internals.ProxyModel->roleForColumn(idx.column()))
+    QObject::connect(internals.Ui.hierarchy, &QTreeView::pressed,
+      [&](const QModelIndex& idx)
       {
-        case detail::BlockPropertiesResetRole:
+        auto model = internals.Ui.hierarchy->model();
+        auto sourceIndex = qobject_cast<QAbstractProxyModel*>(model)->mapToSource(idx);
+        switch (internals.ProxyModel->roleForColumn(idx.column()))
         {
-          auto stateWidget = internals.ProxyModel->getStateWidget(sourceIndex);
-          if (stateWidget->getResetButton()->isEnabled())
+          case detail::BlockPropertiesResetRole:
           {
-            stateWidget->getResetButton()->setDown(true);
+            auto stateWidget = internals.ProxyModel->getStateWidget(sourceIndex);
+            if (stateWidget->getResetButton()->isEnabled())
+            {
+              stateWidget->getResetButton()->setDown(true);
+            }
+            break;
           }
-          break;
+          default:
+            break;
         }
-        default:
-          break;
-      }
-    });
+      });
     // hookup clicked to reset state.
-    QObject::connect(internals.Ui.hierarchy, &QTreeView::clicked, [&](const QModelIndex& idx) {
-      auto model = internals.Ui.hierarchy->model();
-      auto sourceIndex = qobject_cast<QAbstractProxyModel*>(model)->mapToSource(idx);
-      switch (internals.ProxyModel->roleForColumn(idx.column()))
+    QObject::connect(internals.Ui.hierarchy, &QTreeView::clicked,
+      [&](const QModelIndex& idx)
       {
-        case detail::BlockPropertiesResetRole:
+        auto model = internals.Ui.hierarchy->model();
+        auto sourceIndex = qobject_cast<QAbstractProxyModel*>(model)->mapToSource(idx);
+        switch (internals.ProxyModel->roleForColumn(idx.column()))
         {
-          auto stateWidget = internals.ProxyModel->getStateWidget(sourceIndex);
-          if (stateWidget->getResetButton()->isEnabled())
+          case detail::BlockPropertiesResetRole:
           {
-            stateWidget->getResetButton()->setDown(false);
-            stateWidget->getResetButton()->click();
+            auto stateWidget = internals.ProxyModel->getStateWidget(sourceIndex);
+            if (stateWidget->getResetButton()->isEnabled())
+            {
+              stateWidget->getResetButton()->setDown(false);
+              stateWidget->getResetButton()->click();
+            }
+            break;
           }
-          break;
+          default:
+            break;
         }
-        default:
-          break;
-      }
-    });
+      });
   }
 
   adjustHeader(internals.Ui.hierarchy->header());

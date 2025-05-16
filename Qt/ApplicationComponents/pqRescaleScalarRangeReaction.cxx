@@ -286,59 +286,61 @@ pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarR
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->show();
 
-  QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply, [=]() {
-    const QString extraInfo =
-      selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks
-      ? tr("Block ")
-      : QString();
-    const QString undoText =
-      tr("Reset ") + extraInfo + tr("Transfer Function Ranges To Custom Range");
-    BEGIN_UNDO_SET(undoText);
-    double tRange[2];
-    tRange[0] = dialog->minimum();
-    tRange[1] = dialog->maximum();
-    for (size_t i = 0; i < luts.size(); ++i)
+  QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply,
+    [=]()
     {
-      auto tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(luts[i]);
-      auto sofProxy = sofProxies[i];
-      auto tf2dProxy = tf2dProxies[i];
-      tfProxy->RescaleTransferFunction(tRange[0], tRange[1]);
-      if (sofProxy)
+      const QString extraInfo =
+        selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks
+        ? tr("Block ")
+        : QString();
+      const QString undoText =
+        tr("Reset ") + extraInfo + tr("Transfer Function Ranges To Custom Range");
+      BEGIN_UNDO_SET(undoText);
+      double tRange[2];
+      tRange[0] = dialog->minimum();
+      tRange[1] = dialog->maximum();
+      for (size_t i = 0; i < luts.size(); ++i)
       {
-        // If we are using a separate opacity range, get those values from the GUI
-        if (separateOpacity)
+        auto tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(luts[i]);
+        auto sofProxy = sofProxies[i];
+        auto tf2dProxy = tf2dProxies[i];
+        tfProxy->RescaleTransferFunction(tRange[0], tRange[1]);
+        if (sofProxy)
         {
-          tRange[0] = dialog->opacityMinimum();
-          tRange[1] = dialog->opacityMaximum();
+          // If we are using a separate opacity range, get those values from the GUI
+          if (separateOpacity)
+          {
+            tRange[0] = dialog->opacityMinimum();
+            tRange[1] = dialog->opacityMaximum();
+          }
+          vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, tRange[0], tRange[1]);
         }
-        vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, tRange[0], tRange[1]);
-      }
-      if (tf2dProxy)
-      {
-        double tf2dRange[4];
-        if (!tf2dProxy->GetRange(tf2dRange))
+        if (tf2dProxy)
         {
-          tf2dRange[2] = 0.0;
-          tf2dRange[3] = 1.0;
+          double tf2dRange[4];
+          if (!tf2dProxy->GetRange(tf2dRange))
+          {
+            tf2dRange[2] = 0.0;
+            tf2dRange[3] = 1.0;
+          }
+          tf2dRange[0] = tRange[0];
+          tf2dRange[1] = tRange[1];
+          tf2dProxy->RescaleTransferFunction(tf2dRange);
         }
-        tf2dRange[0] = tRange[0];
-        tf2dRange[1] = tRange[1];
-        tf2dProxy->RescaleTransferFunction(tf2dRange);
-      }
-      // disable auto-rescale of transfer function since the user has set on
-      // explicitly (BUG #14371).
-      if (dialog->doLock())
-      {
-        for (auto lut : luts)
+        // disable auto-rescale of transfer function since the user has set on
+        // explicitly (BUG #14371).
+        if (dialog->doLock())
         {
-          vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
-            .Set(vtkSMTransferFunctionManager::NEVER);
-          lut->UpdateVTKObjects();
+          for (auto lut : luts)
+          {
+            vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
+              .Set(vtkSMTransferFunctionManager::NEVER);
+            lut->UpdateVTKObjects();
+          }
         }
       }
-    }
-    END_UNDO_SET();
-  });
+      END_UNDO_SET();
+    });
 
   return dialog;
 }
@@ -386,38 +388,40 @@ pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->show();
 
-  QObject::connect(dialog, &pqRescaleScalarRangeToDataOverTimeDialog::apply, [=]() {
-    const QString extraInfo =
-      selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks
-      ? tr("Block ")
-      : QString();
-    const QString undoText =
-      tr("Reset ") + extraInfo + tr("Transfer Function Ranges Using Temporal Data Range");
-    BEGIN_UNDO_SET(undoText);
-    repr->resetLookupTableScalarRangeOverTime(selectedPropertiesType);
-
-    // disable auto-rescale of transfer function since the user has set one
-    // explicitly (BUG #14371).
-    if (dialog->doLock())
+  QObject::connect(dialog, &pqRescaleScalarRangeToDataOverTimeDialog::apply,
+    [=]()
     {
-      vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper2;
-      colorMapEditorHelper2->SetSelectedPropertiesType(selectedPropertiesType);
-      if (colorMapEditorHelper2->GetAnySelectedUsingScalarColoring(repr->getProxy()))
+      const QString extraInfo =
+        selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks
+        ? tr("Block ")
+        : QString();
+      const QString undoText =
+        tr("Reset ") + extraInfo + tr("Transfer Function Ranges Using Temporal Data Range");
+      BEGIN_UNDO_SET(undoText);
+      repr->resetLookupTableScalarRangeOverTime(selectedPropertiesType);
+
+      // disable auto-rescale of transfer function since the user has set one
+      // explicitly (BUG #14371).
+      if (dialog->doLock())
       {
-        for (auto& lut : colorMapEditorHelper2->GetSelectedLookupTables(repr->getProxy()))
+        vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper2;
+        colorMapEditorHelper2->SetSelectedPropertiesType(selectedPropertiesType);
+        if (colorMapEditorHelper2->GetAnySelectedUsingScalarColoring(repr->getProxy()))
         {
-          if (lut)
+          for (auto& lut : colorMapEditorHelper2->GetSelectedLookupTables(repr->getProxy()))
           {
-            vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
-              .Set(vtkSMTransferFunctionManager::NEVER);
-            lut->UpdateVTKObjects();
+            if (lut)
+            {
+              vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
+                .Set(vtkSMTransferFunctionManager::NEVER);
+              lut->UpdateVTKObjects();
+            }
           }
         }
       }
-    }
-    repr->renderViewEventually();
-    END_UNDO_SET();
-  });
+      repr->renderViewEventually();
+      END_UNDO_SET();
+    });
   return dialog;
 }
 

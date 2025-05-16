@@ -438,27 +438,29 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
   {
     if (auto scene = manager->getActiveScene())
     {
-      QObject::connect(scene, &pqAnimationScene::tick, this, [this](const int) {
-        const auto& internals = *(this->Internals);
-        if (internals.LookupTableProxy != nullptr)
+      QObject::connect(scene, &pqAnimationScene::tick, this,
+        [this](const int)
         {
-          int rescaleMode =
-            vtkSMPropertyHelper(internals.LookupTableProxy, "AutomaticRescaleRangeMode", true)
-              .GetAsInt();
-          if (rescaleMode ==
-            vtkSMTransferFunctionManager::TransferFunctionResetMode::GROW_ON_APPLY_AND_TIMESTEP)
+          const auto& internals = *(this->Internals);
+          if (internals.LookupTableProxy != nullptr)
           {
-            // extends the list of annotations.
-            this->addActiveAnnotations(/*force=*/false, /*extend=*/true);
+            int rescaleMode =
+              vtkSMPropertyHelper(internals.LookupTableProxy, "AutomaticRescaleRangeMode", true)
+                .GetAsInt();
+            if (rescaleMode ==
+              vtkSMTransferFunctionManager::TransferFunctionResetMode::GROW_ON_APPLY_AND_TIMESTEP)
+            {
+              // extends the list of annotations.
+              this->addActiveAnnotations(/*force=*/false, /*extend=*/true);
+            }
+            else if (rescaleMode ==
+              vtkSMTransferFunctionManager::TransferFunctionResetMode::RESET_ON_APPLY_AND_TIMESTEP)
+            {
+              // clamps the list of annotations to the scalar range of the active source.
+              this->addActiveAnnotations(/*force=*/false, /*extend=*/false);
+            }
           }
-          else if (rescaleMode ==
-            vtkSMTransferFunctionManager::TransferFunctionResetMode::RESET_ON_APPLY_AND_TIMESTEP)
-          {
-            // clamps the list of annotations to the scalar range of the active source.
-            this->addActiveAnnotations(/*force=*/false, /*extend=*/false);
-          }
-        }
-      });
+        });
     }
   }
 
@@ -683,9 +685,8 @@ QList<QVariant> pqColorAnnotationsWidget::visibilities() const
   QList<QVariant> reply;
   auto visibilities = this->Internals->Model->visibilities();
   std::sort(visibilities.begin(), visibilities.end(),
-    [](std::pair<QString, int> a, std::pair<QString, int> b) {
-      return a.first.compare(b.first, Qt::CaseInsensitive) < 0;
-    });
+    [](std::pair<QString, int> a, std::pair<QString, int> b)
+    { return a.first.compare(b.first, Qt::CaseInsensitive) < 0; });
   for (const auto& vis : visibilities)
   {
     reply.push_back(vis.first);

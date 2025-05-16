@@ -56,19 +56,21 @@ void fillByteArray(ArrayType* signal, unsigned int sampleSize, QByteArray* byteA
   vtkIdType numberOfSamples = signal->GetNumberOfValues();
   byteArray->resize(sampleSize * numberOfSamples);
 
-  vtkSMPTools::For(0, numberOfSamples, [&](unsigned int begin, unsigned int end) {
-    const auto range = vtk::DataArrayValueRange<1>(signal, begin, end);
-    unsigned int byteIdx = begin * sampleSize;
-    for (const auto sample : range)
+  vtkSMPTools::For(0, numberOfSamples,
+    [&](unsigned int begin, unsigned int end)
     {
-      ValueType s = static_cast<ValueType>(sample);
-      char* bytePtr = reinterpret_cast<char*>(&s);
-      for (unsigned int i = 0; i < sampleSize; i++)
+      const auto range = vtk::DataArrayValueRange<1>(signal, begin, end);
+      unsigned int byteIdx = begin * sampleSize;
+      for (const auto sample : range)
       {
-        (*byteArray)[byteIdx++] = *(bytePtr + i);
+        ValueType s = static_cast<ValueType>(sample);
+        char* bytePtr = reinterpret_cast<char*>(&s);
+        for (unsigned int i = 0; i < sampleSize; i++)
+        {
+          (*byteArray)[byteIdx++] = *(bytePtr + i);
+        }
       }
-    }
-  });
+    });
 }
 
 struct SetupAndFill
@@ -346,7 +348,8 @@ bool pqAudioPlayer::pqInternals::fetchAndPrepareData()
   audioFormat.setSampleType(sampleType);
 
   // Look for a device that supports the format
-  auto isDeviceValid = [audioFormat](const QAudioDeviceInfo& info) {
+  auto isDeviceValid = [audioFormat](const QAudioDeviceInfo& info)
+  {
     return !info.isNull() && info.isFormatSupported(audioFormat) &&
       !info.supportedCodecs().empty() && !info.supportedSampleRates().empty() &&
       !info.supportedSampleTypes().empty() && !info.supportedSampleSizes().empty() &&

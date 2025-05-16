@@ -257,8 +257,9 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
   auto& internals = (*this->Internals);
   auto& ui = internals.Ui;
 
-  QObject::connect(
-    ui.timeValueComboBox->lineEdit(), &QLineEdit::editingFinished, [this, &internals, &ui]() {
+  QObject::connect(ui.timeValueComboBox->lineEdit(), &QLineEdit::editingFinished,
+    [this, &internals, &ui]()
+    {
       // user has selected a timestep using the combo-box.
       const double time = ui.timeValueComboBox->currentData().toDouble();
       if (internals.State.canTimeBeSet(time))
@@ -267,29 +268,33 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
       }
     });
 
-  QObject::connect(ui.timeValueComboBox, &QComboBox::currentTextChanged, [this, &internals, &ui]() {
-    // user has selected a timestep using the combo-box.
-    const double time = ui.timeValueComboBox->currentData().toDouble();
-    if (internals.State.canTimeBeSet(time))
+  QObject::connect(ui.timeValueComboBox, &QComboBox::currentTextChanged,
+    [this, &internals, &ui]()
     {
-      this->setCurrentTime(time);
-    }
-  });
+      // user has selected a timestep using the combo-box.
+      const double time = ui.timeValueComboBox->currentData().toDouble();
+      if (internals.State.canTimeBeSet(time))
+      {
+        this->setCurrentTime(time);
+      }
+    });
 
   // the idiosyncrasies of QSpinBox make it so that we have to delay when we
   // respond to the "go-to-next" event (see paraview/paraview#18204).
   auto timer = new pqTimer(this);
   timer->setInterval(100);
   timer->setSingleShot(true);
-  QObject::connect(timer, &QTimer::timeout, [this, &internals, &ui]() {
-    // user has changed the time-step in the spinbox.
-    const int timeIndex = ui.timestepValue->value();
-    double time;
-    if (internals.State.checkTimeStepFromIndex(timeIndex, time))
+  QObject::connect(timer, &QTimer::timeout,
+    [this, &internals, &ui]()
     {
-      this->setCurrentTime(time);
-    }
-  });
+      // user has changed the time-step in the spinbox.
+      const int timeIndex = ui.timestepValue->value();
+      double time;
+      if (internals.State.checkTimeStepFromIndex(timeIndex, time))
+      {
+        this->setCurrentTime(time);
+      }
+    });
 
   QObject::connect(
     ui.timestepValue, SIGNAL(valueChangedAndEditingFinished()), timer, SLOT(start()));

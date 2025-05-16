@@ -1383,12 +1383,14 @@ void pqPipelineModel::addExtractor(pqExtractor* egenerator)
   // ensure the "enabled" icon is updated when enabled-state changes.
   QPointer<pqPipelineModelDataItem> itemPtr = item;
   QPointer<pqPipelineModel> self = this;
-  QObject::connect(egenerator, &pqExtractor::enabledStateChanged, [itemPtr, self]() {
-    if (itemPtr && self)
+  QObject::connect(egenerator, &pqExtractor::enabledStateChanged,
+    [itemPtr, self]()
     {
-      itemPtr->updateVisibilityIcon(self->View, false);
-    }
-  });
+      if (itemPtr && self)
+      {
+        itemPtr->updateVisibilityIcon(self->View, false);
+      }
+    });
 }
 
 //-----------------------------------------------------------------------------

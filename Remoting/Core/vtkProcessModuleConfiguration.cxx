@@ -39,7 +39,8 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
       "Log verbosity on stderr as an integer in range [-9, 9] "
       "or INFO, WARNING, ERROR, or OFF. Defaults to INFO(0).")
     ->transform(
-      [](const std::string& value) {
+      [](const std::string& value)
+      {
         auto xformedValue = vtkLogger::ConvertToVerbosity(value.c_str());
         if (xformedValue == vtkLogger::VERBOSITY_INVALID)
         {
@@ -62,7 +63,8 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
   groupLogging
     ->add_option(
       "-l,--log",
-      [this](const CLI::results_t& results) {
+      [this](const CLI::results_t& results)
+      {
         for (const auto& value : results)
         {
           const auto separator = value.find_last_of(',');

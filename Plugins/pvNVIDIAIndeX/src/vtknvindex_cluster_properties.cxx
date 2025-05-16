@@ -465,7 +465,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
 // Define this to match local rank i to GPU i. Otherwise IndeX will to the assignment internally,
 // using all available GPUs.
-//#define VTKNVINDEX_MATCH_GPUS_TO_RANKS
+// #define VTKNVINDEX_MATCH_GPUS_TO_RANKS
 #ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
   // Gather all gpu ids.
   mi::Sint32 gpu_id = current_localrank;

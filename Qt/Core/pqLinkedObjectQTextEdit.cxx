@@ -12,12 +12,14 @@ void pqLinkedObjectQTextEdit::link(pqLinkedObjectInterface* other)
   if (other)
   {
     this->ConnectedTo = other;
-    this->Connection = QObject::connect(&this->TextEdit, &QTextEdit::textChanged, [this]() {
-      if (!this->SettingText)
+    this->Connection = QObject::connect(&this->TextEdit, &QTextEdit::textChanged,
+      [this]()
       {
-        this->ConnectedTo->setText(this->getText());
-      }
-    });
+        if (!this->SettingText)
+        {
+          this->ConnectedTo->setText(this->getText());
+        }
+      });
   }
 }
 

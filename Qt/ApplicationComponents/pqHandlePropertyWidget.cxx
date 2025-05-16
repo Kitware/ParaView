@@ -53,16 +53,18 @@ pqHandlePropertyWidget::pqHandlePropertyWidget(
   this->connect(pqPVApplicationCore::instance()->selectionManager(),
     SIGNAL(selectionChanged(pqOutputPort*)), SLOT(selectionChanged()));
   this->selectionChanged();
-  QObject::connect(ui.useSelectionCenter, &QPushButton::clicked, [this]() {
-    auto selMgr = pqPVApplicationCore::instance()->selectionManager();
-    auto bbox = selMgr->selectedDataBounds();
-    if (bbox.IsValid())
+  QObject::connect(ui.useSelectionCenter, &QPushButton::clicked,
+    [this]()
     {
-      double center[3];
-      bbox.GetCenter(center);
-      this->setWorldPosition(center[0], center[1], center[2]);
-    }
-  });
+      auto selMgr = pqPVApplicationCore::instance()->selectionManager();
+      auto bbox = selMgr->selectedDataBounds();
+      if (bbox.IsValid())
+      {
+        double center[3];
+        bbox.GetCenter(center);
+        this->setWorldPosition(center[0], center[1], center[2]);
+      }
+    });
 
   // link show3DWidget checkbox
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));

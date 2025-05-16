@@ -290,7 +290,8 @@ int vtkImageVolumeRepresentation::RequestData(
     {
       auto images = vtkCompositeDataSet::GetDataSets(doTree);
       images.erase(std::remove_if(images.begin(), images.end(),
-                     [](vtkDataSet* ds) {
+                     [](vtkDataSet* ds)
+                     {
                        return vtkRectilinearGrid::SafeDownCast(ds) == nullptr &&
                          vtkImageData::SafeDownCast(ds) == nullptr;
                      }),

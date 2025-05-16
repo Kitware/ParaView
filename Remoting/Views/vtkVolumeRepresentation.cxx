@@ -164,22 +164,24 @@ void CopyComponent(vtkDataArray* dst, int dstComponent, vtkDataArray* src, int s
   }
   else
   {
-    vtkSMPTools::For(0, src->GetNumberOfTuples(), [&](vtkIdType start, vtkIdType end) {
-      // Compute vector value
-      auto inTuples = vtk::DataArrayTupleRange(src, start, end);
-      auto outValues = vtk::DataArrayTupleRange(dst, start, end);
-      auto outIter = outValues.begin();
-      for (auto tuple : inTuples)
+    vtkSMPTools::For(0, src->GetNumberOfTuples(),
+      [&](vtkIdType start, vtkIdType end)
       {
-        double magnitude = 0.0;
-        for (auto component : tuple)
+        // Compute vector value
+        auto inTuples = vtk::DataArrayTupleRange(src, start, end);
+        auto outValues = vtk::DataArrayTupleRange(dst, start, end);
+        auto outIter = outValues.begin();
+        for (auto tuple : inTuples)
         {
-          magnitude += static_cast<double>(component) * static_cast<double>(component);
+          double magnitude = 0.0;
+          for (auto component : tuple)
+          {
+            magnitude += static_cast<double>(component) * static_cast<double>(component);
+          }
+          (*outIter)[dstComponent] = std::sqrt(magnitude);
+          ++outIter;
         }
-        (*outIter)[dstComponent] = std::sqrt(magnitude);
-        ++outIter;
-      }
-    });
+      });
   }
 }
 
@@ -259,7 +261,8 @@ void vtkVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  auto printObject = [&](vtkObject* object, const std::string& name) {
+  auto printObject = [&](vtkObject* object, const std::string& name)
+  {
     if (object)
     {
       os << indent << name << ":\n";

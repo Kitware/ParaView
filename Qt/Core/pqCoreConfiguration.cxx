@@ -52,7 +52,8 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
   groupTesting
     ->add_option(
       "--test-script",
-      [this](const CLI::results_t& args) {
+      [this](const CLI::results_t& args)
+      {
         if (this->TestScripts.empty())
         {
           this->TestScripts.resize(static_cast<int>(args.size()));
@@ -74,7 +75,8 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
   groupTesting
     ->add_option(
       "--test-baseline",
-      [this](const CLI::results_t& args) {
+      [this](const CLI::results_t& args)
+      {
         if (this->TestScripts.empty())
         {
           this->TestScripts.resize(static_cast<int>(args.size()));
@@ -96,7 +98,8 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
   groupTesting
     ->add_option(
       "--test-threshold",
-      [this](const CLI::results_t& args) {
+      [this](const CLI::results_t& args)
+      {
         if (this->TestScripts.empty())
         {
           this->TestScripts.resize(static_cast<int>(args.size()));
@@ -152,20 +155,22 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
     ->excludes("--state")
     ->excludes("--script")
     ->excludes("--data")
-    ->each([this](const std::string& value) {
-      if (::EndsWith(value, ".pvsm"))
+    ->each(
+      [this](const std::string& value)
       {
-        this->StateFileName = value;
-      }
-      else if (::EndsWith(value, ".py"))
-      {
-        this->PythonScript = value;
-      }
-      else
-      {
-        this->DataFileNames.push_back(value);
-      }
-    });
+        if (::EndsWith(value, ".pvsm"))
+        {
+          this->StateFileName = value;
+        }
+        else if (::EndsWith(value, ".py"))
+        {
+          this->PythonScript = value;
+        }
+        else
+        {
+          this->DataFileNames.push_back(value);
+        }
+      });
 
   groupStartup
     ->add_option("--live", this->CatalystLivePort,

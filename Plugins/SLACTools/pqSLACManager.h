@@ -15,7 +15,7 @@ class pqRenderView;
 class pqServer;
 class pqView;
 
-//#define AUTO_FIND_TEMPORAL_RANGE
+// #define AUTO_FIND_TEMPORAL_RANGE
 
 /// This singleton class manages the state associated with the packaged
 /// visualizations provided by the SLAC tools.

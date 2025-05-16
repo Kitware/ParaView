@@ -163,9 +163,8 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
                << vtkClientServerStream::End;
 
         this->ObjectCache->erase(std::find_if(this->ObjectCache->begin(), this->ObjectCache->end(),
-          [id](std::pair<vtkTypeUInt32, vtkSmartPointer<vtkObjectBase>>& pair) {
-            return pair.first == id;
-          }));
+          [id](std::pair<vtkTypeUInt32, vtkSmartPointer<vtkObjectBase>>& pair)
+          { return pair.first == id; }));
       }
       else
       {

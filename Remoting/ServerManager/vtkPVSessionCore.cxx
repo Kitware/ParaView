@@ -861,7 +861,7 @@ void vtkPVSessionCore::GatherInformationStatelliteCallback()
   {                                                                                                \
     if ((array_ptr) != nullptr)                                                                    \
     {                                                                                              \
-      delete[](array_ptr);                                                                         \
+      delete[] (array_ptr);                                                                        \
       (array_ptr) = nullptr;                                                                       \
     }                                                                                              \
   }

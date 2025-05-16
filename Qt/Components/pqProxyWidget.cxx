@@ -1235,17 +1235,19 @@ void pqProxyWidget::showContextMenu(const QPoint& pt, pqPropertyWidget* propWidg
   }
   QMenu menu(this);
   menu.setObjectName("PropertyContextMenu");
-  auto* useDefault = menu.addAction(tr("Use as Default"), propWidget, [this, propWidget]() {
-    // get the property name
-    std::string name = this->Internals->Proxy->GetPropertyName(propWidget->property());
-    // tell settings to save a single property by name
-    std::vector<std::string> names{ name };
-    vtkNew<vtkSMNamedPropertyIterator> propertyIt;
-    propertyIt->SetProxy(this->Internals->Proxy);
-    propertyIt->SetPropertyNames(names);
-    vtkSMSettings* settings = vtkSMSettings::GetInstance();
-    settings->SetProxySettings(this->Internals->Proxy, propertyIt, false);
-  });
+  auto* useDefault = menu.addAction(tr("Use as Default"), propWidget,
+    [this, propWidget]()
+    {
+      // get the property name
+      std::string name = this->Internals->Proxy->GetPropertyName(propWidget->property());
+      // tell settings to save a single property by name
+      std::vector<std::string> names{ name };
+      vtkNew<vtkSMNamedPropertyIterator> propertyIt;
+      propertyIt->SetProxy(this->Internals->Proxy);
+      propertyIt->SetPropertyNames(names);
+      vtkSMSettings* settings = vtkSMSettings::GetInstance();
+      settings->SetProxySettings(this->Internals->Proxy, propertyIt, false);
+    });
   useDefault->setObjectName("UseDefault");
 
   auto pqproxy = pqProxy::findProxy(this->proxy());

@@ -456,7 +456,10 @@ void vtkPointGaussianRepresentation::SetCoordinateSystem(int coordSys)
 
 //----------------------------------------------------------------------------
 #define vtkForwardActorCallMacro(actorMethod, arg, arg_type)                                       \
-  void vtkPointGaussianRepresentation::actorMethod(arg_type arg) { this->Actor->actorMethod(arg); }
+  void vtkPointGaussianRepresentation::actorMethod(arg_type arg)                                   \
+  {                                                                                                \
+    this->Actor->actorMethod(arg);                                                                 \
+  }
 #define vtkForwardActorCallMacro3Args(actorMethod, arg_type)                                       \
   void vtkPointGaussianRepresentation::actorMethod(arg_type a, arg_type b, arg_type c)             \
   {                                                                                                \
