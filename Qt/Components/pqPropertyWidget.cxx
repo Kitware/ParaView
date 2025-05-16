@@ -90,7 +90,24 @@ QString pqPropertyWidget::getTooltip(vtkSMProperty* smproperty)
       "ServerManagerXML", smproperty->GetDocumentation()->GetDescription()));
     doc = doc.trimmed();
     doc = doc.replace(QRegularExpression("\\s+"), " ");
-    return QString("<html><head/><body><p align=\"justify\">%1</p></body></html>").arg(doc);
+    // imperfect way to generate rich-text with wrapping such that the rendered
+    // tooltip isn't too narrow, since Qt doesn't let us set the width explicitly
+    int wrapLength = 70;
+    int wrapWidth = 500;
+    if (doc.size() < wrapLength)
+    {
+      // entire text is formatted without wrapping
+      return QString("<html><head/><body><p style='white-space: pre'>%1</p></body></html>")
+        .arg(doc);
+    }
+    else
+    {
+      // text is wrapped by enforced table width
+      return QString(
+        "<html><head/><body><table width='%2'><tr><td>%1</td></tr></table></body></html>")
+        .arg(doc)
+        .arg(wrapWidth);
+    }
   }
   return QString();
 }
