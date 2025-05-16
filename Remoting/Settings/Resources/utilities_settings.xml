@@ -643,7 +643,7 @@
         panel_visibility="default">
         <BooleanDomain name="bool" />
         <Documentation>
-          Use VTK-m accelerated filters where available.
+          Use Viskores accelerated filters where available.
         </Documentation>
       </IntVectorProperty>
 

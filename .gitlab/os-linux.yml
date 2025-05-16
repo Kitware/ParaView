@@ -92,13 +92,13 @@
     variables:
         CMAKE_CONFIGURATION: fedora35_doxygen
 
-.fedora35_shared_mpi_offscreen_osmesa_python_qt_vtkmoverride:
+.fedora35_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride:
     extends:
         - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_shared_mpi_offscreen_osmesa_python_qt_vtkmoverride
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride
         VTK_DEFAULT_OPENGL_WINDOW: vtkOSOpenGLRenderWindow
 
 .fedora35_shared_mpi_core:
@@ -126,13 +126,13 @@
         CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt
         CMAKE_BUILD_TYPE: Debug
 
-.fedora35_shared_mpi_python_qt_vtkmoverride:
+.fedora35_shared_mpi_python_qt_viskoresoverride:
     extends:
         - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_vtkmoverride
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_viskoresoverride
 
 .fedora35_tidy:
     extends:

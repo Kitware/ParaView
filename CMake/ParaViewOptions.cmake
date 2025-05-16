@@ -103,7 +103,10 @@ option(PARAVIEW_SERIAL_TESTS_USE_MPIEXEC
   "Used on HPC to run serial tests on compute nodes" OFF)
 mark_as_advanced(PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
 option(PARAVIEW_USE_CUDA "Support CUDA compilation" OFF)
-option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" "${PARAVIEW_ENABLE_NONESSENTIAL}")
+
+vtk_deprecated_setting(default_use_viskores PARAVIEW_USE_VISKORES PARAVIEW_USE_VTKM "${PARAVIEW_ENABLE_NONESSENTIAL}")
+option(PARAVIEW_USE_VISKORES "Enable Viskores accelerated algorithms" "${default_use_viskores}")
+
 if (UNIX AND NOT APPLE)
   option(PARAVIEW_USE_MEMKIND  "Build support for extended memory" OFF)
 endif ()
@@ -382,7 +385,7 @@ paraview_require_module(
   MODULES   VTK::RenderingMatplotlib)
 
 paraview_require_module(
-  CONDITION PARAVIEW_USE_VTKM
+  CONDITION PARAVIEW_USE_VISKORES
   MODULES   VTK::AcceleratorsVTKmFilters
   EXCLUSIVE)
 

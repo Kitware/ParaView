@@ -1,8 +1,8 @@
 NAME
   VTKmFilters
 CONDITION
-  PARAVIEW_USE_VTKM
+  PARAVIEW_USE_VISKORES
 DESCRIPTION
-  VTKm many-core filters
+  Viskores (Previously known as VTKm) filters
 REQUIRES_MODULES
   VTK::AcceleratorsVTKmFilters

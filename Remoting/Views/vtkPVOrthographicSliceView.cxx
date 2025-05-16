@@ -5,6 +5,7 @@
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkGridAxesHelper.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCenterAxesActor.h"
@@ -451,11 +452,11 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
         this->GridAxes3DActors[cc]->SetLabelMask(0xff);
       }
       this->GridAxes3DActors[YZ_PLANE]->SetFaceMask(
-        vtkGridAxes3DActor::MAX_YZ | vtkGridAxes3DActor::MIN_YZ);
+        vtkGridAxesHelper::MAX_YZ | vtkGridAxesHelper::MIN_YZ);
       this->GridAxes3DActors[ZX_PLANE]->SetFaceMask(
-        vtkGridAxes3DActor::MAX_ZX | vtkGridAxes3DActor::MIN_ZX);
+        vtkGridAxesHelper::MAX_ZX | vtkGridAxesHelper::MIN_ZX);
       this->GridAxes3DActors[XY_PLANE]->SetFaceMask(
-        vtkGridAxes3DActor::MAX_XY | vtkGridAxes3DActor::MIN_XY);
+        vtkGridAxesHelper::MAX_XY | vtkGridAxesHelper::MIN_XY);
     }
   }
 
@@ -466,8 +467,8 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
 void vtkPVOrthographicSliceView::Update()
 {
   this->SlicePositionAxes3D->SetUseBounds(0);
-  // Since vtkGridAxes3DActor is potentially modified in Update (all of those
-  // modifications are passed on to our vtkGridAxes3DActor instances in
+  // Since vtkGridAxesActor3D is potentially modified in Update (all of those
+  // modifications are passed on to our vtkGridAxesActor3D instances in
   // UpdateCenterAxes(), hence we avoid forcing ShallowCopy on Render since that
   // changes too many things.
   bool prev = this->GridAxes3DActorsNeedShallowCopy;

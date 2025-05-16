@@ -62,7 +62,7 @@
         <BooleanDomain name="bool" />
         <Documentation>
           This property determines whether data should be converted to VTK
-          or stay in VTK-m format.
+          or stay in Viskores format.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty

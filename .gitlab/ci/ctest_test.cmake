@@ -124,7 +124,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
       "^ParaViewExample-Catalyst2/PythonSteeringExample$")
   endif ()
 
-  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "vtkmoverride")
+  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "viskoresoverride")
     list(APPEND test_exclusions
       # https://gitlab.kitware.com/paraview/paraview/-/issues/22801
       "^paraviewPython-TestCatalystClient$"

@@ -20,7 +20,7 @@ if (TARGET ParaView::RemotingViews)
     PythonScriptTest.py)
 endif()
 
-if (PARAVIEW_PLUGIN_ENABLE_VTKmFilters AND PARAVIEW_USE_VTKM)
+if (PARAVIEW_PLUGIN_ENABLE_VTKmFilters AND PARAVIEW_USE_VISKORES)
   list(APPEND legacy_catalyst_pipelines
     CatalystLoadVTKmFilterPlugin.py)
 endif()

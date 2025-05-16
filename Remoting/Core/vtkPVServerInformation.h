@@ -161,7 +161,7 @@ public:
 
   ///@{
   /**
-   * Return true if VTK-m accelerated filters override is enabled in this build.
+   * Return true if Viskores accelerated filters override is enabled in this build.
    */
   vtkGetMacro(AcceleratedFiltersOverrideAvailable, int);
   ///@}

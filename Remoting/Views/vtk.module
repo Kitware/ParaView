@@ -30,6 +30,7 @@ DEPENDS
   VTK::RenderingContext2D
   VTK::RenderingCore
   VTK::RenderingCellGrid
+  VTK::RenderingGridAxes
   VTK::RenderingParallel
   VTK::ViewsContext2D
   VTK::ViewsCore
@@ -66,7 +67,7 @@ OPTIONAL_DEPENDS
   VTK::FiltersOpenTURNS
   VTK::ParallelMPI
   VTK::RenderingRayTracing
-  VTK::vtkm
+  VTK::vtkviskores
 TEST_DEPENDS
   ParaView::RemotingApplication
   VTK::glad

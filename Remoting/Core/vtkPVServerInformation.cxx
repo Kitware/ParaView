@@ -78,7 +78,7 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->SMPBackendName = vtkSMPTools::GetBackend() ? vtkSMPTools::GetBackend() : "";
   this->SMPMaxNumberOfThreads = vtkSMPTools::GetEstimatedNumberOfThreads();
 
-#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters && VTK_ENABLE_VTKM_OVERRIDES
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters && VTK_ENABLE_VISKORES_OVERRIDES
   this->AcceleratedFiltersOverrideAvailable = true;
 #else
   this->AcceleratedFiltersOverrideAvailable = false;
