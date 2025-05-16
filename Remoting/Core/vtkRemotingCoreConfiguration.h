@@ -262,6 +262,21 @@ public:
    */
   vtkGetMacro(ForceOffscreenRendering, bool);
 
+  enum OpenGLWindowBackendEnum
+  {
+    OPENGL_WINDOW_BACKEND_DEFAULT,
+    OPENGL_WINDOW_BACKEND_EGL,
+    OPENGL_WINDOW_BACKEND_GLX,
+    OPENGL_WINDOW_BACKEND_OSMESA,
+    OPENGL_WINDOW_BACKEND_WIN32,
+  };
+  /**
+   *Get the OpenGL window backend to use. This is only valid on rendering
+   * processes. The default is `OPENGL_WINDOW_BACKEND_DEFAULT` which means
+   * use the default backend for the platform.
+   */
+  vtkGetMacro(OpenGLWindowBackend, OpenGLWindowBackendEnum);
+
   /**
    * When set to true, ParaView will create on-screen render windows.
    */
@@ -353,6 +368,7 @@ private:
   bool DisableXDisplayTests = false;
   bool ForceOnscreenRendering = false;
   bool ForceOffscreenRendering = false;
+  OpenGLWindowBackendEnum OpenGLWindowBackend = OPENGL_WINDOW_BACKEND_DEFAULT;
   int EGLDeviceIndex = -1;
   DisplaysAssignmentModeEnum DisplaysAssignmentMode = ROUNDROBIN;
   bool MultiServerMode = false;
