@@ -288,6 +288,19 @@ set_tests_properties(paraviewPython-TestPV_PLUGIN_PATH
         PROPERTIES ENVIRONMENT "PV_PLUGIN_PATH=${CMAKE_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/Plugin")
 
 #------------------------------------------------------------------------------
+# Add a couple of tests for pvpython package listing. Just verify they run.
+add_test(NAME pvpython-ListPackagesTest
+  COMMAND
+    "$<TARGET_FILE:ParaView::pvpython>"
+      -m paraview.apps.packages)
+
+add_test(NAME pvpython-ListPackagesRequirementsTest
+  COMMAND
+    "$<TARGET_FILE:ParaView::pvpython>"
+      -m paraview.apps.packages
+      --format requirements)
+
+#------------------------------------------------------------------------------
 # Add HTG rendering tests
 paraview_add_test_python(
   NO_DATA NO_RT

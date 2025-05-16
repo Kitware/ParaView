@@ -24,3 +24,5 @@ if __name__ == '__main__':
         print("Available applications:")
         if glance.is_supported():
             print("  glance")
+
+        print("  packages [--format requirements]")
