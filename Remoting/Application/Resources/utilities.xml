@@ -1254,10 +1254,10 @@
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+      <DoubleVectorProperty default_values="0.29 0.27 0.26"
                             name="BackgroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0 0 0.16"
+      <DoubleVectorProperty default_values="0.85 0.83 0.82"
                             name="BackgroundColor2"
                             number_of_elements="3"></DoubleVectorProperty>
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
