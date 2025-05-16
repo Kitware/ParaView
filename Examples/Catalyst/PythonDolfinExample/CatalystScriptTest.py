@@ -26,7 +26,7 @@ def CreateCoProcessor():
       # and provide it with information such as the filename to use,
       # how frequently to write the images, etc.
       coprocessor.RegisterView(renderView1,
-                               filename='results/image_%t.png', freq=1, fittoscreen=1, magnification=1, width=400, height=400)
+                               filename='results/image_{time}.png', freq=1, fittoscreen=1, magnification=1, width=400, height=400)
 
       # ----------------------------------------------------------------
       # setup the data processing pipelines

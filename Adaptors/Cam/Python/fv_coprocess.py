@@ -24,26 +24,26 @@ def CreateCoProcessor():
       # writer for 2D rectilinear grid
       h02D = coprocessor.CreateProducer(datadescription, 'input')
       h02DWriter = servermanager.writers.XMLPUnstructuredGridWriter(Input=h02D)
-      h02DWriter.FileName = 'h02D_%t.pvtu'
+      h02DWriter.FileName = 'h02D_{time}.pvtu'
       coprocessor.RegisterWriter(h02DWriter, filename=h02DWriter.FileName, freq=48)
 
       # writer for 3D rectilinear grid
       h03D = coprocessor.CreateProducer(datadescription, 'input3D')
       h03DWriter = servermanager.writers.XMLPUnstructuredGridWriter(Input=h03D)
-      h03DWriter.FileName = 'h03D_%t.pvtu'
+      h03DWriter.FileName = 'h03D_{time}.pvtu'
       coprocessor.RegisterWriter(h03DWriter, filename=h03DWriter.FileName, freq=48)
 
       # writer for 2D spherical grid
       h0s2D = coprocessor.CreateProducer(datadescription, 'sinput')
       h0s2DWriter = servermanager.writers.XMLPUnstructuredGridWriter(Input=h0s2D)
-      h0s2DWriter.FileName = 'h0s2D_%t.pvtu'
+      h0s2DWriter.FileName = 'h0s2D_{time}.pvtu'
       coprocessor.RegisterWriter(h0s2DWriter,
                                  filename=h0s2DWriter.FileName, freq=48)
 
       # writer for 3D spherical grid
       h0s3D = coprocessor.CreateProducer(datadescription, 'sinput3D')
       h0s3DWriter = servermanager.writers.XMLPUnstructuredGridWriter(Input=h0s3D)
-      h0s3DWriter.FileName = 'h0s3D_%t.pvtu'
+      h0s3DWriter.FileName = 'h0s3D_{time}.pvtu'
       coprocessor.RegisterWriter(h0s3DWriter,
                                  filename=h0s3DWriter.FileName, freq=48)
 

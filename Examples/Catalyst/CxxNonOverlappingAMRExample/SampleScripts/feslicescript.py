@@ -23,7 +23,7 @@ def CreateCoProcessor():
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(writer, filename='slice_%t.vtm', freq=10)
+      coprocessor.RegisterWriter(writer, filename='slice_{time}.vtm', freq=10)
 
     return Pipeline()
 

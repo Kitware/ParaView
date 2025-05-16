@@ -18,7 +18,7 @@ def CreateCoProcessor():
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(gridWriter, filename='fullgrid_%t.vtm', freq=10)
+      coprocessor.RegisterWriter(gridWriter, filename='fullgrid_{time}.vtm', freq=10)
 
       Slice1 = Slice( Input=filename_18_vtm, guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
       Slice1.SliceType.Offset = 0.0
@@ -31,7 +31,7 @@ def CreateCoProcessor():
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(sliceWriter, filename='slice_%t.vtm', freq=10)
+      coprocessor.RegisterWriter(sliceWriter, filename='slice_{time}.vtm', freq=10)
 
     return Pipeline()
 
