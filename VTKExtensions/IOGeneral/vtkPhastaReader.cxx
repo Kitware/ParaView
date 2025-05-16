@@ -177,13 +177,6 @@ void xfread(void* ptr, size_t size, size_t count, FILE* stream)
     vtkGenericWarningMacro(<< "Could not read or end of file" << endl);
   }
 }
-
-template <typename... Args>
-void xfscanf(FILE* stream, const char* format, Args... args)
-{
-  int ret = fscanf(stream, format, args...);
-  (void)ret;
-}
 }
 
 int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* params, int expect)
@@ -244,7 +237,8 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
         }
         else
         {
-          xfscanf(fileObject, "%d\n", &integer_value);
+          auto result = vtk::scan<int>(fileObject, "{:d}\n");
+          integer_value = result ? result->value() : 0;
         }
       }
       else
@@ -457,16 +451,24 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
     char* ts1 = StringStripper(datatype);
     if (cscompare("integer", ts1))
     {
+      auto intValueArray = static_cast<int*>(valueArray);
       for (int n = 0; n < nUnits; n++)
       {
-        xfscanf(fileObject, "%d\n", (int*)((int*)valueArray + n));
+        auto result = vtk::scan<int>(fileObject, "{:d}\n");
+        intValueArray[n] = result ? result->value() : 0;
+        if (result)
+        {
+          intValueArray[n] = result->value();
+        }
       }
     }
     else if (cscompare("double", ts1))
     {
+      auto doubleValueArray = static_cast<double*>(valueArray);
       for (int n = 0; n < nUnits; n++)
       {
-        xfscanf(fileObject, "%lf\n", (double*)((double*)valueArray + n));
+        auto result = vtk::scan<double>(fileObject, "{:f}\n");
+        doubleValueArray[n] = result ? result->value() : 0;
       }
     }
     delete[] ts1;
