@@ -75,21 +75,25 @@ void pqExpressionsWidget::setupButtons(const QString& groupName)
   QObject::connect(chooser, SIGNAL(expressionSelected(const QString&)), this->OneLiner,
     SLOT(setPlainText(const QString&)));
 
-  this->connect(addToList, &QToolButton::clicked, [=]() {
-    bool saved =
-      pqExpressionsManager::addExpressionToSettings(groupName, this->OneLiner->toPlainText());
-    statusLine->setText(saved ? tr("Saved! ") : tr("Already Exists"));
-    statusLine->show();
-    QTimer::singleShot(5000, [=]() { statusLine->hide(); });
-  });
+  this->connect(addToList, &QToolButton::clicked,
+    [=]()
+    {
+      bool saved =
+        pqExpressionsManager::addExpressionToSettings(groupName, this->OneLiner->toPlainText());
+      statusLine->setText(saved ? tr("Saved! ") : tr("Already Exists"));
+      statusLine->show();
+      QTimer::singleShot(5000, [=]() { statusLine->hide(); });
+    });
 
-  this->connect(openManager, &QToolButton::clicked, [=]() {
-    pqExpressionsManagerDialog dialog(pqCoreUtilities::mainWidget(), groupName);
-    dialog.setObjectName("ExpressionsManagerDialog");
-    QObject::connect(&dialog, &pqExpressionsManagerDialog::expressionSelected, this->OneLiner,
-      &QTextEdit::setPlainText);
-    dialog.exec();
-  });
+  this->connect(openManager, &QToolButton::clicked,
+    [=]()
+    {
+      pqExpressionsManagerDialog dialog(pqCoreUtilities::mainWidget(), groupName);
+      dialog.setObjectName("ExpressionsManagerDialog");
+      QObject::connect(&dialog, &pqExpressionsManagerDialog::expressionSelected, this->OneLiner,
+        &QTextEdit::setPlainText);
+      dialog.exec();
+    });
 
   this->connect(clearExpression, &QToolButton::clicked, [=]() { this->OneLiner->clear(); });
 }

@@ -143,41 +143,49 @@ void pqPythonEditorActions::updateScriptsList(pqPythonManager* python_mgr)
 
     QAction* openAction = &actions[ScriptAction::Type::Open];
     openAction->setText(filename);
-    QObject::connect(openAction, &QAction::triggered, [openAction]() {
-      const QString openedFilename =
-        pqPythonScriptEditor::getScriptsDir() + "/" + openAction->text() + ".py";
-      auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
-      scriptEditor->open(openedFilename);
-    });
+    QObject::connect(openAction, &QAction::triggered,
+      [openAction]()
+      {
+        const QString openedFilename =
+          pqPythonScriptEditor::getScriptsDir() + "/" + openAction->text() + ".py";
+        auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
+        scriptEditor->open(openedFilename);
+      });
 
     QAction* loadAction = &actions[ScriptAction::Type::Load];
     loadAction->setText(filename);
-    QObject::connect(loadAction, &QAction::triggered, [loadAction]() {
-      const QString loadedFilename =
-        pqPythonScriptEditor::getScriptsDir() + "/" + loadAction->text() + ".py";
-      auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
-      scriptEditor->load(loadedFilename);
-    });
+    QObject::connect(loadAction, &QAction::triggered,
+      [loadAction]()
+      {
+        const QString loadedFilename =
+          pqPythonScriptEditor::getScriptsDir() + "/" + loadAction->text() + ".py";
+        auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
+        scriptEditor->load(loadedFilename);
+      });
 
     QAction* deleteAction = &actions[ScriptAction::Type::Delete];
     deleteAction->setText(filename);
-    QObject::connect(deleteAction, &QAction::triggered, [deleteAction]() {
-      const QString deletedFilename =
-        pqPythonScriptEditor::getScriptsDir() + "/" + deleteAction->text() + ".py";
-      QFile file(deletedFilename);
-      file.remove();
-      pqPythonScriptEditor::getUniqueInstance()->updateScriptList();
-    });
+    QObject::connect(deleteAction, &QAction::triggered,
+      [deleteAction]()
+      {
+        const QString deletedFilename =
+          pqPythonScriptEditor::getScriptsDir() + "/" + deleteAction->text() + ".py";
+        QFile file(deletedFilename);
+        file.remove();
+        pqPythonScriptEditor::getUniqueInstance()->updateScriptList();
+      });
 
     QAction* runAction = &actions[ScriptAction::Type::Run];
     runAction->setText(filename);
-    QObject::connect(runAction, &QAction::triggered, [runAction, python_mgr]() {
-      const QString runFilename =
-        pqPythonScriptEditor::getScriptsDir() + "/" + runAction->text() + ".py";
-      python_mgr->executeScriptAndRender(runFilename);
-      auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
-      scriptEditor->open(runFilename);
-    });
+    QObject::connect(runAction, &QAction::triggered,
+      [runAction, python_mgr]()
+      {
+        const QString runFilename =
+          pqPythonScriptEditor::getScriptsDir() + "/" + runAction->text() + ".py";
+        python_mgr->executeScriptAndRender(runFilename);
+        auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
+        scriptEditor->open(runFilename);
+      });
   }
 }
 
@@ -350,39 +358,43 @@ void pqPythonEditorActions::connect<pqPythonTabWidget>(
 
   QObject::connect(
     &actions[Action::NewFile], &QAction::triggered, tWidget, &pqPythonTabWidget::createNewEmptyTab);
-  QObject::connect(&actions[Action::OpenFile], &QAction::triggered, [tWidget]() {
-    pqServer* server = pqApplicationCore::instance()->getActiveServer();
-    pqFileDialog dialog(server, pqPythonScriptEditor::getUniqueInstance(),
-      QCoreApplication::translate("pqPythonEditorActions", "Open File"), QString(),
-      QCoreApplication::translate("pqPythonEditorActions", "Python Files") + QString(" (*.py);;"),
-      false, false);
-    dialog.setObjectName("FileOpenDialog");
-    if (QFileDialog::Accepted == dialog.exec())
+  QObject::connect(&actions[Action::OpenFile], &QAction::triggered,
+    [tWidget]()
     {
-      const QString filename = dialog.getAllSelectedFiles().begin()->first();
-      const vtkTypeUInt32 location = dialog.getSelectedLocation();
-      tWidget->addNewTextArea(filename, location);
-    }
+      pqServer* server = pqApplicationCore::instance()->getActiveServer();
+      pqFileDialog dialog(server, pqPythonScriptEditor::getUniqueInstance(),
+        QCoreApplication::translate("pqPythonEditorActions", "Open File"), QString(),
+        QCoreApplication::translate("pqPythonEditorActions", "Python Files") + QString(" (*.py);;"),
+        false, false);
+      dialog.setObjectName("FileOpenDialog");
+      if (QFileDialog::Accepted == dialog.exec())
+      {
+        const QString filename = dialog.getAllSelectedFiles().begin()->first();
+        const vtkTypeUInt32 location = dialog.getSelectedLocation();
+        tWidget->addNewTextArea(filename, location);
+      }
 
-    pqPythonScriptEditor::bringFront();
-  });
+      pqPythonScriptEditor::bringFront();
+    });
   QObject::connect(&actions[Action::CloseCurrentTab], &QAction::triggered, tWidget,
     &pqPythonTabWidget::closeCurrentTab);
-  QObject::connect(&actions[Action::DeleteAll], &QAction::triggered, tWidget, [tWidget]() {
-    QMessageBox::StandardButton ret = QMessageBox::question(tWidget,
-      QCoreApplication::translate("pqPythonEditorActions", "Delete All"),
-      QCoreApplication::translate(
-        "pqPythonEditorActions", "All scripts will be deleted. Are you sure?"));
-    if (ret == QMessageBox::StandardButton::Yes)
+  QObject::connect(&actions[Action::DeleteAll], &QAction::triggered, tWidget,
+    [tWidget]()
     {
-      pqCoreUtilities::removeRecursively(pqPythonScriptEditor::getScriptsDir());
-      for (int i = tWidget->count() - 1; i >= 0; --i)
+      QMessageBox::StandardButton ret = QMessageBox::question(tWidget,
+        QCoreApplication::translate("pqPythonEditorActions", "Delete All"),
+        QCoreApplication::translate(
+          "pqPythonEditorActions", "All scripts will be deleted. Are you sure?"));
+      if (ret == QMessageBox::StandardButton::Yes)
       {
-        Q_EMIT tWidget->tabCloseRequested(i);
+        pqCoreUtilities::removeRecursively(pqPythonScriptEditor::getScriptsDir());
+        for (int i = tWidget->count() - 1; i >= 0; --i)
+        {
+          Q_EMIT tWidget->tabCloseRequested(i);
+        }
+        pqPythonScriptEditor::updateScriptList();
       }
-      pqPythonScriptEditor::updateScriptList();
-    }
-  });
+    });
 }
 
 //-----------------------------------------------------------------------------

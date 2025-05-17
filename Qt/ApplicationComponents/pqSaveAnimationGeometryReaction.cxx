@@ -88,13 +88,16 @@ void pqSaveAnimationGeometryReaction::saveAnimationGeometry(const QString& filen
   progress.setWindowModality(Qt::ApplicationModal);
   progress.setWindowTitle(tr("Saving Geometry ..."));
   progress.show();
-  QObject::connect(&progress, &QProgressDialog::canceled, [pqscene, &progress]() {
-    progress.hide();
-    pqscene->pause();
-  });
+  QObject::connect(&progress, &QProgressDialog::canceled,
+    [pqscene, &progress]()
+    {
+      progress.hide();
+      pqscene->pause();
+    });
 
-  auto sceneConnection =
-    QObject::connect(pqscene, &pqAnimationScene::tick, [&progress](int progressInPercent) {
+  auto sceneConnection = QObject::connect(pqscene, &pqAnimationScene::tick,
+    [&progress](int progressInPercent)
+    {
       if (progress.isVisible())
       {
         progress.setValue(progressInPercent);

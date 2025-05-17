@@ -102,23 +102,23 @@ bool vtkPVTransferFunction2D::UpdateRange()
   else
   {
     auto BoxXMin = std::min_element(this->Internals->Boxes.begin(), this->Internals->Boxes.end(),
-      [](vtkPVTransferFunction2DBox* box1, vtkPVTransferFunction2DBox* box2) {
-        return box1->GetBox().GetX() < box2->GetBox().GetX();
-      });
+      [](vtkPVTransferFunction2DBox* box1, vtkPVTransferFunction2DBox* box2)
+      { return box1->GetBox().GetX() < box2->GetBox().GetX(); });
     this->Range[0] = (*BoxXMin)->GetBox().GetX();
     auto BoxXMax = std::max_element(this->Internals->Boxes.begin(), this->Internals->Boxes.end(),
-      [](vtkPVTransferFunction2DBox* box1, vtkPVTransferFunction2DBox* box2) {
+      [](vtkPVTransferFunction2DBox* box1, vtkPVTransferFunction2DBox* box2)
+      {
         return box1->GetBox().GetX() + box1->GetBox().GetWidth() <
           box2->GetBox().GetX() + box2->GetBox().GetWidth();
       });
     this->Range[1] = (*BoxXMax)->GetBox().GetX() + (*BoxXMax)->GetBox().GetWidth();
     auto BoxYMin = std::min_element(this->Internals->Boxes.begin(), this->Internals->Boxes.end(),
-      [](vtkPVTransferFunction2DBox* box1, vtkPVTransferFunction2DBox* box2) {
-        return box1->GetBox().GetY() < box2->GetBox().GetY();
-      });
+      [](vtkPVTransferFunction2DBox* box1, vtkPVTransferFunction2DBox* box2)
+      { return box1->GetBox().GetY() < box2->GetBox().GetY(); });
     this->Range[2] = (*BoxYMin)->GetBox().GetY();
     auto BoxYMax = std::max_element(this->Internals->Boxes.begin(), this->Internals->Boxes.end(),
-      [](vtkPVTransferFunction2DBox* box1, vtkPVTransferFunction2DBox* box2) {
+      [](vtkPVTransferFunction2DBox* box1, vtkPVTransferFunction2DBox* box2)
+      {
         return box1->GetBox().GetY() + box1->GetBox().GetHeight() <
           box2->GetBox().GetY() + box2->GetBox().GetHeight();
       });

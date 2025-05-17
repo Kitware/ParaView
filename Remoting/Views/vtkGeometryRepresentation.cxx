@@ -862,9 +862,8 @@ bool vtkGeometryRepresentation::NeedsOrderedCompositing()
 
   // Check is BlockOpacities has any value not 0 or 1.
   if (std::accumulate(this->BlockOpacities.begin(), this->BlockOpacities.end(), false,
-        [](bool result, const std::pair<std::string, double>& apair) {
-          return result || (apair.second > 0.0 && apair.second < 1.0);
-        }))
+        [](bool result, const std::pair<std::string, double>& apair)
+        { return result || (apair.second > 0.0 && apair.second < 1.0); }))
   {
     // a translucent block may be present.
     return true;
@@ -1522,8 +1521,8 @@ void vtkGeometryRepresentation::SetBlockColor(const char* selector, double r, do
   if (selector != nullptr)
   {
     auto iter = std::find_if(this->BlockColors.begin(), this->BlockColors.end(),
-      [selector](
-        const std::pair<std::string, vtkVector3d>& apair) { return apair.first == selector; });
+      [selector](const std::pair<std::string, vtkVector3d>& apair)
+      { return apair.first == selector; });
     if (iter == this->BlockColors.end())
     {
       this->BlockColors.emplace_back(selector, vtkVector3d(r, g, b));
@@ -1654,9 +1653,8 @@ void vtkGeometryRepresentation::SetBlockArrayName(
   if (selector != nullptr && colorArray != nullptr)
   {
     auto iter = std::find_if(this->BlockArrayNames.begin(), this->BlockArrayNames.end(),
-      [selector](const std::pair<std::string, std::pair<int, std::string>>& apair) {
-        return apair.first == selector;
-      });
+      [selector](const std::pair<std::string, std::pair<int, std::string>>& apair)
+      { return apair.first == selector; });
     if (iter == this->BlockArrayNames.end())
     {
       this->BlockArrayNames.emplace_back(selector, std::make_pair(assoc, colorArray));

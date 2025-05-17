@@ -318,8 +318,9 @@ QVector<pqPipelineSource*> pqLoadDataReaction::loadFilesForAllTypes(
           auto splitCustomPattern = customPattern.split(" ", QString::SkipEmptyParts);
 #endif
           patternValid = !splitCustomPattern.empty() &&
-            std::all_of(
-              splitCustomPattern.begin(), splitCustomPattern.end(), [&](QString const& pattern) {
+            std::all_of(splitCustomPattern.begin(), splitCustomPattern.end(),
+              [&](QString const& pattern)
+              {
                 QRegExp regexp(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
                 if (!regexp.isValid())
                 {

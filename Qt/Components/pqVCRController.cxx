@@ -91,7 +91,8 @@ void pqVCRController::onPlay()
     this->onPause();
     // Wait for the animation to stop before starting it again.
     this->LamdaPlayConnection = QObject::connect(this->Scene, &pqAnimationScene::endPlay, this,
-      [this](vtkObject*, unsigned long, void*, void*) -> void {
+      [this](vtkObject*, unsigned long, void*, void*) -> void
+      {
         // First, disconnect this specific connection, so that it does not trigger itself again.
         QObject::disconnect(this->LamdaPlayConnection);
         // Then, start the forward animation.
@@ -139,7 +140,8 @@ void pqVCRController::onReverse()
     this->onPause();
     // Wait for the animation to stop before starting it again.
     this->LamdaReverseConnection = QObject::connect(this->Scene, &pqAnimationScene::endPlay, this,
-      [this](vtkObject*, unsigned long, void*, void*) -> void {
+      [this](vtkObject*, unsigned long, void*, void*) -> void
+      {
         // First, disconnect this specific connection, so that it does not trigger itself again.
         QObject::disconnect(this->LamdaReverseConnection);
         // Then, start the reverse animation.

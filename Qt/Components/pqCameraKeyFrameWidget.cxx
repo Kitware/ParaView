@@ -207,7 +207,8 @@ bool pqCameraKeyFrameWidget::usePathBasedMode() const
 void pqCameraKeyFrameWidget::initializeUsingJSON(const Json::Value& json)
 {
   std::vector<double> value;
-  auto parseJSONVector = [&json, &value](const char* name, unsigned int size) -> bool {
+  auto parseJSONVector = [&json, &value](const char* name, unsigned int size) -> bool
+  {
     value.resize(size);
     for (unsigned int idx = 0; idx < size; idx++)
     {
@@ -276,7 +277,8 @@ Json::Value pqCameraKeyFrameWidget::serializeToJSON() const
 {
   Json::Value keyFrame;
 
-  auto addJSONVector = [&keyFrame](const char* name, const double* value, size_t size) {
+  auto addJSONVector = [&keyFrame](const char* name, const double* value, size_t size)
+  {
     for (unsigned int idx = 0; idx < size; idx++)
     {
       keyFrame[name].insert(idx, value[idx]);

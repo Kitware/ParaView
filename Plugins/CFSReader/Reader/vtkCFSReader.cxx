@@ -1024,7 +1024,8 @@ void vtkCFSReader::ReadNodeCellData(vtkMultiBlockDataSet* output, bool isNode)
             {
               phase[i] = (std::abs(imaginaryVals[i]) > 1e-16)
                 ? std::atan2(imaginaryVals[i], realVals[i]) * h180degOverPi
-                : (realVals[i] < 0.0) ? 180 : 0;
+                : (realVals[i] < 0.0) ? 180
+                                      : 0;
             }
             vals.push_back(SaveToArray(phase, actInfo->dofNames, numEntities, phaseName));
           }

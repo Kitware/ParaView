@@ -454,7 +454,8 @@ QVector<QWidget*> pqHierarchicalGridLayout::rearrange(
   // currently.
   std::map<QWidget*, QLayoutItem*> w2l;
 
-  auto updateMap = [&internals, &w2l](QWidget* current) {
+  auto updateMap = [&internals, &w2l](QWidget* current)
+  {
     for (auto litem : internals.Items)
     {
       if (auto wdg = litem->widget())
@@ -469,7 +470,8 @@ QVector<QWidget*> pqHierarchicalGridLayout::rearrange(
   updateMap(nullptr);
 
   std::vector<BTNode> bstree(litems.size());
-  std::function<void(int)> build = [&build, &litems, &bstree, &w2l, this, &updateMap](int index) {
+  std::function<void(int)> build = [&build, &litems, &bstree, &w2l, this, &updateMap](int index)
+  {
     if (index < 0 || index >= litems.count())
     {
       return;

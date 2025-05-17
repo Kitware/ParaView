@@ -173,8 +173,9 @@ struct Cleaner
     vtkDataArrayAccessor<ArrayT> accessor(scalars);
     using ValueT = typename vtkDataArrayAccessor<ArrayT>::APIType;
 
-    vtkSMPTools::For(
-      0, scalars->GetNumberOfTuples(), [this, &accessor](vtkIdType begin, vtkIdType end) {
+    vtkSMPTools::For(0, scalars->GetNumberOfTuples(),
+      [this, &accessor](vtkIdType begin, vtkIdType end)
+      {
         for (vtkIdType cc = begin; cc < end; ++cc)
         {
           accessor.Set(

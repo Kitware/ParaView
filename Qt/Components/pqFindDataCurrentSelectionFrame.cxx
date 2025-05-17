@@ -331,10 +331,12 @@ pqFindDataCurrentSelectionFrame::pqFindDataCurrentSelectionFrame(
 {
   auto& internals = *this->Internals;
   internals.Ui.ToggleColumnVisibility->setMenu(&internals.ColumnToggleMenu);
-  QObject::connect(&internals.ColumnToggleMenu, &QMenu::aboutToShow, [&internals]() {
-    pqSpreadSheetColumnsVisibility::populateMenu(
-      internals.GetViewProxy(), internals.GetModel(), &internals.ColumnToggleMenu);
-  });
+  QObject::connect(&internals.ColumnToggleMenu, &QMenu::aboutToShow,
+    [&internals]()
+    {
+      pqSpreadSheetColumnsVisibility::populateMenu(
+        internals.GetViewProxy(), internals.GetModel(), &internals.ColumnToggleMenu);
+    });
 }
 
 //-----------------------------------------------------------------------------

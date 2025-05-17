@@ -253,8 +253,9 @@ pqFindDataWidget::pqFindDataWidget(QWidget* parentObject)
   // pqCoreUtilities::initializeClickMeButton(internals.Ui.findData);
 
   // hookup expander buttons
-  QObject::connect(
-    internals.Ui.createExpander, &pqExpanderButton::toggled, [&internals](bool checked) {
+  QObject::connect(internals.Ui.createExpander, &pqExpanderButton::toggled,
+    [&internals](bool checked)
+    {
       internals.Ui.container->setVisible(checked);
       internals.Ui.findData->setVisible(checked);
       internals.Ui.reset->setVisible(checked);
@@ -267,38 +268,44 @@ pqFindDataWidget::pqFindDataWidget(QWidget* parentObject)
     internals.Ui.selectionDisplayProperties, &QWidget::setVisible);
 
   // hookup findData / reset / clear
-  QObject::connect(internals.Ui.reset, &QAbstractButton::clicked, [&internals](bool) {
-    if (internals.ProxyWidget)
+  QObject::connect(internals.Ui.reset, &QAbstractButton::clicked,
+    [&internals](bool)
     {
-      internals.ProxyWidget->reset();
-    }
-    internals.Ui.reset->setEnabled(false);
-    internals.Ui.findData->setEnabled(false);
-  });
+      if (internals.ProxyWidget)
+      {
+        internals.ProxyWidget->reset();
+      }
+      internals.Ui.reset->setEnabled(false);
+      internals.Ui.findData->setEnabled(false);
+    });
 
-  QObject::connect(internals.Ui.clear, &QAbstractButton::clicked, [&internals](bool) {
-    if (internals.ProxyWidget)
+  QObject::connect(internals.Ui.clear, &QAbstractButton::clicked,
+    [&internals](bool)
     {
-      internals.ProxyWidget->proxy()->ResetPropertiesToDefault(vtkSMProxy::ONLY_XML);
-      internals.ProxyWidget->reset();
-    }
-    internals.Ui.reset->setEnabled(false);
-    internals.Ui.findData->setEnabled(false);
-    internals.Ui.clear->setEnabled(false);
-  });
+      if (internals.ProxyWidget)
+      {
+        internals.ProxyWidget->proxy()->ResetPropertiesToDefault(vtkSMProxy::ONLY_XML);
+        internals.ProxyWidget->reset();
+      }
+      internals.Ui.reset->setEnabled(false);
+      internals.Ui.findData->setEnabled(false);
+      internals.Ui.clear->setEnabled(false);
+    });
 
-  QObject::connect(internals.Ui.findData, &QAbstractButton::clicked, [&internals](bool) {
-    if (internals.ProxyWidget)
+  QObject::connect(internals.Ui.findData, &QAbstractButton::clicked,
+    [&internals](bool)
     {
-      internals.ProxyWidget->apply();
-      internals.findData();
-    }
-    internals.Ui.reset->setEnabled(false);
-    // keep findData enabled, there's no reason the user can't hit the button
-    // again to generate a new selection with same property values. We should
-    // allow for it since the data may have changed.
-    // internals.Ui.findData->setEnabled(false);
-  });
+      if (internals.ProxyWidget)
+      {
+        internals.ProxyWidget->apply();
+        internals.findData();
+      }
+      internals.Ui.reset->setEnabled(false);
+      // keep findData enabled, there's no reason the user can't hit the button
+      // again to generate a new selection with same property values. We should
+      // allow for it since the data may have changed.
+      // internals.Ui.findData->setEnabled(false);
+    });
 
   QObject::connect(
     internals.Ui.freeze, &QAbstractButton::clicked, [&internals]() { internals.freeze(); });
@@ -308,7 +315,8 @@ pqFindDataWidget::pqFindDataWidget(QWidget* parentObject)
     [&internals]() { internals.plotOverTime(); });
 
   QObject::connect(internals.Ui.informationContainer, &pqFindDataCurrentSelectionFrame::showing,
-    [&internals](pqOutputPort* port) {
+    [&internals](pqOutputPort* port)
+    {
       if (port)
       {
         internals.Ui.informationExpander->setText(tr("Selected Data (%1)").arg(port->prettyName()));
@@ -383,8 +391,9 @@ void pqFindDataWidget::setServer(pqServer* aserver)
   proxy->FastDelete();
 
   // enable buttons on modification.
-  QObject::connect(
-    internals.ProxyWidget.data(), &pqProxyWidget::changeAvailable, [&internals, proxy]() {
+  QObject::connect(internals.ProxyWidget.data(), &pqProxyWidget::changeAvailable,
+    [&internals, proxy]()
+    {
       vtkSMUncheckedPropertyHelper inputHelper(proxy, "Input");
       const bool hasInput = (inputHelper.GetAsProxy(0) != nullptr);
       vtkSMUncheckedPropertyHelper queryStringHelper(proxy, "QueryString");

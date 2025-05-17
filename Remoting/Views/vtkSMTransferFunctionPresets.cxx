@@ -115,10 +115,9 @@ public:
     if (newname && newname[0])
     {
       // Check that the newname is not already used
-      if (std::any_of(
-            this->Presets.begin(), this->Presets.end(), [newname](Json::Value const& preset) {
-              return preset.get("Name", "").asString() == newname;
-            }))
+      if (std::any_of(this->Presets.begin(), this->Presets.end(),
+            [newname](Json::Value const& preset)
+            { return preset.get("Name", "").asString() == newname; }))
       {
         return false;
       }
@@ -184,7 +183,8 @@ public:
       // The root is an array of presets that contain a "Name" and "Groups" fields that are
       // extracted to fill the importedPresets vector.
       std::transform(root.begin(), root.end(), std::back_inserter(*importedPresets),
-        [&](Json::Value const& preset) {
+        [&](Json::Value const& preset)
+        {
           auto result = vtkSMTransferFunctionPresets::ImportedPreset{};
           result.name = preset.get("Name", "").asString();
           auto groups = preset.get("Groups", Json::Value());

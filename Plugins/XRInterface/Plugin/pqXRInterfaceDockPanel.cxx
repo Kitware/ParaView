@@ -86,9 +86,8 @@ void pqXRInterfaceDockPanel::constructor()
   QObject::connect(this->Internals->Ui.multisamples, &QCheckBox::pqCheckBoxSignal,
     [&](pqCheckState state) { this->Internals->Helper->SetMultiSample(state == Qt::Checked); });
   QObject::connect(this->Internals->Ui.baseStationVisibility, &QCheckBox::pqCheckBoxSignal,
-    [&](pqCheckState state) {
-      this->Internals->Helper->SetBaseStationVisibility(state == Qt::Checked);
-    });
+    [&](pqCheckState state)
+    { this->Internals->Helper->SetBaseStationVisibility(state == Qt::Checked); });
 
   connect(pqApplicationCore::instance(), SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
     this, SLOT(loadState(vtkPVXMLElement*, vtkSMProxyLocator*)));
@@ -148,8 +147,9 @@ void pqXRInterfaceDockPanel::constructor()
 
 #if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
   this->Internals->Ui.useOpenxrRemoting->setVisible(true);
-  QObject::connect(
-    this->Internals->Ui.useOpenxrRemoting, &QCheckBox::pqCheckBoxSignal, [&](pqCheckState state) {
+  QObject::connect(this->Internals->Ui.useOpenxrRemoting, &QCheckBox::pqCheckBoxSignal,
+    [&](pqCheckState state)
+    {
       this->Internals->Helper->SetUseOpenXRRemoting(state == Qt::Checked);
       this->Internals->Ui.remotingAddress->setVisible(state);
       this->Internals->Ui.remoteAddress->setVisible(state);
@@ -177,114 +177,125 @@ void pqXRInterfaceDockPanel::constructor()
 
 // hide/show widgets based on Imago support
 #if XRINTERFACE_HAS_IMAGO_SUPPORT
-  QObject::connect(this->Internals->Ui.imagoLoginButton, &QPushButton::clicked, [&]() {
-    std::string uid = this->Internals->Ui.imagoUserValue->text().toUtf8().toStdString();
-    std::string pw = this->Internals->Ui.imagoPasswordValue->text().toUtf8().toStdString();
-    if (this->Internals->Helper->GetWidgets()->LoginToImago(uid, pw))
+  QObject::connect(this->Internals->Ui.imagoLoginButton, &QPushButton::clicked,
+    [&]()
     {
-      // set the background of the login button to light green
-      // to indicate success
-      this->Internals->Ui.imagoLoginButton->setStyleSheet("border:2px solid #44ff44;");
-
-      // set the combo box values to what the context has
-      // try to save previous values if we can
-      std::vector<std::string> vals;
+      std::string uid = this->Internals->Ui.imagoUserValue->text().toUtf8().toStdString();
+      std::string pw = this->Internals->Ui.imagoPasswordValue->text().toUtf8().toStdString();
+      if (this->Internals->Helper->GetWidgets()->LoginToImago(uid, pw))
       {
-        this->Internals->Helper->GetWidgets()->GetImagoImageryTypes(vals);
-        std::string oldValue =
-          this->Internals->Ui.imagoImageryTypeCombo->currentText().toUtf8().data();
-        this->Internals->Ui.imagoImageryTypeCombo->clear();
-        QStringList list;
-        list << QString("Any");
-        for (auto s : vals)
-        {
-          list << QString(s.c_str());
-        }
-        this->Internals->Ui.imagoImageryTypeCombo->addItems(list);
-        auto idx = this->Internals->Ui.imagoImageryTypeCombo->findText(QString(oldValue.c_str()));
-        this->Internals->Ui.imagoImageryTypeCombo->setCurrentIndex(idx);
-        this->Internals->Helper->GetWidgets()->SetImagoImageryType(oldValue);
-      }
+        // set the background of the login button to light green
+        // to indicate success
+        this->Internals->Ui.imagoLoginButton->setStyleSheet("border:2px solid #44ff44;");
 
-      {
-        this->Internals->Helper->GetWidgets()->GetImagoImageTypes(vals);
-        std::string oldValue =
-          this->Internals->Ui.imagoImageTypeCombo->currentText().toUtf8().data();
-        this->Internals->Ui.imagoImageTypeCombo->clear();
-        QStringList list;
-        list << QString("Any");
-        for (auto s : vals)
+        // set the combo box values to what the context has
+        // try to save previous values if we can
+        std::vector<std::string> vals;
         {
-          list << QString(s.c_str());
+          this->Internals->Helper->GetWidgets()->GetImagoImageryTypes(vals);
+          std::string oldValue =
+            this->Internals->Ui.imagoImageryTypeCombo->currentText().toUtf8().data();
+          this->Internals->Ui.imagoImageryTypeCombo->clear();
+          QStringList list;
+          list << QString("Any");
+          for (auto s : vals)
+          {
+            list << QString(s.c_str());
+          }
+          this->Internals->Ui.imagoImageryTypeCombo->addItems(list);
+          auto idx = this->Internals->Ui.imagoImageryTypeCombo->findText(QString(oldValue.c_str()));
+          this->Internals->Ui.imagoImageryTypeCombo->setCurrentIndex(idx);
+          this->Internals->Helper->GetWidgets()->SetImagoImageryType(oldValue);
         }
-        this->Internals->Ui.imagoImageTypeCombo->addItems(list);
-        auto idx = this->Internals->Ui.imagoImageTypeCombo->findText(QString(oldValue.c_str()));
-        this->Internals->Ui.imagoImageTypeCombo->setCurrentIndex(idx);
-        this->Internals->Helper->GetWidgets()->SetImagoImageType(oldValue);
-      }
 
-      {
-        this->Internals->Helper->GetWidgets()->GetImagoDatasets(vals);
-        std::string oldValue = this->Internals->Ui.imagoDatasetCombo->currentText().toUtf8().data();
-        this->Internals->Ui.imagoDatasetCombo->clear();
-        QStringList list;
-        list << QString("Any");
-        for (auto s : vals)
         {
-          list << QString(s.c_str());
+          this->Internals->Helper->GetWidgets()->GetImagoImageTypes(vals);
+          std::string oldValue =
+            this->Internals->Ui.imagoImageTypeCombo->currentText().toUtf8().data();
+          this->Internals->Ui.imagoImageTypeCombo->clear();
+          QStringList list;
+          list << QString("Any");
+          for (auto s : vals)
+          {
+            list << QString(s.c_str());
+          }
+          this->Internals->Ui.imagoImageTypeCombo->addItems(list);
+          auto idx = this->Internals->Ui.imagoImageTypeCombo->findText(QString(oldValue.c_str()));
+          this->Internals->Ui.imagoImageTypeCombo->setCurrentIndex(idx);
+          this->Internals->Helper->GetWidgets()->SetImagoImageType(oldValue);
         }
-        this->Internals->Ui.imagoDatasetCombo->addItems(list);
-        auto idx = this->Internals->Ui.imagoDatasetCombo->findText(QString(oldValue.c_str()));
-        this->Internals->Ui.imagoDatasetCombo->setCurrentIndex(idx);
-        this->Internals->Helper->GetWidgets()->SetImagoDataset(oldValue);
-      }
 
-      {
-        this->Internals->Helper->GetWidgets()->GetImagoWorkspaces(vals);
-        std::string oldValue =
-          this->Internals->Ui.imagoWorkspaceCombo->currentText().toUtf8().data();
-        this->Internals->Ui.imagoWorkspaceCombo->clear();
-        QStringList list;
-        list << QString("Any");
-        for (auto s : vals)
         {
-          list << QString(s.c_str());
+          this->Internals->Helper->GetWidgets()->GetImagoDatasets(vals);
+          std::string oldValue =
+            this->Internals->Ui.imagoDatasetCombo->currentText().toUtf8().data();
+          this->Internals->Ui.imagoDatasetCombo->clear();
+          QStringList list;
+          list << QString("Any");
+          for (auto s : vals)
+          {
+            list << QString(s.c_str());
+          }
+          this->Internals->Ui.imagoDatasetCombo->addItems(list);
+          auto idx = this->Internals->Ui.imagoDatasetCombo->findText(QString(oldValue.c_str()));
+          this->Internals->Ui.imagoDatasetCombo->setCurrentIndex(idx);
+          this->Internals->Helper->GetWidgets()->SetImagoDataset(oldValue);
         }
-        this->Internals->Ui.imagoWorkspaceCombo->addItems(list);
-        auto idx = this->Internals->Ui.imagoWorkspaceCombo->findText(QString(oldValue.c_str()));
-        this->Internals->Ui.imagoWorkspaceCombo->setCurrentIndex(idx);
-        this->Internals->Helper->GetWidgets()->SetImagoWorkspace(oldValue);
+
+        {
+          this->Internals->Helper->GetWidgets()->GetImagoWorkspaces(vals);
+          std::string oldValue =
+            this->Internals->Ui.imagoWorkspaceCombo->currentText().toUtf8().data();
+          this->Internals->Ui.imagoWorkspaceCombo->clear();
+          QStringList list;
+          list << QString("Any");
+          for (auto s : vals)
+          {
+            list << QString(s.c_str());
+          }
+          this->Internals->Ui.imagoWorkspaceCombo->addItems(list);
+          auto idx = this->Internals->Ui.imagoWorkspaceCombo->findText(QString(oldValue.c_str()));
+          this->Internals->Ui.imagoWorkspaceCombo->setCurrentIndex(idx);
+          this->Internals->Helper->GetWidgets()->SetImagoWorkspace(oldValue);
+        }
       }
-    }
-    else
-    {
-      this->Internals->Ui.imagoLoginButton->setStyleSheet("border:2px solid #ff4444;");
-    }
-  });
+      else
+      {
+        this->Internals->Ui.imagoLoginButton->setStyleSheet("border:2px solid #ff4444;");
+      }
+    });
 
   QObject::connect(this->Internals->Ui.imagoWorkspaceCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+    QOverload<const QString&>::of(&QComboBox::activated),
+    [=](QString const& text)
+    {
       if (text.length())
       {
         this->Internals->Helper->GetWidgets()->SetImagoWorkspace(text.toUtf8().toStdString());
       }
     });
   QObject::connect(this->Internals->Ui.imagoDatasetCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+    QOverload<const QString&>::of(&QComboBox::activated),
+    [=](QString const& text)
+    {
       if (text.length())
       {
         this->Internals->Helper->GetWidgets()->SetImagoDataset(text.toUtf8().toStdString());
       }
     });
   QObject::connect(this->Internals->Ui.imagoImageryTypeCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+    QOverload<const QString&>::of(&QComboBox::activated),
+    [=](QString const& text)
+    {
       if (text.length())
       {
         this->Internals->Helper->GetWidgets()->SetImagoImageryType(text.toUtf8().toStdString());
       }
     });
   QObject::connect(this->Internals->Ui.imagoImageTypeCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+    QOverload<const QString&>::of(&QComboBox::activated),
+    [=](QString const& text)
+    {
       if (text.length())
       {
         this->Internals->Helper->GetWidgets()->SetImagoImageType(text.toUtf8().toStdString());
@@ -372,9 +383,8 @@ void pqXRInterfaceDockPanel::collaborationConnect()
   if (this->Internals->Ui.cConnectButton->text() == "Connect")
   {
     vtkPVXRInterfaceCollaborationClient* cc = this->Internals->Helper->GetCollaborationClient();
-    cc->SetLogCallback([this](const std::string& msg, vtkLogger::Verbosity verbosity) {
-      this->collaborationCallback(msg, verbosity);
-    });
+    cc->SetLogCallback([this](const std::string& msg, vtkLogger::Verbosity verbosity)
+      { this->collaborationCallback(msg, verbosity); });
     cc->SetCollabHost(this->Internals->Ui.cServerValue->text().toUtf8().data());
     cc->SetCollabSession(this->Internals->Ui.cSessionValue->text().toUtf8().data());
     cc->SetCollabName(this->Internals->Ui.cNameValue->text().toUtf8().data());

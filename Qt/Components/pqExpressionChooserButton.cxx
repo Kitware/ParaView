@@ -28,12 +28,14 @@ pqExpressionChooserButton::pqExpressionChooserButton(QWidget* parent, const QStr
 
   this->connect(menuList, &QMenu::aboutToShow, this, &pqExpressionChooserButton::updateMenu);
 
-  this->connect(this, &QToolButton::triggered, [=](QAction* sender) {
-    if (sender != this->defaultAction())
+  this->connect(this, &QToolButton::triggered,
+    [=](QAction* sender)
     {
-      Q_EMIT this->expressionSelected(sender->data().toString());
-    }
-  });
+      if (sender != this->defaultAction())
+      {
+        Q_EMIT this->expressionSelected(sender->data().toString());
+      }
+    });
 }
 
 //-----------------------------------------------------------------------------

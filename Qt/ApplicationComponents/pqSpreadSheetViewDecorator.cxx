@@ -130,11 +130,13 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
     SLOT(onCurrentAttributeChange(int)));
 
   internal.Links.setUseUncheckedProperties(true);
-  QObject::connect(&internal.Links, &pqPropertyLinks::qtWidgetChanged, [proxy, &internal]() {
-    SCOPED_UNDO_SET("SpreadSheetView changes");
-    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy);
-    internal.Links.accept();
-  });
+  QObject::connect(&internal.Links, &pqPropertyLinks::qtWidgetChanged,
+    [proxy, &internal]()
+    {
+      SCOPED_UNDO_SET("SpreadSheetView changes");
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy);
+      internal.Links.accept();
+    });
 
   internal.Links.addPropertyLink(this, "generateCellConnectivity", SIGNAL(uiModified()), proxy,
     proxy->GetProperty("GenerateCellConnectivity"));
@@ -152,11 +154,13 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
   // Ownership of the menu is not transferred to the tool button.
   internal.ToggleColumnVisibility->setMenu(&internal.ColumnToggleMenu);
 
-  QObject::connect(&internal.ColumnToggleMenu, &QMenu::aboutToShow, [view, model, &internal]() {
-    // populate menu with actions for toggling column check state.
-    pqSpreadSheetColumnsVisibility::populateMenu(
-      view->getViewProxy(), model, &internal.ColumnToggleMenu);
-  });
+  QObject::connect(&internal.ColumnToggleMenu, &QMenu::aboutToShow,
+    [view, model, &internal]()
+    {
+      // populate menu with actions for toggling column check state.
+      pqSpreadSheetColumnsVisibility::populateMenu(
+        view->getViewProxy(), model, &internal.ColumnToggleMenu);
+    });
 
   QObject::connect(this->Internal->Source, SIGNAL(currentIndexChanged(pqOutputPort*)), this,
     SLOT(currentIndexChanged(pqOutputPort*)));

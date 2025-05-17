@@ -408,9 +408,8 @@ bool vtkCellGridRepresentation::NeedsOrderedCompositing()
 
   // Check is BlockOpacities has any value not 0 or 1.
   if (std::accumulate(this->BlockOpacities.begin(), this->BlockOpacities.end(), false,
-        [](bool result, const std::pair<std::string, double>& apair) {
-          return result || (apair.second > 0.0 && apair.second < 1.0);
-        }))
+        [](bool result, const std::pair<std::string, double>& apair)
+        { return result || (apair.second > 0.0 && apair.second < 1.0); }))
   {
     // a translucent block may be present.
     return true;

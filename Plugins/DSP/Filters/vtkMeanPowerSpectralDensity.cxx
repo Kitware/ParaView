@@ -162,7 +162,9 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
       auto fftTupleRange = vtk::DataArrayTupleRange<2>(fftArray).GetSubRange(1);
       using TupleType = decltype(fftTupleRange)::ConstTupleReferenceType;
       vtkSMPTools::Transform(fftTupleRange.cbegin(), fftTupleRange.cend(), resValueRange.cbegin(),
-        resValueRange.begin(), [](TupleType tuple, double value) {
+        resValueRange.begin(),
+        [](TupleType tuple, double value)
+        {
           const double magnitude = std::hypot(*tuple.begin(), *(tuple.begin() + 1));
           return value + magnitude;
         });
@@ -218,8 +220,9 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
         firstRange.begin(), [&](double x, double y) { return x + y; });
     }
 
-    vtkSMPTools::Transform(
-      firstRange.cbegin(), firstRange.cend(), firstRange.begin(), [&](double value) {
+    vtkSMPTools::Transform(firstRange.cbegin(), firstRange.cend(), firstRange.begin(),
+      [&](double value)
+      {
         return 10.0 *
           std::log10((value / totalNbIterations) /
             (vtkAccousticUtilities::REF_PRESSURE * vtkAccousticUtilities::REF_PRESSURE));

@@ -74,8 +74,9 @@ struct pqTimelineView::pqInternals
     hLayout->addStretch();
 
     // Update proxy box with active view camera.
-    QObject::connect(
-      &pqActiveObjects::instance(), &pqActiveObjects::viewChanged, [&](pqView* view) {
+    QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::viewChanged,
+      [&](pqView* view)
+      {
         pqRenderView* rview = qobject_cast<pqRenderView*>(view);
         this->ProxiesBox->removeProxy(tr("Camera"));
         if (rview && this->ProxiesBox->findText(tr("Camera")) == -1)
@@ -85,8 +86,9 @@ struct pqTimelineView::pqInternals
       });
 
     // set new pipeline source as current value for proxy box.
-    QObject::connect(
-      &pqActiveObjects::instance(), &pqActiveObjects::sourceChanged, [&](pqPipelineSource* source) {
+    QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::sourceChanged,
+      [&](pqPipelineSource* source)
+      {
         if (source)
         {
           int idx = this->ProxiesBox->findProxy(source->getProxy());
@@ -98,8 +100,9 @@ struct pqTimelineView::pqInternals
       });
 
     // update properties box when proxy change. (do this after "Python" was added)
-    QObject::connect(
-      this->ProxiesBox, &pqAnimatableProxyComboBox::currentProxyChanged, [&](vtkSMProxy* proxy) {
+    QObject::connect(this->ProxiesBox, &pqAnimatableProxyComboBox::currentProxyChanged,
+      [&](vtkSMProxy* proxy)
+      {
         if (vtkSMRenderViewProxy::SafeDownCast(proxy))
         {
           this->PropertiesBox->setSourceWithoutProperties(proxy);
@@ -118,15 +121,18 @@ struct pqTimelineView::pqInternals
         }
       });
 
-    QObject::connect(this->ProxiesBox, &pqAnimatableProxyComboBox::currentTextChanged, [&]() {
-      if (this->ProxiesBox->count() > 0)
+    QObject::connect(this->ProxiesBox, &pqAnimatableProxyComboBox::currentTextChanged,
+      [&]()
       {
-        Q_EMIT this->Self->validateTrackRequested(this->currentTrackCandidate());
-      }
-    });
+        if (this->ProxiesBox->count() > 0)
+        {
+          Q_EMIT this->Self->validateTrackRequested(this->currentTrackCandidate());
+        }
+      });
 
-    QObject::connect(
-      this->PropertiesBox, &pqAnimatablePropertiesComboBox::currentTextChanged, [&]() {
+    QObject::connect(this->PropertiesBox, &pqAnimatablePropertiesComboBox::currentTextChanged,
+      [&]()
+      {
         if (this->PropertiesBox->count() > 0)
         {
           Q_EMIT this->Self->validateTrackRequested(this->currentTrackCandidate());
@@ -156,12 +162,15 @@ pqTimelineView::pqTimelineView(QWidget* parent)
   : Superclass(parent)
   , Internals(new pqTimelineView::pqInternals(this))
 {
-  this->connect(this, &pqTimelineView::doubleClicked, [&](const QModelIndex& index) {
-    if (index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::ANIMATION)
+  this->connect(this, &pqTimelineView::doubleClicked,
+    [&](const QModelIndex& index)
     {
-      Q_EMIT this->editTrackRequested(index.data(pqTimelineItemRole::REGISTRATION_NAME).toString());
-    }
-  });
+      if (index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::ANIMATION)
+      {
+        Q_EMIT this->editTrackRequested(
+          index.data(pqTimelineItemRole::REGISTRATION_NAME).toString());
+      }
+    });
 }
 
 //-----------------------------------------------------------------------------

@@ -15,7 +15,7 @@
 
 #include <map>
 
-//#define vtkPVHardwareSelectorDEBUG
+// #define vtkPVHardwareSelectorDEBUG
 #ifdef vtkPVHardwareSelectorDEBUG
 #include "vtkImageImport.h"
 #include "vtkNew.h"

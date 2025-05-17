@@ -46,7 +46,7 @@
 #include <vector>
 
 // Uncomment the line below to get debugging information
-//#define DEBUG
+// #define DEBUG
 
 //------------------------------------------------------------------------------
 class vtkGenericIOMetaData

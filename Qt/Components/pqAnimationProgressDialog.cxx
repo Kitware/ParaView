@@ -40,16 +40,19 @@ void pqAnimationProgressDialog::setAnimationScene(pqAnimationScene* scene)
   }
 
   QPointer<pqAnimationScene> qscene(scene);
-  QObject::connect(this, &QProgressDialog::canceled, [qscene, this]() {
-    this->hide();
-    if (qscene)
+  QObject::connect(this, &QProgressDialog::canceled,
+    [qscene, this]()
     {
-      qscene->getProxy()->InvokeCommand("Stop");
-    }
-  });
+      this->hide();
+      if (qscene)
+      {
+        qscene->getProxy()->InvokeCommand("Stop");
+      }
+    });
 
-  this->Connection =
-    QObject::connect(scene, &pqAnimationScene::tick, [this](int progressInPercent) {
+  this->Connection = QObject::connect(scene, &pqAnimationScene::tick,
+    [this](int progressInPercent)
+    {
       if (this->isVisible())
       {
         const auto delta = this->maximum() - this->minimum();

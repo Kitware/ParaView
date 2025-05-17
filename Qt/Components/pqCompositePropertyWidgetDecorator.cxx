@@ -77,7 +77,8 @@ pqCompositePropertyWidgetDecorator::pqCompositePropertyWidgetDecorator(
   assert(xmlConfig);
 
   // provide callback to wrap pqPropertyWidgetDecorator subclasses
-  auto creator = [parentObject](vtkPVXMLElement* xml, vtkSMProxy* proxy) {
+  auto creator = [parentObject](vtkPVXMLElement* xml, vtkSMProxy* proxy)
+  {
     (void)(proxy);
     auto decorator = pqPropertyWidgetDecorator::create(xml, parentObject);
     auto vtkDecorator = vtkSmartPointer<vtkQtPropertyDecorator>::New();

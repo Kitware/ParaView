@@ -615,20 +615,23 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* vtkNotUse
     QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() { this->Internals->Render(); });
   QObject::connect(&this->Internals->AttributesModel, &pqMaterialProxyModel::dataChanged,
     [this]() { this->Internals->ShaderBall->Modified(); });
-  QObject::connect(
-    this->Internals->Ui.ShowShaderBall, &QCheckBox::pqCheckBoxSignal, [this](pqCheckState state) {
+  QObject::connect(this->Internals->Ui.ShowShaderBall, &QCheckBox::pqCheckBoxSignal,
+    [this](pqCheckState state)
+    {
       this->Internals->Ui.RenderWidget->setVisible(state);
       this->Internals->ShaderBall->SetVisible(state);
       this->Internals->ShaderBall->Render();
     });
-  QObject::connect(
-    this->Internals->Ui.ShaderBallNumberOfSamples, &QSpinBox::editingFinished, [this]() {
+  QObject::connect(this->Internals->Ui.ShaderBallNumberOfSamples, &QSpinBox::editingFinished,
+    [this]()
+    {
       this->Internals->ShaderBall->SetNumberOfSamples(
         this->Internals->Ui.ShaderBallNumberOfSamples->value());
       this->Internals->ShaderBall->Render();
     });
-  QObject::connect(
-    &pqActiveObjects::instance(), &pqActiveObjects::serverChanged, [this](pqServer* server) {
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::serverChanged,
+    [this](pqServer* server)
+    {
       this->Internals->AttributesModel.reset();
       this->Internals->Ui.SelectMaterial->clear();
       this->Internals->MaterialLibrary = nullptr;
@@ -706,17 +709,19 @@ void pqMaterialEditor::addMaterial()
   vtkOSPRayRendererNode::SetMaterialLibrary(
     this->Internals->MaterialLibrary, this->Internals->getRenderer());
 
-  QObject::connect(dialog, &pqNewMaterialDialog::accepted, [=]() {
-    const std::string matName = dialog->name().toStdString();
-    ml->AddMaterial(matName, dialog->type().toUtf8().data());
+  QObject::connect(dialog, &pqNewMaterialDialog::accepted,
+    [=]()
+    {
+      const std::string matName = dialog->name().toStdString();
+      ml->AddMaterial(matName, dialog->type().toUtf8().data());
 
-    // Needed to update vtkSMMaterialDomain instances
-    ml->Fire();
+      // Needed to update vtkSMMaterialDomain instances
+      ml->Fire();
 
-    this->Internals->Ui.SelectMaterial->setCurrentText(QString(matName.c_str()));
+      this->Internals->Ui.SelectMaterial->setCurrentText(QString(matName.c_str()));
 
-    this->addProperty();
-  });
+      this->addProperty();
+    });
 }
 
 //-----------------------------------------------------------------------------

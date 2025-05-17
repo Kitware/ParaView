@@ -99,7 +99,8 @@ void vtkProtractorRepresentation::SetTextProperty(vtkTextProperty* prop)
 //----------------------------------------------------------------------------
 void vtkProtractorRepresentation::SetLineColor(double r, double g, double b)
 {
-  auto getMaxTime = [this]() {
+  auto getMaxTime = [this]()
+  {
     return std::max({ this->AngleRepresentation->GetArc()->GetMTime(),
       this->AngleRepresentation->GetRay1()->GetMTime(),
       this->AngleRepresentation->GetRay2()->GetMTime() });
@@ -118,7 +119,8 @@ void vtkProtractorRepresentation::SetLineColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkProtractorRepresentation::SetLineThickness(double thickness)
 {
-  auto getMaxTime = [this]() {
+  auto getMaxTime = [this]()
+  {
     return std::max({ this->AngleRepresentation->GetArc()->GetMTime(),
       this->AngleRepresentation->GetRay1()->GetMTime(),
       this->AngleRepresentation->GetRay2()->GetMTime() });
@@ -137,7 +139,8 @@ void vtkProtractorRepresentation::SetLineThickness(double thickness)
 //----------------------------------------------------------------------------
 void vtkProtractorRepresentation::SetArrowStyle(int style)
 {
-  auto getMaxTime = [this]() {
+  auto getMaxTime = [this]()
+  {
     return std::max(this->AngleRepresentation->GetRay1()->GetMTime(),
       this->AngleRepresentation->GetRay2()->GetMTime());
   };

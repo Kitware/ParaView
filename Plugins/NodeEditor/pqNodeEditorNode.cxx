@@ -77,7 +77,8 @@ pqNodeEditorNode::pqNodeEditorNode(pqProxy* prx, QGraphicsItem* parent)
     // This function retrieves the name of the linked proxy and places it in the
     // middle of the node. If necessary the label is scaled to fit inside the
     // node. The function is connected to the nameChanged event.
-    auto updateNodeLabel = [this]() {
+    auto updateNodeLabel = [this]()
+    {
       this->label->setPlainText(this->proxy->getSMName());
       this->label->setScale(1.0);
 
@@ -107,14 +108,16 @@ pqNodeEditorNode::pqNodeEditorNode(pqProxy* prx, QGraphicsItem* parent)
     this->widgetContainer->setMaximumWidth(pqNodeEditorUtils::CONSTS::NODE_WIDTH);
 
     // install resize event filter
-    this->widgetContainer->installEventFilter(pqNodeEditorUtils::createInterceptor(
-      this->widgetContainer, [this](QObject* /*object*/, QEvent* event) {
-        if (event->type() == QEvent::LayoutRequest)
+    this->widgetContainer->installEventFilter(
+      pqNodeEditorUtils::createInterceptor(this->widgetContainer,
+        [this](QObject* /*object*/, QEvent* event)
         {
-          this->updateSize();
-        }
-        return false;
-      }));
+          if (event->type() == QEvent::LayoutRequest)
+          {
+            this->updateSize();
+          }
+          return false;
+        }));
 
     // initialize property widgets container
     auto containerLayout = new QVBoxLayout;
@@ -287,9 +290,8 @@ void pqNodeEditorNode::exportLayout(QSettings& settings)
 {
   const QString nodeName = this->getNodeKey();
 
-  auto exportProperty = [&](const char* name, QVariant value) {
-    settings.setValue(nodeName + name, value);
-  };
+  auto exportProperty = [&](const char* name, QVariant value)
+  { settings.setValue(nodeName + name, value); };
 
   exportProperty(".verbosity", static_cast<int>(this->verbosity));
 

@@ -35,10 +35,9 @@ public:
 
   Item* FindItem(vtkSMProperty* source, vtkSMProperty* target)
   {
-    auto iter =
-      std::find_if(this->Links.begin(), this->Links.end(), [source, target](const Item& item) {
-        return (item.Source == source && item.Target == target);
-      });
+    auto iter = std::find_if(this->Links.begin(), this->Links.end(),
+      [source, target](const Item& item)
+      { return (item.Source == source && item.Target == target); });
     return (iter != this->Links.end()) ? &(*iter) : nullptr;
   }
 

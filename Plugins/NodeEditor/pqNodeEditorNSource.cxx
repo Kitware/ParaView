@@ -55,60 +55,66 @@ pqNodeEditorNSource::pqNodeEditorNSource(pqPipelineSource* source, QGraphicsItem
   }
 
   // what to do once properties have changed
-  QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [this]() {
-    if (this->proxy->modifiedState() != pqProxy::UNINITIALIZED)
+  QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this,
+    [this]()
     {
-      this->proxy->setModifiedState(pqProxy::MODIFIED);
-    }
-    return 1;
-  });
-  QObject::connect(this->proxy, &pqProxy::modifiedStateChanged, this, [this]() {
-    bool dirty = this->proxy->modifiedState() == pqProxy::ModifiedState::MODIFIED ||
-      this->proxy->modifiedState() == pqProxy::ModifiedState::UNINITIALIZED;
-    this->setNodeState(dirty ? NodeState::DIRTY : NodeState::NORMAL);
-    return 1;
-  });
+      if (this->proxy->modifiedState() != pqProxy::UNINITIALIZED)
+      {
+        this->proxy->setModifiedState(pqProxy::MODIFIED);
+      }
+      return 1;
+    });
+  QObject::connect(this->proxy, &pqProxy::modifiedStateChanged, this,
+    [this]()
+    {
+      bool dirty = this->proxy->modifiedState() == pqProxy::ModifiedState::MODIFIED ||
+        this->proxy->modifiedState() == pqProxy::ModifiedState::UNINITIALIZED;
+      this->setNodeState(dirty ? NodeState::DIRTY : NodeState::NORMAL);
+      return 1;
+    });
 
   // handle label events
   // right click : increment verbosity
   // left click : select node
   // left + ctrl : add to selection
   // middle click : delete node
-  this->getLabel()->setMousePressEventCallback([this](QGraphicsSceneMouseEvent* event) {
-    if (event->button() == Qt::MouseButton::RightButton)
+  this->getLabel()->setMousePressEventCallback(
+    [this](QGraphicsSceneMouseEvent* event)
     {
-      this->incrementVerbosity();
-    }
-    else if (event->button() == Qt::MouseButton::LeftButton)
-    {
-      auto* activeObjects = &pqActiveObjects::instance();
-      if (event->modifiers() == Qt::NoModifier)
+      if (event->button() == Qt::MouseButton::RightButton)
       {
-        activeObjects->setSelection({ this->proxy }, this->proxy);
+        this->incrementVerbosity();
       }
-      else if (event->modifiers() == Qt::ControlModifier)
+      else if (event->button() == Qt::MouseButton::LeftButton)
       {
-        auto sel = activeObjects->selection();
-        pqServerManagerModelItem* newActive = proxy;
-        if (sel.count(proxy))
+        auto* activeObjects = &pqActiveObjects::instance();
+        if (event->modifiers() == Qt::NoModifier)
         {
-          sel.removeAll(proxy);
-          newActive = sel.empty() ? nullptr : sel[0];
+          activeObjects->setSelection({ this->proxy }, this->proxy);
         }
-        else
+        else if (event->modifiers() == Qt::ControlModifier)
         {
-          sel.push_back(proxy);
+          auto sel = activeObjects->selection();
+          pqServerManagerModelItem* newActive = proxy;
+          if (sel.count(proxy))
+          {
+            sel.removeAll(proxy);
+            newActive = sel.empty() ? nullptr : sel[0];
+          }
+          else
+          {
+            sel.push_back(proxy);
+          }
+          activeObjects->setSelection(sel, newActive);
         }
-        activeObjects->setSelection(sel, newActive);
       }
-    }
-    else if (event->button() == Qt::MouseButton::MiddleButton)
-    {
-      pqDeleteReaction::deleteSources({ proxy });
-      // Important so no further events are processed on the destroyed widget
-      event->accept();
-    }
-  });
+      else if (event->button() == Qt::MouseButton::MiddleButton)
+      {
+        pqDeleteReaction::deleteSources({ proxy });
+        // Important so no further events are processed on the destroyed widget
+        event->accept();
+      }
+    });
 
   // input port label events, if any
   // middle click : clear all incoming connections
@@ -119,7 +125,8 @@ pqNodeEditorNSource::pqNodeEditorNSource(pqPipelineSource* source, QGraphicsItem
     for (auto* inPort : this->iPorts)
     {
       inPort->getLabel()->setMousePressEventCallback(
-        [this, index](QGraphicsSceneMouseEvent* event) {
+        [this, index](QGraphicsSceneMouseEvent* event)
+        {
           if (event->button() == Qt::MouseButton::MiddleButton)
           {
             Q_EMIT this->inputPortClicked(static_cast<int>(index), true);
@@ -144,7 +151,8 @@ pqNodeEditorNSource::pqNodeEditorNSource(pqPipelineSource* source, QGraphicsItem
   for (auto* outPort : this->oPorts)
   {
     outPort->getLabel()->setMousePressEventCallback(
-      [this, source, index](QGraphicsSceneMouseEvent* event) {
+      [this, source, index](QGraphicsSceneMouseEvent* event)
+      {
         if (event->button() == Qt::MouseButton::LeftButton)
         {
           auto* activeObjects = &pqActiveObjects::instance();

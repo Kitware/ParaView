@@ -155,10 +155,12 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
                 }
 
                 // next bit is: all of the sides must match at least one of the actual sides
-                ok = std::all_of(
-                  sides.begin(), sides.end(), [&actualSides](std::array<vtkIdType, 4>& side) {
+                ok = std::all_of(sides.begin(), sides.end(),
+                  [&actualSides](std::array<vtkIdType, 4>& side)
+                  {
                     return std::any_of(actualSides.begin(), actualSides.end(),
-                      [&side](std::vector<vtkIdType>* actualSide) {
+                      [&side](std::vector<vtkIdType>* actualSide)
+                      {
                         return std::all_of(actualSide->begin(), actualSide->end(),
                           [&side](const vtkIdType actualSideVertex) {
                             return std::find(side.begin(), side.end(), actualSideVertex) !=
@@ -191,8 +193,8 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
             std::vector<vtkIdType> quadFaceVerts = faceVertices[*quadFaces.begin()];
 
             auto topVertex = std::find_if(cellVertices.begin(), cellVertices.end(),
-              [&vertexFaceConnectivity](
-                const vtkIdType vi) { return vertexFaceConnectivity[vi] == 4; });
+              [&vertexFaceConnectivity](const vtkIdType vi)
+              { return vertexFaceConnectivity[vi] == 4; });
 
             if (topVertex == cellVertices.end())
             {
@@ -293,10 +295,12 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
                     }
 
                     // next bit is: all of the sides must match at least one of the actual sides
-                    ok = std::all_of(
-                      sides.begin(), sides.end(), [&actualSides](std::array<vtkIdType, 4>& side) {
+                    ok = std::all_of(sides.begin(), sides.end(),
+                      [&actualSides](std::array<vtkIdType, 4>& side)
+                      {
                         return std::any_of(actualSides.begin(), actualSides.end(),
-                          [&side](std::vector<vtkIdType>* actualSide) {
+                          [&side](std::vector<vtkIdType>* actualSide)
+                          {
                             return std::all_of(actualSide->begin(), actualSide->end(),
                               [&side](vtkIdType actualSideVertex) {
                                 return std::find(side.begin(), side.end(), actualSideVertex) !=

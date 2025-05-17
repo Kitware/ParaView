@@ -32,9 +32,8 @@ public:
   {
     // override the scale callback to use polyfill
     // so that desktop views look reasonable
-    this->ScaleCallback = [this]() {
-      return this->Helper->GetXRInterfacePolyfill()->GetPhysicalScale();
-    };
+    this->ScaleCallback = [this]()
+    { return this->Helper->GetXRInterfacePolyfill()->GetPhysicalScale(); };
   }
 
 protected:

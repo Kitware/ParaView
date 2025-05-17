@@ -101,9 +101,15 @@ struct vtkClientServerTypeTraits;
   struct vtkClientServerTypeTraits<in>                                                             \
   {                                                                                                \
     /* Type identifier for value of this type. */                                                  \
-    static vtkClientServerStream::Types Value() { return vtkClientServerStream::out##_value; }     \
+    static vtkClientServerStream::Types Value()                                                    \
+    {                                                                                              \
+      return vtkClientServerStream::out##_value;                                                   \
+    }                                                                                              \
     /* Type identifier for array of this type. */                                                  \
-    static vtkClientServerStream::Types Array() { return vtkClientServerStream::out##_array; }     \
+    static vtkClientServerStream::Types Array()                                                    \
+    {                                                                                              \
+      return vtkClientServerStream::out##_array;                                                   \
+    }                                                                                              \
   }
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt8, int8);
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt16, int16);

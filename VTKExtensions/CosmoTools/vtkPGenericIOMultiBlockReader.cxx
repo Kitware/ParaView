@@ -39,7 +39,7 @@
 #include <unistd.h>
 
 // Uncomment the line below to get debugging information
-//#define DEBUG
+// #define DEBUG
 
 namespace
 {

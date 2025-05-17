@@ -154,7 +154,8 @@ private:
     struct Value
     {
       ValueType Type;
-      union {
+      union
+      {
         // single values
         int Int;
         unsigned Unsigned;
@@ -360,9 +361,8 @@ private:
     void AddArg(const fmt::detail::named_arg<char_type, T>& fmtArg)
     {
       bool argNotFound = std::find_if(this->Arguments.begin(), this->Arguments.end(),
-                           [&fmtArg](const vtkNamedArgument& arg) {
-                             return arg.Name == fmtArg.name;
-                           }) == this->Arguments.end();
+                           [&fmtArg](const vtkNamedArgument& arg)
+                           { return arg.Name == fmtArg.name; }) == this->Arguments.end();
       // if argument was not found
       if (argNotFound)
       {

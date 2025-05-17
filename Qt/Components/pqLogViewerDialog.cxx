@@ -203,30 +203,24 @@ pqLogViewerDialog::pqLogViewerDialog(QWidget* parent)
   }
 
   // Set up category checkbox connections
-  QObject::connect(
-    this->Ui->dataMovementCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
-      this->updateCategory(DATA_MOVEMENT_CATEGORY, checked != Qt::Unchecked);
-    });
-  QObject::connect(
-    this->Ui->renderingCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
-      this->updateCategory(RENDERING_CATEGORY, checked != Qt::Unchecked);
-    });
-  QObject::connect(
-    this->Ui->applicationCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
-      this->updateCategory(APPLICATION_CATEGORY, checked != Qt::Unchecked);
-    });
-  QObject::connect(
-    this->Ui->pipelineCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
-      this->updateCategory(PIPELINE_CATEGORY, checked != Qt::Unchecked);
-    });
-  QObject::connect(
-    this->Ui->pluginsCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
-      this->updateCategory(PLUGINS_CATEGORY, checked != Qt::Unchecked);
-    });
-  QObject::connect(
-    this->Ui->executionCheckBox, &QCheckBox::pqCheckBoxSignal, [=](pqCheckState checked) {
-      this->updateCategory(EXECUTION_CATEGORY, checked != Qt::Unchecked);
-    });
+  QObject::connect(this->Ui->dataMovementCheckBox, &QCheckBox::pqCheckBoxSignal,
+    [=](pqCheckState checked)
+    { this->updateCategory(DATA_MOVEMENT_CATEGORY, checked != Qt::Unchecked); });
+  QObject::connect(this->Ui->renderingCheckBox, &QCheckBox::pqCheckBoxSignal,
+    [=](pqCheckState checked)
+    { this->updateCategory(RENDERING_CATEGORY, checked != Qt::Unchecked); });
+  QObject::connect(this->Ui->applicationCheckBox, &QCheckBox::pqCheckBoxSignal,
+    [=](pqCheckState checked)
+    { this->updateCategory(APPLICATION_CATEGORY, checked != Qt::Unchecked); });
+  QObject::connect(this->Ui->pipelineCheckBox, &QCheckBox::pqCheckBoxSignal,
+    [=](pqCheckState checked)
+    { this->updateCategory(PIPELINE_CATEGORY, checked != Qt::Unchecked); });
+  QObject::connect(this->Ui->pluginsCheckBox, &QCheckBox::pqCheckBoxSignal,
+    [=](pqCheckState checked)
+    { this->updateCategory(PLUGINS_CATEGORY, checked != Qt::Unchecked); });
+  QObject::connect(this->Ui->executionCheckBox, &QCheckBox::pqCheckBoxSignal,
+    [=](pqCheckState checked)
+    { this->updateCategory(EXECUTION_CATEGORY, checked != Qt::Unchecked); });
 }
 
 //----------------------------------------------------------------------------
@@ -427,7 +421,8 @@ void pqLogViewerDialog::updateCategory(int category, bool promote)
 {
   this->CategoryPromoted[category] = promote;
 
-  auto DoUpdate = [=](int proxyIndex, int categoryIndex) {
+  auto DoUpdate = [=](int proxyIndex, int categoryIndex)
+  {
     // Reset log messages to TRACE
     int verbosity = static_cast<int>(vtkLogger::VERBOSITY_TRACE);
     if (promote)

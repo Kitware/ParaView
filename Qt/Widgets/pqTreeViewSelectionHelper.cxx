@@ -77,7 +77,8 @@ pqTreeViewSelectionHelper::pqTreeViewSelectionHelper(QAbstractItemView* tree, bo
     pqheader->setCustomIndicatorShown(true);
     pqheader->addCustomIndicatorIcon(QIcon(":/QtWidgets/Icons/pqShowMenu.svg"), "menu");
     QObject::connect(pqheader, &pqHeaderView::customIndicatorClicked,
-      [this, tree](int section, const QPoint& pt, const QString& role) {
+      [this, tree](int section, const QPoint& pt, const QString& role)
+      {
         if (role == "menu")
         {
           this->showContextMenu(section, pt);
@@ -212,21 +213,25 @@ void pqTreeViewSelectionHelper::buildupMenu(QMenu& menu, int section, const QPoi
         : menu.addAction(QIcon(":/pqWidgets/Icons/pqSortDescend.svg"), tr("Sort (descending)")))
     {
       actn->setEnabled(rowCount > 0);
-      QObject::connect(actn, &QAction::triggered, [order, section, sfmodel, header](bool) {
-        sfmodel->sort(section, order);
-        header->setSortIndicatorShown(true);
-        header->setSortIndicator(section, order);
-      });
+      QObject::connect(actn, &QAction::triggered,
+        [order, section, sfmodel, header](bool)
+        {
+          sfmodel->sort(section, order);
+          header->setSortIndicatorShown(true);
+          header->setSortIndicator(section, order);
+        });
     }
 
     if (auto actn = menu.addAction(QIcon(":/pqWidgets/Icons/pqClearSort.svg"), tr("Clear sorting")))
     {
       actn->setEnabled(sfmodel->sortColumn() != -1);
-      QObject::connect(actn, &QAction::triggered, [order, sfmodel, header](bool) {
-        // this clears the indicator, and sets the underlying model to not sort
-        sfmodel->sort(-1, order);
-        header->setSortIndicator(-1, order);
-      });
+      QObject::connect(actn, &QAction::triggered,
+        [order, sfmodel, header](bool)
+        {
+          // this clears the indicator, and sets the underlying model to not sort
+          sfmodel->sort(-1, order);
+          header->setSortIndicator(-1, order);
+        });
     }
   }
   if (searchLineEdit)

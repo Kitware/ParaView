@@ -305,7 +305,8 @@ private:
   vtkSMProxy* Proxy;
   PType Type;
 
-  union {
+  union
+  {
     vtkSMProperty* Property;
     vtkSMVectorProperty* VectorProperty;
     vtkSMIntVectorProperty* IntVectorProperty;

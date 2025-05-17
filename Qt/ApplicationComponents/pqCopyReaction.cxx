@@ -333,18 +333,21 @@ void pqCopyReaction::copyPipeline()
   for (auto item : selection)
   {
     auto proxy = qobject_cast<pqProxy*>(item);
-    SelectedProxyConnections.insert(proxy, QObject::connect(proxy, &QObject::destroyed, [proxy] {
-      auto& connection = SelectedProxyConnections[proxy];
-      QObject::disconnect(connection);
-      SelectedProxyConnections.remove(proxy);
-      FilterSelection.clear();
-      SelectionRoot = nullptr;
+    SelectedProxyConnections.insert(proxy,
+      QObject::connect(proxy, &QObject::destroyed,
+        [proxy]
+        {
+          auto& connection = SelectedProxyConnections[proxy];
+          QObject::disconnect(connection);
+          SelectedProxyConnections.remove(proxy);
+          FilterSelection.clear();
+          SelectionRoot = nullptr;
 
-      for (auto paster : PastePipelineContainer)
-      {
-        paster->updateEnableState();
-      }
-    }));
+          for (auto paster : PastePipelineContainer)
+          {
+            paster->updateEnableState();
+          }
+        }));
 
     FilterSelection.insert(proxy);
   }

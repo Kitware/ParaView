@@ -39,8 +39,14 @@ class QMainWindow;
  */
 
 #define PQ_BEHAVIOR_DEFINE_METHODS(_name)                                                          \
-  static void setEnable##_name(bool val) { pqParaViewBehaviors::_name = val; }                     \
-  static bool enable##_name() { return pqParaViewBehaviors::_name; }
+  static void setEnable##_name(bool val)                                                           \
+  {                                                                                                \
+    pqParaViewBehaviors::_name = val;                                                              \
+  }                                                                                                \
+  static bool enable##_name()                                                                      \
+  {                                                                                                \
+    return pqParaViewBehaviors::_name;                                                             \
+  }
 
 #define PQ_BEHAVIOR_DEFINE_METHODS_LEGACY(_name)                                                   \
   VTK_LEGACY(static void setEnable##_name(bool val) { pqParaViewBehaviors::_name = val; });        \

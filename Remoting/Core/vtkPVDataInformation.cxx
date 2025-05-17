@@ -946,7 +946,8 @@ bool vtkPVDataInformation::HasUnstructuredData() const
 //----------------------------------------------------------------------------
 bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation) const
 {
-  auto f = [&fieldAssociation](int dtype) {
+  auto f = [&fieldAssociation](int dtype)
+  {
     switch (fieldAssociation)
     {
       case vtkDataObject::FIELD_ASSOCIATION_NONE:

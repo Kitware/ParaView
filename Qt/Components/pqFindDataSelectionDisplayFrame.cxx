@@ -61,17 +61,21 @@ public:
 
     QObject::connect(&this->CellLabelsMenu, &QMenu::aboutToShow,
       [this]() { this->fillLabels(vtkDataObject::FIELD_ASSOCIATION_CELLS); });
-    QObject::connect(&this->CellLabelsMenu, &QMenu::triggered, [this](QAction* actn) {
-      vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
-      this->labelBy(vtkDataObject::FIELD_ASSOCIATION_CELLS, actn);
-    });
+    QObject::connect(&this->CellLabelsMenu, &QMenu::triggered,
+      [this](QAction* actn)
+      {
+        vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
+        this->labelBy(vtkDataObject::FIELD_ASSOCIATION_CELLS, actn);
+      });
 
     QObject::connect(&this->PointLabelsMenu, &QMenu::aboutToShow,
       [this]() { this->fillLabels(vtkDataObject::FIELD_ASSOCIATION_POINTS); });
-    QObject::connect(&this->PointLabelsMenu, &QMenu::triggered, [this](QAction* actn) {
-      vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
-      this->labelBy(vtkDataObject::FIELD_ASSOCIATION_POINTS, actn);
-    });
+    QObject::connect(&this->PointLabelsMenu, &QMenu::triggered,
+      [this](QAction* actn)
+      {
+        vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
+        this->labelBy(vtkDataObject::FIELD_ASSOCIATION_POINTS, actn);
+      });
 
     self->connect(
       this->Ui.labelPropertiesSelection, SIGNAL(clicked()), SLOT(editLabelPropertiesSelection()));
@@ -448,7 +452,8 @@ void pqFindDataSelectionDisplayFrame::onDataUpdated()
   // remove a label array name that does not exist anymore
   auto& internals = (*this->Internals);
   auto updateLabels = [&internals](
-                        vtkSMProxy* repr, int fieldAssociation, const std::string& prefix) {
+                        vtkSMProxy* repr, int fieldAssociation, const std::string& prefix)
+  {
     const auto arrayNameProperty = prefix +
       (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS ? "Cell" : "Point") +
       "FieldDataArrayName";

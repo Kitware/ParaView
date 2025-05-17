@@ -185,27 +185,29 @@ QString pqPythonSyntaxHighlighter::Highlight(const QString& text) const
 //-----------------------------------------------------------------------------
 void pqPythonSyntaxHighlighter::ConnectHighligter() const
 {
-  connect(&this->TextEdit, &QTextEdit::textChanged, [this]() {
-    const QString text = this->TextEdit.toPlainText();
-    const int cursorPosition = this->TextEdit.textCursor().position();
-
-    const QString highlightedText = this->Highlight(text);
-    if (!highlightedText.isEmpty())
+  connect(&this->TextEdit, &QTextEdit::textChanged,
+    [this]()
     {
-      const bool oldState = this->TextEdit.blockSignals(true);
+      const QString text = this->TextEdit.toPlainText();
+      const int cursorPosition = this->TextEdit.textCursor().position();
 
-      this->TextEdit.setHtml(this->Highlight(text));
-      QTextCursor cursor = this->TextEdit.textCursor();
-      cursor.setPosition(cursorPosition);
-      this->TextEdit.setTextCursor(cursor);
+      const QString highlightedText = this->Highlight(text);
+      if (!highlightedText.isEmpty())
+      {
+        const bool oldState = this->TextEdit.blockSignals(true);
 
-      const int vScrollBarValue = this->TextEdit.verticalScrollBar()->value();
-      this->TextEdit.verticalScrollBar()->setValue(vScrollBarValue);
+        this->TextEdit.setHtml(this->Highlight(text));
+        QTextCursor cursor = this->TextEdit.textCursor();
+        cursor.setPosition(cursorPosition);
+        this->TextEdit.setTextCursor(cursor);
 
-      const int hScrollBarValue = this->TextEdit.horizontalScrollBar()->value();
-      this->TextEdit.horizontalScrollBar()->setValue(hScrollBarValue);
+        const int vScrollBarValue = this->TextEdit.verticalScrollBar()->value();
+        this->TextEdit.verticalScrollBar()->setValue(vScrollBarValue);
 
-      this->TextEdit.blockSignals(oldState);
-    }
-  });
+        const int hScrollBarValue = this->TextEdit.horizontalScrollBar()->value();
+        this->TextEdit.horizontalScrollBar()->setValue(hScrollBarValue);
+
+        this->TextEdit.blockSignals(oldState);
+      }
+    });
 }

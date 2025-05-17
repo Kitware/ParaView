@@ -156,10 +156,14 @@ bool pqExtendedSortFilterProxyModel::filterAcceptsRow(
 bool pqExtendedSortFilterProxyModel::lessThan(
   const QModelIndex& left, const QModelIndex& right) const
 {
-  int leftPriority =
-    this->hasExactMatch(left) ? 0 : this->hasMatch(left) ? 1 : this->hasUserMatch(left) ? 2 : 3;
-  int rightPriority =
-    this->hasExactMatch(right) ? 0 : this->hasMatch(right) ? 1 : this->hasUserMatch(right) ? 2 : 3;
+  int leftPriority = this->hasExactMatch(left) ? 0
+    : this->hasMatch(left)                     ? 1
+    : this->hasUserMatch(left)                 ? 2
+                                               : 3;
+  int rightPriority = this->hasExactMatch(right) ? 0
+    : this->hasMatch(right)                      ? 1
+    : this->hasUserMatch(right)                  ? 2
+                                                 : 3;
 
   if (leftPriority == rightPriority)
   {

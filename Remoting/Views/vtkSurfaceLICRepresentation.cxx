@@ -13,7 +13,7 @@
 
 // send LOD painter parameters that let it run faster.
 // but lic result will be slightly degraded.
-//#define vtkSurfaceLICRepresentationFASTLOD
+// #define vtkSurfaceLICRepresentationFASTLOD
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSurfaceLICRepresentation);

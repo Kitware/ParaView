@@ -58,30 +58,33 @@ pqOMETransferFunctionsPropertyWidget::pqOMETransferFunctionsPropertyWidget(
       QObject::connect(pageUi.InvertTransferFunctions, &QToolButton::clicked,
         [lut]() { vtkSMTransferFunctionProxy::InvertTransferFunction(lut); });
 
-      QObject::connect(pageUi.ChoosePreset, &QToolButton::clicked, [this, lut]() {
-        (void)this;
-        vtkSMProxy* sof = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
-        bool indexedLookup = vtkSMPropertyHelper(lut, "IndexedLookup", true).GetAsInt() != 0;
-        pqPresetDialog dialog(pqCoreUtilities::mainWidget(),
-          indexedLookup ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
-                        : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
-        dialog.setCustomizableLoadColors(!indexedLookup);
-        dialog.setCustomizableLoadOpacities(sof != nullptr);
-        dialog.setCustomizableUsePresetRange(false);
-        dialog.setCustomizableLoadAnnotations(false);
-        QObject::connect(
-          &dialog, &pqPresetDialog::applyPreset, [lut, sof, &dialog](const Json::Value&) {
-            if (dialog.loadColors())
+      QObject::connect(pageUi.ChoosePreset, &QToolButton::clicked,
+        [this, lut]()
+        {
+          (void)this;
+          vtkSMProxy* sof = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
+          bool indexedLookup = vtkSMPropertyHelper(lut, "IndexedLookup", true).GetAsInt() != 0;
+          pqPresetDialog dialog(pqCoreUtilities::mainWidget(),
+            indexedLookup ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
+                          : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
+          dialog.setCustomizableLoadColors(!indexedLookup);
+          dialog.setCustomizableLoadOpacities(sof != nullptr);
+          dialog.setCustomizableUsePresetRange(false);
+          dialog.setCustomizableLoadAnnotations(false);
+          QObject::connect(&dialog, &pqPresetDialog::applyPreset,
+            [lut, sof, &dialog](const Json::Value&)
             {
-              vtkSMTransferFunctionProxy::ApplyPreset(lut, dialog.currentPreset());
-            }
-            if (dialog.loadOpacities() && sof != nullptr)
-            {
-              vtkSMTransferFunctionProxy::ApplyPreset(sof, dialog.currentPreset());
-            }
-          });
-        dialog.exec();
-      });
+              if (dialog.loadColors())
+              {
+                vtkSMTransferFunctionProxy::ApplyPreset(lut, dialog.currentPreset());
+              }
+              if (dialog.loadOpacities() && sof != nullptr)
+              {
+                vtkSMTransferFunctionProxy::ApplyPreset(sof, dialog.currentPreset());
+              }
+            });
+          dialog.exec();
+        });
 
       auto stc = vtkDiscretizableColorTransferFunction::SafeDownCast(lut->GetClientSideObject());
       pageUi.ColorEditor->initialize(stc, true, nullptr, false);
@@ -116,7 +119,8 @@ pqOMETransferFunctionsPropertyWidget::pqOMETransferFunctionsPropertyWidget(
 
       auto lutWidget = pageUi.ColorEditor;
       auto sofWidget = pageUi.OpacityEditor;
-      auto callback = [lut, sof, lutWidget, sofWidget, this](double rmin, double rmax) {
+      auto callback = [lut, sof, lutWidget, sofWidget, this](double rmin, double rmax)
+      {
         double range[2] = { rmin, rmax };
         vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range);
         vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range);
@@ -129,15 +133,18 @@ pqOMETransferFunctionsPropertyWidget::pqOMETransferFunctionsPropertyWidget(
       QObject::connect(
         pageUi.OpacityEditor, &pqTransferFunctionWidget::rangeHandlesRangeChanged, callback);
 
-      auto callback2 = [lut, lutWidget, sofWidget, this]() {
+      auto callback2 = [lut, lutWidget, sofWidget, this]()
+      {
         pqRescaleScalarRangeToCustomDialog* dialog =
           pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(lut);
         if (dialog != nullptr)
         {
-          QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply, [=]() {
-            this->stcChanged(lutWidget);
-            this->pwfChanged(sofWidget);
-          });
+          QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply,
+            [=]()
+            {
+              this->stcChanged(lutWidget);
+              this->pwfChanged(sofWidget);
+            });
         }
       };
 

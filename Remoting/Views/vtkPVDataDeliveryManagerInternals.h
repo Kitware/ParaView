@@ -222,9 +222,8 @@ public:
   {
     const auto id = repr->GetUniqueIdentifier();
     return std::accumulate(this->ItemsMap.begin(), this->ItemsMap.end(), 0,
-      [&id](int sum, const ItemsMapType::value_type& item_pair) {
-        return sum + (item_pair.first.first == id ? 1 : 0);
-      });
+      [&id](int sum, const ItemsMapType::value_type& item_pair)
+      { return sum + (item_pair.first.first == id ? 1 : 0); });
   }
 
   unsigned long GetVisibleDataSize(bool use_second_if_available, vtkPVDataDeliveryManager* dmgr)

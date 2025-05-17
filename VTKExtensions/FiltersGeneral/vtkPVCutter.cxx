@@ -46,7 +46,8 @@ int vtkPVCutter::RequestData(
 
   vtkPlane* plane = vtkPlane::SafeDownCast(this->CutFunction);
 
-  auto executePlaneCutter = [&](double offset) {
+  auto executePlaneCutter = [&](double offset)
+  {
     // Create a copy of the original plane and apply the offsets value
     // (global offset + "contours")
     vtkNew<vtkPlane> newPlane;

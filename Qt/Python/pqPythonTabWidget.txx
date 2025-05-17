@@ -12,7 +12,8 @@
 template <>
 inline void pqPythonTabWidget::linkTo<QTextEdit>(QTextEdit* obj)
 {
-  const auto FindLinkedWidget = [this](const QObject* localObj) -> pqPythonTextArea* {
+  const auto FindLinkedWidget = [this](const QObject* localObj) -> pqPythonTextArea*
+  {
     for (int i = 0; i < this->count() - 1; ++i)
     {
       pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(i);
@@ -43,21 +44,23 @@ inline void pqPythonTabWidget::linkTo<QTextEdit>(QTextEdit* obj)
     }
 
     // We set a callback on the QTextEdit in the associated filter gets destroyed
-    this->connect(obj, &QObject::destroyed, [this, FindLinkedWidget](QObject* object) {
-      pqPythonTextArea* destroyedWidget = FindLinkedWidget(object);
-      if (destroyedWidget)
+    this->connect(obj, &QObject::destroyed,
+      [this, FindLinkedWidget](QObject* object)
       {
-        destroyedWidget->unlink();
-        if (destroyedWidget->isEmpty())
+        pqPythonTextArea* destroyedWidget = FindLinkedWidget(object);
+        if (destroyedWidget)
         {
-          this->tabCloseRequested(this->indexOf(destroyedWidget));
+          destroyedWidget->unlink();
+          if (destroyedWidget->isEmpty())
+          {
+            this->tabCloseRequested(this->indexOf(destroyedWidget));
+          }
+          else
+          {
+            this->updateTab(destroyedWidget);
+          }
         }
-        else
-        {
-          this->updateTab(destroyedWidget);
-        }
-      }
-    });
+      });
   }
 
   this->tabBar()->setCurrentIndex(this->indexOf(linkedWidget));

@@ -31,7 +31,7 @@
 
 #include <cassert>
 
-//#define pqLiveInsituManagerDebugMacro(x) std::cerr << x << endl;
+// #define pqLiveInsituManagerDebugMacro(x) std::cerr << x << endl;
 #define pqLiveInsituManagerDebugMacro(x)
 
 namespace

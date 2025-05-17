@@ -92,14 +92,14 @@ int vtkSimulationPointCloudFilter::RequestData(vtkInformation* vtkNotUsed(reques
   const vtkIdType numberOfOutputCells = numberOfOutputPoints;
   vtkNew<vtkIdTypeArray> connectivity;
   connectivity->SetNumberOfValues(numberOfOutputCells);
-  vtkSMPTools::For(0, numberOfOutputCells, [&](vtkIdType begin, vtkIdType end) {
-    std::iota(connectivity->GetPointer(begin), connectivity->GetPointer(end), begin);
-  });
+  vtkSMPTools::For(0, numberOfOutputCells,
+    [&](vtkIdType begin, vtkIdType end)
+    { std::iota(connectivity->GetPointer(begin), connectivity->GetPointer(end), begin); });
   vtkNew<vtkIdTypeArray> offsets;
   offsets->SetNumberOfValues(numberOfOutputCells + 1);
-  vtkSMPTools::For(0, numberOfOutputCells + 1, [&](vtkIdType begin, vtkIdType end) {
-    std::iota(offsets->GetPointer(begin), offsets->GetPointer(end), begin);
-  });
+  vtkSMPTools::For(0, numberOfOutputCells + 1,
+    [&](vtkIdType begin, vtkIdType end)
+    { std::iota(offsets->GetPointer(begin), offsets->GetPointer(end), begin); });
 
   // set cell array
   vtkNew<vtkCellArray> cellArray;

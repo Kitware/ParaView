@@ -19,11 +19,13 @@ void pqLinkedObjectPythonTextArea::link(pqLinkedObjectInterface* other)
   {
     const QUndoStack& undoStack = this->TextArea.getUndoStack();
     this->ConnectedTo = other;
-    this->Connection = QObject::connect(&undoStack, &QUndoStack::indexChanged, [this]() {
-      if (!this->SettingText)
+    this->Connection = QObject::connect(&undoStack, &QUndoStack::indexChanged,
+      [this]()
       {
-        this->ConnectedTo->setText(this->getText());
-      }
-    });
+        if (!this->SettingText)
+        {
+          this->ConnectedTo->setText(this->getText());
+        }
+      });
   }
 }

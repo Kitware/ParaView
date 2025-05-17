@@ -99,32 +99,35 @@ std::vector<Band> GenerateOctaveBands(
   std::vector<Band> bands(nBand);
   const double halfBinSize = (frequencies->GetTuple1(1) - frequencies->GetTuple1(0)) / 2;
 
-  vtkSMPTools::For(0, nBand, [&](int begin, int end) {
-    for (int i = begin; i < end; ++i)
+  vtkSMPTools::For(0, nBand,
+    [&](int begin, int end)
     {
-      const int currentBand = lowestBand + i;
-      const std::array<double, 2> bandLimits = { F_BASE *
-          std::pow(F_RATIO, (currentBand - 0.5) / bandWidth),
-        F_BASE * std::pow(F_RATIO, (currentBand + 0.5) / bandWidth) };
+      for (int i = begin; i < end; ++i)
+      {
+        const int currentBand = lowestBand + i;
+        const std::array<double, 2> bandLimits = { F_BASE *
+            std::pow(F_RATIO, (currentBand - 0.5) / bandWidth),
+          F_BASE * std::pow(F_RATIO, (currentBand + 0.5) / bandWidth) };
 
-      xAxis->SetValue(i * 2, bandLimits[0]);
-      xAxis->SetValue(i * 2 + 1, bandLimits[1]);
+        xAxis->SetValue(i * 2, bandLimits[0]);
+        xAxis->SetValue(i * 2 + 1, bandLimits[1]);
 
-      const auto fArrayRange = vtk::DataArrayValueRange<1>(frequencies);
+        const auto fArrayRange = vtk::DataArrayValueRange<1>(frequencies);
 
-      const auto lowerIndex =
-        std::lower_bound(fArrayRange.cbegin(), fArrayRange.cend(), bandLimits[0] - halfBinSize);
-      bands[i].Lower.Index = std::distance(fArrayRange.cbegin(), lowerIndex);
-      bands[i].Lower.Ratio =
-        ::Overlap(bandLimits, { *lowerIndex - halfBinSize, *lowerIndex + halfBinSize });
+        const auto lowerIndex =
+          std::lower_bound(fArrayRange.cbegin(), fArrayRange.cend(), bandLimits[0] - halfBinSize);
+        bands[i].Lower.Index = std::distance(fArrayRange.cbegin(), lowerIndex);
+        bands[i].Lower.Ratio =
+          ::Overlap(bandLimits, { *lowerIndex - halfBinSize, *lowerIndex + halfBinSize });
 
-      const auto upperIndex =
-        std::upper_bound(fArrayRange.cbegin(), fArrayRange.cend(), bandLimits[1] + halfBinSize) - 1;
-      bands[i].Upper.Index = std::distance(fArrayRange.cbegin(), upperIndex);
-      bands[i].Upper.Ratio =
-        ::Overlap(bandLimits, { *upperIndex - halfBinSize, *upperIndex + halfBinSize });
-    }
-  });
+        const auto upperIndex =
+          std::upper_bound(fArrayRange.cbegin(), fArrayRange.cend(), bandLimits[1] + halfBinSize) -
+          1;
+        bands[i].Upper.Index = std::distance(fArrayRange.cbegin(), upperIndex);
+        bands[i].Upper.Ratio =
+          ::Overlap(bandLimits, { *upperIndex - halfBinSize, *upperIndex + halfBinSize });
+      }
+    });
 
   return bands;
 }
@@ -144,7 +147,8 @@ vtkSmartPointer<vtkDataArray> ProcessColumn(
   amplitudes.resize(column->GetNumberOfTuples());
   auto inputRange = vtk::DataArrayTupleRange<2>(column);
   vtkSMPTools::Transform(inputRange.cbegin(), inputRange.cend(), amplitudes.begin(),
-    [decibel, reference](decltype(inputRange)::ConstTupleReferenceType complex) {
+    [decibel, reference](decltype(inputRange)::ConstTupleReferenceType complex)
+    {
       double tuple[2];
       complex->GetTuple(tuple);
       const double mag =
@@ -157,26 +161,28 @@ vtkSmartPointer<vtkDataArray> ProcessColumn(
   resultBands->SetNumberOfValues(bands.size() * 2);
   resultBands->SetName(column->GetName());
 
-  vtkSMPTools::For(0, bands.size(), [&](std::size_t begin, std::size_t end) {
-    for (std::size_t bandIdx = begin; bandIdx < end; ++bandIdx)
+  vtkSMPTools::For(0, bands.size(),
+    [&](std::size_t begin, std::size_t end)
     {
-      const auto& band = bands[bandIdx];
-      double mean = 0.0;
-      mean += amplitudes[band.Lower.Index] * band.Lower.Ratio;
-      mean += amplitudes[band.Upper.Index] * band.Upper.Ratio;
-      double divider = band.Lower.Ratio + band.Upper.Ratio;
-
-      for (std::size_t i = band.Lower.Index + 1; i < band.Upper.Index; ++i)
+      for (std::size_t bandIdx = begin; bandIdx < end; ++bandIdx)
       {
-        mean += amplitudes[i];
-        divider += 1.0;
-      }
+        const auto& band = bands[bandIdx];
+        double mean = 0.0;
+        mean += amplitudes[band.Lower.Index] * band.Lower.Ratio;
+        mean += amplitudes[band.Upper.Index] * band.Upper.Ratio;
+        double divider = band.Lower.Ratio + band.Upper.Ratio;
 
-      mean /= divider;
-      resultBands->SetValue(bandIdx * 2, mean);
-      resultBands->SetValue(bandIdx * 2 + 1, mean);
-    }
-  });
+        for (std::size_t i = band.Lower.Index + 1; i < band.Upper.Index; ++i)
+        {
+          mean += amplitudes[i];
+          divider += 1.0;
+        }
+
+        mean /= divider;
+        resultBands->SetValue(bandIdx * 2, mean);
+        resultBands->SetValue(bandIdx * 2 + 1, mean);
+      }
+    });
 
   return resultBands;
 }

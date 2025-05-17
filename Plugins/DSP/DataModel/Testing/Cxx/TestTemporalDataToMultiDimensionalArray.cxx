@@ -51,7 +51,8 @@ extern int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
   }
 
   // Retrieve info about point data array "VEL" to test at timestep 0.
-  auto retrieveOutArray = [&](const std::string& arrayName) -> vtkAOSDataArrayTemplate<double>* {
+  auto retrieveOutArray = [&](const std::string& arrayName) -> vtkAOSDataArrayTemplate<double>*
+  {
     auto* outputData =
       vtkPartitionedDataSetCollection::SafeDownCast(readerIOSS->GetOutputDataObject(0));
     if (!outputData)

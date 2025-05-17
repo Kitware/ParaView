@@ -84,9 +84,8 @@ public:
       }
     }
 
-    auto sortRanges = [](const RangeType& firstRange, const RangeType& secondRange) {
-      return firstRange.first < secondRange.first;
-    };
+    auto sortRanges = [](const RangeType& firstRange, const RangeType& secondRange)
+    { return firstRange.first < secondRange.first; };
     std::sort(this->TimeRanges.begin(), this->TimeRanges.end(), sortRanges);
   }
 
@@ -273,10 +272,12 @@ void pqLiveSourceManager::onSourceAdded(pqPipelineSource* src)
       pqLiveSourceItem* item = new pqLiveSourceItem(src, liveHints, this);
       auto& internals = *(this->Internals);
 
-      this->connect(item, &pqLiveSourceItem::refreshSource, [item, &internals]() {
-        double time = internals.getCurrentTime();
-        item->update(time);
-      });
+      this->connect(item, &pqLiveSourceItem::refreshSource,
+        [item, &internals]()
+        {
+          double time = internals.getCurrentTime();
+          item->update(time);
+        });
 
       if (item->isEmulatedTimeAlgorithm())
       {

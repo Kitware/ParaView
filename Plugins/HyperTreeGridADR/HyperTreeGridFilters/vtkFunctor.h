@@ -22,7 +22,10 @@
   }
 
 #define vtkDefaultSpecializationFunctorCompMacro(functor)                                          \
-  inline bool operator==(const functor&) const { return true; }
+  inline bool operator==(const functor&) const                                                     \
+  {                                                                                                \
+    return true;                                                                                   \
+  }
 
 /**
  * @class   vtkIdentityFunctor

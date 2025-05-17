@@ -245,9 +245,8 @@ void pqPipelineContextMenuBehavior::buildMenu(
     pqApplicationCore::instance()->interfaceTracker()->interfaces<pqContextMenuInterface*>();
   // Sort the list by priority:
   std::sort(interfaces.begin(), interfaces.end(),
-    [](const pqContextMenuInterface* a, const pqContextMenuInterface* b) -> bool {
-      return a->priority() > b->priority();
-    });
+    [](const pqContextMenuInterface* a, const pqContextMenuInterface* b) -> bool
+    { return a->priority() > b->priority(); });
   for (auto mbldr : interfaces)
   {
     if (mbldr &&

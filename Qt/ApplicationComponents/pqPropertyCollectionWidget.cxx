@@ -109,12 +109,14 @@ public:
       removeButton->setProperty(
         "ParaView::PropertyCollectionWidget::index", static_cast<int>(this->Items.size()));
 
-      QObject::connect(removeButton, &QToolButton::clicked, [this, self, removeButton](bool) {
-        const int index =
-          removeButton->property("ParaView::PropertyCollectionWidget::index").toInt();
-        this->removeItem(index, self);
-        self->updateProperties();
-      });
+      QObject::connect(removeButton, &QToolButton::clicked,
+        [this, self, removeButton](bool)
+        {
+          const int index =
+            removeButton->property("ParaView::PropertyCollectionWidget::index").toInt();
+          this->removeItem(index, self);
+          self->updateProperties();
+        });
 
       auto separator = pqProxyWidget::newGroupLabelWidget(
         QString("%1 #%2").arg(this->ItemLabel.c_str()).arg(this->Items.size() + 1),
@@ -255,15 +257,19 @@ pqPropertyCollectionWidget::pqPropertyCollectionWidget(
     this->addPropertyLink(this, pname, SIGNAL(widgetModified()), prop);
   }
 
-  QObject::connect(internals.Ui.addItemButton, &QToolButton::clicked, [this](bool) {
-    this->Internals->growBy(1, this);
-    this->updateProperties();
-  });
+  QObject::connect(internals.Ui.addItemButton, &QToolButton::clicked,
+    [this](bool)
+    {
+      this->Internals->growBy(1, this);
+      this->updateProperties();
+    });
 
-  QObject::connect(internals.Ui.removeAllButton, &QToolButton::clicked, [this](bool) {
-    this->Internals->resize(0, this);
-    this->updateProperties();
-  });
+  QObject::connect(internals.Ui.removeAllButton, &QToolButton::clicked,
+    [this](bool)
+    {
+      this->Internals->resize(0, this);
+      this->updateProperties();
+    });
 }
 
 //-----------------------------------------------------------------------------

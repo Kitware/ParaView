@@ -157,7 +157,8 @@ void vtkAttributeDataReductionFilterReduce(vtkDataSetAttributes* output,
     {
       // Now combine this inPD with the outPD using the reduction indicated.
       auto f = [progress_offset, progress_factor, self](
-                 vtkAbstractArray* fromA, vtkAbstractArray* toA) {
+                 vtkAbstractArray* fromA, vtkAbstractArray* toA)
+      {
         vtkDataArray* toDA = vtkDataArray::SafeDownCast(toA);
         vtkDataArray* fromDA = vtkDataArray::SafeDownCast(fromA);
         if (!toDA || !fromDA)

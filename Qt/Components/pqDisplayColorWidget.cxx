@@ -285,11 +285,13 @@ pqDisplayColorWidget::pqDisplayColorWidget(QWidget* parentObject)
   this->Variables->setEnabled(false);
   this->Components->setEnabled(false);
 
-  QObject::connect(this->Variables, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
-    this->refreshComponents();
-    this->pruneOutOfDomainEntries();
-    Q_EMIT this->arraySelectionChanged();
-  });
+  QObject::connect(this->Variables, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [this]()
+    {
+      this->refreshComponents();
+      this->pruneOutOfDomainEntries();
+      Q_EMIT this->arraySelectionChanged();
+    });
   QObject::connect(this->Components, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
     &pqDisplayColorWidget::componentNumberChanged);
 

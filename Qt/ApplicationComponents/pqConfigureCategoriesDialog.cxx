@@ -218,16 +218,20 @@ pqConfigureCategoriesDialog::pqConfigureCategoriesDialog(
   this->Internal->Ui->customCategoriesTree->setHeaderLabels(QStringList() << tr("Name"));
   this->Internal->Ui->customCategoriesTree->viewport()->installEventFilter(this);
 
-  QObject::connect(this->Internal->Ui->addCategory, &QToolButton::released, this, [&]() {
-    auto parentItem = this->Internal->Ui->customCategoriesTree->invisibleRootItem();
-    auto precedingItem = parentItem;
-    this->createCategory(::DEFAULT_NAME, parentItem, precedingItem);
-  });
-  QObject::connect(this->Internal->Ui->addSubCategory, &QToolButton::released, this, [&]() {
-    QTreeWidgetItem* parentItem = this->getSelectedCategoryItem();
-    QTreeWidgetItem* precedingItem = this->getSelectedItem();
-    this->createCategory(::DEFAULT_NAME, parentItem, precedingItem);
-  });
+  QObject::connect(this->Internal->Ui->addCategory, &QToolButton::released, this,
+    [&]()
+    {
+      auto parentItem = this->Internal->Ui->customCategoriesTree->invisibleRootItem();
+      auto precedingItem = parentItem;
+      this->createCategory(::DEFAULT_NAME, parentItem, precedingItem);
+    });
+  QObject::connect(this->Internal->Ui->addSubCategory, &QToolButton::released, this,
+    [&]()
+    {
+      QTreeWidgetItem* parentItem = this->getSelectedCategoryItem();
+      QTreeWidgetItem* precedingItem = this->getSelectedItem();
+      this->createCategory(::DEFAULT_NAME, parentItem, precedingItem);
+    });
 
   QObject::connect(this->Internal->Ui->setIcon, &QToolButton::released, this,
     &pqConfigureCategoriesDialog::onSetIconPressed);

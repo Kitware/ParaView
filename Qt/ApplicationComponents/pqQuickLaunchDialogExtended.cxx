@@ -71,7 +71,8 @@ pqQuickLaunchDialogExtended::pqQuickLaunchDialogExtended(
   QItemSelectionModel* disabledSelection = this->Ui->DisabledProxies->selectionModel();
 
   QObject::connect(availableSelection, &QItemSelectionModel::currentChanged,
-    [&](const QModelIndex& current, const QModelIndex& previous) {
+    [&](const QModelIndex& current, const QModelIndex& previous)
+    {
       QItemSelectionModel* disabled = this->Ui->DisabledProxies->selectionModel();
       if (!previous.isValid() && current.isValid() && disabled->hasSelection())
       {
@@ -81,7 +82,8 @@ pqQuickLaunchDialogExtended::pqQuickLaunchDialogExtended(
     });
 
   QObject::connect(disabledSelection, &QItemSelectionModel::currentChanged,
-    [&](const QModelIndex& current, const QModelIndex& previous) {
+    [&](const QModelIndex& current, const QModelIndex& previous)
+    {
       QItemSelectionModel* available = this->Ui->AvailableProxies->selectionModel();
       if (!previous.isValid() && current.isValid() && available->hasSelection())
       {

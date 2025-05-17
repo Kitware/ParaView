@@ -35,7 +35,8 @@ struct vtkButton
   int state;  // New state (0 = off, 1 = on)
 };
 
-union vtkVREventCommonData {
+union vtkVREventCommonData
+{
   vtkTracker tracker;
   vtkValuator valuator;
   vtkButton button;

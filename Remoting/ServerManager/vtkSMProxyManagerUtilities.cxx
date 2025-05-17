@@ -84,7 +84,8 @@ std::set<vtkSMProxy*> vtkSMProxyManagerUtilities::CollectHelpersAndRelatedProxie
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   std::function<void(vtkSMProxy*)> insert;
-  insert = [&](vtkSMProxy* proxy) {
+  insert = [&](vtkSMProxy* proxy)
+  {
     if (proxy == nullptr || all_proxies.insert(proxy).second == false)
     {
       // already added.

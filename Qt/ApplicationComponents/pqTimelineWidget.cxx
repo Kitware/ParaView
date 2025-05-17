@@ -76,7 +76,8 @@ struct pqTimelineWidget::pqInternals
     this->TimelineView->setModel(this->TimeModel);
 
     QObject::connect(this->TimeModel, &QAbstractItemModel::rowsInserted,
-      [&](const QModelIndex& parent, int first, int) {
+      [&](const QModelIndex& parent, int first, int)
+      {
         QModelIndexList newIndexes;
         newIndexes << this->TimeModel->index(first, pqTimelineColumn::NAME, parent);
         newIndexes << this->TimeModel->index(first, pqTimelineColumn::TIMELINE, parent);
@@ -365,28 +366,30 @@ pqTimelineWidget::pqTimelineWidget(QWidget* parent)
     &pqTimelineWidget::updateSceneFromEnabledAnimations);
 
   pqAnimationManager* mgr = pqPVApplicationCore::instance()->animationManager();
-  this->connect(mgr, &pqAnimationManager::activeSceneChanged, [&](pqAnimationScene* scene) {
-    if (scene)
+  this->connect(mgr, &pqAnimationManager::activeSceneChanged,
+    [&](pqAnimationScene* scene)
     {
-      this->connect(scene, &pqAnimationScene::playModeChanged, this,
-        &pqTimelineWidget::updateTimeTrackFromScene);
-      this->connect(scene, &pqAnimationScene::clockTimeRangesChanged, this,
-        &pqTimelineWidget::updateTimeTrackFromScene);
-      this->connect(scene, &pqAnimationScene::frameCountChanged, this,
-        &pqTimelineWidget::updateTimeTrackFromScene);
-      this->connect(scene, &pqAnimationScene::addedCue, this, &pqTimelineWidget::addCueTrack);
-      this->connect(
-        scene, &pqAnimationScene::preRemovedCue, this, &pqTimelineWidget::removeCueTrack);
-
-      // add already existing cues, as TimeKeeper
-      for (auto cue : scene->getCues())
+      if (scene)
       {
-        this->addCueTrack(cue);
-      }
+        this->connect(scene, &pqAnimationScene::playModeChanged, this,
+          &pqTimelineWidget::updateTimeTrackFromScene);
+        this->connect(scene, &pqAnimationScene::clockTimeRangesChanged, this,
+          &pqTimelineWidget::updateTimeTrackFromScene);
+        this->connect(scene, &pqAnimationScene::frameCountChanged, this,
+          &pqTimelineWidget::updateTimeTrackFromScene);
+        this->connect(scene, &pqAnimationScene::addedCue, this, &pqTimelineWidget::addCueTrack);
+        this->connect(
+          scene, &pqAnimationScene::preRemovedCue, this, &pqTimelineWidget::removeCueTrack);
 
-      this->updateTimeTrackFromScene();
-    }
-  });
+        // add already existing cues, as TimeKeeper
+        for (auto cue : scene->getCues())
+        {
+          this->addCueTrack(cue);
+        }
+
+        this->updateTimeTrackFromScene();
+      }
+    });
 }
 
 //-----------------------------------------------------------------------------

@@ -72,10 +72,12 @@ public:
     this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
     this->GroupManager = qobject_cast<pqPresetGroupsManager*>(
       pqApplicationCore::instance()->manager("PRESET_GROUP_MANAGER"));
-    this->connect(this->GroupManager, &pqPresetGroupsManager::groupsUpdated, this, [this]() {
-      this->beginResetModel();
-      this->endResetModel();
-    });
+    this->connect(this->GroupManager, &pqPresetGroupsManager::groupsUpdated, this,
+      [this]()
+      {
+        this->beginResetModel();
+        this->endResetModel();
+      });
   }
 
   ~pqPresetDialogTableModel() override = default;
@@ -561,7 +563,9 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
   this->connect(ui.importPresets, SIGNAL(clicked()), SLOT(importPresets()));
   this->connect(ui.exportPresets, SIGNAL(clicked()), SLOT(exportPresets()));
   this->connect(ui.groupChooser,
-    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [&](int index) {
+    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+    [&](int index)
+    {
       this->Internals->ProxyModel->setCurrentGroupColumn(index);
       this->updateEnabledStateForSelection();
       this->Internals->CurrentGroupColumn = index;

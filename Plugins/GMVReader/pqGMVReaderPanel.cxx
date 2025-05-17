@@ -57,9 +57,9 @@ pqGMVReaderPanel::pqGMVReaderPanel(pqProxy* prox, QWidget* par)
     {
       this->treeWidget = this->findChild<pqTreeWidget*>("CellAndPointArrayStatus");
 
-      QObject::connect(
-        this->ImportTracersWidget, &QCheckBox::pqCheckBoxSignal, this, [&](pqCheckState state) { this->updateTracerDataStatus(static_cast<Qt::CheckState>(state);
-        });
+      QObject::connect(this->ImportTracersWidget, &QCheckBox::pqCheckBoxSignal, this,
+        [&](pqCheckState state)
+        { this->updateTracerDataStatus(static_cast<Qt::CheckState>(state); });
       this->ImportTracersWidget->setChecked(Qt::Checked);
       this->ImportTracersWidget->setEnabled(true);
     }

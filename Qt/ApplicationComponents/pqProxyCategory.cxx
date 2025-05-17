@@ -496,7 +496,8 @@ QList<pqProxyCategory*> pqProxyCategory::getCategoriesAlphabetically()
     orderedCategories << subCategory;
   }
 
-  auto nameSort = [&](pqProxyCategory* categoryA, pqProxyCategory* categoryB) {
+  auto nameSort = [&](pqProxyCategory* categoryA, pqProxyCategory* categoryB)
+  {
     QString nameA = categoryA->name().remove("&").toLower();
     QString nameB = categoryB->name().remove("&").toLower();
     return nameA < nameB;

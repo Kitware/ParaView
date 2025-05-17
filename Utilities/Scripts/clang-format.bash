@@ -78,8 +78,8 @@ test "$#" = 0 || die "$usage"
 
 # Find a default tool.
 tools='
+  clang-format-16
   clang-format
-  clang-format-3.8
 '
 if test "x$clang_format" = "x"; then
     for tool in $tools; do
@@ -111,7 +111,9 @@ $git_ls |
 
   # Select sources with our attribute.
   git check-attr --stdin format.clang-format |
-  sed -n '/: format\.clang-format: set$/ {s/:[^:]*:[^:]*$//p}'  |
+    # Filter sources that have an attribute value of 16.
+    # It is the value assigned to the attribute 'our-c-style' in the root .gitattributes file
+    sed -n '/: format\.clang-format: \(set\|16\)$/ {s/:[^:]*:[^:]*$//p}'  |
 
   # Update sources in-place.
   xargs -d '\n' "$clang_format" -i

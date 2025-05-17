@@ -14,25 +14,27 @@ pqMultiColumnHeaderView::pqMultiColumnHeaderView(Qt::Orientation orientation, QW
   // when a section is resized, for section spanning multiple sections, we
   // need to ensure that we repaint all sections in the span otherwise the text
   // doesn't render correctly on adjacent section not being resized.
-  QObject::connect(this, &QHeaderView::sectionResized, [this](int logicalIndex, int, int) {
-    const auto span = this->sectionSpan(this->visualIndex(logicalIndex));
-    if (span.first != span.second)
+  QObject::connect(this, &QHeaderView::sectionResized,
+    [this](int logicalIndex, int, int)
     {
-      const auto lspan =
-        QPair<int, int>(this->logicalIndex(span.first), this->logicalIndex(span.second));
-      int start = this->sectionViewportPosition(lspan.first);
-      int end = this->sectionViewportPosition(lspan.second) + this->sectionSize(lspan.second);
-      auto viewport = this->viewport();
-      if (this->orientation() == Qt::Horizontal && viewport != nullptr)
+      const auto span = this->sectionSpan(this->visualIndex(logicalIndex));
+      if (span.first != span.second)
       {
-        viewport->update(start, 0, end, viewport->height());
+        const auto lspan =
+          QPair<int, int>(this->logicalIndex(span.first), this->logicalIndex(span.second));
+        int start = this->sectionViewportPosition(lspan.first);
+        int end = this->sectionViewportPosition(lspan.second) + this->sectionSize(lspan.second);
+        auto viewport = this->viewport();
+        if (this->orientation() == Qt::Horizontal && viewport != nullptr)
+        {
+          viewport->update(start, 0, end, viewport->height());
+        }
+        else
+        {
+          viewport->update(0, start, viewport->width(), end);
+        }
       }
-      else
-      {
-        viewport->update(0, start, viewport->width(), end);
-      }
-    }
-  });
+    });
 }
 
 //-----------------------------------------------------------------------------

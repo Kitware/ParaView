@@ -80,7 +80,8 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
     os << i2 << pair.first << "::" << pair.second << endl;
   }
 
-  auto cname = [](size_t comp) {
+  auto cname = [](size_t comp)
+  {
     return (comp == 0 ? std::string("(magnitude)")
                       : std::string("(comp=") + std::to_string(comp - 1) + ")");
   };

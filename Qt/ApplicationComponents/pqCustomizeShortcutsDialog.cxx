@@ -300,7 +300,8 @@ public:
   void resetAll()
   {
     callOnAllLeaves(
-      [this](const QModelIndex& leafIndex, TreeItem* item) {
+      [this](const QModelIndex& leafIndex, TreeItem* item)
+      {
         QKeySequence shortcut = item->defaultKeySequence();
         QModelIndex indexToChange = this->index(leafIndex.row(), 1, this->parent(leafIndex));
         this->setKeySequence(indexToChange, shortcut);
@@ -407,13 +408,15 @@ pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
     &pqCustomizeShortcutsDialog::onResetAll);
   connect(this->Internals->Ui.recordButton, &QAbstractButton::clicked, this,
     [this]() { this->Internals->Ui.keySequenceEdit->setFocus(); });
-  connect(this->Internals->Ui.searchBox, &pqSearchBox::textChanged, this, [this]() {
-    QRegularExpression regex(
-      this->Internals->Ui.searchBox->text(), QRegularExpression::CaseInsensitiveOption);
+  connect(this->Internals->Ui.searchBox, &pqSearchBox::textChanged, this,
+    [this]()
+    {
+      QRegularExpression regex(
+        this->Internals->Ui.searchBox->text(), QRegularExpression::CaseInsensitiveOption);
 
-    this->Internals->FilterModel->setFilterRegularExpression(regex);
-    this->Internals->Ui.treeView->expandAll();
-  });
+      this->Internals->FilterModel->setFilterRegularExpression(regex);
+      this->Internals->Ui.treeView->expandAll();
+    });
   this->setWindowTitle(tr("Customize Shortcuts"));
   this->onSelectionChanged();
 
@@ -445,7 +448,8 @@ void pqCustomizeShortcutsDialog::onEditingFinished()
 
 void pqCustomizeShortcutsDialog::onSelectionChanged()
 {
-  auto setEnabled = [this](bool enable) {
+  auto setEnabled = [this](bool enable)
+  {
     this->Internals->Ui.recordButton->setEnabled(enable);
     this->Internals->Ui.clearButton->setEnabled(enable);
     this->Internals->Ui.resetButton->setEnabled(enable);
