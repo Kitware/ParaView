@@ -152,7 +152,6 @@ set(classes
   pqTextureSelectorPropertyWidget
   pqTimerLogDisplay
   pqToolBarInterface
-  pqToolTipTrapper
   pqTransferFunctionWidget
   pqTransferFunction2DWidget
   pqTriggerOnIdleHelper
