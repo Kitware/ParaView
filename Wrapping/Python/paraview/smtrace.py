@@ -1108,6 +1108,22 @@ class RepresentationProxyFilter(PipelineProxyFilter):
 
 
 class ViewProxyFilter(ProxyFilter):
+    def should_trace_in_create(self, prop):
+        # Camera parallel scale doesn't have a decorator, since it is never
+        # displayed in the GUI. But we should still exclude it from the Python
+        # state file if RECORD_ACTIVE_MODIFIED_PROPERTIES is being used and
+        # CameraParallelProjection is not enabled.
+        if prop.get_property_name() == 'CameraParallelScale':
+            setting = sm.vtkSMTrace.GetActiveTracer().GetPropertiesToTraceOnCreate()
+            if setting == sm.vtkSMTrace.RECORD_ACTIVE_MODIFIED_PROPERTIES:
+                rv = prop.get_proxy()
+                if rv and rv.CameraParallelProjection == 0:
+                    # We should not include `CameraParallelScale` if parallel
+                    # projection is disabled.
+                    return False
+
+        return super().should_trace_in_create(prop)
+
     def should_never_trace(self, prop):
         # skip "Representations" property and others.
         # The fact that we need to skip so many properties means that we are
