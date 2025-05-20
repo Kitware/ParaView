@@ -40,7 +40,7 @@
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetFocalDisk"
-                            default_values="0"
+                            default_values="1"
                             ignore_synchronization="1"
                             immediate_update="1"
                             information_property="CameraFocalDiskInfo"
