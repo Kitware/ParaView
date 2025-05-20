@@ -18,6 +18,7 @@
 #include "pqProxyCategory.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqProxyInfo.h"
+#include "pqWidgetUtilities.h"
 
 namespace
 {
@@ -183,8 +184,9 @@ struct pqConfigureCategoriesDialog::pqInternal
     {
       auto font = item->font(0);
       item->setForeground(0, QBrush(QColor(200, 200, 200)));
-      item->setToolTip(
-        0, tr("Filter is not available.\nIt may be part of a plugin that is not loaded."));
+      QString tooltip = pqWidgetUtilities::formatTooltip(
+        tr("Filter is not available.\nIt may be part of a plugin that is not loaded."));
+      item->setToolTip(0, tooltip);
     }
 
     // use the same icon as the associated menu action.
@@ -715,7 +717,9 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::createCategoryItem(
 
   auto item = this->createItem(parent, displayLabel, preceding);
   item->setData(0, ::CATEGORY_ROLE, QVariant::fromValue(categoryInfo));
-  item->setToolTip(0, "Category name. The letter after a '&' character defines a menu shortcut.");
+  QString tooltip = pqWidgetUtilities::formatTooltip(
+    tr("Category name. The letter after a '&' character defines a menu shortcut."));
+  item->setToolTip(0, tooltip);
 
   auto itemFlags = item->flags();
   itemFlags |= Qt::ItemIsEditable | Qt::ItemIsDropEnabled;

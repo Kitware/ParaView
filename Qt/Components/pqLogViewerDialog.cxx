@@ -6,6 +6,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqServer.h"
+#include "pqWidgetUtilities.h"
 
 #include <QMouseEvent>
 
@@ -357,7 +358,7 @@ void pqLogViewerDialog::appendLogView(pqSingleLogViewerWidget* logView)
   int tabIndex = this->Ui->logTabWidget->addTab(logView, tabTitle);
   QLabel* label = new QLabel();
   label->setObjectName("close");
-  label->setToolTip(tr("Close log"));
+  label->setToolTip(pqWidgetUtilities::formatTooltip(tr("Close log")));
   label->setStatusTip(tr("Close log"));
   label->setPixmap(
     label->style()->standardIcon(QStyle::SP_TitleBarCloseButton).pixmap(PIXMAP_SIZE, PIXMAP_SIZE));

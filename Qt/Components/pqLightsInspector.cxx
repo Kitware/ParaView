@@ -22,6 +22,7 @@
 #include "pqRenderView.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 
 //=============================================================================
 class pqLightsInspector::pqInternals
@@ -165,7 +166,8 @@ public:
       syncButton->setObjectName("MoveToCamera");
       // which light does this button affect?
       syncButton->setProperty("LightIndex", i);
-      syncButton->setToolTip(tr("Match this light's position and focal point to the camera."));
+      syncButton->setToolTip(pqWidgetUtilities::formatTooltip(
+        tr("Match this light's position and focal point to the camera.")));
       connect(syncButton, SIGNAL(clicked()), self, SLOT(syncLightToCamera()));
       hbox->addWidget(syncButton);
       this->updateMoveToCamera(i, light);
@@ -175,7 +177,8 @@ public:
       resetButton->setObjectName("ResetLight");
       // which light does this button affect?
       resetButton->setProperty("LightIndex", i);
-      resetButton->setToolTip(tr("Reset this light parameters to default"));
+      resetButton->setToolTip(
+        pqWidgetUtilities::formatTooltip(tr("Reset this light parameters to default")));
       connect(resetButton, SIGNAL(clicked()), self, SLOT(resetLight()));
       hbox->addWidget(resetButton);
 
@@ -184,7 +187,7 @@ public:
       removeButton->setObjectName("RemoveLight");
       // which light does this button affect?
       removeButton->setProperty("LightIndex", i);
-      removeButton->setToolTip(tr("Remove this light."));
+      removeButton->setToolTip(pqWidgetUtilities::formatTooltip(tr("Remove this light.")));
       connect(removeButton, SIGNAL(clicked()), self, SLOT(removeLight()));
       hbox->addWidget(removeButton);
 

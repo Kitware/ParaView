@@ -8,6 +8,7 @@
 #include "pqPVApplicationCore.h"
 #include "pqTransferFunctionWidget.h"
 #include "pqTransferFunctionWidgetPropertyDialog.h"
+#include "pqWidgetUtilities.h"
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
 #include "vtkPiecewiseFunction.h"
@@ -71,7 +72,7 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
   }
 
   QAction* resetActn = new QAction(this->Internals->Ui.resetButton);
-  resetActn->setToolTip(tr("Reset using current data values"));
+  resetActn->setToolTip(pqWidgetUtilities::formatTooltip(tr("Reset using current data values")));
   resetActn->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   this->Internals->Ui.resetButton->addAction(resetActn);
   this->Internals->Ui.resetButton->setDefaultAction(resetActn);

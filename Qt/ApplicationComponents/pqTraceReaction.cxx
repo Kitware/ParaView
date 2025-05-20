@@ -47,8 +47,8 @@ pqTraceReaction::pqTraceReaction(
     vtkSMTrace::GetActiveTracer() == nullptr ? this->StartTraceLabel : this->StopTraceLabel);
 #else
   this->parentAction()->setEnabled(false);
-  this->parentAction()->setToolTip(
-    tr("Tracing unavailable since application built without Python support."));
+  this->parentAction()->setToolTip(pqWidgetUtilities::formatTooltip(
+    tr("Tracing unavailable since application built without Python support.")));
   this->parentAction()->setStatusTip(
     tr("Tracing unavailable since application built without Python support."));
 #endif

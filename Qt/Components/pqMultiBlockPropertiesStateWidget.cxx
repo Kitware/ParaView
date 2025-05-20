@@ -6,6 +6,7 @@
 #include "pqHighlightableToolButton.h"
 #include "pqPropertiesPanel.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkCommand.h"
 #include "vtkNew.h"
@@ -215,11 +216,13 @@ pqMultiBlockPropertiesStateWidget::pqMultiBlockPropertiesStateWidget(vtkSMProxy*
   internals.ResetButton->setObjectName("Reset");
   internals.ResetButton->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   internals.ResetButton->setIconSize(QSize(iconSize - 4, iconSize - 4));
-  internals.ResetButton->setToolTip(tr("Reset to value(s) inherited from block/representation"));
+  internals.ResetButton->setToolTip(
+    pqWidgetUtilities::formatTooltip(tr("Reset to value(s) inherited from block/representation")));
 
   // create the state label
   internals.StateLabel = new QLabel("BlockPropertyState", this);
-  internals.StateLabel->setToolTip(internals.ToolTips[BlockPropertyState::Disabled]);
+  internals.StateLabel->setToolTip(
+    pqWidgetUtilities::formatTooltip(internals.ToolTips[BlockPropertyState::Disabled]));
   internals.StateLabel->setPixmap(internals.Icons[BlockPropertyState::Disabled]);
 
   // add the widgets to the layout
@@ -272,7 +275,7 @@ void pqMultiBlockPropertiesStateWidget::updateState()
     internals.CurrentState = state;
 
     internals.StateLabel->setPixmap(internals.Icons[state]);
-    internals.StateLabel->setToolTip(internals.ToolTips[state]);
+    internals.StateLabel->setToolTip(pqWidgetUtilities::formatTooltip(internals.ToolTips[state]));
     internals.StateLabel->setEnabled(state != BlockPropertyState::Disabled);
 
     internals.ResetButton->setEnabled(state >= BlockPropertyState::Set);

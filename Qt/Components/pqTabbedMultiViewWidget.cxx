@@ -12,6 +12,7 @@
 #include "pqServerManagerObserver.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
@@ -107,7 +108,7 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(
 
   QLabel* label = new QLabel();
   label->setObjectName("popout");
-  label->setToolTip(pqTabWidget::popoutLabelText(false));
+  label->setToolTip(pqWidgetUtilities::formatTooltip(pqTabWidget::popoutLabelText(false)));
   label->setStatusTip(pqTabWidget::popoutLabelText(false));
   label->setPixmap(label->style()
                      ->standardIcon(pqTabWidget::popoutLabelPixmap(false))
@@ -117,7 +118,7 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(
 
   label = new QLabel();
   label->setObjectName("close");
-  label->setToolTip(tr("Close layout"));
+  label->setToolTip(pqWidgetUtilities::formatTooltip(tr("Close layout")));
   label->setStatusTip(tr("Close layout"));
   label->setPixmap(label->style()
                      ->standardIcon(QStyle::SP_TitleBarCloseButton)
@@ -781,7 +782,8 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject* obj, QEvent* evt)
           label->setPixmap(label->style()
                              ->standardIcon(pqTabWidget::popoutLabelPixmap(popped_out))
                              .pixmap(PQTABBED_WIDGET_PIXMAP_SIZE, PQTABBED_WIDGET_PIXMAP_SIZE));
-          label->setToolTip(pqTabWidget::popoutLabelText(popped_out));
+          label->setToolTip(
+            pqWidgetUtilities::formatTooltip(pqTabWidget::popoutLabelText(popped_out)));
           label->setStatusTip(pqTabWidget::popoutLabelText(popped_out));
         }
         return true;

@@ -7,6 +7,7 @@
 #include "pqProxyWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 #include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyGroup.h"
@@ -104,8 +105,8 @@ public:
       auto removeButton = new QToolButton();
       removeButton->setObjectName(QString::fromUtf8("removeButton"));
       removeButton->setIcon(QIcon(QString::fromUtf8(":/QtWidgets/Icons/pqDelete.svg")));
-      removeButton->setToolTip(
-        QCoreApplication::translate("PropertyCollectionWidget", "Remove", nullptr));
+      removeButton->setToolTip(pqWidgetUtilities::formatTooltip(
+        QCoreApplication::translate("PropertyCollectionWidget", "Remove", nullptr)));
       removeButton->setProperty(
         "ParaView::PropertyCollectionWidget::index", static_cast<int>(this->Items.size()));
 

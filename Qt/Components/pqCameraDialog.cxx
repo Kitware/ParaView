@@ -40,6 +40,7 @@
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 
 // STL
 #include <sstream>
@@ -93,8 +94,8 @@ public:
     // Add + bouton
     this->PlusButton = new QToolButton();
     this->PlusButton->setObjectName("AddButton");
-    this->PlusButton->setToolTip(
-      QCoreApplication::translate("pqCameraDialog", "Add Current Viewpoint"));
+    this->PlusButton->setToolTip(pqWidgetUtilities::formatTooltip(
+      QCoreApplication::translate("pqCameraDialog", "Add Current Viewpoint")));
     this->PlusButton->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
     this->PlusButton->setMinimumSize(QSize(34, 34));
   }

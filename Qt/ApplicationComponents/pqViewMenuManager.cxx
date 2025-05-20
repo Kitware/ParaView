@@ -9,6 +9,7 @@
 #include "pqPreviewMenuManager.h"
 #include "pqSetName.h"
 #include "pqTabbedMultiViewWidget.h"
+#include "pqWidgetUtilities.h"
 
 #include <QDockWidget>
 #include <QMainWindow>
@@ -111,29 +112,29 @@ void pqViewMenuManager::buildMenu()
   QAction* lockDockWidgetsAction =
     this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqToggleLock.svg"), tr("Toggle Lock Panels"));
   lockDockWidgetsAction->setObjectName("actionLockDockWidgets");
-  lockDockWidgetsAction->setToolTip(tr("Toggle locking of dockable panels so they\
-    cannot be moved"));
+  lockDockWidgetsAction->setToolTip(pqWidgetUtilities::formatTooltip(
+    tr("Toggle locking of dockable panels so they cannot be moved")));
   new pqLockPanelsReaction(lockDockWidgetsAction);
 
   QMenu* equalizeMenu = this->Menu->addMenu(tr("Equalize Views")) << pqSetName("equalizeViewsMenu");
   QAction* equalizeViewsHorizontallyAction = equalizeMenu->addAction(tr("Horizontally"));
   equalizeViewsHorizontallyAction->setObjectName("equalizeViewsHorizontallyAction");
   equalizeViewsHorizontallyAction->setToolTip(
-    tr("Equalize layout so views are evenly sized horizontally"));
+    pqWidgetUtilities::formatTooltip(tr("Equalize layout so views are evenly sized horizontally")));
   new pqEqualizeLayoutReaction(
     pqEqualizeLayoutReaction::Orientation::HORIZONTAL, equalizeViewsHorizontallyAction);
 
   QAction* equalizeViewsVerticallyAction = equalizeMenu->addAction(tr("Vertically"));
   equalizeViewsVerticallyAction->setObjectName("equalizeViewsVerticallyAction");
   equalizeViewsVerticallyAction->setToolTip(
-    tr("Equalize layout so views are evenly sized vertically"));
+    pqWidgetUtilities::formatTooltip(tr("Equalize layout so views are evenly sized vertically")));
   new pqEqualizeLayoutReaction(
     pqEqualizeLayoutReaction::Orientation::VERTICAL, equalizeViewsVerticallyAction);
 
   QAction* equalizeViewsBothAction = equalizeMenu->addAction(tr("Both"));
   equalizeViewsBothAction->setObjectName("equalizeViewsBothAction");
-  equalizeViewsBothAction->setToolTip(
-    tr("Equalize layout so views are evenly sized horizontally and vertically"));
+  equalizeViewsBothAction->setToolTip(pqWidgetUtilities::formatTooltip(
+    tr("Equalize layout so views are evenly sized horizontally and vertically")));
   new pqEqualizeLayoutReaction(
     pqEqualizeLayoutReaction::Orientation::BOTH, equalizeViewsBothAction);
 }

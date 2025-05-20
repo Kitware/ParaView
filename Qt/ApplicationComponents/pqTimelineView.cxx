@@ -10,6 +10,7 @@
 #include "pqAnimationCue.h"
 #include "pqRenderView.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 #include "vtkPVCameraCueManipulator.h"
 #include "vtkSMRenderViewProxy.h"
 
@@ -36,7 +37,8 @@ struct pqTimelineView::pqInternals
   {
     auto resetBtn = new QToolButton(this->Self);
     resetBtn->setObjectName("resetStartEndTime");
-    resetBtn->setToolTip(tr("Reset Start and End Time to default values"));
+    resetBtn->setToolTip(
+      pqWidgetUtilities::formatTooltip(tr("Reset Start and End Time to default values")));
     resetBtn->setIcon(QIcon(":/pqWidgets/Icons/pqResetRange.svg"));
 
     QObject::connect(
@@ -55,7 +57,7 @@ struct pqTimelineView::pqInternals
 
     this->ProxiesBox = new pqAnimatableProxyComboBox(addTrackWidget);
     this->ProxiesBox->setObjectName("proxiesBox");
-    this->ProxiesBox->setToolTip(tr("Select proxy to animate"));
+    this->ProxiesBox->setToolTip(pqWidgetUtilities::formatTooltip(tr("Select proxy to animate")));
     this->ProxiesBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 #if VTK_MODULE_ENABLE_ParaView_pqPython
     this->ProxiesBox->addProxy(0, tr("Python"), nullptr);
@@ -64,7 +66,8 @@ struct pqTimelineView::pqInternals
 
     this->PropertiesBox = new pqAnimatablePropertiesComboBox(addTrackWidget);
     this->PropertiesBox->setObjectName("propertiesBox");
-    this->PropertiesBox->setToolTip(tr("Select property to animate"));
+    this->PropertiesBox->setToolTip(
+      pqWidgetUtilities::formatTooltip(tr("Select property to animate")));
     hLayout->addWidget(this->PropertiesBox);
 
     this->AddTrackButton = new QToolButton(addTrackWidget);
@@ -262,10 +265,11 @@ void pqTimelineView::enableTrackCreationWidget(bool enable)
   if (enable)
   {
     this->Internals->AddTrackButton->setToolTip(
-      tr("Add animation cue for selected proxy and property."));
+      pqWidgetUtilities::formatTooltip(tr("Add animation cue for selected proxy and property.")));
   }
   else
   {
-    this->Internals->AddTrackButton->setToolTip(tr("Animation cue already exists."));
+    this->Internals->AddTrackButton->setToolTip(
+      pqWidgetUtilities::formatTooltip(tr("Animation cue already exists.")));
   }
 }

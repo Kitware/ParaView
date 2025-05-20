@@ -5,6 +5,7 @@
 #include "ui_pqMoleculePropertyWidget.h"
 
 #include "pqPropertiesPanel.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDoubleRangeDomain.h"
@@ -57,7 +58,8 @@ pqMoleculePropertyWidget::pqMoleculePropertyWidget(
   QObject::connect(ui.resetAtomicRadiusFactor, &QToolButton::released, this,
     &pqMoleculePropertyWidget::onResetAtomFactorToggled);
   QAction* resetAtomicRadiusAction = new QAction(ui.resetAtomicRadiusFactor);
-  resetAtomicRadiusAction->setToolTip(tr("Reset the range values"));
+  resetAtomicRadiusAction->setToolTip(
+    pqWidgetUtilities::formatTooltip(tr("Reset the range values")));
   resetAtomicRadiusAction->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   ui.resetAtomicRadiusFactor->addAction(resetAtomicRadiusAction);
   ui.resetAtomicRadiusFactor->setDefaultAction(resetAtomicRadiusAction);
@@ -95,7 +97,8 @@ pqMoleculePropertyWidget::pqMoleculePropertyWidget(
     ui.preset->addItem(molproxy->GetPresetDisplayName(i));
   }
   QObject::connect(ui.preset, SIGNAL(currentIndexChanged(int)), this, SLOT(onPresetChanged(int)));
-  ui.preset->setToolTip(tr("Apply a preset to display properties, including advanced ones."));
+  ui.preset->setToolTip(pqWidgetUtilities::formatTooltip(
+    tr("Apply a preset to display properties, including advanced ones.")));
 
   this->addPropertyLink(ui.showBonds, "RenderBonds");
   this->setDocumentationAsTooltip(smgroup->GetProperty("RenderBonds"), ui.showBonds);
@@ -116,7 +119,7 @@ pqMoleculePropertyWidget::pqMoleculePropertyWidget(
   QObject::connect(ui.resetBondRadius, &QToolButton::released, this,
     &pqMoleculePropertyWidget::onResetBondRadiusToggled);
   QAction* resetBondRadiusAction = new QAction(ui.resetBondRadius);
-  resetBondRadiusAction->setToolTip(tr("Reset the range values"));
+  resetBondRadiusAction->setToolTip(pqWidgetUtilities::formatTooltip(tr("Reset the range values")));
   resetBondRadiusAction->setIcon(
     ui.resetBondRadius->style()->standardIcon(QStyle::SP_BrowserReload));
   ui.resetBondRadius->addAction(resetBondRadiusAction);
@@ -253,7 +256,8 @@ void pqMoleculePropertyWidget::setDocumentationAsTooltip(vtkSMProperty* prop, QW
 
   if (doc != nullptr && widget != nullptr && doc->GetDescription())
   {
-    widget->setToolTip(QCoreApplication::translate("ServerManagerXML", doc->GetDescription()));
+    widget->setToolTip(pqWidgetUtilities::formatTooltip(
+      QCoreApplication::translate("ServerManagerXML", doc->GetDescription())));
   }
 }
 

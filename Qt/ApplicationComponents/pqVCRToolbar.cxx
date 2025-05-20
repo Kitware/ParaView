@@ -9,6 +9,7 @@
 #include "pqPVApplicationCore.h"
 #include "pqUndoStack.h"
 #include "pqVCRController.h"
+#include "pqWidgetUtilities.h"
 
 class pqVCRToolbar::pqInternals : public Ui::pqVCRToolbar
 {
@@ -69,8 +70,10 @@ pqVCRToolbar::~pqVCRToolbar()
 //-----------------------------------------------------------------------------
 void pqVCRToolbar::setTimeRanges(double start, double end)
 {
-  this->UI->actionVCRFirstFrame->setToolTip(tr("First Frame (%1)").arg(start, 0, 'g'));
-  this->UI->actionVCRLastFrame->setToolTip(tr("Last Frame (%1)").arg(end, 0, 'g'));
+  this->UI->actionVCRFirstFrame->setToolTip(
+    pqWidgetUtilities::formatTooltip(tr("First Frame (%1)").arg(start, 0, 'g')));
+  this->UI->actionVCRLastFrame->setToolTip(
+    pqWidgetUtilities::formatTooltip(tr("Last Frame (%1)").arg(end, 0, 'g')));
 }
 
 //-----------------------------------------------------------------------------

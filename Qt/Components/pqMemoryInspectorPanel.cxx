@@ -15,6 +15,7 @@
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMRenderViewProxy.h"
 
 #include "vtkClientServerStream.h"
@@ -1735,7 +1736,7 @@ QWidget* pqMemoryInspectorPanel::NewGroupWidget(string name, string icon)
 
   QLabel* label = new QLabel;
   label->setPixmap(QPixmap(icon.c_str()));
-  label->setToolTip(name.c_str());
+  label->setToolTip(pqWidgetUtilities::formatTooltip(QString::fromStdString(name)));
   hlayout->addWidget(label);
 
   label = new QLabel;

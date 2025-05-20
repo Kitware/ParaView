@@ -26,6 +26,7 @@
 #include "pqToggleInteractionViewMode.h"
 #include "pqUndoStack.h"
 #include "pqViewFrame.h"
+#include "pqWidgetUtilities.h"
 #include "vtkChart.h"
 #include "vtkCollection.h"
 #include "vtkPVProxyDefinitionIterator.h"
@@ -339,8 +340,10 @@ void pqStandardViewFrameActionsImplementation::addGenericActions(pqViewFrame* fr
       QAction* captureViewAction = frame->addTitleBarAction(
         QIcon(":/pqWidgets/Icons/pqCaptureScreenshot.svg"), tr("Capture to Clipboard or File"));
       captureViewAction->setObjectName("actionCaptureView");
-      captureViewAction->setToolTip(tr("Capture screenshot to a file or to the clipboard if a "
-                                       "modifier key (Ctrl, Alt or Shift) is pressed."));
+      QString tooltip =
+        pqWidgetUtilities::formatTooltip(tr("Capture screenshot to a file or to the clipboard if a "
+                                            "modifier key (Ctrl, Alt or Shift) is pressed."));
+      captureViewAction->setToolTip(tooltip);
       this->connect(captureViewAction, SIGNAL(triggered(bool)), SLOT(captureViewTriggered()));
     }
   }
