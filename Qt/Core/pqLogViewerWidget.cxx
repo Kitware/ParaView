@@ -22,6 +22,7 @@
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqServer.h"
+#include "pqWidgetUtilities.h"
 
 #include <cassert>
 #include <cmath>
@@ -182,6 +183,7 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
 {
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   internals.Ui.splitter->setSizes(QList<int>{ 800, 200 });
   internals.FilterModel.setRecursiveFilteringEnabled(true);
   internals.FilterModel.setSourceModel(&internals.Model);

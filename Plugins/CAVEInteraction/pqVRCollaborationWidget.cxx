@@ -6,6 +6,7 @@
 #include "pqApplicationCore.h"
 #include "pqVRQueueHandler.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkOpenGLRenderer.h"
 #include "vtkPVRenderView.h"
@@ -539,6 +540,7 @@ pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::Wind
   , Internals(new pqInternals())
 {
   this->Internals->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   this->Internals->AvatarConfigDialog = new pqVRAvatarEvents(this);
   this->Internals->CollaborationClient = nullptr;

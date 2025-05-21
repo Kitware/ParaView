@@ -45,7 +45,7 @@
      <item>
       <widget class="QPushButton" name="cellLabelsButton">
        <property name="toolTip">
-        <string>&lt;p&gt;Set the array to label selected cells with&lt;/p&gt;</string>
+        <string>Set the array to label selected cells with</string>
        </property>
        <property name="text">
         <string>Cell Labels</string>
@@ -59,7 +59,7 @@
      <item>
       <widget class="QPushButton" name="pointLabelsButton">
        <property name="toolTip">
-        <string>&lt;p&gt;Set the array to label to selected points with&lt;/p&gt;</string>
+        <string>Set the array to label to selected points with</string>
        </property>
        <property name="text">
         <string>Point Labels</string>
@@ -119,7 +119,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>&lt;p&gt;Set the color to use to show selected elements&lt;/p&gt;</string>
+      <string>Set the color to use to show selected elements</string>
      </property>
      <property name="text">
       <string>Selection Color</string>
@@ -159,7 +159,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>&lt;p&gt;Set the color to use to show selected elements&lt;/p&gt;</string>
+      <string>Set the color to use to show selected elements</string>
      </property>
      <property name="text">
       <string>Interactive Selection Color</string>

@@ -42,6 +42,7 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
 {
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   internals.Ui.PauseButton->setText(
     QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));

@@ -4,6 +4,7 @@
 #include "pqAudioPlayer.h"
 #include "ui_pqAudioPlayer.h"
 
+#include "pqWidgetUtilities.h"
 #include <pqActiveObjects.h>
 #include <pqApplicationCore.h>
 #include <pqCoreUtilities.h>
@@ -542,6 +543,7 @@ void pqAudioPlayer::constructor()
   this->setWindowTitle("Audio Player");
   QWidget* widget = new QWidget(this);
   this->Internals->setupUi(widget);
+  pqWidgetUtilities::formatChildTooltips(widget);
   this->setWidget(widget);
 
   QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::sourceChanged, this,

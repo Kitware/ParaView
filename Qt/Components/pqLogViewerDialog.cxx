@@ -52,6 +52,7 @@ pqLogViewerDialog::pqLogViewerDialog(QWidget* parent)
 {
   this->Ui = new Ui::pqLogViewerDialog();
   this->Ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   indexToVerbosity[0] = vtkLogger::VERBOSITY_OFF;

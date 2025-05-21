@@ -138,6 +138,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   QString objectName = menu.objectName();
   Ui::pqFileMenuBuilder ui;
   ui.setupUi(&menu);
+  pqWidgetUtilities::formatChildTooltips(&menu);
   // since the UI file tends to change the name of the menu.
   menu.setObjectName(objectName);
 
@@ -189,6 +190,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   QString objectName = menu.objectName();
   Ui::pqEditMenuBuilder ui;
   ui.setupUi(&menu);
+  pqWidgetUtilities::formatChildTooltips(&menu);
   // since the UI file tends to change the name of the menu.
   menu.setObjectName(objectName);
 

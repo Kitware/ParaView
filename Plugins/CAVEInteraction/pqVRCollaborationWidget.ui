@@ -31,7 +31,7 @@
    <item row="0" column="3">
     <widget class="QPushButton" name="configureAvatarBtn">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Map events to avatar head/hands.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Map events to avatar head/hands.</string>
      </property>
      <property name="text">
       <string>Edit Avatar</string>

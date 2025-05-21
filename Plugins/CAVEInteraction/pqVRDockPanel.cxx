@@ -19,6 +19,7 @@
 #include "pqVRConnectionManager.h"
 #include "pqVRQueueHandler.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 
 #if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 #include "pqVRPNConnection.h"
@@ -69,6 +70,7 @@ void pqVRDockPanel::constructor()
   QWidget* container = new QWidget(this);
   this->Internals = new pqInternals();
   this->Internals->setupUi(container);
+  pqWidgetUtilities::formatChildTooltips(container);
   this->setWidget(container);
 
   this->Internals->valuatorLookupTable = std::make_shared<StringMapMap>();

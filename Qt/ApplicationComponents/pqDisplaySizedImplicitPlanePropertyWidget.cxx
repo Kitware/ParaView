@@ -7,6 +7,7 @@
 #include "pqActiveObjects.h"
 #include "pqPointPickingHelper.h"
 #include "pqRenderView.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkCamera.h"
 #include "vtkSMIntVectorProperty.h"
@@ -52,6 +53,7 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
 {
   Ui::DisplaySizedImplicitPlanePropertyWidget ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   if (vtkSMProperty* origin = smgroup->GetProperty("Origin"))
   {
     this->addPropertyLink(ui.originX, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 0);

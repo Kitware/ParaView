@@ -67,6 +67,7 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
   pqViewResolutionPropertyWidget::pqInternals& internals = (*this->Internals);
   Ui::ViewResolutionPropertyWidget& ui = internals.Ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   QIntValidator* iv = new QIntValidator(ui.width);
   iv->setBottom(1);

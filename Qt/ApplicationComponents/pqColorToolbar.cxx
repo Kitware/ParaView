@@ -11,12 +11,14 @@
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqSetName.h"
 #include "pqUseSeparateColorMapReaction.h"
+#include "pqWidgetUtilities.h"
 
 //-----------------------------------------------------------------------------
 void pqColorToolbar::constructor()
 {
   Ui::pqColorToolbar ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   new pqScalarBarVisibilityReaction(ui.actionScalarBarVisibility);
   new pqEditColorMapReaction(ui.actionEditColorMap);

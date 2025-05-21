@@ -14,6 +14,7 @@
 #include "pqSelectionManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqWidgetUtilities.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSessionProxyManager.h"
@@ -244,6 +245,7 @@ pqFindDataWidget::pqFindDataWidget(QWidget* parentObject)
 {
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   internals.Ui.verticalLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
     pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
     pqPropertiesPanel::suggestedMargin());

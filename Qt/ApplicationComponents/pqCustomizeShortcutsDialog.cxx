@@ -8,6 +8,7 @@
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 
 #include <QAbstractItemModel>
 #include <QMainWindow>
@@ -383,6 +384,7 @@ public:
     , FilterModel(new FilterLeavesProxyModel(self))
   {
     Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->FilterModel->setSourceModel(this->Model);
     Ui.treeView->setModel(this->FilterModel);
     Ui.treeView->expandAll();

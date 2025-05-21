@@ -147,7 +147,7 @@
           </sizepolicy>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sample rate used when playing audio. &lt;/p&gt;&lt;p&gt;Default value is deduced from the &amp;quot;time&amp;quot; column if found, from the &amp;quot;sample_rate&amp;quot; field array otherwise.&lt;/p&gt;&lt;p&gt;If both of them are not found, the value is set to 44100 Hz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Sample rate used when playing audio. Default value is deduced from the "time" column if found, from the "sample_rate" field array otherwise. If both of them are not found, the value is set to 44100 Hz.</string>
          </property>
          <property name="minimum">
           <number>1</number>

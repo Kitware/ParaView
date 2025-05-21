@@ -10,6 +10,7 @@
 
 #include "pqCustomFilterManagerModel.h"
 #include "pqFileDialog.h"
+#include "pqWidgetUtilities.h"
 
 #include <QItemSelection>
 #include <QItemSelectionModel>
@@ -35,6 +36,7 @@ pqCustomFilterManager::pqCustomFilterManager(
   this->Model = model;
   this->Form = new pqCustomFilterManagerForm();
   this->Form->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));

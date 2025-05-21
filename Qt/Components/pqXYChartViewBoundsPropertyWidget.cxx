@@ -4,6 +4,7 @@
 #include "ui_pqXYChartViewBoundsPropertyWidget.h"
 
 #include "pqActiveObjects.h"
+#include "pqWidgetUtilities.h"
 #include "pqXYChartView.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMContextViewProxy.h"
@@ -30,6 +31,7 @@ pqXYChartViewBoundsPropertyWidget::pqXYChartViewBoundsPropertyWidget(
 {
   Ui::XYChartViewBoundsPropertyWidget& ui = this->Internals->Ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   ui.Reset->setEnabled(false);
 
   // Keep track of the active view

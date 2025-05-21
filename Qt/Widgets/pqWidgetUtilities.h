@@ -8,6 +8,7 @@
 #include "pqWidgetsModule.h"
 
 #include <QString>
+#include <QWidget>
 
 class PQWIDGETS_EXPORT pqWidgetUtilities
 {
@@ -24,6 +25,8 @@ public:
   static std::string rstToHtml(const char* rstStr);
   static QString rstToHtml(const QString& rstStr);
   ///@}
+
+  static void formatChildTooltips(QWidget* parentObject);
 };
 
 #endif // pqWidgetUtilities_h

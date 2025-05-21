@@ -12,6 +12,7 @@
 #include "pqFileDialog.h"
 #include "pqServerManagerModel.h"
 #include "pqStringVectorPropertyWidget.h"
+#include "pqWidgetUtilities.h"
 #include "vtkPVLogger.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
@@ -79,6 +80,7 @@ pqFileListPropertyWidget::pqFileListPropertyWidget(
   vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "using pqFileListPropertyWidget.");
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   internals.Ui.label->setText(
     QString("<b>%1</b>")
       .arg(QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel())));

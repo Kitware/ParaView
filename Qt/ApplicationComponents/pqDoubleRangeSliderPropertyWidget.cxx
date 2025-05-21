@@ -9,6 +9,7 @@
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
 #include "pqWidgetRangeDomain.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMBoundsDomain.h"
@@ -35,6 +36,7 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
 
   Ui::DoubleRangeSliderPropertyWidget& ui = this->Internals->Ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
     pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),

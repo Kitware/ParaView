@@ -11,6 +11,7 @@
 #include "pqFileDialog.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 
 #include <QKeyEvent>
 #include <QMessageBox>
@@ -226,6 +227,7 @@ public:
     , ExpressionProxyFilter(new pqExpressionFilterProxyModel(self))
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
 
     this->ExpressionProxyFilter->setSourceModel(this->Model.get());
     // use all column for textual filtering

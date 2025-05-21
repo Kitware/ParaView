@@ -13,6 +13,7 @@
 #include "pqFlatTreeView.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqWidgetUtilities.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -60,6 +61,7 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
   this->Model = model;
   this->Form = new pqCustomFilterDefinitionWizardForm();
   this->Form->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));

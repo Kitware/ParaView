@@ -5,6 +5,8 @@
 #include "pqRescaleScalarRangeToDataOverTimeDialog.h"
 #include "ui_pqRescaleScalarRangeToDataOverTimeDialog.h"
 
+#include "pqWidgetUtilities.h"
+
 class pqRescaleScalarRangeToDataOverTimeDialogForm
   : public Ui::RescaleScalarRangeToDataOverTimeDialog
 {
@@ -18,6 +20,7 @@ pqRescaleScalarRangeToDataOverTimeDialog::pqRescaleScalarRangeToDataOverTimeDial
 {
   // Set up the ui.
   this->Form->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   this->connect(this->Form->ApplyButton, SIGNAL(clicked()), SIGNAL(apply()));
   this->connect(this->Form->RescaleButton, SIGNAL(clicked()), SLOT(rescale()));

@@ -210,6 +210,7 @@ pqConfigureCategoriesDialog::pqConfigureCategoriesDialog(
   , Internal(new pqInternal(manager))
 {
   this->Internal->Ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 

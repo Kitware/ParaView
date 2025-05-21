@@ -172,6 +172,7 @@ pqPropertyCollectionWidget::pqPropertyCollectionWidget(
 
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   internals.Ui.groupLabel->setText(
     QString("<b>%1</b>")
       .arg(QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel())));

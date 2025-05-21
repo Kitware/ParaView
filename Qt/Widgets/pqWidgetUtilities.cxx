@@ -108,3 +108,21 @@ std::string pqWidgetUtilities::rstToHtml(const char* rstStr)
   }
   return htmlStr;
 }
+
+//-----------------------------------------------------------------------------
+void pqWidgetUtilities::formatChildTooltips(QWidget* parentObject)
+{
+  if (!parentObject)
+  {
+    return;
+  }
+  const QList<QWidget*> children = parentObject->findChildren<QWidget*>();
+  for (QWidget* child : children)
+  {
+    QString tooltip = child->toolTip();
+    if (!tooltip.isEmpty())
+    {
+      child->setToolTip(formatTooltip(tooltip));
+    }
+  }
+}

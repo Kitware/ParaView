@@ -51,7 +51,7 @@
      <item>
       <widget class="QPushButton" name="startButton">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start listening for VR events on the configured connections.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Start listening for VR events on the configured connections.</string>
        </property>
        <property name="text">
         <string>Start</string>
@@ -61,7 +61,7 @@
      <item>
       <widget class="QPushButton" name="stopButton">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stop listening for VR events.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Stop listening for VR events.</string>
        </property>
        <property name="text">
         <string>Stop</string>
@@ -75,7 +75,7 @@
      <item>
       <widget class="QComboBox" name="stylesCombo">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the type of interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Select the type of interaction.</string>
        </property>
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToContents</enum>
@@ -85,7 +85,7 @@
      <item>
       <widget class="pqAnimatableProxyComboBox" name="proxyCombo">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select an object for interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Select an object for interaction.</string>
        </property>
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToContents</enum>
@@ -95,7 +95,7 @@
      <item>
       <widget class="pqAnimatablePropertiesComboBox" name="propertyCombo">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the object's property for interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Select the object's property for interaction.</string>
        </property>
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToContents</enum>
@@ -119,7 +119,7 @@
      <item>
       <widget class="QPushButton" name="addConnection">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a new VR connection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Add a new VR connection.</string>
        </property>
        <property name="text">
         <string>Add...</string>
@@ -146,7 +146,7 @@
      <item>
       <widget class="QPushButton" name="editConnection">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the selected VR connection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Edit the selected VR connection.</string>
        </property>
        <property name="text">
         <string>Edit...</string>
@@ -156,7 +156,7 @@
      <item>
       <widget class="QPushButton" name="removeConnection">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected VR connection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Remove the selected VR connection.</string>
        </property>
        <property name="text">
         <string>Remove</string>
@@ -206,7 +206,7 @@
      <item>
       <widget class="QPushButton" name="addStyle">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a new interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Add a new interaction.</string>
        </property>
        <property name="text">
         <string>Add...</string>
@@ -233,7 +233,7 @@
      <item>
       <widget class="QPushButton" name="editStyle">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Customize role bindings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Customize role bindings.</string>
        </property>
        <property name="text">
         <string>Edit...</string>
@@ -243,7 +243,7 @@
      <item>
       <widget class="QPushButton" name="removeStyle">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Remove the selected interaction.</string>
        </property>
        <property name="text">
         <string>Remove</string>

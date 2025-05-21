@@ -5,6 +5,7 @@
 #include "ui_pqSpherePropertyWidget.h"
 
 #include "pqPointPickingHelper.h"
+#include "pqWidgetUtilities.h"
 #include "vtkBoundingBox.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
@@ -17,6 +18,7 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
 {
   Ui::SpherePropertyWidget ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   if (vtkSMProperty* center = smgroup->GetProperty("Center"))
   {

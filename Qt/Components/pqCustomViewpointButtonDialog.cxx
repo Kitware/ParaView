@@ -215,6 +215,7 @@ pqCustomViewpointButtonDialog::pqCustomViewpointButtonDialog(QWidget* Parent, Qt
 {
   this->ui = new pqCustomViewpointButtonDialogUI(this);
   this->ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->setToolTipsAndConfigurations(toolTips, configs);

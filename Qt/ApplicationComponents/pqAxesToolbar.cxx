@@ -10,6 +10,7 @@
 #include "pqRenderView.h"
 #include "pqRenderViewSelectionReaction.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMTrace.h"
 
@@ -27,6 +28,7 @@ void pqAxesToolbar::constructor()
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(setView(pqView*)));

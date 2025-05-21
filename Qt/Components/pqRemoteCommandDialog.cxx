@@ -17,6 +17,7 @@
 #include "pqApplicationCore.h"
 #include "pqFileDialog.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 
 #include <string>
 
@@ -219,6 +220,7 @@ pqRemoteCommandDialog::pqRemoteCommandDialog(
 {
   this->Ui = new pqRemoteCommandDialogUI;
   this->Ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   int csid = commandSetId(clientSystemType, serverSystemType);
   switch (csid)

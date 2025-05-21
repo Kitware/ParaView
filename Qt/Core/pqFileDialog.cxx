@@ -251,6 +251,7 @@ void pqFileDialog::addImplementation(vtkTypeUInt32 location)
 
   // set up ui for the file system
   this->Implementations[location]->Ui.setupUi(this->Implementations[location]);
+  pqWidgetUtilities::formatChildTooltips(this->Implementations[location]);
 
   // set up ok and cancel signals/slots
   QObject::connect(impl.Ui.OK, &QPushButton::clicked, this, &pqFileDialog::accept);

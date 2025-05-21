@@ -4,6 +4,8 @@
 #include "pqSeriesGeneratorDialog.h"
 #include "ui_pqSeriesGeneratorDialog.h"
 
+#include "pqWidgetUtilities.h"
+
 #include <QPushButton>
 #include <QTextStream>
 
@@ -183,6 +185,7 @@ pqSeriesGeneratorDialog::pqSeriesGeneratorDialog(
   internals.DataMin = min;
   internals.DataMax = max;
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   internals.Ui.min->setValidator(new QDoubleValidator(this));
   internals.Ui.max->setValidator(new QDoubleValidator(this));
   internals.Ui.ratio->setValidator(new QDoubleValidator(this));

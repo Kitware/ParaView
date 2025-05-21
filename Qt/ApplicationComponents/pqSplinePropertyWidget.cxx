@@ -6,6 +6,7 @@
 
 #include "pqCoreUtilities.h"
 #include "pqPointPickingHelper.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
@@ -224,6 +225,7 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
   pqInternals& internals = (*this->Internals);
   Ui::SplinePropertyWidget& ui = internals.Ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   ui.PointsTable->setModel(&internals.Model);
   ui.PointsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 

@@ -18,6 +18,7 @@
 #include "pqUse2DTransferFunctionReaction.h"
 #include "pqUseSeparateColorMapReaction.h"
 #include "pqUseSeparateOpacityArrayReaction.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkCommand.h"
 #include "vtkNew.h"
@@ -73,6 +74,7 @@ public:
     : ObserverId(0)
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
 
     QVBoxLayout* vbox = new QVBoxLayout(this->Ui.PropertiesFrame);
     vbox->setContentsMargins(0, 0, 0, 0);

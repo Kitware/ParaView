@@ -21,6 +21,7 @@ void pqVCRToolbar::constructor()
   this->UI = new pqInternals();
   Ui::pqVCRToolbar& ui = *this->UI;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   pqVCRController* controller = new pqVCRController(this);
   this->Controller = controller;

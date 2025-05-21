@@ -6,6 +6,7 @@
 #include "ui_pqTextLocationWidget.h"
 
 #include "pqPropertiesPanel.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -22,6 +23,7 @@ public:
   pqInternals(pqTextLocationWidget* self)
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin());

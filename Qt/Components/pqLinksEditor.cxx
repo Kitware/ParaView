@@ -34,6 +34,7 @@
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
+#include "pqWidgetUtilities.h"
 
 // pqComponents
 #include "pqLinksModel.h"
@@ -406,6 +407,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
   , Ui(new Ui::pqLinksEditor)
 {
   this->Ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   this->Proxy1Model = new pqLinksEditorProxyModel(this);
   this->Proxy2Model = new pqLinksEditorProxyModel(this);

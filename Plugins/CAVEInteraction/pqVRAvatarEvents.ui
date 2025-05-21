@@ -38,7 +38,7 @@
     <item row="0" column="1">
      <widget class="QComboBox" name="avatarHeadEventCombo">
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select tracker event to represent head.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select tracker event to represent head.</string>
       </property>
       <property name="sizeAdjustPolicy">
        <enum>QComboBox::AdjustToContents</enum>
@@ -61,7 +61,7 @@
     <item row="1" column="1">
      <widget class="QComboBox" name="avatarLeftHandEventCombo">
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select tracker event to represent left hand.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select tracker event to represent left hand.</string>
       </property>
       <property name="sizeAdjustPolicy">
        <enum>QComboBox::AdjustToContents</enum>
@@ -84,7 +84,7 @@
     <item row="2" column="1">
      <widget class="QComboBox" name="avatarRightHandEventCombo">
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select tracker event to represent right hand.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select tracker event to represent right hand.</string>
       </property>
       <property name="sizeAdjustPolicy">
        <enum>QComboBox::AdjustToContents</enum>

@@ -7,6 +7,7 @@
 #include "pqActiveObjects.h"
 #include "pqPointPickingHelper.h"
 #include "pqRenderView.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkCamera.h"
 #include "vtkSMDomain.h"
@@ -78,6 +79,7 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
 {
   Ui::CoordinateFramePropertyWidget ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   if (this->widgetProxy()->GetProperty("LockedAxis"))
   {

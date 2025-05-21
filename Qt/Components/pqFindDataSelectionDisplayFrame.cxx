@@ -13,6 +13,7 @@
 #include "pqRenderViewBase.h"
 #include "pqSignalAdaptors.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
@@ -51,6 +52,7 @@ public:
     this->PointLabelsMenu.setObjectName("PointLabelsMenu");
 
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.mainLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin());

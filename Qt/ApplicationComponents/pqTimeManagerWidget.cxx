@@ -10,6 +10,7 @@
 #include "pqCoreUtilities.h"
 #include "pqPVApplicationCore.h"
 #include "pqPropertyLinks.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkEventQtSlotConnect.h"
@@ -29,6 +30,7 @@ struct pqTimeManagerWidget::pqInternals
   pqInternals(pqTimeManagerWidget* self)
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     self->connect(this->Ui.advancedButton, &QToolButton::toggled, self,
       &pqTimeManagerWidget::updateWidgetsVisibility);
     // Note: size of both widgets depends only on this max value...

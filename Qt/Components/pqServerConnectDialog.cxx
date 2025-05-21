@@ -129,6 +129,7 @@ pqServerConnectDialog::pqServerConnectDialog(
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->Internals->Selector = selector;
 

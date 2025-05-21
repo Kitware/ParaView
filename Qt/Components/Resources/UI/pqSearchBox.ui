@@ -25,7 +25,7 @@
    <item>
     <widget class="QLineEdit" name="SearchLineEdit">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for properties by name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Search for properties by name</string>
      </property>
      <property name="placeholderText">
       <string>Search ... (use Esc to clear text)</string>
@@ -35,7 +35,7 @@
    <item>
     <widget class="QToolButton" name="AdvancedButton">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Toggle advanced properties&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Toggle advanced properties</string>
      </property>
      <property name="text">
       <string/>

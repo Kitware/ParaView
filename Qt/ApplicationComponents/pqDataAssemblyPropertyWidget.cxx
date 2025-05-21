@@ -21,6 +21,7 @@
 #include "pqTreeViewExpandState.h"
 #include "pqTreeViewSelectionHelper.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkCommand.h"
 #include "vtkDataAssembly.h"
@@ -851,6 +852,7 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
 
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   internals.Ui.hierarchy->header()->setDefaultSectionSize(iconSize + 4);
   internals.Ui.hierarchy->header()->setMinimumSectionSize(iconSize + 4);
   internals.Ui.hierarchy->setSortingEnabled(true);

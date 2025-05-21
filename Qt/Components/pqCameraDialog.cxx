@@ -158,6 +158,7 @@ pqCameraDialog::pqCameraDialog(QWidget* _p /*=nullptr*/, Qt::WindowFlags f /*=0*
 {
   this->Internal = new pqCameraDialogInternal;
   this->Internal->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   this->setUndoLabel("Camera");
 

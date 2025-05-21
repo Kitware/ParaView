@@ -17,6 +17,7 @@
 #include "pqSearchBox.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
@@ -154,6 +155,7 @@ public:
     , ReceivedChangeAvailable(false)
   {
     this->Ui.setupUi(panel);
+    pqWidgetUtilities::formatChildTooltips(panel);
 
     // Setup background color for Apply button so users notice it when it's
     // enabled.

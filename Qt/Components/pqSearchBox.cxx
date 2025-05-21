@@ -14,6 +14,7 @@
 // ParaView Includes.
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 
 #include <cassert>
 
@@ -25,6 +26,7 @@ public:
   pqInternals(pqSearchBox* self)
   {
     this->setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
 
     self->connect(
       this->SearchLineEdit, SIGNAL(textChanged(QString)), self, SIGNAL(textChanged(QString)));

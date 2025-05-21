@@ -181,7 +181,7 @@
    <item row="2" column="0" >
     <widget class="QCheckBox" name="convertToIndicesCheckBox">
      <property name="toolTip">
-      <string>&lt;span&gt;When enabled, selection is linked by evaluating the selection on the data source and select corresponding elements based on their indices on other linked data sources, instead of sharing the actual selection between the data sources.&lt;/span&gt;</string>
+      <string>When enabled, selection is linked by evaluating the selection on the data source and select corresponding elements based on their indices on other linked data sources, instead of sharing the actual selection between the data sources.</string>
      </property>
      <property name="text">
       <string>Link Selected Elements</string>
