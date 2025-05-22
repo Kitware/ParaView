@@ -389,6 +389,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineCustomFieldHigh.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineCustomFieldLow.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineDistance.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataDimDefaultAxesPoint.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataDimDefaultAxesLineX.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataDimDefaultAxesLineY.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser2.png}"
@@ -1101,6 +1104,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   ContourRange.xml
   CriticalTime.xml
   DataAxesGrid2X.xml
+  DataDimDefaultAxes.xml
   DecimatePolyline.xml
   DeleteSubtreePipelineBrowser.xml
   EllipseSource.xml
