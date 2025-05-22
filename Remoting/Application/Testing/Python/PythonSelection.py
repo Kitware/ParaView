@@ -28,6 +28,8 @@ counter = 0
 
 def CheckSelection(numPoints=None, numCells=None):
     global counter
+    # need to save the active source so we can restore it later
+    source = GetActiveSource()
     Render()
     SaveScreenshot("tmp%d.png" % counter)
     print("Saving %s" % ("tmp%d.png" % counter))
@@ -40,7 +42,10 @@ def CheckSelection(numPoints=None, numCells=None):
         assert numPoints == info.GetNumberOfPoints()
     if numCells is not None:
         assert numCells == info.GetNumberOfCells()
+    # del es is not enough, need to also Delete()
+    Delete(es)
     del es
+    SetActiveSource(source)
 
 
 SetActiveSource(s)
@@ -111,6 +116,48 @@ Render()
 # Should make selection within the second subblock
 SelectCompositeDataIDs(IDs=[2, 0, 0], FieldType="POINT")
 CheckSelection(numPoints=1, numCells=1)
+
+# Grow and shrink points selection
+HideAll()
+Show(s)
+SetActiveSource(s)
+ClearSelection(s)
+SelectSurfacePoints(Polygon=[0, 0, 0, 220, 220, 220])
+
+GrowSelection(Layers=1)
+CheckSelection(numPoints=20, numCells=20)
+
+#SetActiveSource(s)
+ShrinkSelection(Source=s, Layers=1)
+CheckSelection(numPoints=7, numCells=7)
+
+SetActiveSource(s)
+GrowSelection(Layers=2)
+CheckSelection(numPoints=32, numCells=32)
+
+SetActiveSource(s)
+ShrinkSelection(Layers=2)
+CheckSelection(numPoints=7, numCells=7)
+
+# Grow and shrink cells selection
+SetActiveSource(s)
+ClearSelection(s)
+SelectSurfaceCells(Polygon=[0, 0, 0, 220, 220, 220])
+
+SetActiveSource(s)
+GrowSelection(Layers=1)
+CheckSelection(numPoints=28, numCells=42)
+
+SetActiveSource(s)
+ShrinkSelection(Layers=1)
+CheckSelection(numPoints=16, numCells=16)
+
+SetActiveSource(s)
+GrowSelection(Layers=2)
+CheckSelection(numPoints=38, numCells=64)
+
+ShrinkSelection(Source=s, Layers=3)
+CheckSelection(numPoints=16, numCells=16)
 
 try:
     SelectSurfacePoints(Rectangle=[0, 0], Polygon=[0, 0])
