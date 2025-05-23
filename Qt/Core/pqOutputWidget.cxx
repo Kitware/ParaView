@@ -461,6 +461,7 @@ void pqOutputWidget::clear()
 {
   pqInternals& internals = (*this->Internals);
   internals.clear();
+  Q_EMIT this->cleared();
 }
 
 //-----------------------------------------------------------------------------

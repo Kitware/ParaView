@@ -157,6 +157,10 @@ Q_SIGNALS:
    * Signal fired any time a message is displayed.
    */
   void messageDisplayed(const QString& message, int type);
+  /**
+   * Signal fired when messages are cleared.
+   */
+  void cleared();
 
 protected:
   /**
