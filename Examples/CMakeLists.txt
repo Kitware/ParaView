@@ -120,6 +120,10 @@ add_example(CustomApplications/Spreadsheet)
 add_example(Catalyst
   TEST_TIMEOUT 600)
 
+if (TARGET VTK::IOCatalystConduit)
+  add_subdirectory(Catalyst2)
+endif ()
+
 add_example(UseParaView/Incubator)
 add_example(UseParaView/NoIncubator)
 
