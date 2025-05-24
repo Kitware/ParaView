@@ -2,8 +2,8 @@
 set -x
 
 readonly catalyst_repo="https://gitlab.kitware.com/paraview/catalyst"
-# we are pre-release, use the most recent commit (Dec 19, 2023)
-readonly catalyst_commit="63665051edd818e8a7874444dae5f1dff3c9f48b"
+# Use 2.0.0 release
+readonly catalyst_commit="v2.0.0"
 
 readonly catalyst_root="$HOME/catalyst"
 readonly catalyst_src="$catalyst_root/src"
@@ -12,13 +12,6 @@ readonly catalyst_build_root="$catalyst_root/build"
 git clone "$catalyst_repo" "$catalyst_src"
 git -C "$catalyst_src" checkout "$catalyst_commit"
 
-catalyst_prepare () {
-  # make sure we have a recent cmake
-  pushd "$catalyst_src"
-  sh .gitlab/ci/cmake.sh
-  export PATH="$catalyst_src"/.gitlab/cmake/bin:${PATH}
-  popd
-}
 catalyst_build () {
     local subdir="$1"
     shift
@@ -38,8 +31,6 @@ catalyst_build () {
         "$@"
     cmake --build "$catalyst_build_root/$subdir" --target install
 }
-
-catalyst_prepare
 
 # MPI-less
 catalyst_build nompi /usr \
