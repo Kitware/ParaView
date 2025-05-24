@@ -20,10 +20,22 @@ dnf install -y --setopt=install_weak_deps=False \
 dnf install -y --setopt=install_weak_deps=False \
     openmpi-devel mpich-devel
 
-# Qt dependencies
+# External repository support
 dnf install -y --setopt=install_weak_deps=False \
-    qt5-qtbase-devel qt5-qtbase-private-devel qt5-qttools-devel qt5-qtsvg-devel \
-    qt5-qtxmlpatterns-devel qt5-qtmultimedia-devel
+    dnf-plugins-core
+
+# RPMFusion
+dnf install -y --setopt=install_weak_deps=False \
+    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-42.noarch.rpm
+
+# RPMFusion external dependencies
+dnf install -y --setopt=install_weak_deps=False \
+    ffmpeg-devel
+
+# Qt6 dependencies
+dnf install -y --setopt=install_weak_deps=False \
+    qt6-qtbase-devel qt6-qtbase-private-devel qt6-qttools-devel qt6-qtsvg-devel  \
+    qt6-qtmultimedia-devel qt6-qttranslations qt6-qt5compat-devel libxslt
 
 # GNOME theme requirements
 dnf install -y --setopt=install_weak_deps=False \
@@ -57,16 +69,5 @@ python3 -m pip install wslink cftime openPMD-api
 # Plugin dependencies
 dnf install -y --setopt=install_weak_deps=False \
     gmsh-devel libcurl-devel openxr openxr-devel
-
-# External repository support
-dnf install -y --setopt=install_weak_deps=False \
-    dnf-plugins-core
-
-# RPMFusion
-dnf install -y --setopt=install_weak_deps=False \
-    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-42.noarch.rpm
-
-dnf install -y --setopt=install_weak_deps=False \
-    ffmpeg-devel
 
 dnf clean all
