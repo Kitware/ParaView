@@ -1,4 +1,4 @@
-FROM fedora:35
+FROM fedora:42
 MAINTAINER Vicente Adolfo Bolea Sanchez <vicente.bolea@kitware.com>
 
 COPY install_deps.sh /root/install_deps.sh
