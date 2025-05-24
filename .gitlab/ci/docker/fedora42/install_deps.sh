@@ -70,4 +70,10 @@ python3 -m pip install wslink cftime openPMD-api
 dnf install -y --setopt=install_weak_deps=False \
     gmsh-devel libcurl-devel openxr openxr-devel
 
+# Openturns dependencies
+dnf config-manager addrepo \
+    --from-repofile=https://download.opensuse.org/repositories/science:/openturns/Fedora_42/science:openturns.repo
+dnf install -y --setopt=install_weak_deps=False \
+    openturns-libs openturns-devel
+
 dnf clean all

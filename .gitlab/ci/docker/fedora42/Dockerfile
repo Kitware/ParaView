@@ -24,6 +24,3 @@ RUN sh /root/install_catalyst.sh
 
 # COPY install_pythonqt.sh /root/install_pythonqt.sh
 # RUN sh /root/install_pythonqt.sh
-
-COPY install_openturns.sh /root/install_openturns.sh
-RUN sh /root/install_openturns.sh
