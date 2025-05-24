@@ -20,9 +20,9 @@
     variables:
         LAUNCHER: "scl enable devtoolset-7 --"
 
-.fedora35:
+.fedora42:
     extends: .linux
-    image: "kitware/paraview:ci-fedora35-20250606"
+    image: "kitware/paraview:ci-fedora42-20250818"
 
 .el7_mindeps:
     extends: .linux
@@ -43,10 +43,13 @@
 .fedora_mpich_addon:
     variables:
         MODULES: mpi/mpich-x86_64
-        # Even with SHM size of 512m, SIGBUS still happened. Let's just use the
-        # network instead for reliability.
-        # https://wiki.mpich.org/mpich/index.php/Frequently_Asked_Questions#Q:_Why_MPI_Put_raises_SIGBUS_error_inside_docker.3F
+        # Even with SHM size of 512m, SIGBUS still happened. Let's just use the network instead for reliability.
+        # https://github.com/pmodels/mpich/blob/main/doc/wiki/faq/Frequently_Asked_Questions.md#q-why-mpi_put-raises-sigbus-error-inside-docker
         MPIR_CVAR_NOLOCAL: 1
+        # Tell libfabric to NOT use psm3 (potentially use sockets) to adhere to the MPIR_CVAR_NOLOCAL
+        FI_PROVIDER: "^psm3"
+        # Fails inside of CI containers.
+        PSM3_KASSIST_MODE: none
 
 .fedora_openmpi_addon:
     variables:
@@ -77,70 +80,70 @@
     variables:
         CMAKE_CONFIGURATION: el8_shared_icc_mpi_python
 
-.fedora35_documentation:
+.fedora42_documentation:
     extends:
-        - .fedora35
+        - .fedora42
         - .fedora_openmpi_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_documentation_mpi_python
+        CMAKE_CONFIGURATION: fedora42_documentation_mpi_python
 
-.fedora35_doxygen:
+.fedora42_doxygen:
     extends:
-        - .fedora35
+        - .fedora42
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_doxygen
+        CMAKE_CONFIGURATION: fedora42_doxygen
 
-.fedora35_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride:
+.fedora42_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride:
     extends:
-        - .fedora35
+        - .fedora42
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride
+        CMAKE_CONFIGURATION: fedora42_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride
         VTK_DEFAULT_OPENGL_WINDOW: vtkOSOpenGLRenderWindow
 
-.fedora35_shared_mpi_core:
+.fedora42_shared_mpi_core:
     extends:
-        - .fedora35
+        - .fedora42
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_shared_mpi_core
+        CMAKE_CONFIGURATION: fedora42_shared_mpi_core
 
-.fedora35_shared_mpi_python_core:
+.fedora42_shared_mpi_python_core:
     extends:
-        - .fedora35
+        - .fedora42
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_core
+        CMAKE_CONFIGURATION: fedora42_shared_mpi_python_core
 
-.fedora35_shared_debug_mpi_python_qt:
+.fedora42_shared_debug_mpi_python_qt:
     extends:
-        - .fedora35
+        - .fedora42
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt
+        CMAKE_CONFIGURATION: fedora42_shared_mpi_python_qt
         CMAKE_BUILD_TYPE: Debug
 
-.fedora35_shared_mpi_python_qt_viskoresoverride:
+.fedora42_shared_mpi_python_qt_viskoresoverride:
     extends:
-        - .fedora35
+        - .fedora42
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_viskoresoverride
+        CMAKE_CONFIGURATION: fedora42_shared_mpi_python_qt_viskoresoverride
 
-.fedora35_tidy:
+.fedora42_tidy:
     extends:
-        - .fedora35
+        - .fedora42
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_tidy
+        CMAKE_CONFIGURATION: fedora42_shared_mpi_python_qt_tidy
 
 .linux_builder_tags:
     tags:

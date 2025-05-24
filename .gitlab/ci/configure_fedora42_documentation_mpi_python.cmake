@@ -1,4 +1,4 @@
 set(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION ON CACHE BOOL "")
 set(VTK_MODULE_ENABLE_ParaView_PVWebPython YES CACHE STRING "")
 
-include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora35.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora42.cmake")

@@ -57,7 +57,7 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
 # aren't doing things properly.
 if (NOT "$ENV{CI}" STREQUAL "")
   # For some reason, warning flags aren't working here.
-  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora40")
+  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora42")
     list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
       "Wstringop-overflow="
       "note: destination object allocated here"
