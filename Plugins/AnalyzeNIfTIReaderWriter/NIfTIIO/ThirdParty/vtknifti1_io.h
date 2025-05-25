@@ -387,8 +387,8 @@ static void         nifti_image_write_bricks(nifti_image * nim,
                                       const nifti_brick_list * NBL);
 static void         nifti_image_infodump( const nifti_image * nim ) ;
 
-static void         nifti_disp_lib_hist( void ) ;     /* to display library history */
-static void         nifti_disp_lib_version( void ) ;  /* to display library version */
+static void         nifti_disp_lib_hist( ) ;     /* to display library history */
+static void         nifti_disp_lib_version( ) ;  /* to display library version */
 static int          nifti_disp_matrix_orient( const char * mesg, mat44 mat );
 static int          nifti_disp_type_list( int which );
 
@@ -450,7 +450,7 @@ static mat44 nifti_make_orthog_mat44( float r11, float r12, float r13 ,
                                float r21, float r22, float r23 ,
                                float r31, float r32, float r33  ) ;
 
-static int nifti_short_order(void) ;              /* CPU byte order */
+static int nifti_short_order( ) ;              /* CPU byte order */
 
 
 /* Orientation codes that might be returned from nifti_mat44_to_orientation().*/
@@ -480,7 +480,7 @@ static nifti_1_header * nifti_read_header(const char *hname, int *swapped, int c
 static nifti_image    * nifti_copy_nim_info(const nifti_image * src);
 static nifti_image    * nifti_make_new_nim(const int dims[], int datatype,
                                                       int data_fill);
-static nifti_image    * nifti_simple_init_nim(void);
+static nifti_image    * nifti_simple_init_nim( );
 static nifti_image    * nifti_convert_nhdr2nim(nifti_1_header nhdr,
                                         const char * fname);
 
@@ -497,7 +497,7 @@ static void   nifti_set_iname_offset      (nifti_image *nim);
 static int    nifti_set_type_from_names   (nifti_image * nim);
 static int    nifti_add_extension(nifti_image * nim, const char * data, int len,
                            int ecode );
-static int    nifti_compiled_with_zlib    (void);
+static int    nifti_compiled_with_zlib    ( );
 static int    nifti_copy_extensions (nifti_image *nim_dest,const nifti_image *nim_src);
 static int    nifti_free_extensions (nifti_image *nim);
 static int  * nifti_get_intlist     (int nvals , const char *str);

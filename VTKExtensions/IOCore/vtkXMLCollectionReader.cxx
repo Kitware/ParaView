@@ -98,13 +98,13 @@ public:
   vtkXMLCollectionReaderRestrictions Restrictions;
   std::vector<vtkSmartPointer<vtkXMLReader>> Readers;
 
-  typedef vtkXMLReader* (*Constructor)(void); // function pointer type
+  typedef vtkXMLReader* (*Constructor)(); // function pointer type
   typedef std::map<std::string, std::pair<std::string, Constructor>> ReaderConstructorsType;
   static const ReaderConstructorsType ReaderConstructors;
 };
 
 // clang-format off
-#define GET_NEW_FUNCTOR(x) { #x, [](void) -> vtkXMLReader* { return x::New(); } }
+#define GET_NEW_FUNCTOR(x) { #x, []() -> vtkXMLReader* { return x::New(); } }
 // clang-format on
 const vtkXMLCollectionReaderInternals::ReaderConstructorsType
   vtkXMLCollectionReaderInternals::ReaderConstructors = { { "vtp",
