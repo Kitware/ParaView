@@ -3699,7 +3699,7 @@ int vtkMaterialInterfaceFilter::ProcessBlock(int blockId)
           if (this->ComputeMoments)
           {
             // Save the moments from the last fragment
-            this->FragmentMoments->InsertTuple(this->FragmentId, &this->FragmentMoment[0]);
+            this->FragmentMoments->InsertTuple(this->FragmentId, this->FragmentMoment.data());
             // clear the moment accumulator
             FillVector(this->FragmentMoment, 0.0);
           }
@@ -3708,7 +3708,7 @@ int vtkMaterialInterfaceFilter::ProcessBlock(int blockId)
           {
             // update the integrated value, independent of ncomps
             this->FragmentVolumeWtdAvgs[i]->InsertTuple(
-              this->FragmentId, &this->FragmentVolumeWtdAvg[i][0]);
+              this->FragmentId, this->FragmentVolumeWtdAvg[i].data());
             // clear the accumulator
             FillVector(this->FragmentVolumeWtdAvg[i], 0.0);
           }
@@ -3717,7 +3717,7 @@ int vtkMaterialInterfaceFilter::ProcessBlock(int blockId)
           {
             // update the integrated value, independent of ncomps
             this->FragmentMassWtdAvgs[i]->InsertTuple(
-              this->FragmentId, &this->FragmentMassWtdAvg[i][0]);
+              this->FragmentId, this->FragmentMassWtdAvg[i].data());
             // clear the accumulator
             FillVector(this->FragmentMassWtdAvg[i], 0.0);
           }
@@ -3725,7 +3725,7 @@ int vtkMaterialInterfaceFilter::ProcessBlock(int blockId)
           for (int i = 0; i < this->NToSum; ++i)
           {
             // update the integrated value, independent of ncomps
-            this->FragmentSums[i]->InsertTuple(this->FragmentId, &this->FragmentSum[i][0]);
+            this->FragmentSums[i]->InsertTuple(this->FragmentId, this->FragmentSum[i].data());
             // clear the accumulator
             FillVector(this->FragmentSum[i], 0.0);
           }
@@ -4601,14 +4601,14 @@ void vtkMaterialInterfaceFilter::CreateFace(vtkMaterialInterfaceFilterIterator* 
     vtkDataArray* srcArray = in->Block->GetIntegratedArray(i);
     int nComps = srcArray->GetNumberOfComponents();
     thisTup.resize(nComps);
-    CopyTuple(&thisTup[0], srcArray, nComps, in->FlatIndex);
+    CopyTuple(thisTup.data(), srcArray, nComps, in->FlatIndex);
 
     // fragment
     vtkDoubleArray* destArray =
       dynamic_cast<vtkDoubleArray*>(this->CurrentFragmentMesh->GetCellData()->GetArray(i));
     for (vtkIdType ii = 0; ii < numTris; ++ii)
     {
-      destArray->InsertNextTuple(&thisTup[0]);
+      destArray->InsertNextTuple(thisTup.data());
     }
   }
 // Cell data attributes for debugging.
@@ -5350,7 +5350,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
       {
         vtkDataArray* arrayToIntegrate = iterator.Block->GetVolumeWtdAvgArray(i);
         int nComps = arrayToIntegrate->GetNumberOfComponents();
-        this->Accumulate(&this->FragmentVolumeWtdAvg[i][0], arrayToIntegrate, nComps,
+        this->Accumulate(this->FragmentVolumeWtdAvg[i].data(), arrayToIntegrate, nComps,
           iterator.FlatIndex, voxelVolumeFrac);
       }
       // accumulate mass weighted average
@@ -5362,7 +5362,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         const double* X0 = iterator.Block->GetOrigin();
         double X[3] = { X0[0] + dX[0] * (0.5 + iterator.Index[0]),
           X0[1] + dX[1] * (0.5 + iterator.Index[1]), X0[2] + dX[2] * (0.5 + iterator.Index[2]) };
-        this->AccumulateMoments(&this->FragmentMoment[0], massArray, iterator.FlatIndex, X);
+        this->AccumulateMoments(this->FragmentMoment.data(), massArray, iterator.FlatIndex, X);
         // mass weighted averages
         double voxelMass;
         massArray->GetTuple(iterator.FlatIndex, &voxelMass);
@@ -5370,7 +5370,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         {
           vtkDataArray* arrayToIntegrate = iterator.Block->GetMassWtdAvgArray(i);
           int nComps = arrayToIntegrate->GetNumberOfComponents();
-          this->Accumulate(&this->FragmentMassWtdAvg[i][0], arrayToIntegrate, nComps,
+          this->Accumulate(this->FragmentMassWtdAvg[i].data(), arrayToIntegrate, nComps,
             iterator.FlatIndex, voxelMass);
         }
       }
@@ -5380,7 +5380,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         vtkDataArray* arrayToIntegrate = iterator.Block->GetArrayToSum(i);
         int nComps = arrayToIntegrate->GetNumberOfComponents();
         this->Accumulate(
-          &this->FragmentSum[i][0], arrayToIntegrate, nComps, iterator.FlatIndex, 1.0);
+          this->FragmentSum[i].data(), arrayToIntegrate, nComps, iterator.FlatIndex, 1.0);
       }
     }
 
@@ -7112,7 +7112,7 @@ int vtkMaterialInterfaceFilter::SendGeometricAttributes(const int recipientProcI
     buffer.Pack(this->FragmentOBBs);
   }
   // resolved fragment ids
-  buffer.Pack(&this->ResolvedFragmentIds[this->MaterialId][0], 1, nLocal);
+  buffer.Pack(this->ResolvedFragmentIds[this->MaterialId].data(), 1, nLocal);
 
   // send buffer in two parts. header then data
   int thisMsgId = msgBase;
@@ -7156,7 +7156,7 @@ int vtkMaterialInterfaceFilter::PrepareToCollectGeometricAttributes(
   ids.resize(nProcs, static_cast<int*>(nullptr));
   if (!this->ResolvedFragmentIds[this->MaterialId].empty())
   {
-    ids[myProcId] = &(this->ResolvedFragmentIds[this->MaterialId][0]);
+    ids[myProcId] = this->ResolvedFragmentIds[this->MaterialId].data();
   }
   else
   {
@@ -9371,7 +9371,7 @@ int vtkMaterialInterfaceFilter::WriteGeometryOutputToTextFile()
       int nComps = aa->GetNumberOfComponents();
       vector<double> tup;
       tup.resize(nComps);
-      CopyTuple(&tup[0], aa, nComps, 0);
+      CopyTuple(tup.data(), aa, nComps, 0);
       fout << tup[0];
       for (int q = 1; q < nComps; ++q)
       {
@@ -9384,7 +9384,7 @@ int vtkMaterialInterfaceFilter::WriteGeometryOutputToTextFile()
         aa = fd->GetArray(j);
         nComps = aa->GetNumberOfComponents();
         tup.resize(nComps);
-        CopyTuple(&tup[0], aa, nComps, 0);
+        CopyTuple(tup.data(), aa, nComps, 0);
         fout << tup[0];
         for (int q = 1; q < nComps; ++q)
         {

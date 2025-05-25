@@ -120,7 +120,7 @@ double vtkSMDoubleMapProperty::GetElement(vtkIdType index)
 double* vtkSMDoubleMapProperty::GetElements(vtkIdType index)
 {
   std::vector<double>& vector = this->Private->GetVector(index);
-  return &vector[0];
+  return vector.data();
 }
 
 //---------------------------------------------------------------------------
@@ -205,7 +205,7 @@ void vtkSMDoubleMapProperty::ReadFrom(
     {
       values.push_back(variant->float64(i * this->GetNumberOfComponents() + j));
     }
-    this->SetElements(variant->idtype(i), &values[0]);
+    this->SetElements(variant->idtype(i), values.data());
   }
 }
 

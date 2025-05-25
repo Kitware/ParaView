@@ -322,7 +322,7 @@ int vtkSMRangeDomainTemplate<T>::SetDefaultValues(
     }
     if (!values.empty())
     {
-      helper.Set(&values[0], static_cast<unsigned int>(values.size()));
+      helper.Set(values.data(), static_cast<unsigned int>(values.size()));
       return 1;
     }
   }
@@ -337,7 +337,7 @@ int vtkSMRangeDomainTemplate<T>::SetDefaultValues(
         values[cc] = value;
       }
     }
-    helper.Set(&values[0], static_cast<unsigned int>(values.size()));
+    helper.Set(values.data(), static_cast<unsigned int>(values.size()));
     return 1;
   }
 

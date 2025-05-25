@@ -944,7 +944,7 @@ int vtkIntersectFragments::SendGeometricAttributes(const int recipientProcId)
     // centers
     buffer.Pack(this->IntersectionCenters[blockId]);
     // ids
-    buffer.Pack(&this->IntersectionIds[blockId][0], 1, nFragments[blockId]);
+    buffer.Pack(this->IntersectionIds[blockId].data(), 1, nFragments[blockId]);
   }
 
   // send

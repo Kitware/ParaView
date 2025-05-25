@@ -118,7 +118,7 @@ vtkDataObject* vtkExtractsDeliveryHelper::Collect(int node_count, vtkDataObject*
     if (pieces.size() > 1)
     {
       result = vtkMultiProcessControllerHelper::MergePieces(
-        &pieces[0], static_cast<unsigned int>(pieces.size()));
+        pieces.data(), static_cast<unsigned int>(pieces.size()));
     }
     else
     {

@@ -700,7 +700,7 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
   {
     if (this->PickFirstAvailableArrayByDefault == true)
     {
-      info = &this->ALDInternals->DomainValues[0];
+      info = this->ALDInternals->DomainValues.data();
     }
     else
     {

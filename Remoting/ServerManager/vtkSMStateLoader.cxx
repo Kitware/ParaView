@@ -732,5 +732,5 @@ void vtkSMStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 vtkTypeUInt32* vtkSMStateLoader::GetMappingArray(int& size)
 {
   size = static_cast<int>(this->Internal->AlignedMappingIdTable.size());
-  return &this->Internal->AlignedMappingIdTable[0];
+  return this->Internal->AlignedMappingIdTable.data();
 }

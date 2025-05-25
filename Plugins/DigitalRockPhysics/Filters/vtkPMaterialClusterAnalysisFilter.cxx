@@ -116,15 +116,15 @@ bool AppendTableToMap(vtkTable* table, LabelValuesMap& lvMap, int rockfillLabel,
       double volume = volumeArray->GetValue(iRow);
       if (center)
       {
-        barycenterArray->GetTuple(iRow, &barycenter[0]);
+        barycenterArray->GetTuple(iRow, barycenter.data());
       }
       auto iter = lvMap.emplace(label, std::make_pair(volume, barycenter));
       if (!iter.second)
       {
         if (center)
         {
-          Barycenter(iter.first->second.first, &iter.first->second.second[0], volume,
-            &barycenter[0], &iter.first->second.second[0]);
+          Barycenter(iter.first->second.first, iter.first->second.second.data(), volume,
+            barycenter.data(), iter.first->second.second.data());
         }
         iter.first->second.first += volume;
       }
@@ -270,12 +270,12 @@ struct AnalysisFunctor
       int tmpLabel = this->Array->GetVariantValue(pointId).ToInt();
       if (tmpLabel != rockfillLabel)
       {
-        this->Input->GetPoint(pointId, &voxelPoint[0]);
+        this->Input->GetPoint(pointId, voxelPoint.data());
         auto iter = lvMap.emplace(tmpLabel, std::make_pair(1, voxelPoint));
         if (!iter.second)
         {
-          Barycenter(iter.first->second.first, &iter.first->second.second[0], 1, &voxelPoint[0],
-            &iter.first->second.second[0]);
+          Barycenter(iter.first->second.first, iter.first->second.second.data(), 1,
+            voxelPoint.data(), iter.first->second.second.data());
           iter.first->second.first++;
         }
       }
@@ -299,8 +299,8 @@ struct AnalysisFunctor
         auto iter = this->OutputLabelMap.emplace(it.first, it.second);
         if (!iter.second)
         {
-          Barycenter(iter.first->second.first, &iter.first->second.second[0], it.second.first,
-            &it.second.second[0], &iter.first->second.second[0]);
+          Barycenter(iter.first->second.first, iter.first->second.second.data(), it.second.first,
+            it.second.second.data(), iter.first->second.second.data());
           iter.first->second.first += it.second.first;
         }
       }

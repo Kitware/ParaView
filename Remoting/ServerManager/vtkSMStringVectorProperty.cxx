@@ -212,7 +212,7 @@ int vtkSMStringVectorProperty::SetElements(const std::vector<std::string>& value
 {
   std::vector<std::string> svalues(values.size() + 1);
   std::copy(values.begin(), values.end(), svalues.begin());
-  return this->Internals->SetElements(&svalues[0], static_cast<unsigned int>(values.size()));
+  return this->Internals->SetElements(svalues.data(), static_cast<unsigned int>(values.size()));
 }
 
 //---------------------------------------------------------------------------
@@ -234,7 +234,7 @@ int vtkSMStringVectorProperty::SetUncheckedElements(const std::vector<std::strin
   std::vector<std::string> svalues(values.size() + 1);
   std::copy(values.begin(), values.end(), svalues.begin());
   return this->Internals->SetUncheckedElements(
-    &svalues[0], static_cast<unsigned int>(values.size()));
+    svalues.data(), static_cast<unsigned int>(values.size()));
 }
 
 //---------------------------------------------------------------------------

@@ -948,7 +948,7 @@ void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
     this->Proc0NodesController->Send(&mappingSize, 1, 1, 8013);
     if (mappingSize > 0)
     {
-      this->Proc0NodesController->Send(&idMappingInStateLoading[0], mappingSize, 1, 8014);
+      this->Proc0NodesController->Send(idMappingInStateLoading.data(), mappingSize, 1, 8014);
     }
   }
 }

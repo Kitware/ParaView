@@ -281,7 +281,7 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
   if (!timesteps_vector.empty())
   {
     vtkSMDoubleVectorProperty::SafeDownCast(this->TimestepValuesProperty)
-      ->SetElements(&timesteps_vector[0], static_cast<unsigned int>(timesteps_vector.size()));
+      ->SetElements(timesteps_vector.data(), static_cast<unsigned int>(timesteps_vector.size()));
   }
   else
   {

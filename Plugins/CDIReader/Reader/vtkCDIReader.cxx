@@ -1449,7 +1449,7 @@ int vtkCDIReader::ConstructGridGeometry()
   vtkDebugMacro("Removing duplicates for clon/clat, size = " << size);
 
   this->RemoveDuplicates(
-    cLonVertices.data(), cLatVertices.data(), size, &this->OrigConnections[0], new_cells);
+    cLonVertices.data(), cLatVertices.data(), size, this->OrigConnections.data(), new_cells);
   vtkDebugMacro("Removed duplicates for clon/clat");
   this->NumberLocalCells = new_cells[0] / this->PointsPerCell;
   this->NumberLocalPoints = new_cells[1];
@@ -2507,15 +2507,15 @@ void vtkCDIReader::OutputCells(bool init)
     if (this->ShowMultilayerView)
     {
       this->ClonArray->SetArray(
-        &this->CLon[0], this->CurrentExtraCell * this->MaximumNVertLevels, 1);
+        this->CLon.data(), this->CurrentExtraCell * this->MaximumNVertLevels, 1);
       this->ClatArray->SetArray(
-        &this->CLat[0], this->CurrentExtraCell * this->MaximumNVertLevels, 1);
+        this->CLat.data(), this->CurrentExtraCell * this->MaximumNVertLevels, 1);
     }
     else
     {
-      this->ClonArray->SetArray(&this->CLon[0], this->CurrentExtraCell,
+      this->ClonArray->SetArray(this->CLon.data(), this->CurrentExtraCell,
         1); // 1 at the end = No freeing these. They are our vectors.
-      this->ClatArray->SetArray(&this->CLat[0], this->CurrentExtraCell,
+      this->ClatArray->SetArray(this->CLat.data(), this->CurrentExtraCell,
         1); // 1 at the end = No freeing these. They are our vectors.
     }
     output->GetCellData()->AddArray(this->ClonArray);

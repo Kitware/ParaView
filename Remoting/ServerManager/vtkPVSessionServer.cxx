@@ -286,7 +286,7 @@ public:
     if (!alivedClients.empty())
     {
       this->Owner->SessionCore->GarbageCollectSIObject(
-        &alivedClients[0], static_cast<int>(alivedClients.size()));
+        alivedClients.data(), static_cast<int>(alivedClients.size()));
     }
   }
   //-----------------------------------------------------------------

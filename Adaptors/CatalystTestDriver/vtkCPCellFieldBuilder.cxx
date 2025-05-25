@@ -47,7 +47,7 @@ void vtkCPCellFieldBuilder::BuildField(unsigned long timeStep, double time, vtkD
     {
       tupleValues[uj] = tensorFieldFunction->ComputeComponenentAtPoint(uj, point, timeStep, time);
     }
-    array->SetTypedTuple(i, &tupleValues[0]);
+    array->SetTypedTuple(i, tupleValues.data());
   }
   grid->GetCellData()->AddArray(array);
   array->Delete();

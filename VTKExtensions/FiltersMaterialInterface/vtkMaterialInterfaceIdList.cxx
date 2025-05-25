@@ -95,5 +95,5 @@ int vtkMaterialInterfaceIdList::GetLocalId(int globalId)
   const int firstListItem = 0;
   const int lastListItem = static_cast<int>(this->IdList->size()) - 1;
   vtkMaterialInterfaceIdListItem itemToFind(globalId);
-  return search(&(*this->IdList)[0], firstListItem, lastListItem, itemToFind);
+  return search(this->IdList->data(), firstListItem, lastListItem, itemToFind);
 }

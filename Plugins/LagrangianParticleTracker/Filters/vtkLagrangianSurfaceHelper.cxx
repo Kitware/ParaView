@@ -148,7 +148,7 @@ void vtkLagrangianSurfaceHelper::FillFieldData(vtkDataSet* dataset, int leaf)
       surfaceArray->SetNumberOfTuples(1);
 
       // Constants filling for correct leaf
-      surfaceArray->SetTuple(0, &arrayVal.Constants[leaf][0]);
+      surfaceArray->SetTuple(0, arrayVal.Constants[leaf].data());
       fd->AddArray(surfaceArray);
       surfaceArray->Delete();
     }
@@ -235,7 +235,7 @@ void vtkLagrangianSurfaceHelper::SetArrayToGenerate(int index, const char* array
   for (int i = 0; i < numberOfLeafs; i++)
   {
     arrayVal.Skips.push_back(
-      !this->ParseDoubleValues(constants, numberOfComponents, &arrayVal.Constants[i][0]));
+      !this->ParseDoubleValues(constants, numberOfComponents, arrayVal.Constants[i].data()));
   }
   this->Internals->ArraysToGenerate[index] = arrayVal;
   this->Modified();

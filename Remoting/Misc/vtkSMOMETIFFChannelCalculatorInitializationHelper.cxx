@@ -53,7 +53,8 @@ void setupDefault(int channelNumber, vtkSMProxy* lut)
       colors = std::vector<double>{ 0.0, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5 };
       break;
   }
-  vtkSMPropertyHelper(lut, "RGBPoints").Set(&colors[0], static_cast<unsigned int>(colors.size()));
+  vtkSMPropertyHelper(lut, "RGBPoints")
+    .Set(colors.data(), static_cast<unsigned int>(colors.size()));
   lut->UpdateVTKObjects();
 }
 }

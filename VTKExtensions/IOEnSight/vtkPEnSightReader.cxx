@@ -466,7 +466,7 @@ int vtkPEnSightReader::RequestInformation(vtkInformation* vtkNotUsed(request),
       // TEST
       // TEST
       outInfo->Set(
-        vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &uniqueTimeValues[0], numTimeValues);
+        vtkStreamingDemandDrivenPipeline::TIME_STEPS(), uniqueTimeValues.data(), numTimeValues);
       double timeRange[2];
       timeRange[0] = uniqueTimeValues[0];
       timeRange[1] = uniqueTimeValues[numTimeValues - 1];

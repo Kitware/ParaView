@@ -1149,7 +1149,7 @@ void vtkSMPropertyHelper::SetStatus(const int key, int* values, int num_values)
     {
       list.push_back(values[kk]);
     }
-    svp->SetElements(&list[0]);
+    svp->SetElements(list.data());
   }
 }
 
@@ -1382,11 +1382,11 @@ void vtkSMPropertyHelper::SetStatus(const int key, const int value)
 
   if (this->UseUnchecked)
   {
-    svp->SetUncheckedElements(&list[0]);
+    svp->SetUncheckedElements(list.data());
   }
   else
   {
-    svp->SetElements(&list[0]);
+    svp->SetElements(list.data());
   }
 }
 
@@ -1600,7 +1600,7 @@ bool vtkSMPropertyHelper::CopyInternal(const vtkSMPropertyHelper& source)
 {
   std::vector<T> values = source.GetPropertyArray<T>();
   this->SetPropertyArray<T>(
-    !values.empty() ? &values[0] : nullptr, static_cast<unsigned int>(values.size()));
+    !values.empty() ? values.data() : nullptr, static_cast<unsigned int>(values.size()));
   return true;
 }
 

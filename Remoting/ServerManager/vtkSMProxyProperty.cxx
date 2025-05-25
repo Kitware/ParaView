@@ -283,7 +283,7 @@ void vtkSMProxyProperty::ReadFrom(
       }
       proxies.push_back(nullptr);
 
-      pld->SetProxies(&proxies[0], static_cast<unsigned int>(proxies.size() - 1));
+      pld->SetProxies(proxies.data(), static_cast<unsigned int>(proxies.size() - 1));
     }
   }
 }

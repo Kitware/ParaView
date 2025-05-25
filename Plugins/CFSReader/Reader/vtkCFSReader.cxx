@@ -515,7 +515,7 @@ int vtkCFSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
     else
     {
       outputVector->GetInformationObject(0)->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
-        &(this->StepVals[0]), static_cast<int>(this->NumberOfTimeSteps));
+        this->StepVals.data(), static_cast<int>(this->NumberOfTimeSteps));
     }
 
     outputVector->GetInformationObject(0)->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),

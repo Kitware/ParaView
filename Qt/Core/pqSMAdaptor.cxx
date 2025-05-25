@@ -807,11 +807,12 @@ void pqSMAdaptor::setSelectionProperty(
     smValueInts.push_back(0); // avoids need to check for size==0.
     if (Type == CHECKED)
     {
-      ivp->SetElements(&smValueInts[0], static_cast<unsigned int>(smValueInts.size() - 1));
+      ivp->SetElements(smValueInts.data(), static_cast<unsigned int>(smValueInts.size() - 1));
     }
     else
     {
-      ivp->SetUncheckedElements(&smValueInts[0], static_cast<unsigned int>(smValueInts.size() - 1));
+      ivp->SetUncheckedElements(
+        smValueInts.data(), static_cast<unsigned int>(smValueInts.size() - 1));
     }
   }
   else if (timeStepsDomain)
@@ -821,12 +822,12 @@ void pqSMAdaptor::setSelectionProperty(
     smValueDoubles.push_back(0); // avoids need to check for size==0.
     if (Type == CHECKED)
     {
-      dvp->SetElements(&smValueDoubles[0], static_cast<unsigned int>(smValueDoubles.size() - 1));
+      dvp->SetElements(smValueDoubles.data(), static_cast<unsigned int>(smValueDoubles.size() - 1));
     }
     else
     {
       dvp->SetUncheckedElements(
-        &smValueDoubles[0], static_cast<unsigned int>(smValueDoubles.size() - 1));
+        smValueDoubles.data(), static_cast<unsigned int>(smValueDoubles.size() - 1));
     }
   }
 }

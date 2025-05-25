@@ -269,8 +269,8 @@ int vtkStreamingParticlesRepresentation::RequestUpdateExtent(
 
         // Request the next "group of blocks" to stream.
         info->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(), 1);
-        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(), &this->StreamingRequest[0],
-          static_cast<int>(this->StreamingRequest.size()));
+        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(),
+          this->StreamingRequest.data(), static_cast<int>(this->StreamingRequest.size()));
       }
       else
       {

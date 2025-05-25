@@ -121,7 +121,7 @@ void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty()
 
   int numPoints = transferFunction->GetSize();
   std::vector<double> functionPoints(numPoints * 4);
-  double* pts = &functionPoints[0];
+  double* pts = functionPoints.data();
 
   for (int i = 0; i < numPoints; ++i)
   {

@@ -87,7 +87,7 @@ bool vtkDeserialize(vtkClientServerStream& css, int msgIdx, vtkDataSetAttributes
       return false;
     }
     std::vector<unsigned char> data(length);
-    if (!css.GetArgument(msgIdx, idx++, &data[0], length))
+    if (!css.GetArgument(msgIdx, idx++, data.data(), length))
     {
       return false;
     }
@@ -351,10 +351,10 @@ void vtkCompleteArrays::CompleteArraysOnBlock(vtkDataSet* inputDS, vtkDataSet*& 
 
     int length = typeAndLength[1];
     std::vector<unsigned char> data(static_cast<size_t>(length));
-    this->Controller->Receive(&data[0], length, infoProc, 389003);
+    this->Controller->Receive(data.data(), length, infoProc, 389003);
 
     vtkClientServerStream css;
-    css.SetData(&data[0], static_cast<size_t>(length));
+    css.SetData(data.data(), static_cast<size_t>(length));
 
     vtkDeserialize(css, 0, outputDS->GetPointData());
     vtkDeserialize(css, 1, outputDS->GetCellData());

@@ -97,7 +97,7 @@ int vtkExplicitStructuredGridGeneratorSource::RequestInformation(
     {
       timeSteps[i] = i;
     }
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &timeSteps[0], numTimesteps);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), numTimesteps);
     double timeRange[2];
     timeRange[0] = timeSteps[0];
     timeRange[1] = timeSteps[numTimesteps - 1];

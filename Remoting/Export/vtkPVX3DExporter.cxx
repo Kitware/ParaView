@@ -264,7 +264,7 @@ void vtkPVX3DExporter::WriteColorLegend(vtkRenderer* bottomRenderer,
     sfImageValues[i] = static_cast<int>(value);
   }
 
-  writer->SetField(vtkX3D::SFIMAGE, &sfImageValues[0], sfImageValues.size(), true);
+  writer->SetField(vtkX3D::SFIMAGE, sfImageValues.data(), sfImageValues.size(), true);
   writer->EndNode();
 
   // Restore renderer state

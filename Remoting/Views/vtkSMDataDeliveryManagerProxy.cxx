@@ -75,7 +75,7 @@ void vtkSMDataDeliveryManagerProxy::Deliver(bool interactive)
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this->ViewProxy) << "Deliver"
          << static_cast<int>(use_lod) << static_cast<unsigned int>(keys_to_deliver.size())
          << vtkClientServerStream::InsertArray(
-              &keys_to_deliver[0], static_cast<int>(keys_to_deliver.size()))
+              keys_to_deliver.data(), static_cast<int>(keys_to_deliver.size()))
          << vtkClientServerStream::End;
   this->ViewProxy->GetSession()->ExecuteStream(this->ViewProxy->GetLocation(), stream, false);
   timeStamp.Modified();
@@ -113,7 +113,7 @@ bool vtkSMDataDeliveryManagerProxy::DeliverStreamedPieces()
     stream << vtkClientServerStream::Invoke << VTKOBJECT(this->ViewProxy) << "DeliverStreamedPieces"
            << static_cast<unsigned int>(keys_to_deliver.size())
            << vtkClientServerStream::InsertArray(
-                &keys_to_deliver[0], static_cast<int>(keys_to_deliver.size()))
+                keys_to_deliver.data(), static_cast<int>(keys_to_deliver.size()))
            << vtkClientServerStream::End;
     session->ExecuteStream(this->ViewProxy->GetLocation(), stream, false);
   }

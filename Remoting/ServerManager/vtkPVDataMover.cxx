@@ -183,7 +183,7 @@ bool vtkPVDataMover::Execute()
     if (numDataSets > 0)
     {
       std::vector<int> ranks(numDataSets);
-      sController->Receive(&ranks[0], numDataSets, 1, 78112);
+      sController->Receive(ranks.data(), numDataSets, 1, 78112);
       for (int cc = 0; cc < numDataSets; ++cc)
       {
         auto dobj = vtk::TakeSmartPointer(sController->ReceiveDataObject(1, 78113));
@@ -200,7 +200,7 @@ bool vtkPVDataMover::Execute()
       std::vector<int> ranks(numDataSets);
       std::transform(this->DataSets.begin(), this->DataSets.end(), ranks.begin(),
         [](const std::pair<int, vtkSmartPointer<vtkDataObject>>& pair) { return pair.first; });
-      cController->Send(&ranks[0], numDataSets, 1, 78112);
+      cController->Send(ranks.data(), numDataSets, 1, 78112);
       for (const auto& pair : this->DataSets)
       {
         cController->Send(pair.second, 1, 78113);

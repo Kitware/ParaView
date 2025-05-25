@@ -215,7 +215,7 @@ void pqAnimationCue::deleteKeyFrame(int index)
   vtkSMProxyProperty* pp =
     vtkSMProxyProperty::SafeDownCast(this->getProxy()->GetProperty("KeyFrames"));
   pp->SetProxies(static_cast<unsigned int>(proxy_vector.size()),
-    (!proxy_vector.empty() ? &proxy_vector[0] : nullptr));
+    (!proxy_vector.empty() ? proxy_vector.data() : nullptr));
   this->getProxy()->UpdateVTKObjects();
   this->removeKeyFrameInternal(keyframe);
 }
@@ -316,7 +316,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
   vtkSMProxyProperty* pp =
     vtkSMProxyProperty::SafeDownCast(this->getProxy()->GetProperty("KeyFrames"));
   pp->SetProxies(static_cast<unsigned int>(proxy_vector.size()),
-    (!proxy_vector.empty() ? &proxy_vector[0] : nullptr));
+    (!proxy_vector.empty() ? proxy_vector.data() : nullptr));
   this->getProxy()->UpdateVTKObjects();
 
   kf->Delete();

@@ -313,11 +313,11 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
         double lbds[6];
         local_bounds.GetBounds(lbds);
         std::vector<double> all_bounds(num_ranks * 6);
-        controller->AllGather(lbds, &all_bounds[0], 6);
+        controller->AllGather(lbds, all_bounds.data(), 6);
         this->Cuts.resize(num_ranks);
         for (int cc = 0; cc < num_ranks; ++cc)
         {
-          this->Cuts[cc].SetBounds(&all_bounds[6 * cc]);
+          this->Cuts[cc].SetBounds(all_bounds.data() + (6 * cc));
         }
         this->RawCuts.clear();
         this->RawCutsRankAssignments.clear();

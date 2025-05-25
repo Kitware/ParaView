@@ -350,9 +350,10 @@ void pqCameraKeyFrameWidget::setViewUp(double viewUp[3])
 /// Initialize the widget using the values from the key frame proxy.
 void pqCameraKeyFrameWidget::initializeUsingKeyFrame(vtkSMProxy* keyFrame)
 {
-  this->Internal->setPosition(&vtkSMPropertyHelper(keyFrame, "Position").GetDoubleArray()[0]);
-  this->Internal->setFocalPoint(&vtkSMPropertyHelper(keyFrame, "FocalPoint").GetDoubleArray()[0]);
-  this->Internal->setViewUp(&vtkSMPropertyHelper(keyFrame, "ViewUp").GetDoubleArray()[0]);
+  this->Internal->setPosition(vtkSMPropertyHelper(keyFrame, "Position").GetDoubleArray().data());
+  this->Internal->setFocalPoint(
+    vtkSMPropertyHelper(keyFrame, "FocalPoint").GetDoubleArray().data());
+  this->Internal->setViewUp(vtkSMPropertyHelper(keyFrame, "ViewUp").GetDoubleArray().data());
   this->Internal->setViewAngle(vtkSMPropertyHelper(keyFrame, "ViewAngle").GetAsDouble());
   this->Internal->setParallelScale(vtkSMPropertyHelper(keyFrame, "ParallelScale").GetAsDouble());
 

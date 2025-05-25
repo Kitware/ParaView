@@ -430,7 +430,7 @@ void vtkPUnstructuredGridGhostCellsGenerator::ExchangeBoundsAndDetermineNeighbor
 
   // everyone shares bounds
   vtkTimerLog::MarkStartEvent("AllGather 6tuple Bounds");
-  this->Internals->SubController->AllGather(bounds, &allBounds[0], 6);
+  this->Internals->SubController->AllGather(bounds, allBounds.data(), 6);
   vtkTimerLog::MarkEndEvent("AllGather 6tuple Bounds");
 
   double xlength = bounds[1] - bounds[0];
@@ -562,8 +562,8 @@ void vtkPUnstructuredGridGhostCellsGenerator::ExtractAndReduceSurfacePointsShare
         &sizesToSend[reqidx], 1, *iter, UGGCG_SIZE_EXCHANGE_TAG, sendReqs[2 * reqidx]);
 
       // send the vector
-      this->Internals->SubController->NoBlockSend(
-        &sendIds[0], sizesToSend[reqidx], *iter, UGGCG_DATA_EXCHANGE_TAG, sendReqs[2 * reqidx + 1]);
+      this->Internals->SubController->NoBlockSend(sendIds.data(), sizesToSend[reqidx], *iter,
+        UGGCG_DATA_EXCHANGE_TAG, sendReqs[2 * reqidx + 1]);
       reqidx++;
     }
 
@@ -592,7 +592,7 @@ void vtkPUnstructuredGridGhostCellsGenerator::ExtractAndReduceSurfacePointsShare
       CommDataInfo& c = this->Internals->CommData[*iter];
       this->Internals->ProcessIdToSurfacePointIds[*iter].resize(c.RecvSize);
       this->Internals->SubController->NoBlockReceive(
-        &this->Internals->ProcessIdToSurfacePointIds[*iter][0], c.RecvSize, *iter,
+        this->Internals->ProcessIdToSurfacePointIds[*iter].data(), c.RecvSize, *iter,
         UGGCG_DATA_EXCHANGE_TAG, c.RecvReqs[1]);
     }
 
@@ -667,7 +667,7 @@ void vtkPUnstructuredGridGhostCellsGenerator::ExtractAndReduceSurfacePointsShare
         &sizesToSend[reqidx], 1, *iter, UGGCG_SIZE_EXCHANGE_TAG, sendReqs[2 * reqidx]);
 
       // Send raw data
-      this->Internals->SubController->NoBlockSend(&sendPoints[0], sizesToSend[reqidx], *iter,
+      this->Internals->SubController->NoBlockSend(sendPoints.data(), sizesToSend[reqidx], *iter,
         UGGCG_DATA_EXCHANGE_TAG, sendReqs[2 * reqidx + 1]);
       reqidx++;
     }
@@ -698,7 +698,7 @@ void vtkPUnstructuredGridGhostCellsGenerator::ExtractAndReduceSurfacePointsShare
       std::vector<double>& incomingPoints = this->Internals->ProcessIdToSurfacePoints[*iter];
       incomingPoints.resize(c.RecvSize);
       this->Internals->SubController->NoBlockReceive(
-        &incomingPoints[0], c.RecvSize, *iter, UGGCG_DATA_EXCHANGE_TAG, c.RecvReqs[1]);
+        incomingPoints.data(), c.RecvSize, *iter, UGGCG_DATA_EXCHANGE_TAG, c.RecvReqs[1]);
     }
 
     // wait for receives of data
@@ -720,7 +720,7 @@ void vtkPUnstructuredGridGhostCellsGenerator::ExtractAndReduceSurfacePointsShare
   }
   // should have all point data by now
   // wait for all my sends to complete
-  this->Internals->SubController->WaitAll(static_cast<int>(sendReqs.size()), &sendReqs[0]);
+  this->Internals->SubController->WaitAll(static_cast<int>(sendReqs.size()), sendReqs.data());
   vtkTimerLog::MarkEndEvent("Share Local Partition Surface Points With Potential Neighbors");
 }
 
@@ -1225,7 +1225,7 @@ void vtkPUnstructuredGridGhostCellsGenerator::AddGlobalCellIds()
   // do an all-to-all to share the number of cells everyone has
   vtkIdType numCells = this->Internals->Input->GetNumberOfCells();
   std::vector<vtkIdType> allNumCells(this->Internals->SubController->GetNumberOfProcesses());
-  this->Internals->SubController->AllGather(&numCells, &allNumCells[0], 1);
+  this->Internals->SubController->AllGather(&numCells, allNumCells.data(), 1);
 
   // the value of global cell ids starts at the number of cells that ranks
   // before you have
