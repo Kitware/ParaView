@@ -427,7 +427,7 @@ void pqHierarchicalGridLayout::split(int location, Qt::Orientation direction, do
     }
     assert(internals.SBTree[child0].Invalid && internals.SBTree[child1].Invalid);
 
-    internals.SBTree[child0] = std::move(internals.SBTree[location]);
+    internals.SBTree[child0] = internals.SBTree[location];
     internals.SBTree[child1] = BTNode(nullptr);
     internals.SBTree[location] = BTNode(direction, splitFraction);
   }

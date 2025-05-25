@@ -187,7 +187,7 @@ bool vtkPVDataMover::Execute()
       for (int cc = 0; cc < numDataSets; ++cc)
       {
         auto dobj = vtk::TakeSmartPointer(sController->ReceiveDataObject(1, 78113));
-        this->DataSets[ranks[cc]] = std::move(dobj);
+        this->DataSets[ranks[cc]] = dobj;
       }
     }
   }
