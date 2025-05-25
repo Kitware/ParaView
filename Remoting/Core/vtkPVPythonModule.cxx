@@ -19,7 +19,7 @@ static vtkPVPythonModuleContainerType vtkPVPythonModuleRegisteredModules;
 
 void vtkPVPythonModule::RegisterModule(vtkPVPythonModule* module)
 {
-  vtkPVPythonModuleRegisteredModules.push_front(module);
+  vtkPVPythonModuleRegisteredModules.emplace_front(module);
 }
 
 vtkPVPythonModule* vtkPVPythonModule::GetModule(const char* fullname)

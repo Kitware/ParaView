@@ -344,7 +344,7 @@ void vtkSMProxy::AddProperty(const char* name, vtkSMProperty* prop)
   // Add the property name to the vector of property names.
   // This vector keeps track of the order in which properties
   // were added.
-  this->Internals->PropertyNamesInOrder.push_back(name);
+  this->Internals->PropertyNamesInOrder.emplace_back(name);
 }
 
 //---------------------------------------------------------------------------
@@ -1534,7 +1534,7 @@ vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
   }
 
   // FIXME: should we use group-name as the "key" for the property groups?
-  this->Internals->PropertyGroups.push_back(group);
+  this->Internals->PropertyGroups.emplace_back(group);
   group->Delete();
 
   return group;
@@ -1547,7 +1547,7 @@ void vtkSMProxy::AppendPropertyGroup(vtkSMPropertyGroup* group)
   auto iter = std::find(internals.PropertyGroups.begin(), internals.PropertyGroups.end(), group);
   if (iter == internals.PropertyGroups.end())
   {
-    internals.PropertyGroups.push_back(group);
+    internals.PropertyGroups.emplace_back(group);
   }
 }
 
@@ -1951,7 +1951,7 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement* el
       }
       sharingLink->AddLinkedProxy(src_subproxy, vtkSMLink::INPUT);
       sharingLink->AddLinkedProxy(subproxy, vtkSMLink::OUTPUT);
-      this->Internals->SubProxyLinks.push_back(sharingLink);
+      this->Internals->SubProxyLinks.emplace_back(sharingLink);
       sharingLink->Delete();
     }
   }
@@ -2046,7 +2046,7 @@ void vtkSMProxy::ExposeSubProxyProperty(
   // Add the exposed property name to the vector of property names.
   // This vector keeps track of the order in which properties
   // were added.
-  this->Internals->PropertyNamesInOrder.push_back(exposed_name);
+  this->Internals->PropertyNamesInOrder.emplace_back(exposed_name);
 }
 
 //---------------------------------------------------------------------------
@@ -2730,7 +2730,7 @@ std::vector<std::string> vtkSMProxy::GetPropertiesWithDifferentValues(vtkSMProxy
       }
       if (different)
       {
-        differentProperties.push_back(iter->GetKey());
+        differentProperties.emplace_back(iter->GetKey());
       }
     }
   }

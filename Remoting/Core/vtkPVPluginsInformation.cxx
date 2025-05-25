@@ -105,7 +105,7 @@ public:
       {
         return false;
       }
-      this->XMLs.push_back(temp_ptr);
+      this->XMLs.emplace_back(temp_ptr);
     }
 
     if (!stream.GetArgument(0, offset++, &this->Loaded))

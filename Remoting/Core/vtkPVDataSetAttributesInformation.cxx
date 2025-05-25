@@ -136,7 +136,7 @@ void vtkPVDataSetAttributesInformation::DeepCopy(vtkPVDataSetAttributesInformati
     arrayInfo->DeepCopy(oinfo);
 
     internals.ArrayInformationLookupMap[arrayInfo->GetName()] = internals.ArrayInformations.size();
-    internals.ArrayInformations.push_back(arrayInfo);
+    internals.ArrayInformations.emplace_back(arrayInfo);
   }
 
   // Now the default attributes.

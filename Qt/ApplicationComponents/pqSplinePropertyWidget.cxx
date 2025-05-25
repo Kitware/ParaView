@@ -420,8 +420,7 @@ void pqSplinePropertyWidget::setPoints(const QList<QVariant>& pts)
   coords.reserve(pts.size() / 3);
   for (int cc = 0; (cc + 2) < pts.size(); cc += 3)
   {
-    coords.push_back(
-      vtkVector3d(pts[cc].toDouble(), pts[cc + 1].toDouble(), pts[cc + 2].toDouble()));
+    coords.emplace_back(pts[cc].toDouble(), pts[cc + 1].toDouble(), pts[cc + 2].toDouble());
   }
 
   auto& model = this->Internals->Model;

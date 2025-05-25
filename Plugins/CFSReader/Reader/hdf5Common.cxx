@@ -81,7 +81,7 @@ herr_t FileInfo(hid_t /* loc_id */, const char* name, void* opdata)
 {
   std::vector<std::string>* names = reinterpret_cast<std::vector<std::string>*>(opdata);
   assert(names != nullptr);
-  names->push_back(std::string(name));
+  names->emplace_back(name);
 
   return 0;
 }

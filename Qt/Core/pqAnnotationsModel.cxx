@@ -697,7 +697,7 @@ std::vector<std::pair<QString, QString>> pqAnnotationsModel::annotations() const
   strAnnotations.reserve(this->Internals->Items.size());
   for (const AnnotationItem& item : this->Internals->Items)
   {
-    strAnnotations.push_back(std::make_pair(item.Value, item.Annotation));
+    strAnnotations.emplace_back(item.Value, item.Annotation);
   }
   return strAnnotations;
 }
@@ -739,7 +739,7 @@ std::vector<std::pair<QString, int>> pqAnnotationsModel::visibilities() const
   std::vector<std::pair<QString, int>> visibilities;
   for (const AnnotationItem& item : this->Internals->Items)
   {
-    visibilities.push_back(std::make_pair(item.Value, item.Visibility));
+    visibilities.emplace_back(item.Value, item.Visibility);
   }
 
   return visibilities;

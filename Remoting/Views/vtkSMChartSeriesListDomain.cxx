@@ -92,7 +92,7 @@ void vtkSMChartSeriesListDomain::PopulateArrayComponents(
         const char* arrayName = arrayInfo->GetName();
         if (arrayName)
         {
-          strings.push_back(arrayName);
+          strings.emplace_back(arrayName);
         }
       }
     }

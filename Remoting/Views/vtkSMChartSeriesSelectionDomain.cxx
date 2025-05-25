@@ -332,12 +332,12 @@ std::vector<std::string> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const 
   std::vector<std::string> values;
   if (this->DefaultMode == VISIBILITY)
   {
-    values.push_back(this->GetDefaultSeriesVisibility(series) ? "1" : "0");
+    values.emplace_back(this->GetDefaultSeriesVisibility(series) ? "1" : "0");
   }
   else if (this->DefaultMode == LABEL)
   {
     // by default, label is same as the name of the series.
-    values.push_back(series);
+    values.emplace_back(series);
   }
   else if (this->DefaultMode == COLOR)
   {
@@ -354,7 +354,7 @@ std::vector<std::string> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const 
   }
   else if (this->DefaultMode == VALUE)
   {
-    values.push_back(this->DefaultValue);
+    values.emplace_back(this->DefaultValue);
   }
   return values;
 }

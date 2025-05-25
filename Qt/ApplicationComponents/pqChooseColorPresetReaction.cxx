@@ -104,7 +104,7 @@ void pqChooseColorPresetReaction::setTransferFunctions(std::vector<vtkSMProxy*> 
   this->TransferFunctionProxies.clear();
   for (auto& lut : luts)
   {
-    this->TransferFunctionProxies.push_back(lut);
+    this->TransferFunctionProxies.emplace_back(lut);
   }
   this->updateEnableState();
 }

@@ -74,7 +74,7 @@ public:
     assert(prop != nullptr);
     unsigned long oid =
       prop->AddObserver(vtkCommand::DomainModifiedEvent, this, &vtkDomainObserver::DomainModified);
-    this->MonitoredProperties.push_back(std::pair<vtkSMProperty*, unsigned long>(prop, oid));
+    this->MonitoredProperties.emplace_back(prop, oid);
   }
 
   const std::set<vtkSMProperty*>& GetPropertiesWithModifiedDomains() const
@@ -696,7 +696,7 @@ bool vtkSMParaViewPipelineController::UnRegisterViewProxy(
     vtkSMPropertyHelper helper(prop);
     for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
     {
-      reprs.push_back(helper.GetAsProxy(cc));
+      reprs.emplace_back(helper.GetAsProxy(cc));
     }
 
     for (proxyvectortype::iterator iter = reprs.begin(), end = reprs.end(); iter != end; ++iter)
@@ -781,8 +781,7 @@ bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* 
     consumer = consumer ? consumer->GetTrueParentProxy() : nullptr;
     if (consumer && consumer->IsA("vtkSMViewProxy") && proxy->GetConsumerProperty(cc))
     {
-      views.push_back(
-        std::pair<vtkSMProxy*, vtkSMProperty*>(consumer, proxy->GetConsumerProperty(cc)));
+      views.emplace_back(consumer, proxy->GetConsumerProperty(cc));
     }
   }
   for (viewsvector::iterator iter = views.begin(), max = views.end(); iter != max; ++iter)
@@ -906,7 +905,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
     if (proxy->GetConsumerProperty(cc) && consumer && consumer->GetXMLGroup() &&
       strcmp(consumer->GetXMLGroup(), "animation") == 0)
     {
-      consumers.push_back(proxypairitemtype(consumer, proxy->GetConsumerProperty(cc)));
+      consumers.emplace_back(consumer, proxy->GetConsumerProperty(cc));
     }
   }
   for (proxypairvectortype::iterator iter = consumers.begin(), max = consumers.end(); iter != max;
@@ -928,7 +927,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
     vtkSMPropertyHelper helper(kfProperty);
     for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
     {
-      keyframes.push_back(helper.GetAsProxy(cc));
+      keyframes.emplace_back(helper.GetAsProxy(cc));
     }
   }
 
@@ -1240,7 +1239,7 @@ bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
     iter->SetModeToOneGroup();
     for (iter->Begin(groupname.c_str()); !iter->IsAtEnd(); iter->Next())
     {
-      proxymap.push_back(proxymapitemtype(iter->GetKey(), iter->GetProxy()));
+      proxymap.emplace_back(iter->GetKey(), iter->GetProxy());
     }
   }
 
@@ -1278,7 +1277,7 @@ bool vtkSMParaViewPipelineController::UnRegisterDependencies(vtkSMProxy* proxy)
     consumer = consumer ? consumer->GetTrueParentProxy() : nullptr;
     if (consumer)
     {
-      consumers.push_back(consumer);
+      consumers.emplace_back(consumer);
     }
   }
 

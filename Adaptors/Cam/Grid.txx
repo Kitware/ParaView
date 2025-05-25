@@ -980,7 +980,7 @@ size_t Grid<gridType>::CubeToIndex(double side, const std::vector<double>& cubeC
       assert(it1 != cubeCoordinates.end() && it2 != cubeCoordinates.end());
       int oneIndex[3] = { static_cast<int>(it1 - cubeCoordinates.begin()),
         static_cast<int>(it2 - cubeCoordinates.begin()), valIndex[i].face };
-      index.push_back(std::vector<int>(oneIndex, oneIndex + 3));
+      index.emplace_back(oneIndex, oneIndex + 3);
       if (valIndex[i].face < minFace)
       {
         minFace = valIndex[i].face;

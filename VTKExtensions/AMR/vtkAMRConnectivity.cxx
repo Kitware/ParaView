@@ -245,7 +245,7 @@ void vtkAMRConnectivity::PrintSelf(ostream& os, vtkIndent indent)
 
 void vtkAMRConnectivity::AddInputVolumeArrayToProcess(const char* name)
 {
-  this->VolumeArrays.push_back(name);
+  this->VolumeArrays.emplace_back(name);
   this->Modified();
 }
 
@@ -1018,7 +1018,7 @@ int vtkAMRConnectivity::ExchangeBoundaries(vtkMPIController* controller)
         boundary->SetTuple1(i, array->GetTuple1(index));
         index++;
       }
-      this->BoundaryArrays[myProc].push_back(boundary);
+      this->BoundaryArrays[myProc].emplace_back(boundary);
     }
   }
 

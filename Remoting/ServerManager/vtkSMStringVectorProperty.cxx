@@ -338,7 +338,7 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElem
     else if (tmp)
     {
       this->SetElement(0, tmp);
-      this->Internals->DefaultValues.push_back(tmp);
+      this->Internals->DefaultValues.emplace_back(tmp);
       this->Internals->DefaultsValid = true;
     }
   }

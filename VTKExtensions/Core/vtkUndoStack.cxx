@@ -42,7 +42,7 @@ void vtkUndoStack::Push(const char* label, vtkUndoSet* changeSet)
     this->Internal->UndoStack.erase(this->Internal->UndoStack.begin());
     this->InvokeEvent(vtkUndoStack::UndoSetRemovedEvent);
   }
-  this->Internal->UndoStack.push_back(vtkUndoStackInternal::Element(label, changeSet));
+  this->Internal->UndoStack.emplace_back(label, changeSet);
   this->Modified();
 }
 

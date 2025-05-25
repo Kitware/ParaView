@@ -55,7 +55,7 @@ public:
       this->FilePaths.clear();
       for (auto child : this->XMLElement.children("Element"))
       {
-        this->FilePaths.push_back(child.attribute("value").value());
+        this->FilePaths.emplace_back(child.attribute("value").value());
       }
       this->OriginalFilePaths = this->FilePaths;
     }
@@ -631,7 +631,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
             info.FilePaths.clear();
             for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
             {
-              info.FilePaths.push_back(helper.GetAsString(cc));
+              info.FilePaths.emplace_back(helper.GetAsString(cc));
             }
           }
         }

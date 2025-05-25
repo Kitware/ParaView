@@ -623,8 +623,8 @@ int vtkUnstructuredPOPReader::ProcessGrid(
     {
       this->LoadPointData(grid, netCDFFD, varidp, start, count, rStride, variableName);
       std::vector<std::string> scalarArrayNames;
-      scalarArrayNames.push_back("UVEL");
-      scalarArrayNames.push_back("VVEL");
+      scalarArrayNames.emplace_back("UVEL");
+      scalarArrayNames.emplace_back("VVEL");
       ConvertScalarsToVector(grid->GetPointData(), scalarArrayNames);
       this->VectorGrid = 2;
     }
@@ -1364,7 +1364,7 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(int* wholeExt
     for (std::map<vtkIdType, std::vector<int>>::iterator it = sendIndexInfo.begin();
          it != sendIndexInfo.end(); it++)
     {
-      requests.push_back(vtkMPICommunicator::Request());
+      requests.emplace_back();
       controller->NoBlockSend(&(it->second[0]), static_cast<int>(it->second.size()),
         static_cast<int>(it->first), 4837, requests.back());
       controller->NoBlockSend(&(sendValueInfo[it->first][0]),

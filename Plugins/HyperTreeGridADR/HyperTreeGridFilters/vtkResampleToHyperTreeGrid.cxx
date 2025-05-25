@@ -365,7 +365,7 @@ void vtkResampleToHyperTreeGrid::AddDataArray(const char* name)
     return;
   }
 
-  this->InputDataArrayNames.push_back(std::string(name));
+  this->InputDataArrayNames.emplace_back(name);
   this->Modified();
 }
 
@@ -1625,9 +1625,8 @@ void vtkResampleToHyperTreeGrid::ExtrapolateValuesOnGaps(vtkHyperTreeGrid* htg)
         ++invalidNeighbors;
       }
     }
-    buf.emplace_back(PriorityQueueElement(
-      key + static_cast<vtkIdType>(qe.InvalidNeighborIds.size()) - invalidNeighbors, id,
-      std::move(means), std::move(qe.InvalidNeighborIds)));
+    buf.emplace_back(key + static_cast<vtkIdType>(qe.InvalidNeighborIds.size()) - invalidNeighbors,
+      id, std::move(means), std::move(qe.InvalidNeighborIds));
     pq.pop();
     if (pq.empty() || pq.top().Key != key)
     {

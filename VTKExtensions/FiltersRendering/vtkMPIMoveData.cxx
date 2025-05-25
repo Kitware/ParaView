@@ -1078,7 +1078,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
       // global ids attributes are removed when appending data so we set
       // the active global ids attribute to nullptr which keeps the global ids array.
       unsetGlobalIdsAttribute(clone);
-      pieces.push_back(clone);
+      pieces.emplace_back(clone);
       clone->Delete();
     }
     else
@@ -1086,7 +1086,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
       vtkDataObject* output = reader->GetOutputDataObject(0);
       // reconstructing data distributted on MPI node, so global ids are valid
       unsetGlobalIdsAttribute(output);
-      pieces.push_back(output);
+      pieces.emplace_back(output);
     }
     mystring->Delete();
     mystring = nullptr;

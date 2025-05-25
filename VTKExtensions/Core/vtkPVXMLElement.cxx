@@ -132,8 +132,8 @@ void vtkPVXMLElement::AddAttribute(const char* attrName, const char* attrValue)
     return;
   }
 
-  this->Internal->AttributeNames.push_back(attrName);
-  this->Internal->AttributeValues.push_back(attrValue);
+  this->Internal->AttributeNames.emplace_back(attrName);
+  this->Internal->AttributeValues.emplace_back(attrValue);
 }
 
 //----------------------------------------------------------------------------
@@ -231,7 +231,7 @@ void vtkPVXMLElement::AddNestedElement(vtkPVXMLElement* element, int setParent)
   {
     element->SetParent(this);
   }
-  this->Internal->NestedElements.push_back(element);
+  this->Internal->NestedElements.emplace_back(element);
 }
 
 //----------------------------------------------------------------------------

@@ -102,7 +102,7 @@ bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
       // Push to stream
       stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetReader" << i
              << VTKOBJECT(proxy) << vtkClientServerStream::End;
-      proxies.push_back(proxy);
+      proxies.emplace_back(proxy);
       proxy->Delete();
     }
     else

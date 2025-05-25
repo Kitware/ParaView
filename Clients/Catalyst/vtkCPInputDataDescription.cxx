@@ -63,7 +63,7 @@ void vtkCPInputDataDescription::AddField(const char* fieldName, int type)
   if (std::find(this->Internals->Fields[type].begin(), this->Internals->Fields[type].end(),
         fieldName) == this->Internals->Fields[type].end())
   {
-    this->Internals->Fields[type].push_back(fieldName);
+    this->Internals->Fields[type].emplace_back(fieldName);
   }
 }
 

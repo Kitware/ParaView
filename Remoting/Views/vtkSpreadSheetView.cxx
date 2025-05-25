@@ -405,7 +405,7 @@ public:
         }
         else
         {
-          arrays.push_back(column);
+          arrays.emplace_back(column);
         }
       }
     }

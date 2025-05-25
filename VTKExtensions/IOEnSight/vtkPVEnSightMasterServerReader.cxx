@@ -468,7 +468,7 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
       {
         // Handle the case file line an sos file with one server.
         numServers = 1;
-        this->Internal->PieceFileNames.push_back(this->CaseFileName);
+        this->Internal->PieceFileNames.emplace_back(this->CaseFileName);
         // We could exit the state machine here
         // because we have nothing else to do from this state.
         // We assume the line "SERVERS" will not appear in any case file.
@@ -512,7 +512,7 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
         vtkErrorMacro("Error parsing case file name from: " << line.c_str());
         return VTK_ERROR;
       }
-      this->Internal->PieceFileNames.push_back(p);
+      this->Internal->PieceFileNames.emplace_back(p);
     }
   }
 

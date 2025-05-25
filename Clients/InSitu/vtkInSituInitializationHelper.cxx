@@ -435,7 +435,7 @@ bool vtkInSituInitializationHelper::ExecutePipelines(const conduit_node* params)
     {
       if (item.Pipeline->GetName())
       {
-        pipelines.push_back(item.Pipeline->GetName());
+        pipelines.emplace_back(item.Pipeline->GetName());
       }
     }
   }

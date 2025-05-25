@@ -232,7 +232,7 @@ void pqHierarchicalGridLayout::addItem(QLayoutItem* item)
   // 1. If tree is empty, simply add the item as the root node.
   if (internals.SBTree.empty())
   {
-    internals.SBTree.emplace_back(BTNode(item));
+    internals.SBTree.emplace_back(item);
     return;
   }
 

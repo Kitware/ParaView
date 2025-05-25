@@ -420,7 +420,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(const cha
     result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_HANDSHAKE_ERROR;
     return nullptr;
   }
-  this->Internals->Controllers.push_back(controller);
+  this->Internals->Controllers.emplace_back(controller);
   result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS;
   return controller;
 }
@@ -504,7 +504,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(int por
 
   if (controller)
   {
-    this->Internals->Controllers.push_back(controller);
+    this->Internals->Controllers.emplace_back(controller);
     result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS;
   }
   else if (this->AbortPendingConnectionFlag)

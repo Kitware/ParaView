@@ -75,7 +75,7 @@ vtkDataObject* vtkCPMultiBlockGridBuilder::GetGrid(
 //----------------------------------------------------------------------------
 void vtkCPMultiBlockGridBuilder::AddGridBuilder(vtkCPGridBuilder* gridBuilder)
 {
-  this->Internal->GridBuilders.push_back(gridBuilder);
+  this->Internal->GridBuilders.emplace_back(gridBuilder);
 }
 
 //----------------------------------------------------------------------------

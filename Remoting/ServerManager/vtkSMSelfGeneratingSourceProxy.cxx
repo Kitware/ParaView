@@ -81,7 +81,7 @@ bool vtkSMSelfGeneratingSourceProxy::ExtendDefinition(vtkPVXMLElement* xml)
     this->RebuildStateForProperties();
   }
 
-  this->Internals->ExtendedDefinitionXMLs.push_back(xml);
+  this->Internals->ExtendedDefinitionXMLs.emplace_back(xml);
   return true;
 }
 

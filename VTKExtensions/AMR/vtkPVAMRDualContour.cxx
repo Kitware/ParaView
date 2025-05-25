@@ -92,7 +92,7 @@ int vtkPVAMRDualContour::RequestData(vtkInformation* vtkNotUsed(request),
 //-----------------------------------------------------------------------------
 void vtkPVAMRDualContour::AddInputCellArrayToProcess(const char* name)
 {
-  this->Implementation->CellArrays.push_back(std::string(name));
+  this->Implementation->CellArrays.emplace_back(name);
   this->Modified();
 }
 

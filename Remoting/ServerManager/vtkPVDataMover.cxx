@@ -59,7 +59,7 @@ std::vector<vtkSmartPointer<vtkDataObject>> CollectDataSets(
     std::vector<vtkSmartPointer<vtkDataObject>> result;
     if (localData)
     {
-      result.push_back(localData);
+      result.emplace_back(localData);
     }
     return result;
   }

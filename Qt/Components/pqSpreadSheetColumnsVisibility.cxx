@@ -98,13 +98,13 @@ void pqSpreadSheetColumnsVisibility::populateMenu(
         model->headerData(col, Qt::Horizontal, pqSpreadSheetViewModel::SectionVisible).toBool();
       if (columnLabelsSet.insert(label).second == true)
       {
-        columnLabels.push_back(std::make_pair(label, checked));
+        columnLabels.emplace_back(label, checked);
       }
     }
   }
 
   // add a separator
-  columnLabels.push_back(std::make_pair(std::string(), false));
+  columnLabels.emplace_back(std::string(), false);
 
   // if there are any columns already hidden that are not already added, we
   // add them so that the user can always unhide them.
@@ -114,7 +114,7 @@ void pqSpreadSheetColumnsVisibility::populateMenu(
     auto txt = svp->GetElement(cc);
     if (columnLabelsSet.insert(txt).second == true)
     {
-      columnLabels.push_back(std::make_pair(txt, false));
+      columnLabels.emplace_back(txt, false);
     }
   }
 
@@ -146,7 +146,7 @@ void pqSpreadSheetColumnsVisibility::populateMenu(
         std::vector<std::string> values;
         for (unsigned int cc = 0, max = vsvp->GetNumberOfElements(); cc < max; ++cc)
         {
-          values.push_back(vsvp->GetElement(cc));
+          values.emplace_back(vsvp->GetElement(cc));
         }
         if (is_checked)
         {

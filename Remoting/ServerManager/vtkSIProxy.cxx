@@ -331,8 +331,7 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
   {
     const ProxyState_SubProxy& subproxyMsg = message->GetExtension(ProxyState::subproxy, cc);
     vtkSIProxy* subproxy = vtkSIProxy::SafeDownCast(this->GetSIObject(subproxyMsg.global_id()));
-    this->Internals->SubProxyInfoVector.push_back(
-      SubProxyInfo(subproxyMsg.name(), subproxyMsg.global_id()));
+    this->Internals->SubProxyInfoVector.emplace_back(subproxyMsg.name(), subproxyMsg.global_id());
     if (subproxy == nullptr)
     {
       // This code has been commented to support ImplicitPlaneWidgetRepresentation

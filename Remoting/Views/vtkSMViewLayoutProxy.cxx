@@ -1139,7 +1139,7 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magX, int magY)
       vtkImageData* image = iter->ViewProxy->CaptureWindow(magX, magY);
       if (image)
       {
-        images.push_back(image);
+        images.emplace_back(image);
         image->FastDelete();
       }
     }

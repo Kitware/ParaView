@@ -416,7 +416,7 @@ void vtkFileSeriesReader::RemoveAllFileNamesInternal()
 //----------------------------------------------------------------------------
 void vtkFileSeriesReader::AddFileNameInternal(const char* name)
 {
-  this->Internal->FileNames.push_back(name);
+  this->Internal->FileNames.emplace_back(name);
 }
 
 //----------------------------------------------------------------------------

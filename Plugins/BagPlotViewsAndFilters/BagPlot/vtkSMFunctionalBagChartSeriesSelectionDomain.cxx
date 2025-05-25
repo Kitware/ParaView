@@ -53,30 +53,30 @@ std::vector<std::string> vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaul
       vtksys::SystemTools::ReplaceString(name, "_median", "");
       name = "Highest density (" + name + ")";
     }
-    values.push_back(name.c_str());
+    values.emplace_back(name.c_str());
     return values;
   }
   else if (this->DefaultMode == COLOR)
   {
     if (vtksys::SystemTools::StringStartsWith(name, "Q3Points"))
     {
-      values.push_back("0.50");
-      values.push_back("0.00");
-      values.push_back("0.00");
+      values.emplace_back("0.50");
+      values.emplace_back("0.00");
+      values.emplace_back("0.00");
       return values;
     }
     else if (name == "QMedPoints")
     {
-      values.push_back("0.75");
-      values.push_back("0.00");
-      values.push_back("0.00");
+      values.emplace_back("0.75");
+      values.emplace_back("0.00");
+      values.emplace_back("0.00");
       return values;
     }
     else if (vtksys::SystemTools::StringEndsWith(name, "_median"))
     {
-      values.push_back("0.00");
-      values.push_back("0.00");
-      values.push_back("0.00");
+      values.emplace_back("0.00");
+      values.emplace_back("0.00");
+      values.emplace_back("0.00");
       return values;
     }
   }

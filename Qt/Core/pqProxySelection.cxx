@@ -55,11 +55,11 @@ bool pqProxySelectionUtilities::copy(const pqProxySelection& source, vtkSMProxyS
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
     if (port)
     {
-      selection.push_back(port->getOutputPortProxy());
+      selection.emplace_back(port->getOutputPortProxy());
     }
     else if (proxy)
     {
-      selection.push_back(proxy->getProxy());
+      selection.emplace_back(proxy->getProxy());
     }
   }
   if (dest->GetSelection() != selection)

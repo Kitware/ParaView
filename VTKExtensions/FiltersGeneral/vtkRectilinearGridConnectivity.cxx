@@ -618,7 +618,7 @@ void vtkRectilinearGridConnectivity::AddVolumeArrayName(char* arayName)
   }
 
   this->Internal->VolumeFractionArraysType = 0;
-  this->Internal->VolumeFractionArrayNames.push_back(arayName);
+  this->Internal->VolumeFractionArrayNames.emplace_back(arayName);
   this->Modified();
 }
 
@@ -636,7 +636,7 @@ void vtkRectilinearGridConnectivity::AddDoubleVolumeArrayName(char* arayName)
     this->Internal->VolumeFractionArraysType = VTK_DOUBLE;
   }
 
-  this->Internal->VolumeFractionArrayNames.push_back(arayName);
+  this->Internal->VolumeFractionArrayNames.emplace_back(arayName);
   this->Modified();
 }
 
@@ -654,7 +654,7 @@ void vtkRectilinearGridConnectivity::AddFloatVolumeArrayName(char* arayName)
     this->Internal->VolumeFractionArraysType = VTK_FLOAT;
   }
 
-  this->Internal->VolumeFractionArrayNames.push_back(arayName);
+  this->Internal->VolumeFractionArrayNames.emplace_back(arayName);
   this->Modified();
 }
 
@@ -672,7 +672,7 @@ void vtkRectilinearGridConnectivity::AddUnsignedCharVolumeArrayName(char* arayNa
     this->Internal->VolumeFractionArraysType = VTK_UNSIGNED_CHAR;
   }
 
-  this->Internal->VolumeFractionArrayNames.push_back(arayName);
+  this->Internal->VolumeFractionArrayNames.emplace_back(arayName);
   this->Modified();
 }
 
@@ -872,11 +872,11 @@ int vtkRectilinearGridConnectivity::CheckVolumeDataArrays(
       if (strcmp(aryNames[i], vtkDataSetAttributes::GhostArrayName()) != 0)
       {
         // note that the ghost array is a hidden data array
-        this->Internal->VolumeDataAttributeNames.push_back(aryNames[i]);
+        this->Internal->VolumeDataAttributeNames.emplace_back(aryNames[i]);
 
         if (!strstr(aryNames[i], "raction") && !this->IsVolumeFractionArray(aryNames[i]))
         {
-          this->Internal->IntegrableAttributeNames.push_back(aryNames[i]);
+          this->Internal->IntegrableAttributeNames.emplace_back(aryNames[i]);
         }
       }
     }

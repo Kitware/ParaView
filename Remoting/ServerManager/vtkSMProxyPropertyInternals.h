@@ -124,7 +124,7 @@ public:
   // Add a proxy/port to the unchecked list. Returns true if value modified.
   bool AddUnchecked(vtkSMProxy* proxy, unsigned int port = 0)
   {
-    this->UncheckedProxies.push_back(proxy);
+    this->UncheckedProxies.emplace_back(proxy);
     this->UncheckedPorts.push_back(port);
     return true;
   }
@@ -132,7 +132,7 @@ public:
   // Add a proxy/port to the list and clear any unchecked values. Returns true if value modified.
   bool Add(vtkSMProxy* proxy, unsigned int port = 0)
   {
-    this->Proxies.push_back(proxy);
+    this->Proxies.emplace_back(proxy);
     this->Ports.push_back(port);
     return this->CheckedValueChanged();
   }
@@ -433,7 +433,7 @@ public:
       }
       if (proxy != nullptr || gid == 0)
       {
-        proxies.push_back(proxy);
+        proxies.emplace_back(proxy);
         ports.push_back(port);
       }
     }

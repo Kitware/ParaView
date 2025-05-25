@@ -3428,7 +3428,7 @@ int vtkMaterialInterfaceFilter::RequestData(vtkInformation* vtkNotUsed(request),
             case VTK_INT:
             {
               const char* arrayName = ds->GetCellData()->GetArrayName(i);
-              this->IntegratedArrayNames.push_back(arrayName);
+              this->IntegratedArrayNames.emplace_back(arrayName);
             }
             break;
             default:

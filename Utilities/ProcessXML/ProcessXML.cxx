@@ -226,12 +226,12 @@ static std::vector<std::string> parse_expand_args(int argc, char* argv[])
       /* (this mimics the way that gcc expands @file arguments) */
       if (!read_option_file(strings, &argv[cc][1]))
       {
-        strings.push_back(argv[cc]);
+        strings.emplace_back(argv[cc]);
       }
     }
     else
     {
-      strings.push_back(argv[cc]);
+      strings.emplace_back(argv[cc]);
     }
   }
 

@@ -236,7 +236,7 @@ bool vtkExtractsDeliveryHelper::Update()
           {
             vtkCompositeDataSet* dsToShare = vtkCompositeDataSet::SafeDownCast(
               vtkDataObjectTypes::NewDataObject(extract->GetClassName()));
-            compositeDSToShare.push_back(dsToShare);
+            compositeDSToShare.emplace_back(dsToShare);
             dsToShare->CopyStructure(vtkCompositeDataSet::SafeDownCast(extract));
             dsToShare->FastDelete();
             needToShare = 1;

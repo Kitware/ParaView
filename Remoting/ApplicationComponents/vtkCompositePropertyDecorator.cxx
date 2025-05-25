@@ -23,7 +23,7 @@ struct BaseOperation
 
   void Add(std::shared_ptr<BaseOperation>& op) { this->Expressions.push_back(op); }
 
-  void Add(vtkPropertyDecorator* op) { this->Decorators.push_back(op); }
+  void Add(vtkPropertyDecorator* op) { this->Decorators.emplace_back(op); }
 
   virtual bool CanShow(bool show_advanced) const = 0;
   virtual bool Enable() const = 0;

@@ -574,7 +574,7 @@ void vtkCPPythonScriptV2Helper::RegisterView(vtkSMProxy* view)
   auto& internals = (*this->Internals);
   vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Registering view (%s) for pipeline (%s)",
     vtkLogIdentifier(view), vtkLogIdentifier(this));
-  internals.Views.push_back(view);
+  internals.Views.emplace_back(view);
 }
 
 //----------------------------------------------------------------------------

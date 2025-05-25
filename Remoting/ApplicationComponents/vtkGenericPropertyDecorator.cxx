@@ -202,7 +202,7 @@ void vtkGenericPropertyDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy
   }
   else
   {
-    this->Internals->Values.push_back(value);
+    this->Internals->Values.emplace_back(value);
   }
 
   const char* mode = config->GetAttribute("mode");

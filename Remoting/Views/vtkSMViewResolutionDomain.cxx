@@ -38,8 +38,8 @@ void vtkSMViewResolutionDomain::Update(vtkSMProperty*)
   if (resolution[0] != 0 && resolution[1] != 0)
   {
     std::vector<vtkEntry> values;
-    values.push_back(vtkEntry(0, resolution[0]));
-    values.push_back(vtkEntry(0, resolution[1]));
+    values.emplace_back(0, resolution[0]);
+    values.emplace_back(0, resolution[1]);
     this->SetEntries(values);
   }
 }

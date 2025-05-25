@@ -104,8 +104,8 @@ std::vector<std::string> GetUnixSystemDirectories()
       paths.push_back(directory);
     }
   }
-  paths.push_back("/usr/local/share");
-  paths.push_back("/usr/share");
+  paths.emplace_back("/usr/local/share");
+  paths.emplace_back("/usr/share");
   return paths;
 }
 #endif

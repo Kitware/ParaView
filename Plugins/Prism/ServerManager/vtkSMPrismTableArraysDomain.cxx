@@ -100,7 +100,7 @@ void vtkSMPrismTableArraysDomain::Update(vtkSMProperty*)
     {
       if (currentTableId != -1)
       {
-        arraysOfTables[currentTableId].push_back(str);
+        arraysOfTables[currentTableId].emplace_back(str);
       }
     }
   }

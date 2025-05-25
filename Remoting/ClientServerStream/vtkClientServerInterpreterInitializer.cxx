@@ -84,7 +84,7 @@ vtkClientServerInterpreter* vtkClientServerInterpreterInitializer::NewInterprete
 void vtkClientServerInterpreterInitializer::RegisterInterpreter(vtkClientServerInterpreter* interp)
 {
   // THIS DOES NOT AFFECT REF-COUNT.
-  this->Internals->Interpreters.push_back(interp);
+  this->Internals->Interpreters.emplace_back(interp);
 
   // Initialize using existing callbacks.
   vtkInternals::VectorOfCallbacks::iterator iter;

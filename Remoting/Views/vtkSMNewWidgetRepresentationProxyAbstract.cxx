@@ -120,7 +120,7 @@ void vtkSMNewWidgetRepresentationProxyAbstract::SetupPropertiesLinks()
       link->AddLinkedProperty(this, piter->GetKey(), vtkSMLink::OUTPUT);
       link->AddLinkedProperty(this, this->GetPropertyName(info), vtkSMLink::INPUT);
 
-      this->Links.push_back(link);
+      this->Links.emplace_back(link);
       link->Delete();
     }
   }

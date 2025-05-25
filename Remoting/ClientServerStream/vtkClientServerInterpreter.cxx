@@ -892,10 +892,10 @@ int vtkClientServerInterpreter::Load(const char* moduleName, const char* const* 
 #else
   vtkClientServerInterpreterSplit(getenv("LD_LIBRARY_PATH"), ':', '/', paths);
   vtkClientServerInterpreterSplit(getenv("PATH"), ':', '/', paths);
-  paths.push_back("/usr/lib/");
-  paths.push_back("/usr/lib/vtk/");
-  paths.push_back("/usr/local/lib/");
-  paths.push_back("/usr/local/lib/vtk/");
+  paths.emplace_back("/usr/lib/");
+  paths.emplace_back("/usr/lib/vtk/");
+  paths.emplace_back("/usr/local/lib/");
+  paths.emplace_back("/usr/local/lib/vtk/");
 #endif
 
   // Search for the module.

@@ -504,7 +504,7 @@ void vtkSMCompoundSourceProxy::StripValues(vtkPVXMLElement* propertyElem)
     vtkPVXMLElement* nested = propertyElem->GetNestedElement(i);
     if (this->ShouldWriteValue(nested))
     {
-      elements.push_back(nested);
+      elements.emplace_back(nested);
     }
   }
 

@@ -628,7 +628,7 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name, const char*
   if (n == this->Internal->AttributeNames.end())
   {
     // Need to create an entry for this attribute.
-    this->Internal->AttributeNames.push_back(name);
+    this->Internal->AttributeNames.emplace_back(name);
 
     this->Internal->AttributeValueSets.resize(this->Internal->AttributeValueSets.size() + 1);
     values = &*(this->Internal->AttributeValueSets.end() - 1);
@@ -647,7 +647,7 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name, const char*
   if (i == values->end())
   {
     // Need to add the value.
-    values->push_back(value);
+    values->emplace_back(value);
   }
 }
 

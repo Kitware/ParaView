@@ -42,7 +42,7 @@ void vtkSMAnimationFrameWindowDomain::Update(vtkSMProperty*)
       case vtkCompositeAnimationPlayer::SEQUENCE:
       {
         const int numFrames = vtkSMUncheckedPropertyHelper(scene, "NumberOfFrames").GetAsInt();
-        values.push_back(vtkEntry(0, numFrames - 1));
+        values.emplace_back(0, numFrames - 1);
         break;
       }
       case vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS:
@@ -50,7 +50,7 @@ void vtkSMAnimationFrameWindowDomain::Update(vtkSMProperty*)
         vtkSMProxy* timeKeeper = vtkSMUncheckedPropertyHelper(scene, "TimeKeeper").GetAsProxy();
         const int numTS =
           vtkSMUncheckedPropertyHelper(timeKeeper, "TimestepValues").GetNumberOfElements();
-        values.push_back(vtkEntry(0, numTS - 1));
+        values.emplace_back(0, numTS - 1);
         break;
       }
     }
@@ -58,7 +58,7 @@ void vtkSMAnimationFrameWindowDomain::Update(vtkSMProperty*)
   else
   {
     // no scene, nothing much to do.
-    values.push_back(vtkEntry(0, 0));
+    values.emplace_back(0, 0);
   }
   this->SetEntries(values);
 }

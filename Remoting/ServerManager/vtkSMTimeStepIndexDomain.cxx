@@ -47,7 +47,7 @@ void vtkSMTimeStepIndexDomain::Update(vtkSMProxyProperty* pp)
       int numberOfTimeSteps = info->GetNumberOfTimeSteps();
 
       std::vector<vtkEntry> entries;
-      entries.push_back(vtkEntry(0, numberOfTimeSteps - 1));
+      entries.emplace_back(0, numberOfTimeSteps - 1);
       this->SetEntries(entries);
       return;
     }

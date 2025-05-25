@@ -518,7 +518,7 @@ public:
       vtkAddRepresentation(
         this->OverlayViews ? rootView : this->GetView(cc), reprClones->GetItem(cc));
     }
-    this->Representations.push_back(reprClones.Get());
+    this->Representations.emplace_back(reprClones.Get());
   }
 
   /**
@@ -679,7 +679,7 @@ vtkPVComparativeView::~vtkPVComparativeView()
 //----------------------------------------------------------------------------
 void vtkPVComparativeView::AddCue(vtkSMComparativeAnimationCueProxy* cue)
 {
-  this->Internal->Cues.push_back(cue);
+  this->Internal->Cues.emplace_back(cue);
   cue->UpdateVTKObjects();
   vtkObject::SafeDownCast(cue->GetClientSideObject())
     ->AddObserver(vtkCommand::ModifiedEvent, this->MarkOutdatedObserver);
@@ -932,7 +932,7 @@ vtkImageData* vtkPVComparativeView::CaptureWindow(int magX, int magY)
     vtkImageData* image = views->GetView(cc)->CaptureWindow(magX, magY);
     if (image)
     {
-      images.push_back(image);
+      images.emplace_back(image);
       image->FastDelete();
     }
     if (this->OverlayAllComparisons)

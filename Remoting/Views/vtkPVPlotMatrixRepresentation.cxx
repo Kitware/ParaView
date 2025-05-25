@@ -239,7 +239,7 @@ void vtkPVPlotMatrixRepresentation::SetVisibility(bool visible)
 void vtkPVPlotMatrixRepresentation::SetSeriesVisibility(const char* series, bool visibility)
 {
   assert(series != nullptr);
-  this->Internals->SeriesVisibilities.push_back(std::pair<std::string, bool>(series, visibility));
+  this->Internals->SeriesVisibilities.emplace_back(series, visibility);
   this->Modified();
 }
 

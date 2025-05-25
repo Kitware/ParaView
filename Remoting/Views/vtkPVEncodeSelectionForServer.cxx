@@ -50,7 +50,7 @@ static void vtkShrinkSelection(vtkSelection* sel)
       if (properties->Has(vtkSelectionNode::SOURCE()) &&
         properties->Get(vtkSelectionNode::SOURCE()) == chosen)
       {
-        chosenNodes.push_back(node);
+        chosenNodes.emplace_back(node);
       }
     }
   }
