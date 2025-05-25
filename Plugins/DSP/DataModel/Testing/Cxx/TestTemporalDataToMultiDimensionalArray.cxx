@@ -44,7 +44,7 @@ extern int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
   std::vector<double> timeSteps;
   const int nbOfTimesteps = info->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   const double* timeStepsPtr = info->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-
+  timeSteps.reserve(nbOfTimesteps);
   for (int ts = 0; ts < nbOfTimesteps; ts++)
   {
     timeSteps.emplace_back(timeStepsPtr[ts]);

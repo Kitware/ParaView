@@ -150,6 +150,7 @@ vtkSMColorMapEditorHelper::HasBlockProperty(vtkSMProxy* proxy,
     return { "/", BlockPropertyState::Disabled };
   }
   std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  blockPropertyStates.reserve(blockSelectors.size());
   for (const std::string& blockSelector : blockSelectors)
   {
     blockPropertyStates.push_back(
@@ -165,6 +166,7 @@ vtkSMColorMapEditorHelper::HasBlockProperties(vtkSMProxy* proxy, const std::stri
   const std::vector<std::string>& propertyNames)
 {
   std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  blockPropertyStates.reserve(propertyNames.size());
   for (const std::string& propertyName : propertyNames)
   {
     blockPropertyStates.push_back(
@@ -184,6 +186,7 @@ vtkSMColorMapEditorHelper::HasBlocksProperties(vtkSMProxy* proxy,
     return { "/", BlockPropertyState::Disabled };
   }
   std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  blockPropertyStates.reserve(blockSelectors.size());
   for (const std::string& blockSelector : blockSelectors)
   {
     blockPropertyStates.push_back(

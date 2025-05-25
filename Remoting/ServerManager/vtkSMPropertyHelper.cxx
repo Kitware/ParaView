@@ -181,7 +181,7 @@ template <typename T>
 inline std::vector<T> vtkSMPropertyHelper::GetPropertyArray() const
 {
   std::vector<T> array;
-
+  array.reserve(this->GetNumberOfElements());
   for (unsigned int i = 0; i < this->GetNumberOfElements(); i++)
   {
     array.push_back(this->GetProperty<T>(i));

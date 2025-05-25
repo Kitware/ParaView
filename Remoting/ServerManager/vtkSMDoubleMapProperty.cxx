@@ -200,6 +200,7 @@ void vtkSMDoubleMapProperty::ReadFrom(
   for (unsigned int i = 0; i < num_elems; i++)
   {
     std::vector<double> values;
+    values.reserve(this->GetNumberOfComponents());
     for (unsigned int j = 0; j < this->GetNumberOfComponents(); j++)
     {
       values.push_back(variant->float64(i * this->GetNumberOfComponents() + j));

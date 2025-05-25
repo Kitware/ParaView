@@ -737,6 +737,7 @@ void pqAnnotationsModel::setVisibilities(
 std::vector<std::pair<QString, int>> pqAnnotationsModel::visibilities() const
 {
   std::vector<std::pair<QString, int>> visibilities;
+  visibilities.reserve(this->Internals->Items.size());
   for (const AnnotationItem& item : this->Internals->Items)
   {
     visibilities.emplace_back(item.Value, item.Visibility);
