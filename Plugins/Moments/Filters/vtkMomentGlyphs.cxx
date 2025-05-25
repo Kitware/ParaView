@@ -23,6 +23,7 @@
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
+#include <algorithm>
 #include <cmath>
 
 //=============================================================================
@@ -172,10 +173,7 @@ vtkSmartPointer<vtkDataArray> vtkMomentGlyphs::MakeGlyphScaleFactors(
     {
       input->GetCell(cellId, cell);
       double localFitScaleFactor = sqrt(cell->GetLength2()) / fluxMag;
-      if (localFitScaleFactor < fitScaleFactor)
-      {
-        fitScaleFactor = localFitScaleFactor;
-      }
+      fitScaleFactor = std::min(localFitScaleFactor, fitScaleFactor);
     }
   }
 

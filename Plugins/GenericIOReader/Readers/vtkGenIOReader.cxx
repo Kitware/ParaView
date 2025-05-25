@@ -989,8 +989,7 @@ int vtkGenIOReader::RequestData(
           numRowsToSample =
             round(numLoadingRows * (dataPercentage * dataPercentage * dataPercentage));
 
-        if (numRowsToSample > numLoadingRows)
-          numRowsToSample = numLoadingRows;
+        numRowsToSample = std::min(numRowsToSample, numLoadingRows);
 
         msgLog << "Rank (i): " + vtk::to_string(i) << ", Np/numLoadingRows: " << numLoadingRows
                << ", # rows in rank: " << gioReader->readNumElems(i)
@@ -1128,8 +1127,7 @@ int vtkGenIOReader::RequestData(
           numRowsToSample =
             round(numLoadingRows * (dataPercentage * dataPercentage * dataPercentage));
 
-        if (numRowsToSample > numLoadingRows)
-          numRowsToSample = numLoadingRows;
+        numRowsToSample = std::min(numRowsToSample, numLoadingRows);
         msgLog << "\ni: " + vtk::to_string(i) << ", Np: " << numLoadingRows
                << ", # rows in rank: " << gioReader->readNumElems(i)
                << ", dataPercentage: " << dataPercentage

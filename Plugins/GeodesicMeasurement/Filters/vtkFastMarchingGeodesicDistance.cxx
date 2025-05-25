@@ -18,6 +18,7 @@
 #include "gw_core/GW_Vertex.h"
 #include "gw_geodesic/GW_GeodesicMesh.h"
 #include "gw_geodesic/GW_GeodesicPath.h"
+#include <algorithm>
 #include <cassert>
 #include <set>
 
@@ -362,10 +363,7 @@ void vtkFastMarchingGeodesicDistance::CopyDistanceField(vtkPolyData* pd)
       distance = vertex->GetDistance();
 
       // record the farthest geodesic distance we've marched
-      if (distance > this->MaximumDistance)
-      {
-        this->MaximumDistance = distance;
-      }
+      this->MaximumDistance = std::max(distance, this->MaximumDistance);
 
       // if the array is defined store the distance. It is possible to run
       // this filter without the overhead of allocating and copying the

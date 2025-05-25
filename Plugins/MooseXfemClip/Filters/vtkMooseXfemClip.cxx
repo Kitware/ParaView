@@ -19,6 +19,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
+#include <algorithm>
 #include <cmath>
 
 vtkStandardNewMacro(vtkMooseXfemClip);
@@ -110,10 +111,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   // allocate the output and associated helper classes
   estimatedSize = numCells;
   estimatedSize = estimatedSize / 1024 * 1024; // multiple of 1024
-  if (estimatedSize < 1024)
-  {
-    estimatedSize = 1024;
-  }
+  estimatedSize = std::max<vtkIdType>(estimatedSize, 1024);
   vtkNew<vtkFloatArray> cellScalars;
   cellScalars->Allocate(VTK_CELL_SIZE);
   vtkNew<vtkCellArray> conn;

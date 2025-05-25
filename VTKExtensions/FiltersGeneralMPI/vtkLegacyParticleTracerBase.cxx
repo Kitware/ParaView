@@ -296,10 +296,7 @@ int vtkLegacyParticleTracerBase::RequestUpdateExtent(vtkInformation* vtkNotUsed(
       this->SetTerminationTimeNoModify(terminationTime);
     }
 
-    if (this->TerminationTime > this->InputTimeValues.back())
-    {
-      this->TerminationTime = this->InputTimeValues.back();
-    }
+    this->TerminationTime = std::min(this->TerminationTime, this->InputTimeValues.back());
 
     if (this->InputTimeValues.size() == 1)
     {
