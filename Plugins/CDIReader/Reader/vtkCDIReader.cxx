@@ -1955,7 +1955,7 @@ bool vtkCDIReader::BuildDomainCellVars()
   }
 
   vtkDebugMacro("Built cell vars from domain data");
-  return 1;
+  return true;
 }
 
 //------------------------------------------------------------------------------

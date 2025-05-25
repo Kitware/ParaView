@@ -1223,7 +1223,7 @@ int vtkSpyPlotUniReader::ReadGroupHeaderInformation(vtkSpyPlotIStream* spis)
     vtkTypeInt64* DumpOffset;
   };
 
-  while (1)
+  while (true)
   {
     GroupHeader gh;
     if (!spis->ReadInt64s(&(gh.Offset), 1))

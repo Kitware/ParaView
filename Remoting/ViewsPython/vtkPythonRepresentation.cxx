@@ -330,7 +330,7 @@ bool vtkPythonRepresentation::HasProcessRole(vtkTypeUInt32 role)
   if (!session)
   {
     vtkErrorMacro("No active ParaView session");
-    return 0;
+    return false;
   }
 
   return session->HasProcessRole(role);

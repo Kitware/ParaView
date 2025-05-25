@@ -300,7 +300,7 @@ void pqDataRepresentation::updateLookupTable()
   }
 
   int rescaleOnVisibilityChange =
-    vtkSMPropertyHelper(lut, "RescaleOnVisibilityChange", 1).GetAsInt(0);
+    vtkSMPropertyHelper(lut, "RescaleOnVisibilityChange", true).GetAsInt(0);
 
   auto blockLutsProp =
     vtkSMProxyProperty::SafeDownCast(representationProxy->GetProperty("BlockLookupTables"));
@@ -317,7 +317,8 @@ void pqDataRepresentation::updateLookupTable()
     for (unsigned int i = 0; i < blockLutsProp->GetNumberOfProxies(); i++)
     {
       const int blockRescaleOnVisibilityChange =
-        vtkSMPropertyHelper(blockLutsProp->GetProxy(i), "RescaleOnVisibilityChange", 1).GetAsInt(0);
+        vtkSMPropertyHelper(blockLutsProp->GetProxy(i), "RescaleOnVisibilityChange", true)
+          .GetAsInt(0);
       rescaleOnVisibilityChange = rescaleOnVisibilityChange || blockRescaleOnVisibilityChange;
     }
   }

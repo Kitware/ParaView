@@ -113,7 +113,8 @@ void addPlaceHolderIfNeeded(QWidget* widget)
   QMenu* menu = qobject_cast<QMenu*>(widget);
   if (menu && menu->isEmpty())
   {
-    menu->addAction(QCoreApplication::translate("pqPythonMacroSupervisor", "empty"))->setEnabled(0);
+    menu->addAction(QCoreApplication::translate("pqPythonMacroSupervisor", "empty"))
+      ->setEnabled(false);
   }
 }
 void removePlaceHolderIfNeeded(QWidget* widget)

@@ -978,7 +978,7 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
   if (val < 0.0 || val > 1.0)
   {
     vtkErrorMacro("Invalid fraction : " << val << ". Must be in the range [0, 1]");
-    return 0;
+    return false;
   }
 
   if (!this->IsSplitCell(location))

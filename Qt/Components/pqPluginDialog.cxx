@@ -537,7 +537,7 @@ void pqPluginDialog::updateEnableState(
   }
 
   loadButton->setEnabled(shouldEnableLoad);
-  removeButton->setEnabled(num > 0 ? 1 : 0);
+  removeButton->setEnabled(num > 0);
 }
 
 //----------------------------------------------------------------------------

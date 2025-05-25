@@ -33,7 +33,7 @@ vtkDataObject* vtkCustomUnstructuredGridBuilder::GetGrid(
     builtNewGrid = 1;
   }
 
-  this->IsGridModified = 0;
+  this->IsGridModified = false;
 
   return this->GetUnstructuredGrid();
 }

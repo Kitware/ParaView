@@ -1075,7 +1075,7 @@ int vtkSMTestDriver::WaitForLine(vtksysProcess* process, std::string& line, doub
   line = "";
   std::vector<char>::iterator outiter = out.begin();
   std::vector<char>::iterator erriter = err.begin();
-  while (1)
+  while (true)
   {
     // Check for a newline in stdout.
     for (; outiter != out.end(); ++outiter)

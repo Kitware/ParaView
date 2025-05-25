@@ -180,7 +180,7 @@ void vtkPrismView::SynchronizeGeometryBounds()
       if (prop && !vtkWidgetRepresentation::SafeDownCast(prop) && prop->GetVisibility() &&
         prop->GetUseBounds())
       {
-        prop->SetUseBounds(0);
+        prop->SetUseBounds(false);
         propsToHide.push_back(prop);
       }
     }
@@ -190,7 +190,7 @@ void vtkPrismView::SynchronizeGeometryBounds()
 
   for (auto prop : propsToHide)
   {
-    prop->SetUseBounds(1);
+    prop->SetUseBounds(true);
   }
 }
 

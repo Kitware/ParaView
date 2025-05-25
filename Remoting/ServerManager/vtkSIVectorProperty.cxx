@@ -62,7 +62,7 @@ bool vtkSIVectorProperty::ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLEle
     this->SetInitialString(initial_string);
   }
 
-  return 1;
+  return true;
 }
 
 //----------------------------------------------------------------------------

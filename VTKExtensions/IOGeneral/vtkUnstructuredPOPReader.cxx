@@ -698,7 +698,7 @@ bool vtkUnstructuredPOPReader::Transform(vtkUnstructuredGrid* grid, size_t* star
   if (this->VectorGrid != 1 && this->VectorGrid != 2)
   {
     vtkErrorMacro("Don't know if this should be a scalar or vector field grid.");
-    return 0;
+    return false;
   }
 
   int latlonFileId = 0;
@@ -708,7 +708,7 @@ bool vtkUnstructuredPOPReader::Transform(vtkUnstructuredGrid* grid, size_t* star
   {
     // we don't need to close the file if there was an error opening the file
     vtkErrorMacro(<< "Can't read file " << nc_strerror(retval));
-    return 0;
+    return false;
   }
 
   int varidp;

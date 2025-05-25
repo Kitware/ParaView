@@ -15,8 +15,8 @@ vtkCxxSetObjectMacro(vtkCPFileGridBuilder, Grid, vtkDataObject);
 vtkCPFileGridBuilder::vtkCPFileGridBuilder()
 {
   this->FileName = nullptr;
-  this->KeepPointData = 1;
-  this->KeepCellData = 1;
+  this->KeepPointData = true;
+  this->KeepCellData = true;
   this->Grid = nullptr;
 }
 

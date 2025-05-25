@@ -104,7 +104,7 @@ vtkSMProxy::vtkSMProxy()
   this->DoNotUpdateImmediately = 0;
   this->DoNotModifyProperty = 0;
   this->InUpdateVTKObjects = 0;
-  this->PropertiesModified = 0;
+  this->PropertiesModified = false;
 
   this->SubProxyObserver = vtkSMProxyObserver::New();
   this->SubProxyObserver->SetProxy(this);
@@ -457,7 +457,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
   }
   else
   {
-    this->PropertiesModified = 1;
+    this->PropertiesModified = true;
   }
 }
 

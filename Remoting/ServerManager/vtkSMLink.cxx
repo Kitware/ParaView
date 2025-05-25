@@ -122,5 +122,5 @@ void vtkSMLink::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator)
 {
   this->Superclass::LoadState(msg, locator);
   this->SetPropagateUpdateVTKObjects(msg->GetExtension(LinkState::propagate_update) ? 1 : 0);
-  this->SetEnabled(msg->GetExtension(LinkState::enabled) ? 1 : 0);
+  this->SetEnabled(msg->GetExtension(LinkState::enabled));
 }

@@ -1896,7 +1896,7 @@ void vtkAMRDualGridHelper::MarshalDegenerateRegionMessage(void* messagePtr, int 
 void vtkAMRDualGridHelper::UnmarshalDegenerateRegionMessage(const void* messagePtr,
   int vtkNotUsed(messageLength), int vtkNotUsed(srcProc), bool hackLevelFlag)
 {
-  while (1)
+  while (true)
   {
     const int* gridPtr = static_cast<const int*>(messagePtr);
     int level;

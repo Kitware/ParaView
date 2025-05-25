@@ -368,7 +368,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(const cha
   timer->StartTimer();
 
   this->AbortPendingConnectionFlag = false;
-  while (1)
+  while (true)
   {
     double progress = 0.5;
     this->InvokeEvent(vtkCommand::ProgressEvent, &progress);

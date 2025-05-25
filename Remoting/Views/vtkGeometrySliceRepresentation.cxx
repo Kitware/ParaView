@@ -213,7 +213,7 @@ void vtkGeometrySliceRepresentation::SetupDefaults()
   this->Internals->OutlineMapper->SetInputConnection(
     this->Internals->OutlineSource->GetOutputPort());
   this->Internals->OutlineActor->SetMapper(this->Internals->OutlineMapper.GetPointer());
-  this->Internals->OutlineActor->SetUseBounds(0);
+  this->Internals->OutlineActor->SetUseBounds(false);
   this->Internals->OutlineActor->SetVisibility(0);
 }
 

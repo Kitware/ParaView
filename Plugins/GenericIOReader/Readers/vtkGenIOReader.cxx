@@ -797,7 +797,7 @@ int vtkGenIOReader::RequestData(
 
     // override above if it's a position scalar
     if (paraviewData[i].position)
-      paraviewData[i].load = 1;
+      paraviewData[i].load = true;
 
     msgLog << "Var: " + std::string(_name) << " ~ show: " << paraviewData[i].show
            << " ~ load: " << paraviewData[i].load << "\n";

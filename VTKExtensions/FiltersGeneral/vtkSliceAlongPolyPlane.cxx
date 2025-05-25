@@ -332,7 +332,7 @@ bool vtkSliceAlongPolyPlane::Execute(
   if (cutterOutput == nullptr || cutterOutput->GetNumberOfPoints() == 0)
   {
     // shortcut if the cut produces an empty dataset.
-    return 1;
+    return true;
   }
 
   vtkNew<vtkTransformPolyDataFilter> transformOutputFilter;

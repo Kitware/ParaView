@@ -73,10 +73,10 @@ double* vtkCPUniformGridBuilder::GetOrigin()
 //----------------------------------------------------------------------------
 bool vtkCPUniformGridBuilder::CreateUniformGrid()
 {
-  bool builtNewGrid = 0;
+  bool builtNewGrid = false;
   if (this->UniformGrid == nullptr)
   {
-    builtNewGrid = 1;
+    builtNewGrid = true;
   }
   else
   {
@@ -86,7 +86,7 @@ bool vtkCPUniformGridBuilder::CreateUniformGrid()
         this->Spacing[i] != this->UniformGrid->GetSpacing()[i] ||
         this->Origin[i] != this->UniformGrid->GetOrigin()[i])
       {
-        builtNewGrid = 1;
+        builtNewGrid = true;
         break;
       }
     }

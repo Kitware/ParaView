@@ -231,8 +231,8 @@ vtkAMRConnectivity::vtkAMRConnectivity()
   this->VolumeFractionSurfaceValue = 0.5;
   this->Helper = nullptr;
   this->Equivalence = nullptr;
-  this->ResolveBlocks = 1;
-  this->PropagateGhosts = 0;
+  this->ResolveBlocks = true;
+  this->PropagateGhosts = false;
 }
 
 vtkAMRConnectivity::~vtkAMRConnectivity() = default;

@@ -164,7 +164,7 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
 
     this->SlicePositionAxes2D[cc]->SetComputeNormals(0);
     this->SlicePositionAxes2D[cc]->SetPickable(1);
-    this->SlicePositionAxes2D[cc]->SetUseBounds(1);
+    this->SlicePositionAxes2D[cc]->SetUseBounds(true);
     this->SlicePositionAxes2D[cc]->SetScale(10, 10, 10);
     this->Renderers[cc]->AddActor(this->SlicePositionAxes2D[cc].GetPointer());
 
@@ -180,7 +180,7 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
 
   this->SlicePositionAxes3D->SetComputeNormals(0);
   this->SlicePositionAxes3D->SetPickable(0);
-  this->SlicePositionAxes3D->SetUseBounds(1);
+  this->SlicePositionAxes3D->SetUseBounds(true);
   this->SlicePositionAxes3D->SetScale(10, 10, 10);
   this->GetRenderer()->AddActor(this->SlicePositionAxes3D.GetPointer());
 
@@ -466,7 +466,7 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
 //----------------------------------------------------------------------------
 void vtkPVOrthographicSliceView::Update()
 {
-  this->SlicePositionAxes3D->SetUseBounds(0);
+  this->SlicePositionAxes3D->SetUseBounds(false);
   // Since vtkGridAxesActor3D is potentially modified in Update (all of those
   // modifications are passed on to our vtkGridAxesActor3D instances in
   // UpdateCenterAxes(), hence we avoid forcing ShallowCopy on Render since that
@@ -474,7 +474,7 @@ void vtkPVOrthographicSliceView::Update()
   bool prev = this->GridAxes3DActorsNeedShallowCopy;
   this->Superclass::Update();
   this->GridAxes3DActorsNeedShallowCopy = prev;
-  this->SlicePositionAxes3D->SetUseBounds(1);
+  this->SlicePositionAxes3D->SetUseBounds(true);
 }
 
 //----------------------------------------------------------------------------

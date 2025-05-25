@@ -28,7 +28,7 @@ vtkPVDiscretizableColorTransferFunction::vtkPVDiscretizableColorTransferFunction
 
   this->ActiveAnnotatedValues = vtkVariantArray::New();
 
-  this->UseActiveValues = 1;
+  this->UseActiveValues = true;
 
   this->TransferFunction2D = nullptr;
 }

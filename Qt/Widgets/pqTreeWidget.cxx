@@ -162,7 +162,7 @@ void pqTreeWidget::updateCheckStateInternal()
   for (int i = 0; i < numRows; i++)
   {
     QModelIndex idx = m->index(i, 0);
-    bool convert = 0;
+    bool convert = false;
     int v = m->data(idx, Qt::CheckStateRole).toInt(&convert);
     if (convert)
     {
