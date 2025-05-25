@@ -350,8 +350,7 @@ public:
     vtkSmartPointer<vtkStringList> stringList = vtkSmartPointer<vtkStringList>::New();
     for (size_t i = 0; i < vector.size(); ++i)
     {
-      std::string vtk_string(vector[i]);
-      stringList->AddString(vtk_string.c_str());
+      stringList->AddString(vector[i].c_str());
     }
 
     if (property->GetRepeatable())

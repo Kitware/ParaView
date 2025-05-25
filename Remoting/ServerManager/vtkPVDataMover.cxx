@@ -167,7 +167,7 @@ bool vtkPVDataMover::Execute()
     const auto vectorOfDataSets = ::CollectDataSets(this, pm->GetGlobalController());
     for (size_t cc = 0; cc < vectorOfDataSets.size(); ++cc)
     {
-      if (auto dObj = vectorOfDataSets[cc])
+      if (const auto& dObj = vectorOfDataSets[cc])
       {
         this->DataSets[static_cast<int>(cc)] = dObj;
       }

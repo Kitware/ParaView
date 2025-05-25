@@ -169,7 +169,7 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
       auto boxes = this->TransferFunction2D->GetBoxes();
       for (auto it = boxes.cbegin(); it != boxes.cend(); ++it)
       {
-        auto const b = (*it);
+        const auto& b = (*it);
         double* c = b->GetColor();
         // Add a box item to the chart based on existing boxes in the transfer function
         // making sure that the box is not duplicated in the function (addToTF2D = false).

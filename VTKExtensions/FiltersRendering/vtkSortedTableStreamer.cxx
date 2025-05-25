@@ -1579,8 +1579,7 @@ vtkSmartPointer<vtkIdTypeArray> vtkSortedTableStreamer::GenerateBlockIndicesArra
   vtkIdType counter = 0;
   for (vtkIdType i = 0; i < blockNames->GetNumberOfValues(); ++i)
   {
-    const auto name = blockNames->GetValue(i);
-    nameMap[name] = counter++;
+    nameMap[blockNames->GetValue(i)] = counter++;
   }
 
   auto blockIndices = vtkSmartPointer<vtkIdTypeArray>::New();

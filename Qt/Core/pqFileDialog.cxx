@@ -589,7 +589,7 @@ void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
     QStringList filePaths = impl.Model->getFilePaths(sourceItemIndex);
     if (filePaths.size() == 1)
     {
-      QString const dirPath = filePaths.front();
+      const QString& dirPath = filePaths.front();
       QObject::connect(
         addToFavoritesAction, &QAction::triggered, [=] { this->AddDirectoryToFavorites(dirPath); });
       menu.addAction(addToFavoritesAction);

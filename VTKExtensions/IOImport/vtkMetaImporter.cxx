@@ -388,7 +388,7 @@ public:
     if (iter == cache.end())
     {
       // Create new cache item.
-      const std::string key = userName;
+      const std::string& key = userName;
       cache.insert(std::make_pair(dobj, key));
       this->DataObjectCacheKeys.emplace_back(key);
       vtkDistributedTrivialProducer::SetGlobalOutput(key.c_str(), dobj);

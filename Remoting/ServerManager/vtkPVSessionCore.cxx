@@ -403,7 +403,7 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
       // abort();
     }
     // Create the corresponding SI object.
-    std::string classname = message->GetExtension(DefinitionHeader::server_class);
+    const std::string& classname = message->GetExtension(DefinitionHeader::server_class);
     vtkObjectBase* object;
     object = vtkClientServerStreamInstantiator::CreateInstance(classname.c_str());
     if (!object)

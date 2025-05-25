@@ -612,7 +612,7 @@ vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(
     for (size_t i = 0; i < blockSelectors.size(); ++i)
     {
       const ColorArray& blockColorArray = blocksColorArrays[i];
-      const std::string selector = blockSelectors[i];
+      const std::string& selector = blockSelectors[i];
       const std::vector<int>& colorArrayResults = arrayResults.find(blockColorArray)->second;
       const std::vector<std::string>& colorArrayBlockSelectors =
         commonColorArraysBlockSelectors.find(blockColorArray)->second;
@@ -3753,7 +3753,7 @@ vtkSMColorMapEditorHelper::GetBlocksProminentValuesInformationForColorArray(vtkS
   {
     if (vtkPVArrayInformation* blockArrayInfo = blockArrayInfos[i])
     {
-      const auto attributeTypeAndArrayName = blockColorArrays[i];
+      const auto& attributeTypeAndArrayName = blockColorArrays[i];
       blockProminentValuesInfos[i] = repr->GetBlockProminentValuesInformation(blockSelectors[i],
         vtkSMPropertyHelper(repr->GetProperty("Assembly"), true).GetAsString(),
         blockArrayInfo->GetName(), attributeTypeAndArrayName.first,

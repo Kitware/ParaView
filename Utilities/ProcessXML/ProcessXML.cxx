@@ -256,7 +256,7 @@ int main(int argc, char* argv[])
     argv_offset = 1;
   }
 
-  std::string output = args[argv_offset + 1];
+  const std::string& output = args[argv_offset + 1];
   std::string output_file_name = vtksys::SystemTools::GetFilenameWithoutExtension(output);
   ot.Prefix = args[argv_offset + 2];
   ot.Suffix = args[argv_offset + 3];
@@ -275,7 +275,7 @@ int main(int argc, char* argv[])
   size_t cc;
   for (cc = 5; (cc + argv_offset) < args.size(); cc++)
   {
-    std::string fname = args[argv_offset + cc];
+    const std::string& fname = args[argv_offset + cc];
     std::string moduleName = vtksys::SystemTools::GetFilenameWithoutLastExtension(fname);
     if (moduleName.empty())
     {

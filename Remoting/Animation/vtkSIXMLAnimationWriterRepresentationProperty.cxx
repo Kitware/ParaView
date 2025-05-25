@@ -22,7 +22,7 @@ bool vtkSIXMLAnimationWriterRepresentationProperty::Push(vtkSMMessage* message, 
 {
   assert(message->ExtensionSize(ProxyState::property) > offset);
 
-  const ProxyState_Property prop = message->GetExtension(ProxyState::property, offset);
+  const ProxyState_Property& prop = message->GetExtension(ProxyState::property, offset);
   assert(strcmp(prop.name().c_str(), this->GetXMLName()) == 0);
 
   const Variant& variant = prop.value();

@@ -226,7 +226,7 @@ struct vtkSMSessionProxyManagerInternals
     int max = newState->ExtensionSize(PXMRegistrationState::registered_proxy);
     for (int cc = 0; cc < max; cc++)
     {
-      PXMRegistrationState_Entry reg =
+      const PXMRegistrationState_Entry& reg =
         newState->GetExtension(PXMRegistrationState::registered_proxy, cc);
       vtkSMProxy* proxy = locator->LocateProxy(reg.global_id());
       if (proxy)

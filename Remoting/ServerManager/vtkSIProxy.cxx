@@ -122,7 +122,7 @@ void vtkSIProxy::Push(vtkSMMessage* message)
   // update log name, if changed.
   if (message->HasExtension(ProxyState::log_name))
   {
-    const auto log_name = message->GetExtension(ProxyState::log_name);
+    const auto& log_name = message->GetExtension(ProxyState::log_name);
     assert(!log_name.empty());
     this->SetLogName(log_name.c_str());
   }

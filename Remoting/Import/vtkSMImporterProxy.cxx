@@ -304,7 +304,7 @@ private:
       vtkSMPropertyHelper(repr, "TextureTransform").Set(transformProxy);
     }
     // copy display properties over to representation.
-    const auto displayProperty = actor["DisplayProperty"];
+    const auto& displayProperty = actor["DisplayProperty"];
     this->AssignPropertyArray<double, 3>("AmbientColor", displayProperty, repr);
     this->AssignPropertyArray<double, 3>("DiffuseColor", displayProperty, repr);
     this->AssignPropertyArray<double, 3>("SpecularColor", displayProperty, repr);
