@@ -16,7 +16,7 @@ vtkStandardNewMacro(vtkPVExtractCellsByType);
 
 namespace
 {
-static const std::map<std::string, unsigned int> SupportedCellTypes = { { "Vertex", VTK_VERTEX },
+const std::map<std::string, unsigned int> SupportedCellTypes = { { "Vertex", VTK_VERTEX },
   { "Polyvertex", VTK_POLY_VERTEX }, { "Line", VTK_LINE }, { "Polyline", VTK_POLY_LINE },
   { "Triangle", VTK_TRIANGLE }, { "Triangle Strip", VTK_TRIANGLE_STRIP },
   { "Polygon", VTK_POLYGON }, { "Pixel", VTK_PIXEL }, { "Quadrilateral", VTK_QUAD },

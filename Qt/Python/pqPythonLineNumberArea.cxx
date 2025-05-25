@@ -17,7 +17,7 @@
 namespace
 {
 //-----------------------------------------------------------------------------
-inline static std::uint32_t getNumberOfDigits(std::uint32_t i)
+inline std::uint32_t getNumberOfDigits(std::uint32_t i)
 {
   return i > 0 ? static_cast<std::int32_t>(std::log10(static_cast<float>(i)) + 1) : 1;
 }

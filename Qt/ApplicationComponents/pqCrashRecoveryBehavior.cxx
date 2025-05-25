@@ -28,7 +28,7 @@
 
 namespace
 {
-static const QString PARAVIEW_RUN_FILE = ".paraview-recovery.pvsm";
+const QString PARAVIEW_RUN_FILE = ".paraview-recovery.pvsm";
 
 QString recoveryState()
 {

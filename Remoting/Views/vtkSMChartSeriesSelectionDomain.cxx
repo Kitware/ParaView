@@ -37,7 +37,7 @@ vtkStandardNewMacro(vtkSMChartSeriesSelectionDomain);
 namespace
 {
 // match string like: "ACCL (0)" or "VEL (1)"
-static vtksys::RegularExpression PotentialComponentNameRe(".*\\([0-9]+\\)");
+vtksys::RegularExpression PotentialComponentNameRe(".*\\([0-9]+\\)");
 }
 
 class vtkSMChartSeriesSelectionDomain::vtkInternals

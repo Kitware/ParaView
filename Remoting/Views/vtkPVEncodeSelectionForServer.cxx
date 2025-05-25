@@ -16,7 +16,7 @@
 namespace
 {
 //-----------------------------------------------------------------------------
-static void vtkShrinkSelection(vtkSelection* sel)
+void vtkShrinkSelection(vtkSelection* sel)
 {
   std::map<void*, int> pixelCounts;
   unsigned int numNodes = sel->GetNumberOfNodes();

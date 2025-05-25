@@ -90,7 +90,7 @@ public:
 //------------------------------------------------------------------------------
 // Creates an array for attribute 'name' and adds it to 'grid'.
 template <typename T>
-static int addAttribute(
+int addAttribute(
   vtkSmartPointer<vtkUnstructuredGrid> grid, const char* name, vtkIdType size, int nComponents)
 {
   vtkSmartPointer<T> a = vtkSmartPointer<T>::New();

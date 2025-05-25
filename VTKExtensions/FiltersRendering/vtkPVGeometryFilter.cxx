@@ -70,8 +70,8 @@
 
 namespace
 {
-static constexpr const char* ORIGINAL_FACE_IDS = "RecoverWireframeOriginalFaceIds";
-static constexpr const char* TEMP_ORIGINAL_IDS = "__original_ids__";
+constexpr const char* ORIGINAL_FACE_IDS = "RecoverWireframeOriginalFaceIds";
+constexpr const char* TEMP_ORIGINAL_IDS = "__original_ids__";
 
 //----------------------------------------------------------------------------
 void AddOriginalIds(vtkDataSetAttributes* attributes, vtkIdType size)

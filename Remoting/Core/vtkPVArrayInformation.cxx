@@ -27,7 +27,7 @@
 
 namespace
 {
-static constexpr size_t MAX_STRING_VALUES = 6;
+constexpr size_t MAX_STRING_VALUES = 6;
 
 vtkTuple<double, 2> MergeRanges(const vtkTuple<double, 2>& r1, const vtkTuple<double, 2>& r2)
 {

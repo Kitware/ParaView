@@ -20,7 +20,7 @@ namespace
 {
 //-----------------------------------------------------------------------------
 using InstanceTrackerType = QList<pqDoubleLineEdit*>;
-static InstanceTrackerType* InstanceTracker = nullptr;
+InstanceTrackerType* InstanceTracker = nullptr;
 
 //-----------------------------------------------------------------------------
 void register_dle_instance(pqDoubleLineEdit* dle)

@@ -26,7 +26,7 @@
 
 namespace
 {
-static const QString CONFIG_FILENAME = "PropertyPanelVisibilities.json";
+const QString CONFIG_FILENAME = "PropertyPanelVisibilities.json";
 };
 
 pqPropertyPanelVisibilitiesBehavior::~pqPropertyPanelVisibilitiesBehavior() = default;

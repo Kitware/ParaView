@@ -14,7 +14,7 @@
 
 namespace
 {
-static vtksys::RegularExpression StatsArrayRe("^([^( ]+)\\((.+)\\)$");
+vtksys::RegularExpression StatsArrayRe("^([^( ]+)\\((.+)\\)$");
 }
 
 class vtkQuartileChartRepresentation::vtkQCRInternals

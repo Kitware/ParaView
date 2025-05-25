@@ -19,7 +19,7 @@
 
 namespace
 {
-static QString SETTINGS_CATEGORY_KEY = QStringLiteral("categories.%1/");
+QString SETTINGS_CATEGORY_KEY = QStringLiteral("categories.%1/");
 
 QString makeUniqueString(const QString& suggestedString, QStringList list)
 {

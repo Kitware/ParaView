@@ -5,7 +5,7 @@
 
 namespace
 {
-static unsigned int counter = 0;
+unsigned int counter = 0;
 }
 
 pqSMProxySchwartzCounter::pqSMProxySchwartzCounter()

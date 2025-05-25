@@ -49,7 +49,7 @@
 
 namespace
 {
-static const int PARAVIEW_DEFAULT_LAYOUT_SPACING = 4;
+const int PARAVIEW_DEFAULT_LAYOUT_SPACING = 4;
 }
 
 class pqMultiViewWidget::pqInternals

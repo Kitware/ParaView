@@ -111,7 +111,7 @@ struct PointWithIndex
   int Idx;
 };
 
-constexpr static int MAX_VARS = 100;
+constexpr int MAX_VARS = 100;
 
 struct Dimset
 {

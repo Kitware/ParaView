@@ -36,11 +36,11 @@
 namespace
 {
 typedef vtkTypeInt64 Fixed64;
-static inline Fixed64 toFixed(int i)
+inline Fixed64 toFixed(int i)
 {
   return (Fixed64)i * 256;
 }
-static inline int fRound(Fixed64 i)
+inline int fRound(Fixed64 i)
 {
   return (i % 256 < 128) ? i / 256 : 1 + i / 256;
 }

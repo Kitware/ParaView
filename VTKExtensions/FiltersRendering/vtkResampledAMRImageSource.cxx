@@ -23,7 +23,7 @@
 
 namespace
 {
-static inline vtkIdType FindCell(vtkImageData* image, double point[3])
+inline vtkIdType FindCell(vtkImageData* image, double point[3])
 {
   double pcoords[3];
   int subid = 0;

@@ -1015,7 +1015,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
 //----------------------------------------------------------------------------
 namespace
 {
-static void AddLabelIfUnoccluded(double x, const vtkColor3ub& color, const std::string& label,
+void AddLabelIfUnoccluded(double x, const vtkColor3ub& color, const std::string& label,
   vtkScalarBarActorInternal* scalarBar)
 {
   // Don't place the label if the nearest existing labels are within 1% of

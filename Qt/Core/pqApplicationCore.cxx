@@ -82,7 +82,7 @@
 //-----------------------------------------------------------------------------
 namespace
 {
-static const QString DEFAULT_SAVE_STATE_FORMAT_KEY = "GeneralSettings.DefaultSaveStateFormat";
+const QString DEFAULT_SAVE_STATE_FORMAT_KEY = "GeneralSettings.DefaultSaveStateFormat";
 };
 
 //-----------------------------------------------------------------------------

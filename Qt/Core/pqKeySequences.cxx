@@ -28,7 +28,7 @@ struct Dictionary
   QMap<QKeySequence, Shortcuts> Data;
 };
 
-static Dictionary g_keys;
+Dictionary g_keys;
 
 } // anonymous namespace
 

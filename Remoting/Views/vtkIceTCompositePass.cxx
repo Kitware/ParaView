@@ -52,8 +52,8 @@ struct vtkIceTCompositePass::IceTDrawParams
 
 namespace
 {
-static vtkIceTCompositePass* IceTDrawCallbackHandle = nullptr;
-static const vtkRenderState* IceTDrawCallbackState = nullptr;
+vtkIceTCompositePass* IceTDrawCallbackHandle = nullptr;
+const vtkRenderState* IceTDrawCallbackState = nullptr;
 
 void IceTDrawCallback(const IceTDouble* projection_matrix, const IceTDouble* modelview_matrix,
   const IceTFloat* background_color, const IceTInt* readback_viewport, IceTImage result)

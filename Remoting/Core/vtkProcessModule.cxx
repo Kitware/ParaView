@@ -69,8 +69,7 @@ private:
 };
 vtkStandardNewMacro(vtkPVGenericOutputWindow);
 
-static void UpdateThreadName(
-  vtkProcessModule::ProcessTypes type, vtkMultiProcessController* controller)
+void UpdateThreadName(vtkProcessModule::ProcessTypes type, vtkMultiProcessController* controller)
 {
   // set thread name based on application.
   std::string tname_suffix;
