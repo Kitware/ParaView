@@ -110,7 +110,7 @@ public:
   template <typename OtherValue>
   void ImplicitShallowCopy(vtkMultiDimensionalArray<OtherValue>* other)
   {
-    static_assert(std::is_same<OtherValue, ValueType>::value,
+    static_assert(std::is_same_v<OtherValue, ValueType>,
       "Cannot copy multidimensional array from another underlying type");
     this->SetName(other->GetName());
     auto backend = other->GetBackend();
