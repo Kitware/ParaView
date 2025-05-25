@@ -105,7 +105,7 @@ void pqProxyCategory::copyAttributes(pqProxyCategory* other)
 void pqProxyCategory::deepCopy(pqProxyCategory* other)
 {
   this->copyAttributes(other);
-  for (auto proxyName : other->OrderedProxies)
+  for (const auto& proxyName : other->OrderedProxies)
   {
     this->addProxy(new pqProxyInfo(this, other->Proxies[proxyName]));
   }
@@ -123,7 +123,7 @@ void pqProxyCategory::addCategory(pqProxyCategory* category)
 {
   category->setParent(this);
 
-  for (auto categoryName : this->SubCategories.keys())
+  for (const auto& categoryName : this->SubCategories.keys())
   {
     if (this->SubCategories[categoryName] == category)
     {
@@ -461,7 +461,7 @@ QMap<QString, pqProxyCategory*> pqProxyCategory::getSubCategoriesRecursive()
   for (auto cat : this->SubCategories)
   {
     auto subCategories = cat->getSubCategoriesRecursive();
-    for (auto subCategoryName : subCategories.keys())
+    for (const auto& subCategoryName : subCategories.keys())
     {
       categories.insert(subCategoryName, subCategories[subCategoryName]);
     }

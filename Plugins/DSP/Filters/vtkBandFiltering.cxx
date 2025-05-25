@@ -348,7 +348,7 @@ int vtkBandFiltering::RequestData(
     }
 
     vtkIdType iArr = 0;
-    for (auto aggregator : aggregators)
+    for (const auto& aggregator : aggregators)
     {
       (*aggregator)(result->GetRowData()->GetArray(iArr));
       iArr++;
@@ -356,7 +356,7 @@ int vtkBandFiltering::RequestData(
   }
 
   vtkNew<vtkTable> output;
-  for (auto aggregator : aggregators)
+  for (const auto& aggregator : aggregators)
   {
     output->GetRowData()->AddArray(aggregator->GetAggregate());
   }

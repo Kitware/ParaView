@@ -64,7 +64,7 @@ public:
       if (!xmls.empty())
       {
         stream << " >\n";
-        for (std::string xml : xmls)
+        for (const std::string& xml : xmls)
         {
           stream << "<XML filename=\"" << xml << "\" />\n";
         }

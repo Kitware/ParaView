@@ -885,7 +885,7 @@ QString pqApplicationCore::getTranslationsPathFromInterfaceLanguage(QString pref
   QProcessEnvironment options = QProcessEnvironment::systemEnvironment();
   if (options.contains("PV_TRANSLATIONS_DIR"))
   {
-    for (QString path : options.value("PV_TRANSLATIONS_DIR").split(":"))
+    for (const QString& path : options.value("PV_TRANSLATIONS_DIR").split(":"))
     {
       paths.append(QDir(path));
     }
@@ -894,9 +894,9 @@ QString pqApplicationCore::getTranslationsPathFromInterfaceLanguage(QString pref
   /* PV_TRANSLATIONS_DIR `override` translationsPath's qm files,
     thus translationsPath has to be added lastly */
   paths.append(translationsPath);
-  for (QDir directory : paths)
+  for (const QDir& directory : paths)
   {
-    for (QFileInfo fileInfo : directory.entryInfoList(QDir::Files))
+    for (const QFileInfo& fileInfo : directory.entryInfoList(QDir::Files))
     {
       if (fileInfo.suffix() == "qm")
       {

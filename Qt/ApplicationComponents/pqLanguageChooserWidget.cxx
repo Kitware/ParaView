@@ -32,7 +32,7 @@ pqLanguageChooserWidget::pqLanguageChooserWidget(
   QProcessEnvironment options = QProcessEnvironment::systemEnvironment();
   if (options.contains("PV_TRANSLATIONS_DIR"))
   {
-    for (QString path : options.value("PV_TRANSLATIONS_DIR").split(":"))
+    for (const QString& path : options.value("PV_TRANSLATIONS_DIR").split(":"))
     {
       paths.append(QDir(path));
     }
@@ -45,9 +45,9 @@ pqLanguageChooserWidget::pqLanguageChooserWidget(
   /* en is the language used in source string, therefore it does not need a translation file
     and is always available */
   this->ComboBox->addItem(QLocale("en").nativeLanguageName(), QVariant("en"));
-  for (QDir directory : paths)
+  for (const QDir& directory : paths)
   {
-    for (QFileInfo fileInfo : directory.entryInfoList(QDir::Files))
+    for (const QFileInfo& fileInfo : directory.entryInfoList(QDir::Files))
     {
       QString localeString =
         fileInfo.completeBaseName().mid(fileInfo.completeBaseName().indexOf("_") + 1);

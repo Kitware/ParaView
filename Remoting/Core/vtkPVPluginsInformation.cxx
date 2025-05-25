@@ -133,7 +133,7 @@ void operator<<(vtkClientServerStream& stream, const vtkItem& item)
          << item.Description.c_str() << item.Version.c_str() << item.AutoLoad << item.DelayedLoad;
 
   stream << item.XMLs.size();
-  for (std::string xml : item.XMLs)
+  for (const std::string& xml : item.XMLs)
   {
     stream << xml.c_str();
   }

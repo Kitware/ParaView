@@ -43,7 +43,7 @@ public:
   {
     this->cleanCache();
     auto toolbarName = this->MenuManager->getToolbarName(category);
-    for (auto toolbar : this->CachedToolBars)
+    for (const auto& toolbar : this->CachedToolBars)
     {
       if (toolbar->objectName() == toolbarName)
       {
@@ -99,7 +99,7 @@ public:
    */
   void removeObsoleteToolbars(QList<QToolBar*> newToolbars)
   {
-    for (auto toolbar : this->CachedToolBars)
+    for (const auto& toolbar : this->CachedToolBars)
     {
       if (!newToolbars.contains(toolbar))
       {

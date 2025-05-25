@@ -178,7 +178,7 @@ void pqArrayListWidget::updateProperty()
     QScopedValueRollback<bool> rollback(this->UpdatingProperty, true);
     QList<QVariant> values;
     std::vector<std::pair<QString, QString>> annotations = this->Model->annotations();
-    for (auto annotation : annotations)
+    for (const auto& annotation : annotations)
     {
       values.push_back(annotation.first);
       values.push_back(annotation.second);

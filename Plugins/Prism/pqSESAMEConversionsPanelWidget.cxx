@@ -280,7 +280,7 @@ public:
     auto conversionPanelWidget = qobject_cast<pqSESAMEConversionsPanelWidget*>(this->parent());
     if (conversionPanelWidget)
     {
-      for (auto conversionOption : conversionPanelWidget->getConversionOptions())
+      for (const auto& conversionOption : conversionPanelWidget->getConversionOptions())
       {
         paramsList << conversionOption.first;
       }

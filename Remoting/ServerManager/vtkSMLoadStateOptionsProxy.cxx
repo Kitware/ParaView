@@ -122,7 +122,7 @@ public:
 
   std::string GetExposedPropertyName(int id, const std::string& pname) const
   {
-    for (auto pair : this->ExposedPropertyNameMap)
+    for (const auto& pair : this->ExposedPropertyNameMap)
     {
       const auto& tuple = pair.second;
       if (tuple.first == id &&

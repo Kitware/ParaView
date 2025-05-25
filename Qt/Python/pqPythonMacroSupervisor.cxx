@@ -69,7 +69,7 @@ public:
 
     auto fileBaseName = QFileInfo(macroPath).completeBaseName();
     QStringList filter;
-    for (auto extension : pqIconListModel::getSupportedIconFormats())
+    for (const auto& extension : pqIconListModel::getSupportedIconFormats())
     {
       filter << fileBaseName + extension;
     }
@@ -434,13 +434,13 @@ void pqPythonMacroSupervisor::onDeleteMacroTriggered()
     QDir dir = QFileInfo(filename).absoluteDir();
     QStringList filter;
     filter << QFileInfo(filename).completeBaseName() + ".py";
-    for (auto extension : pqIconListModel::getSupportedIconFormats())
+    for (const auto& extension : pqIconListModel::getSupportedIconFormats())
     {
       filter << QFileInfo(filename).completeBaseName() + extension;
     }
     auto fileList = dir.entryInfoList(filter);
 
-    for (auto file : fileList)
+    for (const auto& file : fileList)
     {
       pqPythonMacroSupervisor::hideFile(file.absoluteFilePath());
     }

@@ -180,7 +180,7 @@ int vtkDSPTableFFT::RequestData(
     }
 
     vtkIdType iArr = 0;
-    for (auto aggregator : aggregators)
+    for (const auto& aggregator : aggregators)
     {
       (*aggregator)(result->GetRowData()->GetArray(iArr));
       iArr++;
@@ -188,7 +188,7 @@ int vtkDSPTableFFT::RequestData(
   }
 
   vtkNew<vtkTable> output;
-  for (auto aggregator : aggregators)
+  for (const auto& aggregator : aggregators)
   {
     output->GetRowData()->AddArray(aggregator->GetAggregate());
   }

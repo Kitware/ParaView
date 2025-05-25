@@ -16,7 +16,7 @@ void pqExpressionsManager::storeToSettings(const QList<pqExpression>& expression
   // cleanup previous content.
   settings->remove("");
   QString settingString;
-  for (auto expr : expressions)
+  for (const auto& expr : expressions)
   {
     settingString += QString("%1;%2;%3;").arg(expr.Group).arg(expr.Name).arg(expr.Value);
   }
@@ -55,7 +55,7 @@ QList<pqExpressionsManager::pqExpression> pqExpressionsManager::getExpressionsFr
 {
   QList<pqExpression> settings = pqExpressionsManager::getExpressionsFromSettings();
   QList<pqExpression> expressions;
-  for (auto expr : settings)
+  for (const auto& expr : settings)
   {
     if (expr.Group == group)
     {
