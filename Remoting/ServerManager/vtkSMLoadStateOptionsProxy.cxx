@@ -604,7 +604,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
           vtkInternals::PropertyInfo& info = pair2.second;
           if (pair2.first.find("FilePattern") == std::string::npos)
           {
-            bool path = pair2.first.compare("FilePrefix") == 0;
+            bool path = pair2.first == "FilePrefix";
             this->LocateFilesInDirectory(info.FilePaths, path, this->OnlyUseFilesInDataDirectory);
           }
         }
