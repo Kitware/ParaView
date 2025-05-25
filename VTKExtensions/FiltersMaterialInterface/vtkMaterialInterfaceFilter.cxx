@@ -6290,7 +6290,7 @@ void vtkMaterialInterfaceFilter::ResolveLocalFragmentGeometry()
   // Resize the id vector to reflect loss of removed ids.
   resolvedFragmentIds.erase(shortEnd, end);
   // Squeeze
-  vector<int>(resolvedFragmentIds).swap(resolvedFragmentIds);
+  resolvedFragmentIds.shrink_to_fit();
 }
 
 //----------------------------------------------------------------------------
@@ -8026,7 +8026,7 @@ void vtkMaterialInterfaceFilter::PrepareForResolveEquivalences()
     this->FragmentSums[i]->Squeeze();
   }
   // geometry container
-  vector<vtkPolyData*>(this->FragmentMeshes).swap(this->FragmentMeshes);
+  this->FragmentMeshes.shrink_to_fit();
 }
 //----------------------------------------------------------------------------
 void vtkMaterialInterfaceFilter::ResolveEquivalences()

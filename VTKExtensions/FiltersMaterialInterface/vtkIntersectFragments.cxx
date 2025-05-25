@@ -334,7 +334,7 @@ int vtkIntersectFragments::Intersect()
       }
     }
     // free extra memory
-    vector<int>(ids).swap(ids);
+    ids.shrink_to_fit();
 
     this->Progress += this->ProgressIncrement;
     this->UpdateProgress(this->Progress);
