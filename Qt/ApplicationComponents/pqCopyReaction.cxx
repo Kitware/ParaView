@@ -183,6 +183,7 @@ pqProxy* getPipelineRoot(const pqProxySelection& sel)
   }
 
   // Count the number of input connections of each source
+  // NOLINTNEXTLINE(bugprone-nondeterministic-pointer-iteration-order)
   for (auto& pair : connections)
   {
     pqProxy* proxy = pair.first;
@@ -212,6 +213,7 @@ pqProxy* getPipelineRoot(const pqProxySelection& sel)
   }
 
   pqProxy* root = nullptr;
+  // NOLINTNEXTLINE(bugprone-nondeterministic-pointer-iteration-order)
   for (auto& pair : connections)
   {
     pqProxy* proxy = pair.first;
