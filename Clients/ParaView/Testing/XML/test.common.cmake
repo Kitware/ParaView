@@ -1432,6 +1432,7 @@ list(APPEND TESTS_WITH_BASELINES
   ChartAxisRangeAndLabels.xml
   CheckableHeader.xml
   Clip.xml
+  ClipExactBoxNonInverted.xml
   CrinkleClip.xml
   ColorAnnotationsVisibilitiesAndOpacities.xml
   ColorEditorControls.xml
