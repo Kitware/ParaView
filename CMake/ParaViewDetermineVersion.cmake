@@ -47,7 +47,22 @@ function(determine_version source_dir git_command var_prefix)
   unset(tmp_VERSION)
   extract_version_components(${source_dir} "${output}" tmp)
   if(DEFINED tmp_VERSION)
-    if (NOT "${tmp_VERSION}" STREQUAL "${${var_prefix}_VERSION}")
+    if (${var_prefix}_VERSION_PATCH GREATER "20200101")
+      if (NOT tmp_VERSION_MAJOR STREQUAL ${var_prefix}_VERSION_MAJOR OR
+          NOT tmp_VERSION_MINOR STREQUAL ${var_prefix}_VERSION_MINOR)
+        message(WARNING
+          "Version from git (${tmp_VERSION}) disagrees with hard coded version (${${var_prefix}_VERSION}). Either update the git tags or version.txt.")
+        if (NOT "$ENV{CI}" STREQUAL "")
+          message(WARNING
+            "Please update your fork tags, using this command: `git fetch origin --tags && git push gitlab --tags`.")
+        endif ()
+      endif ()
+      # git describe rely on tags that do not have access to the patch version, correct the ${var_prefix}_VERSION accordingly
+      if (${var_prefix}_VERSION_PATCH GREATER tmp_VERSION_PATCH)
+        set(tmp_VERSION_PATCH "${${var_prefix}_VERSION_PATCH}")
+        set(tmp_VERSION "${tmp_VERSION_MAJOR}.${tmp_VERSION_MINOR}.${tmp_VERSION_PATCH}")
+      endif ()
+    elseif (NOT "${tmp_VERSION}" STREQUAL "${${var_prefix}_VERSION}")
       message(WARNING
         "Version from git (${tmp_VERSION}) disagrees with hard coded version (${${var_prefix}_VERSION}). Either update the git tags or version.txt.")
       if (NOT "$ENV{CI}" STREQUAL "")
