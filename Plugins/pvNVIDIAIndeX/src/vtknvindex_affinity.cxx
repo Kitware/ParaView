@@ -377,7 +377,7 @@ mi::Sint32 vtknvindex_KDTree_affinity::build_internal(
       same_rank = false;
   }
 
-  m_kdtree.push_back(kd_node());
+  m_kdtree.emplace_back();
   const mi::Uint32 node_idx = static_cast<mi::Uint32>(m_kdtree.size() - 1);
 
   if (same_rank)

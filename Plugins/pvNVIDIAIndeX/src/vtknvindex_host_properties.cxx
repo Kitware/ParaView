@@ -492,12 +492,12 @@ void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, mi::Sint32 ra
   if (shmit == m_shmlist.end())
   {
     std::vector<shm_info> shmlist;
-    shmlist.push_back(shm_info(rank_id, m_hostid, shmname, shmbbox, shmsize, subset_ptr));
+    shmlist.emplace_back(rank_id, m_hostid, shmname, shmbbox, shmsize, subset_ptr);
     m_shmlist[time_step] = std::move(shmlist);
   }
   else
   {
-    shmit->second.push_back(shm_info(rank_id, m_hostid, shmname, shmbbox, shmsize, subset_ptr));
+    shmit->second.emplace_back(rank_id, m_hostid, shmname, shmbbox, shmsize, subset_ptr);
   }
 
   // TODO : Change this to reflect the actual subcube size.
