@@ -123,6 +123,13 @@ ParaViewMainWindow::ParaViewMainWindow()
   // show output widget if we received an error message.
   this->connect(this->Internals->outputWidget, SIGNAL(messageDisplayed(const QString&, int)),
     SLOT(handleMessage(const QString&, int)));
+  // send the output message information to the status bar.
+  this->connect(this->Internals->outputWidget, SIGNAL(messageDisplayed(const QString&, int)),
+    this->Internals->statusbar, SLOT(handleMessage(const QString&, int)));
+  this->connect(this->Internals->outputWidget, SIGNAL(cleared()), this->Internals->statusbar,
+    SLOT(resetMessageIndicators()));
+  this->connect(
+    this->Internals->statusbar, SIGNAL(messageIndicatorPressed()), this, SLOT(showOutputWidget()));
 
   // Setup default GUI layout.
   this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
@@ -401,4 +408,11 @@ void ParaViewMainWindow::handleMessage(const QString&, int type)
   {
     dock->raise();
   }
+}
+
+//-----------------------------------------------------------------------------
+void ParaViewMainWindow::showOutputWidget()
+{
+  this->Internals->outputWidgetDock->show();
+  this->Internals->outputWidgetDock->raise();
 }

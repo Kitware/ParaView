@@ -33,6 +33,9 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
+
+private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  void showOutputWidget();
 };
 
 #endif
