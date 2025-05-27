@@ -83,7 +83,7 @@
                  base_proxygroup="filters"
                  name="AppendLocationAttributes">
 
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'Coordinates'. Please consider using that instead.
       </Deprecated>
     </SourceProxy>
@@ -297,7 +297,7 @@
                  base_proxyname="BlockIds"
                  base_proxygroup="filters"
                  name="BlockIdScalars">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This filter has been replaced by 'BlockIds'.
         Please consider using that instead.
       </Deprecated>
@@ -971,7 +971,7 @@
                  base_proxyname="OverlappingAMRLevelIds"
                  base_proxygroup="filters"
                  name="OverlappingLevelIdScalars">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'OverlappingAMRLevelIds'. Please consider using that instead.
       </Deprecated>
       <!-- End GroupIdScalars -->
@@ -1552,7 +1552,7 @@
                  base_proxyname="SpatioTemporalHarmonics"
                  base_proxygroup="filters"
                  name="GenerateSpatioTemporalHarmonics">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'SpatioTemporalHarmonics'. Please consider using that instead.
       </Deprecated>
     </SourceProxy>

@@ -683,7 +683,7 @@
     <SourceProxy class="vtkHyperTreeGridGhostCellsGenerator"
                  label="HyperTreeGrid Ghost Cells Generator"
                  name="HyperTreeGridGhostCellsGenerator">
-      <Deprecated deprecated_in="5.14" to_remove_in="5.16">
+      <Deprecated deprecated_in="6.0" to_remove_in="6.2">
         This filter has been replaced by 'Ghost Cells', that supports HyperTree Grids.
         Please consider using that instead.
       </Deprecated>
@@ -1292,7 +1292,7 @@
                  base_proxyname="SurfaceNormals"
                  base_proxygroup="filters"
                  name="PolyDataNormals">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'SurfaceNormals'. Please consider using that instead.
       </Deprecated>
       <!-- End  PolyDataNormals -->
@@ -1302,7 +1302,7 @@
     <SourceProxy class="vtkPReflectionFilter"
                  label="Reflect"
                  name="ReflectionFilter">
-      <Deprecated deprecated_in="5.14" to_remove_in="5.16">
+      <Deprecated deprecated_in="6.0" to_remove_in="6.2">
         This filter has been replaced by 'Axis-Aligned Reflect'.
         Please consider using that instead.
       </Deprecated>

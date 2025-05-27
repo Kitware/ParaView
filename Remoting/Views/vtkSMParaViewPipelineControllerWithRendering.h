@@ -178,7 +178,7 @@ public:
   /**
    * Control how scalar bar visibility is updated by the Hide call.
    */
-  PARAVIEW_DEPRECATED_IN_5_14_0(
+  PARAVIEW_DEPRECATED_IN_6_0_0(
     "Use vtkPVGeneralSettings::SetScalarBarMode(AUTOMATICALLY_HIDE_SCALAR_BARS) instead")
   static void SetHideScalarBarOnHide(bool);
 
@@ -189,10 +189,10 @@ public:
    * a source, then any filter that you connect to it should be transformed as
    * well.
    */
-  PARAVIEW_DEPRECATED_IN_5_14_0(
+  PARAVIEW_DEPRECATED_IN_6_0_0(
     "Use vtkPVGeneralSettings::SetInheritRepresentationProperties() instead")
   static void SetInheritRepresentationProperties(bool);
-  PARAVIEW_DEPRECATED_IN_5_14_0(
+  PARAVIEW_DEPRECATED_IN_6_0_0(
     "Use vtkPVGeneralSettings::GetInheritRepresentationProperties() instead")
   static bool GetInheritRepresentationProperties();
   ///@}

@@ -17,7 +17,7 @@
 #include "vtkParaViewDeprecation.h" // For deprecation macro
 
 template <class Scalar>
-class PARAVIEW_DEPRECATED_IN_5_14_0(
+class PARAVIEW_DEPRECATED_IN_6_0_0(
   "Please use the SetArray functionality of `vtkAOSDataArrayTemplate` instead.")
   vtkCPMappedVectorArrayTemplate : public vtkMappedDataArray<Scalar>
 {

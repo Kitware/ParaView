@@ -62,7 +62,7 @@ public:
    * This fires `vtkPVPluginTracker::RegisterAvailablePluginEvent` to notify a
    * new plugin has been made available.
    */
-  PARAVIEW_DEPRECATED_IN_5_14_0("Use LoadPluginConfigurationXML instead.")
+  PARAVIEW_DEPRECATED_IN_6_0_0("Use LoadPluginConfigurationXML instead.")
   unsigned int RegisterAvailablePlugin(const char* filename);
 
   ///@{

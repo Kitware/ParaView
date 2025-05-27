@@ -13,10 +13,10 @@
 #define vtkPVPlane_h
 
 #include "vtkPVVTKExtensionsMiscModule.h" // Needed for exports
-#include "vtkParaViewDeprecation.h"       // For PARAVIEW_DEPRECATED_IN_5_14_0
+#include "vtkParaViewDeprecation.h"       // For PARAVIEW_DEPRECATED_IN_6_0_0
 #include "vtkPlane.h"
 
-class PARAVIEW_DEPRECATED_IN_5_14_0(
+class PARAVIEW_DEPRECATED_IN_6_0_0(
   "Use vtkPlane instead (vtkPlane now supports AxisAligned and Offset).")
   VTKPVVTKEXTENSIONSMISC_EXPORT vtkPVPlane : public vtkPlane
 {
