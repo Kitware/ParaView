@@ -2067,7 +2067,7 @@ struct Process_5_12_to_5_13
 };
 
 //===========================================================================
-struct Process_5_13_to_5_14
+struct Process_5_13_to_6_0
 {
   bool operator()(xml_document& document)
   {
@@ -2497,7 +2497,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
 
   if (status && (version < vtkSMVersion(5, 14, 0)))
   {
-    Process_5_13_to_5_14 converter;
+    Process_5_13_to_6_0 converter;
     status = converter(document);
     version = vtkSMVersion(5, 14, 0);
   }

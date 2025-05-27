@@ -29,7 +29,7 @@
 #include <cmath>
 #include <vtksys/SystemTools.hxx>
 
-// PARAVIEW_DEPRECATED_IN_5_14_0
+// PARAVIEW_DEPRECATED_IN_6_0_0
 bool vtkPVXYChartView::IgnoreNegativeLogAxisWarning = false;
 
 class vtkPVXYChartView::vtkInternals

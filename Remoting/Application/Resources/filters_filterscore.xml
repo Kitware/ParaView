@@ -31,7 +31,7 @@
                  base_proxyname="PolylineLength"
                  base_proxygroup="filters"
                  name="AppendArcLength">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'PolylineLength'. Please consider using that instead.
       </Deprecated>
     </SourceProxy>
@@ -1118,7 +1118,7 @@ found and the point will be rejected.</Documentation>
                  base_proxyname="PointAndCellIds"
                  base_proxygroup="filters"
                  name="GenerateIdScalars">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'PointAndCellIds'. Please consider using that instead.
       </Deprecated>
       <!-- End GenerateIdScalars -->
@@ -1363,7 +1363,7 @@ found and the point will be rejected.</Documentation>
                  base_proxyname="SurfaceTangents"
                  base_proxygroup="filters"
                  name="PolyDataTangents">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'SurfaceTangents'. Please consider using that instead.
       </Deprecated>
       <!-- End  PolyDataTangents -->

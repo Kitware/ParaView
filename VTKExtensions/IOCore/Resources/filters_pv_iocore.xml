@@ -41,7 +41,7 @@
       class="vtkAdditionalFieldReader"
       base_proxyname="FieldArraysFromFile"
       base_proxygroup="filters">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'FieldArrayFromFile'. Please consider using that instead.
       </Deprecated>
     </SourceProxy>

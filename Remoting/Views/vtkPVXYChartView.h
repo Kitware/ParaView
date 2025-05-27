@@ -484,9 +484,9 @@ public:
    * When plotting data with nonpositive values, ignore the standard warning
    * and draw only the data with positive values.
    */
-  PARAVIEW_DEPRECATED_IN_5_14_0("Use vtkPVGeneralSettings::SetIgnoreNegativeLogAxisWarning instead")
+  PARAVIEW_DEPRECATED_IN_6_0_0("Use vtkPVGeneralSettings::SetIgnoreNegativeLogAxisWarning instead")
   static void SetIgnoreNegativeLogAxisWarning(bool val);
-  PARAVIEW_DEPRECATED_IN_5_14_0("Use vtkPVGeneralSettings::GetIgnoreNegativeLogAxisWarning instead")
+  PARAVIEW_DEPRECATED_IN_6_0_0("Use vtkPVGeneralSettings::GetIgnoreNegativeLogAxisWarning instead")
   static bool GetIgnoreNegativeLogAxisWarning();
 
   /**
@@ -539,7 +539,7 @@ protected:
   bool HideTimeMarker;
   bool SortByXAxis;
 
-  // PARAVIEW_DEPRECATED_IN_5_14_0
+  // PARAVIEW_DEPRECATED_IN_6_0_0
   static bool IgnoreNegativeLogAxisWarning;
 
 private:

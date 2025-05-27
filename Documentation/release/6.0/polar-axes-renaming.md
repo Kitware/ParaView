@@ -11,4 +11,4 @@ Different properties of the **PolarAxes** have been renamed:
 | **RadialTitleOffset** | **RadialLabelOffset**|
 | **PolarTicksVisibility** | **AllTicksVisibility**|
 
-Full backwards compatibility with state files and Python scripts from versions of ParaView before version 5.14.0 has been provided.
+Full backwards compatibility with state files and Python scripts from versions of ParaView before version 6.0.0 has been provided.
