@@ -28,8 +28,13 @@ pqFlipBookReaction::pqFlipBookReaction(
   , StepAction(stepAction)
   , PlayDelay(playDelay)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   this->StepActionMode = pqKeySequences::instance().addModalShortcut(
     QKeySequence(Qt::Key_Space), this->StepAction, toggleAction->parentWidget());
+#else
+  this->StepActionMode = pqKeySequences::instance().addModalShortcut(
+    QKeySequence(Qt::Key_Space), this->StepAction, qobject_cast<QWidget*>(toggleAction->parent()));
+#endif
 
   QObject::connect(toggleAction, SIGNAL(toggled(bool)), this, SLOT(onToggled(bool)));
   QObject::connect(playAction, SIGNAL(triggered()), this, SLOT(onPlay()));
