@@ -5395,7 +5395,7 @@
         </Domain>
       </Property>
     </Proxy>
-    <Proxy group="representations" type="UniformGridRepresentation" id="10572" servers="21">
+    <Proxy group="representations" type="RectilinearGridRepresentation" id="10572" servers="21">
       <Property name="DataAxesGrid" id="10572.DataAxesGrid" number_of_elements="1">
         <Proxy value="10329"/>
         <Domain name="proxy_list" id="10572.DataAxesGrid.proxy_list">
@@ -8331,21 +8331,21 @@
       <Item id="10928" name="RepresentationAnimationHelper"/>
     </ProxyCollection>
     <ProxyCollection name="pq_helper_proxies.10572">
-      <Item id="10329" name="DataAxesGrid" logname="UniformGridRepresentation1/DataAxesGrid/GridAxesRepresentation"/>
-      <Item id="10443" name="GlyphType" logname="UniformGridRepresentation1/Glyph3DRepresentation/GlyphType/ArrowSource"/>
-      <Item id="10454" name="GlyphType" logname="UniformGridRepresentation1/Glyph3DRepresentation/GlyphType/ConeSource"/>
-      <Item id="10465" name="GlyphType" logname="UniformGridRepresentation1/Glyph3DRepresentation/GlyphType/CubeSource"/>
-      <Item id="10476" name="GlyphType" logname="UniformGridRepresentation1/Glyph3DRepresentation/GlyphType/CylinderSource"/>
-      <Item id="10487" name="GlyphType" logname="UniformGridRepresentation1/Glyph3DRepresentation/GlyphType/LineSource"/>
-      <Item id="10498" name="GlyphType" logname="UniformGridRepresentation1/Glyph3DRepresentation/GlyphType/SphereSource"/>
-      <Item id="10509" name="GlyphType" logname="UniformGridRepresentation1/Glyph3DRepresentation/GlyphType/GlyphSource2D"/>
-      <Item id="10520" name="GlyphType" logname="UniformGridRepresentation1/Glyph3DRepresentation/GlyphType/PipelineConnection"/>
-      <Item id="10534" name="OSPRayScaleFunction" logname="UniformGridRepresentation1/SurfaceRepresentation/OSPRayScaleFunction/PiecewiseFunction"/>
-      <Item id="10535" name="OpacityTransferFunction" logname="UniformGridRepresentation1/PointGaussianRepresentation/OpacityTransferFunction/PiecewiseFunction"/>
-      <Item id="10432" name="PolarAxes" logname="UniformGridRepresentation1/PolarAxes/PolarAxesRepresentation"/>
-      <Item id="10536" name="ScaleTransferFunction" logname="UniformGridRepresentation1/PointGaussianRepresentation/ScaleTransferFunction/PiecewiseFunction"/>
-      <Item id="10537" name="SliceFunction" logname="UniformGridRepresentation1/VolumeRepresentation/SliceFunction/Plane"/>
-      <Item id="10538" name="TextureTransform" logname="UniformGridRepresentation1/SurfaceRepresentation/TextureTransform/Transform2"/>
+      <Item id="10329" name="DataAxesGrid" logname="RectilinearGridRepresentation1/DataAxesGrid/GridAxesRepresentation"/>
+      <Item id="10443" name="GlyphType" logname="RectilinearGridRepresentation1/Glyph3DRepresentation/GlyphType/ArrowSource"/>
+      <Item id="10454" name="GlyphType" logname="RectilinearGridRepresentation1/Glyph3DRepresentation/GlyphType/ConeSource"/>
+      <Item id="10465" name="GlyphType" logname="RectilinearGridRepresentation1/Glyph3DRepresentation/GlyphType/CubeSource"/>
+      <Item id="10476" name="GlyphType" logname="RectilinearGridRepresentation1/Glyph3DRepresentation/GlyphType/CylinderSource"/>
+      <Item id="10487" name="GlyphType" logname="RectilinearGridRepresentation1/Glyph3DRepresentation/GlyphType/LineSource"/>
+      <Item id="10498" name="GlyphType" logname="RectilinearGridRepresentation1/Glyph3DRepresentation/GlyphType/SphereSource"/>
+      <Item id="10509" name="GlyphType" logname="RectilinearGridRepresentation1/Glyph3DRepresentation/GlyphType/GlyphSource2D"/>
+      <Item id="10520" name="GlyphType" logname="RectilinearGridRepresentation1/Glyph3DRepresentation/GlyphType/PipelineConnection"/>
+      <Item id="10534" name="OSPRayScaleFunction" logname="RectilinearGridRepresentation1/SurfaceRepresentation/OSPRayScaleFunction/PiecewiseFunction"/>
+      <Item id="10535" name="OpacityTransferFunction" logname="RectilinearGridRepresentation1/PointGaussianRepresentation/OpacityTransferFunction/PiecewiseFunction"/>
+      <Item id="10432" name="PolarAxes" logname="RectilinearGridRepresentation1/PolarAxes/PolarAxesRepresentation"/>
+      <Item id="10536" name="ScaleTransferFunction" logname="RectilinearGridRepresentation1/PointGaussianRepresentation/ScaleTransferFunction/PiecewiseFunction"/>
+      <Item id="10537" name="SliceFunction" logname="RectilinearGridRepresentation1/VolumeRepresentation/SliceFunction/Plane"/>
+      <Item id="10538" name="TextureTransform" logname="RectilinearGridRepresentation1/SurfaceRepresentation/TextureTransform/Transform2"/>
     </ProxyCollection>
     <ProxyCollection name="pq_helper_proxies.10629">
       <Item id="10929" name="RepresentationAnimationHelper"/>
@@ -8384,7 +8384,7 @@
       <Item id="10851" name="StructuredGridRepresentation1" logname="StructuredGridRepresentation1"/>
       <Item id="10882" name="TextSourceRepresentation1" logname="TextSourceRepresentation1"/>
       <Item id="10913" name="TextSourceRepresentation2" logname="TextSourceRepresentation2"/>
-      <Item id="10572" name="UniformGridRepresentation1" logname="UniformGridRepresentation1"/>
+      <Item id="10572" name="RectilinearGridRepresentation1" logname="RectilinearGridRepresentation1"/>
     </ProxyCollection>
     <ProxyCollection name="scalar_bars">
       <Item id="10591" name="ScalarBarWidgetRepresentation1"/>
