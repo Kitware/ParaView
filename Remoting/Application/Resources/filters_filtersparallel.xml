@@ -1292,7 +1292,7 @@
                  base_proxyname="SurfaceNormals"
                  base_proxygroup="filters"
                  name="PolyDataNormals">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'SurfaceNormals'. Please consider using that instead.
       </Deprecated>
       <!-- End  PolyDataNormals -->

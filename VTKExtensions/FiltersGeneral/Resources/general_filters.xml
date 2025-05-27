@@ -4784,7 +4784,7 @@ Every Nth Point.
                 base_proxyname="ConnectedSurfaceProperties"
                 base_proxygroup="filters"
                 name="ComputeConnectedSurfaceProperties">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
         This has been renamed into 'ConnectedSurfaceProperties'. Please consider using that instead.
       </Deprecated>
      <!-- End ComputeConnectedSurfaceProperties -->
