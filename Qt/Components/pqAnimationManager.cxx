@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqAnimationManager.h"
-#include "ui_pqAbortAnimation.h"
 
 #include "vtkMath.h"
 #include "vtkNew.h"
