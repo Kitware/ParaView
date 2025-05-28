@@ -7,7 +7,7 @@ from paraview.simple import *
 hyperTreeGridRandom = HyperTreeGridRandom()
 
 hyperTreeGridAxisReflection = HyperTreeGridAxisReflection(Input=hyperTreeGridRandom)
-assert(type(hyperTreeGridAxisReflection).__name__ == "AxisAlignedReflectionFilter")
+assert (type(hyperTreeGridAxisReflection).__name__ == "AxisAlignedReflect")
 
 hyperTreeGridAxisReflection.PlaneNormal = 'Z Axis'
 assert(hyperTreeGridAxisReflection.ReflectionPlane.Normal == [0.0, 0.0, 1.0])

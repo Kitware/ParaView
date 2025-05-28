@@ -8,13 +8,13 @@ def main():
     sphere1 = Sphere()
 
     # Test vtkPartitionedDataSetCollection output
-    axisAlignedReflectionFilter1 = AxisAlignedReflectionFilter(Input=sphere1)
-    axisAlignedReflectionFilter1.Set(
+    axisAlignedReflect1 = AxisAlignedReflect(Input=sphere1)
+    axisAlignedReflect1.Set(
         PlaneMode='Y Min',
     )
-    axisAlignedReflectionFilter1.UpdatePipeline()
+    axisAlignedReflect1.UpdatePipeline()
 
-    info = paraview.servermanager.Fetch(axisAlignedReflectionFilter1)
+    info = paraview.servermanager.Fetch(axisAlignedReflect1)
     assert info.GetClassName() == "vtkPartitionedDataSetCollection"
 
     # Test vtkMultiBlockDataSet output

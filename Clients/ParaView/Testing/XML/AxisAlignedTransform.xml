@@ -16,7 +16,8 @@
 
   <!-- Create the 'AxisAlignedTransform' filter -->
   <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Alphabetical" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="AxisAlignedTransformFilter" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate"
+           arguments="AxisAlignedTransform"/>
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Rotation/ComboBox" command="activated" arguments="90°" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 

@@ -9,7 +9,8 @@
   <!-- Apply Axis-Aligned Reflect filter with X Max plane -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Alphabetical" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="AxisAlignedReflectionFilter" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate"
+           arguments="AxisAlignedReflect"/>
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PlaneMode/ComboBox" command="activated" arguments="X Max" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
