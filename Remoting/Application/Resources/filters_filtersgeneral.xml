@@ -90,8 +90,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkAxisAlignedReflectionFilter"
-                 label="Axis-Aligned Reflection Filter"
-                 name="AxisAlignedReflectionFilter">
+                 label="Axis-Aligned Reflect"
+                 name="AxisAlignedReflect">
       <Documentation long_help="This filter reflects the input over an axis-aligned plane."
                      short_help="Reflect input over an axis aligned plane.">
         The Axis Aligned Reflection filter reflects the input dataset across the
@@ -183,13 +183,13 @@
           All other arrays won't be reflected and will only be copied.
         </Documentation>
       </IntVectorProperty>
-      <!-- End AxisAlignedReflectionFilter -->
+      <!-- End AxisAlignedReflect -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkAxisAlignedTransformFilter"
-                 label="Axis-Aligned Transform Filter"
-                 name="AxisAlignedTransformFilter">
+                 label="Axis-Aligned Transform"
+                 name="AxisAlignedTransform">
       <Documentation long_help="This filter applies an axis-aligned affine transformation (translation, scaling, and rotation) ."
                      short_help="Apply an axis-aligned affine transformation.">
         The Axis Aligned Transform filter operates on any type of data
@@ -268,7 +268,7 @@
         </Documentation>
       </IntVectorProperty>
 
-      <!-- End AxisAlignedTransformFilter -->
+      <!-- End AxisAlignedTransform -->
     </SourceProxy>
 
     <!-- ==================================================================== -->

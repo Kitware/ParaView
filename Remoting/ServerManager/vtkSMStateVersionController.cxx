@@ -2071,7 +2071,7 @@ struct Process_5_13_to_6_0
 {
   bool operator()(xml_document& document)
   {
-    return HandlePolarAxesRenaming(document) && HandleAxisAlignedReflectionFilter(document) &&
+    return HandlePolarAxesRenaming(document) && HandleAxisAlignedReflect(document) &&
       HandleRenamedProxies(document);
   }
 
@@ -2129,12 +2129,12 @@ struct Process_5_13_to_6_0
     return true;
   }
 
-  void BuildAxisAlignedReflectionFilter(std::ostringstream& stream, const char_t* proxyId,
+  void BuildAxisAlignedReflect(std::ostringstream& stream, const char_t* proxyId,
     const char_t* inputId, const char_t* server, const vtkTypeUInt32 planeId, int copyInput,
     int flipArrays, int planeMode)
   {
-    // AxisAlignedReflectionFilter
-    stream << "<Proxy group=\"filters\" type=\"AxisAlignedReflectionFilter\" id=\"" << proxyId
+    // AxisAlignedReflect
+    stream << "<Proxy group=\"filters\" type=\"AxisAlignedReflect\" id=\"" << proxyId
            << "\" servers=\"" << server << "\">\n";
     stream << "  <Property name=\"CopyInput\" id=\"" << proxyId
            << ".CopyInput\" number_of_elements=\"1\">\n"
@@ -2179,7 +2179,7 @@ struct Process_5_13_to_6_0
     stream << "</Proxy>\n";
   }
 
-  bool HandleAxisAlignedReflectionFilter(xml_document& document)
+  bool HandleAxisAlignedReflect(xml_document& document)
   {
     // Replace HyperTreeGridAxisReflection
     auto xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='filters'"
@@ -2238,13 +2238,13 @@ struct Process_5_13_to_6_0
 
       stream << "</Proxy>\n";
 
-      BuildAxisAlignedReflectionFilter(stream, proxyId, inputId, server, planeId, 0, 0, 0);
+      BuildAxisAlignedReflect(stream, proxyId, inputId, server, planeId, 0, 0, 0);
 
       pugi::xml_node smstate = document.root().child("ServerManagerState");
       std::string buffer = stream.str();
       if (!smstate.append_buffer(buffer.c_str(), buffer.size()))
       {
-        vtkGenericWarningMacro("Unable to add AxisAlignedReflectionFilter proxy.");
+        vtkGenericWarningMacro("Unable to add AxisAlignedReflect proxy.");
       }
     }
 
@@ -2326,14 +2326,14 @@ struct Process_5_13_to_6_0
         planeMode = planeValue + 1;
       }
 
-      BuildAxisAlignedReflectionFilter(
+      BuildAxisAlignedReflect(
         stream, proxyId, inputId, server, planeId, copyInputValue, flipArraysValue, planeMode);
 
       pugi::xml_node smstate = document.root().child("ServerManagerState");
       std::string buffer = stream.str();
       if (!smstate.append_buffer(buffer.c_str(), buffer.size()))
       {
-        vtkGenericWarningMacro("Unable to add AxisAlignedReflectionFilter proxy.");
+        vtkGenericWarningMacro("Unable to add AxisAlignedReflect proxy.");
       }
     }
     return true;
