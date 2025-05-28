@@ -3,30 +3,26 @@
 #include "vtkSMSourceProxy.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkCollection.h"
 #include "vtkCommand.h"
-#include "vtkDataSetAttributes.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAlgorithmPortsInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
 #include "vtkSMDocumentation.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringFormatter.h"
+#include "vtkStringScanner.h"
 
 #include <cassert>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -76,6 +72,8 @@ struct vtkSMSourceProxyInternals
   typedef std::vector<vtkSMSourceProxyOutputPort> VectorOfPorts;
   VectorOfPorts OutputPorts;
   std::vector<vtkSmartPointer<vtkSMSourceProxy>> SelectionProxies;
+  unsigned int SelectionProxyId = 0;
+  unsigned int SelectionProxyPort = 0;
   std::vector<unsigned long> SelectionObservers;
 
   // Resizes output ports and ensures that Name for each port is initialized to
@@ -315,6 +313,85 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLEl
 }
 
 //---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMSourceProxy::SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter)
+{
+  vtkPVXMLElement* proxy = this->Superclass::SaveXMLState(root, iter);
+
+  vtkSMProxy* appendSelectionProxy =
+    this->GetSessionProxyManager()->GetProxy("selections", "AppendSelections");
+  if (appendSelectionProxy)
+  {
+    unsigned int appendSelectionId = appendSelectionProxy->GetGlobalID();
+    if (appendSelectionId == this->GetGlobalID())
+    {
+      vtkNew<vtkPVXMLElement> selectionProxyXml;
+      selectionProxyXml->SetName("SelectionProxy");
+      selectionProxyXml->AddAttribute("name", "selection");
+      std::ostringstream selectionID;
+      selectionID << this->GetGlobalID() << "."
+                  << "selection" << ends;
+      selectionProxyXml->AddAttribute("id", selectionID.str().c_str());
+      selectionProxyXml->AddAttribute("value", this->GetSelectionId());
+      selectionProxyXml->AddAttribute("port", this->GetSelectionPort());
+
+      proxy->AddNestedElement(selectionProxyXml);
+    }
+  }
+
+  return proxy;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMSourceProxy::LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator)
+{
+  int status = this->Superclass::LoadXMLState(element, locator);
+
+  unsigned int numElems = element->GetNumberOfNestedElements();
+  for (unsigned int i = 0; i < numElems; i++)
+  {
+    vtkPVXMLElement* currentElement = element->GetNestedElement(i);
+    const char* name = currentElement->GetName();
+    if (!name)
+    {
+      continue;
+    }
+    if (strcmp(name, "SelectionProxy") == 0)
+    {
+      auto sourceIdScan = vtk::scan_int<int>(currentElement->GetAttribute("value"));
+      auto sourcePortScan = vtk::scan_int<int>(currentElement->GetAttribute("port"));
+      if (!sourceIdScan || !sourcePortScan)
+      {
+        vtkWarningMacro(
+          "The selection proxy is missing the ID and/or the port of the selected proxy.");
+        break;
+      }
+      int sourceId = sourceIdScan->value();
+      int port = sourcePortScan->value();
+
+      vtkSMSourceProxy* sourceProxy =
+        vtkSMSourceProxy::SafeDownCast(locator->LocateProxy(sourceId));
+      if (!sourceProxy)
+      {
+        vtkWarningMacro(
+          "The selected proxy could not be retrieved. The selection ID may be wrong.");
+        break;
+      }
+
+      this->SetSelectionId(sourceProxy->GetGlobalID());
+      this->SetSelectionPort(port);
+      sourceProxy->SelectionProxiesCreated = true;
+      this->DisableSelectionProxies = true;
+
+      sourceProxy->Superclass::Modified();
+      sourceProxy->UpdateVTKObjects();
+      this->UpdateVTKObjects();
+    }
+  }
+
+  return status & 1;
+}
+
+//---------------------------------------------------------------------------
 // Call Update() on all sources
 // TODO this should update information properties.
 void vtkSMSourceProxy::UpdatePipeline()
@@ -475,7 +552,6 @@ void vtkSMSourceProxy::SetExtractSelectionProxy(unsigned int index, vtkSMSourceP
     this->PInternals->SelectionProxies.resize(index + 1);
     this->PInternals->SelectionObservers.resize(index + 1);
   }
-
   this->PInternals->SelectionProxies[index] = proxy;
 
   // Set up observer on the "Selection" property's ModifiedEvent and invoke
@@ -668,14 +744,57 @@ void vtkSMSourceProxy::SetSelectionInput(
   {
     return;
   }
+
   vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
-  if (esProxy)
+  if (!esProxy)
   {
-    vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(esProxy->GetProperty("Selection"));
-    pp->RemoveAllProxies();
-    pp->AddInputConnection(input, outputport);
-    esProxy->UpdateVTKObjects();
-    this->InvokeEvent(vtkCommand::SelectionChangedEvent, &portIndex);
+    return;
+  }
+
+  vtkSMInputProperty* ppSelection =
+    vtkSMInputProperty::SafeDownCast(esProxy->GetProperty("Selection"));
+  ppSelection->RemoveAllProxies();
+  ppSelection->AddInputConnection(input, outputport);
+  esProxy->UpdateVTKObjects();
+  this->InvokeEvent(vtkCommand::SelectionChangedEvent, &portIndex);
+
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
+  // Unregister previous SelectionSources
+  vtkSMSourceProxy* previousAppendSelectionSourceProxy =
+    vtkSMSourceProxy::SafeDownCast(pxm->GetProxy("selections", "AppendSelections"));
+  unsigned int previousNumSelSources = 0;
+  if (previousAppendSelectionSourceProxy)
+  {
+    previousNumSelSources =
+      vtkSMPropertyHelper(previousAppendSelectionSourceProxy, "Input").GetNumberOfElements();
+  }
+  for (unsigned int i = 0; i < previousNumSelSources; ++i)
+  {
+    pxm->UnRegisterProxy(("SelectionSource" + vtk::to_string(i)).c_str());
+  }
+
+  // Register the new AppendSelection proxy
+  vtkSMSourceProxy* appendSelectionSourceProxy =
+    vtkSMSourceProxy::SafeDownCast(ppSelection->GetProxy(0));
+  if (!appendSelectionSourceProxy)
+  {
+    return;
+  }
+  appendSelectionSourceProxy->SetSelectionId(this->GetGlobalID());
+  appendSelectionSourceProxy->SetSelectionPort(portIndex);
+  std::string appendSelName = "AppendSelections";
+  pxm->UnRegisterProxy(appendSelName.c_str());
+  pxm->RegisterProxy("selections", appendSelName.c_str(), appendSelectionSourceProxy);
+
+  // Register the new SelectionSources
+  vtkSMInputProperty* ppInput = vtkSMInputProperty::SafeDownCast(input->GetProperty("Input"));
+  unsigned int numSelSources = vtkSMPropertyHelper(input, "Input").GetNumberOfElements();
+  for (unsigned int i = 0; i < numSelSources; ++i)
+  {
+    vtkSMProxy* selectionSource = ppInput->GetProxy(i);
+    std::string selName = "SelectionSource" + vtk::to_string(i);
+    pxm->RegisterProxy("selections", selName.c_str(), selectionSource);
   }
 }
 
@@ -742,6 +861,30 @@ vtkSMSourceProxy* vtkSMSourceProxy::GetSelectionOutput(unsigned int portIndex)
   }
 
   return nullptr;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMSourceProxy::GetSelectionId()
+{
+  return this->PInternals->SelectionProxyId;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMSourceProxy::GetSelectionPort()
+{
+  return this->PInternals->SelectionProxyPort;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::SetSelectionId(unsigned int id)
+{
+  this->PInternals->SelectionProxyId = id;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::SetSelectionPort(unsigned int port)
+{
+  this->PInternals->SelectionProxyPort = port;
 }
 
 //---------------------------------------------------------------------------
