@@ -1,0 +1,123 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy
+      name="ONNXPrediction"
+      class="vtkONNXInference"
+      label="ONNX Prediction">
+      <Documentation short_help="Run an ONNX model.">
+        Run an ONNX model on input and store result as a new data array.
+        Result can be on Cells or on Points (see OnCellData).
+        The actual model should be provided, as well as a Json
+        that describes the different parameters for this model.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          Specifies the input to the ONNX Inference filter.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="ModelFile"
+                            animateable="0"
+                            command="SetModelFile"
+                            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          Sets the ONNX model file.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ParametersFile"
+                            animateable="0"
+                            panel_visibility="default"
+                            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+           Sets the Json file that defines the ONNX parameters.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- parameters properties are set from custom panel -->
+      <DoubleVectorProperty name="InputParameters"
+                            command="SetInputParameter"
+                            repeatable="1"
+                            set_number_command="SetNumberOfInputParameters"
+                            number_of_elements_per_command="1"
+                            use_index="1"
+                            panel_visibility="never"
+                            animateable="0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TimeValues"
+                            command="SetTimeStepValue"
+                            clear_command="ClearTimeStepValues"
+                            repeatable="1"
+                            set_number_command="SetNumberOfTimeStepValues"
+                            number_of_elements_per_command="1"
+                            use_index="1"
+                            panel_visibility="never"
+                            animateable="0" >
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="TimeStepIndex"
+                         command="SetTimeStepIndex"
+                         number_of_elements="1"
+                         default_values="0"
+                         animateable="0"
+                         panel_visibility="never">
+      </IntVectorProperty>
+
+      <PropertyGroup
+         name="ONNX Input Parameters"
+         panel_widget="onnx_property_widget">
+
+        <Property name="ParametersFile"/>
+        <Property name="InputParameters"/>
+        <Property name="TimeValues"/>
+        <Property name="TimeStepIndex"/>
+      </PropertyGroup>
+
+      <IntVectorProperty name="OnCellData"
+                         command="SetOnCellData"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         animateable="0">
+        <Documentation>
+
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="OutputDimension"
+                         command="SetOutputDimension"
+                         number_of_elements="1"
+                         default_values="1"
+                         animateable="0"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <PropertyGroup
+         name="ONNX Output">
+         <Property name="OnCellData"/>
+         <Property name="OutputDimension" />
+      </PropertyGroup>
+
+      <!-- information property used by the paraview timekeeper -->
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,14 @@
+NAME
+  ONNXPlugin
+DESCRIPTION
+  Plugin that adds a filter to infer AI models with ONNX.
+CONDITION
+  PARAVIEW_USE_QT
+REQUIRES_MODULES
+  ParaView::pqApplicationComponents
+  ParaView::pqComponents
+  ParaView::RemotingServerManager
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::CommonDataModel
+  VTK::FiltersONNX
