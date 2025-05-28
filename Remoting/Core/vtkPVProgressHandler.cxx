@@ -118,7 +118,7 @@ vtkPVProgressHandler::vtkPVProgressHandler()
 {
   this->Session = nullptr;
   this->Internals = new vtkInternals();
-  this->LastProgress = 0;
+  this->LastProgress = -1;
   this->LastProgressText = nullptr;
 
   // use higher frequency for client while lower for server (or batch).
@@ -318,6 +318,12 @@ void vtkPVProgressHandler::OnProgressEvent(vtkObject* caller, unsigned long even
   // cout <<"Elapsed: " << this->Internals->ProgressTimer->GetElapsedTime() <<
   //  endl;
   double progress = *reinterpret_cast<double*>(calldata);
+  if (this->LastProgress == static_cast<int>(progress * 100.0))
+  {
+    // If the progress hasn't changed, we don't need to update.
+    return;
+  }
+  // If the elapsed time is less than the interval, we skip this update.
   if (this->Internals->ProgressTimer->GetElapsedTime() < this->ProgressInterval)
   {
     return;
@@ -384,7 +390,7 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
   // std::cout << "Progress: " << progress_text << " " << progress * 100 << endl;
   this->InvokeEvent(vtkCommand::ProgressEvent, this);
   this->SetLastProgressText(nullptr);
-  this->LastProgress = 0;
+  this->LastProgress = -1;
 }
 
 //----------------------------------------------------------------------------
