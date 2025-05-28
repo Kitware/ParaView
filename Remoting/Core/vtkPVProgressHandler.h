@@ -141,7 +141,7 @@ private:
   /**
    * Callback called when events from vtkOutputWindow singleton are received.
    * This is also called when vtkCommand::MessageEvent is received from any
-   * vtkOutput we're observing progress from.
+   * vtkObject we're observing progress from.
    */
   void OnMessageEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 

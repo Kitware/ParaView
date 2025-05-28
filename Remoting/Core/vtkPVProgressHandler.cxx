@@ -347,7 +347,7 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
   vtkMultiProcessController* client_controller = this->Session->GetController(vtkPVSession::CLIENT);
   if (client_controller)
   {
-    // only true of server-nodes.
+    // only true in server-nodes.
     int progress_text_len = static_cast<int>(strlen(progress_text));
     int message_size = progress_text_len + sizeof(double) + sizeof(char);
     std::vector<unsigned char> buffer(message_size);
