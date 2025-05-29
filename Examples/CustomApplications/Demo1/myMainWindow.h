@@ -12,7 +12,7 @@ class myMainWindow : public QMainWindow
   typedef QMainWindow Superclass;
 
 public:
-  myMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  myMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~myMainWindow();
 
 protected Q_SLOTS:
