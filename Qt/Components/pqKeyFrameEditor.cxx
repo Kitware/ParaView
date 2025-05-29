@@ -48,7 +48,7 @@ pqKeyFrameEditorDialog::pqKeyFrameEditorDialog(QWidget* p, QWidget* child)
   : QDialog(p)
 {
   this->Child = child;
-  this->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(this, &QWidget::close, this, &QObject::deleteLater);
   this->setWindowModality(Qt::WindowModal);
   this->setWindowTitle(tr("Key Frame Interpolation"));
   this->setModal(false);
@@ -613,18 +613,18 @@ void pqKeyFrameEditor::writeKeyFrameData()
 
   this->Internal->Cue->blockSignals(prev);
   this->Internal->Cue->triggerKeyFramesModified();
-
-  // Reload current timestep, force deleting outdated geometry cache
-  pqSMAdaptor::setElementProperty(
-    this->Internal->Scene->getProxy()->GetProperty("ForceDisableCaching", 1), 1);
-  this->Internal->Scene->getProxy()->UpdateProperty("ForceDisableCaching", 1);
-  pqSMAdaptor::setElementProperty(this->Internal->Scene->getProxy()->GetProperty("AnimationTime"),
-    this->Internal->Scene->getAnimationTime());
-  this->Internal->Scene->getProxy()->UpdateProperty("AnimationTime", 1);
-  this->Internal->Scene->getProxy()->UpdateVTKObjects();
-  pqSMAdaptor::setElementProperty(
-    this->Internal->Scene->getProxy()->GetProperty("ForceDisableCaching", 1), 0);
-  this->Internal->Scene->getProxy()->UpdateProperty("ForceDisableCaching", 1);
+  if (auto sceneProxy = this->Internal->Scene->getProxy())
+  {
+    // Reload current timestep, force deleting outdated geometry cache
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("ForceDisableCaching", 1), 1);
+    sceneProxy->UpdateProperty("ForceDisableCaching", 1);
+    pqSMAdaptor::setElementProperty(
+      sceneProxy->GetProperty("AnimationTime"), this->Internal->Scene->getAnimationTime());
+    sceneProxy->UpdateProperty("AnimationTime", 1);
+    sceneProxy->UpdateVTKObjects();
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("ForceDisableCaching", 1), 0);
+    sceneProxy->UpdateProperty("ForceDisableCaching", 1);
+  }
 
   END_UNDO_SET();
 }

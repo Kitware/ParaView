@@ -59,7 +59,7 @@ pqItemViewSearchWidget::pqItemViewSearchWidget(QWidget* parentW)
   QObject::connect(this->Private->previousButton, SIGNAL(clicked()), this, SLOT(findPrevious()));
   this->installEventFilter(this);
   this->Private->lineEditSearch->installEventFilter(this);
-  this->setAttribute(Qt::WA_DeleteOnClose, true);
+  QObject::connect(this, &QWidget::close, this, &QObject::deleteLater);
   this->setFocusPolicy(Qt::StrongFocus);
 }
 

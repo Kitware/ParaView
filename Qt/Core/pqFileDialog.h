@@ -25,14 +25,14 @@ class pqServer;
 
   pqFileDialog can be used in both "modal" and "non-modal" operations.
   For "non-modal" operation, create an instance of pqFileDialog on the heap,
-  set the Qt::WA_DeleteOnClose flag, connect to the fileSelected() signal,
+  connect the slot to deleteLater on close signal, connect to the fileSelected() signal,
   and show the dialog.  The dialog will be automatically destroyed when the
   user completes their file selection, and your slot will be called with
   the files the user selected:
 
   /code
   pqFileDialog* dialog = new pqFileDialog(nullptr, this);
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(dialog, &QWidget::close, dialog, &QObject::deleteLater);
 
   QObject::connect(
     dialog,

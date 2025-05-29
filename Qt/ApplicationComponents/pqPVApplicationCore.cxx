@@ -147,7 +147,7 @@ void pqPVApplicationCore::startSearch()
   }
 
   pqItemViewSearchWidget* searchDialog = new pqItemViewSearchWidget(focusItemView);
-  searchDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+  QObject::connect(searchDialog, &QWidget::close, searchDialog, &QObject::deleteLater);
   searchDialog->showSearchWidget();
 }
 

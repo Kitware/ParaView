@@ -205,13 +205,13 @@ void pqCustomFilterManager::importFiles()
     new pqFileDialog(nullptr, this, tr("Open Custom Filter File"), QString(),
       tr("Custom Filter Files") + QString(" (*.cpd *.xml);;") + tr("All Files") + QString(" (*)"),
       false);
-  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(fileDialog, &QWidget::close, fileDialog, &QObject::deleteLater);
   fileDialog->setObjectName("FileOpenDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
 
   // Listen for the user's selection.
-  this->connect(fileDialog, SIGNAL(filesSelected(const QStringList&)), this,
-    SLOT(importFiles(const QStringList&)));
+  QObject::connect(fileDialog, QOverload<const QStringList&>::of(&pqFileDialog::filesSelected),
+    this, QOverload<const QStringList&>::of(&pqCustomFilterManager::importFiles));
 
   fileDialog->show();
 }
@@ -224,13 +224,13 @@ void pqCustomFilterManager::exportSelected()
     new pqFileDialog(nullptr, this, tr("Save Custom Filter File"), QString(),
       tr("Custom Filter Files") + QString(" (*.cpd *.xml);;") + tr("All Files") + QString(" (*)"),
       false);
-  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(fileDialog, &QWidget::close, fileDialog, &QObject::deleteLater);
   fileDialog->setObjectName("FileSaveDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
 
   // Listen for the user's selection.
-  this->connect(fileDialog, SIGNAL(filesSelected(const QStringList&)), this,
-    SLOT(exportSelected(const QStringList&)));
+  QObject::connect(fileDialog, QOverload<const QStringList&>::of(&pqFileDialog::filesSelected),
+    this, QOverload<const QStringList&>::of(&pqCustomFilterManager::exportSelected));
 
   fileDialog->show();
 }
