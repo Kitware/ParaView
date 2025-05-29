@@ -770,7 +770,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
       << pqSetName("actionProfessionalSupport")));
 
   // Professional Training
-  new pqDesktopServicesReaction(QUrl("https://www.kitware.com/support/#training"),
+  new pqDesktopServicesReaction(QUrl("https://www.kitware.com/paraview-solutions/#training"),
     (menu.addAction(QCoreApplication::translate("pqHelpMenu", "Professional Training"))
       << pqSetName("actionTraining")));
 
