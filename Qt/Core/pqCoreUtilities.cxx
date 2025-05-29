@@ -15,6 +15,7 @@
 #include <QStandardPaths>
 #include <QString>
 #include <QStringList>
+#include <QStyleHints>
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
@@ -545,4 +546,18 @@ void pqCoreUtilities::remove(const QString& filePath)
       pqCoreUtilities::mainWidget())
       .exec();
   }
+}
+
+//-----------------------------------------------------------------------------
+bool pqCoreUtilities::isDarkTheme()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  const auto scheme = QGuiApplication::styleHints()->colorScheme();
+  return scheme == Qt::ColorScheme::Dark;
+#else
+  const QPalette defaultPalette;
+  const auto text = defaultPalette.color(QPalette::WindowText);
+  const auto window = defaultPalette.color(QPalette::Window);
+  return text.lightness() > window.lightness();
+#endif
 }
