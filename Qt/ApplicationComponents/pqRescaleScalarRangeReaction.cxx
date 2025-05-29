@@ -283,7 +283,7 @@ pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarR
     }
     dialog->setOpacityRange(range[0], range[1]);
   }
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(dialog, &QWidget::close, dialog, &QObject::deleteLater);
   dialog->show();
 
   QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply,
@@ -385,7 +385,7 @@ pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(
   pqRescaleScalarRangeToDataOverTimeDialog* dialog =
     new pqRescaleScalarRangeToDataOverTimeDialog(pqCoreUtilities::mainWidget());
   dialog->setLock(lockInfo == vtkSMTransferFunctionManager::NEVER);
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(dialog, &QWidget::close, dialog, &QObject::deleteLater);
   dialog->show();
 
   QObject::connect(dialog, &pqRescaleScalarRangeToDataOverTimeDialog::apply,

@@ -54,7 +54,7 @@ struct pqAnimationTrackEditor::pqInternals
 
     this->Editor = new pqPipelineTimeKeyFrameEditor(this->Scene, cue, nullptr);
     this->Editor->setAttribute(Qt::WA_QuitOnClose, false);
-    this->Editor->setAttribute(Qt::WA_DeleteOnClose);
+    QObject::connect(this->Editor, &QWidget::close, this->Editor, &QObject::deleteLater);
     this->Editor->show();
   }
 
