@@ -248,6 +248,12 @@ public:
    */
   static void remove(const QString& filePath);
 
+  /**
+   * Returns true if the current application is running in dark mode.
+   * This is determined based on the current application palette.
+   */
+  static bool isDarkTheme();
+
 private:
   static QWidget* findMainWindow();
   static QPointer<QWidget> MainWidget;

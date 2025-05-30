@@ -28,10 +28,12 @@
 #include "vtkSMViewProxy.h"
 #include "vtkTimerLog.h"
 
+#include <QApplication>
 #include <QKeyEvent>
 #include <QPointer>
 #include <QStyle>
 #include <QStyleFactory>
+#include <QStyleHints>
 
 #include <cassert>
 
@@ -194,6 +196,13 @@ public:
 
     // change the apply button palette so it is green when it is enabled.
     pqCoreUtilities::initializeClickMeButton(this->Ui.Accept);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    // Re-apply the palette when the color scheme changes.
+    QObject::connect(QApplication::styleHints(), &QStyleHints::colorSchemeChanged, this->Ui.Accept,
+      [button = this->Ui.Accept](Qt::ColorScheme)
+      { pqCoreUtilities::initializeClickMeButton(button); });
+#endif
   }
 
   ~pqInternals()

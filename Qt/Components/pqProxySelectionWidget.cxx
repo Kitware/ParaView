@@ -14,6 +14,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
+#include "Private/pqComboBoxStyle.h"
+
 #include <QPointer>
 
 #include <cassert>
@@ -99,7 +101,7 @@ pqProxySelectionWidget::pqProxySelectionWidget(
   assert(this->Internal->Domain);
   this->connect(
     this->Internal->Ui.comboBox, SIGNAL(currentIndexChanged(int)), SLOT(currentIndexChanged(int)));
-  this->Internal->Ui.comboBox->setStyleSheet("combobox-popup: 0;");
+  this->Internal->Ui.comboBox->setStyle(new pqComboBoxStyle(/*showPopup=*/false));
   this->Internal->Ui.comboBox->setMaxVisibleItems(
     pqPropertyWidget::hintsWidgetHeightNumberOfRows(smproperty->GetHints()));
   new pqComboBoxDomain(this->Internal->Ui.comboBox, smproperty, this->Internal->Domain);

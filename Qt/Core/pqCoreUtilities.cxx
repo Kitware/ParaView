@@ -15,6 +15,7 @@
 #include <QStandardPaths>
 #include <QString>
 #include <QStringList>
+#include <QStyleHints>
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
@@ -484,7 +485,16 @@ void pqCoreUtilities::initializeClickMeButton(QAbstractButton* button)
 {
   if (button)
   {
-    QPalette applyPalette = button->palette();
+    QPalette applyPalette = QApplication::palette(button);
+    // In dark themes, we use black text on the button. By default, Qt uses white text on
+    // dark buttons, however, this code changes the button color to a light green
+    // so we need to set the text color to black for better contrast.
+    // In light themes, we use the default button text color.
+    if (pqCoreUtilities::isDarkTheme())
+    {
+      applyPalette.setColor(QPalette::Active, QPalette::ButtonText, QColor(Qt::black));
+      applyPalette.setColor(QPalette::Inactive, QPalette::ButtonText, QColor(Qt::black));
+    }
     applyPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
     applyPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
     button->setPalette(applyPalette);
@@ -545,4 +555,18 @@ void pqCoreUtilities::remove(const QString& filePath)
       pqCoreUtilities::mainWidget())
       .exec();
   }
+}
+
+//-----------------------------------------------------------------------------
+bool pqCoreUtilities::isDarkTheme()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  const auto scheme = QGuiApplication::styleHints()->colorScheme();
+  return scheme == Qt::ColorScheme::Dark;
+#else
+  const QPalette defaultPalette;
+  const auto text = defaultPalette.color(QPalette::WindowText);
+  const auto window = defaultPalette.color(QPalette::Window);
+  return text.lightness() > window.lightness();
+#endif
 }
