@@ -106,6 +106,7 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QProxyStyle>
+#include <QStyleFactory>
 #include <QSysInfo>
 
 #include "vtkPVFileInformation.h"
@@ -122,6 +123,17 @@
 class pqActiveDisabledStyle : public QProxyStyle
 {
 public:
+  pqActiveDisabledStyle()
+#if QT_VERSION >= QT_VERSION_CHECK(6, 1, 0)
+    : QProxyStyle(QStyleFactory::create(QApplication::style()->name()))
+#else
+    : QProxyStyle(QStyleFactory::create("fusion"))
+#endif
+  {
+  }
+
+  ~pqActiveDisabledStyle() override = default;
+
   int styleHint(StyleHint hint, const QStyleOption* option = nullptr,
     const QWidget* widget = nullptr, QStyleHintReturn* returnData = nullptr) const override
   {
