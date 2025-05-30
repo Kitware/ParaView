@@ -72,6 +72,7 @@ protected:
       ? QString("%1 (%2%)").arg(this->text()).arg(this->ProgressPercentage)
       : this->text();
     pbstyle.textAlignment = this->alignment();
+    pbstyle.state |= QStyle::State_Horizontal;
     pbstyle.rect = this->rect();
 
     if (this->ShowProgress && this->ProgressPercentage > 0)

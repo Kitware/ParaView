@@ -47,6 +47,8 @@
 #include "pqTreeViewSelectionHelper.h"
 #include "pqTreeWidget.h"
 
+#include "Private/pqComboBoxStyle.h"
+
 #include <QComboBox>
 #include <QCoreApplication>
 #include <QDebug>
@@ -283,7 +285,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `QComboBox`.");
     QComboBox* comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
-    comboBox->setStyleSheet("combobox-popup: 0;");
+    comboBox->setStyle(new pqComboBoxStyle(/*showPopup=*/false));
     comboBox->setMaxVisibleItems(
       pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
@@ -299,7 +301,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqComboBoxDomain`.");
     QComboBox* comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
-    comboBox->setStyleSheet("combobox-popup: 0;");
+    comboBox->setStyle(new pqComboBoxStyle(/*showPopup=*/false));
     comboBox->setMaxVisibleItems(
       pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 

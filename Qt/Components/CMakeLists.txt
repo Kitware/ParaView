@@ -167,6 +167,7 @@ set(classes
 
 set(private_classes
   "Private/pqProxyWidgetItem"
+  "Private/pqComboBoxStyle"
 )
 
 set_property(SOURCE pqComponentsInit.cxx APPEND

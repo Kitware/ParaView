@@ -174,7 +174,14 @@ QVariant pqArraysModel::data(const QModelIndex& indx, int role) const
   }
   else if (role == Qt::ForegroundRole)
   {
-    return ainfo->GetIsPartial() ? QBrush(Qt::darkBlue) : QBrush(Qt::darkGreen);
+    if (pqCoreUtilities::isDarkTheme())
+    {
+      return ainfo->GetIsPartial() ? QBrush(Qt::blue) : QBrush(Qt::green);
+    }
+    else
+    {
+      return ainfo->GetIsPartial() ? QBrush(Qt::darkBlue) : QBrush(Qt::darkGreen);
+    }
   }
   else if (role == Qt::ToolTipRole)
   {

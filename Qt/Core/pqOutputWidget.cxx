@@ -26,6 +26,7 @@
 #include <QStandardItemModel>
 #include <QStringList>
 #include <QStyle>
+#include <QStyleHints>
 
 namespace OutputWidgetInternals
 {
@@ -318,15 +319,15 @@ public:
     {
       case QtInfoMsg:
       case QtDebugMsg:
-        return QColor(Qt::darkGreen);
+        return (pqCoreUtilities::isDarkTheme() ? QColor(Qt::green) : QColor(Qt::darkGreen));
 
       case QtCriticalMsg:
       case QtFatalMsg:
       case QtWarningMsg:
-        return QColor(Qt::darkRed);
+        return (pqCoreUtilities::isDarkTheme() ? QColor(Qt::red) : QColor(Qt::darkRed));
 
       default:
-        return QColor(Qt::black);
+        return QApplication::palette().color(QPalette::Text);
     }
   }
 
