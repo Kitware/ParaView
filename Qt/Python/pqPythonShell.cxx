@@ -10,6 +10,7 @@
 
 #include "pqApplicationCore.h"
 #include "pqConsoleWidget.h"
+#include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqPythonShellCompleter.h"
 #include "pqScopedOverrideCursor.h"
@@ -166,6 +167,21 @@ public:
 
   vtkPythonInteractiveInterpreter* interpreter() const { return this->Interpreter; }
 
+  QColor foregroundColor(pqPythonShell::PrintMode mode) const
+  {
+    switch (mode)
+    {
+      case pqPythonShell::OUTPUT:
+        return (pqCoreUtilities::isDarkTheme() ? QColor(Qt::green) : QColor(Qt::darkGreen));
+      case pqPythonShell::ERROR:
+        return (pqCoreUtilities::isDarkTheme() ? QColor(Qt::red) : QColor(Qt::darkRed));
+      case pqPythonShell::STATUS:
+      default:
+        return pqCoreUtilities::isDarkTheme() ? QColor(Qt::cyan)
+                                              : QApplication::palette().color(QPalette::Highlight);
+    }
+  }
+
 private:
   /**
    * Will initialize (or re-initialize) the interpreter.
@@ -273,20 +289,7 @@ void pqPythonShell::printString(const QString& text, pqPythonShell::PrintMode mo
   if (!string.isEmpty())
   {
     QTextCharFormat format = consoleWidget->getFormat();
-    switch (mode)
-    {
-      case OUTPUT:
-        format.setForeground(QColor(0, 150, 0));
-        break;
-
-      case ERROR:
-        format.setForeground(QColor(255, 0, 0));
-        break;
-
-      case STATUS:
-      default:
-        format.setForeground(QApplication::palette().highlight().color());
-    }
+    format.setForeground(this->Internals->foregroundColor(mode));
     consoleWidget->setFormat(format);
     consoleWidget->printString(string);
     format.setForeground(QApplication::palette().windowText().color());
