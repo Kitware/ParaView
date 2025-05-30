@@ -54,6 +54,7 @@ set(PY_TESTS
   PythonSMTraceTest4.py,NO_VALID
   PythonSMTraceTest5.py,NO_VALID
   PythonSMTraceTest6.py,NO_VALID
+  PythonSMTraceTest7.py,NO_VALID
   PythonSMScopedTrace.py,NO_VALID
   PythonDecorators.py,NO_VALID
   PythonTestBenchmark.py,NO_VALID
