@@ -797,8 +797,8 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
 
   const char* representationsToTry[] = { "UnstructuredGridRepresentation",
     "StructuredGridRepresentation", "HyperTreeGridRepresentation", "AMRRepresentation",
-    "UniformGridRepresentation", "PVMoleculeRepresentation", "GeometryRepresentation",
-    "CellGridRepresentation", nullptr };
+    "RectilinearGridRepresentation", "UniformGridRepresentation", "PVMoleculeRepresentation",
+    "GeometryRepresentation", "CellGridRepresentation", nullptr };
   for (int cc = 0; representationsToTry[cc] != nullptr; ++cc)
   {
     if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", representationsToTry[cc]))

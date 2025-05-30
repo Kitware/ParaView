@@ -227,7 +227,6 @@
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
           <DataType value="vtkImageData" />
-          <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
                           name="input_array_cell"
@@ -367,6 +366,136 @@
         <NoSolidColor representation="Volume" />
       </Hints>
       <!-- End of UniformGridRepresentation -->
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy base_proxygroup="internal_representations"
+                           base_proxyname="PVRepresentationBase"
+                           class="vtkPVCompositeRepresentation"
+                           name="RectilinearGridRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>This representation is used to show image data as
+      Surface/Outline/Points/Wireframe/Volume.</Documentation>
+      <!-- this adds to the types already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="VolumeRepresentation"
+                          text="Volume" />
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1"></InputArrayDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1"></InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="VolumeRepresentation"
+               proxygroup="representations"
+               proxyname="UniformGridVolumeRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Volume Rendering">
+            <Property name="ScalarOpacityUnitDistance"
+                      panel_visibility="advanced" />
+            <Property name="ScalarOpacityFunction" />
+            <Property name="TransferFunction2D" />
+            <Property name="UseSeparateOpacityArray"
+                      panel_visibility="advanced" />
+            <Property name="OpacityArrayName"
+                      panel_visibility="advanced" />
+            <Property name="OpacityComponent"
+                      panel_visibility="advanced" />
+            <Property name="UseTransfer2D"
+                      panel_visibility="advanced" />
+            <Property name="UseGradientForTransfer2D"
+                      panel_visibility="advanced" />
+            <Property name="ColorArray2Name"
+                      panel_visibility="advanced" />
+            <Property name="ColorArray2Component"
+                      panel_visibility="advanced" />
+            <Property name="VolumeRenderingMode"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="Shade"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="GlobalIlluminationReach"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="VolumetricScatteringBlending"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="VolumeAnisotropy"
+                      panel_visibility="advanced"/>
+            <Property name="InterpolationType"
+                      panel_visibility="never" />
+            <Property name="BlendMode" />
+            <Property name="IsosurfaceValues" />
+            <Property name="UseCropping" />
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="or">
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="NVIDIA IndeX" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
+          </PropertyGroup>
+          <PropertyGroup label="Cropping Parameters" panel_widget="InteractiveBox">
+            <Property function="Position" name="CroppingOrigin" />
+            <Property function="Scale" name="CroppingScale" />
+            <Property function="Input" name="DummyInput" />
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <Expression type="or">
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="Representation"
+                                             value="Volume" />
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="Representation"
+                                             value="NVIDIA IndeX" />
+                  </Expression>
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="UseCropping"
+                                           value="1" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="DummyInput" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+      <Hints>
+        <!-- pqDisplayRepresentationWidget respects this hint to put out
+             a warning for the user before switching to this type of Representation.
+             The user can then accept or reject the change.
+             BUG #15117
+        -->
+        <WarnOnRepresentationChange value="Volume" />
+        <!-- pqDisplayColorWidget disables "Solid Color" for this representation type -->
+        <NoSolidColor representation="Volume" />
+      </Hints>
+      <!-- End of RectilinearGridRepresentation -->
     </PVRepresentationProxy>
 
     <!-- ================================================================== -->
