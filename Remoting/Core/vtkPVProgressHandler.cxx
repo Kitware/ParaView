@@ -119,6 +119,7 @@ vtkPVProgressHandler::vtkPVProgressHandler()
   this->Session = nullptr;
   this->Internals = new vtkInternals();
   this->LastProgress = -1;
+  this->LastProgressId = 0;
   this->LastProgressText = nullptr;
 
   // use higher frequency for client while lower for server (or batch).
@@ -220,6 +221,7 @@ void vtkPVProgressHandler::PrepareProgress()
   SKIP_IF_DISABLED();
   this->InvokeEvent(vtkCommand::StartEvent, this);
   this->Internals->EnableProgress = true;
+  this->LastProgressId = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -301,6 +303,7 @@ void vtkPVProgressHandler::LocalCleanupPendingProgress()
 {
   SKIP_IF_DISABLED();
   this->Internals->EnableProgress = false;
+  this->LastProgressId = 0;
   this->InvokeEvent(vtkCommand::EndEvent, this);
 }
 
@@ -342,12 +345,14 @@ void vtkPVProgressHandler::OnProgressEvent(vtkObject* caller, unsigned long even
     progress = (progress > 1.0) ? 1.0 : progress;
   }
 
+  const auto id = this->Internals->GetIDFromObject(caller);
   std::string text = ::vtkGetProgressText(caller);
-  this->RefreshProgress(text.c_str(), progress);
+  this->RefreshProgress(text.c_str(), progress, id);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double progress)
+void vtkPVProgressHandler::RefreshProgress(
+  const char* progress_text, double progress, vtkTypeUInt32 progress_id)
 {
   // On server-root-nodes, send the progress message to the client.
   vtkMultiProcessController* client_controller = this->Session->GetController(vtkPVSession::CLIENT);
@@ -355,14 +360,19 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
   {
     // only true in server-nodes.
     int progress_text_len = static_cast<int>(strlen(progress_text));
-    int message_size = progress_text_len + sizeof(double) + sizeof(char);
+    int message_size = progress_text_len + sizeof(double) + sizeof(vtkTypeUInt32) + sizeof(char);
     std::vector<unsigned char> buffer(message_size);
+
+    vtkTypeUInt32 le_id = progress_id;
+    vtkByteSwap::SwapLE(&le_id);
+    memcpy(buffer.data(), &le_id, sizeof(vtkTypeUInt32));
 
     double le_progress = progress;
     vtkByteSwap::SwapLE(&progress);
     memcpy(buffer.data(), &le_progress, sizeof(double));
 
-    memcpy(buffer.data() + sizeof(double), progress_text, progress_text_len);
+    memcpy(
+      buffer.data() + sizeof(vtkTypeUInt32) + sizeof(double), progress_text, progress_text_len);
     buffer[progress_text_len + sizeof(double)] = 0;
 
     vtkCompositeMultiProcessController* collabController =
@@ -386,6 +396,7 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
 
   this->SetLastProgressText(progress_text);
   this->LastProgress = static_cast<int>(progress * 100.0);
+  this->LastProgressId = progress_id;
   // DEBUG useful for diagnosing filter progress events.
   // std::cout << "Progress: " << progress_text << " " << progress * 100 << endl;
   this->InvokeEvent(vtkCommand::ProgressEvent, this);
@@ -448,13 +459,17 @@ bool vtkPVProgressHandler::OnWrongTagEvent(vtkObject*, unsigned long eventid, vo
     memcpy(&progress, ptr, sizeof(double));
     ptr += sizeof(progress);
 
+    vtkTypeUInt32 id = VTK_TYPE_UINT32_MAX;
+    memcpy(&id, ptr, sizeof(vtkTypeUInt32));
+    ptr += sizeof(vtkTypeUInt32);
 #ifdef VTK_WORDS_BIGENDIAN
     // Progress is sent in little-endian form. We need to convert it to  big
     // endian.
     vtkByteSwap::SwapLE(&progress);
+    vtkByteSwap::SwapLE(&id);
 #endif
 
-    this->RefreshProgress(ptr, progress);
+    this->RefreshProgress(ptr, progress, id);
     return true;
   }
 

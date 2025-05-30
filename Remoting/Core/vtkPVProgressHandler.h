@@ -102,6 +102,7 @@ public:
    */
   vtkGetStringMacro(LastProgressText);
   vtkGetMacro(LastProgress, int);
+  vtkGetMacro(LastProgressId, vtkTypeUInt32);
   ///@}
 
 protected:
@@ -124,7 +125,7 @@ protected:
   /**
    * Update the last progress and progress text and invokes a progress event
    */
-  void RefreshProgress(const char* progress_text, double progress);
+  void RefreshProgress(const char* progress_text, double progress, vtkTypeUInt32 progress_id);
 
   vtkPVSession* Session;
   double ProgressInterval;
@@ -162,6 +163,7 @@ private:
   vtkSetStringMacro(LastProgressText);
   int LastProgress;
   char* LastProgressText;
+  vtkTypeUInt32 LastProgressId;
 
   class RMICallback;
   friend class RMICallback;

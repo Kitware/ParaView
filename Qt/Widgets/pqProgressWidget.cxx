@@ -188,6 +188,29 @@ void pqProgressWidget::updateUI()
 }
 
 //-----------------------------------------------------------------------------
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+void pqProgressWidget::enterEvent(QEvent* e)
+#else
+void pqProgressWidget::enterEvent(QEnterEvent* e)
+#endif
+{
+  if (this->ProgressBar->showProgress())
+  {
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
+  }
+  this->Superclass::enterEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+void pqProgressWidget::leaveEvent(QEvent* e)
+{
+  // do not check for ProgressBar->showProgress() here since we want to restore the cursor
+  // even if the progress bar is not showing progress.
+  QApplication::restoreOverrideCursor();
+  this->Superclass::leaveEvent(e);
+}
+
+//-----------------------------------------------------------------------------
 void pqProgressWidget::enableAbort(bool enabled)
 {
   this->AbortButton->setEnabled(enabled);

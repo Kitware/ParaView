@@ -215,6 +215,8 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
 
   vtkAlgorithm* algo = output_port->GetProducer();
   assert(algo);
+  // reset AbortExecute flag if the algorithm was aborted.
+  algo->SetAbortExecute(false);
 
   auto sddp = vtkStreamingDemandDrivenPipeline::SafeDownCast(algo->GetExecutive());
 
