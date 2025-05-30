@@ -37,9 +37,9 @@ dnf install -y --setopt=install_weak_deps=False \
     qt6-qtbase-devel qt6-qtbase-private-devel qt6-qttools-devel qt6-qtsvg-devel  \
     qt6-qtmultimedia-devel qt6-qttranslations qt6-qt5compat-devel libxslt
 
-# GNOME theme requirements
+# GNOME theme and language requirements
 dnf install -y --setopt=install_weak_deps=False \
-    abattis-cantarell-fonts
+    abattis-cantarell-fonts glibc-langpack-en
 
 # Mesa dependencies
 dnf install -y --setopt=install_weak_deps=False \
