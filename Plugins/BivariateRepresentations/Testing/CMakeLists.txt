@@ -24,4 +24,8 @@ set(tests
 paraview_add_client_tests(
   LOAD_PLUGIN "BivariateRepresentations"
   TEST_DATA_TARGET ParaViewData
-  TEST_SCRIPTS ${tests})
+  TEST_SCRIPTS ${tests}
+  # The test lists OpenGL features, some containing the keyword error. This
+  # result in false positive errors.
+  SMTESTING_ALLOW_ERRORS
+)
