@@ -397,24 +397,29 @@ vtkObjectBase* vtkSIPythonSourceProxy::NewVTKObject(const char* className)
       vtkSmartPyObject newmodule(PyImport_ReloadModule(internals.Module));
       if (!newmodule)
       {
-        // this could be from a plugin, in which case, the reload is a little
-        // tricky.
+        SafePyErrorClear(); // clean up error from failure to reload the module.
+        // this could be from a plugin, in which case, the reload is a little tricky.
         vtkSmartPyObject pvdetail(PyImport_ImportModule("paraview.detail.pythonalgorithm"));
         if (pvdetail)
         {
           vtkSmartPyObject reload_plugin_module(
             PyObject_GetAttrString(pvdetail, "reload_plugin_module"));
-          if (reload_plugin_module)
+          if (reload_plugin_module && PyCallable_Check(reload_plugin_module))
           {
             newmodule.TakeReference(PyObject_CallFunctionObjArgs(
               reload_plugin_module, internals.Module.GetPointer(), nullptr));
           }
           else
           {
-            // silently clear the AttributeError raised by
-            // `PyObject_GetAttrString`
-            SafePyErrorClear();
+            SafePyErrorClear(); // clean up error from failure to call the reload function.
+            vtkErrorMacro("paraview.detail.pythonalgorithm.reload_plugin_module not available or "
+                          "not callable.");
           }
+        }
+        else
+        {
+          SafePyErrorClear(); // clean up error from failure to import the module.
+          vtkErrorMacro("paraview.detail.pythonalgorithm was not been imported.");
         }
       }
 
@@ -424,7 +429,7 @@ vtkObjectBase* vtkSIPythonSourceProxy::NewVTKObject(const char* className)
       }
       else
       {
-        vtkWarningMacro("Failed to re-import module '" << module.c_str() << "'.");
+        vtkErrorMacro("Failed to re-import module '" << module.c_str() << "'.");
       }
     }
 
