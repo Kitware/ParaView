@@ -47,7 +47,7 @@ public:
     this->Model.clear();
     this->ActiveScopeItem.clear();
     this->LastItem = nullptr;
-    this->Ui.details->setText(tr(""));
+    this->Ui.details->setText(QCoreApplication::translate("pqLogViewerWidget", ""));
   }
 
   void addLines(const QStringList& lines)
@@ -204,7 +204,9 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
           detailText.append("\n");
         }
       }
-      internals.Ui.details->setText(detailText);
+      const char* detailTextStr = detailText.toUtf8().data();
+      internals.Ui.details->setText(
+        QCoreApplication::translate("pqLogViewerWidget", detailTextStr));
     });
 
   QObject::connect(internals.Ui.treeView->verticalScrollBar(), &QScrollBar::valueChanged,
