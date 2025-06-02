@@ -28,6 +28,8 @@ public:
   pqDoubleRangeWidget(QWidget* parent = nullptr);
   ~pqDoubleRangeWidget() override;
 
+  pqDoubleRangeWidget(QWidget* parent, double min, double max, double value);
+
   // get the min range value
   double minimum() const;
   // get the max range value
@@ -53,9 +55,9 @@ private Q_SLOTS:
   void updateValidator();
 
 private: // NOLINT(readability-redundant-access-specifiers)
-  int Resolution;
-  double Minimum;
-  double Maximum;
+  int Resolution = 100;
+  double Minimum = 0;
+  double Maximum = 1;
 };
 
 #endif

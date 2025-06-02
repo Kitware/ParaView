@@ -12,9 +12,15 @@
 pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   : Superclass(p)
 {
-  this->Minimum = 0;
-  this->Maximum = 1;
-  this->Resolution = 100;
+}
+
+//-----------------------------------------------------------------------------
+pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* parent, double min, double max, double value)
+  : Superclass(parent)
+  , Minimum(min)
+  , Maximum(max)
+{
+  this->setValue(value);
 }
 
 //-----------------------------------------------------------------------------
