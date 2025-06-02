@@ -304,7 +304,7 @@ void pqLinksModel::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locat
                  << linkedViewProxyId << " . Dropping";
       continue;
     }
-    this->createCameraWidgetViewLink(name, displayViewProxy, linkedViewProxy);
+    this->createCameraWidgetViewLink(name, displayViewProxy, linkedViewProxy, /*loadState=*/true);
   }
 }
 
@@ -690,7 +690,7 @@ void pqLinksModel::addCameraWidgetLink(
   // Ensure that nothing stay linked. (especially "Representations" property)
   link->ClearExceptions();
 
-  this->createCameraWidgetViewLink(name, inputProxy, outputProxy);
+  this->createCameraWidgetViewLink(name, inputProxy, outputProxy, /*loadState=*/false);
 
   Q_EMIT this->linkAdded(pqLinksModel::CameraWidget);
   CLEAR_UNDO_STACK();
@@ -753,7 +753,7 @@ void pqLinksModel::createInteractiveViewLink(const QString& name, vtkSMProxy* di
 
 //------------------------------------------------------------------------------
 void pqLinksModel::createCameraWidgetViewLink(
-  const QString& name, vtkSMProxy* displayView, vtkSMProxy* linkedView)
+  const QString& name, vtkSMProxy* displayView, vtkSMProxy* linkedView, bool loadState)
 {
   // Look for corresponding pqRenderView
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
@@ -775,7 +775,8 @@ void pqLinksModel::createCameraWidgetViewLink(
   // If found, create the pqCameraWidgetViewLink
   if (firstView && otherView)
   {
-    this->Internal->CameraWidgetViewLinks[name] = new pqCameraWidgetViewLink(firstView, otherView);
+    this->Internal->CameraWidgetViewLinks[name] =
+      new pqCameraWidgetViewLink(firstView, otherView, loadState);
   }
 }
 

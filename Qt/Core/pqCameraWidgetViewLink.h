@@ -24,7 +24,8 @@ class PQCORE_EXPORT pqCameraWidgetViewLink : public QObject
   typedef QObject Superclass;
 
 public:
-  pqCameraWidgetViewLink(pqRenderView* displayView, pqRenderView* linkedView);
+  pqCameraWidgetViewLink(
+    pqRenderView* displayView, pqRenderView* linkedView, bool loadState = false);
   ~pqCameraWidgetViewLink() override;
 
   // Save this camera widget view link in xml node
