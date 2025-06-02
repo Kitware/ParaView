@@ -1083,7 +1083,8 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
     (bounds[4] + bounds[5]) / 2 };
   double position[3] = { 0, 0, 0 };
   double viewUp[3] = { 0, 0, 0 };
-  bool is2DDataSet = false;
+  int emptyDims = 0;
+  int dataAxisIdx = -1;
 
   double maxWidth =
     std::max({ bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4] });
@@ -1099,14 +1100,33 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
   // Update camera infos
   for (int i = 0; i < 3; i++)
   {
-    if (bounds[i * 2 + 1] - bounds[i * 2] == 0 && !is2DDataSet)
+    if (bounds[i * 2 + 1] - bounds[i * 2] == 0)
     {
-      position[i] = focal[i] + 3.35 * maxWidth;
-      viewUp[(i + 2) % 3] = 1;
-      is2DDataSet = true;
+      emptyDims++;
+      if (emptyDims == 1)
+      {
+        // Found an empty bound, this is either 0D, 1D or 2D
+        position[i] = focal[i] + 3.35 * maxWidth;
+        viewUp[(i + 2) % 3] = 1;
+      }
+      else if (emptyDims == 2)
+      {
+        // Found a second empty bound, this is either 0D, 1D
+        // Replace viewUp and position set by 2D DataSet
+        for (int j = 0; j < 3; j++)
+        {
+          position[j] = focal[j];
+          viewUp[j] = 0;
+        }
+        position[(dataAxisIdx + 2) % 3] = focal[(dataAxisIdx + 2) % 3] + 3.35 * maxWidth;
+        viewUp[(dataAxisIdx + 1) % 3] = 1;
+      }
     }
     else
     {
+      // Get the data axis for 1D DataSets
+      dataAxisIdx = i;
+
       position[i] = focal[i];
     }
   }
@@ -1115,8 +1135,9 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
   SM_SCOPED_TRACE(PropertiesModified)
     .arg(this->getProxy())
     .arg("comment", qPrintable(tr("changing interaction mode based on data extents")));
-  if (is2DDataSet)
+  if (emptyDims == 1 || emptyDims == 2)
   {
+    // 1D or 2D DataSet
     // Update camera position
     vtkSMPropertyHelper(this->getProxy(), "CameraFocalPoint").Set(focal, 3);
     vtkSMPropertyHelper(this->getProxy(), "CameraPosition").Set(position, 3);
@@ -1129,6 +1150,7 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
   }
   else
   {
+    // 0D or 3D DataSet
     // Update the interaction
     vtkSMPropertyHelper(this->getProxy(), "InteractionMode")
       .Set(vtkPVRenderView::INTERACTION_MODE_3D);
