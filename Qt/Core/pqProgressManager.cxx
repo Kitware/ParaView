@@ -7,12 +7,16 @@
 #include <QEvent>
 
 #include "pqApplicationCore.h"
+#include "pqCoreConfiguration.h"
 #include "pqCoreUtilities.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "vtkAlgorithm.h"
 #include "vtkCommand.h"
 #include "vtkOutputWindow.h"
+#include "vtkPVLogger.h"
 #include "vtkPVProgressHandler.h"
+#include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"
 
@@ -22,7 +26,6 @@ pqProgressManager::pqProgressManager(QObject* _parent)
 {
   this->ProgressCount = 0;
   this->InUpdate = false;
-  QApplication::instance()->installEventFilter(this);
 
   this->EnableProgress = false;
   this->UnblockEvents = false;
@@ -100,7 +103,8 @@ bool pqProgressManager::isLocked() const
 }
 
 //-----------------------------------------------------------------------------
-void pqProgressManager::setProgress(const QString& message, int progress_val)
+void pqProgressManager::setProgress(
+  const QString& message, int progress_val, bool processEvents /*=false*/)
 {
   if (this->Lock && this->Lock != this->sender())
   {
@@ -111,18 +115,12 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
   {
     return;
   }
+  vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "setProgress %d", progress_val);
   this->InUpdate = true;
   Q_EMIT this->progress(message, progress_val);
-  if (progress_val > 0)
+  if (processEvents)
   {
-    // we don't want to call a processEvents on zero progress
-    // since that breaks numerous other classes currently in ParaView
-    // mainly because of subtle timing issues from QTimers that are expected
-    // to expire in a certain order
-
-    // we are disabling this for the 3.12 release so we are sure we don't
-    // get tag mismatches in the release product
-    // pqCoreUtilities::processEvents(QEventLoop::ExcludeUserInputEvents);
+    pqCoreUtilities::processEvents();
   }
   this->InUpdate = false;
 }
@@ -168,7 +166,50 @@ void pqProgressManager::setEnableProgress(bool enable)
 //-----------------------------------------------------------------------------
 void pqProgressManager::triggerAbort()
 {
-  Q_EMIT this->abort();
+  pqApplicationCore* appCore = pqApplicationCore::instance();
+  if (auto* server = appCore->getActiveServer())
+  {
+    if (auto* progressHandler = server->session()->GetProgressHandler())
+    {
+      const auto abortGid = progressHandler->GetLastProgressId();
+      if (abortGid > 0)
+      {
+        if (auto* proxy = vtkSMProxy::SafeDownCast(server->session()->GetRemoteObject(abortGid)))
+        {
+          if (auto* algorithm = vtkAlgorithm::SafeDownCast(proxy->GetClientSideObject()))
+          {
+            vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+              "abort gid=" << abortGid << ",object=" << algorithm->GetObjectDescription());
+            algorithm->SetAbortExecuteAndUpdateTime();
+          }
+          else
+          {
+            vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+              "abort triggered, but no vtkAlgorithm found for gid="
+                << abortGid << ", found " << proxy->GetClassName() << " instead.");
+          }
+        }
+        else
+        {
+          vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+            "abort triggered, but no vtkSMProxy found for gid=" << abortGid);
+        }
+      }
+      else
+      {
+        vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+          "abort triggered, but gid of last progress proxy is 0!");
+      }
+    }
+    else
+    {
+      vtkLog(ERROR, << "abort triggered with no progress handler.");
+    }
+  }
+  else
+  {
+    vtkLog(ERROR, << "abort triggered with no active server.");
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -176,12 +217,16 @@ void pqProgressManager::onStartProgress()
 {
   Q_EMIT progressStartEvent();
   this->setEnableProgress(true);
+  this->setEnableAbort(true);
+  QApplication::instance()->installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressManager::onEndProgress()
 {
+  QApplication::instance()->removeEventFilter(this);
   this->setEnableProgress(false);
+  this->setEnableAbort(false);
   Q_EMIT progressEndEvent();
 }
 
@@ -202,5 +247,21 @@ void pqProgressManager::onProgress(vtkObject* caller)
   {
     text = text.mid(3);
   }
-  this->setProgress(text, oldProgress);
+
+  // Do not call processEvents when running tests. Doing so can cause
+  // tests to fail due to tag mismatch problems. It may be because of a
+  // conflict with the processEvents() invoked inside pqTestUtility::playTests().
+  bool processEvents = pqCoreConfiguration::instance()->testScriptCount() == 0;
+  // we don't want to call a processEvents on zero progress
+  // since that breaks numerous other classes currently in ParaView
+  // mainly because of subtle timing issues from QTimers that are expected
+  // to expire in a certain order
+  processEvents &= (oldProgress > 0);
+  // must be builtin to safely process events.
+  if (auto* server = pqApplicationCore::instance()->getActiveServer())
+  {
+    // processEvents &= session->HasProcessRole(vtkPVSession::CLIENT_AND_SERVERS);
+    processEvents &= server->isRemote() ? false : true;
+  }
+  this->setProgress(text, oldProgress, processEvents);
 }

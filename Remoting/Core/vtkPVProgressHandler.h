@@ -102,6 +102,7 @@ public:
    */
   vtkGetStringMacro(LastProgressText);
   vtkGetMacro(LastProgress, int);
+  vtkGetMacro(LastProgressId, vtkTypeUInt32);
   ///@}
 
 protected:
@@ -124,7 +125,7 @@ protected:
   /**
    * Update the last progress and progress text and invokes a progress event
    */
-  void RefreshProgress(const char* progress_text, double progress);
+  void RefreshProgress(const char* progress_text, double progress, vtkTypeUInt32 progress_id);
 
   vtkPVSession* Session;
   double ProgressInterval;
@@ -141,7 +142,7 @@ private:
   /**
    * Callback called when events from vtkOutputWindow singleton are received.
    * This is also called when vtkCommand::MessageEvent is received from any
-   * vtkOutput we're observing progress from.
+   * vtkObject we're observing progress from.
    */
   void OnMessageEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
@@ -162,6 +163,7 @@ private:
   vtkSetStringMacro(LastProgressText);
   int LastProgress;
   char* LastProgressText;
+  vtkTypeUInt32 LastProgressId;
 
   class RMICallback;
   friend class RMICallback;

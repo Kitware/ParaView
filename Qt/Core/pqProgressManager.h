@@ -66,7 +66,7 @@ public Q_SLOTS:
    * enableProgress(true) before calling  this method for the progress to be
    * updated.
    */
-  void setProgress(const QString& message, int progress);
+  void setProgress(const QString& message, int progress, bool processEvents = false);
 
   /**
    * Enables progress.
@@ -85,7 +85,9 @@ public Q_SLOTS:
   void setEnableAbort(bool);
 
   /**
-   * fires abort(). Must be called by the GUI that triggers abort.
+   * This is called when the user clicks on the "Abort" button.
+   * It is used to abort the current operation on a vtkAlgorithm object.
+   * @warning This method only works in the built-in mode.
    */
   void triggerAbort();
 
@@ -106,10 +108,6 @@ public Q_SLOTS:
   bool unblockEvents(bool val);
 
 Q_SIGNALS:
-  /**
-   * Emitted to trigger an abort.
-   */
-  void abort();
 
   void progress(const QString& message, int progress);
 
