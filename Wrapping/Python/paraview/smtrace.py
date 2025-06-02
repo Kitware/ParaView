@@ -648,6 +648,10 @@ def get_property_formatter(property_trace_helper):
 
 
 def indent_lines(string, n_indent):
+    if '"""' in string or "'''" in string:
+        # Do not perform any indentation on multiline strings
+        return string
+
     lines = string.splitlines(keepends=True)
     INDENT = "    " * n_indent
     return INDENT.join(lines)
@@ -723,6 +727,14 @@ class RealProxyAccessor(Accessor):
             return ",\n    ".join([
                 indent_lines(x.get_property_trace(in_ctor), 1) for x in props]
             )
+
+        # Sort the props so that any multiline strings get moved to the back.
+        # This is just because it looks nicer...
+        def sort_key(prop):
+            val = prop.get_value()
+            return '"""' in val or "'''" in val
+
+        props = sorted(props, key=sort_key)
 
         lines = []
         if len(props) > 1:
