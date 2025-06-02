@@ -228,7 +228,7 @@ protected Q_SLOTS:
    * Create a camera widget view link with provided parameters
    */
   void createCameraWidgetViewLink(
-    const QString& name, vtkSMProxy* displayView, vtkSMProxy* linkedView);
+    const QString& name, vtkSMProxy* displayView, vtkSMProxy* linkedView, bool loadState = false);
 
   /**
    * Convenience method used by the internal

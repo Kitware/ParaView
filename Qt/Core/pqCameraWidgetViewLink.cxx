@@ -51,7 +51,8 @@ struct pqCameraWidgetViewLink::pqInternal
 };
 
 //-----------------------------------------------------------------------------
-pqCameraWidgetViewLink::pqCameraWidgetViewLink(pqRenderView* displayView, pqRenderView* linkedView)
+pqCameraWidgetViewLink::pqCameraWidgetViewLink(
+  pqRenderView* displayView, pqRenderView* linkedView, bool loadState)
   : Internal(new pqInternal)
 {
   assert(displayView != nullptr && linkedView != nullptr);
@@ -81,7 +82,11 @@ pqCameraWidgetViewLink::pqCameraWidgetViewLink(pqRenderView* displayView, pqRend
     vtkCommand::PropertyModifiedEvent, this->Internal->Callback);
 
   // Initial Render
-  this->Internal->DisplayView->resetCamera();
+  // when loading a state, don't reset the camera since the camera is already set correctly.
+  if (!loadState)
+  {
+    this->Internal->DisplayView->resetCamera();
+  }
   this->Internal->DisplayView->forceRender();
 }
 
