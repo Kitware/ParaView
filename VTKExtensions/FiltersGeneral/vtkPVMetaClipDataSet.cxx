@@ -211,3 +211,23 @@ int vtkPVMetaClipDataSet::RequestDataObject(
 
   return this->Superclass::RequestDataObject(request, inputVector, outputVector);
 }
+
+//------------------------------------------------------------------------------
+vtkMTimeType vtkPVMetaClipDataSet::GetMTime()
+{
+  vtkMTimeType time;
+  vtkMTimeType mTime = this->Superclass::GetMTime();
+
+  if (this->ImplicitFunctions[METACLIP_DATASET])
+  {
+    time = this->ImplicitFunctions[METACLIP_DATASET]->GetMTime();
+    mTime = (time > mTime ? time : mTime);
+  }
+  if (this->ImplicitFunctions[METACLIP_HYPERTREEGRID])
+  {
+    time = this->ImplicitFunctions[METACLIP_HYPERTREEGRID]->GetMTime();
+    mTime = (time > mTime ? time : mTime);
+  }
+
+  return mTime;
+}
