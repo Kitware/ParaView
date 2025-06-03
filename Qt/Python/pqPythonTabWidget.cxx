@@ -11,11 +11,13 @@
 #include "pqPythonTextArea.h"
 #include "pqTextLinker.h"
 
+#include <QApplication>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMenu>
 #include <QPushButton>
 #include <QStandardPaths>
+#include <QStyleHints>
 #include <QTabBar>
 #include <QTextStream>
 
@@ -264,6 +266,11 @@ void pqPythonTabWidget::createNewEmptyTab()
   this->connect(widget, &pqPythonTextArea::fileSaved,
     [this, widget](const QString&) { this->updateTab(widget); });
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  QObject::connect(QApplication::styleHints(), &QStyleHints::colorSchemeChanged, this,
+    [this, widget](Qt::ColorScheme) { this->updateTab(widget); });
+#endif
+
   this->connect(
     widget, &pqPythonTextArea::contentChanged, [this, widget]() { this->updateTab(widget); });
 
@@ -380,24 +387,29 @@ void pqPythonTabWidget::generateTabName(const pqPythonTextArea* widget, QString&
   if (widget == this->TraceWidget)
   {
     prefix = "[Trace]";
-    prefixColor = Qt::GlobalColor::darkCyan;
+    prefixColor =
+      pqCoreUtilities::isDarkTheme() ? Qt::GlobalColor::cyan : Qt::GlobalColor::darkCyan;
   }
   else if (fileName.contains(macroDir))
   {
     prefix = "[Macro]";
-    prefixColor = Qt::GlobalColor::darkGreen;
+    prefixColor =
+      pqCoreUtilities::isDarkTheme() ? Qt::GlobalColor::green : Qt::GlobalColor::darkGreen;
   }
   else if (fileName.contains(scriptDir))
   {
     prefix = "[Script]";
-    prefixColor = Qt::GlobalColor::darkBlue;
+    prefixColor =
+      pqCoreUtilities::isDarkTheme() ? Qt::GlobalColor::blue : Qt::GlobalColor::darkBlue;
   }
   tabName = ColorText(prefixColor, prefix);
   unstyledTabName = prefix;
 
   if (widget->isLinked())
   {
-    tabName += ColorText(Qt::GlobalColor::darkYellow, "[Linked]");
+    tabName += ColorText(
+      pqCoreUtilities::isDarkTheme() ? Qt::GlobalColor::yellow : Qt::GlobalColor::darkYellow,
+      "[Linked]");
     unstyledTabName += "[Linked]";
   }
 
@@ -419,14 +431,20 @@ void pqPythonTabWidget::generateTabName(const pqPythonTextArea* widget, QString&
     absoluteDirPath.replace(homeDirectory, "~");
 
     elidedTabName = tabName;
-    tabName += ColorText(Qt::GlobalColor::gray, absoluteDirPath) + "/";
+    tabName +=
+      ColorText(pqCoreUtilities::isDarkTheme() ? Qt::GlobalColor::lightGray : Qt::GlobalColor::gray,
+        absoluteDirPath) +
+      "/";
     unstyledTabName += absoluteDirPath + "/";
 
     // Path can get long, elide it
     QLabel tmpLabel;
     QFontMetrics metrics(tmpLabel.font());
     QString elidedAbsoluteDirPath = metrics.elidedText(absoluteDirPath, Qt::ElideMiddle, 200);
-    elidedTabName += ColorText(Qt::GlobalColor::gray, elidedAbsoluteDirPath) + "/";
+    elidedTabName +=
+      ColorText(pqCoreUtilities::isDarkTheme() ? Qt::GlobalColor::lightGray : Qt::GlobalColor::gray,
+        elidedAbsoluteDirPath) +
+      "/";
 
     QString styledFileName;
     if (widget->isDirty())
