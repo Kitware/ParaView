@@ -43,11 +43,6 @@ void pqLightToolbar::constructor()
 {
   this->Internals->setupUi(this);
 
-  QIcon LightIcon;
-  LightIcon.addFile(":/pqWidgets/Icons/pqLightOn.svg", QSize(), QIcon::Normal, QIcon::On);
-  LightIcon.addFile(":/pqWidgets/Icons/pqLightOff.svg", QSize(), QIcon::Normal, QIcon::Off);
-  this->Internals->actionActiveLightKit->setIcon(LightIcon);
-
   this->Internals->Links.setUseUncheckedProperties(false);
   this->Internals->Links.setAutoUpdateVTKObjects(true);
 
