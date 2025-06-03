@@ -90,6 +90,12 @@ public:
   vtkIncrementalPointLocator* GetLocator();
   ///@}
 
+  /**
+   * Override GetMTime because the implicit functions need to be taken
+   * into account.
+   */
+  vtkMTimeType GetMTime() override;
+
 protected:
   vtkPVMetaSliceDataSet();
   ~vtkPVMetaSliceDataSet() override;
