@@ -3,42 +3,47 @@
 <!-- SPDX-License-Identifier: BSD-3-Clause -->
 <ui version="4.0">
  <class>pqLightToolbar</class>
- <widget class="QToolBar" name="lightToolbar" >
-  <property name="enabled" >
+ <widget class="QToolBar" name="pqLightToolbar">
+  <property name="enabled">
    <bool>true</bool>
   </property>
-  <property name="windowTitle" >
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>136</width>
+    <height>24</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
    <string>Light controls</string>
   </property>
-  <property name="orientation" >
-   <enum>Qt::Horizontal</enum>
+  <property name="orientation">
+   <enum>Qt::Orientation::Horizontal</enum>
   </property>
-  <attribute name="toolBarArea" >
-   <enum>TopToolBarArea</enum>
-  </attribute>
-  <attribute name="toolBarBreak" >
-   <bool>false</bool>
-  </attribute>
-
-  <action name="actionActiveLightKit" >
-   <property name="checkable" >
+  <action name="actionActiveLightKit">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="enabled" >
+   <property name="enabled">
     <bool>true</bool>
    </property>
-   <property name="icon" >
-    <iconset resource="../pqComponents.qrc">:/pqWidgets/Icons/pqLightOn.svg</iconset>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqLightOff.svg</normaloff>
+     <normalon>:/pqWidgets/Icons/pqLightOn.svg</normalon>
+     <activeoff>:/pqWidgets/Icons/pqLightOff.svg</activeoff>
+     <activeon>:/pqWidgets/Icons/pqLightOn.svg</activeon>:/pqWidgets/Icons/pqLightOff.svg</iconset>
    </property>
    <property name="text" >
     <string>Enable/Disable Light Kit</string>
    </property>
   </action>
-
   <addaction name="actionActiveLightKit" />
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
+  <include location="../pqComponents.qrc"/>
  </resources>
  <connections/>
 </ui>
