@@ -7,6 +7,7 @@
 #include "vtkPVLogger.h"
 #include "vtkSMSessionProxyManager.h"
 
+#include <QApplication>
 #include <QByteArray>
 #include <QDebug>
 #include <QPushButton>
@@ -99,7 +100,7 @@ public:
         // Qt::TextAlignmentRole);
 
         // Change log message color for warnings and errors
-        QColor color;
+        QColor color = QApplication::palette().color(QPalette::Text);
         if (parts[3] == "WARN")
         {
           color.setRgb(174, 173, 39);
