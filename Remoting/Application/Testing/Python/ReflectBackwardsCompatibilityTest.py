@@ -7,7 +7,7 @@ from paraview.simple import *
 sphere = Sphere()
 
 sphereReflection = Reflect(Input=sphere)
-assert(type(sphereReflection).__name__ == "AxisAlignedReflectionFilter")
+assert (type(sphereReflection).__name__ == "AxisAlignedReflect")
 
 sphereReflection.Plane = 7
 sphereReflection.Center = 2
