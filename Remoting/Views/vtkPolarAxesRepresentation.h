@@ -265,6 +265,7 @@ public:
   virtual void SetRadialTitleVisibility(int visible);
   virtual void SetPolarArcsVisibility(int visible);
   virtual void SetUse2DMode(int use);
+  void SetRasterizeText(int use);
   virtual void SetRatio(double ratio);
   virtual void SetPolarArcResolutionPerDegree(double resolution);
   virtual void SetDeltaRangeMinor(double delta);

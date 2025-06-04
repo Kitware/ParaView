@@ -961,6 +961,12 @@ void vtkPolarAxesRepresentation::SetUse2DMode(int use)
 }
 
 //----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetRasterizeText(int use)
+{
+  this->PolarAxesActor->SetUseTextActor3D(use);
+}
+
+//----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetRatio(double ratio)
 {
   this->PolarAxesActor->SetRatio(ratio);

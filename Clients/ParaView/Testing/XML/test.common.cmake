@@ -1573,6 +1573,7 @@ list(APPEND TESTS_WITH_BASELINES
   PointInterpolator.xml
   PointVolumeInterpolator.xml
   PolarAxes.xml
+  PolarAxesRasterizedText.xml
   PolarAxesRemoteRendering.xml
   PolarAxes2D.xml
   PolyLineAndSplineSources.xml
@@ -2094,6 +2095,7 @@ set(LineChartSelection_METHOD LOOSE_VALID)
 set(OrthographicView_METHOD LOOSE_VALID)
 set(PlotGlobalVariablesOverTime_METHOD LOOSE_VALID)
 set(PointChartView_METHOD LOOSE_VALID)
+set(PolarAxesRasterizedText_METHOD LOOSE_VALID)
 set(PolarAxesRemoteRendering_METHOD LOOSE_VALID)
 set(Preview_METHOD LOOSE_VALID)
 set(ProgrammableAnnotation_METHOD LOOSE_VALID)
