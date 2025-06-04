@@ -14,6 +14,7 @@
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqServerManagerModel.h"
 #include "pqUseSeparateColorMapReaction.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMProxy.h"
@@ -56,6 +57,7 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(
 
   Ui::ColorEditorPropertyWidget& Ui = internals.Ui;
   Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargins());
   Ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());

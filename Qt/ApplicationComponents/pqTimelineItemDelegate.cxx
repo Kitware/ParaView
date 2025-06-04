@@ -12,6 +12,7 @@
 #include "pqPropertyLinks.h"
 #include "pqTimelineModel.h"
 #include "pqTimelinePainter.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkCommand.h"
 #include "vtkPVGeneralSettings.h"
@@ -104,7 +105,8 @@ struct pqTimelineItemDelegate::pqInternals
     auto scrollArea = dynamic_cast<QAbstractScrollArea*>(parentWidget);
     this->LockStart = new QToolButton(scrollArea->viewport());
     this->LockStart->setObjectName("LockStart");
-    this->LockStart->setToolTip(this->lockTooltip().arg(tr("Start time")));
+    this->LockStart->setToolTip(
+      pqWidgetUtilities::formatTooltip(this->lockTooltip().arg(tr("Start time"))));
     this->LockStart->setCheckable(true);
     this->LockStart->setIcon(QIcon(":/pqWidgets/Icons/pqLock.svg"));
     QObject::connect(this->LockStart, &QToolButton::clicked,
@@ -113,19 +115,22 @@ struct pqTimelineItemDelegate::pqInternals
         if (!this->LockStart->isChecked())
         {
           this->LockStart->setIcon(QIcon(":/pqWidgets/Icons/pqLock.svg"));
-          this->LockStart->setToolTip(this->lockTooltip().arg(tr("Start time")));
+          this->LockStart->setToolTip(
+            pqWidgetUtilities::formatTooltip(this->lockTooltip().arg(tr("Start time"))));
         }
         else
         {
           this->LockStart->setIcon(QIcon(":/pqWidgets/Icons/pqUnlock.svg"));
-          this->LockStart->setToolTip(this->unlockTooltip().arg(tr("Start time")));
+          this->LockStart->setToolTip(
+            pqWidgetUtilities::formatTooltip(this->unlockTooltip().arg(tr("Start time"))));
         }
         this->Self->TimelinePainter->setSceneLockStart(this->LockStart->isChecked());
       });
 
     this->LockEnd = new QToolButton(scrollArea->viewport());
     this->LockEnd->setObjectName("LockEnd");
-    this->LockEnd->setToolTip(this->lockTooltip().arg(tr("End Time")));
+    this->LockEnd->setToolTip(
+      pqWidgetUtilities::formatTooltip(this->lockTooltip().arg(tr("End Time"))));
     this->LockEnd->setCheckable(true);
     this->LockEnd->setIcon(QIcon(":/pqWidgets/Icons/pqLock.svg"));
     QObject::connect(this->LockEnd, &QToolButton::clicked,
@@ -134,12 +139,14 @@ struct pqTimelineItemDelegate::pqInternals
         if (!this->LockEnd->isChecked())
         {
           this->LockEnd->setIcon(QIcon(":/pqWidgets/Icons/pqLock.svg"));
-          this->LockEnd->setToolTip(this->lockTooltip().arg(tr("End time")));
+          this->LockEnd->setToolTip(
+            pqWidgetUtilities::formatTooltip(this->lockTooltip().arg(tr("End time"))));
         }
         else
         {
           this->LockEnd->setIcon(QIcon(":/pqWidgets/Icons/pqUnlock.svg"));
-          this->LockEnd->setToolTip(this->unlockTooltip().arg(tr("End time")));
+          this->LockEnd->setToolTip(
+            pqWidgetUtilities::formatTooltip(this->unlockTooltip().arg(tr("End time"))));
         }
 
         this->Self->TimelinePainter->setSceneLockEnd(this->LockEnd->isChecked());

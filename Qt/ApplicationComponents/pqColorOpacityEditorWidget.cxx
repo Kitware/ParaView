@@ -21,6 +21,7 @@
 #include "pqSignalsBlocker.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
 #include "vtkDiscretizableColorTransferFunction.h"
@@ -166,6 +167,7 @@ public:
     , SignalsBlocker(new pqSignalsBlocker(self))
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.mainLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin());
@@ -1175,6 +1177,7 @@ void pqColorOpacityEditorWidget::saveAsPreset()
   QDialog dialog(this);
   Ui::SavePresetOptions ui;
   ui.setupUi(&dialog);
+  pqWidgetUtilities::formatChildTooltips(&dialog);
   ui.saveOpacities->setEnabled(this->scalarOpacityFunctionProxy() != nullptr);
   ui.saveOpacities->setChecked(ui.saveOpacities->isEnabled());
   ui.saveAnnotations->setVisible(false);

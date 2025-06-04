@@ -6,17 +6,15 @@
 
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
-#include "pqProxy.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCollection.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
-
-#include <QRegularExpression>
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy* smProxy, QWidget* parentObject)
@@ -86,11 +84,9 @@ QString pqPropertyWidget::getTooltip(vtkSMProperty* smproperty)
 {
   if (smproperty && smproperty->GetDocumentation())
   {
-    QString doc = pqProxy::rstToHtml(QCoreApplication::translate(
-      "ServerManagerXML", smproperty->GetDocumentation()->GetDescription()));
-    doc = doc.trimmed();
-    doc = doc.replace(QRegularExpression("\\s+"), " ");
-    return QString("<html><head/><body><p align=\"justify\">%1</p></body></html>").arg(doc);
+    QString doc = QCoreApplication::translate(
+      "ServerManagerXML", smproperty->GetDocumentation()->GetDescription());
+    return pqWidgetUtilities::formatTooltip(doc);
   }
   return QString();
 }

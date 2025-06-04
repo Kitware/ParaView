@@ -8,6 +8,7 @@
 #include "pqCoreUtilities.h"
 #include "pqProxyWidget.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -87,6 +88,7 @@ public:
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     // remove do-nothing "?" title bar button on Windows.
     self->setWindowFlags(self->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 

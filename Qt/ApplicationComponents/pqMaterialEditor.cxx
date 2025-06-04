@@ -36,6 +36,7 @@
 #include "pqObjectBuilder.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 
 #include <QAbstractTableModel>
 #include <QDockWidget>
@@ -553,6 +554,7 @@ public:
   pqInternals(pqMaterialEditor* self)
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
 
     this->Ui.PropertiesView->setModel(&this->AttributesModel);
 

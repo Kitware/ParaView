@@ -17,6 +17,7 @@
 #include "pqPropertiesPanel.h"
 #include "pqSignalAdaptors.h"
 #include "pqWidgetRangeDomain.h"
+#include "pqWidgetUtilities.h"
 
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
@@ -60,7 +61,7 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
   pqHighlightableToolButton* resetButton = new pqHighlightableToolButton(this);
   resetButton->setObjectName("Reset");
   QAction* resetActn = new QAction(resetButton);
-  resetActn->setToolTip(tr("Reset using current data values"));
+  resetActn->setToolTip(pqWidgetUtilities::formatTooltip(tr("Reset using current data values")));
   resetActn->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   resetButton->addAction(resetActn);
   resetButton->setDefaultAction(resetActn);

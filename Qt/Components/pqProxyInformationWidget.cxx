@@ -17,6 +17,7 @@
 #include "pqDoubleLineEdit.h"
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqOutputPort.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
@@ -675,7 +676,7 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* parentWdg)
   button->setChecked(false);
   button->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
   button->setObjectName("showRawDataGrouping");
-  button->setToolTip(tr("Show hierarchy / assembly as text"));
+  button->setToolTip(pqWidgetUtilities::formatTooltip(tr("Show hierarchy / assembly as text")));
   ui.rawCompositeTree->hide();
   ui.rawAssemblyTree->hide();
 

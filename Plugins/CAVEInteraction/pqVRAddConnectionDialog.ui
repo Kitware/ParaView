@@ -41,7 +41,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the type of VR connection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Select the type of VR connection.</string>
      </property>
     </widget>
    </item>
@@ -61,7 +61,7 @@
    <item row="1" column="1">
     <widget class="QLineEdit" name="connectionName">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of the connection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Name of the connection.</string>
      </property>
      <property name="text">
       <string>vrconn</string>

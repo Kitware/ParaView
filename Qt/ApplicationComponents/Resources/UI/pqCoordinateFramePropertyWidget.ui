@@ -84,7 +84,7 @@
         </palette>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: Use 'P' to pick a &amp;quot;Point&amp;quot; on the mesh or 'Ctrl+P' to snap to the closest mesh point. Use 'N' to align a vector with a surface  &amp;quot;Normal&amp;quot; ( 'Ctrl+N' to snap to the closest mesh point's normal), if availiable. Use 'T' ('Ctrl+T') to point an axis &amp;quot;Toward&amp;quot; the clicked point (or its nearest mesh point).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Note: Use 'P' to pick a "Point" on the mesh or 'Ctrl+P' to snap to the closest mesh point. Use 'N' to align a vector with a surface "Normal" ( 'Ctrl+N' to snap to the closest mesh point's normal), if availiable. Use 'T' ('Ctrl+T') to point an axis "Toward" the clicked point (or its nearest mesh point).</string>
        </property>
        <property name="text">
         <string>↗</string>
@@ -123,7 +123,7 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select an axis to lock (or &amp;quot;–&amp;quot; for none). When an axis is locked, editing other axes with the pointer will rotate them around the locked axis. When picking directions with a locked axis, the locked axis will always be modified (rather than the closest axis to the picked direction).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Select an axis to lock (or "–" for none). When an axis is locked, editing other axes with the pointer will rotate them around the locked axis. When picking directions with a locked axis, the locked axis will always be modified (rather than the closest axis to the picked direction).</string>
        </property>
        <item>
         <property name="text">

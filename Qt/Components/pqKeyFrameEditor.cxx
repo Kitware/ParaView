@@ -38,6 +38,7 @@
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptorKeyFrameType.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 
 #include <algorithm>
 
@@ -355,6 +356,7 @@ pqKeyFrameEditor::pqKeyFrameEditor(
 {
   this->Internal = new pqInternal(this);
   this->Internal->Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   this->Internal->Scene = scene;
   this->Internal->Cue = cue;
   this->Internal->TimeRange = scene ? scene->getClockTimeRange() : QPair<double, double>(0, 1);

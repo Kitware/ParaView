@@ -15,6 +15,7 @@
 #include "pqCollapsedGroup.h"
 #include "pqSMAdaptor.h"
 #include "pqSeriesGeneratorDialog.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
@@ -325,6 +326,7 @@ public:
     , Mode(MODE_DOUBLE)
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.Table->setModel(&this->Model);
     this->Ui.Table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     this->Ui.Table->horizontalHeader()->setStretchLastSection(true);

@@ -18,6 +18,7 @@
 #include "pqPropertiesPanel.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqTreeViewSelectionHelper.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkAbstractArray.h"
 #include "vtkCollection.h"
@@ -323,6 +324,7 @@ public:
   {
     this->SetCurrentPresetName("");
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin());
@@ -1034,6 +1036,7 @@ void pqColorAnnotationsWidget::saveAsNewPreset()
   QDialog dialog(this);
   Ui::SavePresetOptions ui;
   ui.setupUi(&dialog);
+  pqWidgetUtilities::formatChildTooltips(&dialog);
   ui.saveOpacities->setVisible(false);
   auto name =
     this->Internals->Model->headerData(pqAnnotationsModel::LABEL, Qt::Horizontal, Qt::DisplayRole)

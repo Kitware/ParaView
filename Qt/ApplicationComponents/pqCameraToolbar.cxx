@@ -8,12 +8,14 @@
 #include "pqCameraReaction.h"
 #include "pqDataRepresentation.h"
 #include "pqRenderViewSelectionReaction.h"
+#include "pqWidgetUtilities.h"
 
 //-----------------------------------------------------------------------------
 void pqCameraToolbar::constructor()
 {
   Ui::pqCameraToolbar ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   new pqCameraReaction(ui.actionResetCamera, pqCameraReaction::RESET_CAMERA);
   new pqCameraReaction(ui.actionZoomToData, pqCameraReaction::ZOOM_TO_DATA);
   new pqCameraReaction(ui.actionResetCameraClosest, pqCameraReaction::RESET_CAMERA_CLOSEST);

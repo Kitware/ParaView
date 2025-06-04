@@ -6,6 +6,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqRenderView.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkCamera.h"
 #include "vtkMath.h"
@@ -45,6 +46,7 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
 {
   Ui::CylinderPropertyWidget ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   if (vtkSMProperty* center = smgroup->GetProperty("Center"))
   {

@@ -140,7 +140,7 @@
    <item>
     <widget class="QCheckBox" name="useReferenceBounds">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use reference bounding box. When checked, &lt;span style=&quot; font-weight:600;&quot;&gt;Position&lt;/span&gt;, &lt;span style=&quot; font-weight:600;&quot;&gt;Rotation&lt;/span&gt;, and &lt;span style=&quot; font-weight:600;&quot;&gt;Scale&lt;/span&gt; are specified relative to the explicitly provided reference bounding box.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Use reference bounding box. When checked, "**Position**", "**Rotation**", and "**Scale**" are specified relative to the explicitly provided reference bounding box.</string>
      </property>
      <property name="text">
       <string>Use Reference Bounds</string>

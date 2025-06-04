@@ -20,6 +20,7 @@
 #include "pqShortcutDecorator.h"
 #include "pqStringVectorPropertyWidget.h"
 #include "pqTimer.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCollection.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
@@ -564,7 +565,8 @@ QString pqProxyWidget::documentationText(vtkSMProperty* smProperty, Documentatio
   }
   else
   {
-    return pqProxy::rstToHtml(QCoreApplication::translate("ServerManagerXML", xmlDocumentation));
+    return pqWidgetUtilities::rstToHtml(
+      QCoreApplication::translate("ServerManagerXML", xmlDocumentation));
   }
 }
 
@@ -575,7 +577,8 @@ QString pqProxyWidget::documentationText(vtkSMProxy* smProxy, DocumentationType 
     smProxy ? vtkGetDocumentation(smProxy->GetDocumentation(), dtype) : nullptr;
   return (!xmlDocumentation || xmlDocumentation[0] == 0)
     ? QString()
-    : pqProxy::rstToHtml(QCoreApplication::translate("ServerManagerXML", xmlDocumentation));
+    : pqWidgetUtilities::rstToHtml(
+        QCoreApplication::translate("ServerManagerXML", xmlDocumentation));
 }
 
 //-----------------------------------------------------------------------------

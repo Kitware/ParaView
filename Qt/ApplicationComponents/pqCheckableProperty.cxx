@@ -6,6 +6,7 @@
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 #include "vtkPVLogger.h"
 #include "vtkSMPropertyGroup.h"
 
@@ -69,8 +70,9 @@ pqCheckableProperty::pqCheckableProperty(
   // Trailing checkbox -----------------------------------------
   auto* checkBox = new QCheckBox(this);
   checkBox->setObjectName("CheckBox");
-  checkBox->setToolTip(
+  QString tooltip = pqWidgetUtilities::formatTooltip(
     QCoreApplication::translate("ServerManagerXML", PropertyCheckBox->GetXMLLabel()));
+  checkBox->setToolTip(tooltip);
   layoutLocal->addWidget(checkBox);
 
   this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), PropertyCheckBox);

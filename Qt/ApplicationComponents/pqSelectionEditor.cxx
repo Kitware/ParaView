@@ -18,6 +18,7 @@
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
@@ -438,6 +439,7 @@ public:
   pqInternal(pqSelectionEditor* self)
   {
     this->setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
 
     this->PropertiesView->setModel(&this->SelectionModel);
     this->PropertiesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);

@@ -6,6 +6,7 @@
 
 #include "pqHighlightItemDelegate.h"
 #include "pqScopedOverrideCursor.h"
+#include "pqWidgetUtilities.h"
 
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
@@ -51,6 +52,7 @@ pqItemViewSearchWidget::pqItemViewSearchWidget(QWidget* parentW)
 {
   this->Private = new pqItemViewSearchWidget::PIMPL(parentW);
   this->Private->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   QObject::connect(
     this->Private->lineEditSearch, SIGNAL(textEdited(QString)), this, SLOT(updateSearch(QString)));
   QObject::connect(

@@ -10,6 +10,7 @@
 #include "pqOutputPort.h"
 #include "pqProxyWidget.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkPVDataInformation.h"
 #include "vtkSMPropertyGroup.h"
@@ -107,6 +108,7 @@ public:
   pqInternals(pqMultiBlockInspectorWidget* self)
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     if (auto settings = pqApplicationCore::instance()->settings())
     {
       const bool checked = settings->value("pqMultiBlockInspectorWidget/ShowHints", true).toBool();

@@ -10,6 +10,7 @@
 #include "pqProxyWidget.h"
 #include "pqRescaleScalarRangeReaction.h"
 #include "pqRescaleScalarRangeToCustomDialog.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkPiecewiseFunction.h"
@@ -44,6 +45,7 @@ pqOMETransferFunctionsPropertyWidget::pqOMETransferFunctionsPropertyWidget(
   auto& internals = (*this->Internals);
   internals.Group = smgroup;
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   for (int idx = 0; idx < 10; ++idx)
   {

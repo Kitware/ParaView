@@ -9,6 +9,7 @@
 
 #include "pqQtDeprecated.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkSMComparativeAnimationCueProxy.h"
@@ -218,6 +219,7 @@ void pqComparativeCueWidget::editRange()
   QDialog dialog;
   Ui::pqComparativeParameterRangeDialog ui;
   ui.setupUi(&dialog);
+  pqWidgetUtilities::formatChildTooltips(&dialog);
   bool csv = this->acceptsMultipleValues();
   ui.multivalueHint->setVisible(csv);
   ui.mode->setVisible(ranges[0].rowCount() > 1 && ranges[0].columnCount() > 1);

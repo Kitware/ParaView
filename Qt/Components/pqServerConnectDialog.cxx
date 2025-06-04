@@ -13,6 +13,7 @@
 #include "pqServerConfigurationImporter.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSetGet.h"
 
 #include <QAuthenticator>
@@ -128,6 +129,7 @@ pqServerConnectDialog::pqServerConnectDialog(
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->Internals->Selector = selector;
 
@@ -269,8 +271,8 @@ void pqServerConnectDialog::updateConfigurations()
     QTableWidgetItem* item2 = new QTableWidgetItem(config.resource().schemeHostsPorts().toURI());
 
     // setup tooltips.
-    item1->setToolTip(item1->text());
-    item2->setToolTip(item2->text());
+    item1->setToolTip(pqWidgetUtilities::formatTooltip(item1->text()));
+    item2->setToolTip(pqWidgetUtilities::formatTooltip(item2->text()));
 
     // original_index helps us find the item after sorting.
     item1->setData(Qt::UserRole, original_index);
@@ -886,9 +888,9 @@ void pqServerConnectDialog::updateImportableConfigurations()
     QTableWidgetItem* item3 = new QTableWidgetItem(item.SourceName);
 
     // setup tooltips.
-    item1->setToolTip(item1->text());
-    item2->setToolTip(item2->text());
-    item3->setToolTip(item3->text());
+    item1->setToolTip(pqWidgetUtilities::formatTooltip(item1->text()));
+    item2->setToolTip(pqWidgetUtilities::formatTooltip(item2->text()));
+    item3->setToolTip(pqWidgetUtilities::formatTooltip(item3->text()));
 
     // original_index helps us find the item after sorting.
     item1->setData(Qt::UserRole, original_index);

@@ -25,6 +25,7 @@
 #include "pqSpreadSheetViewModel.h"
 #include "pqSpreadSheetViewWidget.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 #include "vtkDataObject.h"
 #include "vtkNew.h"
 #include "vtkSMEnumerationDomain.h"
@@ -99,6 +100,7 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
 
   auto& internal = *this->Internal;
   internal.setupUi(header);
+  pqWidgetUtilities::formatChildTooltips(header);
   internal.Source->setAutoUpdateIndex(false);
   internal.Source->addCustomEntry("None", nullptr);
   internal.Source->fillExistingPorts();

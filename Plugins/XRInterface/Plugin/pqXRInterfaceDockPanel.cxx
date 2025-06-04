@@ -9,6 +9,7 @@
 #include "pqPVApplicationCore.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
+#include "pqWidgetUtilities.h"
 #include "pqXRInterfaceControls.h"
 #include "vtkNew.h"
 #include "vtkPVRenderView.h"
@@ -68,6 +69,7 @@ void pqXRInterfaceDockPanel::constructor()
   this->setWindowTitle("XRInterface");
   QWidget* t_widget = new QWidget(this);
   this->Internals->Ui.setupUi(t_widget);
+  pqWidgetUtilities::formatChildTooltips(t_widget);
   this->setWidget(t_widget);
 
   this->Internals->Ui.showXRViewButton->setEnabled(false);

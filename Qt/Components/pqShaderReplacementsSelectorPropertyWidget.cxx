@@ -21,6 +21,7 @@
 #include "pqTextEdit.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
@@ -58,22 +59,24 @@ pqShaderReplacementsSelectorPropertyWidget::pqShaderReplacementsSelectorProperty
   gridLayout->setColumnStretch(2, 1);
 
   this->Internal->ComboBox = new pqShaderReplacementsComboBox(this);
-  this->Internal->ComboBox->setToolTip(tr("List of previously loaded Json files"));
+  this->Internal->ComboBox->setToolTip(
+    pqWidgetUtilities::formatTooltip(tr("List of previously loaded Json files")));
   QObject::connect(
     this->Internal->ComboBox, SIGNAL(activated(int)), this, SLOT(onPresetChanged(int)));
 
   gridLayout->addWidget(this->Internal->ComboBox, 0, 0);
   QToolButton* loadButton = new QToolButton(this);
   loadButton->setText(tr("Load"));
-  loadButton->setToolTip(tr("Load a Json preset file"));
+  loadButton->setToolTip(pqWidgetUtilities::formatTooltip(tr("Load a Json preset file")));
   loadButton->setIcon(QIcon(":/pqWidgets/Icons/pqNewFolder.svg"));
   QObject::connect(loadButton, SIGNAL(clicked()), this, SLOT(onLoad()));
   gridLayout->addWidget(loadButton, 0, 1);
 
   QToolButton* delButton = new QToolButton(this);
   delButton->setText(tr("Delete"));
-  delButton->setToolTip(tr("Delete the selected preset from the preset list or clear the current "
-                           "shader replacement string."));
+  delButton->setToolTip(
+    pqWidgetUtilities::formatTooltip(tr("Delete the selected preset from the preset list or clear "
+                                        "the current shader replacement string.")));
   delButton->setIcon(QIcon(":/QtWidgets/Icons/pqDelete.svg"));
   QObject::connect(delButton, SIGNAL(clicked()), this, SLOT(onDelete()));
   gridLayout->addWidget(delButton, 0, 2);

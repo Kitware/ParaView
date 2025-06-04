@@ -6,6 +6,7 @@
 
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
+#include "pqWidgetUtilities.h"
 
 #include <QRegExp>
 
@@ -40,6 +41,7 @@ pqImageCompressorWidget::pqImageCompressorWidget(
 
   Ui::ImageCompressorWidget& ui = this->Internals->Ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   ui.mainLayout->setContentsMargins(0, 0, 0, 0);
   ui.mainLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 

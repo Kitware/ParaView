@@ -5,6 +5,7 @@
 #include "pqExpressionChooserButton.h"
 
 #include "pqExpressionsManager.h"
+#include "pqWidgetUtilities.h"
 
 #include <QAction>
 #include <QMenu>
@@ -15,7 +16,7 @@ pqExpressionChooserButton::pqExpressionChooserButton(QWidget* parent, const QStr
   , Group(group)
 {
   this->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->setToolTip(tr("Choose Expression"));
+  this->setToolTip(pqWidgetUtilities::formatTooltip(tr("Choose Expression")));
   this->setPopupMode(QToolButton::InstantPopup);
 
   QMenu* menuList = new QMenu(this);

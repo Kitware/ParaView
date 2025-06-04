@@ -12,6 +12,7 @@
 #include "pqQtDeprecated.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 
 #include <QAbstractButton>
 #include <QAbstractItemView>
@@ -250,6 +251,7 @@ void pqFileDialog::addImplementation(vtkTypeUInt32 location)
 
   // set up ui for the file system
   this->Implementations[location]->Ui.setupUi(this->Implementations[location]);
+  pqWidgetUtilities::formatChildTooltips(this->Implementations[location]);
 
   // set up ok and cancel signals/slots
   QObject::connect(impl.Ui.OK, &QPushButton::clicked, this, &pqFileDialog::accept);
@@ -274,8 +276,8 @@ void pqFileDialog::addImplementation(vtkTypeUInt32 location)
   impl.Ui.NavigateBack->setIcon(back);
   impl.Ui.NavigateBack->setEnabled(false);
   impl.Ui.NavigateBack->setShortcut(QKeySequence::Back);
-  impl.Ui.NavigateBack->setToolTip(
-    tr("Navigate Back (%1)").arg(impl.Ui.NavigateBack->shortcut().toString()));
+  impl.Ui.NavigateBack->setToolTip(pqWidgetUtilities::formatTooltip(
+    tr("Navigate Back (%1)").arg(impl.Ui.NavigateBack->shortcut().toString())));
 
   QObject::connect(impl.Ui.NavigateBack, SIGNAL(clicked(bool)), this, SLOT(onNavigateBack()));
   // just flip the back image to make a forward image
@@ -283,17 +285,17 @@ void pqFileDialog::addImplementation(vtkTypeUInt32 location)
   impl.Ui.NavigateForward->setIcon(forward);
   impl.Ui.NavigateForward->setDisabled(true);
   impl.Ui.NavigateForward->setShortcut(QKeySequence::Forward);
-  impl.Ui.NavigateForward->setToolTip(
-    tr("Navigate Forward (%1)").arg(impl.Ui.NavigateForward->shortcut().toString()));
+  impl.Ui.NavigateForward->setToolTip(pqWidgetUtilities::formatTooltip(
+    tr("Navigate Forward (%1)").arg(impl.Ui.NavigateForward->shortcut().toString())));
   QObject::connect(impl.Ui.NavigateForward, SIGNAL(clicked(bool)), this, SLOT(onNavigateForward()));
   impl.Ui.NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
   impl.Ui.NavigateUp->setShortcut(Qt::ALT | Qt::Key_Up);
-  impl.Ui.NavigateUp->setToolTip(
-    tr("Navigate Up (%1)").arg(impl.Ui.NavigateUp->shortcut().toString()));
+  impl.Ui.NavigateUp->setToolTip(pqWidgetUtilities::formatTooltip(
+    tr("Navigate Up (%1)").arg(impl.Ui.NavigateUp->shortcut().toString())));
   impl.Ui.CreateFolder->setIcon(style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
   impl.Ui.CreateFolder->setShortcut(QKeySequence::New);
-  impl.Ui.CreateFolder->setToolTip(
-    tr("Create New Folder (%1)").arg(impl.Ui.CreateFolder->shortcut().toString()));
+  impl.Ui.CreateFolder->setToolTip(pqWidgetUtilities::formatTooltip(
+    tr("Create New Folder (%1)").arg(impl.Ui.CreateFolder->shortcut().toString())));
 
   impl.Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
 
@@ -793,7 +795,7 @@ void pqFileDialog::setFileMode(FileMode mode, vtkTypeUInt32 location)
     // only set the tooltip and window title the first time through
     impl.ShowMultipleFileHelp = true;
     this->setWindowTitle(this->windowTitle() + "  " + tr("open multiple files with <ctrl> key.)"));
-    this->setToolTip(tr("open multiple files with <ctrl> key."));
+    this->setToolTip(pqWidgetUtilities::formatTooltip(tr("open multiple files with <ctrl> key.")));
   }
   impl.Ui.Files->setSelectionMode(selectionMode);
 
@@ -1182,7 +1184,8 @@ void pqFileDialog::onFilterChange(const QString& filter)
 
   // update view
   impl.FileFilter.invalidate();
-  impl.Ui.EntityType->setToolTip(impl.Ui.EntityType->currentText());
+  impl.Ui.EntityType->setToolTip(
+    pqWidgetUtilities::formatTooltip(tr(impl.Ui.EntityType->currentText().toUtf8().data())));
 
   impl.SelectedFilterIndex = impl.Ui.EntityType->currentIndex();
 

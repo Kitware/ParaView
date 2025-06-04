@@ -21,6 +21,7 @@
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 #include "pqXYChartView.h"
 #include "vtkAlgorithm.h"
 #include "vtkNew.h"
@@ -82,6 +83,7 @@ pqSLACManager::pqSLACManager(QObject* p)
   // structure created with designer that holds the actions.
   this->Internal->ActionPlaceholder = new QWidget(nullptr);
   this->Internal->Actions.setupUi(this->Internal->ActionPlaceholder);
+  pqWidgetUtilities::formatChildTooltips(this->Internal->ActionPlaceholder);
 
   this->actionShowParticles()->setChecked(true);
 

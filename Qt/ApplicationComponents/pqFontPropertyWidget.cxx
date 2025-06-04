@@ -7,6 +7,7 @@
 #include "pqComboBoxDomain.h"
 #include "pqPropertiesPanel.h"
 #include "pqSignalAdaptors.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProxy.h"
 
@@ -22,6 +23,7 @@ public:
   pqInternals(pqFontPropertyWidget* self)
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.mainLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin());

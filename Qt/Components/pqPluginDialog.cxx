@@ -24,6 +24,7 @@
 #include "pqFileDialog.h"
 #include "pqPluginManager.h"
 #include "pqServer.h"
+#include "pqWidgetUtilities.h"
 #include "vtkNew.h"
 #include "vtkPVPythonInformation.h"
 #include "vtkSMSession.h"
@@ -360,7 +361,8 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
     infoText << tr(plInfo->GetDescription(index));
     infoNode = new QTreeWidgetItem(pluginNode, infoText);
     infoNode->setFlags(infoFlags);
-    infoNode->setToolTip(ValueCol, plInfo->GetDescription(index));
+    infoNode->setToolTip(
+      ValueCol, pqWidgetUtilities::formatTooltip(tr(plInfo->GetDescription(index))));
     infoNode->setData(NameCol, Qt::UserRole, vdata);
   }
 
@@ -369,7 +371,8 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   infoText << tr("Location") << plInfo->GetPluginFileName(index);
   infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags);
-  infoNode->setToolTip(ValueCol, plInfo->GetPluginFileName(index));
+  infoNode->setToolTip(
+    ValueCol, pqWidgetUtilities::formatTooltip(plInfo->GetPluginFileName(index)));
   infoNode->setData(NameCol, Qt::UserRole, vdata);
 
   // Depended Plugins
@@ -380,7 +383,8 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
     infoText << plInfo->GetRequiredPlugins(index);
     infoNode = new QTreeWidgetItem(pluginNode, infoText);
     infoNode->setFlags(infoFlags);
-    infoNode->setToolTip(ValueCol, plInfo->GetRequiredPlugins(index));
+    infoNode->setToolTip(
+      ValueCol, pqWidgetUtilities::formatTooltip(plInfo->GetRequiredPlugins(index)));
     infoNode->setData(NameCol, Qt::UserRole, vdata);
   }
 
@@ -392,7 +396,8 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   infoNode->setFlags(infoFlags);
   if (plInfo->GetPluginStatusMessage(index) != nullptr)
   {
-    infoNode->setToolTip(ValueCol, tr(plInfo->GetPluginStatusMessage(index)));
+    infoNode->setToolTip(
+      ValueCol, pqWidgetUtilities::formatTooltip(tr(plInfo->GetPluginStatusMessage(index))));
   }
   infoNode->setData(NameCol, Qt::UserRole, vdata);
 

@@ -152,7 +152,6 @@ set(classes
   pqTextureSelectorPropertyWidget
   pqTimerLogDisplay
   pqToolBarInterface
-  pqToolTipTrapper
   pqTransferFunctionWidget
   pqTransferFunction2DWidget
   pqTriggerOnIdleHelper
@@ -184,7 +183,6 @@ set(headers
   pqPluginTreeWidget.h)
 
 set(ui_files
-  Resources/UI/pqAbortAnimation.ui
   Resources/UI/pqAboutDialog.ui
   Resources/UI/pqAnimationTimeWidget.ui
   Resources/UI/pqFavoritesDialog.ui

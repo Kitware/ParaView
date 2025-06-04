@@ -76,7 +76,7 @@
      <item>
       <widget class="QCheckBox" name="colors">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uncheck to not load colors from the selected preset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Uncheck to not load colors from the selected preset.</string>
        </property>
        <property name="text">
         <string>Colors</string>
@@ -92,7 +92,7 @@
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uncheck to not load opacities from the selected preset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Uncheck to not load opacities from the selected preset.</string>
        </property>
        <property name="text">
         <string>Opacities</string>
@@ -108,7 +108,7 @@
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uncheck to not load annotations from the selected preset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Uncheck to not load annotations from the selected preset.</string>
        </property>
        <property name="text">
         <string>Annotations</string>
@@ -140,10 +140,7 @@
      <item>
       <widget class="QLineEdit" name="regexpLine">
        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This regexp will be applied to seriesName and preset value. If any, matching groups are used, otherwise whole matching. &lt;/p&gt;
-           E.g. series name is `y1 &#x02d3;custom&#x02d2;`, preset have `y1 &#x02d3;generic&#x02d2;` and `z1 &#x02d3;custom&#x02d2;`. Then with the regexp `(.*) &#x02d3;.*&#x02d2;` the `y1 &#x02d3;custom&#x02d2;` series will match with `y1 &#x02d3;generic&#x02d2;`, whereas with `.* (&#x02d3;custom&#x02d2;)` it will match with `z1 &#x02d3;custom&#x02d2;`.
-           &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
-       </string>
+         <string>This regexp will be applied to seriesName and preset value. If any, matching groups are used, otherwise whole matching. E.g. series name is `y1 &#x02d3;custom&#x02d2;`, preset have `y1 &#x02d3;generic&#x02d2;` and `z1 &#x02d3;custom&#x02d2;`. Then with the regexp `(.*) &#x02d3;.*&#x02d2;` the `y1 &#x02d3;custom&#x02d2;` series will match with `y1 &#x02d3;generic&#x02d2;`, whereas with `.* (&#x02d3;custom&#x02d2;)` it will match with `z1 &#x02d3;custom&#x02d2;`.</string>
        </property>
        <property name="text">
         <string>(.*)</string>
@@ -156,7 +153,7 @@
      <item>
       <widget class="QCheckBox" name="usePresetRange">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to use data range specified in the preset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Check to use data range specified in the preset.</string>
        </property>
        <property name="text">
         <string>Use preset range</string>

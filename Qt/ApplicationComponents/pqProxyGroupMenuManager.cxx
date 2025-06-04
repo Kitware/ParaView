@@ -19,6 +19,7 @@
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
@@ -868,7 +869,7 @@ QAction* pqProxyGroupMenuManager::createAction(pqProxyInfo* proxyInfo)
     return nullptr;
   }
 
-  QString tooltip = pqProxyAction::GetProxyDocumentation(action);
+  QString tooltip = pqWidgetUtilities::formatTooltip(pqProxyAction::GetProxyDocumentation(action));
   action->setToolTip(tooltip);
 
   // Add action in the pool for the QuickSearch...

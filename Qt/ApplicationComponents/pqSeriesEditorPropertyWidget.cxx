@@ -7,6 +7,7 @@
 #include "pqActiveObjects.h"
 #include "pqAnnotationsModel.h"
 #include "pqPropertiesPanel.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
@@ -102,6 +103,7 @@ public:
     vtkSMPropertyHelper(lutProxy, "IndexedLookup").Set(1);
 
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.wdgLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin());

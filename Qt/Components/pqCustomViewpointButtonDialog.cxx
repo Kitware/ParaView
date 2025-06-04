@@ -7,6 +7,7 @@
 #include <QToolButton>
 
 #include "pqFileDialog.h"
+#include "pqWidgetUtilities.h"
 #include "vtkIndent.h"
 #include "vtkSMCameraConfigurationFileInfo.h"
 
@@ -82,8 +83,8 @@ public:
       arow.IndexLabel = new QLabel(QString::number(cc + 1), this->Parent);
       arow.IndexLabel->setAlignment(Qt::AlignCenter);
       arow.ToolTipEdit = new QLineEdit(this->Parent);
-      arow.ToolTipEdit->setToolTip(QCoreApplication::translate(
-        "pqCustomViewpointButtonDialogUI", "This text will be set to the buttons tool tip."));
+      arow.ToolTipEdit->setToolTip(pqWidgetUtilities::formatTooltip(QCoreApplication::translate(
+        "pqCustomViewpointButtonDialogUI", "This text will be set to the buttons tool tip.")));
       arow.ToolTipEdit->setText(::pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP);
       arow.ToolTipEdit->setObjectName(QString("toolTip%1").arg(cc));
       arow.AssignButton = new QPushButton(
@@ -201,8 +202,8 @@ public:
 };
 
 //------------------------------------------------------------------------------
-const QString pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP =
-  QCoreApplication::translate("pqCustomViewpointButtonFileInfo", "Unnamed Viewpoint");
+const QString pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP = pqWidgetUtilities::formatTooltip(
+  QCoreApplication::translate("pqCustomViewpointButtonFileInfo", "Unnamed Viewpoint"));
 const int pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS = 0;
 const int pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS = 30;
 
@@ -214,6 +215,7 @@ pqCustomViewpointButtonDialog::pqCustomViewpointButtonDialog(QWidget* Parent, Qt
 {
   this->ui = new pqCustomViewpointButtonDialogUI(this);
   this->ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->setToolTipsAndConfigurations(toolTips, configs);
@@ -508,7 +510,8 @@ void pqCustomViewpointButtonDialog::assignCurrentViewpoint()
     this->Configurations[row] = this->CurrentConfiguration;
     if (this->ui->toolTip(row) == pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP)
     {
-      this->ui->setToolTip(row, tr("Current Viewpoint %1").arg(QString::number(row + 1)));
+      this->ui->setToolTip(row,
+        pqWidgetUtilities::formatTooltip(tr("Current Viewpoint %1").arg(QString::number(row + 1))));
     }
   }
 }

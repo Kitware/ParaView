@@ -9,6 +9,7 @@
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
+#include "pqPropertyWidget.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "vtkSMDocumentation.h"
@@ -133,9 +134,7 @@ void pqChangeInputDialog::buildPortWidgets()
     rb->setText(QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
     if (smproperty->GetDocumentation())
     {
-      rb->setToolTip(QCoreApplication::translate(
-        "ServerManagerXML", smproperty->GetDocumentation()->GetDescription())
-                       .trimmed());
+      rb->setToolTip(pqPropertyWidget::getTooltip(smproperty));
     }
     vbox->addWidget(rb);
 

@@ -10,6 +10,7 @@
 #include "pqKeyEventFilter.h"
 #include "pqProxyActionListModel.h"
 #include "pqQtConfig.h"
+#include "pqWidgetUtilities.h"
 
 #include <QAction>
 #include <QItemSelectionModel>
@@ -24,6 +25,7 @@ pqQuickLaunchDialogExtended::pqQuickLaunchDialogExtended(
   , Ui(new Ui::QuickLaunchDialogExtended)
 {
   this->Ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   QIcon warningIcon = this->style()->standardIcon(QStyle::SP_MessageBoxWarning);
   QSize iconSize = this->Ui->GoToHelp->size();
   this->Ui->RequirementIcon->setPixmap(warningIcon.pixmap(iconSize));

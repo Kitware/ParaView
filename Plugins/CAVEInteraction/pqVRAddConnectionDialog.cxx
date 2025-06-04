@@ -11,6 +11,7 @@
 #if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 #include "pqVRUIConnection.h"
 #endif
+#include "pqWidgetUtilities.h"
 
 #include <QKeyEvent>
 #include <QMessageBox>
@@ -117,6 +118,7 @@ pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject, Qt::Wind
   , Internals(new pqInternals())
 {
   this->Internals->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   this->Internals->Type = pqInternals::None;
 #if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   this->Internals->VRPNConn = nullptr;

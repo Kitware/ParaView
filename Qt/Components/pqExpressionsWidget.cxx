@@ -9,6 +9,7 @@
 #include "pqExpressionsDialog.h"
 #include "pqExpressionsManager.h"
 #include "pqOneLinerTextEdit.h"
+#include "pqWidgetUtilities.h"
 
 #include <QGridLayout>
 #include <QIcon>
@@ -59,17 +60,17 @@ void pqExpressionsWidget::setupButtons(const QString& groupName)
   auto addToList = new QToolButton(this);
   addToList->setObjectName("AddToList");
   addToList->setIcon(QIcon(":/pqWidgets/Icons/pqSave.svg"));
-  addToList->setToolTip(tr("Save expression"));
+  addToList->setToolTip(pqWidgetUtilities::formatTooltip(tr("Save expression")));
   grid->addWidget(addToList, 1, 2);
   auto openManager = new QToolButton(this);
   openManager->setObjectName("OpenManager");
   openManager->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
-  openManager->setToolTip(tr("Open Expressions Manager"));
+  openManager->setToolTip(pqWidgetUtilities::formatTooltip(tr("Open Expressions Manager")));
   grid->addWidget(openManager, 1, 3);
   auto clearExpression = new QToolButton(this);
   clearExpression->setObjectName("ClearExpression");
   clearExpression->setIcon(QIcon(":/pqWidgets/Icons/pqCancel.svg"));
-  clearExpression->setToolTip(tr("Clear expression"));
+  clearExpression->setToolTip(pqWidgetUtilities::formatTooltip(tr("Clear expression")));
   grid->addWidget(clearExpression, 1, 4);
 
   QObject::connect(chooser, SIGNAL(expressionSelected(const QString&)), this->OneLiner,

@@ -6,6 +6,7 @@
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqIconListModel.h"
+#include "pqWidgetUtilities.h"
 
 #include "ui_pqIconBrowser.h"
 
@@ -31,6 +32,7 @@ struct pqIconBrowser::pqInternal
     , TypeFilter(new QSortFilterProxyModel(self))
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     auto applyBtn = this->Ui.buttonBox->button(QDialogButtonBox::Ok);
     applyBtn->setObjectName("ApplyIcon");
     auto closeBtn = this->Ui.buttonBox->button(QDialogButtonBox::Close);

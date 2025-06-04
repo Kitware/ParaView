@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqClickableLabel.h"
 
+#include "pqWidgetUtilities.h"
+
 #include <QMouseEvent>
 
 //-----------------------------------------------------------------------------
@@ -12,7 +14,7 @@ pqClickableLabel::pqClickableLabel(QWidget* widget, const QString& text, const Q
   , Widget(widget)
 {
   this->setText(text);
-  this->setToolTip(tooltip);
+  this->setToolTip(pqWidgetUtilities::formatTooltip(tooltip));
   this->setStatusTip(statusTip);
   if (pixmap)
   {

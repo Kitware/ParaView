@@ -6,6 +6,7 @@
 #include "pqIconSettings.h"
 #include "pqPythonMacroSettings.h"
 #include "pqServer.h"
+#include "pqWidgetUtilities.h"
 
 #include "pqCoreUtilities.h"
 #include "pqIconListModel.h"
@@ -307,7 +308,7 @@ void pqPythonMacroSupervisor::addMacro(
   QAction* runAction = new QAction(macroName, this);
   runAction->setData(fileName);
   runAction->setEnabled(enable);
-  runAction->setToolTip(tip);
+  runAction->setToolTip(pqWidgetUtilities::formatTooltip(tip));
 
   QString storedName = pqPythonMacroSupervisor::macroNameFromFileName(fileName);
   if (!storedName.isEmpty())
@@ -323,7 +324,7 @@ void pqPythonMacroSupervisor::addMacro(
   QString macroToolTip = pqPythonMacroSupervisor::macroToolTipFromFileName(fileName);
   if (!macroToolTip.isEmpty())
   {
-    runAction->setToolTip(macroToolTip);
+    runAction->setToolTip(pqWidgetUtilities::formatTooltip(macroToolTip));
   }
   else
   {

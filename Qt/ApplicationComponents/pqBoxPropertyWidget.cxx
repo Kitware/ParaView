@@ -6,6 +6,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
@@ -24,6 +25,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
   , BoxIsRelativeToInput(false)
 {
   this->Ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   vtkSMProxy* wdgProxy = this->widgetProxy();
 

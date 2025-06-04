@@ -9,6 +9,7 @@
 #include "pqFileDialog.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 #include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -182,6 +183,7 @@ public:
     : Parent(self)
   {
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.filterButton->hide(); // for now. not sure how useful the filter is.
     this->Model = new QStandardItemModel(self);
     this->Model->setColumnCount(2);

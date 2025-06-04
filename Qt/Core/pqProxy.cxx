@@ -11,8 +11,6 @@
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
-#include "vtksys/RegularExpression.hxx"
-
 #include "pqApplicationCore.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -344,76 +342,4 @@ void pqProxy::onProxyUnRegistered(const QString& group, const QString& name, vtk
   {
     this->removeInternalHelperProxy(name, proxy);
   }
-}
-
-//-----------------------------------------------------------------------------
-QString pqProxy::rstToHtml(const QString& rstStr)
-{
-  return QString::fromStdString(pqProxy::rstToHtml(rstStr.toUtf8().data()));
-}
-
-//-----------------------------------------------------------------------------
-std::string pqProxy::rstToHtml(const char* rstStr)
-{
-  std::string htmlStr = rstStr;
-  {
-    // bold
-    vtksys::RegularExpression re("[*][*]([^*]+)[*][*]");
-    while (re.find(htmlStr))
-    {
-      const char* s = htmlStr.c_str();
-      std::string bold(s + re.start(1), re.end(1) - re.start(1));
-      htmlStr.replace(re.start(0), re.end(0) - re.start(0), std::string("<b>") + bold + "</b>");
-    }
-  }
-  {
-    // italic
-    vtksys::RegularExpression re("[*]([^*]+)[*]");
-    while (re.find(htmlStr))
-    {
-      const char* s = htmlStr.c_str();
-      std::string it(s + re.start(1), re.end(1) - re.start(1));
-      htmlStr.replace(re.start(0), re.end(0) - re.start(0), std::string("<i>") + it + "</i>");
-    }
-  }
-  {
-    // begin bullet list
-    size_t start = 0;
-    std::string src("\n\n- ");
-    while ((start = htmlStr.find(src, start)) != std::string::npos)
-    {
-      htmlStr.replace(start, src.size(), "\n<ul><li>");
-    }
-  }
-  {
-    // li for bullet list
-    size_t start = 0;
-    std::string src("\n- ");
-    while ((start = htmlStr.find(src, start)) != std::string::npos)
-    {
-      htmlStr.replace(start, src.size(), "\n<li>");
-    }
-  }
-  {
-    // end bullet list
-    vtksys::RegularExpression re("<li>(.*)\n\n([^-])");
-    while (re.find(htmlStr))
-    {
-      const char* s = htmlStr.c_str();
-      std::string listItem(s + re.start(1), re.end(1) - re.start(1));
-      std::string afterList(s + re.start(2), re.end(2) - re.start(2));
-      htmlStr.replace(re.start(0), re.end(0) - re.start(0),
-        std::string("<li>").append(listItem).append("</ul>").append(afterList));
-    }
-  }
-  {
-    // paragraph
-    size_t start = 0;
-    std::string src("\n\n");
-    while ((start = htmlStr.find(src, start)) != std::string::npos)
-    {
-      htmlStr.replace(start, src.size(), "\n<p>\n");
-    }
-  }
-  return htmlStr;
 }

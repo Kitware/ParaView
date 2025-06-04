@@ -16,6 +16,7 @@
 #include "pqSpreadSheetViewModel.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkDataObject.h"
 #include "vtkNew.h"
@@ -124,6 +125,7 @@ public:
       pqApplicationCore::instance()->manager("SELECTION_MANAGER"));
 
     this->Ui.setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
     this->Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
       pqPropertiesPanel::suggestedMargin());

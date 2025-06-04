@@ -6,6 +6,7 @@
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProxy.h"
@@ -328,6 +329,7 @@ public:
   pqUI(pqSESAMEConversionsPanelWidget* self)
   {
     this->setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
 
     this->PropertiesView->setModel(&this->ConversionsModel);
     this->PropertiesView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);

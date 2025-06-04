@@ -16,6 +16,7 @@
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
 #include "pqUndoRedoReaction.h"
+#include "pqWidgetUtilities.h"
 
 #include <QToolButton>
 
@@ -24,6 +25,7 @@ void pqMainControlsToolbar::constructor()
 {
   Ui::pqMainControlsToolbar ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   new pqLoadDataReaction(ui.actionOpenData);
   new pqSaveDataReaction(ui.actionSaveData);
   new pqServerConnectReaction(ui.actionServerConnect);

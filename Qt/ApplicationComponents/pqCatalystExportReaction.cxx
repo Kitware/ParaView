@@ -15,6 +15,7 @@
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqProxyWidgetDialog.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
@@ -30,7 +31,7 @@ pqCatalystExportReaction::pqCatalystExportReaction(QAction* parentObject)
   parentObject->setEnabled(true);
 #else
   parentObject->setEnabled(false);
-  parentObject->setToolTip(tr("Needs Python support"));
+  parentObject->setToolTip(pqWidgetUtilities::formatTooltip(tr("Needs Python support")));
   parentObject->setStatusTip(tr("Needs Python support"));
 #endif
 }

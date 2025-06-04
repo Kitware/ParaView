@@ -553,8 +553,7 @@
          <item row="4" column="1">
           <widget class="QDoubleSpinBox" name="focalDisk">
            <property name="toolTip">
-            <string> The size of the camera's lens in world coordinates. Affects ray traced depth of field rendering.
-             </string>
+            <string>The size of the camera's lens in world coordinates. Affects ray traced depth of field rendering.</string>
            </property>
            <property name="minimum">
             <double>0.000000000000000</double>

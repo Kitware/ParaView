@@ -85,6 +85,7 @@
 #include "pqUndoRedoReaction.h"
 #include "pqVCRToolbar.h"
 #include "pqViewMenuManager.h"
+#include "pqWidgetUtilities.h"
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqEditMacrosReaction.h"
@@ -149,6 +150,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   QString objectName = menu.objectName();
   Ui::pqFileMenuBuilder ui;
   ui.setupUi(&menu);
+  pqWidgetUtilities::formatChildTooltips(&menu);
   // since the UI file tends to change the name of the menu.
   menu.setObjectName(objectName);
 
@@ -200,6 +202,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   QString objectName = menu.objectName();
   Ui::pqEditMenuBuilder ui;
   ui.setupUi(&menu);
+  pqWidgetUtilities::formatChildTooltips(&menu);
   // since the UI file tends to change the name of the menu.
   menu.setObjectName(objectName);
 
@@ -423,8 +426,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   actionPBOpen->setText(
     QCoreApplication::translate("pqPipelineBrowserContextMenu", "&Open", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-  actionPBOpen->setToolTip(
-    QCoreApplication::translate("pqPipelineBrowserContextMenu", "Open", Q_NULLPTR));
+  actionPBOpen->setToolTip(pqWidgetUtilities::formatTooltip(
+    QCoreApplication::translate("pqPipelineBrowserContextMenu", "Open", Q_NULLPTR)));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_STATUSTIP
   actionPBOpen->setStatusTip(
@@ -509,8 +512,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   actionPBChangeInput->setIconText(
     QCoreApplication::translate("pqPipelineBrowserContextMenu", "Change Input...", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-  actionPBChangeInput->setToolTip(QCoreApplication::translate(
-    "pqPipelineBrowserContextMenu", "Change a Filter's Input", Q_NULLPTR));
+  actionPBChangeInput->setToolTip(pqWidgetUtilities::formatTooltip(QCoreApplication::translate(
+    "pqPipelineBrowserContextMenu", "Change a Filter's Input", Q_NULLPTR)));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_STATUSTIP
   actionPBChangeInput->setStatusTip(QCoreApplication::translate(
@@ -524,8 +527,9 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   actionPBReloadFiles->setIconText(
     QCoreApplication::translate("pqPipelineBrowserContextMenu", "Reload Files", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-  actionPBReloadFiles->setToolTip(QCoreApplication::translate("pqPipelineBrowserContextMenu",
-    "Reload data files in case they were changed externally.", Q_NULLPTR));
+  actionPBReloadFiles->setToolTip(
+    pqWidgetUtilities::formatTooltip(QCoreApplication::translate("pqPipelineBrowserContextMenu",
+      "Reload data files in case they were changed externally.", Q_NULLPTR)));
 #endif // QT_NO_TOOLTIP
 
   QAction* actionPBChangeFile = new QAction(menu.parent());
@@ -543,8 +547,9 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   actionPBIgnoreTime->setText(
     QCoreApplication::translate("pqPipelineBrowserContextMenu", "Ignore Time", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-  actionPBIgnoreTime->setToolTip(QCoreApplication::translate("pqPipelineBrowserContextMenu",
-    "Disregard this source/filter's time from animations", Q_NULLPTR));
+  actionPBIgnoreTime->setToolTip(
+    pqWidgetUtilities::formatTooltip(QCoreApplication::translate("pqPipelineBrowserContextMenu",
+      "Disregard this source/filter's time from animations", Q_NULLPTR)));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_STATUSTIP
   actionPBIgnoreTime->setStatusTip(QCoreApplication::translate("pqPipelineBrowserContextMenu",
@@ -594,8 +599,9 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   actionPBLinkSelection->setIconText(
     QCoreApplication::translate("pqPipelineBrowserContextMenu", "Link with selection", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-  actionPBLinkSelection->setToolTip(QCoreApplication::translate("pqPipelineBrowserContextMenu",
-    "Link this source and current selected source as a selection link", Q_NULLPTR));
+  actionPBLinkSelection->setToolTip(
+    pqWidgetUtilities::formatTooltip(QCoreApplication::translate("pqPipelineBrowserContextMenu",
+      "Link this source and current selected source as a selection link", Q_NULLPTR)));
 #endif // QT_NO_TOOLTIP
 
   QAction* actionPBRename = new QAction(menu.parent());
@@ -603,8 +609,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   actionPBRename->setText(
     QCoreApplication::translate("pqPipelineBrowserContextMenu", "Rename", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-  actionPBRename->setToolTip(QCoreApplication::translate(
-    "pqPipelineBrowserContextMenu", "Rename currently selected source", Q_NULLPTR));
+  actionPBRename->setToolTip(pqWidgetUtilities::formatTooltip(QCoreApplication::translate(
+    "pqPipelineBrowserContextMenu", "Rename currently selected source", Q_NULLPTR)));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_STATUSTIP
   actionPBRename->setStatusTip(QCoreApplication::translate(

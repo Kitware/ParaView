@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqScaleByButton.h"
 
+#include "pqWidgetUtilities.h"
+
 #include <QAction>
 
 //-----------------------------------------------------------------------------
@@ -43,7 +45,7 @@ pqScaleByButton::~pqScaleByButton() = default;
 void pqScaleByButton::constructor(const QMap<double, QString>& scaleFactors)
 {
   this->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->setToolTip(tr("Scale by ..."));
+  this->setToolTip(pqWidgetUtilities::formatTooltip(tr("Scale by ...")));
   this->setPopupMode(QToolButton::InstantPopup);
 
   int index = 0;

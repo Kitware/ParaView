@@ -6,6 +6,7 @@
 #include "ui_pqRescaleScalarRangeToCustomDialog.h"
 
 #include "pqCoreUtilities.h"
+#include "pqWidgetUtilities.h"
 
 #include <algorithm> // for std::swap
 
@@ -20,6 +21,7 @@ pqRescaleScalarRangeToCustomDialog::pqRescaleScalarRangeToCustomDialog(QWidget* 
 {
   // Set up the ui.
   this->Form->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   // Connect the gui elements.
   this->connect(

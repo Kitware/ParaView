@@ -7,6 +7,7 @@
 #include "pqLiveSourceItem.h"
 #include "pqLiveSourceManager.h"
 #include "pqPVApplicationCore.h"
+#include "pqWidgetUtilities.h"
 #include "vtkPVXMLElement.h"
 
 #include <QCoreApplication>
@@ -27,7 +28,8 @@ public:
     QString iconName = isPaused ? "pqVcrPlay" : "pqVcrPause";
     this->Ui.EmulatedTimePauseButton->setIcon(QIcon(":/pqWidgets/Icons/" + iconName + ".svg"));
     QString toolTip = isPaused ? tr("Play") : tr("Pause");
-    this->Ui.EmulatedTimePauseButton->setToolTip(toolTip + tr(" emulated time sources."));
+    toolTip += tr(" emulated time sources.");
+    this->Ui.EmulatedTimePauseButton->setToolTip(pqWidgetUtilities::formatTooltip(toolTip));
   }
 };
 
@@ -40,6 +42,7 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
 {
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   internals.Ui.PauseButton->setText(
     QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));

@@ -46,7 +46,7 @@
       <item>
        <widget class="QCheckBox" name="multisamples">
         <property name="toolTip">
-         <string extracomment="Whether or not to use multisampled framebuffers. Using multisamples can reduce flickering but currently does not work with volume rendering."/>
+         <string>Whether or not to use multisampled framebuffers. Using multisamples can reduce flickering but currently does not work with volume rendering.</string>
         </property>
         <property name="text">
          <string>Use MultiSamples</string>
@@ -78,7 +78,7 @@
         <item>
          <widget class="QComboBox" name="chooseBackendCombo">
           <property name="toolTip">
-           <string>&quot;When sending to VR, both OpenVR and OpenXR runtimes are available.  This option determines which should be used.&quot;</string>
+           <string>When sending to VR, both OpenVR and OpenXR runtimes are available. This option determines which should be used.</string>
           </property>
          </widget>
         </item>
@@ -125,7 +125,7 @@
            <bool>false</bool>
           </property>
           <property name="toolTip">
-           <string extracomment="Specify the IP address used to connect ParaView to the remote XR device, e.g. Hololens2"/>
+           <string>Specify the IP address used to connect ParaView to the remote XR device, e.g. Hololens2</string>
           </property>
           <property name="placeholderText">
            <string>127.0.0.1</string>
@@ -161,7 +161,7 @@
       <item>
        <widget class="QPushButton" name="exportLocationsAsViewButton">
         <property name="toolTip">
-         <string extracomment="This option will export the saved locations, their geometry, txtures, and properties into a form that can be used in MineView. The result is stored in a pv-view directory. "/>
+         <string>This option will export the saved locations, their geometry, txtures, and properties into a form that can be used in MineView. The result is stored in a pv-view directory.</string>
         </property>
         <property name="text">
          <string>Export Locations as a View</string>
@@ -171,7 +171,7 @@
       <item>
        <widget class="QPushButton" name="exportLocationsAsSkyboxesButton">
         <property name="toolTip">
-         <string extracomment="Export the saved locations from XR as skyboxes suitable for viewing with vtk.js. This option will produce a pv-skybox folder that can be zipped up for use by ParaView Glance or vtk.js."/>
+         <string>Export the saved locations from XR as skyboxes suitable for viewing with vtk.js. This option will produce a pv-skybox folder that can be zipped up for use by ParaView Glance or vtk.js.</string>
         </property>
         <property name="text">
          <string>Export Locations as Skyboxes</string>

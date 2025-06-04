@@ -265,7 +265,6 @@ set(ui_files
   Resources/UI/pqPauseLiveSourcePropertyWidget.ui
   Resources/UI/pqQuickLaunchDialogExtended.ui
   Resources/UI/pqPropertyCollectionWidget.ui
-  Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSelectionEditor.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui

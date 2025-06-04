@@ -6,6 +6,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqServer.h"
+#include "pqWidgetUtilities.h"
 
 #include <QMouseEvent>
 
@@ -51,6 +52,7 @@ pqLogViewerDialog::pqLogViewerDialog(QWidget* parent)
 {
   this->Ui = new Ui::pqLogViewerDialog();
   this->Ui->setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   indexToVerbosity[0] = vtkLogger::VERBOSITY_OFF;
@@ -357,7 +359,7 @@ void pqLogViewerDialog::appendLogView(pqSingleLogViewerWidget* logView)
   int tabIndex = this->Ui->logTabWidget->addTab(logView, tabTitle);
   QLabel* label = new QLabel();
   label->setObjectName("close");
-  label->setToolTip(tr("Close log"));
+  label->setToolTip(pqWidgetUtilities::formatTooltip(tr("Close log")));
   label->setStatusTip(tr("Close log"));
   label->setPixmap(
     label->style()->standardIcon(QStyle::SP_TitleBarCloseButton).pixmap(PIXMAP_SIZE, PIXMAP_SIZE));

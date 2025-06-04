@@ -8,6 +8,7 @@
 #include "pqActiveObjects.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
+#include "pqWidgetUtilities.h"
 
 #include "vtkCamera.h"
 #include "vtkMath.h"
@@ -29,6 +30,7 @@ pqAnnulusPropertyWidget::pqAnnulusPropertyWidget(
 {
   Ui::AnnulusPropertyWidget ui;
   ui.setupUi(this);
+  pqWidgetUtilities::formatChildTooltips(this);
 
   if (vtkSMProperty* center = smgroup->GetProperty("Center"))
   {

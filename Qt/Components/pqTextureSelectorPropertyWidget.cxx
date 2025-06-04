@@ -11,6 +11,7 @@
 #include "pqTextureComboBox.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqWidgetUtilities.h"
 
 // Server Manager Includes
 #include "vtkDataSetAttributes.h"
@@ -29,7 +30,7 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
   : pqPropertyWidget(smProxy, pWidget)
 {
   this->setProperty(smProperty);
-  this->setToolTip(tr("Select/Load texture to apply."));
+  this->setToolTip(pqWidgetUtilities::formatTooltip(tr("Select/Load texture to apply.")));
 
   QVBoxLayout* l = new QVBoxLayout;
   l->setContentsMargins(0, 0, 0, 0);
@@ -114,13 +115,15 @@ void pqTextureSelectorPropertyWidget::checkAttributes(bool tcoords, bool tangent
       if (tcoords && pdInfo->GetAttributeInformation(vtkDataSetAttributes::TCOORDS) == nullptr)
       {
         enable = false;
-        this->setToolTip(tr("No tcoords present in the data. Cannot apply texture."));
+        this->setToolTip(pqWidgetUtilities::formatTooltip(
+          tr("No tcoords present in the data. Cannot apply texture.")));
       }
       else if (tangents &&
         pdInfo->GetAttributeInformation(vtkDataSetAttributes::TANGENTS) == nullptr)
       {
         enable = false;
-        this->setToolTip(tr("No tangents present in the data. Cannot apply texture."));
+        this->setToolTip(pqWidgetUtilities::formatTooltip(
+          tr("No tangents present in the data. Cannot apply texture.")));
       }
     }
   }

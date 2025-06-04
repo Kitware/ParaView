@@ -7,6 +7,7 @@
 #include "pqApplicationCore.h"
 #include "pqPropertyGroupWidget.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
@@ -17,7 +18,11 @@
 class pqLightsEditor::pqInternal : public Ui::LightsEditor
 {
 public:
-  pqInternal(pqLightsEditor* self) { this->setupUi(self); }
+  pqInternal(pqLightsEditor* self)
+  {
+    this->setupUi(self);
+    pqWidgetUtilities::formatChildTooltips(self);
+  }
 };
 
 namespace

@@ -10,6 +10,7 @@
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
+#include "pqWidgetUtilities.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVMemoryUseInformation.h"
 #include "vtkPVServerInformation.h"
@@ -155,7 +156,8 @@ bool pqSourcesMenuReaction::warnOnCreate(
         }
 
         return pqCoreUtilities::promptUser(QString("WarnOnCreate/%1/%2").arg(xmlgroup).arg(xmlname),
-          QMessageBox::Information, pqProxy::rstToHtml(title), pqProxy::rstToHtml(text),
+          QMessageBox::Information, pqWidgetUtilities::rstToHtml(title),
+          pqWidgetUtilities::rstToHtml(text),
           QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
       }
     }
