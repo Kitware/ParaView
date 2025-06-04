@@ -182,3 +182,23 @@ vtkIncrementalPointLocator* vtkPVMetaSliceDataSet::GetLocator()
 {
   return this->Locator.Get();
 }
+
+//------------------------------------------------------------------------------
+vtkMTimeType vtkPVMetaSliceDataSet::GetMTime()
+{
+  vtkMTimeType time;
+  vtkMTimeType mTime = this->Superclass::GetMTime();
+
+  if (this->ImplicitFunctions[METASLICE_DATASET])
+  {
+    time = this->ImplicitFunctions[METASLICE_DATASET]->GetMTime();
+    mTime = (time > mTime ? time : mTime);
+  }
+  if (this->ImplicitFunctions[METASLICE_HYPERTREEGRID])
+  {
+    time = this->ImplicitFunctions[METASLICE_HYPERTREEGRID]->GetMTime();
+    mTime = (time > mTime ? time : mTime);
+  }
+
+  return mTime;
+}

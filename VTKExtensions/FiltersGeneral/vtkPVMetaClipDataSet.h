@@ -99,6 +99,12 @@ public:
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
+  /**
+   * Override GetMTime because the implicit functions need to be taken
+   * into account.
+   */
+  vtkMTimeType GetMTime() override;
+
 protected:
   vtkPVMetaClipDataSet();
   ~vtkPVMetaClipDataSet() override;
