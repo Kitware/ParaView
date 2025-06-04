@@ -169,29 +169,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPro
       setCompositeIndices NOTIFY selectorsChanged);
   ///@}
 
-  ///@{
-  /**
-   * Property with selectors/composite indices and associated colors (as RGB).
-   */
-  // PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  Q_PROPERTY(QList<QVariant> selectorColors READ selectorColorsAsVariantList WRITE setSelectorColors
-      NOTIFY colorsChanged);
-  // PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  Q_PROPERTY(QList<QVariant> compositeIndexColors READ compositeIndexColorsAsVariantList WRITE
-      setCompositeIndexColors NOTIFY colorsChanged);
-  ///@}
-
-  ///@{
-  /**
-   * Properties with selectors/composite indieces and associated opacities.
-   */
-  // PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  Q_PROPERTY(QList<QVariant> selectorOpacities READ selectorOpacitiesAsVariantList WRITE
-      setSelectorOpacities NOTIFY opacitiesChanged);
-  // PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  Q_PROPERTY(QList<QVariant> compositeIndexOpacities READ compositeIndexOpacitiesAsVariantList WRITE
-      setCompositeIndexOpacities NOTIFY opacitiesChanged);
-  ///@}
 public:
   pqDataAssemblyPropertyWidget(
     vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
@@ -217,48 +194,10 @@ public:
   QList<QVariant> compositeIndicesAsVariantList() const;
   ///@}
 
-  ///@{
-  /**
-   * API to get/set colors. Colors are specified either as a list of selectors
-   * followed by corresponding RGB color or list of composite indices followed by
-   * the color.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  void setCompositeIndexColors(const QList<QVariant>& values) { Q_UNUSED(values); }
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  QList<QVariant> compositeIndexColorsAsVariantList() const { return QList<QVariant>(); }
-
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  void setSelectorColors(const QList<QVariant>& values) { Q_UNUSED(values); }
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  QList<QVariant> selectorColorsAsVariantList() const { return QList<QVariant>(); }
-  ///@}
-
-  ///@{
-  /**
-   * API to get/set opacities. Opacities are specified either as a list of selectors
-   * followed by corresponding opacity or list of composite indices followed by
-   * the opacity.
-   */
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  void setCompositeIndexOpacities(const QList<QVariant>& values) { Q_UNUSED(values); }
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  QList<QVariant> compositeIndexOpacitiesAsVariantList() const { return QList<QVariant>(); }
-
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  void setSelectorOpacities(const QList<QVariant>& values) { Q_UNUSED(values); }
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  QList<QVariant> selectorOpacitiesAsVariantList() const { return QList<QVariant>(); }
-  ///@}
-
   void updateWidget(bool showing_advanced_properties) override;
 
 Q_SIGNALS:
   void selectorsChanged();
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  void colorsChanged();
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
-  void opacitiesChanged();
 
 private Q_SLOTS:
   void updateDataAssembly(vtkObject* sender);

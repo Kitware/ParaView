@@ -14,9 +14,8 @@
 
 #include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVRenderView.h"        // needed for renderer enum
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_13_0
-#include "vtkWeakPointer.h"         // needed for vtkWeakPointer.
+#include "vtkPVRenderView.h" // needed for renderer enum
+#include "vtkWeakPointer.h"  // needed for vtkWeakPointer.
 
 class vtkPolarAxesActor;
 class vtkPolyData;
@@ -127,12 +126,8 @@ public:
    * Get/Set the use of custom min radius.
    * If off, min radius is computed relatively to pole position.
    */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use EnableCustomMinRadius instead")
-  virtual void SetEnableCustomRadius(bool enabled);
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use EnableCustomMinRadius instead")
-  virtual bool GetEnableCustomRadius();
-  void SetEnableCustomMinRadius(bool enabled);
-  vtkGetMacro(EnableCustomMinRadius, double);
+  vtkSetMacro(EnableCustomMinRadius, bool);
+  vtkGetMacro(EnableCustomMinRadius, bool);
   ///@}
 
   ///@{
@@ -321,8 +316,6 @@ protected:
   bool EnableCustomAngle = true;
   double MinAngle = 0.0;
   double MaxAngle = 90.0;
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use Get/Set EnableCustomMinRadius methods instead")
-  bool EnableCustomRadius = true;
   double MinRadius = 0.0;
   bool EnableOverallColor = true;
   double OverallColor[3] = { 1.0 };

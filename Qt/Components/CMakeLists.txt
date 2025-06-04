@@ -56,7 +56,6 @@ set(classes
   pqExpressionsManager
   pqExpressionsTableModel
   pqExpressionsWidget
-  pqFavoritesDialog
   pqFavoritesTreeWidget
   pqFileChooserWidget
   pqFindDataCurrentSelectionFrame
@@ -185,7 +184,6 @@ set(headers
 set(ui_files
   Resources/UI/pqAboutDialog.ui
   Resources/UI/pqAnimationTimeWidget.ui
-  Resources/UI/pqFavoritesDialog.ui
   Resources/UI/pqCalculatorWidget.ui
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraKeyFrameWidget.ui

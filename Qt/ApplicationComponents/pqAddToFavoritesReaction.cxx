@@ -36,18 +36,6 @@ pqAddToFavoritesReaction::pqAddToFavoritesReaction(
 }
 
 //-----------------------------------------------------------------------------
-pqAddToFavoritesReaction::pqAddToFavoritesReaction(QAction* parentObject, QVector<QString>& filters)
-  : Superclass(parentObject)
-  , Internal(new pqInternal(new pqProxyGroupMenuManager(nullptr, QString("ParaViewFilters"))))
-{
-  Q_UNUSED(filters);
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
-    SLOT(updateEnableState()));
-
-  this->parentAction()->setEnabled(false);
-}
-
-//-----------------------------------------------------------------------------
 pqAddToFavoritesReaction::~pqAddToFavoritesReaction() = default;
 
 //-----------------------------------------------------------------------------

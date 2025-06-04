@@ -169,13 +169,6 @@ vtkStandardNewMacro(vtkPVGeometryFilter);
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
 
 //----------------------------------------------------------------------------
-vtkInformationKeyMacro(vtkPVGeometryFilter, POINT_OFFSETS, IntegerVector);
-vtkInformationKeyMacro(vtkPVGeometryFilter, VERTS_OFFSETS, IntegerVector);
-vtkInformationKeyMacro(vtkPVGeometryFilter, LINES_OFFSETS, IntegerVector);
-vtkInformationKeyMacro(vtkPVGeometryFilter, POLYS_OFFSETS, IntegerVector);
-vtkInformationKeyMacro(vtkPVGeometryFilter, STRIPS_OFFSETS, IntegerVector);
-
-//----------------------------------------------------------------------------
 vtkPVGeometryFilter::vtkPVGeometryFilter()
 {
   this->OutlineFlag = 0;
@@ -1019,80 +1012,6 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
 
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestDataObjectTree");
   return 1;
-}
-
-//----------------------------------------------------------------------------
-// We need to change the mapper.  Now it always flat shades when cell normals
-// are available.
-void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunicate)
-{
-  // Do not generate cell normals if any of the processes
-  // have lines, verts or strips.
-  vtkCellArray* aPrim;
-  int skip = 0;
-  aPrim = output->GetVerts();
-  if (aPrim && aPrim->GetNumberOfCells())
-  {
-    skip = 1;
-  }
-  aPrim = output->GetLines();
-  if (aPrim && aPrim->GetNumberOfCells())
-  {
-    skip = 1;
-  }
-  aPrim = output->GetStrips();
-  if (aPrim && aPrim->GetNumberOfCells())
-  {
-    skip = 1;
-  }
-  if (this->Controller && doCommunicate)
-  {
-    int reduced_skip = 0;
-    if (!this->Controller->AllReduce(&skip, &reduced_skip, 1, vtkCommunicator::MAX_OP))
-    {
-      vtkErrorMacro("Failed to reduce correctly.");
-      skip = 1;
-    }
-    else
-    {
-      skip = reduced_skip;
-    }
-  }
-  if (skip)
-  {
-    return;
-  }
-
-  aPrim = output->GetPolys();
-  const vtkIdType numPolys = aPrim ? aPrim->GetNumberOfCells() : 0;
-  if (numPolys != output->GetNumberOfCells())
-  {
-    vtkErrorMacro("Number of numPolys does not match output.");
-    return;
-  }
-
-  vtkNew<vtkFloatArray> cellNormals;
-  cellNormals->SetName("cellNormals");
-  cellNormals->SetNumberOfComponents(3);
-  cellNormals->SetNumberOfTuples(numPolys);
-
-  if (aPrim)
-  {
-    vtkPoints* p = output->GetPoints();
-    vtkNew<vtkIdList> tempPtIds;
-    vtkIdType npts;
-    const vtkIdType* pts;
-    double polyNorm[3];
-    for (vtkIdType cellId = 0; cellId < numPolys; cellId++)
-    {
-      aPrim->GetCellAtId(cellId, npts, pts, tempPtIds);
-      vtkPolygon::ComputeNormal(p, static_cast<int>(npts), pts, polyNorm);
-      cellNormals->SetTuple(cellId, polyNorm);
-    }
-  }
-
-  output->GetCellData()->AddArray(cellNormals);
-  output->GetCellData()->SetActiveNormals(cellNormals->GetName());
 }
 
 //----------------------------------------------------------------------------

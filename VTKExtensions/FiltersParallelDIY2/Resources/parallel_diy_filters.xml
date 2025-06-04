@@ -122,15 +122,7 @@
         </Hints>
       </IntVectorProperty>
     </SourceProxy>
-
-    <SourceProxy  name="GhostCellsGenerator"
-                  class="vtkPVGhostCellsGenerator"
-                  base_proxyname="GhostCells"
-                  base_proxygroup="filters">
-      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
-        This has been renamed into 'GhostCells'. Please consider using that instead.
-      </Deprecated>
-    </SourceProxy>
+    <!-- End GhostCells -->
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkStitchImageDataWithGhosts"
@@ -419,17 +411,8 @@
                                    mode="visibility"/>
         </Hints>
       </DoubleVectorProperty>
+      <!-- GlobalPointAndCellIds -->
     </SourceProxy>
 
-    <SourceProxy class="vtkPVGenerateGlobalIds"
-                 label="Generate Global Ids"
-                 base_proxyname="GlobalPointAndCellIds"
-                 base_proxygroup="filters"
-                 name="GenerateGlobalIds">
-      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
-        This has been renamed into 'GlobalPointAndCellIds'. Please consider using that instead.
-      </Deprecated>
-      <!-- End GenerateGlobalIds -->
-    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -121,7 +121,6 @@ set(classes
   pqMainWindowEventBehavior
   pqManageCustomFiltersReaction
   pqManageExpressionsReaction
-  pqManageFavoritesReaction
   pqManageLinksReaction
   pqManagePluginsReaction
   pqMasterOnlyReaction

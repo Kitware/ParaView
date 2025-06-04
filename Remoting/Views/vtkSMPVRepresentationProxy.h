@@ -22,7 +22,6 @@
 #ifndef vtkSMPVRepresentationProxy_h
 #define vtkSMPVRepresentationProxy_h
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_13_0
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSmartPointer.h" // For LastLUTProxy
@@ -44,11 +43,7 @@ public:
    * Set/get last LUT proxy.
    * Used as a memory of what was the last LUT proxy linked to this representation.
    */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use SetLastLookupTable instead")
-  void SetLastLUTProxy(vtkSMProxy* proxy) { this->SetLastLookupTable(proxy); }
   void SetLastLookupTable(vtkSMProxy* proxy);
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use GetLastLookupTable instead")
-  vtkSMProxy* GetLastLUTProxy() { return this->GetLastLookupTable(); }
   vtkSMProxy* GetLastLookupTable();
   void SetLastBlockLookupTable(const std::string& blockSelector, vtkSMProxy* proxy)
   {
@@ -84,8 +79,6 @@ public:
    * Returns the lut proxy of this representation in the given view.
    * This method will return `nullptr` if no lut proxy exists in this view.
    */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use GetLookupTable instead")
-  vtkSMProxy* GetLUTProxy(vtkSMProxy* view) { return this->GetLookupTable(view); }
   vtkSMProxy* GetLookupTable(vtkSMProxy* view);
   vtkSMProxy* GetBlockLookupTable(vtkSMProxy* view, const std::string& blockSelector)
   {

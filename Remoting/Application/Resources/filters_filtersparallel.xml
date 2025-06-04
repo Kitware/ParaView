@@ -1287,17 +1287,6 @@
       </IntVectorProperty>
     </SourceProxy>
 
-    <SourceProxy class="vtkPPolyDataNormals"
-                 label="Generate Surface Normals"
-                 base_proxyname="SurfaceNormals"
-                 base_proxygroup="filters"
-                 name="PolyDataNormals">
-      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
-        This has been renamed into 'SurfaceNormals'. Please consider using that instead.
-      </Deprecated>
-      <!-- End  PolyDataNormals -->
-    </SourceProxy>
-
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPReflectionFilter"
                  label="Reflect"

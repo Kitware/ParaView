@@ -27,8 +27,6 @@
 #include "vtkParaViewDeprecation.h"     // for deprec macros
 #include "vtkRemotingAnimationModule.h" //needed for exports
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_13_0
-
 class vtkCompositeAnimationPlayer;
 class vtkEventForwarderCommand;
 class vtkSMProxy;
@@ -153,9 +151,6 @@ public:
   void SetPlayMode(int val);
   int GetPlayMode();
   void SetNumberOfFrames(int val);
-
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use `SetStride` instead`")
-  void SetDuration(int vtkNotUsed(val)) {}
 
   void SetFramesPerTimestep(int val);
   void SetStride(int val);

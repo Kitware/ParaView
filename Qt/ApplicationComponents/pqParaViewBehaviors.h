@@ -6,8 +6,7 @@
 
 #include "pqApplicationComponentsModule.h"
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_13_0
-#include "vtkSetGet.h"              // for VTK_LEGACY.
+#include "vtkSetGet.h" // for VTK_LEGACY.
 
 #include <QFlags>
 #include <QObject>

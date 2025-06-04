@@ -25,15 +25,7 @@
         </DataTypeDomain>
         <Documentation>The input.</Documentation>
       </InputProperty>
-    </SourceProxy>
-
-    <SourceProxy class="vtkAppendArcLength"
-                 base_proxyname="PolylineLength"
-                 base_proxygroup="filters"
-                 name="AppendArcLength">
-      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
-        This has been renamed into 'PolylineLength'. Please consider using that instead.
-      </Deprecated>
+      <!-- End PolylineLength -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -1111,17 +1103,7 @@ found and the point will be rejected.</Documentation>
         <Property name="GenerateCellIds" />
         <Property name="CellIdsArrayName" />
       </PropertyGroup>
-    </SourceProxy>
-
-    <SourceProxy class="vtkIdFilter"
-                 label="Generate Ids"
-                 base_proxyname="PointAndCellIds"
-                 base_proxygroup="filters"
-                 name="GenerateIdScalars">
-      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
-        This has been renamed into 'PointAndCellIds'. Please consider using that instead.
-      </Deprecated>
-      <!-- End GenerateIdScalars -->
+      <!-- End PointAndCellIds -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -1356,17 +1338,7 @@ found and the point will be rejected.</Documentation>
         If you want these normals to be passed to the output of this filter,
         set the value of this property to 1.</Documentation>
       </IntVectorProperty>
-    </SourceProxy>
-
-    <SourceProxy class="vtkPolyDataTangents"
-                 label="Generate Surface Tangents"
-                 base_proxyname="SurfaceTangents"
-                 base_proxygroup="filters"
-                 name="PolyDataTangents">
-      <Deprecated deprecated_in="5.13" to_remove_in="6.1">
-        This has been renamed into 'SurfaceTangents'. Please consider using that instead.
-      </Deprecated>
-      <!-- End  PolyDataTangents -->
+      <!-- End SurfaceTangents -->
     </SourceProxy>
 
     <!-- ==================================================================== -->

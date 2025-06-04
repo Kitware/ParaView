@@ -13,7 +13,6 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
-#include "vtkParaViewDeprecation.h"                   // For PARAVIEW_DEPRECATED_IN_5_13_0
 #include "vtkSmartPointer.h"                          // needed for vtkSmartPointer
 
 #include "vtkNew.h" // for vtkNew
@@ -228,19 +227,6 @@ public:
   vtkBooleanMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
   ///@}
 
-  // These keys are put in the output composite-data metadata for multipieces
-  // since this filter merges multipieces together.
-  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
-  static vtkInformationIntegerVectorKey* POINT_OFFSETS();
-  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
-  static vtkInformationIntegerVectorKey* VERTS_OFFSETS();
-  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
-  static vtkInformationIntegerVectorKey* LINES_OFFSETS();
-  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
-  static vtkInformationIntegerVectorKey* POLYS_OFFSETS();
-  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
-  static vtkInformationIntegerVectorKey* STRIPS_OFFSETS();
-
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter() override;
@@ -304,16 +290,8 @@ protected:
    * Cleans up the output polydata. If doCommunicate is true the method is free
    * to communicate with other processes as needed.
    */
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use CleanupOutputData(vtkPolyData* output) instead.")
-  void CleanupOutputData(vtkPolyData* output, int vtkNotUsed(doCommunicate))
-  {
-    this->CleanupOutputData(output);
-  }
   void CleanupOutputData(vtkPolyData* output);
   ///@}
-
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use ExecuteNormalsComputation instead.")
-  void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
 
   int OutlineFlag;
   int UseOutline;

@@ -80,11 +80,6 @@ protected Q_SLOTS:
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   void setRepresentation(pqDataRepresentation* repr, bool forceUpdate = false);
-  PARAVIEW_DEPRECATED_IN_5_13_0("Use setRepresentation instead.")
-  void setDataRepresentation(pqDataRepresentation* repr, bool forceUpdate = false)
-  {
-    this->setRepresentation(repr, forceUpdate);
-  }
   void setColorTransferFunctions(std::vector<vtkSMProxy*> ctfs);
   void setColorTransferFunction(vtkSMProxy* ctf)
   {
