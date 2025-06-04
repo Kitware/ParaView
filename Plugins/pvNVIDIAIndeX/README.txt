@@ -37,9 +37,8 @@ The NVIDIA IndeX for ParaView Plugin is compatible with:
 #-------------------------------------------------------------------------------
 
 The NVIDIA IndeX for ParaView Plugin comes with a free evaluation license that
-enables all features for a limited time, including full scalability to run on
-multiple NVIDIA GPUs and on a cluster of GPU hosts. The software will continue
-to run after the evaluation period, but with multi-GPU features disabled.
+enables all features, including full scalability to run on multiple NVIDIA GPUs
+and on a cluster of GPU hosts.
 
 For licensing requests, please contact nvidia-index@nvidia.com.
 
