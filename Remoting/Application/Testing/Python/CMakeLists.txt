@@ -36,6 +36,7 @@ set(PY_TESTS
   LocatorNonMergingBackwardsCompatibilityTest.py,NO_VALID
   LookupTable.py,NO_VALID
   MultiServer.py,NO_VALID
+  PlotOverLineLeaks.py,NO_VALID
   PointGaussianProperties.py
   ProcessIdScalarsBackwardsCompatibilityTest.py,NO_VALID
   ProgrammableFilterProperties.py,NO_VALID
