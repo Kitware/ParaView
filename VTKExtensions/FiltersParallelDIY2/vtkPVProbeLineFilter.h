@@ -18,6 +18,7 @@
 
 class vtkLineSource;
 class vtkProbeLineFilter;
+class vtkGarbageCollector;
 
 class VTKPVVTKEXTENSIONSFILTERSPARALLELDIY2_EXPORT vtkPVProbeLineFilter
   : public vtkPolyDataAlgorithm
@@ -131,6 +132,7 @@ protected:
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int, vtkInformation*) override;
+  void ReportReferences(vtkGarbageCollector* collector) override;
 
   int SamplingPattern = 0;
   int LineResolution = 1000;
