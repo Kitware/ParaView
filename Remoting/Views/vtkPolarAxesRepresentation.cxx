@@ -469,7 +469,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
     // min/max angle
     // Check bottom-left, top-left, left, bottom-right, top-right, right, bottom, top
     // If inside, keep default values
-    if (pole[0] < bds[0])
+    if (pole[0] <= bds[0])
     {
       if (!this->EnableCustomMinRadius)
       {
@@ -489,15 +489,15 @@ void vtkPolarAxesRepresentation::UpdateBounds()
 
       if (!this->EnableCustomAngle)
       {
-        maxAngle = ((pole[1] < bds[3]) ? atan((bds[3] - pole[1]) / (bds[0] - pole[0]))
-                                       : atan((bds[3] - pole[1]) / (bds[1] - pole[0]))) *
+        maxAngle = ((pole[1] <= bds[3]) ? atan((bds[3] - pole[1]) / (bds[0] - pole[0]))
+                                        : atan((bds[3] - pole[1]) / (bds[1] - pole[0]))) *
           180.0 / vtkMath::Pi();
-        minAngle = ((pole[1] < bds[2]) ? atan((bds[2] - pole[1]) / (bds[1] - pole[0]))
-                                       : atan((bds[2] - pole[1]) / (bds[0] - pole[0]))) *
+        minAngle = ((pole[1] <= bds[2]) ? atan((bds[2] - pole[1]) / (bds[1] - pole[0]))
+                                        : atan((bds[2] - pole[1]) / (bds[0] - pole[0]))) *
           180.0 / vtkMath::Pi();
       }
     }
-    else if (pole[0] > bds[1])
+    else if (pole[0] >= bds[1])
     {
       if (!this->EnableCustomMinRadius)
       {
@@ -518,16 +518,16 @@ void vtkPolarAxesRepresentation::UpdateBounds()
       if (!this->EnableCustomAngle)
       {
         maxAngle = 180 +
-          ((pole[1] < bds[2]) ? atan((bds[2] - pole[1]) / (bds[0] - pole[0]))
-                              : atan((bds[2] - pole[1]) / (bds[1] - pole[0]))) *
+          ((pole[1] <= bds[2]) ? atan((bds[2] - pole[1]) / (bds[0] - pole[0]))
+                               : atan((bds[2] - pole[1]) / (bds[1] - pole[0]))) *
             180 / vtkMath::Pi();
         minAngle = 180 +
-          ((pole[1] < bds[3]) ? atan((bds[3] - pole[1]) / (bds[1] - pole[0]))
-                              : atan((bds[3] - pole[1]) / (bds[0] - pole[0]))) *
+          ((pole[1] <= bds[3]) ? atan((bds[3] - pole[1]) / (bds[1] - pole[0]))
+                               : atan((bds[3] - pole[1]) / (bds[0] - pole[0]))) *
             180 / vtkMath::Pi();
       }
     }
-    else if (pole[1] < bds[2])
+    else if (pole[1] <= bds[2])
     {
       if (!this->EnableCustomMinRadius)
       {
@@ -540,7 +540,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
         minAngle = atan((bds[2] - pole[1]) / (bds[1] - pole[0])) * 180 / vtkMath::Pi();
       }
     }
-    else if (pole[1] > bds[3])
+    else if (pole[1] >= bds[3])
     {
       if (!this->EnableCustomMinRadius)
       {
