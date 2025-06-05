@@ -378,45 +378,8 @@ void vtkPolarAxesRepresentation::InitializeDataBoundsFromData(vtkDataObject* dat
 //----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::UpdateBounds()
 {
-  double* scale = this->Scale;
-  double* position = this->Position;
-  double* rotation = this->Orientation;
   double bds[6];
-  if (scale[0] != 1.0 || scale[1] != 1.0 || scale[2] != 1.0 || position[0] != 0.0 ||
-    position[1] != 0.0 || position[2] != 0.0 || rotation[0] != 0.0 || rotation[1] != 0.0 ||
-    rotation[2] != 0.0)
-  {
-    const double* bounds = this->DataBounds;
-    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-    transform->Translate(position);
-    transform->RotateZ(rotation[2]);
-    transform->RotateX(rotation[0]);
-    transform->RotateY(rotation[1]);
-    transform->Scale(scale);
-    vtkBoundingBox bbox;
-    int i, j, k;
-    double origX[3], x[3];
-
-    for (i = 0; i < 2; i++)
-    {
-      origX[0] = bounds[i];
-      for (j = 0; j < 2; j++)
-      {
-        origX[1] = bounds[2 + j];
-        for (k = 0; k < 2; k++)
-        {
-          origX[2] = bounds[4 + k];
-          transform->TransformPoint(origX, x);
-          bbox.AddPoint(x);
-        }
-      }
-    }
-    bbox.GetBounds(bds);
-  }
-  else
-  {
-    memcpy(bds, this->DataBounds, sizeof(double) * 6);
-  }
+  this->GetDataBounds(bds);
 
   // overload bounds with the active custom bounds
   for (int i = 0; i < 3; ++i)
@@ -429,7 +392,25 @@ void vtkPolarAxesRepresentation::UpdateBounds()
     }
   }
 
-  this->PolarAxesActor->SetBounds(bds);
+  vtkBoundingBox bbox(bds);
+
+  vtkNew<vtkTransform> transform;
+  transform->Translate(this->Position);
+  transform->RotateX(this->Orientation[0]);
+  transform->RotateY(this->Orientation[1]);
+  transform->RotateZ(this->Orientation[2]);
+  transform->Scale(this->Scale);
+
+  vtkBoundingBox transformedBox;
+  for (int corner = 0; corner < 8; corner++)
+  {
+    double pt[3];
+    bbox.GetCorner(corner, pt);
+    transform->TransformPoint(pt, pt);
+    transformedBox.AddPoint(pt);
+  }
+
+  transformedBox.GetBounds(bds);
 
   double pole[3] = { 0.0, 0.0, 0.0 };
   double center[2] = { (bds[0] + bds[1]) * 0.5, (bds[2] + bds[3]) * 0.5 };
@@ -451,7 +432,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   {
     for (std::size_t ind{ 0 }; ind < 3; ++ind)
     {
-      pole[ind] = position[ind];
+      pole[ind] = this->Position[ind];
     }
 
     this->PolarAxesActor->SetPole(pole);
