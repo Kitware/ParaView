@@ -413,7 +413,8 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   transformedBox.GetBounds(bds);
 
   double pole[3] = { 0.0, 0.0, 0.0 };
-  double center[2] = { (bds[0] + bds[1]) * 0.5, (bds[2] + bds[3]) * 0.5 };
+  double center[3];
+  transformedBox.GetCenter(center);
   double maxRadius = this->EnableCustomMaxRadius ? this->MaxRadius : 0.0;
   double minRadius = this->EnableCustomMinRadius ? this->MinRadius : 0.0;
   double minAngle = EnableCustomAngle ? this->MinAngle : 0.0;
