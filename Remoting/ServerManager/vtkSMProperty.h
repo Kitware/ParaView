@@ -457,6 +457,18 @@ public:
 
   ///@{
   /**
+   * The server manager configuration XML may define \c \<Deprecated/\> element for
+   * a property. Deprecated is metadata associated with the property. The
+   * Server Manager does not (and should not) interpret the deprecated.
+   * Returns the XML element for the deprecated associated with this property,
+   * if any, otherwise returns nullptr.
+   */
+  vtkGetObjectMacro(Deprecated, vtkPVXMLElement);
+  void SetDeprecated(vtkPVXMLElement* deprecated);
+  ///@}
+
+  ///@{
+  /**
    * Overridden to support blocking of modified events.
    */
   void Modified() override
@@ -603,7 +615,13 @@ protected:
    */
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
 
-  vtkPVXMLElement* Hints;
+  /**
+   * If a proxy is deprecated, prints a warning.
+   */
+  bool WarnIfDeprecated();
+
+  vtkPVXMLElement* Hints = nullptr;
+  vtkPVXMLElement* Deprecated = nullptr;
 
   char* Command;
 
