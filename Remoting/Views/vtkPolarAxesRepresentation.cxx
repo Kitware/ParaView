@@ -395,7 +395,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   vtkBoundingBox bbox(bds);
 
   vtkNew<vtkTransform> transform;
-  transform->Translate(this->Position);
+  transform->Translate(this->Translation);
   transform->RotateX(this->Orientation[0]);
   transform->RotateY(this->Orientation[1]);
   transform->RotateZ(this->Orientation[2]);

@@ -219,6 +219,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            name="PolePosition"
+                            number_of_elements="3">
+        <Documentation>Pole coordinates. The Pole is the origin of the Polar Axes.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AutoPole"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
       <IntVectorProperty command="SetEnableCustomMinRadius"
                          default_values="1"
                          name="CustomMinRadius"
@@ -330,6 +343,7 @@
 
       <PropertyGroup label="Custom Bounds and Position">
         <Property name="AutoPole"/>
+        <Property name="PolePosition"/>
         <Property name="CustomMinRadius" />
         <Property name="MinimumRadius" />
         <Property name="CustomMaxRadius" />
@@ -341,7 +355,7 @@
         <Property name="CustomBounds"/>
       </PropertyGroup>
 
-      <DoubleVectorProperty command="SetPosition"
+      <DoubleVectorProperty command="SetTranslation"
                             default_values="0 0 0"
                             label="Translation"
                             name="Position"
