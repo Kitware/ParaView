@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<pqevents>
+  <!-- Smoke test to run pv_plugin_on_load_check callback with an environment variable forcing the
+  function to return true. -->
+</pqevents>

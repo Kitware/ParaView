@@ -31,8 +31,9 @@ bool vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
         << indent << "required-on-client: " << plugin->GetRequiredOnClient() << endl
         << indent << "has-eula: " << (plugin->GetEULA() != nullptr) << endl;
 
-    // If plugin has an EULA, confirm it before proceeding.
-    if ((plugin->GetEULA() == nullptr || vtkPVPlugin::ConfirmEULA(plugin)))
+    // If plugin has an EULA and an on load check function callback, confirm it before proceeding.
+    if ((plugin->GetEULA() == nullptr || vtkPVPlugin::ConfirmEULA(plugin)) &&
+      plugin->OnLoadCheckCallbackExecute())
     {
       // Register the plugin with the plugin manager on the current process. That
       // will kick in the code to process the plugin e.g. initialize CSInterpreter,
@@ -55,6 +56,7 @@ bool vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
 vtkPVPlugin::vtkPVPlugin()
 {
   this->FileName = nullptr;
+  this->OnLoadCheckCallbackPtr = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,4 +104,29 @@ bool vtkPVPlugin::ConfirmEULA(vtkPVPlugin* plugin)
     vtkOutputWindowDisplayText(str.str().c_str());
   }
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPlugin::SetOnLoadCheckCallbackFunction(OnLoadCheckCallback callback)
+{
+  this->OnLoadCheckCallbackPtr = callback;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVPlugin::OnLoadCheckCallback vtkPVPlugin::GetOnLoadCheckCallbackFunction() const
+{
+  return this->OnLoadCheckCallbackPtr;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPlugin::OnLoadCheckCallbackExecute()
+{
+  // In case no callback function has been specified, we return true immediately.
+  if (this->OnLoadCheckCallbackPtr == nullptr)
+  {
+    return true;
+  }
+
+  bool callbackResult = this->OnLoadCheckCallbackPtr();
+  return callbackResult;
 }

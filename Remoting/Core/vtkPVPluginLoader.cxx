@@ -676,14 +676,16 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
     "Loaded shared library successfully. Now trying to validate that it's a ParaView plugin.");
 
-  // A plugin shared library has two global functions:
-  // * pv_plugin_instance -- to obtain the plugin instance.
-
-  // If we succeeded so far, then obtain the instance of vtkPVPlugin for this
-  // plugin and load it.
-
+  // A plugin shared library can have global functions:
+  // * pv_plugin_instance -- to obtain the plugin instance, required.
+  // * pv_plugin_on_load_check -- to check if the plugin can be loaded, optional.
   pv_plugin_query_instance_fptr pv_plugin_query_instance =
     (pv_plugin_query_instance_fptr)(vtkDynamicLoader::GetSymbolAddress(lib, "pv_plugin_instance"));
+  // We try to get the check function in the plugin library.
+  // If this callback is nullptr, it will be handled by vtkPVPlugin::ImportPlugin static function.
+  vtkPVPlugin::OnLoadCheckCallback onLoadCheckCallback = (vtkPVPlugin::OnLoadCheckCallback)(
+    vtkDynamicLoader::GetSymbolAddress(lib, "pv_plugin_on_load_check"));
+
   if (!pv_plugin_query_instance)
   {
     vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
@@ -746,6 +748,9 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   if (vtkPVPlugin* plugin = pv_plugin_query_instance())
   {
     plugin->SetFileName(file);
+
+    plugin->SetOnLoadCheckCallbackFunction(onLoadCheckCallback);
+
     //  if (plugin->UnloadOnExit())
     {
       // So that the lib is closed when the application quits.

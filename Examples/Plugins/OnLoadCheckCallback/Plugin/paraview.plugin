@@ -1,0 +1,6 @@
+NAME
+  OnLoadCheckCallback
+DESCRIPTION
+  Plugin example to show how to check conditions when loading.
+REQUIRES_MODULES
+  ParaView::pqCore

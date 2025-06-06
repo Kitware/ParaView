@@ -114,6 +114,20 @@ public:
   static EULAConfirmationCallback GetEULAConfirmationCallback();
   ///@}
 
+  /**
+   * Function pointer for the on load callback check.
+   * This is the type for the internal attribute OnLoadCheckCallbackPtr.
+   */
+  typedef bool (*OnLoadCheckCallback)();
+
+  ///@{
+  /**
+   * Get/Set the callback function for on load check.
+   */
+  void SetOnLoadCheckCallbackFunction(OnLoadCheckCallback callback);
+  OnLoadCheckCallback GetOnLoadCheckCallbackFunction() const;
+  ///@}
+
 protected:
   /**
    * Set the filename the plugin is loaded from, if any. If it's nullptr, then
@@ -131,7 +145,11 @@ private:
    */
   static bool ConfirmEULA(vtkPVPlugin* plugin);
 
+  bool OnLoadCheckCallbackExecute();
+
   char* FileName;
+
+  OnLoadCheckCallback OnLoadCheckCallbackPtr;
 
   static EULAConfirmationCallback EULAConfirmationCallbackPtr;
   friend class vtkPVPluginLoader;
