@@ -4,6 +4,7 @@
 #include "vtkPVProbeLineFilter.h"
 
 #include "vtkDemandDrivenPipeline.h"
+#include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkLineSource.h"
@@ -73,6 +74,14 @@ int vtkPVProbeLineFilter::FillInputPortInformation(int port, vtkInformation* inf
     default:
       return 0;
   }
+}
+
+//------------------------------------------------------------------------------
+void vtkPVProbeLineFilter::ReportReferences(vtkGarbageCollector* collector)
+{
+  this->Superclass::ReportReferences(collector);
+  vtkGarbageCollectorReport(collector, this->Prober, "Prober");
+  vtkGarbageCollectorReport(collector, this->LineSource, "LineSource");
 }
 
 //----------------------------------------------------------------------------
