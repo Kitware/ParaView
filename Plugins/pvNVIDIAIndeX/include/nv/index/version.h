@@ -26,13 +26,13 @@
 
 /// Revision indicating the build of the NVIDIA IndeX library that corresponds to this header file.
 /// This string may consist of multiples numbers separated by dots.
-#define NVIDIA_INDEX_LIBRARY_REVISION_STRING "385200.1158"
+#define NVIDIA_INDEX_LIBRARY_REVISION_STRING "385200.2327"
 
 /// Major (branch) number of NVIDIA IndeX revision.
 #define NVIDIA_INDEX_LIBRARY_REVISION_MAJOR 385200
 
 /// Minor number of NVIDIA IndeX revision. May be 0 if there is no minor revision.
-#define NVIDIA_INDEX_LIBRARY_REVISION_MINOR 1158
+#define NVIDIA_INDEX_LIBRARY_REVISION_MINOR 2327
 
 /// Sub-minor number of NVIDIA IndeX revision. May be 0 if there is no sub-minor revision (which is
 /// commonly the case).
