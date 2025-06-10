@@ -130,7 +130,7 @@
                                   command="SetFileName"
                                   name="FileName"
                                   number_of_elements="1"
-                                  panel_visibility="advanced">
+                                  panel_visibility="never">
                 <FileListDomain name="files"/>
                 <Documentation>
                     This property specifies the file name for the reader.
