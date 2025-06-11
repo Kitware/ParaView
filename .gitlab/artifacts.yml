@@ -34,6 +34,7 @@
 
             # The artifacts of the build.
             - build/bin/
+            - build/ContractTests/
             - build/lib/
             - build/VTK/Utilities/KWIML/vtkkwiml/test/kwiml_test
             - build/VTK/Utilities/KWIML/vtkkwiml/test/kwiml_test.exe

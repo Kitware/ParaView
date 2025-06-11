@@ -25,6 +25,7 @@ set(PARAVIEW_PLUGIN_ENABLE_ParFlow ON CACHE BOOL "")
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY "ON" CACHE BOOL "")
 
 include("${CMAKE_CURRENT_LIST_DIR}/configure_options.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/configure_contract_testing.cmake")
 
 # Default to Release builds.
 if ("$ENV{CMAKE_BUILD_TYPE}" STREQUAL "")
