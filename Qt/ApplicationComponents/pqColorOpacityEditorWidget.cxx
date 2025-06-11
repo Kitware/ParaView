@@ -234,12 +234,26 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   if (stc)
   {
     ui.ColorEditor->initialize(stc, true, nullptr, false);
-    QObject::connect(&this->Internals->ColorTableModel,
-      SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
-      SIGNAL(xrgbPointsChanged()));
-    QObject::connect(&this->Internals->OpacityTableModel,
-      SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
-      SIGNAL(xvmsPointsChanged()));
+    QObject::connect(&this->Internals->ColorTableModel, &pqColorTableModel::dataChanged, this,
+      [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles)
+      {
+        Q_UNUSED(topLeft);
+        Q_UNUSED(bottomRight);
+        if (roles.contains(Qt::DisplayRole) || roles.contains(Qt::EditRole))
+        {
+          Q_EMIT this->xrgbPointsChanged();
+        }
+      });
+    QObject::connect(&this->Internals->OpacityTableModel, &pqColorTableModel::dataChanged, this,
+      [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles)
+      {
+        Q_UNUSED(topLeft);
+        Q_UNUSED(bottomRight);
+        if (roles.contains(Qt::DisplayRole) || roles.contains(Qt::EditRole))
+        {
+          Q_EMIT this->xvmsPointsChanged();
+        }
+      });
   }
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(representationChanged(pqRepresentation*)),
     this, SLOT(representationOrViewChanged()));
