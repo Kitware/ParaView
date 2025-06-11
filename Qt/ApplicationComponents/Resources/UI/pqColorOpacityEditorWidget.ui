@@ -177,20 +177,88 @@
         </widget>
        </item>
        <item>
-        <widget class="pqExpandableTableView" name="OpacityTable">
-         <property name="editTriggers">
-          <set>QAbstractItemView::DoubleClicked</set>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="maximumRowCountBeforeScrolling" stdset="0">
-          <number>10</number>
-         </property>
-        </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+            <number>2</number>
+          </property>
+          <item>
+            <widget class="pqExpandableTableView" name="OpacityTable">
+              <property name="editTriggers">
+                <set>QAbstractItemView::DoubleClicked</set>
+              </property>
+              <property name="alternatingRowColors">
+                <bool>true</bool>
+              </property>
+              <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="maximumRowCountBeforeScrolling" stdset="0">
+                <number>10</number>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+              <number>2</number>
+            </property>
+            <item>
+              <widget class="QToolButton" name="AddOpacityPoint">
+              <property name="toolTip">
+                <string>Add new control point</string>
+              </property>
+              <property name="text">
+                <string>...</string>
+              </property>
+              <property name="icon">
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+                <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
+              </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="QToolButton" name="RemoveOpacityPoint">
+              <property name="toolTip">
+                <string>Remove selected control point(s)</string>
+              </property>
+              <property name="text">
+                <string>...</string>
+              </property>
+              <property name="icon">
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+                <normaloff>:/QtWidgets/Icons/pqMinus.svg</normaloff>:/QtWidgets/Icons/pqMinus.svg</iconset>
+              </property>
+              </widget>
+            </item>
+            <item>
+              <spacer name="verticalSpacer">
+              <property name="orientation">
+                <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+                <size>
+                <width>20</width>
+                </size>
+              </property>
+              </spacer>
+            </item>
+            <item>
+              <widget class="QToolButton" name="DeleteAllOpacityPoints">
+              <property name="toolTip">
+                <string>Remove all points</string>
+              </property>
+              <property name="text">
+                <string>...</string>
+              </property>
+              <property name="icon">
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+                <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
+              </property>
+              </widget>
+            </item>
+            </layout>
+          </item>
+          </layout>
        </item>
        <item>
         <widget class="pqTransferFunctionWidget" name="ColorEditor" native="true">
@@ -241,20 +309,88 @@
         </widget>
        </item>
        <item>
-        <widget class="pqExpandableTableView" name="ColorTable">
-         <property name="editTriggers">
-          <set>QAbstractItemView::DoubleClicked</set>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="maximumRowCountBeforeScrolling" stdset="0">
-          <number>10</number>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+            <number>2</number>
+          </property>
+          <item>
+            <widget class="pqExpandableTableView" name="ColorTable">
+              <property name="editTriggers">
+                <set>QAbstractItemView::DoubleClicked</set>
+              </property>
+              <property name="alternatingRowColors">
+                <bool>true</bool>
+              </property>
+              <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="maximumRowCountBeforeScrolling" stdset="0">
+                <number>10</number>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+              <number>2</number>
+            </property>
+            <item>
+              <widget class="QToolButton" name="AddColorPoint">
+              <property name="toolTip">
+                <string>Add new control point</string>
+              </property>
+              <property name="text">
+                <string>...</string>
+              </property>
+              <property name="icon">
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+                <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
+              </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="QToolButton" name="RemoveColorPoint">
+              <property name="toolTip">
+                <string>Remove selected control point(s)</string>
+              </property>
+              <property name="text">
+                <string>...</string>
+              </property>
+              <property name="icon">
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+                <normaloff>:/QtWidgets/Icons/pqMinus.svg</normaloff>:/QtWidgets/Icons/pqMinus.svg</iconset>
+              </property>
+              </widget>
+            </item>
+            <item>
+              <spacer name="verticalSpacer_2">
+              <property name="orientation">
+                <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+                <size>
+                <width>20</width>
+                </size>
+              </property>
+              </spacer>
+            </item>
+            <item>
+              <widget class="QToolButton" name="DeleteAllColorPoints">
+              <property name="toolTip">
+                <string>Remove all points</string>
+              </property>
+              <property name="text">
+                <string>...</string>
+              </property>
+              <property name="icon">
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+                <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
+              </property>
+              </widget>
+            </item>
+            </layout>
+          </item>
+          </layout>
        </item>
        <item>
         <widget class="pqTransferFunction2DWidget" name="Transfer2DEditor" native="true">
@@ -276,7 +412,7 @@ background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="spacing">
         <number>1</number>
        </property>
@@ -407,7 +543,7 @@ background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_2">
+        <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>

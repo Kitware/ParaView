@@ -7,6 +7,8 @@
 #include "pqApplicationComponentsModule.h"
 #include <QAbstractTableModel>
 
+#include "vtkVector.h"
+
 class pqColorOpacityEditorWidget;
 
 // QAbstractTableModel subclass for viewing and manipulating color transfer
@@ -38,6 +40,12 @@ public:
   QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+  std::vector<vtkVector<double, 6>> points() const;
+
+  size_t insertPoint(size_t loc);
+
+  bool setPoints(const std::vector<vtkVector<double, 6>>& pts);
 
 protected Q_SLOTS:
 
