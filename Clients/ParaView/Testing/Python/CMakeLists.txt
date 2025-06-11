@@ -126,6 +126,7 @@ paraview_add_test_python(
 paraview_add_test_python(
   NO_VALID NO_RT
   ExportCSV.py
+  LegacyVTKFileVersion.py
   LoadStateWithOptions.py
   LoadStateWithDataSets.py
   Plot3DReader.py
