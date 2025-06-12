@@ -9,7 +9,6 @@
 #include "vtkFloatArray.h"
 #include "vtkGenericCell.h"
 #include "vtkImplicitFunction.h"
-#include "vtkIncrementalPointLocator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkNonMergingPointLocator.h"
@@ -25,40 +24,15 @@
 vtkStandardNewMacro(vtkMooseXfemClip);
 
 //----------------------------------------------------------------------------
-vtkMooseXfemClip::vtkMooseXfemClip()
-{
-  this->OutputPointsPrecision = DEFAULT_PRECISION;
-  this->Locator = nullptr;
-}
+vtkMooseXfemClip::vtkMooseXfemClip() = default;
 
 //----------------------------------------------------------------------------
-vtkMooseXfemClip::~vtkMooseXfemClip()
-{
-  if (this->Locator)
-  {
-    this->Locator->UnRegister(this);
-    this->Locator = nullptr;
-  }
-}
+vtkMooseXfemClip::~vtkMooseXfemClip() = default;
 
 //----------------------------------------------------------------------------
 void vtkMooseXfemClip::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-}
-
-//----------------------------------------------------------------------------
-void vtkMooseXfemClip::CreateDefaultLocator()
-{
-  if (this->Locator == nullptr)
-  {
-    // The vtkNonMergingPointLocator does not merge coincident points on
-    // opposing sides of the cutting plane, which is essential for proper
-    // visualization of fields that are discontinuous across that interface.
-    this->Locator = vtkNonMergingPointLocator::New();
-    this->Locator->Register(this);
-    this->Locator->Delete();
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -93,9 +67,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPointData *inPD = input->GetPointData(), *outPD = output->GetPointData();
   vtkCellData* inCD = input->GetCellData();
   vtkCellData* outCD = output->GetCellData();
-  vtkPoints* newPoints;
-  vtkFloatArray* cellScalars;
-  vtkImplicitFunction* ClipFunction = nullptr;
+  vtkSmartPointer<vtkImplicitFunction> ClipFunction;
   vtkPlane* ClipPlane = nullptr;
 
   vtkDataArray* XFEMCutOriginArray = input->GetCellData()->GetArray("xfem_cut_origin_")
@@ -106,7 +78,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
     : input->GetCellData()->GetArray("xfem_cut_normal");
   if (XFEMCutOriginArray && XFEMCutNormalArray)
   {
-    ClipFunction = vtkPlane::New();
+    ClipFunction = vtkSmartPointer<vtkImplicitFunction>::Take(vtkPlane::New());
     ClipPlane = vtkPlane::SafeDownCast(ClipFunction);
   }
   else
@@ -142,16 +114,14 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   {
     estimatedSize = 1024;
   }
-  cellScalars = vtkFloatArray::New();
+  vtkNew<vtkFloatArray> cellScalars;
   cellScalars->Allocate(VTK_CELL_SIZE);
-  vtkCellArray* conn = vtkCellArray::New();
+  vtkNew<vtkCellArray> conn;
   conn->Allocate(estimatedSize, estimatedSize / 2);
   conn->InitTraversal();
-  vtkUnsignedCharArray* types = vtkUnsignedCharArray::New();
+  vtkNew<vtkUnsignedCharArray> types;
   types->Allocate(estimatedSize, estimatedSize / 2);
-  vtkIdTypeArray* locs = vtkIdTypeArray::New();
-  locs->Allocate(estimatedSize, estimatedSize / 2);
-  newPoints = vtkPoints::New();
+  vtkNew<vtkPoints> newPoints;
 
   // set precision for the points in the output
   if (this->OutputPointsPrecision == vtkAlgorithm::DEFAULT_PRECISION)
@@ -173,17 +143,11 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
 
   newPoints->Allocate(numPts, numPts / 2);
 
-  // locator used to merge potentially duplicate points
-  if (this->Locator == nullptr)
-  {
-    this->CreateDefaultLocator();
-  }
   this->Locator->InitPointInsertion(newPoints, input->GetBounds());
 
-  vtkDataSetAttributes* tempDSA = vtkDataSetAttributes::New();
+  vtkNew<vtkDataSetAttributes> tempDSA;
   tempDSA->InterpolateAllocate(inPD, 1, 2);
   outPD->InterpolateAllocate(inPD, estimatedSize, estimatedSize / 2);
-  tempDSA->Delete();
   outCD = output->GetCellData();
   outCD->CopyAllocate(inCD, estimatedSize, estimatedSize / 2);
 
@@ -191,7 +155,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   //
   int abort = 0;
   vtkIdType updateTime = numCells / 20 + 1; // update roughly every 5%
-  vtkGenericCell* cell = vtkGenericCell::New();
+  vtkNew<vtkGenericCell> cell;
   int num = 0;
   int numNew = 0;
   for (vtkIdType cellId = 0; cellId < numCells && !abort; cellId++)
@@ -262,7 +226,6 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
       }
       else
       {
-        locs->InsertNextValue(conn->GetTraversalLocation());
         conn->GetNextCell(npts, pts);
 
         // For each new cell added, got to set the type of the cell
@@ -290,21 +253,8 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
     } // for each new cell
   }   // for each cell
 
-  cell->Delete();
-  cellScalars->Delete();
-
-  if (ClipFunction)
-  {
-    ClipFunction->Delete();
-  }
-
   output->SetPoints(newPoints);
-  output->SetCells(types, locs, conn);
-  conn->Delete();
-  types->Delete();
-  locs->Delete();
-
-  newPoints->Delete();
+  output->SetCells(types, conn);
   this->Locator->Initialize(); // release any extra memory
   output->Squeeze();
 

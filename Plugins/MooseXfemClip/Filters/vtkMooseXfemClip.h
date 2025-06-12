@@ -31,9 +31,10 @@
 #define vtkMooseXfemClip_h
 
 #include "vtkMooseXfemClipModule.h" // for export macro
+#include "vtkNew.h"                 // for vtkNew
 #include "vtkUnstructuredGridAlgorithm.h"
 
-class vtkIncrementalPointLocator;
+class vtkNonMergingPointLocator;
 
 class VTKMOOSEXFEMCLIP_EXPORT vtkMooseXfemClip : public vtkUnstructuredGridAlgorithm
 {
@@ -48,28 +49,23 @@ public:
    * Set/get the desired precision for the output types. See the documentation
    * for the vtkAlgorithm::DesiredOutputPrecision enum for an explanation of
    * the available precision settings.
+   *
+   * Default is DEFAULT_PRECISION
    */
   vtkSetClampMacro(OutputPointsPrecision, int, SINGLE_PRECISION, DEFAULT_PRECISION);
   vtkGetMacro(OutputPointsPrecision, int);
   ///@}
 
-  /**
-   * Create default locator. Used to create one when none is specified. The
-   * locator is used to merge coincident points. In this case, a non-merging
-   * locator is used because merging is not desired.
-   */
-  void CreateDefaultLocator();
-
 protected:
   vtkMooseXfemClip();
   ~vtkMooseXfemClip() override;
 
-  int OutputPointsPrecision;
-  vtkIncrementalPointLocator* Locator;
-
 private:
   vtkMooseXfemClip(const vtkMooseXfemClip&) = delete; // Not implemented.
   void operator=(const vtkMooseXfemClip&) = delete;   // Not implemented.
+
+  int OutputPointsPrecision = DEFAULT_PRECISION;
+  vtkNew<vtkNonMergingPointLocator> Locator;
 };
 
 #endif
