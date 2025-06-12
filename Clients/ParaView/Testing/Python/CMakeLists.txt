@@ -193,6 +193,11 @@ paraview_add_test_driven(
   TestCompositedGeometryCulling.py
 )
 
+paraview_add_test_driven(
+  NO_VALID NO_OUTPUT NO_RT
+  TestLoadRemoteState.py
+)
+
 # Python Multi-servers test
 # => Only for shared build as we dynamically load plugins
 if(BUILD_SHARED_LIBS)
