@@ -37,8 +37,7 @@ std::string AsString(const T& var)
 }
 
 template <>
-vtkMaybeUnused("not used in non-double specializations") inline std::string
-  AsString(const double& var)
+[[maybe_unused]] inline std::string AsString(const double& var)
 {
   char buf[256];
   const double_conversion::DoubleToStringConverter& converter =
@@ -59,8 +58,8 @@ B vtkSMVPConvertFromString(const std::string& string_representation)
 }
 
 template <>
-vtkMaybeUnused("not used in non-string specializations") inline std::string
-  vtkSMVPConvertFromString<std::string>(const std::string& string_representation)
+[[maybe_unused]] inline std::string vtkSMVPConvertFromString<std::string>(
+  const std::string& string_representation)
 {
   return string_representation;
 }
