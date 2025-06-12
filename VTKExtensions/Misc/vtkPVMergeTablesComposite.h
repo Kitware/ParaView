@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 /**
- * @class   vtkPVMergeTablesMultiBlock
+ * @class   vtkPVMergeTablesComposite
  * @brief   used to merge rows in tables.
  *
  * Simplified version of vtkMergeTables which simply combines tables merging
@@ -12,36 +12,34 @@
  * composite structure.
  * All inputs must either be vtkTable or vtkCompositeDataSet mixing is not
  * allowed.
- * The output is a multiblock dataset of vtkTable.
- * @todo
- * We may want to consolidate with vtkPVMergeTable somehow
+ * The output is a vtkMultiBlockDataSet/vtkPartitionedDataSetCollection of vtkTables.
  */
 
-#ifndef vtkPVMergeTablesMultiBlock_h
-#define vtkPVMergeTablesMultiBlock_h
+#ifndef vtkPVMergeTablesComposite_h
+#define vtkPVMergeTablesComposite_h
 
-#include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsMiscModule.h" // needed for export macro
-#include "vtkParaViewDeprecation.h"       // for PARAVIEW_DEPRECATED
 
-class PARAVIEW_DEPRECATED_IN_6_1_0("Please use the `vtkPVMergeTablesComposite` instead.")
-  VTKPVVTKEXTENSIONSMISC_EXPORT vtkPVMergeTablesMultiBlock : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSMISC_EXPORT vtkPVMergeTablesComposite : public vtkDataObjectAlgorithm
 {
 public:
-  static vtkPVMergeTablesMultiBlock* New();
-  vtkTypeMacro(vtkPVMergeTablesMultiBlock, vtkMultiBlockDataSetAlgorithm);
+  static vtkPVMergeTablesComposite* New();
+  vtkTypeMacro(vtkPVMergeTablesComposite, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkPVMergeTablesMultiBlock();
-  ~vtkPVMergeTablesMultiBlock() override;
+  vtkPVMergeTablesComposite();
+  ~vtkPVMergeTablesComposite() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
-  vtkPVMergeTablesMultiBlock(const vtkPVMergeTablesMultiBlock&) = delete;
-  void operator=(const vtkPVMergeTablesMultiBlock&) = delete;
+  vtkPVMergeTablesComposite(const vtkPVMergeTablesComposite&) = delete;
+  void operator=(const vtkPVMergeTablesComposite&) = delete;
 };
 
 #endif

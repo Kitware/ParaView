@@ -19,7 +19,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
-#include "vtkPVMergeTablesMultiBlock.h"
+#include "vtkPVMergeTablesComposite.h"
 #include "vtkPlot.h"
 #include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
@@ -219,7 +219,7 @@ vtkSmartPointer<vtkDataObject> vtkChartRepresentation::ReduceDataToRoot(vtkDataO
   preprocessor->SetInputData(data);
 
   vtkNew<vtkReductionFilter> reductionFilter;
-  vtkNew<vtkPVMergeTablesMultiBlock> algo;
+  vtkNew<vtkPVMergeTablesComposite> algo;
   reductionFilter->SetPostGatherHelper(algo.GetPointer());
   reductionFilter->SetInputConnection(preprocessor->GetOutputPort());
   reductionFilter->Update();
