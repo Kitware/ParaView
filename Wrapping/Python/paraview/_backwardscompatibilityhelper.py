@@ -596,6 +596,21 @@ def setattr(proxy, pname, value):
             else:
                 raise NotSupportedException("'FlipAllInputArrays' was renamed in 'ReflectAllInputArrays' since ParaView 6.0")
 
+    # 6.0 -> 6.1 vtkParticleTracerBase have been reworked
+    # Caching is now automated, DisableResetCache has been removed
+    # TerminationTime is not exposed anymore
+    if pname == "DisableResetCache" and proxy.SMProxy.GetXMLName() in ["LegacyStreakLine", "StreakLine"]:
+        if compatibility_version <= (6, 0):
+            return
+        else:
+            raise NotSupportedException(
+                "%s now automates caching, simply remove DisableResetCache usages." % proxy.SMProxy.GetXMLName())
+    if pname == "TerminationTime" and proxy.SMProxy.GetXMLName() == "ParticlePath":
+        if compatibility_version <= (6, 0):
+            return
+        else:
+            raise NotSupportedException(
+                "ParticlePath does not support setting TerminationTime anymore, simply remove it.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
