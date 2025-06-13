@@ -101,6 +101,12 @@ def LoadState(
                     pyproxy.SMProxy.CHOOSE_FILES_EXPLICITLY
                 )
                 for item in filenames:
+                    if not { "name", "FileName" } <= item.keys():
+                        keylist = list(item.keys())
+                        raise RuntimeError(
+                            "filename dictionaries must include 'name' and 'FileName' keys. "
+                            "This dictionary had keys {}".format(keylist)
+                        )
                     for pname in item.keys():
                         if pname == "name" or pname == "id":
                             continue
