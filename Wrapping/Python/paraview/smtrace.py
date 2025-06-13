@@ -1932,12 +1932,12 @@ class LoadState(TraceItem):
             trace.append("# load state")
             trace.append("LoadState('%s')" % filename)
         elif mode == options.SMProxy.USE_DATA_DIRECTORY:
+            restrict_to_data_directory = 'True' if options.OnlyUseFilesInDataDirectory else 'False'
             trace.append("# load state using data from chosen directory")
             trace.append( \
                 ["LoadState('%s'," % filename,
                  "    data_directory='%s'," % options.DataDirectory,
-                 "    restrict_to_data_directory=%s)",
-                 True if options.OnlyUseFilesInDataDirectory else False])
+                 "    restrict_to_data_directory=%s)" % restrict_to_data_directory])
         elif mode == options.SMProxy.CHOOSE_FILES_EXPLICITLY:
             iter = sm.PropertyIterator(options)
             params = {}
