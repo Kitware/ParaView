@@ -57,8 +57,8 @@
 #endif
 #endif
 
-// API deprecated before 5.11.0 have already been removed.
-#define PARAVIEW_MINIMUM_DEPRECATION_LEVEL PARAVIEW_VERSION_CHECK(5, 11, 0)
+// API deprecated before 6.0.0 have already been removed.
+#define PARAVIEW_MINIMUM_DEPRECATION_LEVEL PARAVIEW_VERSION_CHECK(6, 0, 0)
 
 // Force the deprecation level to be at least that of ParaView's build
 // configuration.
@@ -97,6 +97,15 @@
 #endif
 #endif
 
+// APIs deprecated in 6.1.0.
+#if defined(__VTK_WRAP__)
+#define PARAVIEW_DEPRECATED_IN_6_1_0(reason) [[vtk::deprecated(reason, "6.1.0")]]
+#elif PARAVIEW_DEPRECATION_LEVEL >= PARAVIEW_VERSION_CHECK(6, 1, 20250520)
+#define PARAVIEW_DEPRECATED_IN_6_1_0(reason) PARAVIEW_DEPRECATION(reason)
+#else
+#define PARAVIEW_DEPRECATED_IN_6_1_0(reason)
+#endif
+
 // APIs deprecated in 6.0.0.
 #if defined(__VTK_WRAP__)
 #define PARAVIEW_DEPRECATED_IN_6_0_0(reason) [[vtk::deprecated(reason, "6.0.0")]]
@@ -106,24 +115,11 @@
 #define PARAVIEW_DEPRECATED_IN_6_0_0(reason)
 #endif
 
-// APIs deprecated in 5.13.0.
-#if defined(__VTK_WRAP__)
-#define PARAVIEW_DEPRECATED_IN_5_13_0(reason) [[vtk::deprecated(reason, "5.13.0")]]
-#elif PARAVIEW_DEPRECATION_LEVEL >= PARAVIEW_VERSION_CHECK(5, 12, 20230101)
-#define PARAVIEW_DEPRECATED_IN_5_13_0(reason) PARAVIEW_DEPRECATION(reason)
-#else
-#define PARAVIEW_DEPRECATED_IN_5_13_0(reason)
-#endif
-
 // APIs deprecated in the older release always warn.
 #if defined(__VTK_WRAP__)
-#define PARAVIEW_DEPRECATED_IN_5_12_0(reason) [[vtk::deprecated(reason, "5.12.0")]]
-#define PARAVIEW_DEPRECATED_IN_5_11_0(reason) [[vtk::deprecated(reason, "5.11.0")]]
-#define PARAVIEW_DEPRECATED_IN_5_10_0(reason) [[vtk::deprecated(reason, "5.10.0")]]
+#define PARAVIEW_DEPRECATED_IN_5_13_0(reason) [[vtk::deprecated(reason, "5.13.0")]]
 #else
-#define PARAVIEW_DEPRECATED_IN_5_12_0(reason) PARAVIEW_DEPRECATION(reason)
-#define PARAVIEW_DEPRECATED_IN_5_11_0(reason) PARAVIEW_DEPRECATION(reason)
-#define PARAVIEW_DEPRECATED_IN_5_10_0(reason) PARAVIEW_DEPRECATION(reason)
+#define PARAVIEW_DEPRECATED_IN_5_13_0(reason) PARAVIEW_DEPRECATION(reason)
 #endif
 
 #endif
