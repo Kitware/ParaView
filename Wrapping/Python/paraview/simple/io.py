@@ -110,8 +110,11 @@ def LoadState(
                     for pname in item.keys():
                         if pname == "name" or pname == "id":
                             continue
+                        proxy_id = 0 # indicates no id is available
+                        if ("id" in item.keys()):
+                            proxy_id = int(item.get("id"))
                         smprop = pyproxy.FindProperty(
-                            item.get("name"), int(item.get("id")), pname
+                            item.get("name"), proxy_id, pname
                         )
                         if not smprop:
                             raise RuntimeError(
