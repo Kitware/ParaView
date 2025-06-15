@@ -121,7 +121,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,1,0,0,0,1">
        <property name="spacing">
-        <number>0</number>
+        <number>6</number>
        </property>
        <property name="sizeConstraint">
         <enum>QLayout::SetMinimumSize</enum>
