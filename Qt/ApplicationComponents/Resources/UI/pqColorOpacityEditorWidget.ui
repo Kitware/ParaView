@@ -145,7 +145,7 @@
        <item>
         <widget class="QCheckBox" name="UseOpacityControlPointsFreehandDrawing">
          <property name="toolTip">
-          <string>When checked, the control point of the opacity transfer fonction can be "drawn" instead of being placed one by one.</string>
+          <string>When checked, the control point of the opacity transfer function can be "drawn" instead of being placed one by one.</string>
          </property>
          <property name="text">
           <string>Enable Freehand Drawing Of Opacity Transfer Function</string>
