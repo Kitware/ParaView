@@ -342,8 +342,8 @@ void pqFileDialog::addImplementation(vtkTypeUInt32 location)
 
   QObject::connect(impl.Ui.CreateFolder, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
 
-  QObject::connect(
-    impl.Ui.Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
+  QObject::connect(impl.Ui.Parents, QOverload<int>::of(&QComboBox::activated), this,
+    [this, &impl](int index) { this->onNavigate(impl.Ui.Parents->itemText(index)); });
 
   QObject::connect(
     impl.Ui.EntityType, &QComboBox::currentTextChanged, this, &pqFileDialog::onFilterChange);
