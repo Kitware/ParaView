@@ -612,6 +612,19 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                 "ParticlePath does not support setting TerminationTime anymore, simply remove it.")
 
+    chart_proxies = ["ImageChartRepresentation", "XYChartRepresentationBase", "XYChartRepresentation",
+                     "XYPointChartRepresentation", "XYBarChartRepresentation", "QuartileChartRepresentation",
+                     "ParallelCoordinatesRepresentation", "BoxChartRepresentation", "PlotMatrixRepresentation",
+                     "BagPlotMatrixRepresentation", "XYBagChartRepresentation", "XYFunctionalBagChartRepresentation"]
+    if pname == "CompositeDataSetIndex" and proxy.SMProxy.GetXMLName() in chart_proxies:
+        if compatibility_version <= (6, 0):
+            selectors = ["//*[@cid='%s']" % cid for cid in value]
+            return proxy.GetProperty("BlockSelectors").SetData(selectors)
+        else:
+            raise NotSupportedException(
+                "SpreadSheetRepresentation no longer uses 'CompositeDataSetIndex' but instead "
+                "supports 'Selectors' to select blocks.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -1250,6 +1263,20 @@ def getattr(proxy, pname):
                 return proxy.GetProperty("ReflectAllInputArrays").GetData()
             else:
                 raise NotSupportedException("'FlipAllInputArrays' was renamed in 'ReflectAllInputArrays' since ParaView 6.0")
+
+    # 6.0 -> 6.1 onwards chart representations cannot provide a value for CompositeDataSetIndex
+    chart_proxies = ["ImageChartRepresentation", "XYChartRepresentationBase", "XYChartRepresentation",
+                     "XYPointChartRepresentation", "XYBarChartRepresentation", "QuartileChartRepresentation",
+                     "ParallelCoordinatesRepresentation", "BoxChartRepresentation", "PlotMatrixRepresentation",
+                     "BagPlotMatrixRepresentation", "XYBagChartRepresentation", "XYFunctionalBagChartRepresentation"]
+    if pname == "CompositeDataSetIndex" and proxy.SMProxy.GetXMLName() in chart_proxies:
+        if compatibility_version < (6, 1):
+            return []
+        else:
+            raise NotSupportedException(
+                "Since ParaView 6.1, chart representations no longer "
+                "supports 'CompositeDataSetIndex' and it has been replaced by "
+                "'BlockSelectors'.")
 
     raise Continue()
 
