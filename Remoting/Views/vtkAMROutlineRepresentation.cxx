@@ -9,7 +9,6 @@
 #include "vtkCompositePolyDataMapper.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
@@ -18,6 +17,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVTrivialProducer.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
@@ -248,7 +248,7 @@ int vtkAMROutlineRepresentation::RequestData(
   {
     // create an empty dataset. This is needed so that view knows what dataset
     // to expect from the other processes on this node.
-    this->ProcessedData = vtkSmartPointer<vtkMultiBlockDataSet>::New();
+    this->ProcessedData = vtkSmartPointer<vtkPartitionedDataSetCollection>::New();
     this->DataBounds.Reset();
   }
 
@@ -258,7 +258,7 @@ int vtkAMROutlineRepresentation::RequestData(
 
     // provide the mapper with an empty input. This is needed only because
     // mappers die when input is nullptr, currently.
-    vtkNew<vtkMultiBlockDataSet> tmp;
+    vtkNew<vtkPartitionedDataSetCollection> tmp;
     this->Mapper->SetInputDataObject(tmp.GetPointer());
   }
 
