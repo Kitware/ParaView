@@ -43,7 +43,7 @@ int vtkSMChartRepresentationProxy::ReadXMLAttributes(
   vtkSMProxy* optionsProxy = this->GetSubProxy("PlotOptions");
   if (optionsProxy)
   {
-    const char* names[] = { "Input", "CompositeDataSetIndex", "AttributeType", nullptr };
+    const char* names[] = { "Input", "Assembly", "BlockSelectors", "AttributeType", nullptr };
     for (int cc = 0; names[cc] != nullptr; cc++)
     {
       vtkSMProperty* src = this->GetProperty(names[cc]);
