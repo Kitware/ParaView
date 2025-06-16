@@ -59,7 +59,7 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" command="mouseRelease" arguments="1,0,67108864,45,7,/2:0" />
 
 
-  <!-- play around with "CompositeDataSetIndex" to make sure selection remains unaffected. -->
+  <!-- play around with "BlockSelectors" to make sure selection remains unaffected. -->
 
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setCheckState" arguments="0.0,2" />
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setCheckState" arguments="0.0,0" />
