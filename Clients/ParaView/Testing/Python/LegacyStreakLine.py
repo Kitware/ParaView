@@ -32,7 +32,7 @@ generateTimeSteps1 = GenerateTimeSteps(
 generateTimeSteps1.TimeStepValues = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
 pointSource1 = PointSource(registrationName="PointSource1")
 streakLine1 = StreakLine(
-    registrationName="StreakLine1", Input=generateTimeSteps1, SeedSource=pointSource1
+    registrationName="StreakLine1", Input=generateTimeSteps1, SeedSource=pointSource1, TerminationTime=1, DisableResetCache=True
 )
 
 assert streakLine1.GetXMLName() == "LegacyStreakLine"

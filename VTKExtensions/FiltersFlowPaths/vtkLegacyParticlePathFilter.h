@@ -30,15 +30,12 @@ public:
 
   static vtkLegacyParticlePathFilter* New();
 
-  double GetTerminationTime() VTK_FUTURE_CONST override { return this->TerminationTime; }
-  void SetTerminationTime(double t) override
-  {
-    if (this->TerminationTime != t)
-    {
-      this->TerminationTime = t;
-      this->Modified();
-    }
-  }
+  /**
+   * Set/Get the termination time, 0 means unlimited.
+   * Default is 0.
+   */
+  vtkGetMacro(TerminationTime, double);
+  vtkSetMacro(TerminationTime, double);
 
 protected:
   vtkLegacyParticlePathFilter() = default;
