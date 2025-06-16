@@ -4,8 +4,8 @@
 
 #include "vtkActor.h"
 #include "vtkAlgorithmOutput.h"
-#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
@@ -14,10 +14,11 @@
 #include "vtkMaskPoints.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
 #include "vtkPointGaussianMapper.h"
@@ -201,10 +202,15 @@ int vtkPointGaussianRepresentation::FillInputPortInformation(
 int vtkPointGaussianRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (auto input = vtkDataObject::GetData(inputVector[0], 0))
+  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
+    vtkSmartPointer<vtkDataObject> data = vtkDataObject::GetData(inputVector[0], 0);
+    if (!data)
+    {
+      return 0;
+    }
     vtkNew<vtkMaskPoints> unstructuredToPolyData;
-    unstructuredToPolyData->SetInputData(input);
+    unstructuredToPolyData->SetInputData(data);
     unstructuredToPolyData->SetMaximumNumberOfPoints(VTK_ID_MAX);
 #if USE_VERTEX_CELLS
     unstructuredToPolyData->GenerateVerticesOn();
@@ -214,19 +220,29 @@ int vtkPointGaussianRepresentation::RequestData(
 #endif
     unstructuredToPolyData->SetOnRatio(1);
     unstructuredToPolyData->Update();
-    this->ProcessedData = unstructuredToPolyData->GetOutputDataObject(0);
-    if (vtkCompositeDataSet::SafeDownCast(this->ProcessedData) == nullptr)
+    data = unstructuredToPolyData->GetOutputDataObject(0);
+    if (auto pds = vtkPartitionedDataSet::SafeDownCast(data))
     {
-      vtkNew<vtkMultiBlockDataSet> ds;
-      ds->SetBlock(0, this->ProcessedData);
-      this->ProcessedData = ds;
+      vtkNew<vtkPartitionedDataSetCollection> pdc;
+      pdc->SetPartitionedDataSet(0, pds);
+      data = pdc.GetPointer();
     }
+    else if (auto ds = vtkDataSet::SafeDownCast(data))
+    {
+      vtkNew<vtkPartitionedDataSetCollection> pdc;
+      pdc->SetPartition(0, 0, ds);
+      data = pdc.GetPointer();
+    }
+    this->ProcessedData = data;
   }
-
-  // Create a vtkMultiBlockDataSet on the client to match what is delivered by the server
-  if (this->ProcessedData == nullptr)
+  else
   {
-    this->ProcessedData = vtkSmartPointer<vtkMultiBlockDataSet>::New();
+    auto placeHolderType = this->PlaceHolderDataType == VTK_MULTIBLOCK_DATA_SET
+      ? this->PlaceHolderDataType
+      : VTK_PARTITIONED_DATA_SET_COLLECTION;
+    auto placeHolder = vtk::TakeSmartPointer(vtkDataObjectTypes::NewDataObject(placeHolderType));
+    placeHolder->Initialize();
+    this->ProcessedData = placeHolder;
   }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -392,6 +408,16 @@ void vtkPointGaussianRepresentation::SetScaleTransferFunction(vtkPiecewiseFuncti
     this->ScaleFunction = pwf;
     this->Modified();
     this->UpdateMapperScaleFunction();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::SetPlaceHolderDataType(int datatype)
+{
+  if (this->PlaceHolderDataType != datatype)
+  {
+    this->PlaceHolderDataType = datatype;
+    this->MarkModified();
   }
 }
 
