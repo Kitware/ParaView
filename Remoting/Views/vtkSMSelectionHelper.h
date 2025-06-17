@@ -116,6 +116,15 @@ public:
   static vtkSMProxy* ConvertSelectionSource(int outputType, vtkSMSourceProxy* selectionSourceProxy,
     vtkSMSourceProxy* dataSource, int dataPort);
 
+  /**
+   * Given a selection source, expands the selection by the given number of
+   * layers (which may be negative). Also takes options for removing either
+   * the initial selection (the seed) or the intermediate layers between the
+   * initial selection and the outermost layer.
+   */
+  static void ExpandSelection(
+    vtkSMProxy* selectionSource, int layers, bool removeSeed, bool removeIntermediateLayers);
+
 protected:
   vtkSMSelectionHelper() = default;
   ~vtkSMSelectionHelper() override = default;

@@ -852,6 +852,16 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   return outSource;
 }
 
+void vtkSMSelectionHelper::ExpandSelection(
+  vtkSMProxy* selectionSource, int layers, bool removeSeed, bool removeIntermediateLayers)
+{
+  vtkSMPropertyHelper numberOfLayersHelper(selectionSource, "NumberOfLayers");
+  numberOfLayersHelper.Set(numberOfLayersHelper.GetAsInt() + layers);
+  vtkSMPropertyHelper(selectionSource, "RemoveSeed").Set(removeSeed);
+  vtkSMPropertyHelper(selectionSource, "RemoveIntermediateLayers").Set(removeIntermediateLayers);
+  selectionSource->UpdateVTKObjects();
+}
+
 namespace
 {
 // Splits \c selection into a collection of selections based on the

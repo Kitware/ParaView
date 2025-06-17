@@ -528,3 +528,37 @@ def ClearSelection(Source=None):
         Source = paraview.simple.GetActiveSource()
 
     Source.SMProxy.SetSelectionInput(0, None, 0)
+
+
+def GrowSelection(Source=None, Layers=1):
+    """Grows a selection by a number of layers.
+
+    :param Source: If provided, the source whose selection should be modified. Defaults to the active source.
+    :type Source: Source proxy
+    :param Layers: The number of layers of points (or cells depending on the selection type) by which to grow
+        the selection. Can be negative to shrink the selection. Defaults to 1.
+    :type Layers: int
+    :rtype: None"""
+    if Source == None:
+        Source = paraview.simple.GetActiveSource()
+
+    if Source == None or not Source.SMProxy.IsA("vtkSMSourceProxy"):
+        return
+
+    selection_source = sm.vtkSMPropertyHelper(Source.SMProxy.GetSelectionInput(0), "Input").GetAsProxy()
+    settings = sm.vtkPVRenderViewSettings.GetInstance();
+    remove_seed = settings.GetGrowSelectionRemoveSeed()
+    remove_intermediate_layers = settings.GetGrowSelectionRemoveIntermediateLayers()
+    sm.vtkSMSelectionHelper.ExpandSelection(selection_source, Layers, remove_seed, remove_intermediate_layers)
+
+
+def ShrinkSelection(Source=None, Layers=1):
+    """Shrinks a selection by a number of layers.
+
+    :param Source: If provided, the source whose selection should be modified. Defaults to the active source.
+    :type Source: Source proxy
+    :param Layers: The number of layers of points (or cells depending on the selection type) by which to shrink
+        the selection. Can be negative to grow the selection. Defaults to 1.
+    :type Layers: int
+    :rtype: None"""
+    GrowSelection(Source, -Layers)
