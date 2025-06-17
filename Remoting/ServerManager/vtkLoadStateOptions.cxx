@@ -92,5 +92,7 @@ std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepa
   str << "Cannot find '" << SystemTools::GetFilenameName(filepath) << "' in '"
       << this->DataDirectory.c_str() << "'. Using '" << filepath << "'.\n\n";
   vtkOutputWindowDisplayDebugText(str.str().c_str());
+  result = filepath;
+
   return result;
 }
