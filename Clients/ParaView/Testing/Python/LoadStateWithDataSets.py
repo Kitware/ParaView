@@ -79,6 +79,38 @@ LoadState(
 )
 ResetSession()
 
+# load state using specified data files without proxy ids from the statefile
+LoadState(
+    statefile,
+    filenames=[
+        {
+            "name": "can.ex2",
+            "FileName": data_dir + "can.ex2",
+        },
+        {
+            "name": "dataset",
+            "FileName": data_dir + "disk_out_ref.ex2",
+        },
+        {
+            "name": "timeseries",
+            "FileName": [
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0000.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0001.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0002.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0003.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0004.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0005.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0006.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0007.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0008.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0009.vtp",
+                data_dir + "dualSphereAnimation/dualSphereAnimation_P00T0010.vtp",
+            ],
+        },
+    ],
+)
+ResetSession()
+
 # load state using specified data files (swapped)
 LoadState(
     statefile,

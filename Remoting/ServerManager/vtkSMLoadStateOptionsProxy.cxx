@@ -214,7 +214,7 @@ public:
   int GetId(const std::string& pname) const
   {
     const auto query =
-      std::string("//ServerManagerState/ProxyCollection/Item[@name=") + pname + "]";
+      std::string("//ServerManagerState/ProxyCollection/Item[@name='") + pname + "']";
     if (auto xpath_node = this->StateXML.select_node(query.c_str()))
     {
       return xpath_node.node().attribute("id").as_int();

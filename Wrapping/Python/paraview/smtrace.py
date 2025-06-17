@@ -1932,26 +1932,34 @@ class LoadState(TraceItem):
             trace.append("# load state")
             trace.append("LoadState('%s')" % filename)
         elif mode == options.SMProxy.USE_DATA_DIRECTORY:
+            restrict_to_data_directory = 'True' if options.OnlyUseFilesInDataDirectory else 'False'
             trace.append("# load state using data from chosen directory")
             trace.append( \
                 ["LoadState('%s'," % filename,
                  "    data_directory='%s'," % options.DataDirectory,
-                 "    restrict_to_data_directory=%s)",
-                 True if options.OnlyUseFilesInDataDirectory else False])
+                 "    restrict_to_data_directory=%s)" % restrict_to_data_directory])
         elif mode == options.SMProxy.CHOOSE_FILES_EXPLICITLY:
             iter = sm.PropertyIterator(options)
             params = {}
-            for smprop in iter:
-                pname = iter.GetKey()
-                m = re.match(r"(\d+)\.(.+)", pname)
-                if m and options.IsPropertyModified(int(m.group(1)), m.group(2)):
-                    sid = m.group(1)
-                    readername = options.GetReaderName(int(sid))
-                    d = params.get(sid, {'name': readername, 'id': sid})
+
+            # Get the property groups constructed for each reader. We'll parse the label
+            # of the group to get the file name and proxy id in the XML. This label is
+            # formatted and set in vtkSMLoadStateOptionsProxy::vtkInternals::AddProperties()
+            for i in range(options.GetNumberOfPropertyGroups()):
+                group = options.GetPropertyGroup(i)
+                smprop = group.GetProperty(0)
+                property_name = group.GetPropertyName(0)
+                group_label = group.GetXMLLabel()
+                m = re.search(r'^([^(]+).*id=(\d+)', group_label)
+                registration_name = m.group(1)[:-1]
+                sid = int(m.group(2))
+                if m and options.IsPropertyModified(sid, property_name):
+                    readername = options.GetReaderName(sid)
+                    d = params.get(sid, {'name': registration_name, 'id': sid})
                     if smprop.GetNumberOfElements() == 1:
-                        d[m.group(2)] = smprop.GetElement(0)
+                        d[property_name] = smprop.GetElement(0)
                     else:
-                        d[m.group(2)] = [smprop.GetElement(x) for x in range(smprop.GetNumberOfElements())]
+                        d[property_name] = [smprop.GetElement(x) for x in range(smprop.GetNumberOfElements())]
                     params[sid] = d
             if params:
                 trace.append("# load state using specified data files")
