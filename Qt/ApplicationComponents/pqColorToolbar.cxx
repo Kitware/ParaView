@@ -5,13 +5,18 @@
 #include "ui_pqColorToolbar.h"
 
 #include "pqActiveObjects.h"
+#include "pqChooseColorPresetReaction.h"
 #include "pqDisplayColorWidget.h"
 #include "pqEditColorMapReaction.h"
+#include "pqEditScalarBarReaction.h"
+#include "pqLoadPaletteReaction.h"
 #include "pqRescaleScalarRangeReaction.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqSetName.h"
 #include "pqUseSeparateColorMapReaction.h"
 #include "pqWidgetUtilities.h"
+
+#include <QToolButton>
 
 //-----------------------------------------------------------------------------
 void pqColorToolbar::constructor()
@@ -20,8 +25,26 @@ void pqColorToolbar::constructor()
   ui.setupUi(this);
   pqWidgetUtilities::formatChildTooltips(this);
 
+  new pqLoadPaletteReaction(ui.actionLoadPalette);
+  QToolButton* tb = qobject_cast<QToolButton*>(this->widgetForAction(ui.actionLoadPalette));
+  if (tb)
+  {
+    tb->setPopupMode(QToolButton::InstantPopup);
+  }
   new pqScalarBarVisibilityReaction(ui.actionScalarBarVisibility);
   new pqEditColorMapReaction(ui.actionEditColorMap);
+  auto chooseColorPresetReaction = new pqChooseColorPresetReaction(ui.actionColorMapPresets);
+  QObject::connect(chooseColorPresetReaction, &pqChooseColorPresetReaction::presetApplied,
+    []()
+    {
+      auto& activeObjects(pqActiveObjects::instance());
+      if (auto* rep = activeObjects.activeRepresentation())
+      {
+        rep->renderViewEventually();
+      }
+    });
+
+  new pqEditScalarBarReaction(ui.actionScalarBarProperties);
   new pqRescaleScalarRangeReaction(ui.actionResetRange, true, pqRescaleScalarRangeReaction::DATA);
   new pqRescaleScalarRangeReaction(
     ui.actionRescaleCustomRange, true, pqRescaleScalarRangeReaction::CUSTOM);

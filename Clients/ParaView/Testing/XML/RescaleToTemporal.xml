@@ -25,7 +25,7 @@
   <pqevent object="pqClientMainWindow/RescaleScalarRangeToDataOverTimeDialog/AutomaticRescaling" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/RescaleScalarRangeToDataOverTimeDialog/RescaleButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionIgnoreTime" />
-  <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton5" property="enabled" arguments="false" />
+  <pqcheck object="pqClientMainWindow/variableToolbar/actionRescaleTemporalRange" property="enabled" arguments="false" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionIgnoreTime" />
-  <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton5" property="enabled" arguments="true" />
+  <pqcheck object="pqClientMainWindow/variableToolbar/actionRescaleTemporalRange" property="enabled" arguments="true" />
 </pqevents>

@@ -36,6 +36,48 @@
      <string>Toggle Color Legend Visibility</string>
     </property>
    </action>
+   <action name="actionScalarBarProperties" >
+    <property name="checkable" >
+     <bool>false</bool>
+    </property>
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqEditScalarBar.svg</normaloff>:/pqWidgets/Icons/pqEditScalarBar.svg</iconset>
+    </property>
+    <property name="text" >
+     <string>Edit Color Legend Properties</string>
+    </property>
+    <property name="toolTip" >
+     <string>Edit Color Legend Properties</string>
+    </property>
+    <property name="statusTip" >
+     <string>Edit Color Legend Properties</string>
+    </property>
+   </action>
+   <action name="actionColorMapPresets" >
+    <property name="checkable" >
+     <bool>false</bool>
+    </property>
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc">
+      <normaloff>:/pqWidgets/Icons/pqFavorites.svg</normaloff>:/pqWidgets/Icons/pqFavorites32.png</iconset>
+    </property>
+    <property name="text" >
+     <string>Choose Preset Color Map</string>
+    </property>
+    <property name="toolTip" >
+     <string>Choose Preset Color Map</string>
+    </property>
+    <property name="statusTip" >
+     <string>Choose Preset Color Map</string>
+    </property>
+   </action>
    <action name="actionEditColorMap" >
     <property name="checkable" >
      <bool>true</bool>
@@ -65,6 +107,18 @@
     </property>
     <property name="statusTip" >
      <string>Use Separate Color Map</string>
+    </property>
+   </action>
+   <action name="actionLoadPalette">
+    <property name="icon">
+     <iconset resource="../../../Components/Resources/pqComponents.qrc">
+      <normaloff>:/pqWidgets/Icons/pqPalette.svg</normaloff>:/pqWidgets/Icons/pqPalette.svg</iconset>
+    </property>
+    <property name="text">
+     <string>Load Palette</string>
+    </property>
+    <property name="toolTip">
+     <string>Load a color palette</string>
     </property>
    </action>
    <action name="actionResetRange" >
@@ -137,8 +191,11 @@
     </property>
    </action>
    <addaction name="actionScalarBarVisibility" />
+   <addaction name="actionScalarBarProperties" />
+   <addaction name="actionColorMapPresets" />
    <addaction name="actionEditColorMap" />
    <addaction name="actionUseSeparateColorMap" />
+   <addaction name="actionLoadPalette"/>
    <addaction name="actionResetRange" />
    <addaction name="actionRescaleCustomRange" />
    <addaction name="actionRescaleTemporalRange" />

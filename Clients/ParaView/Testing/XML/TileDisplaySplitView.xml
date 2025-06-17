@@ -73,7 +73,7 @@
 
   <!--
   < ! - - switch to gradient background - - >
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionLoadPalette" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionLoadPalette" command="activate" arguments="" />
   <pqevent object="LoadPaletteMenu" command="activate" arguments="Gradient Background" />
 
   < !- - close the spreadsheet view - - >
