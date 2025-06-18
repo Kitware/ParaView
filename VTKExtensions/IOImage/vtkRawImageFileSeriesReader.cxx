@@ -10,9 +10,10 @@ vtkStandardNewMacro(vtkRawImageFileSeriesReader);
 vtkRawImageFileSeriesReader::vtkRawImageFileSeriesReader()
   : FileDimensionality(2)
 {
-  for (int i = 0; i < 6; i++)
+  for (int i = 0; i < 3; i++)
   {
-    this->DataExtent[i] = 0;
+    this->Dimensions[i] = 0;
+    this->MinimumIndex[i] = 0;
   }
 }
 
@@ -28,27 +29,40 @@ void vtkRawImageFileSeriesReader::UpdateReaderDataExtent()
     return;
   }
   imageReader->SetFileDimensionality(this->FileDimensionality);
-  // see superclass on why we also check on the number of file names here
+
+  int ext[6];
+  ext[0] = this->MinimumIndex[0];
+  ext[1] = this->MinimumIndex[0] + std::max(this->Dimensions[0] - 1, 0);
+  ext[2] = this->MinimumIndex[1];
+  ext[3] = this->MinimumIndex[1] + std::max(this->Dimensions[1] - 1, 0);
+
   if (this->ReadAsImageStack && this->GetNumberOfFileNames() > 1 && this->FileDimensionality == 2)
   {
-    int ext[6] = { this->DataExtent[0], this->DataExtent[1], this->DataExtent[2],
-      this->DataExtent[3], 0, static_cast<int>(this->GetNumberOfFileNames()) - 1 };
-    imageReader->SetDataExtent(ext);
+    ext[4] = 0;
+    ext[5] = static_cast<int>(this->GetNumberOfFileNames()) - 1;
   }
   else
   {
-    imageReader->SetDataExtent(this->DataExtent);
+    ext[4] = this->MinimumIndex[2];
+    ext[5] = this->MinimumIndex[2] + std::max(this->Dimensions[2] - 1, 0);
   }
+  imageReader->SetDataExtent(ext);
 }
 
 //----------------------------------------------------------------------------
 void vtkRawImageFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "DataExtent: (" << this->DataExtent[0];
-  for (int idx = 1; idx < 6; ++idx)
+  os << indent << "Dimensions: (" << this->Dimensions[0];
+  for (int idx = 1; idx < 3; ++idx)
   {
-    os << ", " << this->DataExtent[idx];
+    os << ", " << this->Dimensions[idx];
+  }
+  os << ")\n";
+  os << indent << "MinimumIndex: (" << this->MinimumIndex[0];
+  for (int idx = 1; idx < 3; ++idx)
+  {
+    os << ", " << this->MinimumIndex[idx];
   }
   os << ")\n";
   os << indent << "File Dimensionality: " << this->FileDimensionality << "\n";

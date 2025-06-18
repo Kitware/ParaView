@@ -611,6 +611,23 @@ def setattr(proxy, pname, value):
         else:
             raise NotSupportedException(
                 "ParticlePath does not support setting TerminationTime anymore, simply remove it.")
+    # DataExtent has been replaced by Dimensions
+    if pname == "DataExtent" and proxy.SMProxy.GetXMLName() == "ImageReader":
+        if compatibility_version <= (6, 0):
+            if isinstance(value, (list, tuple)) and len(value) == 6:
+                minIdx = [value[0], value[2], value[4]]
+                dimensions = [value[1] - value[0] + 1, value[3] - value[2] + 1, 0]
+                if int(proxy.GetProperty("FileDimensionality").GetData()) > 2:
+                    dimensions[2] = value[5] - value[4] + 1
+                proxy.GetProperty("MinimumIndex").SetData(minIdx)
+                proxy.GetProperty("Dimensions").SetData(dimensions)
+                return Continue()
+            else:
+                raise RuntimeError("This property requires 6 values.")
+        else:
+            raise NotSupportedException("'DataExtent' has been removed in ParaView 6.1. Please use the "
+                                        "'Dimensions' property to define the sizes of each dimension in "
+                                        "the image data instead.")
 
     chart_proxies = ["ImageChartRepresentation", "XYChartRepresentationBase", "XYChartRepresentation",
                      "XYPointChartRepresentation", "XYBarChartRepresentation", "QuartileChartRepresentation",
@@ -1277,6 +1294,20 @@ def getattr(proxy, pname):
                 "Since ParaView 6.1, chart representations no longer "
                 "supports 'CompositeDataSetIndex' and it has been replaced by "
                 "'BlockSelectors'.")
+    # 6.0 -> 6.1 onwards DataExtent has been replaced by Dimensions
+    if pname == "DataExtent" and proxy.SMProxy.GetXMLName() == "ImageReader":
+        if compatibility_version < (6, 1):
+            dataSize = proxy.GetProperty("Dimensions").GetData()
+            minIdxs = proxy.GetProperty("MinimumIndex").GetData()
+            return [
+                minIdxs[0], minIdxs[0] + max(dataSize[0] - 1, 0),
+                minIdxs[1], minIdxs[1] + max(dataSize[1] - 1, 0),
+                minIdxs[2], minIdxs[2] + max(dataSize[2] - 1, 0)
+            ]
+        else:
+            raise NotSupportedException("'DataExtent' has been removed in ParaView 6.1. Please use the "
+                                        "'Dimensions' property to get the sizes of each dimension in "
+                                        "the image data instead.")
 
     raise Continue()
 
