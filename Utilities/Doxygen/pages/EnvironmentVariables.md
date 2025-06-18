@@ -49,3 +49,4 @@ Variable | Description
 `PARAVIEW_LOG_PIPELINE_VERBOSITY`  | Log messages related to Pipeline execution (see vtkPVLogger::GetPipelineVerbosity())
 `PARAVIEW_LOG_PLUGIN_VERBOSITY` | Log messages related to ParaView plugins (see vtkPVLogger::GetPluginVerbosity())
 `PARAVIEW_LOG_EXECUTION_VERBOSITY` | Log messages related to ParaView algorithms executions (see vtkPVLogger::GetExecutionVerbosity())
+`PARAVIEW_LOG_RENDERING_VERBOSITY` | Log messages related to ParaView rendering operations (see vtkPVLogger::GetRenderingVerbosity())
