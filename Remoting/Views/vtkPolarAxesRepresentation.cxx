@@ -422,7 +422,9 @@ void vtkPolarAxesRepresentation::UpdateBounds()
 
   if (this->EnableAutoPole)
   {
-    this->PolarAxesActor->SetPole(center);
+    pole[0] = center[0];
+    pole[1] = center[1];
+    pole[2] = center[2];
 
     if (!this->EnableCustomMaxRadius)
     {
@@ -435,8 +437,6 @@ void vtkPolarAxesRepresentation::UpdateBounds()
     {
       pole[ind] = this->Position[ind];
     }
-
-    this->PolarAxesActor->SetPole(pole);
 
     if (!this->EnableCustomMaxRadius)
     {
@@ -568,6 +568,10 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   {
     this->PolarAxesActor->SetRange(minRadius, maxRadius);
   }
+
+  // SetPole triggers a bounds computation based on Min/Max Radii and Angles.
+  // So call it after everything is setup.
+  this->PolarAxesActor->SetPole(pole);
 }
 
 //----------------------------------------------------------------------------
