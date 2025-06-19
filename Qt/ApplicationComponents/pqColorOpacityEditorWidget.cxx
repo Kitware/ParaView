@@ -337,7 +337,13 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     ui.ColorEditor->initialize(stc, true, nullptr, false);
     QObject::connect(&this->Internals->ColorTableModel, &pqColorTableModel::dataChanged, this,
-      [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles)
+      [this](const QModelIndex& topLeft, const QModelIndex& bottomRight,
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        const QList<int>& roles
+#else
+        const QVector<int>& roles
+#endif
+      )
       {
         Q_UNUSED(topLeft);
         Q_UNUSED(bottomRight);
@@ -347,7 +353,13 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
         }
       });
     QObject::connect(&this->Internals->OpacityTableModel, &pqColorTableModel::dataChanged, this,
-      [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles)
+      [this](const QModelIndex& topLeft, const QModelIndex& bottomRight,
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        const QList<int>& roles
+#else
+        const QVector<int>& roles
+#endif
+      )
       {
         Q_UNUSED(topLeft);
         Q_UNUSED(bottomRight);
