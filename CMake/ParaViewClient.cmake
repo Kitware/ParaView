@@ -740,6 +740,10 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
   _paraview_client_escape_cmake_list(_paraview_gpd_output)
 
   # Convert into a list of HTML documents.
+  # This version handles the output of xsltproc:
+  string(REPLACE "</html><html>" "</html>\n;<html>"  _paraview_gpd_output "${_paraview_gpd_output}")
+  # This version handles the output of xmlpatterns:
+  # xxx(Remove when Qt5 is deprecated)
   string(REPLACE "</html>\n<html>" "</html>\n;<html>"  _paraview_gpd_output "${_paraview_gpd_output}")
 
   foreach (_paraview_gpd_html_doc IN LISTS _paraview_gpd_output)
