@@ -22,7 +22,7 @@
 #include "vtkObject.h"
 #include "vtkRemotingViewsModule.h" // for export macros
 
-class vtkAMRInformation;
+class vtkOverlappingAMRMetaData;
 class vtkMultiProcessController;
 
 class VTKREMOTINGVIEWS_EXPORT vtkAMRStreamingPriorityQueue : public vtkObject
@@ -49,7 +49,7 @@ public:
   /**
    * Initializes the queue. All information about items in the is lost.
    */
-  void Initialize(vtkAMRInformation* amr);
+  void Initialize(vtkOverlappingAMRMetaData* amr);
 
   /**
    * Re-initializes the priority queue using the amr structure given to the most
