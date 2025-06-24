@@ -3,7 +3,6 @@
 
 #include "vtkPVGeometryFilter.h"
 
-#include "vtkAMRInformation.h"
 #include "vtkAffineArray.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
@@ -37,6 +36,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkOverlappingAMR.h"
+#include "vtkOverlappingAMRMetaData.h"
 #include "vtkPVFeatureEdges.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPartitionedDataSet.h"

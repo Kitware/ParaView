@@ -8,7 +8,7 @@
  * vtkAMRStreamingPriorityQueue is used by representations supporting streaming
  * of AMR datasets to determine the priorities for blocks in the dataset. This
  * class relies on the bounds information provided by the AMR meta-data i.e.
- * vtkAMRInformation. This class support view-based priority computation. Simply
+ * vtkAMRMetaData. This class support view-based priority computation. Simply
  * provide the view planes (returned by vtkCamera::GetFrustumPlanes()) to the
  * vtkAMRStreamingPriorityQueue::Update() call to update the prorities for the
  * blocks currently in the queue.

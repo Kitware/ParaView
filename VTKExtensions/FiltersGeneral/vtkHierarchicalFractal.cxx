@@ -3,7 +3,6 @@
 #include "vtkHierarchicalFractal.h"
 
 #include "vtkAMRBox.h"
-#include "vtkAMRInformation.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"

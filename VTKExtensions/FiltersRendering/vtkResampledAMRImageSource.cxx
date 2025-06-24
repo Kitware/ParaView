@@ -3,7 +3,6 @@
 #include "vtkResampledAMRImageSource.h"
 
 #include "vtkAMRBox.h"
-#include "vtkAMRInformation.h"
 #include "vtkBoundingBox.h"
 #include "vtkCellData.h"
 #include "vtkIdList.h"
@@ -12,6 +11,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
+#include "vtkOverlappingAMRMetaData.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPointData.h"
 #include "vtkUniformGrid.h"
