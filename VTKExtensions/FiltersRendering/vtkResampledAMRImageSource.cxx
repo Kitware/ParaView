@@ -64,7 +64,6 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(vtkOverlappingAMR* amr)
   // Now, fill in values from datasets in the amr.
 
   bool something_changed = false;
-  const vtkOverlappingAMRMetaData* amrInfo = amr->GetAMRInfo();
   vtkSmartPointer<vtkUniformGridAMRDataIterator> iter;
   iter.TakeReference(vtkUniformGridAMRDataIterator::SafeDownCast(amr->NewIterator()));
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -77,7 +76,7 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(vtkOverlappingAMR* amr)
     unsigned int level = iter->GetCurrentLevel();
     unsigned int index = iter->GetCurrentIndex();
 
-    const vtkAMRBox& box = amrInfo->GetAMRBox(level, index);
+    const vtkAMRBox& box = amr->GetAMRBox(level, index);
     bool val = this->UpdateResampledVolume(level, index, box, data);
     something_changed |= val;
   }
@@ -143,9 +142,9 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
 
   // get the spacing at the maximum level. That will help us compute the maximum
   // refinement we can get from the data.
-  assert(amr->GetAMRInfo()->HasSpacing(amr->GetNumberOfLevels() - 1));
+  assert(amr->GetOverlappingAMRMetaData()->HasSpacing(amr->GetNumberOfLevels() - 1));
   double data_spacing[3];
-  amr->GetAMRInfo()->GetSpacing(amr->GetNumberOfLevels() - 1, data_spacing);
+  amr->GetSpacing(amr->GetNumberOfLevels() - 1, data_spacing);
 
   // now for a box covering the bounds, with this data-spacing, we can get the
   // following resolution.
