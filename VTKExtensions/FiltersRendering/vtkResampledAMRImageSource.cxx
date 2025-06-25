@@ -3,7 +3,6 @@
 #include "vtkResampledAMRImageSource.h"
 
 #include "vtkAMRBox.h"
-#include "vtkAMRInformation.h"
 #include "vtkBoundingBox.h"
 #include "vtkCellData.h"
 #include "vtkIdList.h"
@@ -12,6 +11,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
+#include "vtkOverlappingAMRMetaData.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPointData.h"
 #include "vtkUniformGrid.h"
@@ -64,7 +64,7 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(vtkOverlappingAMR* amr)
   // Now, fill in values from datasets in the amr.
 
   bool something_changed = false;
-  const vtkAMRInformation* amrInfo = amr->GetAMRInfo();
+  const vtkOverlappingAMRMetaData* amrInfo = amr->GetAMRInfo();
   vtkSmartPointer<vtkUniformGridAMRDataIterator> iter;
   iter.TakeReference(vtkUniformGridAMRDataIterator::SafeDownCast(amr->NewIterator()));
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())

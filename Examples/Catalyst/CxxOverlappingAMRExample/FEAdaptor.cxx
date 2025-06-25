@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include <vtkAMRBox.h>
-#include <vtkAMRInformation.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
@@ -15,6 +14,7 @@
 #include <vtkMultiProcessController.h>
 #include <vtkNew.h>
 #include <vtkOverlappingAMR.h>
+#include <vtkOverlappingAMRMetaData.h>
 #include <vtkPointData.h>
 #include <vtkUniformGrid.h>
 
