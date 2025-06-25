@@ -1877,52 +1877,80 @@ set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better 
 set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
+set (ColorAnnotationsVisibilitiesAndOpacities_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ComputeArrayMagnitudeSetting_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ConfigurableCategories_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ColorAnnotationsVisibilitiesAndOpacities_FORCE_SERIAL TRUE) # since this uses context menu
 set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (CSVPreview_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (DelimitedTextReader_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (DynamicFieldDataDomain_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExodusModeShapes_FORCE_SERIAL TRUE)
 set (ExportFilteredColumnsSpreadsheet_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ExportLinePlotToCSV_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ExportSceneSpreadSheetView2_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ExportSelectionToCSV_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ExportSpreadsheetFormatting_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionChooser_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsDialog_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsExporter_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsSettings_FORCE_SERIAL TRUE) # since this uses combo-box popup-menu
+set (HistogramKernelSmoothing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
 set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
 set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window
 set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (MathTextColumn_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (MoleculeToLines_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (ParallelCoordinatesView_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (PartialArrayInLineChart_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (PlotDataOverTime-NonDistributed_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (PlotMatrixViewArraySelection_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (PlotMatrixViewDensityMaps_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (PlotMatrixViewParameters_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (PointChartView_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PolygonCellSelection_FORCE_SERIAL TRUE)
 set (PolygonPointSelection_FORCE_SERIAL TRUE)
 set (PropertyLink_FORCE_SERIAL TRUE)
 set (PropertyContextMenu_FORCE_SERIAL TRUE)
 set (ProxyCategoriesConfiguration_FORCE_SERIAL TRUE) # since this uses popup-line edit
 set (ProxyCategoriesToolbar_FORCE_SERIAL TRUE)
-set (QuickLaunchCreateProxy_FORCE_SERIAL TRUE)
-set (QuickLaunchNavigation_FORCE_SERIAL TRUE)
-set (QuickLaunchRequest_FORCE_SERIAL TRUE)
+set (PythonCalculatorInput_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (QuickLaunchCreateProxy_FORCE_SERIAL TRUE)
+set (QuickLaunchNavigation_FORCE_SERIAL TRUE)
+set (QuickLaunchRequest_FORCE_SERIAL TRUE)
 set (ReadPartitionedCGNS_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (RecentFiles_FORCE_SERIAL TRUE) # use key events
 set (RecentFilesHardFilename_FORCE_SERIAL TRUE) # use key events
 set (SPTimeseries_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
+set (SaveCSV_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (SaveMultiBlockCSV_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (SaveTSV_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (SaveTXT_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (SelectionLinkHistogram_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (SelectionLinkParallelCoordinatesView_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (SeriesPresetRegexp_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (SettingsOverrideDomain_FORCE_SERIAL TRUE) # since this uses context menu
 set (ShaderReplacements_FORCE_SERIAL TRUE)
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (StringInLineChartView_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (TableHistogram_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TestHTGHoverOnCell_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
 set (TextSourceBorder_FORCE_SERIAL TRUE) # Seems to work better in serial
+set (ThresholdTable_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TimeKeeper_FORCE_SERIAL TRUE) # since this uses popup window
 set (TooltipCopy_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
+set (TraceExportAndSaveData_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (XYBarChart_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-menu
 
