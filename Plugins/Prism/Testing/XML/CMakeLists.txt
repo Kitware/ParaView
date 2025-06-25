@@ -23,6 +23,8 @@ if (BUILD_SHARED_LIBS)
     ViewThresholding.xml
     )
 
+  set(LANLLoadSESAME_FORCE_SERIAL TRUE) # since this uses popup-menu
+
   paraview_add_client_tests(
     LOAD_PLUGIN "Prism"
     BASELINE_DIR "${paraview_prism_baseline_dir}"
