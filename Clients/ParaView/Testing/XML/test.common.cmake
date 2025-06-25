@@ -1889,6 +1889,7 @@ set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (DelimitedTextReader_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (DynamicFieldDataDomain_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (EnSight_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExodusModeShapes_FORCE_SERIAL TRUE)
 set (ExportFilteredColumnsSpreadsheet_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExportLinePlotToCSV_FORCE_SERIAL TRUE) # since this uses popup-menu
