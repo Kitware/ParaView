@@ -34,6 +34,7 @@ set(classes
   vtkPVMetaClipDataSet
   vtkPVMetaSliceDataSet
   vtkPVPlaneCutter
+  vtkPVTableToStructuredGrid
   vtkPVTextSource
   vtkPVThreshold
   vtkPVTransposeTable
