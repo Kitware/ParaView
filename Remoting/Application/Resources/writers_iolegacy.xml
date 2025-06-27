@@ -6,6 +6,17 @@
            class="vtkGenericDataObjectWriter"
            name="DataSetWriterCore">
       <Documentation>Internal proxy used for writing legacy vtk files.</Documentation>
+      <IntVectorProperty command="SetFileVersion"
+        name="FormatVersion"
+        default_values="51"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <!-- vtkDataWriter.VTKFileVersion.VTK_LEGACY_READER_VERSION_5_1 -->
+          <Entry text="Version 5.1" value="51" />
+          <!-- vtkDataWriter.VTKFileVersion.VTK_LEGACY_READER_VERSION_4_2 -->
+          <Entry text="Version 4.2" value="42" />
+        </EnumerationDomain>
+      </IntVectorProperty>
     </Proxy>
     <!-- end of "internal_writers" -->
   </ProxyGroup>
@@ -29,6 +40,7 @@
                proxyname="DataSetWriterCore"></Proxy>
         <ExposedProperties>
           <Property name="FileType" />
+          <Property name="FormatVersion" />
         </ExposedProperties>
       </SubProxy>
       <InputProperty command="SetInputConnection"
@@ -66,6 +78,7 @@
                proxyname="DataSetWriterCore"></Proxy>
         <ExposedProperties>
           <Property name="FileType" />
+          <Property name="FormatVersion" />
         </ExposedProperties>
       </SubProxy>
       <InputProperty command="SetInputConnection"
@@ -113,6 +126,7 @@
                proxyname="DataSetWriterCore"></Proxy>
         <ExposedProperties>
           <Property name="FileType" />
+          <Property name="FormatVersion" />
         </ExposedProperties>
       </SubProxy>
       <InputProperty command="SetInputConnection"
