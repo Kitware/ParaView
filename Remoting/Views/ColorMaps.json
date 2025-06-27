@@ -226,7 +226,7 @@
   },
   {
     "ColorSpace": "Diverging",
-    "Name": "Inferno (matplotlib)",
+    "Name": "Inferno",
     "NanColor": [
       0,
       1,
@@ -1485,7 +1485,7 @@
   },
   {
     "ColorSpace": "Diverging",
-    "Name": "Viridis (matplotlib)",
+    "Name": "Viridis",
     "NanColor": [
       1,
       0,
@@ -13422,7 +13422,7 @@
   },
   {
     "ColorSpace": "Diverging",
-    "Name": "Magma (matplotlib)",
+    "Name": "Magma",
     "NanColor": [
       0,
       1,
@@ -14460,7 +14460,7 @@
   },
   {
     "ColorSpace": "Diverging",
-    "Name": "Plasma (matplotlib)",
+    "Name": "Plasma",
     "NanColor": [
       0,
       1,

@@ -8,10 +8,10 @@
       "Cool to Warm (Extended)",
       "Black-Body Radiation",
       "X Ray",
-      "Inferno (matplotlib)",
+      "Inferno",
       "Black, Blue and White",
       "Blue Orange (divergent)",
-      "Viridis (matplotlib)",
+      "Viridis",
       "Cold and Hot",
       "Linear Green (Gr4L)",
       "Rainbow Desaturated",
@@ -26,8 +26,8 @@
       "X Ray",
       "Black, Blue and White",
       "Linear Green (Gr4L)",
-      "Viridis (matplotlib)",
-      "Inferno (matplotlib)",
+      "Viridis",
+      "Inferno",
       "Fast (Reds)",
       "Fast (Blues)",
       "Grayscale",
@@ -91,8 +91,8 @@
       "erdc_red2yellow_BW",
       "Black, Orange, and White",
       "erdc_pbj_lin",
-      "Magma (matplotlib)",
-      "Plasma (matplotlib)"
+      "Magma",
+      "Plasma"
     ]
   },
   {

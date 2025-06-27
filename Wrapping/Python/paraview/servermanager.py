@@ -948,6 +948,31 @@ class RepresentationProxy(SourceProxy):
             )
         self.RescaleBlocksTransferFunctionToDataRange(selectors)
 
+
+class TransferFunctionProxy(Proxy):
+    """Special class for managing all color, opacity, and annotation presets"""
+    def ApplyPreset(self, presetName, rescale=True):
+        # If the named LUT is not in the presets, see if it was one that was removed and
+        # substitute it with the backwards compatibility helper
+        presets = vtkSMTransferFunctionPresets.GetInstance()
+        reverse = False
+        if not presets.HasPreset(presetName):
+            presetName, reverse = paraview._backwardscompatibilityhelper.lookupTableUpdate(presetName)
+
+        # If no alternate LUT exists, raise an exception
+        if not presets.HasPreset(presetName):
+            raise RuntimeError("no preset with name `%s` present", presetName)
+
+        if not self.SMProxy.ApplyPreset(presetName, rescale):
+            return False
+
+        # Reverse if necessary for backwards compatibility
+        if reverse:
+            self.InvertTransferFunction()
+
+        return True
+
+
 class ViewLayoutProxy(Proxy):
     """Special class to define convenience methods for View Layout"""
 
@@ -3262,6 +3287,8 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
         superclasses = (SourceProxy,)
     elif proto.IsA("vtkSMViewLayoutProxy"):
         superclasses = (ViewLayoutProxy,)
+    elif proto.IsA("vtkSMTransferFunctionProxy"):
+        superclasses = (TransferFunctionProxy,)
     else:
         superclasses = (Proxy,)
 

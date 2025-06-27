@@ -1393,5 +1393,17 @@ def lookupTableUpdate(lutName):
             lutName = nameChanges[lutName]
         except:
             pass
+    if compatibility_version <= (6, 0):
+        # In 6.1, the string "(matplotlib)" was removed from some color preset names
+        nameChanges = {
+            "Inferno (matplotlib)": "Inferno",
+            "Viridis (matplotlib)": "Viridis",
+            "Magma (matplotlib)": "Magma",
+            "Plasma (matplotlib)": "Plasma"
+        }
+        try:
+            lutName = nameChanges[lutName]
+        except:
+            pass
 
     return lutName, reverseLut
