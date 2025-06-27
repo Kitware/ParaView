@@ -262,11 +262,11 @@ void pqTimerLogDisplay::save()
 
   pqFileDialog* const fileDialog =
     new pqFileDialog(nullptr, this, tr("Save Timer Log"), QString(), filters, false);
-  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(fileDialog, &QWidget::close, fileDialog, &QObject::deleteLater);
   fileDialog->setObjectName("TimerLogSaveDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
-  connect(
-    fileDialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(save(const QStringList&)));
+  QObject::connect(fileDialog, QOverload<const QStringList&>::of(&pqFileDialog::filesSelected),
+    this, QOverload<const QStringList&>::of(&pqTimerLogDisplay::save));
   fileDialog->setModal(true);
   fileDialog->show();
 }

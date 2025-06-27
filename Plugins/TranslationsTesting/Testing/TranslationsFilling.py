@@ -9,7 +9,7 @@ import re
 
 def replaceByEscapable_TranslationTestings(text: str) -> str:
     """
-    Generates '_TranslationTesting expressions', a repetion of n + 1 _TranslationTesting, n being
+    Generates '_TranslationTesting expressions', a repetition of n + 1 _TranslationTesting, n being
     the number of Qt escape sequences (%1, %2...)
     """
     res = "_TranslationTesting" + "".join(re.findall("%[0-9]{1,2}", text))
@@ -24,8 +24,13 @@ def recTranslations(node):
     from `replaceByEscapable_TranslationTestings`.
     """
     if node.tag == "message":
-        node.find('translation').attrib.pop("type", None)
-        node.find('translation').text = replaceByEscapable_TranslationTestings(node.find('source').text)
+        translation_node = node.find('translation')
+        translation_node.attrib.pop("type", None)
+        source_node = node.find('source')
+        if translation_node is None or source_node is None or source_node.text is None:
+            print(f"Error: Message with missing translation or source: {ET.tostring(node, encoding='unicode')}")
+            return
+        translation_node.text = replaceByEscapable_TranslationTestings(source_node.text)
     else:
         for child in node:
             recTranslations(child)

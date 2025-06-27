@@ -126,7 +126,7 @@ bool pqPythonView::eventFilter(QObject* caller, QEvent* e)
         if (!actions.isEmpty())
         {
           QMenu* menu = new QMenu(this->widget());
-          menu->setAttribute(Qt::WA_DeleteOnClose);
+          QObject::connect(menu, &QWidget::close, menu, &QObject::deleteLater);
           menu->addActions(actions);
           menu->popup(qobject_cast<QWidget*>(caller)->mapToGlobal(newPos));
         }

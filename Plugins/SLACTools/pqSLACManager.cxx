@@ -314,12 +314,16 @@ void pqSLACManager::destroyPipelineSourceAndConsumers(pqPipelineSource* source)
 void pqSLACManager::showDataLoadManager()
 {
   pqSLACDataLoadManager* dialog = new pqSLACDataLoadManager(pqCoreUtilities::mainWidget());
-  dialog->setAttribute(Qt::WA_DeleteOnClose, true);
-  QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(checkActionEnabled()));
-  QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(showEField()));
-  QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(showStandardViewpoint()));
+  QObject::connect(dialog, &QWidget::close, dialog, &QObject::deleteLater);
+  QObject::connect(
+    dialog, &pqSLACDataLoadManager::createdPipeline, this, &pqSLACManager::checkActionEnabled);
+  QObject::connect(
+    dialog, &pqSLACDataLoadManager::createdPipeline, this, &pqSLACManager::showEField);
+  QObject::connect(
+    dialog, &pqSLACDataLoadManager::createdPipeline, this, &pqSLACManager::showStandardViewpoint);
 #ifdef AUTO_FIND_TEMPORAL_RANGE
-  QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(resetRangeTemporal()));
+  QObject::connect(
+    dialog, &pqSLACDataLoadManager::createdPipeline, this, &pqSLACManager::resetRangeTemporal);
 #endif
   dialog->show();
 }

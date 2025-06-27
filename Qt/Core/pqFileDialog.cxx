@@ -279,7 +279,11 @@ void pqFileDialog::addImplementation(vtkTypeUInt32 location)
 
   QObject::connect(impl.Ui.NavigateBack, SIGNAL(clicked(bool)), this, SLOT(onNavigateBack()));
   // just flip the back image to make a forward image
+#if QT_VERSION < QT_VERSION_CHECK(6, 9, 0)
   QPixmap forward = QPixmap::fromImage(back.toImage().mirrored(true, false));
+#else
+  QPixmap forward = QPixmap::fromImage(back.toImage().flipped(Qt::Horizontal));
+#endif
   impl.Ui.NavigateForward->setIcon(forward);
   impl.Ui.NavigateForward->setDisabled(true);
   impl.Ui.NavigateForward->setShortcut(QKeySequence::Forward);

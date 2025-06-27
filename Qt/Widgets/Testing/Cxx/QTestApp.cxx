@@ -6,10 +6,9 @@
 #include <cstdio>
 
 #include <QDebug>
-#include <QKeyEvent>
-#include <QMouseEvent>
 #include <QTimer>
 #include <QWidget>
+#include <QtTest/QTest>
 
 int QTestApp::Error = 0;
 
@@ -80,8 +79,7 @@ void QTestApp::delay(int ms)
 {
   if (ms > 0)
   {
-    QTimer::singleShot(ms, QApplication::instance(), SLOT(quit()));
-    QApplication::exec();
+    QTest::qWait(ms);
   }
 }
 
@@ -108,94 +106,87 @@ QString QTestApp::keyToAscii(Qt::Key key, Qt::KeyboardModifiers mod)
 void QTestApp::keyUp(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int ms)
 {
   if (!w)
-    return;
-  delay(ms);
-  QKeyEvent e(QEvent::KeyRelease, key, mod, keyToAscii(key, mod));
-  if (!simulateEvent(w, &e))
   {
-    qWarning("keyUp not handled\n");
+    return;
   }
+  QTest::keyRelease(w, key, mod, ms);
 }
 
 void QTestApp::keyDown(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int ms)
 {
   if (!w)
-    return;
-  delay(ms);
-  QKeyEvent e(QEvent::KeyPress, key, mod, keyToAscii(key, mod));
-  if (!simulateEvent(w, &e))
   {
-    qWarning("keyDown not handled\n");
+    return;
   }
+  QTest::keyPress(w, key, mod, ms);
 }
 
 void QTestApp::keyClick(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int ms)
 {
-  delay(ms);
-  keyDown(w, key, mod, 0);
-  keyUp(w, key, mod, 0);
+  if (!w)
+  {
+    return;
+  }
+  QTest::keyClick(w, key, mod, ms);
 }
 
 void QTestApp::keyClicks(QWidget* w, const QString& text, Qt::KeyboardModifiers mod, int ms)
 {
-  for (int i = 0; i < text.length(); ++i)
+  if (!w)
   {
-    QChar letter = text.at(i);
-    Qt::Key key =
-      static_cast<Qt::Key>(Qt::Key_A + letter.toLower().unicode() - QChar('a').unicode());
-    Qt::KeyboardModifiers upper = letter.isUpper() ? Qt::ShiftModifier : Qt::NoModifier;
-    keyClick(w, key, mod | upper, ms);
+    return;
   }
+  QTest::keyClicks(w, text, mod, ms);
 }
 
 void QTestApp::mouseDown(
   QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms)
 {
-  delay(ms);
-  QMouseEvent e(QEvent::MouseButtonPress, pos, w->mapToGlobal(pos), btn, btn, mod);
-  if (!simulateEvent(w, &e))
+  if (!w)
   {
-    qWarning("mouseDown not handled\n");
+    return;
   }
+  QTest::mousePress(w, btn, mod, pos, ms);
 }
 
 void QTestApp::mouseUp(
   QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms)
 {
-  delay(ms);
-  QMouseEvent e(QEvent::MouseButtonRelease, pos, w->mapToGlobal(pos), btn, btn, mod);
-  if (!simulateEvent(w, &e))
+  if (!w)
   {
-    qWarning("mouseUp not handled\n");
+    return;
   }
+  QTest::mouseRelease(w, btn, mod, pos, ms);
 }
 
 void QTestApp::mouseMove(
   QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms)
 {
-  delay(ms);
-  QMouseEvent e(QEvent::MouseMove, pos, w->mapToGlobal(pos), btn, btn, mod);
-  if (!simulateEvent(w, &e))
+  if (!w)
   {
-    qWarning("mouseMove not handled\n");
+    return;
   }
+  Q_UNUSED(btn);
+  Q_UNUSED(mod);
+  QTest::mouseMove(w, pos, ms);
 }
 
 void QTestApp::mouseClick(
   QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms)
 {
-  delay(ms);
-  mouseDown(w, pos, btn, mod, 0);
-  mouseUp(w, pos, btn, mod, 0);
+  if (!w)
+  {
+    return;
+  }
+  QTest::mouseClick(w, btn, mod, pos, ms);
 }
 
 void QTestApp::mouseDClick(
   QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms)
 {
-  delay(ms);
-  QMouseEvent e(QEvent::MouseButtonDblClick, pos, w->mapToGlobal(pos), btn, btn, mod);
-  if (!simulateEvent(w, &e))
+  if (!w)
   {
-    qWarning("mouseMove not handled\n");
+    return;
   }
+  QTest::mouseDClick(w, btn, mod, pos, ms);
 }

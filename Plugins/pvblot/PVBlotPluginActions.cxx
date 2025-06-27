@@ -61,10 +61,10 @@ void PVBlotPluginActions::startPVBlot()
 
   pqFileDialog* fdialog =
     new pqFileDialog(server, this->mainWindow(), "Open Blot File", QString(), filter, false);
-  fdialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(fdialog, &QWidget::close, fdialog, &QObject::deleteLater);
   fdialog->setFileMode(pqFileDialog::ExistingFile);
-  QObject::connect(fdialog, SIGNAL(filesSelected(const QStringList&)), this,
-    SLOT(startPVBlot(const QStringList&)));
+  QObject::connect(dialog, QOverload<const QStringList&>::of(&pqFileDialog::filesSelected), this,
+    QOverload<const QStringList&>::of(&PVBlotPluginActions::startPVBlot));
   fdialog->show();
 }
 
@@ -74,7 +74,7 @@ void PVBlotPluginActions::startPVBlot(const QString& filename)
   pqServer* server = PVBlotPluginActions::activeServer();
 
   pqBlotDialog* dialog = new pqBlotDialog(this->mainWindow());
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(dialog, &QWidget::close, dialog, &QObject::deleteLater);
   dialog->setActiveServer(server);
   dialog->show();
   dialog->open(filename);
