@@ -165,8 +165,8 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          When enabled, the filter may use approxiamte algorithm for extracting
-          the exterior surface at the risk not being highly accurate.
+          When enabled, the filter may use approximate algorithm for extracting
+          the exterior surface at the risk of not being highly accurate.
           This may miss interior faces, for example, for structured data with blanking
           for better speed.
         </Documentation>
