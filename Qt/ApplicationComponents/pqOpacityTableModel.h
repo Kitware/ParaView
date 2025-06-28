@@ -4,6 +4,7 @@
 #ifndef pqOpacityTableModel_h
 #define pqOpacityTableModel_h
 
+#include "vtkVector.h"
 #include <QAbstractTableModel>
 
 class pqColorOpacityEditorWidget;
@@ -35,6 +36,12 @@ public:
   QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+  std::vector<vtkVector4d> points() const;
+
+  size_t insertPoint(size_t loc);
+
+  bool setPoints(const std::vector<vtkVector4d>& pts);
 
 protected Q_SLOTS:
 

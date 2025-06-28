@@ -14,7 +14,7 @@
 class pqOpacityTableModel::pqInternals
 {
 public:
-  std::vector<std::array<double, 4>> XVMSPoints;
+  std::vector<vtkVector4d> XVMSPoints;
 };
 
 //-----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ QVariant pqOpacityTableModel::data(const QModelIndex& idx, int role) const
 {
   if (role == Qt::DisplayRole || role == Qt::EditRole)
   {
-    std::array<double, 4>& xvms = this->Internals->XVMSPoints[idx.row()];
+    vtkVector4d& xvms = this->Internals->XVMSPoints[idx.row()];
     if (idx.column() >= 0 && idx.column() < 4)
     {
       return QString::number(xvms[idx.column()]);
@@ -145,6 +145,121 @@ QVariant pqOpacityTableModel::headerData(int section, Qt::Orientation orientatio
 }
 
 //-----------------------------------------------------------------------------
+std::vector<vtkVector4d> pqOpacityTableModel::points() const
+{
+  return this->Internals->XVMSPoints;
+}
+
+//-----------------------------------------------------------------------------
+size_t pqOpacityTableModel::insertPoint(size_t loc)
+{
+  vtkDiscretizableColorTransferFunction* stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
+    this->Widget->proxy()->GetClientSideObject());
+  if (!stc)
+  {
+    return 0;
+  }
+  vtkPiecewiseFunction* pwf = nullptr;
+  if (stc)
+  {
+    pwf = stc ? stc->GetScalarOpacityFunction() : nullptr;
+  }
+  if (!pwf)
+  {
+    return 0;
+  }
+
+  size_t currentSize = pwf->GetSize();
+  loc = std::min(loc, currentSize);
+  if (loc == 0 || loc >= currentSize)
+  {
+    // Cannot insert before the first point or after the last point.
+    return currentSize;
+  }
+
+  const auto& pts = this->Internals->XVMSPoints;
+  const auto xvms = pts[loc - 1] + (pts[loc] - pts[loc - 1]) / vtkVector4d(2.0);
+  pwf->AddPoint(xvms[0], xvms[1], xvms[2], xvms[3]);
+
+  Q_EMIT this->beginInsertRows(QModelIndex(), static_cast<int>(loc), static_cast<int>(loc));
+  this->Internals->XVMSPoints.insert(std::next(pts.begin(), loc), xvms);
+  Q_EMIT this->endInsertRows();
+
+  return loc;
+}
+
+//-----------------------------------------------------------------------------
+bool pqOpacityTableModel::setPoints(const std::vector<vtkVector4d>& pts)
+{
+  vtkDiscretizableColorTransferFunction* stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
+    this->Widget->proxy()->GetClientSideObject());
+  if (!stc)
+  {
+    return false;
+  }
+  vtkPiecewiseFunction* pwf = nullptr;
+  if (stc)
+  {
+    pwf = stc ? stc->GetScalarOpacityFunction() : nullptr;
+  }
+  if (!pwf)
+  {
+    return false;
+  }
+  auto& existingPts = this->Internals->XVMSPoints;
+  if (pts.empty())
+  {
+    if (existingPts.empty())
+    {
+      return false;
+    }
+    else if (existingPts.size() == 2)
+    {
+      // If we have only two points, we cannot remove any.
+      return false;
+    }
+    else
+    {
+      // Remove all points except the first and last.
+      Q_EMIT this->beginRemoveRows(QModelIndex(), 1, static_cast<int>(existingPts.size()) - 2);
+      for (size_t i = 1; i < existingPts.size() - 1; ++i)
+      {
+        pwf->RemovePoint(existingPts[i][0]);
+      }
+      existingPts.clear();
+      existingPts.reserve(pwf->GetSize());
+      for (int idx = 0; idx < pwf->GetSize(); ++idx)
+      {
+        vtkVector4d xvms;
+        pwf->GetNodeValue(idx, xvms.GetData());
+        existingPts.push_back(xvms);
+      }
+      Q_EMIT this->endRemoveRows();
+      return true;
+    }
+  }
+  else if (pts.size() >= 2)
+  {
+    this->beginResetModel();
+    pwf->RemoveAllPoints();
+    existingPts.clear();
+    existingPts.reserve(pts.size());
+    for (const auto& xvms : pts)
+    {
+      pwf->AddPoint(xvms[0], xvms[1], xvms[2], xvms[3]);
+      existingPts.push_back(xvms);
+    }
+    this->endResetModel();
+  }
+  else
+  {
+    return false; // we need at least two points.
+  }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 void pqOpacityTableModel::controlPointsChanged()
 {
   vtkDiscretizableColorTransferFunction* stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
@@ -167,8 +282,8 @@ void pqOpacityTableModel::controlPointsChanged()
     Q_EMIT this->beginInsertRows(QModelIndex(), previousSize, newSize - 1);
     for (int idx = previousSize; idx < newSize; ++idx)
     {
-      std::array<double, 4> xvms;
-      pwf->GetNodeValue(idx, xvms.data());
+      vtkVector4d xvms;
+      pwf->GetNodeValue(idx, xvms.GetData());
       this->Internals->XVMSPoints.push_back(xvms);
     }
     Q_EMIT this->endInsertRows();
@@ -188,8 +303,8 @@ void pqOpacityTableModel::controlPointsChanged()
     this->beginResetModel();
     for (int idx = 0; idx < newSize; ++idx)
     {
-      std::array<double, 4> xvms;
-      pwf->GetNodeValue(idx, xvms.data());
+      vtkVector4d xvms;
+      pwf->GetNodeValue(idx, xvms.GetData());
       this->Internals->XVMSPoints[idx] = xvms;
     }
     this->endResetModel();
