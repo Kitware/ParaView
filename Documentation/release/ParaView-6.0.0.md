@@ -1153,3 +1153,68 @@ This may change the default array picked by the downstream filter.
 Calling `GetValuatorRole(eventName)` has never worked because valuator events are configured with a single id, which is the index of a single channel of valuator data. However, valuator events are delivered with all ids/indices of valuator as a single event.
 
 Since the relationship between roles and valuator events isn't one-to-one, the `GetValuatorRole` method has been removed. Now `vtkSMVRInteractorStyleProxy` provides a method to get the id/index associated with given a role name.
+
+## Source code deprecations and removals
+
+### Deprecations new in 6.0
+
+* The class `vtkCPMappedVectorArrayTemplate` has been deprecated. Please use the `SetArray` functionality of `vtkAOSDataArrayTemplate` instead.
+* In `pqReloadFilesReaction`, the static member function `bool pqReloadFilesReaction::reload()` has been deprecated. Use `reloadSources()` instead.
+* In `pqServerConfiguration`, the function `QString portForwardingLocalPort() const` has been deprecated. Use `int localPortForwardingPort() const` instead.
+* In `vtkSMAnimationScene`, the member function `static void SetGlobalUseGeometryCache(bool)` has been deprecated in favor of `vtkPVGeneralSettings::SetCacheGeometryForAnimation(bool)`, and the member function `static bool GetGlobalUseGeometryCache()` has been deprecated in favor of `bool vtkPVGeneralSettings::GetCacheGeometryForAnimation()`.
+* In `vtkPVArrayInformation`, member function `void CopyFromArray(vtkAbstractArray*, vtkFieldData*)` has been deprecated. Use `CopyFromArray(vtkAbstractArray*)` or `CopyFromArray(vtkFieldData*, int)` overloads instead.
+* In `vtkPVPluginLoader`, the member function `bool LoadDelayedLoadPlugin(const std::string&, const std::vector<std::string>&, const std::string&)` has been removed in favor of overloaded member functions of the same name with version and description arguments.
+* In `vtkPVPluginTracker`, member function `unsigned int RegisterAvailablePlugin(const char*)` has been deprecated. Use `LoadPluginConfigurationXML(const char*, bool)` instead.
+* In `vtkPVXYChartView` the static member variable `IgnoreNegativeLogAxisWarning` and its accessors `static void SetIgnoreNegativeLogAxisWarning(bool val)` and `static bool GetIgnoreNegativeLogAxisWarning()` have been deprecated. Use `void vtkPVGeneralSettings::SetIgnoreNegativeLogAxisWarning(bool)` and `bool vtkPVGeneralSettings::GetIgnoreNegativeLogAxisWarning()` instead.
+* In `vtkSMChartSeriesSelectionDomain`, the member functions `static void SetLoadNoChartVariables(bool)` has been deprecated in favor of `vtkPVGeneralSettings::SetLoadNoChartVariables(bool)` and `static bool GetLoadNoChartVariables()` has been deprecated in favor of `bool vtkPVGeneralSettings::GetLoadNoChartVariables()`.
+* In `vtkSMParaViewPipelineControllerWithRendering`, member function `static void SetHideScalarBarOnHide(bool)` has been deprecated. Use `vtkPVGeneralSettings::SetScalarBarMode(AUTOMATICALLY_HIDE_SCALAR_BARS)` instead. `static void SetInheritRepresentationProperties(bool)` has been deprecated in favor of `vtkPVGeneralSettings::SetInheritRepresentationProperties(bool)`, and `static bool GetInheritRepresentationProperties()` has been deprecated in favor of `bool vtkPVGeneralSettings::GetInheritRepresentationProperties()`.
+* In `vtkPVGhostCellsGenerator`, member function `int GhostCellsGeneratorUsingSuperclassInstance(vtkInformation*, vtkInformationVector**, vtkInformationVector*)` has been deprecated. Use `int GhostCellsGeneratorUsingSuperclassInstance(vtkDataObject*, vtkDataObject*)` instead.
+* Class `vtkPVPlane` has been deprecated. Use `vtkPlane` instead.
+* In the Python `paraview` module, function `satelite()` has been deprecated. Use `satellite()` instead.
+
+### Removals
+
+* Class `pvPVAnimationWidget` has been removed. Use `pqTimeManagerWidget` instead.
+* Class `pqResetScalarRangeReaction` and its associated `.ui` file has been removed. Use `pqRescaleScalarRangeReaction` instead.
+* Class `pqTimeInspsectorWidget` and its associated `.ui` file have been removed. Use `pqTimeManagerWidget` instead.
+* In `pqAnimationTimeWidget`, public slots `void setNotation(RealNumberNotation)` and `void setPrecision(int)` have been removed. Global settings for these properties are now used.
+* Class `pqAnimationTimeWidget` has been removed. Use `pqTimeManagerWidget` instead.
+* In `pqHelpWindow`, public slot `virtual void showHomePage(const QString&)` has been removed. Use `setNameSpace(const QString&)` and `showHomePage()` functions instead.
+* In `pqHelpWindowWebEngine`, member function `static pqWebView* newInstance(QHelpEngine*, QWidget*)` has been removed. Use `pqWebView* newInstance(QHelpEngine*, pqHelpWindow*)` instead.
+* Class `pqRescaleRange` has been removed. Use `pqRescaleScalarRangeToCustomDialog` instead.
+* In `pqScalarValueListPropertyWidget`, public member function `void setLabels(std::vector<const char*>&)` has been removed. Use `void setLabels(const std::vector<std::string>& labels)` instead.
+* In `pqAnnotationsModel`, the unused member variable `QIcon MissingColorIcon` has been removed.
+* In `pqFileDialogFavoriteModel`, removed member variable `static bool AddExamplesInFavorites`. Use `pqFileDialogLocationModel::AddExamplesInLocations` instead.
+* In `pqFileDialogModel`, member function `void setCurrentPath(const QString&, bool)` has been removed. Use `setGroupFiles(bool)` and `setCurrentPath(path)` instead.
+* In `pqPythonMacroSupervisor`, member function `static void removeStoredMacro(const QString&)` has been removed in favor of `hideFile()`. Member function `static QStringList getSupportedIconFormats()` has been removed in favor of `pqIconListModel::getSupportedIconFormats()`.
+* Classes `pqAnimationKeyFrame`, `pqAnimationModel`,  `pqAnimationTrack`, and `pqAnimationWidget` have been removed. See `pqTimeManagerWidget` for the new design.
+* In `pqDoubleLineEdit`, member function `static QString formatDouble(double, QTextStream::RealNumberNotation, int)` has been removed. Use `pqDoubleLineEdit::formatDouble(double, pqDoubleLineEdit::RealNumberNotation, int)` instead. `static QString formatDoubleUsingGlobalPrecisionAndNotation(double)` has been removed - use `pqCoreUtilities::formatNumber(double)` instead. `void setAlwaysUseFullPrecision(bool)` has been removed - use `pqDoubleLineEdit::setNotation(pqDoubleLineEdit::FullNotation)` instead.
+* In `vtkCompositeAnimationPlayer`, `void SetDuration(int)` has been removed. Use `SetStride(int)` and `vtkSequenceAnimationPlayer` instead.
+* Class `vtkRealtimeAnimationPlayer` has been removed. Use `vtkSequenceAnimationPlayer` instead.
+* In `vtkSMAnimationScene`, member function `void SetDuration(int)` has been removed. Use `SetStride(int)` instead.
+* Classes `vtkPVOptions`, `vtkPVOptionsXMLParser`, `vtkCommandOptions`, and `vtkCommandOptionsXMLParser` have been removed. Use `vtkCLIOptions` instead.
+* In `vtkSMParaViewPipelineController` and `vtkSMParaViewPipelineControllerWithRendering`, member function `virtual void DoMaterialSetup(vtkSMProxy*)` has been removed. Material setup is now handled by the **RenderView** proxy on raytracing backend update.
+* In `vtkSMProperty`, member function `static const char* CreateNewPrettyLabel(const char*)` has been removed. Use `vtkSMObject::CreatePrettyLabel(const std::string&)` instead.
+* In `vtkPVGeneralSettings`, member functions `void SetConsoleFontSize(int)` and `int GetConsoleFontSize()` has no effect and have been removed.
+* In `vtkChartRepresentation`, `vtkPVContextView`,  `vtkPVParallelCoordinatesRepresentation`, and `vtkXYChartRepresentation`, member function `virtual bool Export(vtkCSVExporter*)` has been removed. Use `Export(vtkAbstractChartExporter*)` instead.
+* In `vtkPVRepresentedArrayListSettings`, member functions `virtual void SetNumberOfExcludedNameFilters(int)`, `virtual int GetNumberOfExcludedNameFilters()`, `virtual void SetExcludedNameFilter(int, const char*)`, `virtual const char* GetExcludedNameFilter(int)`, and `vtkStringArray* GetAllNameFilters()` have been removed. Use member functions of the same name in class `vtkPVIOSettings` instead.
+* In `vtkPolarAxesRepresentation`, member function `virtual void SetNumberOfPolarAxisTicks(int)` has been removed. Set `SetDeltaRangeMajor(double)` instead or enable `AxisTickMatchesPolarAxes`. Member function `virtual void SetAutoSubdividePolarAxis(bool)` has also been removed. Set `SetDeltaRangePolarAxes(double)` instead.
+* In `vtkSMChartSeriesListDomain`, member function `static const char** GetKnownSeriesNames()` has been removed. Use `vtkPVRepresentedArrayListSettings::GetAllChartsDefaultXAxis()` instead.
+* In `vtkSMChartSeriesSelectionDomain`, member function `static void AddSeriesVisibilityDefault(const char*, bool)` has been removed. Use `vtkPVRepresentedArrayListSettings::SetChartsHiddenAttributes()` instead.
+* In `vtkSMPVRepresentationProxy`, member functions `static bool GetUsingScalarColoring(vtkSMProxy*)` and `static void SetupLookupTable(vtkSMProxy*)` have been removed. Use static functions from `vtkSMColorMapEditorHelper` instead.
+* In `vtkPVMetaSliceDataSet`, member function `void SetMergePoints(bool)` was removed. Use `SetLocator(vtkIncrementalPointLocator*)` instead.
+* Files `_colorMaps.py` and `lookuptable.py` have been removed as they were no longer used.
+* In `paraview/coprocessing.py`, function `CoProcessor.CreateWriter` has been removed - use `CoProcessor.RegisterWriter` instead. Function `CoProcessor.CreateView` is deprecated - use `CoProcessor.RegisterView` instead.
+* In Python class `paraview.servermanager.DataInformation`, the `Update()` method has been removed as it is no longer necessary because it is called automatically when any value from the data information object is retrieved.
+* In Python class `paraview.servermanager.ParaViewLoader`, method `LoadXML(xmlstring)` has been removed. Use `LoadPlugin()` instead. In this same class, method `updateModules(m=None)` has been removed since it is no longer necessary.
+* In `paraview.simple`, function `GetLookupTableForArray(arrayname, num_components, **params)` has been removed. Use `GetColorTransferFunction()` instead.
+
+* Filters that have been removed and their suggested replacements:
+
+  * **Slice (demand-driven-composite)**. Replace with **Slice**.
+  * **Extract Block (Legacy)**. Replace with **Extract Block**.
+  * **Extract Level (Legacy)**. Replace with **Extract Block**.
+  * **Gradient Of Unstructured DataSet**. Replace with **Gradient**.
+  * **Gradient Legacy**. Replace with **Gradient**.
+  * **Probe Line Legacy**. Replace with **Probe Line**.
+  * **AMR CutPlane**. Replace with **Slice With Plane** filter.
