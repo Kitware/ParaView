@@ -1,0 +1,2 @@
+# Prevent header markers "========" from being treated as conflict markers.
+*.md conflict-marker-size=1000
