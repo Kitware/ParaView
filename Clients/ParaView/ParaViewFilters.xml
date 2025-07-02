@@ -53,6 +53,7 @@
       <Proxy group="filters" name="HyperTreeGridGenerateFields" />
       <Proxy group="filters" name="HyperTreeGridGeometry" />
       <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
+      <Proxy group="filters" name="HyperTreeGridRedistribute" />
       <Proxy group="filters" name="HyperTreeGridToDualGrid" />
       <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
       <Proxy group="filters" name="HyperTreeGridVisibleLeavesSize" />
@@ -137,6 +138,7 @@
       <Proxy group="filters" name="GhostCells" />
       <Proxy group="filters" name="ProcessIds" />
       <Proxy group="filters" name="RedistributeDataSet" />
+      <Proxy group="filters" name="HyperTreeGridRedistribute" />
       <Proxy group="filters" name="RemoveGhostInformation" />
     </Category>
     <Category name="Material Analysis" menu_label="Materia&amp;l Analysis">
@@ -403,6 +405,7 @@
   <Proxy group="filters" name="HyperTreeGridGenerateFields" />
   <Proxy group="filters" name="HyperTreeGridGeometry" />
   <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
+  <Proxy group="filters" name="HyperTreeGridRedistribute" />
   <Proxy group="filters" name="HyperTreeGridToDualGrid" />
   <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
   <Proxy group="filters" name="HyperTreeGridVisibleLeavesSize" />

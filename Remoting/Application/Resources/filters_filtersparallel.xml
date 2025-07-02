@@ -680,6 +680,30 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridRedistribute"
+                 label="HyperTreeGrid Redistribute"
+                 name="HyperTreeGridRedistribute">
+      <Documentation long_help="Redistribute HyperTreeGrid."
+                     short_help="Redistribute HyperTreeGrid.">
+        This filter redistributes trees of a hyper tree grid for multi processing purposes.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_types">
+          <DataType value="vtkHyperTreeGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input HTG to the redistribution filter.
+        </Documentation>
+      </InputProperty>
+      <!-- End vtkHyperTreeGridRedistribute -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridGhostCellsGenerator"
                  label="HyperTreeGrid Ghost Cells Generator"
                  name="HyperTreeGridGhostCellsGenerator">
@@ -701,7 +725,7 @@
           <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <Documentation>
-          This property specified the input to the ghost cell generator.
+          This property specifies the input to the ghost cell generator.
         </Documentation>
       </InputProperty>
       <!-- End vtkHyperTreeGridGhostCellsGenerator -->
