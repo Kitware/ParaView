@@ -378,6 +378,14 @@ def GenerateRGBPoints(preset_name=None, range_min=None, range_max=None):
     # Create a default PVLookupTable
     lut = servermanager.rendering.PVLookupTable()
 
+    # If the named LUT is not in the presets, see if it was one that was removed and
+    # substitute it with the backwards compatibility helper
+    presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
+    if not presets.HasPreset(preset_name):
+        (preset_name, reverse) = (
+            paraview._backwardscompatibilityhelper.lookupTableUpdate(preset_name)
+        )
+
     # If a preset name was provided, apply the preset
     if preset_name is not None:
         lut.SMProxy.ApplyPreset(preset_name)
