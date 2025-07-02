@@ -226,17 +226,23 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
     const int count = static_cast<int>(state.timeSteps().size());
     ui.timestepValue->setMaximum(count - 1);
     int idx = 0;
+    bool found = false;
     for (auto ts : state.timeSteps())
     {
       if (ts >= state.time())
       {
+        found = true;
         break;
       }
       idx++;
     }
-    ui.timestepValue->setValue(idx);
-    ui.timestepValue->setSuffix(state.timeSteps()[idx] == state.time() ? "" : " (?)");
-    ui.timestepCountLabel->setText(tr("max is %1").arg(count - 1));
+
+    if (found)
+    {
+      ui.timestepValue->setValue(idx);
+      ui.timestepValue->setSuffix(state.timeSteps()[idx] == state.time() ? "" : " (?)");
+      ui.timestepCountLabel->setText(tr("max is %1").arg(count - 1));
+    }
   }
   else
   {
