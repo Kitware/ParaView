@@ -386,6 +386,10 @@ def GenerateRGBPoints(preset_name=None, range_min=None, range_max=None):
             paraview._backwardscompatibilityhelper.lookupTableUpdate(preset_name)
         )
 
+    # If no preset name was found, return an empty list.
+    if preset_name is not None and not presets.HasPreset(preset_name):
+        return []
+
     # If a preset name was provided, apply the preset
     if preset_name is not None:
         lut.SMProxy.ApplyPreset(preset_name)
