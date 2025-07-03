@@ -1364,7 +1364,7 @@ void vtkSpyPlotReader::PrintBlockList(vtkNonOverlappingAMR* hbds, int vtkNotUsed
   for (level = 0; level < numberOfLevels; level++)
   {
     // cout<<myProcId<<" level="<<level<<"/"<<numberOfLevels<<endl;
-    int totalNumberOfDataSets = hbds->GetNumberOfDataSets(level);
+    int totalNumberOfDataSets = hbds->GetNumberOfBlocks(level);
     int i;
     for (i = 0; i < totalNumberOfDataSets; i++)
     {
@@ -1799,7 +1799,7 @@ int vtkSpyPlotReader::PrepareAMRData(vtkNonOverlappingAMR* hb, vtkSpyPlotBlock* 
   //
 
   //  vtkAMRBox box(realExtents);
-  //  hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), box, ug);
+  //  hb->SetDataSet(*level, hb->GetNumberOfBlocks(*level), box, ug);
   vtkUniformGrid* ug = vtkUniformGrid::New();
 
   ug->SetSpacing(spacing);
@@ -2318,7 +2318,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
     int numberOfDataSets(0);
     if (hbDS)
     {
-      numberOfDataSets = level >= hbDS->GetNumberOfLevels() ? 0 : hbDS->GetNumberOfDataSets(level);
+      numberOfDataSets = level >= hbDS->GetNumberOfLevels() ? 0 : hbDS->GetNumberOfBlocks(level);
     }
     else
     {
@@ -2439,7 +2439,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
     for (unsigned int level = 0; level < numberOfLevels; level++)
     {
       std::vector<vtkSmartPointer<vtkUniformGrid>> datasetsAtLevel;
-      for (unsigned int kk = 0; kk < hbDS->GetNumberOfDataSets(level); kk++)
+      for (unsigned int kk = 0; kk < hbDS->GetNumberOfBlocks(level); kk++)
       {
         vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
         datasetsAtLevel.push_back(ug);

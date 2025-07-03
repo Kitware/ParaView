@@ -193,7 +193,7 @@ vtkUniformGrid* GetReferenceGrid(vtkNonOverlappingAMR* amrds)
   unsigned int numLevels = amrds->GetNumberOfLevels();
   for (unsigned int l = 0; l < numLevels; ++l)
   {
-    unsigned int numDatasets = amrds->GetNumberOfDataSets(l);
+    unsigned int numDatasets = amrds->GetNumberOfBlocks(l);
     for (unsigned int dataIdx = 0; dataIdx < numDatasets; ++dataIdx)
     {
       vtkUniformGrid* refGrid = amrds->GetDataSet(l, dataIdx);
@@ -1893,7 +1893,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
     cumulativeExt[0] = cumulativeExt[2] = cumulativeExt[4] = VTK_INT_MAX;
     cumulativeExt[1] = cumulativeExt[3] = cumulativeExt[5] = -VTK_INT_MAX;
 
-    int numBlocks = input->GetNumberOfDataSets(level);
+    int numBlocks = input->GetNumberOfBlocks(level);
     for (int levelBlockId = 0; levelBlockId < numBlocks; ++levelBlockId)
     {
       //      vtkAMRBox box;
@@ -2393,7 +2393,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
     int* receivedBlockSize = new int[nbProcs * 3];
     double localSpacing[3] = { 0, 0, 0 };
     double* receivedSpacing = new double[nbProcs * 3];
-    unsigned int dsIdxSize = input->GetNumberOfDataSets(minLevel);
+    unsigned int dsIdxSize = input->GetNumberOfBlocks(minLevel);
     for (unsigned int dsIdx = 0; dsIdx < dsIdxSize; ++dsIdx)
     {
       vtkUniformGrid* grid = input->GetDataSet(minLevel, dsIdx);
@@ -2528,7 +2528,7 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(vtkNonOverlapping
   // Add each block.
   for (int level = 0; level < numLevels; ++level)
   {
-    numBlocks = input->GetNumberOfDataSets(level);
+    numBlocks = input->GetNumberOfBlocks(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
     {
       //      vtkAMRBox box;

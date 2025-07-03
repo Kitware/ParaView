@@ -45,11 +45,11 @@ void vtkAMRStreamingPriorityQueue::Initialize(vtkOverlappingAMRMetaData* amr)
   this->Internals = new vtkInternals();
   this->Internals->AMRMetadata = amr;
 
-  for (unsigned int cc = 0; cc < amr->GetTotalNumberOfBlocks(); cc++)
+  for (unsigned int cc = 0; cc < amr->GetNumberOfBlocks(); cc++)
   {
     vtkStreamingPriorityQueueItem item;
     item.Identifier = cc;
-    item.Priority = (amr->GetTotalNumberOfBlocks() - cc);
+    item.Priority = (amr->GetNumberOfBlocks() - cc);
 
     unsigned int level = 0, index = 0;
     this->Internals->AMRMetadata->ComputeIndexPair(item.Identifier, level, index);
