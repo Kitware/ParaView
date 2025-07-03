@@ -367,10 +367,6 @@ int vtkResampleToHyperTreeGrid::RequestData(
   this->InputPointDataArrays.clear();
 
   this->LocalHyperTreeBoundingBox.clear();
-
-  // Avoid keeping extra memory around.
-  output->Squeeze();
-
   this->UpdateProgress(1.0);
 
   return 1;
