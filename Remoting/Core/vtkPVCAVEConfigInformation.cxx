@@ -151,27 +151,27 @@ void vtkPVCAVEConfigInformation::CopyToStream(vtkClientServerStream* css)
        << this->Internal->EyeSeparation << this->Internal->ShowBorders
        << this->Internal->FullScreen;
 
-  for (int i = 0; i < this->Internal->Geometries.size(); ++i)
+  for (std::size_t i = 0; i < this->Internal->Geometries.size(); ++i)
   {
     *css << this->Internal->Geometries[i];
   }
 
-  for (int i = 0; i < this->Internal->HasCorners.size(); ++i)
+  for (std::size_t i = 0; i < this->Internal->HasCorners.size(); ++i)
   {
     *css << this->Internal->HasCorners[i];
   }
 
-  for (int i = 0; i < this->Internal->LowerLefts.size(); ++i)
+  for (std::size_t i = 0; i < this->Internal->LowerLefts.size(); ++i)
   {
     *css << this->Internal->LowerLefts[i];
   }
 
-  for (int i = 0; i < this->Internal->LowerRights.size(); ++i)
+  for (std::size_t i = 0; i < this->Internal->LowerRights.size(); ++i)
   {
     *css << this->Internal->LowerRights[i];
   }
 
-  for (int i = 0; i < this->Internal->UpperRights.size(); ++i)
+  for (std::size_t i = 0; i < this->Internal->UpperRights.size(); ++i)
   {
     *css << this->Internal->UpperRights[i];
   }
