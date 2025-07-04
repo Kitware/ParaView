@@ -40,7 +40,7 @@ PropertyItem::PropertyItem(
   {
     case 2:
       this->isSegmentable = true;
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     case 1:
       this->isActive = true;
       if (this->isNumeric)

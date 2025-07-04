@@ -103,7 +103,7 @@ void vtkPVZSpaceView::SetInteractionMode(int mode)
         this->Interactor->SetInteractorStyle(this->ZSpaceInteractorStyle);
         break;
       case INTERACTION_MODE_2D:
-        VTK_FALLTHROUGH;
+        [[fallthrough]];
       default:
         break;
     }

@@ -1401,7 +1401,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
           this->addToFilesSelected(selected_files);
           return true;
         }
-        VTK_FALLTHROUGH;
+        [[fallthrough]];
       case Directory:
         if (!impl.InDoubleClickHandler)
         {
@@ -1409,7 +1409,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
           this->onNavigate(file);
           return true;
         }
-        VTK_FALLTHROUGH;
+        [[fallthrough]];
       case ExistingFile:
       case ExistingFiles:
       case AnyFile:

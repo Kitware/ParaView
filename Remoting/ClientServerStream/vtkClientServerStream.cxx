@@ -3144,7 +3144,7 @@ int vtkClientServerStream::AddArgumentFromString(
             {
               *out++ = *c;
             }
-            VTK_FALLTHROUGH;
+            [[fallthrough]];
           default:
             *out++ = *c;
             break;

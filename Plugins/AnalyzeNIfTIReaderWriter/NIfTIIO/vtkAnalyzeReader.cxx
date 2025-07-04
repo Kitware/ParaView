@@ -264,22 +264,22 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   {
     case 7:
       numElts *= m_NiftiImage->nw;
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     case 6:
       numElts *= m_NiftiImage->nv;
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     case 5:
       numElts *= m_NiftiImage->nu;
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     case 4:
       numElts *= m_NiftiImage->nt;
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     case 3:
       numElts *= m_NiftiImage->nz;
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     case 2:
       numElts *= m_NiftiImage->ny;
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     case 1:
       numElts *= m_NiftiImage->nx;
       break;

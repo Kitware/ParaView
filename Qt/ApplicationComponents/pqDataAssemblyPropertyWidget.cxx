@@ -359,7 +359,7 @@ public:
           {
             return this->HeaderText;
           }
-          VTK_FALLTHROUGH;
+          [[fallthrough]];
         default:
           return this->data(this->index(0, section), role);
       }

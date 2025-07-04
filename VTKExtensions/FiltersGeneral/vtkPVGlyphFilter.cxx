@@ -231,7 +231,7 @@ public:
         }
         break;
       case vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE:
-        VTK_FALLTHROUGH;
+        [[fallthrough]];
       case vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME:
       {
         // No cells means no sampling possible
@@ -453,9 +453,9 @@ public:
         return self->GetStride() <= 1 || (ptId % self->GetStride()) == 0;
 
       case vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION:
-        VTK_FALLTHROUGH;
+        [[fallthrough]];
       case vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE:
-        VTK_FALLTHROUGH;
+        [[fallthrough]];
       case vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME:
         // This will initialize the needed structure and compute visible points
         // that should be glyphed.
