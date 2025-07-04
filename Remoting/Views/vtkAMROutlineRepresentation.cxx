@@ -209,7 +209,7 @@ int vtkAMROutlineRepresentation::RequestData(
       // and we should initialize our streaming.
       vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
         inInfo->Get(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA()));
-      this->PriorityQueue->Initialize(amr->GetAMRInfo());
+      this->PriorityQueue->Initialize(amr->GetOverlappingAMRMetaData());
     }
   }
 
