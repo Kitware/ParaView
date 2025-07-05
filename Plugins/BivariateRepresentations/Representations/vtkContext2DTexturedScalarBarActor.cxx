@@ -150,7 +150,7 @@ void vtkContext2DTexturedScalarBarActor::SetCustomLabel(vtkIdType index, double 
     return;
   }
 
-  this->CustomLabels->SetTypedTuple(index, &value);
+  this->CustomLabels->SetValue(index, value);
 }
 
 //----------------------------------------------------------------------------

@@ -106,6 +106,7 @@ set_property(CACHE BUILD_TESTING
 include(ParaViewCompilerChecks)
 include(ParaViewCompilerPlatformFlags)
 include(ParaViewCompilerExtraFlags)
+include(ParaViewCompilerWarningFlags)
 include(ParaViewInitializeBuildType)
 include(ParaViewSupportMacros)
 include(CMakeDependentOption)

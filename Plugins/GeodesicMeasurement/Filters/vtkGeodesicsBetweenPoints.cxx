@@ -184,7 +184,7 @@ int vtkGeodesicsBetweenPoints::RequestData(vtkInformation* vtkNotUsed(request),
   totalLengthArray->SetName("TotalLength");
   totalLengthArray->SetNumberOfComponents(1);
   totalLengthArray->SetNumberOfTuples(1);
-  totalLengthArray->InsertTypedTuple(0, &totalLength);
+  totalLengthArray->InsertValue(0, totalLength);
 
   vtkFieldData* fieldData = output->GetFieldData();
   fieldData->AddArray(totalLengthArray);

@@ -215,7 +215,7 @@ void vtkContext2DScalarBarActor::SetCustomLabel(vtkIdType index, double value)
     return;
   }
 
-  this->CustomLabels->SetTypedTuple(index, &value);
+  this->CustomLabels->SetValue(index, value);
 }
 
 //----------------------------------------------------------------------------

@@ -40,24 +40,15 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     endif ()
   endif ()
 
-  # Set up the debug CXX_FLAGS for extra warnings
+  # Set up the CXX_FLAGS for extra warnings
   option(PARAVIEW_EXTRA_COMPILER_WARNINGS
     "Add compiler flags to do stricter checking" OFF)
   if (PARAVIEW_EXTRA_COMPILER_WARNINGS)
     if (TARGET paraviewbuild)
       target_compile_options(paraviewbuild
         INTERFACE
-          "$<$<COMPILE_LANGUAGE:CXX>${paraview_extra_warning_flags}>")
+          "$<$<COMPILE_LANGUAGE:CXX>:${paraview_extra_warning_flags}>")
     endif ()
-  endif ()
-
-  # Silence spurious -Wattribute warnings on GCC < 9.1:
-  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
-    target_compile_options(paraviewbuild
-      INTERFACE
-        # XXX(cmake-3.15): `COMPILE_LANGUAGE` supports multiple languages.
-        "$<BUILD_INTERFACE:$<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:-Wno-attributes>>")
   endif ()
 endif ()
 
