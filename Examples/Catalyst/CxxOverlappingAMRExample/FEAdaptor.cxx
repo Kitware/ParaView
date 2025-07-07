@@ -31,7 +31,7 @@ void BuildVTKGrid(vtkOverlappingAMR* grid)
   int numberOfLevels = 3;
   int blocksPerLevel[3] = { numRanks, numRanks, 2 * numRanks };
   grid->Initialize(numberOfLevels, blocksPerLevel);
-  grid->SetGridDescription(VTK_XYZ_GRID);
+  grid->SetGridDescription(vtkStructuredData::VTK_STRUCTURED_XYZ_GRID);
   double globalOrigin[] = { 0, 0, 0 };
   double level0Spacing[] = { 4, 4, 4 };
   double level1Spacing[] = { 2, 2, 2 };

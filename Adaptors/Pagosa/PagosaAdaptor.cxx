@@ -74,7 +74,7 @@ void setcoprocessorgeometry_(int* mx, int* my, int* mz, double* x0, double* y0, 
   int numLevels = 1;
   const int blocksPerLevel[1] = { *tot_pes };
   grid->Initialize(numLevels, blocksPerLevel);
-  grid->SetGridDescription(VTK_XYZ_GRID);
+  grid->SetGridDescription(vtkStructuredData::VTK_STRUCTURED_XYZ_GRID);
   unsigned int level = 0;
   unsigned int blockId = *my_id;
   grid->SetDataSet(level, blockId, img);
