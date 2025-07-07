@@ -102,7 +102,7 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(vtkOverlappingAMR* amr)
 //----------------------------------------------------------------------------
 bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
 {
-  if (amr->GetNumberOfLevels() < 1 || amr->GetNumberOfDataSets(0) < 1)
+  if (amr->GetNumberOfLevels() < 1 || amr->GetNumberOfBlocks(0) < 1)
   {
     // this is an empty AMR. Nothing to do here.
     return false;
@@ -192,7 +192,7 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   vtkImageData* reference = nullptr;
   for (unsigned int level = 0; reference == nullptr && level < amr->GetNumberOfLevels(); level++)
   {
-    for (unsigned int index = 0; reference == nullptr && index < amr->GetNumberOfDataSets(level);
+    for (unsigned int index = 0; reference == nullptr && index < amr->GetNumberOfBlocks(level);
          index++)
     {
       reference = amr->GetDataSet(level, index);

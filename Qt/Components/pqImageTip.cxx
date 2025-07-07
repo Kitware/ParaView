@@ -93,7 +93,7 @@ bool pqImageTip::eventFilter(QObject*, QEvent* e)
       {
         break;
       }
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     }
     case QEvent::Leave:
     case QEvent::WindowActivate:

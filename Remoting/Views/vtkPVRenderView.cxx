@@ -2248,7 +2248,7 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
         // vtkIceTCompositePass uses that as indicator to not use z buffer.
         return true;
       }
-      VTK_FALLTHROUGH;
+      [[fallthrough]];
     default:
       return false;
   }

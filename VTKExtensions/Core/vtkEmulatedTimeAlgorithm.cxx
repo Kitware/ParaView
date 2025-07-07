@@ -133,7 +133,7 @@ void vtkEmulatedTimeAlgorithm::PrintSelf(ostream& os, vtkIndent indent)
   else
   {
     os << "[";
-    for (int idx = 0; idx < this->TimeSteps.size() - 1; ++idx)
+    for (std::size_t idx = 0; idx < this->TimeSteps.size() - 1; ++idx)
     {
       os << this->TimeSteps[idx] << ", ";
     }

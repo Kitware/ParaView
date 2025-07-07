@@ -32,7 +32,7 @@ void AssignNamesToBlocks(vtkUniformGridAMR* amr)
   for (unsigned int l = 0; l < numLevels; ++l)
   {
     const std::string levelString = fmt::format("{:{}}", l, GetNumberOfDigits(l));
-    const auto numDataSets = amr->GetNumberOfDataSets(l);
+    const auto numDataSets = amr->GetNumberOfBlocks(l);
     for (unsigned idx = 0; idx < numDataSets; ++idx)
     {
       const std::string label =

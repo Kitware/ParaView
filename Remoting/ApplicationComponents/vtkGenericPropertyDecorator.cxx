@@ -46,9 +46,9 @@ public:
     , Enabled(true)
     , Visible(true)
     , NumberOfComponents(-1)
-    , Mode(ENABLED_STATE)
     , ObserverId(0)
     , Self(self)
+    , Mode(ENABLED_STATE)
   {
   }
 

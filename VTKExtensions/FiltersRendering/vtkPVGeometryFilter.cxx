@@ -708,7 +708,7 @@ int vtkPVGeometryFilter::RequestAMRData(
 
   for (unsigned int level = 0; level < amr->GetNumberOfLevels(); ++level)
   {
-    const unsigned int num_datasets = amr->GetNumberOfDataSets(level);
+    const unsigned int num_datasets = amr->GetNumberOfBlocks(level);
     for (unsigned int partitionIdx = 0; partitionIdx < num_datasets; ++partitionIdx)
     {
       vtkUniformGrid* ug = amr->GetDataSet(level, partitionIdx);

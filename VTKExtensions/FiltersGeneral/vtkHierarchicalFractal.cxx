@@ -1221,7 +1221,7 @@ void vtkHierarchicalFractal::AddDepthArray(vtkOverlappingAMR* output)
   int level = 0;
   while (level < levels)
   {
-    int blocks = output->GetNumberOfDataSets(level);
+    int blocks = output->GetNumberOfBlocks(level);
     int block = 0;
     while (block < blocks)
     {

@@ -2298,7 +2298,7 @@ int vtkAMRDualGridHelper::Initialize(vtkNonOverlappingAMR* input)
   // Add all of the blocks
   for (int level = 0; level < numLevels; ++level)
   {
-    numBlocks = input->GetNumberOfDataSets(level);
+    numBlocks = input->GetNumberOfBlocks(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
     {
       //      vtkAMRBox box;
@@ -2342,7 +2342,7 @@ int vtkAMRDualGridHelper::SetupData(vtkNonOverlappingAMR* input, const char* arr
   // Find the first that has data.
   for (int level = 0; level < numLevels; ++level)
   {
-    numBlocks = input->GetNumberOfDataSets(level);
+    numBlocks = input->GetNumberOfBlocks(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
     {
       vtkImageData* image = input->GetDataSet(level, blockId);
@@ -2728,7 +2728,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
   this->NumberOfBlocksInThisProcess = 0;
   for (int level = 0; level < numLevels; ++level)
   {
-    numBlocks = input->GetNumberOfDataSets(level);
+    numBlocks = input->GetNumberOfBlocks(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
     {
       //      vtkAMRBox box;
