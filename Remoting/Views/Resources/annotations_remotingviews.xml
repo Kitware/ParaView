@@ -245,9 +245,12 @@
                             default_values="0"
                             name="MinimumRadius"
                             number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           max="100"
-                           name="range" />
+
+        <BoundsDomain name="range" mode="scaled_extent" default_mode="min" scale_factor="1.">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="CustomMinRadius"
@@ -268,9 +271,11 @@
                             default_values="1"
                             name="MaximumRadius"
                             number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           max="100"
-                           name="range" />
+        <BoundsDomain name="range" mode="scaled_extent" default_mode="max" scale_factor="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="CustomMaxRadius"
@@ -797,6 +802,9 @@
                          name="RadialLabelVisibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+        </Hints>
         <Documentation>Set radial title visibility.</Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetRadialAngleFormat"
@@ -805,9 +813,11 @@
                             panel_visibility="advanced"
                             number_of_elements="1">
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialLabelVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialLabelVisibility" mode="visibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the polar radial label format.</Documentation>
@@ -824,9 +834,11 @@
                  value="1" />
         </EnumerationDomain>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialLabelVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialLabelVisibility" mode="visibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the location of radial title.</Documentation>
@@ -837,9 +849,11 @@
                             number_of_elements="2">
         <DoubleRangeDomain name="range" />
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialLabelVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialLabelVisibility" mode="visibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the 2D text offset (in pixels) for radial titles.
@@ -852,8 +866,17 @@
                          panel_visibility="advanced"
                          number_of_elements="1">
        <BooleanDomain name="bool" />
-      <Documentation>Show radial units in labels (degrees).</Documentation>
+       <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialLabelVisibility" mode="visibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Show radial units in labels (degrees).</Documentation>
       </IntVectorProperty>
+
       <DoubleVectorProperty command="SetScreenSize"
                             default_values="10"
                             name="ScreenSize"
