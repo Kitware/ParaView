@@ -922,6 +922,10 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
       // not in composite-indices mode.
       usingCompositeIndices = false;
 
+      // indicates if we should only returns selectors for leaf nodes.
+      internals.LeafNodesOnly = (vtkSMDataAssemblyDomain::SafeDownCast(domain)->GetMode() ==
+        vtkSMDataAssemblyDomain::LEAVES);
+
       // monitor SelectorsTableModel data changes.
       QObject::connect(internals.SelectorsTableModel.data(), &QAbstractItemModel::dataChanged, this,
         &pqDataAssemblyPropertyWidget::selectorsTableModified);
@@ -1145,7 +1149,7 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
 
   if (role == Qt::CheckStateRole)
   {
-    internals.Selectors = internals.AssemblyTreeModel->checkedNodes();
+    internals.Selectors = internals.AssemblyTreeModel->checkedNodes(internals.LeafNodesOnly);
     internals.SelectorsTableModel->setData(internals.Selectors);
     internals.CompositeIndices.clear();
     if (assembly != nullptr && internals.InCompositeIndicesMode)
@@ -1154,9 +1158,8 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
       std::vector<std::string> selectors(internals.Selectors.size());
       std::transform(internals.Selectors.begin(), internals.Selectors.end(), selectors.begin(),
         [](const QString& str) { return str.toStdString(); });
-      internals.CompositeIndices =
-        compositeIndicesToVariantList(vtkDataAssemblyUtilities::GetSelectedCompositeIds(
-          selectors, assembly, nullptr, internals.LeafNodesOnly));
+      internals.CompositeIndices = compositeIndicesToVariantList(
+        vtkDataAssemblyUtilities::GetSelectedCompositeIds(selectors, assembly));
     }
     Q_EMIT this->selectorsChanged();
   }

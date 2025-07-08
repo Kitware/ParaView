@@ -526,7 +526,7 @@ void pqDataAssemblyTreeModel::setCheckedNodes(const QStringList& paths)
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqDataAssemblyTreeModel::checkedNodes() const
+QStringList pqDataAssemblyTreeModel::checkedNodes(bool leafNodesOnly) const
 {
   auto& internals = (*this->Internals);
   const auto assembly = internals.DataAssembly.GetPointer();
@@ -556,10 +556,27 @@ QStringList pqDataAssemblyTreeModel::checkedNodes() const
     }
     if (state == Qt::Checked)
     {
-      // this is a selected node, add it to the paths.
-      paths.push_back(QString::fromStdString(assembly->GetNodePath(id)));
-      // no need to traverse the substree, however.
-      return false;
+      if (leafNodesOnly)
+      {
+        if (assembly->GetNumberOfChildren(id) == 0)
+        {
+          // this is a leaf node, add it to the paths.
+          paths.push_back(QString::fromStdString(assembly->GetNodePath(id)));
+          return false; // stop traversing.
+        }
+        else
+        {
+          // this is a checked node with children, traverse the subtree.
+          return true; // traverse subtree.
+        }
+      }
+      else
+      {
+        // this is a selected node, add it to the paths.
+        paths.push_back(QString::fromStdString(assembly->GetNodePath(id)));
+        // no need to traverse the substree, however.
+        return false;
+      }
     }
     else
     {

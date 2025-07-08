@@ -78,12 +78,13 @@ public:
    * @note checking a node causes all it child nodes to be checked as well.
    * @note `checkedNodes()` may not returns exactly the same paths passed to
    *       `setCheckedNodes` even if the check-states were not changed in
-   *       between the two calls.
+   *       between the two calls. leafNodesOnly controls whether the returned
+   *       paths are leaf nodes only or all nodes that are checked.
    *
    * @sa vtkDataAssembly::SelectNodes
    */
   void setCheckedNodes(const QStringList& paths);
-  QStringList checkedNodes() const;
+  QStringList checkedNodes(bool leafNodesOnly = false) const;
   ///@}
 
   /**
