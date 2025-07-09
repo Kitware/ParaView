@@ -1691,10 +1691,12 @@ list(APPEND TESTS_WITH_BASELINES
 )
 
 if (TARGET VTK::IOParallelLSDyna)
+  if (NOT TARGET VTK::IOPDAL)
+    list(APPEND TESTS_WITH_BASELINES
+      Plot3DReader.xml)
+  endif ()
   list(APPEND TESTS_WITH_BASELINES
-    Plot3DReader.xml
-    SelectReader.xml
-    )
+    SelectReader.xml)
 endif ()
 
 if (TARGET VTK::IOFides)
@@ -1909,6 +1911,7 @@ set (MathTextColumn_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (MoleculeToLines_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (ParallelCoordinatesView_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PartialArrayInLineChart_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (Plot3DReader_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PlotDataOverTime-NonDistributed_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PlotMatrixViewArraySelection_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PlotMatrixViewDensityMaps_FORCE_SERIAL TRUE) # since this uses popup-menu
