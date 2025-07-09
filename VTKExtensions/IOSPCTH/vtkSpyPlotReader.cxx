@@ -695,20 +695,6 @@ int vtkSpyPlotReader::RequestData(vtkInformation* request,
   // Determine the minimum level in use
   // and its grid spacing
   this->SetGlobalMinLevelAndSpacing(blockIterator);
-  // export global bounds, minimum level, spacing, and box size
-  // in field data arrays for use by downstream filters
-  if (hbds != nullptr)
-  {
-    this->AddAttributes(hbds);
-    assert("FieldData should not be nullptr!" && hbds->GetFieldData() != nullptr);
-
-    vtkFieldData* fd = hbds->GetFieldData();
-    (void)fd; // only used for asserts
-    assert("Must have a GlobalBounds array!" && fd->HasArray("GlobalBounds"));
-    assert("Must have a GlobalBoxSize array!" && fd->HasArray("GlobalBoxSize"));
-    assert("Must have a MinLevel array!" && fd->HasArray("MinLevel"));
-    assert("Must have a MinLevelSpacing!" && fd->HasArray("MinLevelSpacing"));
-  }
 
   int needTracers = 1;
 
@@ -850,6 +836,13 @@ int vtkSpyPlotReader::RequestData(vtkInformation* request,
       }
     }
     delete blockIterator;
+  }
+
+  // export global bounds, minimum level, spacing, and box size
+  // in field data arrays for use by downstream filters
+  if (hbds != nullptr)
+  {
+    this->AddAttributes(hbds);
   }
 
 #ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
@@ -2439,10 +2432,13 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
     for (unsigned int level = 0; level < numberOfLevels; level++)
     {
       std::vector<vtkSmartPointer<vtkUniformGrid>> datasetsAtLevel;
-      for (unsigned int kk = 0; kk < hbDS->GetNumberOfBlocks(level); kk++)
+      if (level < hbDS->GetNumberOfLevels())
       {
-        vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
-        datasetsAtLevel.push_back(ug);
+        for (unsigned int kk = 0; kk < hbDS->GetNumberOfBlocks(level); kk++)
+        {
+          vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
+          datasetsAtLevel.push_back(ug);
+        }
       }
       datasets.push_back(datasetsAtLevel);
     }
