@@ -3202,7 +3202,7 @@
                          panel_visibility="default">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Show/hide the polar grid.
+          Show/hide the axes grid. Requires a camera in Parallel Projection mode.
         </Documentation>
       </IntVectorProperty>
 
@@ -3336,7 +3336,7 @@
                          panel_visibility="advanced">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Show/hide the axes grid.
+          Show/hide the axes grid. Requires a camera in Parallel Projection mode.
         </Documentation>
       </IntVectorProperty>
 

@@ -782,16 +782,33 @@ void vtkPVRenderView::SetInteractionMode(int mode)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::AddAnnotationToView(vtkProp* annotation)
+{
+  if (annotation)
+  {
+    this->AddPropToRenderer(annotation);
+    vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler);
+    culler->DoNotCullList.erase(annotation);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RemoveAnnotationFromView(vtkProp* annotation)
+{
+  if (annotation)
+  {
+    this->RemovePropFromRenderer(annotation);
+    vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler);
+    culler->DoNotCullList.insert(annotation);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetLegendGridActor(vtkLegendScaleActor* gridActor)
 {
   if (this->LegendGridActor != gridActor)
   {
-    vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler.GetPointer());
-    if (this->LegendGridActor)
-    {
-      this->GetRenderer()->RemoveViewProp(this->LegendGridActor);
-      culler->DoNotCullList.erase(this->LegendGridActor);
-    }
+    this->RemoveAnnotationFromView(this->LegendGridActor);
     this->LegendGridActor = gridActor;
     if (this->LegendGridActor)
     {
@@ -801,8 +818,7 @@ void vtkPVRenderView::SetLegendGridActor(vtkLegendScaleActor* gridActor)
       this->LegendGridActor->LegendVisibilityOff();
       this->LegendGridActor->SetCornerOffsetFactor(1);
 
-      this->GetRenderer()->AddViewProp(this->LegendGridActor);
-      culler->DoNotCullList.insert(this->LegendGridActor);
+      this->AddAnnotationToView(this->LegendGridActor);
     }
   }
 }
@@ -812,18 +828,9 @@ void vtkPVRenderView::SetPolarGridActor(vtkPolarAxesActor2D* polarActor)
 {
   if (this->PolarAxesActor != polarActor)
   {
-    vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler);
-    if (this->PolarAxesActor)
-    {
-      this->GetRenderer()->RemoveViewProp(this->PolarAxesActor);
-      culler->DoNotCullList.erase(this->PolarAxesActor);
-    }
+    this->RemoveAnnotationFromView(this->PolarAxesActor);
     this->PolarAxesActor = polarActor;
-    if (this->PolarAxesActor)
-    {
-      this->GetRenderer()->AddViewProp(this->PolarAxesActor);
-      culler->DoNotCullList.insert(this->PolarAxesActor);
-    }
+    this->AddAnnotationToView(this->PolarAxesActor);
   }
 }
 
@@ -3141,6 +3148,17 @@ void vtkPVRenderView::SetParallelProjection(int mode)
     this->ParallelProjection = mode;
     this->GetActiveCamera()->SetParallelProjection(mode);
     this->Modified();
+  }
+
+  if (!mode)
+  {
+    this->RemoveAnnotationFromView(this->LegendGridActor);
+    this->RemoveAnnotationFromView(this->PolarAxesActor);
+  }
+  else
+  {
+    this->AddAnnotationToView(this->LegendGridActor);
+    this->AddAnnotationToView(this->PolarAxesActor);
   }
 }
 
