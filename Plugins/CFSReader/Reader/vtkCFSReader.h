@@ -562,7 +562,7 @@ private:
   /**
    * array with first/last time/freq step value
    */
-  int TimeStepNumberRange[2] = { 1,
+  int TimeStepNumberRange[2] = { 0,
     1 }; // as this is used in vtk macros, a std::array<> does not work
 
   /**
