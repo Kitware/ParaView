@@ -9,7 +9,7 @@ for i, arg in enumerate(sys.argv):
         diskFile = sys.argv[i+1] + '/Testing/Data/disk_out_ref.ex2'
 
 # create a new 'IOSS Reader'
-disk_out_ref = IOSSReader(registrationName='disk_out_ref',
+disk_out_ref = IOSSReader(registrationName='disk_out_ref.ex2',
         FileName=[diskFile])
 disk_out_ref.ElementBlocks = ['block_1']
 disk_out_ref.NodeBlockFields = ['ash3', 'ch4', 'game3', 'h2', 'pres', 'temp', 'v']
