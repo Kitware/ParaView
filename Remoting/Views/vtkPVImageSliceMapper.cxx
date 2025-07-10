@@ -193,17 +193,17 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
       if (this->SliceMode == XY_PLANE) // XY plane
       {
         outextent[4] = outextent[5] = outextent[4] + slice;
-        sliceDescription = VTK_XY_PLANE;
+        sliceDescription = vtkStructuredData::VTK_STRUCTURED_XY_PLANE;
       }
       else if (this->SliceMode == YZ_PLANE) // YZ plane
       {
         outextent[0] = outextent[1] = outextent[0] + slice;
-        sliceDescription = VTK_YZ_PLANE;
+        sliceDescription = vtkStructuredData::VTK_STRUCTURED_YZ_PLANE;
       }
       else if (this->SliceMode == XZ_PLANE) // XZ plane
       {
         outextent[2] = outextent[3] = outextent[2] + slice;
-        sliceDescription = VTK_XZ_PLANE;
+        sliceDescription = vtkStructuredData::VTK_STRUCTURED_XZ_PLANE;
       }
     }
     else if (numdims == 2)
@@ -211,15 +211,15 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
       if (inextent[4] == inextent[5]) // XY plane
       {
         // nothing to change.
-        sliceDescription = VTK_XY_PLANE;
+        sliceDescription = vtkStructuredData::VTK_STRUCTURED_XY_PLANE;
       }
       else if (inextent[0] == inextent[1]) /// YZ plane
       {
-        sliceDescription = VTK_YZ_PLANE;
+        sliceDescription = vtkStructuredData::VTK_STRUCTURED_YZ_PLANE;
       }
       else if (inextent[2] == inextent[3]) // XZ plane
       {
-        sliceDescription = VTK_XZ_PLANE;
+        sliceDescription = vtkStructuredData::VTK_STRUCTURED_XZ_PLANE;
       }
     }
     else
@@ -290,7 +290,7 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
     const int* indices = nullptr;
     switch (sliceDescription)
     {
-      case VTK_XY_PLANE:
+      case vtkStructuredData::VTK_STRUCTURED_XY_PLANE:
         indices = XY_PLANE_QPOINTS_INDICES;
         if (this->UseXYPlane)
         {
@@ -299,7 +299,7 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
         }
         break;
 
-      case VTK_YZ_PLANE:
+      case vtkStructuredData::VTK_STRUCTURED_YZ_PLANE:
         indices = YZ_PLANE_QPOINTS_INDICES;
         if (this->UseXYPlane)
         {
@@ -307,7 +307,7 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
         }
         break;
 
-      case VTK_XZ_PLANE:
+      case vtkStructuredData::VTK_STRUCTURED_XZ_PLANE:
         indices = XZ_PLANE_QPOINTS_INDICES;
         if (this->UseXYPlane)
         {

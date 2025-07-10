@@ -8,9 +8,9 @@
  * required properties: "Input", "Direction". "Input" is generally an
  * vtkSMInputProperty which provides the information about the data extents.
  * "Direction" is an option required property which helps determine the
- * direction (VTK_XY_PLANE, VTK_YZ_PLANE or VTK_XZ_PLANE). If "Direction" is not
- * provided then the property must be a 3 element property while when Direction
- * is provided the property must be a 1 element property.
+ * direction (VTK_STRUCTURED_XY_PLANE, VTK_STRUCTURED_YZ_PLANE or VTK_STRUCTURED_XZ_PLANE).
+ * If "Direction" is not provided then the property must be a 3 element property while when
+ * Direction is provided the property must be a 1 element property.
  *
  * Supported Required-Property functions:
  * \li \c Input : points to a property that provides the data producer.

@@ -81,9 +81,9 @@ public:
 
   enum
   {
-    XY_PLANE = VTK_XY_PLANE,
-    YZ_PLANE = VTK_YZ_PLANE,
-    XZ_PLANE = VTK_XZ_PLANE
+    XY_PLANE = vtkStructuredData::VTK_STRUCTURED_XY_PLANE,
+    YZ_PLANE = vtkStructuredData::VTK_STRUCTURED_YZ_PLANE,
+    XZ_PLANE = vtkStructuredData::VTK_STRUCTURED_XZ_PLANE
   };
 
   ///@{
