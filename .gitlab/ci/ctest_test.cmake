@@ -97,6 +97,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "TestPythonView$"
     "pv\\.TooltipCopy$"
 
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22801
+    # There are warnings about initialization order confusion, but there are
+    # then GL context errors. Not sure if these are related.
+    "^paraviewPython-TestCatalystClient$"
+
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22598
     "^pv\\.HelpWindowHistory$"
 
@@ -126,9 +131,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "viskoresoverride")
     list(APPEND test_exclusions
-      # https://gitlab.kitware.com/paraview/paraview/-/issues/22801
-      "^paraviewPython-TestCatalystClient$"
-
       # https://gitlab.kitware.com/paraview/paraview/-/issues/22941
       "^pv\\.AdaptiveResampleToImage$"
       "^pvcs\\.AdaptiveResampleToImage$")
@@ -288,6 +290,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     # rendering bug, but our machines all use nVidia cards today.
     "^paraviewPython-TestColorHistogram$"
 
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22801
     # There are warnings about initialization order confusion, but there are
     # then GL context errors. Not sure if these are related.
     "^paraviewPython-TestCatalystClient$"
