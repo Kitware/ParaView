@@ -90,7 +90,7 @@ public:
   }
   void CreateOutput(vtkOverlappingAMR* hbds)
   {
-    std::vector<int> blocksPerLevel;
+    std::vector<unsigned int> blocksPerLevel;
     double origin[3] = { DBL_MAX, DBL_MAX, DBL_MAX };
     for (size_t i = 0; i < this->Levels.size(); i++)
     {
@@ -113,7 +113,7 @@ public:
 
     std::vector<unsigned int> blockIds(
       blocksPerLevel.size(), 0); // keep track of the id at each level
-    hbds->Initialize(static_cast<int>(blocksPerLevel.size()), &blocksPerLevel[0]);
+    hbds->Initialize(blocksPerLevel);
     hbds->SetOrigin(origin);
     hbds->SetGridDescription(this->GridDescription);
     for (unsigned int level = 0; level < hbds->GetNumberOfLevels(); level++)

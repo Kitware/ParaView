@@ -725,7 +725,7 @@ int vtkSpyPlotReader::RequestData(vtkInformation* request,
     // Note that this is a quick fix. Taking this extra pass should be avoided. -Leo
     if (this->IsAMR)
     {
-      std::vector<int> blocksPerLevel;
+      std::vector<unsigned int> blocksPerLevel;
       for (blockIterator->Start(); blockIterator->IsActive(); blockIterator->Next())
       {
         block = blockIterator->GetBlock();
@@ -744,7 +744,7 @@ int vtkSpyPlotReader::RequestData(vtkInformation* request,
         }
         blocksPerLevel[level]++;
       }
-      hbds->Initialize(static_cast<int>(blocksPerLevel.size()), &blocksPerLevel[0]);
+      hbds->Initialize(blocksPerLevel);
     }
 
     // Read the blocks/files that are assigned to this process
@@ -2310,7 +2310,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
   // At this point, the global number of levels is set in each processor.
   // Update each level
   // i.e. for each level synchronize the number of datasets (or pieces).
-  std::vector<int> blocksPerLevel(numberOfLevels, 0); // collect this
+  std::vector<unsigned int> blocksPerLevel(numberOfLevels, 0); // collect this
   std::vector<int> globalIndices(numberOfLevels);
   for (unsigned int level = 0; level < numberOfLevels; level++)
   {
@@ -2447,7 +2447,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
       datasets.push_back(datasetsAtLevel);
     }
 
-    hbDS->Initialize(numberOfLevels, &blocksPerLevel[0]);
+    hbDS->Initialize(blocksPerLevel);
     for (unsigned int level = 0; level < numberOfLevels; level++)
     {
       int globalIndex = globalIndices[level];
