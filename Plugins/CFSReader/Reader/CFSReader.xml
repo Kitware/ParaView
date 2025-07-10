@@ -164,6 +164,22 @@
        </Documentation>
      </IntVectorProperty>
 
+     <!-- ============================================================== -->
+     <!--  Show Current Frequency Value based on selected frequency step -->
+     <!-- ============================================================== -->
+     <StringVectorProperty name="TimeOrFrequencyValue"
+       number_of_elements="1"
+       command="GetTimeOrFrequencyValueStr"
+       information_only="1"
+       panel_visibility="default"
+       animateable="1"
+       default_values="0.0"
+       label="Frequency">
+       <Documentation>
+          Current frequency value based on selected frequency step.
+       </Documentation>
+     </StringVectorProperty>
+
      <!-- ==================================== -->
      <!--  Switch: Complex Mode                -->
      <!-- ==================================== -->
@@ -264,22 +280,6 @@
           Read dimensional units from field data and add them to array names as human-readable string.
         </Documentation>
      </IntVectorProperty>
-
-     <!-- ===================================== -->
-     <!--  Show Current Time or Frequency Value -->
-     <!-- ===================================== -->
-     <StringVectorProperty name="TimeOrFrequencyValue"
-       number_of_elements="1"
-       command="GetTimeOrFrequencyValueStr"
-       information_only="1"
-       panel_visibility="default"
-       animateable="1"
-       default_values="0.0"
-       label="Frequency">
-       <Documentation>
-          Current time / frequency value.
-       </Documentation>
-     </StringVectorProperty>
 
      <!-- This property is used by the property panel to show the available timesteps in the data. -->
      <DoubleVectorProperty name="TimestepValues"
