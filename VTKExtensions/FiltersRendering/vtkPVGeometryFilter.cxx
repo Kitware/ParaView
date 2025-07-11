@@ -780,7 +780,7 @@ int vtkPVGeometryFilter::RequestAMRData(
         this->ExecuteAMRBlock(ug, outputPartition, extractface);
         // add atttribute arrays when not generating outlines
         this->CleanupOutputData(outputPartition);
-        this->AddCompositeIndex(outputPartition, amr->GetCompositeIndex(level, partitionIdx));
+        this->AddCompositeIndex(outputPartition, amr->GetAbsoluteBlockIndex(level, partitionIdx));
         this->AddHierarchicalIndex(outputPartition, level, partitionIdx);
         // we don't call this->AddBlockColors() for AMR dataset since it doesn't
         // make sense, nor can be supported since all datasets merged into a
