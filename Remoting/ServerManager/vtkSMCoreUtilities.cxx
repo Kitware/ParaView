@@ -475,6 +475,14 @@ void vtkSMCoreUtilities::ReplaceReaderFileName(
   std::string fileName = files.size() > 1 ? vtkSMCoreUtilities::FindLargestPrefix(files)
                                           : vtksys::SystemTools::GetFilenameName(files[0]);
 
+  // If the user renamed the proxy, keep its name.
+  const char* proxyName =
+    vtkSMProxyManager::GetProxyManager()->GetProxyName(proxy->GetXMLGroup(), proxy);
+  if (std::string(proxyName) != vtksys::SystemTools::GetFilenameName(*fileNames.begin()))
+  {
+    fileName = proxyName;
+  }
+
   // We need to register the new proxy before we change the input property of the consumers of the
   // legacy proxy
   controller->RegisterPipelineProxy(newProxy, fileName.c_str());

@@ -29,11 +29,8 @@ for field in ('ep_g', 'mu_g', 'p_g', 'ro_g', 'rop_g', 'u_g', 'v_g', 'volfrac', '
 # Change file
 ReplaceReaderFileName(amrex_mfix_ref, [double_mach], 'FileNames')
 
-# Check that previous source does not exist anymore
-assert(FindSource("amrex_mfix_ref") is None)
-
-# Check that new source is loaded
-double_mach_ref = FindSource('plt00030.temp')
+# Reader's filename should have changed, but not the source's name
+double_mach_ref = FindSource('amrex_mfix_ref')
 assert(double_mach_ref is not None)
 
 double_mach_ref.CellArrayStatus = ['Temp', 'density', 'pressure', 'rho_E', 'rho_X', 'rho_e', 'xmom', 'ymom', 'zmom']
