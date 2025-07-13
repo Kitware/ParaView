@@ -80,8 +80,7 @@ class vtkSMSettings::vtkSMSettingsInternal
 public:
   vtkSMSettingsInternal() = default;
 
-  std::vector<::SettingsCollection> SettingCollections{ ::SettingsCollection{
-    vtkSMSettings::GetUserPriority() } };
+  std::vector<::SettingsCollection> SettingCollections;
   bool SettingCollectionsAreSorted = false;
   bool IsModified = false;
 
@@ -964,6 +963,7 @@ public:
     ::SettingsCollection newCollection(vtkSMSettings::GetUserPriority());
     this->SettingCollections.push_back(newCollection);
     this->IsModified = true;
+    this->SettingCollectionsAreSorted = false;
   }
 
   //----------------------------------------------------------------------------
