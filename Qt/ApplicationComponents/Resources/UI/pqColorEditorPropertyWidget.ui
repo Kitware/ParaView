@@ -35,6 +35,9 @@
    </item>
    <item row="1" column="0">
     <widget class="QPushButton" name="EditColorMap">
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
      <property name="toolTip">
       <string>Edit color map</string>
      </property>
