@@ -124,10 +124,10 @@ public:
 
 protected:
   /**
-   * Override the QMainWindow closeEvent We ask the user wants to save the current file if it's not
-   * already saved.
+   * Intercept the QMainWindow's closeEvent. Prompts the user to save the current files
+   * if they have not already been saved.
    */
-  void closeEvent(QCloseEvent* event) override;
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
   void createMenus();
