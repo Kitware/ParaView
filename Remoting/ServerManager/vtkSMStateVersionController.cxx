@@ -2495,11 +2495,11 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     version = vtkSMVersion(5, 13, 0);
   }
 
-  if (status && (version < vtkSMVersion(5, 14, 0)))
+  if (status && (version < vtkSMVersion(6, 0, 0)))
   {
     Process_5_13_to_6_0 converter;
     status = converter(document);
-    version = vtkSMVersion(5, 14, 0);
+    version = vtkSMVersion(6, 0, 0);
   }
 
   if (status)
