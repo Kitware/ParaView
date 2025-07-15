@@ -14,14 +14,27 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 
-  <!--display polar axes at bottom left, with bigger text-->
+  <!--display polar -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/1QCheckBox0" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/PushButton" command="activate" arguments="" />
+
+  <!-- draw a smaller axes so its text can go out its bounds: use custom bounds and position -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/AutoPole/CheckBox" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Position/DoubleLineEdit0" command="set_string" arguments="-10" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Position/DoubleLineEdit1" command="set_string" arguments="-10" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ScreenSize/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="15" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/PolePosition/DoubleLineEdit0" command="set_string" arguments="-10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/PolePosition/DoubleLineEdit1" command="set_string" arguments="-10" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/EnableCustomBounds/LineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/EnableCustomBounds/LineEdit1" command="set_string" arguments="1" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CustomBounds/DoubleLineEdit0" command="set_string" arguments="-10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CustomBounds/DoubleLineEdit1" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CustomBounds/DoubleLineEdit2" command="set_string" arguments="-10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CustomBounds/DoubleLineEdit3" command="set_string" arguments="0" />
+
+  <!-- increase font size to make text big enough to go outside of polar axes bounds -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ScreenSize/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="20" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/PolarAxes/EditProxy/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 
@@ -38,5 +51,4 @@
   <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollPlusButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/zoomOutButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
-
 </pqevents>

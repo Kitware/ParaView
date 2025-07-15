@@ -31,6 +31,7 @@ public:
   ///@{
   /**
    * Get/Set the Position to transform the data bounds.
+   * Default is (0, 0, 0)
    */
   vtkSetVector3Macro(Position, double);
   vtkGetVector3Macro(Position, double);
@@ -38,7 +39,17 @@ public:
 
   ///@{
   /**
+   * Get/Set the Translation to transform the data bounds.
+   * Default is (0, 0, 0)
+   */
+  vtkSetVector3Macro(Translation, double);
+  vtkGetVector3Macro(Translation, double);
+  ///@}
+
+  ///@{
+  /**
    * Get/Set the Orientation to transform the data bounds.
+   * Default is (0, 0, 0)
    */
   vtkSetVector3Macro(Orientation, double);
   vtkGetVector3Macro(Orientation, double);
@@ -47,6 +58,7 @@ public:
   ///@{
   /**
    * Get/Set the Scale to transform the data bounds.
+   * Default is (1, 1, 1)
    */
   vtkSetVector3Macro(Scale, double);
   vtkGetVector3Macro(Scale, double);
@@ -306,6 +318,7 @@ protected:
   vtkNew<vtkPolarAxesActor> PolarAxesActor;
   vtkWeakPointer<vtkPVRenderView> RenderView;
   double Position[3] = { 0.0 };
+  double Translation[3] = { 0.0 };
   double Scale[3] = { 1.0 };
   double Orientation[3] = { 0.0 };
   double CustomBounds[6] = { 0.0, 1.0, 0.0, 1.0, 0.0, 1.0 };

@@ -1337,6 +1337,15 @@ private:
   void OnPolygonSelectionEvent();
   void FinishSelection(vtkSelection*, const char*);
 
+  ///@{
+  /**
+   * Add/remove the given prop in the view.
+   * Update culler list accordingly.
+   */
+  void AddAnnotationToView(vtkProp*);
+  void RemoveAnnotationFromView(vtkProp*);
+  ///@}
+
   // This flag is set to false when not all processes cannot render e.g. cannot
   // open the DISPLAY etc.
   bool RemoteRenderingAvailable;

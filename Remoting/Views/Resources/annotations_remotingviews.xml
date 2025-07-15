@@ -209,33 +209,119 @@
         <Documentation>Set the visibility of the representation.</Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetEnableAutoPole"
+                         default_values="1"
+                         name="AutoPole"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Place the pole (origin of the axes) at the center of the bounds.
+          If off, use the Pole property.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty command="SetPosition"
                             default_values="0 0 0"
-                            label="Translation"
-                            name="Position"
+                            name="PolePosition"
                             number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-        <Documentation>Translate the origin of the axes.</Documentation>
+        <Documentation>Pole coordinates. The Pole is the origin of the Polar Axes.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AutoPole"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetScale"
-                            default_values="1 1 1"
-                            name="Scale"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-        <Documentation>Scale the origin of the axes.</Documentation>
+
+      <IntVectorProperty command="SetEnableCustomMinRadius"
+                         default_values="1"
+                         name="CustomMinRadius"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom minimum radius.
+        If off, Minimum Radius is computed relatively to pole position and bounds.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMinRadius"
+                            default_values="0"
+                            name="MinimumRadius"
+                            number_of_elements="1">
+
+        <BoundsDomain name="range" mode="scaled_extent" default_mode="min" scale_factor="1.">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomMinRadius"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the minimum radius.</Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetOrientation"
-                            default_values="0 0 0"
-                            name="Orientation"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-        <Documentation>Rotate the origin of the axes around the scene origin.</Documentation>
+      <IntVectorProperty command="SetEnableCustomMaxRadius"
+                         default_values="0"
+                         name="CustomMaxRadius"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom maximum radius.
+        If off, Maximum Radius is computed relatively to pole position and bounds.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMaxRadius"
+                            default_values="1"
+                            name="MaximumRadius"
+                            number_of_elements="1">
+        <BoundsDomain name="range" mode="scaled_extent" default_mode="max" scale_factor="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomMaxRadius"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the maximum radius.</Documentation>
       </DoubleVectorProperty>
-      <PropertyGroup label="Transform">
-        <Property name="Position"/>
-        <Property name="Scale"/>
-        <Property name="Orientation"/>
-      </PropertyGroup>
+      <IntVectorProperty command="SetEnableCustomAngle"
+                         default_values="1"
+                         name="CustomAngles"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom min/max angle.
+        If off, Minimum/Maximum Angle are computed relatively to pole position and bounds.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMinAngle"
+                            default_values="0"
+                            name="MinimumAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="-180"
+                           max="180"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomAngles"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the minimum angle (in degrees).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMaxAngle"
+                            default_values="90"
+                            name="MaximumAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="-180"
+                           max="180"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomAngles"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the maximum angle (in degrees).</Documentation>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty command="GetDataBounds"
                             default_values="0 1 0 1 0 1"
@@ -259,39 +345,47 @@
                             number_of_elements="6">
         <Documentation>Set the polar axes custom bounds.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetEnableCustomRange"
-                         default_values="0"
-                         name="EnableCustomRange"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Activate the use of polar axes custom range.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetCustomRange"
-                            default_values="0 1"
-                            name="CustomRange"
-                            number_of_elements="2">
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="EnableCustomRange"
-                      function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-        <Documentation>Set the polar axes custom range.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetEnableAutoPole"
-                         default_values="1"
-                         name="AutoPole"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Activate the automatic placement of the pole (origin of the axes) at the center of the bounding box.
-        </Documentation>
-      </IntVectorProperty>
-      <PropertyGroup label="Custom Bounds and Range">
+
+      <PropertyGroup label="Custom Bounds and Position">
+        <Property name="AutoPole"/>
+        <Property name="PolePosition"/>
+        <Property name="CustomMinRadius" />
+        <Property name="MinimumRadius" />
+        <Property name="CustomMaxRadius" />
+        <Property name="MaximumRadius" />
+        <Property name="CustomAngles" />
+        <Property name="MinimumAngle" />
+        <Property name="MaximumAngle" />
         <Property name="EnableCustomBounds"/>
         <Property name="CustomBounds"/>
-        <Property name="EnableCustomRange"/>
-        <Property name="CustomRange"/>
-        <Property name="AutoPole"/>
+      </PropertyGroup>
+
+      <DoubleVectorProperty command="SetTranslation"
+                            default_values="0 0 0"
+                            label="Translation"
+                            name="Position"
+                            number_of_elements="3">
+        <Documentation>Translate the input bounds before computing the PolarAxes parameters.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            number_of_elements="3">
+        <Documentation>Scale the bounds before computing the PolarAxes parameters.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            number_of_elements="3">
+        <Documentation>Rotate the bounds around the scene origin before computing the PolarAxes parameters.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Transform Bounds">
+        <Documentation>This transform the input bounds. The bounds are a region
+          of the scene covered by the PolarAxes. They are used to compute default
+          values for the Polar Axes radii and angles. </Documentation>
+        <Property name="Position"/>
+        <Property name="Scale"/>
+        <Property name="Orientation"/>
       </PropertyGroup>
 
       <IntVectorProperty command="SetPolarAxisVisibility"
@@ -397,91 +491,6 @@
         Depends on the Number Of Arcs for automatic computation.
         </Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetEnableCustomMinRadius"
-                         default_values="1"
-                         name="CustomMinRadius"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Activate the use of custom minimum radius.
-        If off, Minimum Radius is computed relatively to pole position.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetMinRadius"
-                            default_values="0"
-                            name="MinimumRadius"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           max="100"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="CustomMinRadius"
-                      function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-        <Documentation>Set the minimum radius.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetEnableCustomMaxRadius"
-                         default_values="0"
-                         name="CustomMaxRadius"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Activate the use of custom maximum radius.
-        If off, Maximum Radius is computed relatively to pole position.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetMaxRadius"
-                            default_values="1"
-                            name="MaximumRadius"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           max="100"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="CustomMaxRadius"
-                      function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-        <Documentation>Set the maximum radius.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetEnableCustomAngle"
-                         default_values="1"
-                         name="CustomAngles"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Activate the use of custom min/max angle.
-        If off, Minimum/Maximum Angle are computed relatively to pole position.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetMinAngle"
-                            default_values="0"
-                            name="MinimumAngle"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="-180"
-                           max="180"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="CustomAngles"
-                      function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-        <Documentation>Set the minimum angle (in degrees).</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMaxAngle"
-                            default_values="90"
-                            name="MaximumAngle"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="-180"
-                           max="180"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="CustomAngles"
-                      function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-        <Documentation>Set the maximum angle (in degrees).</Documentation>
-      </DoubleVectorProperty>
       <IntVectorProperty command="SetRadialAxesOriginToPolarAxis"
                          default_values="1"
                          name="RadialAxesOriginToPolarAxis"
@@ -511,21 +520,47 @@
                            name="range" />
         <Documentation>Set the polar ellipse ratio.</Documentation>
       </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetEnableCustomRange"
+                         default_values="0"
+                         name="EnableCustomRange"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of polar axes custom range.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomRange"
+                            default_values="0 1"
+                            name="CustomRange"
+                            number_of_elements="2">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the polar axes custom range.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetLog"
+                         default_values="0"
+                         name="UseLogAxis"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the use of Log axis.</Documentation>
+      </IntVectorProperty>
+
+
       <PropertyGroup label="Aspect Control">
         <Property name="NumberOfRadialAxes" />
         <Property name="DeltaAngleRadialAxes" />
         <Property name="NumberOfArcs" />
         <Property name="DeltaRangeArcs" />
-        <Property name="CustomMinRadius" />
-        <Property name="MinimumRadius" />
-        <Property name="CustomMaxRadius" />
-        <Property name="MaximumRadius" />
-        <Property name="CustomAngles" />
-        <Property name="MinimumAngle" />
-        <Property name="MaximumAngle" />
         <Property name="RadialAxesOriginToPolarAxis" />
         <Property name="PolarArcResolutionPerDegree" />
         <Property name="Ratio" />
+        <Property name="EnableCustomRange"/>
+        <Property name="CustomRange"/>
+        <Property name="UseLogAxis" />
       </PropertyGroup>
 
       <IntVectorProperty command="SetEnableOverallColor"
@@ -701,6 +736,7 @@
         <BooleanDomain name="bool" />
         <Documentation>Set the visibility of polar axis label.</Documentation>
       </IntVectorProperty>
+
       <StringVectorProperty command="SetPolarLabelFormat"
                             name="PolarLabelFormat"
                             default_values="%-#6.3g"
@@ -766,6 +802,9 @@
                          name="RadialLabelVisibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+        </Hints>
         <Documentation>Set radial title visibility.</Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetRadialAngleFormat"
@@ -774,9 +813,11 @@
                             panel_visibility="advanced"
                             number_of_elements="1">
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialLabelVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialLabelVisibility" mode="visibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the polar radial label format.</Documentation>
@@ -793,9 +834,11 @@
                  value="1" />
         </EnumerationDomain>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialLabelVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialLabelVisibility" mode="visibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the location of radial title.</Documentation>
@@ -806,22 +849,34 @@
                             number_of_elements="2">
         <DoubleRangeDomain name="range" />
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialLabelVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialLabelVisibility" mode="visibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the 2D text offset (in pixels) for radial titles.
         The X offset is not applied if the text should be centered.</Documentation>
       </DoubleVectorProperty>
+
       <IntVectorProperty command="SetRadialUnits"
                          default_values="1"
                          name="RadialUnitsVisibility"
                          panel_visibility="advanced"
                          number_of_elements="1">
        <BooleanDomain name="bool" />
-      <Documentation>Show radial units in labels (degrees).</Documentation>
+       <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialAxesVisibility" mode="visibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" property="RadialLabelVisibility" mode="visibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Show radial units in labels (degrees).</Documentation>
       </IntVectorProperty>
+
       <DoubleVectorProperty command="SetScreenSize"
                             default_values="10"
                             name="ScreenSize"
@@ -830,9 +885,31 @@
         <DoubleRangeDomain name="range"
                            min="0"
                            max="100"/>
-        <Documentation>Set the screen size to use, which impact label and title
-        relative location to the axes.</Documentation>
+        <Documentation>Set a zoom factor. Default is 10.</Documentation>
       </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetUse2DMode"
+                         default_values="0"
+                         name="Use2DMode"
+                         label="Use 2D Mode"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Print text in overlay. Default is off (text in 3D scene)</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetRasterizeText"
+                         default_values="0"
+                         name="RasterizeText"
+                         label="Rasterize Text"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Rasterize the text for display. This enables full font configuration. This is forced to ON in 2DMode.
+          Default is false (text is vectorized)</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="Use2DMode" value="0" />
+        </Hints>
+      </IntVectorProperty>
+
       <PropertyGroup label="Title and Labels Control">
         <Property name="PolarAxisTitle" />
         <Property name="PolarAxisTitleVisibility" />
@@ -849,6 +926,8 @@
         <Property name="RadialLabelOffset" />
         <Property name="RadialUnitsVisibility" />
         <Property name="ScreenSize" />
+        <Property name="Use2DMode" />
+        <Property name="RasterizeText" />
       </PropertyGroup>
 
       <SubProxy command="SetPolarAxisTitleTextProperty">
@@ -1490,41 +1569,6 @@
         <Property name="ArcTickRatioThickness" />
       </PropertyGroup>
 
-      <IntVectorProperty command="SetUse2DMode"
-                         default_values="0"
-                         name="Use2DMode"
-                         label="Use 2D Mode"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Print text in overlay. Default is off (text in 3D scene)</Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty command="SetRasterizeText"
-                         default_values="0"
-                         name="RasterizeText"
-                         label="Rasterize Text"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Rasterize the text for display. This enables full font configuration. This is forced to ON in 2DMode.
-          Default is false (text is vectorized)</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="Use2DMode" value="0" />
-        </Hints>
-      </IntVectorProperty>
-
-      <IntVectorProperty command="SetLog"
-                         default_values="0"
-                         name="UseLogAxis"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Set the use of Log axis.</Documentation>
-      </IntVectorProperty>
-
-      <PropertyGroup label="Miscellaneous">
-        <Property name="Use2DMode" />
-        <Property name="RasterizeText" />
-        <Property name="UseLogAxis" />
-      </PropertyGroup>
       <!-- End of PolarAxesRepresentation -->
     </RepresentationProxy>
 
