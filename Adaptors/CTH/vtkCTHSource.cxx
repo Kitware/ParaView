@@ -335,14 +335,14 @@ int vtkCTHSource::FillInputData(vtkCPInputDataDescription* input)
     this->AMRSet = vtkSmartPointer<vtkNonOverlappingAMR>::New();
     input->SetGrid(this->AMRSet);
 
-    std::vector<int> datasets(this->MaxLevel + 1, 0);
+    std::vector<unsigned int> datasets(this->MaxLevel + 1, 0);
     // clear out the hierarchy
     for (size_t i = 0; i < Blocks.size(); i++)
     {
       Block& b = this->Blocks[i];
       datasets[b.level]++;
     }
-    AMRSet->Initialize(this->MaxLevel + 1, &datasets[0]);
+    AMRSet->Initialize(datasets);
 
     this->NeighborArray->SetNumberOfTuples(0);
     for (size_t i = 0; i < Blocks.size(); i++)
