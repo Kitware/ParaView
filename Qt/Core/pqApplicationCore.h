@@ -253,7 +253,7 @@ public:
    * Should be set before the first call to settings(): later calls will
    * not be taken into account.
    *
-   * Default is true.
+   * Default is false.
    */
   void useVersionedSettings(bool use);
 
@@ -493,7 +493,7 @@ private:
    */
   QString getSettingFileBaseName();
 
-  bool VersionedSettings = true;
+  bool VersionedSettings = false;
 };
 
 #endif
