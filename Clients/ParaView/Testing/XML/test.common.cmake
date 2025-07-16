@@ -962,6 +962,7 @@ set(TransferFunction2D_TIMEOUT 150)
 set(ZoomToData_TIMEOUT 150)
 
 list (APPEND TESTS_WITHOUT_BASELINES
+  AbortExit.xml
   AboutDialog.xml
   AddFieldArrays.xml
   AnimateProperty.xml
@@ -1854,6 +1855,7 @@ set(BoxWidgetVisibleBlock_DISABLE_CRS TRUE)
 set(ZoomToData_DISABLE_CRS TRUE)
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
+set (AbortExit_FORCE_SERIAL TRUE) # since this uses popup window
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
 set (AnimateProperty_FORCE_SERIAL TRUE) # since this uses popup window
 set (AnimationCache_FORCE_SERIAL TRUE) # since this uses popup window

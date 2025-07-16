@@ -26,7 +26,7 @@
         default_values="0"
         panel_visibility="advanced">
         <Documentation>
-          Prompt to save state when exiting ParaView.
+          Prompt to save state when exiting the application.
         </Documentation>
         <BooleanDomain name="bool" />
         <Hints>
