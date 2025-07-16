@@ -1,16 +1,36 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <!-- log TRACE level -->
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsLogViewer" />
   <pqevent object="pqClientMainWindow/pqLogViewerDialog/clientVerbosities" command="activated" arguments="TRACE" />
+
+  <!-- create dummy pipeline -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- refresh and clear logs -->
   <pqevent object="pqClientMainWindow/pqLogViewerDialog/refreshButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLogViewerDialog/clearLogsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqLogViewerDialog/categoryWidget/renderingCheckBox" command="set_boolean" arguments="" />
+
+  <!-- enable categories -->
+  <pqevent object="pqClientMainWindow/pqLogViewerDialog/categoryWidget/dataMovementCheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqLogViewerDialog/categoryWidget/renderingCheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqLogViewerDialog/categoryWidget/applicationCheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqLogViewerDialog/categoryWidget/pipelineCheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqLogViewerDialog/categoryWidget/pluginsCheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqLogViewerDialog/categoryWidget/executionCheckBox" command="set_boolean" arguments="true" />
+
+  <!-- update pipeline -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Clip" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- close tab and reopen -->
+  <pqevent object="pqClientMainWindow/pqLogViewerDialog/logTabWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Client - Rank 0" />
+  <pqevent object="pqClientMainWindow/pqLogViewerDialog/addLogButton" command="activate" arguments="" />
+
+  <!-- refresh and clear logs -->
   <pqevent object="pqClientMainWindow/pqLogViewerDialog/refreshButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLogViewerDialog/clearLogsButton" command="activate" arguments="" />
 </pqevents>
