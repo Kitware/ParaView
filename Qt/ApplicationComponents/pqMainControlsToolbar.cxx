@@ -9,7 +9,6 @@
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
 #include "pqLoadDataReaction.h"
-#include "pqLoadPaletteReaction.h"
 #include "pqSaveDataReaction.h"
 #include "pqSaveExtractsReaction.h"
 #include "pqSaveStateReaction.h"
@@ -17,8 +16,6 @@
 #include "pqServerDisconnectReaction.h"
 #include "pqUndoRedoReaction.h"
 #include "pqWidgetUtilities.h"
-
-#include <QToolButton>
 
 //-----------------------------------------------------------------------------
 void pqMainControlsToolbar::constructor()
@@ -35,7 +32,6 @@ void pqMainControlsToolbar::constructor()
   new pqUndoRedoReaction(ui.actionRedo, false);
   new pqAutoApplyReaction(ui.actionAutoApply);
   new pqDataQueryReaction(ui.actionQuery);
-  new pqLoadPaletteReaction(ui.actionLoadPalette);
   new pqSaveStateReaction(ui.actionSaveState);
   new pqSaveExtractsReaction(ui.actionGenerateExtracts);
 #if VTK_MODULE_ENABLE_ParaView_pqPython
@@ -43,10 +39,4 @@ void pqMainControlsToolbar::constructor()
 #else
   ui.actionSaveCatalystState->setEnabled(false);
 #endif
-
-  QToolButton* tb = qobject_cast<QToolButton*>(this->widgetForAction(ui.actionLoadPalette));
-  if (tb)
-  {
-    tb->setPopupMode(QToolButton::InstantPopup);
-  }
 }

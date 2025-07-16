@@ -846,6 +846,20 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   customViewpointsToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, customViewpointsToolbar);
 
+#if VTK_MODULE_ENABLE_ParaView_pqPython
+  // Give the macros menu to the pqPythonMacroSupervisor
+  pqPythonManager* manager =
+    qobject_cast<pqPythonManager*>(pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
+  if (manager)
+  {
+    QToolBar* macrosToolbar =
+      new QToolBar(QCoreApplication::translate("pqmacrosToolbar", "Macros Toolbars"), &mainWindow)
+      << pqSetName("MacrosToolbar");
+    manager->addWidgetForRunMacros(macrosToolbar);
+    mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
+  }
+#endif
+
   mainWindow.addToolBarBreak();
 
   QToolBar* colorToolbar = new pqColorToolbar(&mainWindow) << pqSetName("variableToolbar");
@@ -868,20 +882,6 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   QToolBar* lightingToolbar = new pqLightToolbar(&mainWindow) << pqSetName("lightingToolbar");
   lightingToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, lightingToolbar);
-
-#if VTK_MODULE_ENABLE_ParaView_pqPython
-  // Give the macros menu to the pqPythonMacroSupervisor
-  pqPythonManager* manager =
-    qobject_cast<pqPythonManager*>(pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
-  if (manager)
-  {
-    QToolBar* macrosToolbar =
-      new QToolBar(QCoreApplication::translate("pqmacrosToolbar", "Macros Toolbars"), &mainWindow)
-      << pqSetName("MacrosToolbar");
-    manager->addWidgetForRunMacros(macrosToolbar);
-    mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
-  }
-#endif
 
   mainWindow.addToolBarBreak();
 }

@@ -120,18 +120,6 @@
     <string>Find data matching various criteria from the current source (v)</string>
    </property>
   </action>
-  <action name="actionLoadPalette">
-   <property name="icon">
-    <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqPalette.svg</normaloff>:/pqWidgets/Icons/pqPalette.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Load Palette</string>
-   </property>
-   <property name="toolTip">
-    <string>Load a color palette</string>
-   </property>
-  </action>
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -198,7 +186,6 @@
   <addaction name="separator"/>
   <addaction name="actionAutoApply"/>
   <addaction name="actionQuery"/>
-  <addaction name="actionLoadPalette"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
