@@ -93,7 +93,7 @@ private: // NOLINT(readability-redundant-access-specifiers)
   QList<vtkSmartPointer<vtkSMProxy>> LogRecorderProxies;
   using LogLocation = QPair<vtkSmartPointer<vtkSMProxy>, int>;
   QMap<LogLocation, double> RefTimes;
-  std::array<bool, 5> CategoryPromoted;
+  std::array<bool, 6> CategoryPromoted;
 };
 
 #endif // pqLogViewerDialog_h
