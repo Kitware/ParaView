@@ -14,14 +14,14 @@ void format_error(const conduit_cpp::Node& n)
   if (n.has_child("valid") && n["valid"].as_string() == "false")
   {
     vtkLogScopeF(ERROR, "%s", n.name().c_str());
-    for (size_t i = 0; i < n.number_of_children(); i++)
+    for (conduit_index_t i = 0; i < n.number_of_children(); i++)
     {
       format_error(n.child(i));
     }
     if (n.has_child("errors"))
     {
       vtkLogF(ERROR, "Errors: %zu", n["errors"].number_of_children());
-      for (size_t i = 0; i < n["errors"].number_of_children(); i++)
+      for (conduit_index_t i = 0; i < n["errors"].number_of_children(); i++)
       {
         vtkLogF(ERROR, "Error %zu : %s", i, n["errors"][i].as_string().c_str());
       }
