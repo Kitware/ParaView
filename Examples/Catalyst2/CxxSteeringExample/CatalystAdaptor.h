@@ -154,7 +154,7 @@ void Results(unsigned int timeStep)
     std::cout << "Result Node dump:" << std::endl;
     results.print();
 
-    const std::string x_value_path = "catalyst/steerable/coordsets/coords/values/x";
+    const std::string x_value_path = "catalyst/steerable/data/coordsets/coords/values/x";
     if (results.has_path(x_value_path))
     {
       double expected_value = timeStep * 0.1;
@@ -169,7 +169,7 @@ void Results(unsigned int timeStep)
       std::cerr << "key: [" << x_value_path << "] not found!" << std::endl;
     }
 
-    const std::string field_values_path = "catalyst/steerable/fields/type/values";
+    const std::string field_values_path = "catalyst/steerable/data/fields/type/values";
     if (results.has_path(field_values_path))
     {
       int expected_value = timeStep % 3;
