@@ -13,6 +13,7 @@
 
 #include "vtkSMLoadStateOptionsProxy.h"
 
+#include <QApplication>
 #include <QDropEvent>
 #include <QMessageBox>
 #include <QMimeData>
@@ -43,16 +44,27 @@ pqMainWindowEventBehavior::pqMainWindowEventBehavior(QObject* parentObject)
 pqMainWindowEventBehavior::~pqMainWindowEventBehavior() = default;
 
 //-----------------------------------------------------------------------------
-void pqMainWindowEventBehavior::onClose(QCloseEvent*)
+void pqMainWindowEventBehavior::onClose(QCloseEvent* event)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core->settings()->value("GeneralSettings.ShowSaveStateOnExit", false).toBool())
   {
-    if (QMessageBox::question(qobject_cast<QWidget*>(sender()), "Exit ParaView?",
-          "Do you want to save the state before exiting ParaView?",
-          QMessageBox::Save | QMessageBox::Discard) == QMessageBox::Save)
+    QString title = tr("Exit %1").arg(QApplication::applicationName());
+    QString message =
+      tr("Do you want to save the state before exiting %1?").arg(QApplication::applicationName());
+    auto choice = QMessageBox::question(qobject_cast<QWidget*>(sender()), title, message,
+      QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    switch (choice)
     {
-      pqSaveStateReaction::saveState();
+      case QMessageBox::Save:
+        pqSaveStateReaction::saveState();
+        return;
+      case QMessageBox::Cancel:
+        event->ignore();
+        return;
+      case QMessageBox::Discard:
+      default:
+        return;
     }
   }
 }

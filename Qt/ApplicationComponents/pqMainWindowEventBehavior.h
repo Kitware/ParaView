@@ -28,6 +28,11 @@ public:
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Triggered when a close event occurs on the main window.
+   * If the settings ShowSaveStateOnExit is true, shows a popup to
+   * ask for saving state with 3 options:
+   * - Save: run a save state and quit
+   * - Discard: quit without saving
+   * - Cancel: do not quit nor save; return to the application
    */
   void onClose(QCloseEvent*);
 
