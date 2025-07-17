@@ -43,6 +43,7 @@ target_link_libraries(catalyst-paraview
     ParaView::InSitu
     ParaView::VTKExtensionsCore
     VTK::IOCatalystConduit
+    VTK::FiltersCore
     ParaView::RemotingServerManager)
 
 _vtk_module_optional_dependency_exists(VTK::ParallelMPI
