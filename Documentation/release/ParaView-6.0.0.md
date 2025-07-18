@@ -502,9 +502,9 @@ Example syntax for a reverse connection server with a random forwarded port betw
 </Server>
 ```
 
-## User interface settings unversionned
+## User interface settings are now unversioned
 
-ParaView now uses unversionned user interface settings, which means it is no longer necessary to copy over the user interface settings when changing ParaView version. The file is named `ParaView.ini` and can be found under the standard user configuration.
+ParaView no longer uses versioned user interface settings files, which means it is no longer necessary to copy over the user interface settings when updating ParaView versions. The file is named `ParaView.ini` and can be found in standard user configuration file storage locations.
 
 ## Site settings for user interface settings
 
