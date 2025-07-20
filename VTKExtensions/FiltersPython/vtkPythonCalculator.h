@@ -11,12 +11,18 @@
  * to the output as an array. See numpy and paraview.vtk documentation
  * for the list of available functions.
  *
- * This filter tries to make it easy for the user to write expressions
- * by defining certain variables. The filter tries to assign each array
- * to a variable of the same name. If the name of the array is not a
- * valid Python variable, it has to be accessed through a dictionary called
- * arrays (i.e. arrays['array_name']). The points can be accessed using the
- * points variable.
+ * The variables available in the expression evaluation scope are as follows:
+ * \li sanitized array names for all arrays in the chosen ArrayAssociation.
+ * \li input: refers to the input dataset (wrapped as
+ * vtk.numpy_interface.dataset_adapter.DataObject or subclass).
+ * \li current_time: the current time in ParaView's time controls, defined by the
+ *   vtkStreamingDemandDrivenPipeline.UPDATE_TIME_STEP() from the filter's executive.
+ * \li time_value: vtkDataObject::DATA_TIME_STEP() from input.
+ * \li t_value: same as time_value, but with a shorter name.
+ * \li time_index: position of the time_value in the time_steps array, if any
+ * \li t_index: same as time_index, but with a shorter name.
+ * \li time_steps: vtkDataObject::TIME_STEPS() from the input, if any
+ * \li t_steps: same as time_steps, but with a shorter name.
  */
 
 #ifndef vtkPythonCalculator_h
