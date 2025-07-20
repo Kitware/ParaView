@@ -108,6 +108,10 @@ protected:
   // overridden to allow multiple inputs to port 0
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
+  // ovveridden to set a time range so the filter is updated when a timestep changes.
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
+
   // overridden to allow string substitutions for the Expression
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
