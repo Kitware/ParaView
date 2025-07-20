@@ -119,6 +119,26 @@ if not equal(value, expected):
   errors += 1
   print ("Error: Expected ", expected, " and got ", value)
 
+# update expression to test current_time variable
+annotation.Expression = '"%f" % (current_time)'
+time = timesteps[4]
+annotation.UpdatePipeline(time)
+annotation.SMProxy.UpdatePropertyInformation()
+value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
+expected = "0.0004"
+if not equal(value, expected):
+    errors += 1
+    print ("Error: Expected ", expected, " and got ", value)
+
+time = timesteps[5]
+annotation.UpdatePipeline(time)
+annotation.SMProxy.UpdatePropertyInformation()
+value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
+expected = "0.0005"
+if not equal(value, expected):
+    errors += 1
+    print ("Error: Expected ", expected, " and got ", value)
+
 # update expression and time to test string substitutions
 annotation.Expression = '"{timeindex} {timevalue} {timerange}"'
 # annotation.Expression = '"%i %f %s" % (t_index, t_value, str(t_range))'
