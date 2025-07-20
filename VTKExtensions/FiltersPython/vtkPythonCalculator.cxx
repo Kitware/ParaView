@@ -55,14 +55,18 @@ int vtkPythonCalculator::RequestInformation(
     return 0;
   }
 
-  // We're not actually supplying any specific time steps, so we set the range to
-  // the largest possible range.
-  double timeRange[2];
-  timeRange[0] = VTK_DOUBLE_MIN;
-  timeRange[1] = VTK_DOUBLE_MAX;
+  vtkInformation* inputInfo = inputVector[0]->GetInformationObject(0);
+  if (inputInfo && !inputInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+  {
+    // We're not actually supplying any specific time steps, so we set the range to
+    // the largest possible range.
+    double timeRange[2];
+    timeRange[0] = VTK_DOUBLE_MIN;
+    timeRange[1] = VTK_DOUBLE_MAX;
+    vtkInformation* outInfo = outputVector->GetInformationObject(0);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+  }
 
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   return 1;
 }
 
