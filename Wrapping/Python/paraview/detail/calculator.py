@@ -186,6 +186,16 @@ def get_data_time(self, do, ininfo):
     return (t, t_index)
 
 
+def get_pipeline_time(self):
+    """Get the pipeline time from the input information."""
+    key  = vtkStreamingDemandDrivenPipeline.UPDATE_TIME_STEP()
+    time = self.GetExecutive().GetOutputInformation(0).Get(key)
+    if time is not None:
+        time = self.GetExecutive().GetOutputInformation(0).Get(key)
+
+    return time
+
+
 def execute(self, expression, multiline=False):
     """
     **Internal Method**
@@ -207,6 +217,7 @@ def execute(self, expression, multiline=False):
         # wrap all input data objects using vtkmodules.numpy_interface.dataset_adapter
         wdo_input = dsa.WrapDataObject(self.GetInputDataObject(0, index))
         t, t_index = get_data_time(self, wdo_input.VTKObject, self.GetInputInformation(0, index))
+        current_time = get_pipeline_time(self)
         wdo_input.time_value = wdo_input.t_value = t
         wdo_input.time_index = wdo_input.t_index = t_index
         inputs.append(wdo_input)
@@ -226,7 +237,8 @@ def execute(self, expression, multiline=False):
     variables.update({"time_value": inputs[0].time_value,
                       "t_value": inputs[0].t_value,
                       "time_index": inputs[0].time_index,
-                      "t_index": inputs[0].t_index})
+                      "t_index": inputs[0].t_index,
+                      "current_time": current_time})
     retVal = compute(inputs, expression, ns=variables, multiline=multiline)
 
     if retVal is not None:

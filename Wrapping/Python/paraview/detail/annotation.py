@@ -64,6 +64,11 @@ def _get_ns(self, do, association):
             ns["t_index"] = ns["time_index"]
         except ValueError:
             pass
+
+    current_time = calculator.get_pipeline_time(self)
+    if current_time is not None:
+        ns["current_time"] = current_time
+
     ns.update(arrays)
     return ns
 

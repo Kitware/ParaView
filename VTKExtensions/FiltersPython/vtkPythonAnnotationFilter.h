@@ -14,9 +14,16 @@
  * \li sanitized array names for all arrays in the chosen ArrayAssociation.
  * \li input: refers to the input dataset (wrapped as
  * vtk.numpy_interface.dataset_adapter.DataObject or subclass).
+ * \li current_time: the current time in ParaView's time controls, defined by the
+ *   vtkStreamingDemandDrivenPipeline.UPDATE_TIME_STEP() from the filter's executive.
  * \li time_value: vtkDataObject::DATA_TIME_STEP() from input.
+ * \li t_value: same as time_value, but with a shorter name.
+ * \li time_index: position of the time_value in the time_steps array, if any
+ * \li t_index: same as time_index, but with a shorter name.
  * \li time_steps: vtkDataObject::TIME_STEPS() from the input, if any
+ * \li t_steps: same as time_steps, but with a shorter name.
  * \li time_range: vtkDataObject::TIME_RANGE() from the input, if any
+ * \li t_range: same as time_range, but with a shorter name.
  *
  * Examples of valid expressions are:
  * \li "Max temp is %s" % max(Temp)
@@ -89,6 +96,8 @@ protected:
   ~vtkPythonAnnotationFilter() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
