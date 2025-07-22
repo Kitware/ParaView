@@ -89,7 +89,7 @@ def execute(self):
               "expression. Verify that the expression is valid.\n\n" \
               "Variables in current scope are %s \n" % (expression, list(ns)), file=sys.stderr)
         raise
-    self.SetComputedAnnotationValue("%s" % result)
+    self.SetComputedAnnotationValue(str(result))
     return True
 
 
