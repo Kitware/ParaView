@@ -309,30 +309,12 @@ def AssignFieldToColorPreset(array_name, preset_name, range_override=None):
     :return: `True` on success, `False` otherwise.
     :rtype: bool"""
 
-    # If the named LUT is not in the presets, see if it was one that was removed and
-    # substitute it with the backwards compatibility helper
-    presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
-    reverse = False
-    if not presets.HasPreset(preset_name):
-        (preset_name, reverse) = (
-            paraview._backwardscompatibilityhelper.lookupTableUpdate(preset_name)
-        )
-
-    # If no alternate LUT exists, raise an exception
-    if not presets.HasPreset(preset_name):
-        raise RuntimeError("no preset with name `%s` present", preset_name)
-
-    # Preset found. Apply it.
     lut = GetColorTransferFunction(array_name)
     if not lut.ApplyPreset(preset_name):
         return False
 
     if range_override:
         lut.RescaleTransferFunction(range_override)
-
-    # Reverse if necessary for backwards compatibility
-    if reverse:
-        lut.InvertTransferFunction()
 
     return True
 

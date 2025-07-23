@@ -53,7 +53,7 @@
    <item row="2" column="0" colspan="2">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tip: &amp;lt;click&amp;gt; to select, &amp;lt;double-click&amp;gt; to apply a preset.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Tip: &amp;lt;click&amp;gt; to select, &amp;lt;double-click&amp;gt; to apply a preset, &amp;lt;Ctrl-C&amp;gt;/&amp;lt;Cmd-C&amp;gt; to copy the preset name.</string>
      </property>
     </widget>
    </item>

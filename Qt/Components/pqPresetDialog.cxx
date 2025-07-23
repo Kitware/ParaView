@@ -188,7 +188,6 @@ public:
             this->data(this->index(idx.row(), defaultColumn), Qt::DisplayRole) != -1)
           {
             font.setBold(true);
-            font.setUnderline(true);
           }
 
           if (!this->Presets->IsPresetBuiltin(idx.row()))

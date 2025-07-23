@@ -66,8 +66,8 @@ assert are_close(rgb_points, lut.RGBPoints)
 
 # In the past, applying Viridis would produce RGBPoints that were ~250 lines
 # long. Verify that we now use `GenerateRGBPoints()` instead.
-preset_name = 'Viridis (matplotlib)'
-lut.SMProxy.ApplyPreset(preset_name)
+preset_name = 'Viridis'
+lut.ApplyPreset(preset_name)
 
 # The LUT points should no longer match the old rgb_points
 assert not are_close(rgb_points, lut.RGBPoints)
@@ -88,7 +88,7 @@ assert are_close(rgb_points, lut.RGBPoints)
 # Now also rescale the colormap to a specific range, and verify
 # that the kwargs show that range.
 new_range = [51, 199]
-lut.SMProxy.RescaleTransferFunction(new_range)
+lut.RescaleTransferFunction(new_range)
 
 # The LUT points should no longer match the old rgb_points
 assert not are_close(rgb_points, lut.RGBPoints)
@@ -111,7 +111,7 @@ assert are_close(rgb_points, lut.RGBPoints)
 # Now manually adjust one of the points, and verify that we instead
 # dump out the whole RGBPoints
 lut.RGBPoints[4] += 0.01
-lut.SMProxy.UpdateVTKObjects()
+lut.UpdateVTKObjects()
 
 state_string = smstate.get_state()
 kwargs = get_kwargs(state_string)
