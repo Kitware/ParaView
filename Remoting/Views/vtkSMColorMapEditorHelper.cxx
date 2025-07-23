@@ -2935,7 +2935,12 @@ std::vector<vtkSMProxy*> vtkSMColorMapEditorHelper::GetSelectedLookupTables(vtkS
   }
   else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
   {
-    return { vtkSMColorMapEditorHelper::GetLookupTable(proxy) };
+    vtkSMProxy* lut = vtkSMColorMapEditorHelper::GetLookupTable(proxy);
+    if (!lut)
+    {
+      return {};
+    }
+    return { lut };
   }
 }
 
