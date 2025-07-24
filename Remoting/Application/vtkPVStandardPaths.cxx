@@ -146,7 +146,7 @@ std::vector<std::string> GetInstallDirectories()
   // If the application path ends with lib/<app_name>-X.X, shared
   // forwarding of the executable was used. Remove that part of the
   // path to get back to the installation root.
-  auto appPathEnds = app_dir.find("/lib/" + app_name + "-" PARAVIEW_VERSION);
+  auto appPathEnds = app_dir.find("/lib/" + app_name + "-" PARAVIEW_VERSION_SHORT);
   std::string rootDirectory = app_dir;
   if (appPathEnds != std::string::npos)
   {
