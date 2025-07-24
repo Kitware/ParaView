@@ -164,6 +164,7 @@ std::vector<std::string> GetInstallDirectories()
   }
 
   installDirectories.push_back(rootDirectory + "/share/" + app_name + "-" PARAVIEW_VERSION);
+  installDirectories.push_back(rootDirectory + "/share/" + app_name + "-" PARAVIEW_VERSION_SHORT);
   installDirectories.push_back(rootDirectory + "/lib");
 #if defined(__APPLE__)
   // paths for app
@@ -172,6 +173,7 @@ std::vector<std::string> GetInstallDirectories()
 
   // path when doing a unix style install.
   installDirectories.push_back(rootDirectory + "/../lib/" + app_name + "-" PARAVIEW_VERSION);
+  installDirectories.push_back(rootDirectory + "/../lib/" + app_name + "-" PARAVIEW_VERSION_SHORT);
 
   installDirectories.push_back(rootDirectory + "/../Support");
   installDirectories.push_back(rootDirectory + "/../../../Support");
