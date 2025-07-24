@@ -313,7 +313,10 @@ documentation:build:
         - .doxygen_build_linux
         - .linux_builder_tags
         - .doxygen_log_artifacts
-        - .doxygen_only
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
+        PV_CI_NIGHTLY_ONLY: "true"
 
 fedora42-doxygen:build:
     extends:

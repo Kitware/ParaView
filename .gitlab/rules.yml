@@ -68,13 +68,3 @@ workflow:
           start_in: 30 minutes
         # Normal jobs on the project run automatically.
         - when: on_success
-
-.doxygen_only:
-    rules:
-        - if: '$CI_MERGE_REQUEST_ID'
-          when: manual
-        - if: '$CI_PIPELINE_SOURCE == "schedule"'
-          when: on_success
-        - if: '$CI_COMMIT_TAG'
-          when: on_success
-        - when: never
