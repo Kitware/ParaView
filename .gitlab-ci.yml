@@ -148,7 +148,9 @@ translations:test:
         - .cmake_translations_linux
         - .linux_tester_tags
         - .cmake_translations_artifacts
-        - .merged_only
+        - .rules
+    variables:
+        PV_CI_MERGED_ONLY: "true"
     needs:
         - fedora42-shared-debug-mpi-python-qt:build
     timeout: 15 minutes
@@ -326,9 +328,10 @@ fedora42-doxygen:build:
 
 superbuild:build:
     extends:
-        - .merged_only
+        - .rules
     stage: build
     variables:
+        PV_CI_MERGED_ONLY: "true"
         PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
         RSYNC_UPLOAD_ENABLE: "true"
     trigger:
