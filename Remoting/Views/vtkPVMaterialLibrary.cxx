@@ -64,7 +64,8 @@ vtkPVMaterialLibrary::vtkPVMaterialLibrary()
 #if defined(_WIN32) || defined(__APPLE__)
     "materials"
 #else
-    "share/paraview-" PARAVIEW_VERSION "/materials"
+    "share/paraview-" PARAVIEW_VERSION "/materials",
+    "share/paraview-" PARAVIEW_VERSION_SHORT "/materials"
 #endif
   };
   // search
