@@ -60,7 +60,7 @@ el7-mindeps-shared-mpi-python:build:
 #         - .cmake_test_linux
 #         - .linux_tester_tags
 #         - .cmake_test_artifacts
-#         - .run_automatically
+#         - .rules
 #     needs:
 #         - el7-mindeps-shared-mpi-python:build
 
@@ -78,7 +78,7 @@ el8-shared-icc-mpi-python:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - el8-shared-icc-mpi-python:build
 
@@ -97,7 +97,7 @@ fedora42-shared-debug-mpi-python-qt:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-debug-mpi-python-qt:build
     timeout: 240 minutes
@@ -116,7 +116,7 @@ fedora42-shared-mpi-python-qt-viskoresoverride:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-mpi-python-qt-viskoresoverride:build
     timeout: 180 minutes
@@ -127,7 +127,7 @@ fedora42-shared-mpi-offscreen-osmesa-python-qt-viskoresoverride:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-mpi-python-qt-viskoresoverride:build
     timeout: 180 minutes
@@ -161,7 +161,7 @@ fedora42-shared-mpi-core:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-mpi-core:build
 
@@ -179,7 +179,7 @@ fedora42-shared-mpi-python-core:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-mpi-python-core:build
 
@@ -211,7 +211,7 @@ macos-arm64-python-qt:test:
         - .cmake_test_macos
         - .macos_arm64_builder_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - macos-arm64-python-qt:build
     timeout: 180 minutes
@@ -230,7 +230,7 @@ macos-x86_64-python-qt:test:
         - .cmake_test_macos
         - .macos_x86_64_builder_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - macos-x86_64-python-qt:build
 
@@ -251,7 +251,7 @@ windows-vs2022-kits-mpi-python-qt:test:
         - .cmake_test_windows
         - .windows_test_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - windows-vs2022-kits-mpi-python-qt:build
     timeout: 90 minutes
@@ -271,7 +271,7 @@ windows-vs2022-qt:test:
         - .cmake_test_windows
         - .windows_test_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - windows-vs2022-qt:build
     timeout: 90 minutes

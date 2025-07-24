@@ -30,8 +30,19 @@ workflow:
         # Skip pipelines in all other cases
         - when: never
 
-.run_automatically:
+# Generic rules block to apply if the pipeline would be run
+.rules:
     rules:
+        # Normal jobs run automatically.
+        - if: '$CI_MERGE_REQUEST_ID'
+          when: on_success
+        # Jobs on a tag run right away.
+        - if: '$CI_COMMIT_TAG'
+          when: on_success
+        # Jobs on a schedule run right away.
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
+          when: on_success
+        # Normal jobs on the project run automatically.
         - when: on_success
 
 .run_scheduled:
