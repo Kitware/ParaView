@@ -49,7 +49,9 @@ el7-mindeps-shared-mpi-python:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 # Disable testing for now. Even with a modern Mesa and the llvmpipe backend,
 # modern enough OpenGL is just not working in CI. Rather than disabling just
@@ -70,7 +72,9 @@ el8-shared-icc-mpi-python:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 el8-shared-icc-mpi-python:test:
     extends:
@@ -88,7 +92,9 @@ fedora42-shared-debug-mpi-python-qt:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
     timeout: 90 minutes
 
 fedora42-shared-debug-mpi-python-qt:test:
@@ -108,7 +114,9 @@ fedora42-shared-mpi-python-qt-viskoresoverride:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 fedora42-shared-mpi-python-qt-viskoresoverride:test:
     extends:
@@ -153,7 +161,9 @@ fedora42-shared-mpi-core:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 fedora42-shared-mpi-core:test:
     extends:
@@ -171,7 +181,9 @@ fedora42-shared-mpi-python-core:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 fedora42-shared-mpi-python-core:test:
     extends:
@@ -191,7 +203,9 @@ fedora42-tidy:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_tidy_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
     # clang-tidy is *really* slow because it isn't cached.
     timeout: 4 hours
 
@@ -203,7 +217,9 @@ macos-arm64-python-qt:build:
         - .cmake_build_macos
         - .macos_arm64_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 macos-arm64-python-qt:test:
     extends:
@@ -222,7 +238,9 @@ macos-x86_64-python-qt:build:
         - .cmake_build_macos
         - .macos_x86_64_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 macos-x86_64-python-qt:test:
     extends:
@@ -242,7 +260,9 @@ windows-vs2022-kits-mpi-python-qt:build:
         - .cmake_build_windows
         - .windows_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
     timeout: 90 minutes
 
 windows-vs2022-kits-mpi-python-qt:test:
@@ -262,7 +282,9 @@ windows-vs2022-qt:build:
         - .cmake_build_windows
         - .windows_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
     timeout: 90 minutes
 
 windows-vs2022-qt:test:
@@ -294,7 +316,9 @@ fedora42-doxygen:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_doxygen_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 # Triggers
 
