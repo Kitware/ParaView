@@ -116,6 +116,11 @@ paraview_add_client_server_tests(
   TEST_SCRIPTS HyperTreeGridGhostCellsGeneratorComposite.xml
   NUMSERVERS 2
   )
+paraview_add_client_server_tests(
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS RedistributeHTG.xml
+  NUMSERVERS 4
+  )
 
 # AppendReduceFilter needs specifically four servers to generate duplicate points
 paraview_add_client_server_tests(
