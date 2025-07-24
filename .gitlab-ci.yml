@@ -302,7 +302,7 @@ fedora42-doxygen:build:
 
 superbuild:build:
     extends:
-        - .run_superbuild_trigger
+        - .merged_only
     stage: build
     variables:
         PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME

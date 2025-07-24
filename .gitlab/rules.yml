@@ -57,12 +57,6 @@ workflow:
           when: never
         - when: on_success
 
-.run_superbuild_trigger:
-    rules:
-        - if: '$CI_MERGE_REQUEST_ID'
-          when: never
-        - when: on_success
-
 .doxygen_only:
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
