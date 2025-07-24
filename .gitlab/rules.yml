@@ -1,12 +1,38 @@
 # Rules for where jobs can run
 
+# When to even consider running a pipeline
+workflow:
+    rules:
+        # Run for merge requests.
+        - if: '$CI_MERGE_REQUEST_ID'
+          when: always
+          auto_cancel:
+              # Cancel all pipeline jobs if a new commit comes in on the branch/tag.
+              on_new_commit: interruptible
+        # If this is not a MR, do not run for other projects.
+        - if: '$CI_PROJECT_PATH != "paraview/paraview"'
+          when: never
+        # Run for protected branches.
+        - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+          when: always
+          auto_cancel:
+              # Cancel all pipeline jobs if a new commit comes in on the branch.
+              on_new_commit: interruptible
+        # Run for tags.
+        - if: '$CI_COMMIT_TAG'
+          when: always
+        # Run for schedules.
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
+          when: always
+          auto_cancel:
+              # Never cancel scheduled pipelines because of new commits
+              on_new_commit: none
+        # Skip pipelines in all other cases
+        - when: never
+
 .run_automatically:
     rules:
-        - if: '$CI_MERGE_REQUEST_ID'
-          when: on_success
-        - if: '$CI_PROJECT_PATH == "paraview/paraview"'
-          when: on_success
-        - when: never
+        - when: on_success
 
 .run_scheduled:
     rules:
@@ -14,7 +40,7 @@
 # manually for MRs. disabling these to make it easier to do tests on MRs
 #        - if: '$CI_MERGE_REQUEST_ID'
 #          when: manual
-        - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "paraview/paraview"'
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
           when: on_success
         - when: never
 
@@ -22,33 +48,27 @@
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
           when: manual
-        - if: '$CI_PROJECT_PATH == "paraview/paraview"'
-          when: delayed
+        - when: delayed
           start_in: 30 minutes
-        - when: never
 
 .merged_only:
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
           when: never
-        - if: '$CI_PROJECT_PATH == "paraview/paraview"'
-          when: on_success
-        - when: never
+        - when: on_success
 
 .run_superbuild_trigger:
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
           when: never
-        - if: '$CI_PROJECT_PATH == "paraview/paraview"'
-          when: on_success
-        - when: never
+        - when: on_success
 
 .doxygen_only:
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
           when: manual
-        - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "paraview/paraview"'
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
           when: on_success
-        - if: '$CI_COMMIT_TAG && $CI_PROJECT_PATH == "paraview/paraview"'
+        - if: '$CI_COMMIT_TAG'
           when: on_success
         - when: never
