@@ -43,12 +43,6 @@
           when: on_success
         - when: never
 
-.upload_only:
-    rules:
-      - if: '$RSYNC_UPLOAD_ENABLE == "true"'
-        when: on_success
-      - when: never
-
 .doxygen_only:
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
