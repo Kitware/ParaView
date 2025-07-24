@@ -39,7 +39,10 @@ stages:
 #         - .centos7
 #         - .spack_build_linux
 #         - .linux_builder_tags
-#         - .run_scheduled
+#         - .rules
+#     variables:
+#         PV_CI_MERGED_ONLY: "true"
+#         PV_CI_NIGHTLY_ONLY: "true"
 
 ## Linux
 
