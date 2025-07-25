@@ -384,6 +384,7 @@ vtkInformationKeyRestrictedMacro(vtkPVRenderView, VIEW_PLANES, DoubleVector, 24)
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 
 #define VTK_STEREOTYPE_SAME_AS_CLIENT 0
+#define VTK_STEREOTYPE_REMOTELY_MANAGED -1
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -3104,10 +3105,8 @@ void vtkPVRenderView::SetStereoRender(int val)
   this->GetRenderWindow()->SetStereoRender(val);
 }
 
-//----------------------------------------------------------------------------
-namespace
-{
-inline int vtkGetNumberOfRendersPerFrame(int stereoMode)
+//------------------------------------------------------------------------------
+int vtkPVRenderView::GetNumberOfRendersPerFrame(int stereoMode)
 {
   switch (stereoMode)
   {
@@ -3129,6 +3128,27 @@ inline int vtkGetNumberOfRendersPerFrame(int stereoMode)
       return 1;
   }
 }
+
+//------------------------------------------------------------------------------
+int vtkPVRenderView::GetCompatibleStereoType(int stereoMode)
+{
+  int rendersPerFrame = vtkPVRenderView::GetNumberOfRendersPerFrame(stereoMode);
+  if (rendersPerFrame == 2)
+  {
+    return VTK_STEREO_EMULATE;
+  }
+  return VTK_STEREO_LEFT;
+}
+
+//------------------------------------------------------------------------------
+bool vtkPVRenderView::AreStereoTypesCompatible(int mode1, int mode2)
+{
+  if (vtkPVRenderView::GetNumberOfRendersPerFrame(mode1) ==
+    vtkPVRenderView::GetNumberOfRendersPerFrame(mode2))
+  {
+    return true;
+  }
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -3152,71 +3172,74 @@ void vtkPVRenderView::UpdateStereoProperties()
   }
 
   int client_type = this->StereoType;
-  int server_type = (this->ServerStereoType == VTK_STEREOTYPE_SAME_AS_CLIENT)
-    ? client_type
-    : this->ServerStereoType;
+  int server_type = this->ServerStereoType;
+
+  vtkRemotingCoreConfiguration* config = vtkRemotingCoreConfiguration::GetInstance();
+  auto ptype = vtkProcessModule::GetProcessType();
+  bool is_server = false;
+  if (ptype == vtkProcessModule::PROCESS_RENDER_SERVER || ptype == vtkProcessModule::PROCESS_SERVER)
+  {
+    is_server = true;
+  }
+
+  if (server_type == VTK_STEREOTYPE_SAME_AS_CLIENT)
+  {
+    server_type = client_type;
+  }
 
   if ((this->InTileDisplayMode() || this->InCaveDisplayMode()) && !this->GetInCaptureScreenshot())
   {
     // in this mode, the render server processes are showing results to the user
     // and the stereo mode is more relevant on the server side than the client
     // side since the client is merely a driver.
-    if (::vtkGetNumberOfRendersPerFrame(server_type) !=
-      ::vtkGetNumberOfRendersPerFrame(client_type))
+    if (server_type == VTK_STEREOTYPE_REMOTELY_MANAGED)
     {
-      if (::vtkGetNumberOfRendersPerFrame(server_type) == 2)
+      if (is_server)
       {
-        client_type = VTK_STEREO_EMULATE;
+        server_type = config->GetStereoType();
       }
       else
       {
-        client_type = server_type;
+        // In this case, the proxy figured out a compatible client type and passed
+        // it to us, so we can just pick anything compatible for the server.
+        server_type = vtkPVRenderView::GetCompatibleStereoType(client_type);
       }
+    }
+
+    if (!vtkPVRenderView::AreStereoTypesCompatible(client_type, server_type))
+    {
+      client_type = vtkPVRenderView::GetCompatibleStereoType(server_type);
+      vtkWarningMacro(<< "Selected client type of " << this->StereoType << " is not compatible "
+                      << "with selected server type, " << this->ServerStereoType
+                      << ". Overriding the client to be " << client_type << ".");
     }
   }
   else
   {
     // the client is the main viewport for the user, the server side processes
-    // are not showing final results to the user. The server never needs any 2
-    // pass mode except VTK_STEREO_EMULATE.
-    if (::vtkGetNumberOfRendersPerFrame(client_type) == 2)
+    // are not showing final results to the user. The server never only needs
+    // something compatible.
+    if (!vtkPVRenderView::AreStereoTypesCompatible(client_type, server_type))
     {
-      server_type = VTK_STEREO_EMULATE;
-    }
-    else
-    {
-      server_type = client_type;
+      server_type = vtkPVRenderView::GetCompatibleStereoType(client_type);
     }
   }
 
-  if (this->StereoType != client_type)
-  {
-    vtkWarningMacro("Incompatible stereo types for client and server ranks. "
-                    "Forcing the client to use '"
-      << vtkRenderWindow::GetStereoTypeAsString(client_type) << "'.");
-    this->StereoType = client_type;
-  }
+  this->StereoType = client_type;
+  this->ServerStereoType = server_type;
 
-  if (this->ServerStereoType != server_type)
-  {
-    // we don't warn here since this only happens in modes where the server
-    // not showing final results to the user.
-    this->ServerStereoType = server_type;
-  }
-
-  // by this point, the ServerStereoType should have been updated to be a type
-  // VTK knows about.
+  // By this point, the StereoType and ServerStereoType should have been updated
+  // to be a type VTK knows about.
   assert(this->ServerStereoType != VTK_STEREOTYPE_SAME_AS_CLIENT);
+  assert(this->ServerStereoType != VTK_STEREOTYPE_REMOTELY_MANAGED);
 
-  switch (vtkProcessModule::GetProcessType())
+  if (is_server)
   {
-    case vtkProcessModule::PROCESS_RENDER_SERVER:
-    case vtkProcessModule::PROCESS_SERVER:
-      this->GetRenderWindow()->SetStereoType(this->ServerStereoType);
-      break;
-
-    default:
-      this->GetRenderWindow()->SetStereoType(this->StereoType);
+    this->GetRenderWindow()->SetStereoType(this->ServerStereoType);
+  }
+  else
+  {
+    this->GetRenderWindow()->SetStereoType(this->StereoType);
   }
 }
 

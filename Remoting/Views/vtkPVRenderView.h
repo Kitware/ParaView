@@ -764,6 +764,17 @@ public:
 
   ///@{
   /**
+   * Convenience methods used to ensure stereo types used on client
+   * and servers remain compatible with each other, i.e. require the
+   * same number of render passes.
+   */
+  static int GetNumberOfRendersPerFrame(int stereoMode);
+  static int GetCompatibleStereoType(int stereoMode);
+  static bool AreStereoTypesCompatible(int mode1, int mode2);
+  ///@}
+
+  ///@{
+  /**
    * Forward to vtkRenderWindow.
    */
   void SetStereoCapableWindow(int val);

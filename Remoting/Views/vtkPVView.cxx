@@ -103,6 +103,11 @@ public:
       {
         this->GetState()->PushFramebufferBindings();
       }
+      if (this->Context && this->Context->GetStereoType() == VTK_STEREO_LEFT ||
+        this->Context->GetStereoType() == VTK_STEREO_RIGHT)
+      {
+        this->SetStereoType(this->Context->GetStereoType());
+      }
       this->Superclass::Render();
       if (auto state = this->GetState())
       {

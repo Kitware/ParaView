@@ -16,6 +16,7 @@
 #include "vtkRemotingCoreModule.h" // for exports
 #include "vtkTuple.h"              // for vtkTuple
 #include <memory>                  // for std::unique_ptr
+#include <string>                  // for std::string
 
 class VTKREMOTINGCORE_EXPORT vtkDisplayConfiguration : public vtkObject
 {
@@ -120,6 +121,15 @@ public:
 
   ///@{
   /**
+   * Returns the stereo type for the given display index. Returns -1 if no stereo
+   * type attribute was present on the element, or if the attribute could not be
+   * parsed as one of the understood types
+   */
+  int GetStereoType(int index) const;
+  ///@}
+
+  ///@{
+  /**
    * Returns the number of child elements under the optional IndependentViewers
    * element.  If provided, these are used to set default EyeSeparation for each
    * of the independent viewers listed in the Machine elements.
@@ -149,6 +159,23 @@ public:
    * Parses a PVX file to load display configuration information.
    */
   bool LoadPVX(const char* fname);
+
+  ///@{
+  /**
+   * Return an integer stereo type corresponding to the given string value,
+   * or -1 if the string value is not recognized as a stereo type.
+   */
+  static int ParseStereoType(const std::string& value);
+  ///@}
+
+  ///@{
+  /**
+   * Returns the string representation of the given stereo type. Returns
+   * the empty string if no stereo type attribute was present on the element, or
+   * if the attribute could not be parsed as one of the understood types.
+   */
+  static const char* GetStereoTypeAsString(int stereoType);
+  ///@}
 
 protected:
   vtkDisplayConfiguration();

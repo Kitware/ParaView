@@ -11,7 +11,7 @@
 #include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 
-#include <iostream>
+// #include <iostream>
 #include <vtk_cli11.h>
 #include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -19,58 +19,49 @@
 namespace
 {
 // Redefined from vtkRenderWindow.h
-const int VTK_STEREO_CRYSTAL_EYES = 1;
-const int VTK_STEREO_RED_BLUE = 2;
-const int VTK_STEREO_INTERLACED = 3;
-const int VTK_STEREO_LEFT = 4;
-const int VTK_STEREO_RIGHT = 5;
-const int VTK_STEREO_DRESDEN = 6;
 const int VTK_STEREO_ANAGLYPH = 7;
-const int VTK_STEREO_CHECKERBOARD = 8;
-const int VTK_STEREO_SPLITVIEWPORT_HORIZONTAL = 9;
-const int VTK_STEREO_FAKE = 10;
-const int VTK_STEREO_EMULATE = 11;
 
-int ParseStereoType(const std::string& value)
+int ParseStereoTypeOrThrow(const std::string& value)
 {
-  if (value == "Crystal Eyes")
+  int retVal = vtkDisplayConfiguration::ParseStereoType(value);
+  if (retVal == -1)
   {
-    return VTK_STEREO_CRYSTAL_EYES;
+    throw CLI::ValidationError("Invalid stereo-type specified.");
   }
-  else if (value == "Red-Blue")
-  {
-    return VTK_STEREO_RED_BLUE;
-  }
-  else if (value == "Interlaced")
-  {
-    return VTK_STEREO_INTERLACED;
-  }
-  else if (value == "Dresden")
-  {
-    return VTK_STEREO_DRESDEN;
-  }
-  else if (value == "Anaglyph")
-  {
-    return VTK_STEREO_ANAGLYPH;
-  }
-  else if (value == "Checkerboard")
-  {
-    return VTK_STEREO_CHECKERBOARD;
-  }
-  else if (value == "SplitViewportHorizontal")
-  {
-    return VTK_STEREO_SPLITVIEWPORT_HORIZONTAL;
-  }
-  throw CLI::ValidationError("Invalid stereo-type specified.");
+  return retVal;
 }
 }
+
+class vtkRemotingCoreConfiguration::vtkInternals
+{
+public:
+  std::string ValidateStereoType(const std::string& value)
+  {
+    int stereoType = ::ParseStereoTypeOrThrow(value);
+    if (stereoType > 0)
+    {
+      this->StereoTypeOnCli = true;
+    }
+    return vtk::to_string(stereoType);
+  }
+
+  void CliStereoEnabled(int count)
+  {
+    if (count > 0)
+    {
+      this->StereoEnabledOnCli = true;
+    }
+  }
+
+  bool StereoEnabledOnCli = false;
+  bool StereoTypeOnCli = false;
+};
 
 vtkStandardNewMacro(vtkRemotingCoreConfiguration);
 //----------------------------------------------------------------------------
 vtkRemotingCoreConfiguration::vtkRemotingCoreConfiguration()
+  : Internals(new vtkRemotingCoreConfiguration::vtkInternals())
 {
-  this->StereoType = VTK_STEREO_ANAGLYPH;
-
   // initialize host names
   vtksys::SystemInformation sys_info;
   sys_info.RunOSCheck();
@@ -129,30 +120,61 @@ bool vtkRemotingCoreConfiguration::GetIsInCave() const
 }
 
 //----------------------------------------------------------------------------
-const char* vtkRemotingCoreConfiguration::GetStereoTypeAsString() const
+const char* vtkRemotingCoreConfiguration::GetStereoTypeAsString()
 {
-  switch (this->StereoType)
+  return vtkDisplayConfiguration::GetStereoTypeAsString(this->GetStereoType());
+}
+
+//----------------------------------------------------------------------------
+int vtkRemotingCoreConfiguration::GetStereoType()
+{
+  // The command line has the highest priority, so if that is non-default, it
+  // is the answer we return    optStereoType
+  if (this->Internals->StereoTypeOnCli)
   {
-    case VTK_STEREO_CRYSTAL_EYES:
-      return "Crystal Eyes";
-    case VTK_STEREO_RED_BLUE:
-      return "Red-Blue";
-    case VTK_STEREO_INTERLACED:
-      return "Interlaced";
-    case VTK_STEREO_LEFT:
-      return "Left";
-    case VTK_STEREO_RIGHT:
-      return "Right";
-    case VTK_STEREO_DRESDEN:
-      return "Dresden";
-    case VTK_STEREO_ANAGLYPH:
-      return "Anaglyph";
-    case VTK_STEREO_CHECKERBOARD:
-      return "Checkerboard";
-    case VTK_STEREO_SPLITVIEWPORT_HORIZONTAL:
-      return "SplitViewportHorizontal";
+    return this->StereoType;
   }
-  return nullptr;
+
+  if (this->GetIsInCave())
+  {
+    // Otherwise check .pvx file for presence and validity of a stereo attribute on the Machine
+    auto controller = vtkMultiProcessController::GetGlobalController();
+    const int rank = controller->GetLocalProcessId();
+    int pvxStereoType = this->DisplayConfiguration->GetStereoType(rank);
+    if (pvxStereoType > 0)
+    {
+      return pvxStereoType;
+    }
+  }
+
+  // Preserves the previous default behavior
+  return VTK_STEREO_ANAGLYPH;
+}
+
+//----------------------------------------------------------------------------
+bool vtkRemotingCoreConfiguration::GetUseStereoRendering()
+{
+  // Highest precedence is command line
+  if (this->Internals->StereoEnabledOnCli)
+  {
+    return true;
+  }
+
+  if (this->GetIsInCave())
+  {
+    // Otherwise check .pvx file for presence and validity of a stereo attribute on the Machine
+    auto controller = vtkMultiProcessController::GetGlobalController();
+    const int rank = controller->GetLocalProcessId();
+    int pvxStereoType = this->DisplayConfiguration->GetStereoType(rank);
+    if (pvxStereoType > 0)
+    {
+      return true;
+    }
+  }
+
+  // If we didn't enable on the cli, and .pvx has no valid stereo attribute, we are
+  // not using stereo rendering
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -511,14 +533,17 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
 
   // Stereo
   auto stereoGroup = app->add_option_group("Stereo", "Stereo rendering options");
-  stereoGroup->add_flag("--stereo", this->UseStereoRendering, "Enable stereo rendering.");
+
+  auto callback = [this](int count) { this->Internals->CliStereoEnabled(count); };
+  stereoGroup->add_flag_function("--stereo", callback, "Enable stereo rendering.");
   stereoGroup
     ->add_option("--stereo-type", this->StereoType,
       "Specify the stereo type to use. Possible values are 'Crystal Eyes', "
-      "'Red-Blue', 'Interlaced', 'Dresden', 'Anaglyph', 'Checkerboard', or "
+      "'Red-Blue', 'Interlaced', 'Left', 'Right', 'Dresden', 'Anaglyph', 'Checkerboard', or "
       "'SplitViewportHorizontal'.")
     ->needs("--stereo")
-    ->transform([](const std::string& value) { return vtk::to_string(::ParseStereoType(value)); });
+    ->transform(
+      [this](const std::string& value) { return this->Internals->ValidateStereoType(value); });
 
   stereoGroup
     ->add_option("--eye-separation", this->EyeSeparation, "Specify eye separation distance.")
@@ -616,8 +641,8 @@ void vtkRemotingCoreConfiguration::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Timeout: " << this->Timeout << endl;
   os << indent << "TimeoutCommand: " << this->TimeoutCommand << endl;
   os << indent << "TimeoutCommandInterval: " << this->TimeoutCommandInterval << endl;
-  os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
-  os << indent << "StereoType: " << this->StereoType << endl;
+  os << indent << "UseStereoRendering: " << this->GetUseStereoRendering() << endl;
+  os << indent << "StereoType: " << this->GetStereoType() << endl;
   os << indent << "EyeSeparation: " << this->GetEyeSeparation() << endl;
   os << indent << "TileDimensions: " << this->TileDimensions[0] << ", " << this->TileDimensions[1]
      << endl;
