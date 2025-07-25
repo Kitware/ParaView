@@ -319,10 +319,10 @@ void pqPythonTabWidget::addNewTabWidget()
 bool pqPythonTabWidget::saveOnClose()
 {
   bool rValue = true;
-  for (int i = 0; i < this->count() - 1; ++i)
+  for (int i = 0; rValue && i < this->count() - 1; ++i)
   {
     pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(i);
-    if (widget)
+    if (widget && !widget->isLinked())
     {
       rValue &= widget->saveOnClose();
     }
