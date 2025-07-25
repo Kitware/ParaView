@@ -293,7 +293,9 @@ public:
   int GetNumberOfDisplays();
 
   /**
-   * @brief Get the remotely configured eye separation.
+   * @brief Get the remotely configured eye separation. This always returns the
+   * original value specified in the pvx file, even if a change on the client has
+   * caused the value to change on the servers.
    *
    * @return int
    */
@@ -371,6 +373,43 @@ public:
    * Set whether the window is currently resizing.
    */
   vtkSetMacro(ResizingWindow, bool);
+
+  /**
+   * @brief Get the optional name of the screen at the given index, or the
+   * empty string, if no name was set.
+   *
+   * @return const char*
+   */
+  const char* GetName(int index);
+
+  /**
+   * @brief Get the optional viewer id associated with the screen at the
+   * given index, or -1 if no viewer id was set.
+   *
+   * @return int
+   */
+  int GetViewerId(int index);
+
+  /**
+   * @brief Get the number of configured IndependentViewers in the pvx file.
+   *
+   * @return int
+   */
+  int GetNumberOfViewers();
+
+  /**
+   * @brief Get the id of the given indexed viewer.
+   *
+   * @return int
+   */
+  int GetId(int viewerIndex);
+
+  /**
+   * @brief Get the eye separation of the given indexed viewer.
+   *
+   * @return double
+   */
+  double GetEyeSeparation(int viewerIndex);
 
 protected:
   vtkSMRenderViewProxy();

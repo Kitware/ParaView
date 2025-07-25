@@ -244,7 +244,7 @@ vtk_module_add_module(ParaView::RemotingViews
   # This is code generated from ColorMaps.json. Exclude until issue 22351 is fixed.
   SPDX_SKIP_REGEX "vtkSMTransferFunctionPresetsBuiltin"
 )
-  
+
 
 paraview_add_server_manager_xmls(
   XMLS Resources/2dwidgets_remotingviews.xml

@@ -204,6 +204,7 @@ void vtkSMVRPythonInteractorStyleProxy::UpdateVTKObjects()
   this->ReloadPythonFile();
 }
 
+// ----------------------------------------------------------------------------
 bool vtkSMVRPythonInteractorStyleProxy::Update()
 {
 #if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON

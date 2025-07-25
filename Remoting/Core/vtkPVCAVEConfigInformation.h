@@ -87,6 +87,13 @@ public:
 
   ///@{
   /**
+   * Return the (optional) name of the indexed display, or nullptr if none
+   * was set.
+   */
+  virtual const char* GetName(int index);
+
+  ///@{
+  /**
    * Return whether or not the indexed display was configured to show 2D overlays.
    */
   virtual bool GetShow2DOverlays(int index);
@@ -125,6 +132,35 @@ public:
    * Return the upper right corner of the indexed display.
    */
   virtual vtkTuple<double, 3> GetUpperRight(int index);
+  ///@}
+
+  ///@{
+  /**
+   * Return the viewer id of the given display index, or -1 if none
+   * was set.
+   */
+  int GetViewerId(int index);
+  ///@}
+
+  ///@{
+  /**
+   * Return the number of configured independent viewers.
+   */
+  int GetNumberOfViewers();
+  ///@}
+
+  ///@{
+  /**
+   * Return the id attribute of the indexed independent viewer.
+   */
+  int GetId(int viewerIndex);
+  ///@}
+
+  ///@{
+  /**
+   * Return the eye separation attribute of the indexed independent viewer.
+   */
+  double GetEyeSeparation(int viewerIndex);
   ///@}
 
 protected:

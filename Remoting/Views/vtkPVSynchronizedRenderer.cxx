@@ -8,6 +8,7 @@
 #include "vtkCaveSynchronizedRenderers.h"
 #include "vtkFXAAOptions.h"
 #include "vtkImageProcessingPass.h"
+#include "vtkIndependentViewerCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLFXAAPass.h"
 #include "vtkOpenGLRenderer.h"
@@ -409,6 +410,22 @@ void vtkPVSynchronizedRenderer::SetRenderer(vtkRenderer* ren)
 
   vtkSetObjectBodyMacro(Renderer, vtkOpenGLRenderer, glRenderer);
   this->SetupPasses();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetIndependentViewers(vtkIndependentViewerCollection* viewers)
+{
+  if (viewers != nullptr)
+  {
+    if (this->ParallelSynchronizer)
+    {
+      this->ParallelSynchronizer->SetIndependentViewers(viewers);
+    }
+    if (this->CSSynchronizer)
+    {
+      this->CSSynchronizer->SetIndependentViewers(viewers);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------

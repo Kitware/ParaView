@@ -17,7 +17,6 @@
 #include "pqRenderView.h"
 
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 
 // -----------------------------------------------------------------------------
@@ -27,6 +26,7 @@ vtkStandardNewMacro(vtkSMVRControlLocationRelativeStyleProxy);
 vtkSMVRControlLocationRelativeStyleProxy::vtkSMVRControlLocationRelativeStyleProxy()
   : Superclass()
 {
+  this->AddTrackerRole("Tracker");
   this->AddButtonRole("Reset");
   this->AddButtonRole("Move");
   this->EnableMovePoint = false;
@@ -41,7 +41,7 @@ bool vtkSMVRControlLocationRelativeStyleProxy::Update()
 {
   if (this->ControlledProxy == nullptr || this->ControlledPropertyName == nullptr)
   {
-    std::cout << "Inside Update() but missing proxy or property" << std::endl;
+    vtkWarningMacro("Inside Update() but missing proxy or property");
     return true;
   }
 
@@ -124,6 +124,7 @@ void vtkSMVRControlLocationRelativeStyleProxy::HandleButton(const vtkVREvent& da
   {
     vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName)
       .Set(this->OriginalPoint, 3);
+    this->ControlledProxy->UpdateVTKObjects();
   }
 }
 

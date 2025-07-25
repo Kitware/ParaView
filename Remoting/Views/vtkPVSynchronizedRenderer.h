@@ -25,6 +25,7 @@ class vtkIceTSynchronizedRenderers;
 class vtkImageProcessingPass;
 class vtkOpenGLRenderer;
 class vtkOrderedCompositingHelper;
+class vtkIndependentViewerCollection;
 class vtkPVSession;
 class vtkRenderPass;
 class vtkRenderer;
@@ -65,6 +66,8 @@ public:
    * Set the renderer that is being synchronized.
    */
   void SetRenderer(vtkRenderer*);
+
+  void SetIndependentViewers(vtkIndependentViewerCollection* viewers);
 
   ///@{
   /**

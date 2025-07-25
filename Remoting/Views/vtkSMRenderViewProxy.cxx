@@ -11,6 +11,7 @@
 #include "vtkExtractSelectedFrustum.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
+#include "vtkIndependentViewerCollection.h"
 #include "vtkInformation.h"
 #include "vtkIntArray.h"
 #include "vtkLogger.h"
@@ -119,6 +120,16 @@ void RotateElevation(vtkCamera* camera, double angle)
   {                                                                                                \
     vtkErrorWithObjectMacro(_obj, << "Display index " << _idx << " out of range, there are "       \
                                   << nDisplays << " displays.");                                   \
+    return _err_result;                                                                            \
+  }
+
+#define vtkCheckNumViewersMacro(_obj, _idx, _err_result)                                           \
+  int nViewers = _obj->GetNumberOfViewers();                                                       \
+                                                                                                   \
+  if (_idx < 0 || _idx >= nViewers)                                                                \
+  {                                                                                                \
+    vtkErrorWithObjectMacro(                                                                       \
+      _obj, << "Viewer index " << _idx << " out of range, there are " << nViewers << " viewers."); \
     return _err_result;                                                                            \
   }
 
@@ -242,6 +253,55 @@ public:
     vtkCheckNumDisplaysMacro(info, index, errorResult);
 
     return info->GetUpperRight(index);
+  }
+
+  const char* GetName(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, "");
+    vtkCheckNumDisplaysMacro(info, index, "");
+
+    return info->GetName(index);
+  }
+
+  int GetViewerId(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+    vtkCheckNumDisplaysMacro(info, index, -1);
+
+    return info->GetViewerId(index);
+  }
+
+  int GetNumberOfViewers(vtkSMSession* session)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+
+    return info->GetNumberOfViewers();
+  }
+
+  int GetId(vtkSMSession* session, int viewerIndex)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+    vtkCheckNumViewersMacro(info, viewerIndex, -1);
+
+    return info->GetId(viewerIndex);
+  }
+
+  double GetEyeSeparation(vtkSMSession* session, int viewerIndex)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+    vtkCheckNumViewersMacro(info, viewerIndex, -1);
+
+    return info->GetEyeSeparation(viewerIndex);
   }
 
 private:
@@ -711,11 +771,21 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     vtkCamera::SafeDownCast(this->GetSubProxy("ActiveCamera")->GetClientSideObject());
   rv->SetActiveCamera(camera);
 
+  if (this->GetIsInCAVE())
+  {
+    // Update the local proxy property from the remote cave configuration
+    vtkSMPropertyHelper(this, "EyeSeparation").Set(this->GetEyeSeparation());
+  }
+
   vtkEventForwarderCommand* forwarder = vtkEventForwarderCommand::New();
   forwarder->SetTarget(this);
   rv->AddObserver(vtkCommand::SelectionChangedEvent, forwarder);
   rv->AddObserver(vtkCommand::ResetCameraEvent, forwarder);
   forwarder->Delete();
+
+  vtkIndependentViewerCollection* viewers = vtkIndependentViewerCollection::SafeDownCast(
+    this->GetSubProxy("IndependentViewers")->GetClientSideObject());
+  rv->SetIndependentViewers(viewers);
 
   // We'll do this for now. But we need to not do this here. I am leaning
   // towards not making stereo a command line option as mentioned by a very
@@ -1805,4 +1875,34 @@ vtkTuple<double, 3> vtkSMRenderViewProxy::GetLowerRight(int index)
 vtkTuple<double, 3> vtkSMRenderViewProxy::GetUpperRight(int index)
 {
   return this->Internal->GetUpperRight(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMRenderViewProxy::GetName(int index)
+{
+  return this->Internal->GetName(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMRenderViewProxy::GetViewerId(int index)
+{
+  return this->Internal->GetViewerId(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMRenderViewProxy::GetNumberOfViewers()
+{
+  return this->Internal->GetNumberOfViewers(this->GetSession());
+}
+
+//----------------------------------------------------------------------------
+int vtkSMRenderViewProxy::GetId(int viewerIndex)
+{
+  return this->Internal->GetId(this->GetSession(), viewerIndex);
+}
+
+//----------------------------------------------------------------------------
+double vtkSMRenderViewProxy::GetEyeSeparation(int viewerIndex)
+{
+  return this->Internal->GetEyeSeparation(this->GetSession(), viewerIndex);
 }

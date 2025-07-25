@@ -823,6 +823,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_D.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGThreshold.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGThreshold_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIndependentViewers-tile0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIndependentViewers-tile1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume3.png}"
@@ -2295,6 +2297,9 @@ paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRightDeprecated.pvx"
 
 paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRightHide2DOverlay.pvx"
   TEST_SCRIPTS TestCAVE2DAnnotations.xml)
+
+paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/TwoViewers.pvx"
+  TEST_SCRIPTS TestIndependentViewers.xml)
 
 #------------------------------------------------------------------
 # Add tests that test command line arguments (among other things).

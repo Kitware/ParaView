@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<pvx>
+  <!--
+      You can optionally configure default eye separation values globally
+      for all viewers. This value overrides the system default value.
+  -->
+
+  <EyeSeparation Value="0.2" />
+
+  <!--
+      You can optionally configure default eye separation values for each
+      viewer by adding an IndependentViewers section. Each Viewer must have
+      Id and EyeSeparation attributes, Id attributes here must match "ViewerId"
+      attribute values in Machine elements to be applied. Eye separation values
+      configured in IndependentViewers section override eye separation values
+      configured any other way.
+  -->
+
+  <IndependentViewers>
+    <Viewer Id="0"
+            EyeSeparation="0.1" />
+    <Viewer Id="1"
+            EyeSeparation="0.3" />
+  </IndependentViewers>
+
+  <!--
+      All that's required to enable multiple independent viewers is to add a
+      ViewerId attribute to every machine. Id values must range from 0 to
+      the number of viewers minus one. Any number of Machine elements can be
+      associated with the same ViewerId.
+  -->
+
+  <Machine Name="Mach1"
+    ViewerId="0"
+    Geometry="640x360+100+1200"
+    ShowBorders="0"
+    Show2DOverlays="0"
+    LowerLeft="-1.13 -0.635  -1.22"
+    LowerRight="1.13 -0.635 -1.22"
+    UpperRight="1.13  0.635 -1.22"
+  />
+  <Machine Name="Mach2"
+    ViewerId="1"
+    Geometry="640x360+100+1560"
+    ShowBorders="0"
+    Show2DOverlays="0"
+    LowerLeft="-1.13 -0.635  -1.22"
+    LowerRight="1.13 -0.635 -1.22"
+    UpperRight="1.13  0.635 -1.22"
+    IgnoredKey="garbage"
+  />
+</pvx>

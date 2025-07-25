@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Geometric Shapes" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/GeometricShapes" command="activate" arguments="ConeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Python Shell" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="rv = GetActiveView()" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="rv.SetPropertyWithName(&quot;EyeTransforms&quot;, [1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 10.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -2.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0, 1.0, 10.0, 0.0, 0.0, 0.0, 1.0])" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="Render()" />
+
+  <pqcomparetile object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport"
+    rank="0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/TestIndependentViewers-tile0.png" />
+  <pqcomparetile object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport"
+    rank="1" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/TestIndependentViewers-tile1.png" />
+</pqevents>
