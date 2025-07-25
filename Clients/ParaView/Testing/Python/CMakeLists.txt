@@ -21,6 +21,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0062/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/NestedRings/NestedRings.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/plotly_json_line_chart.json}"
+  "DATA{${paraview_test_data_directory_input}/Data/raw2DImage.raw}"
+  "DATA{${paraview_test_data_directory_input}/Data/raw3DImage.raw}"
   "DATA{${paraview_test_data_directory_input}/Data/WorldWithTexture.obj}"
   "DATA{${paraview_test_data_directory_input}/Data/WorldWithTexture.png}"
 
@@ -132,6 +134,7 @@ paraview_add_test_python(
   Plot3DReader.py
   SaveDataWithArraySelection.py
   SaveDataWithArrayAndBlockSelection.py
+  RawImageDataReader.py
   ReadTimeArray.py
   ReplaceReaderFileName.py
   ReplaceReaderFileNameNoExtensions.py
