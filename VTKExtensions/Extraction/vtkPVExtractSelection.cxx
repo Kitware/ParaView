@@ -20,7 +20,7 @@
 #include "vtkSelector.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
-#include "vtkUniformGridAMRDataIterator.h"
+#include "vtkUniformGridAMRIterator.h"
 
 #if VTK_MODULE_ENABLE_ParaView_VTKExtensionsExtractionPython
 #include "vtkPythonSelector.h"
@@ -156,7 +156,7 @@ int vtkPVExtractSelection::RequestData(
     // COMPOSITE_INDEX() or HIERARCHICAL_LEVEL(), HIERARCHICAL_INDEX() keys are set on
     // each of the vtkSelection instances correctly to help identify the block they came from.
     vtkCompositeDataIterator* iter = cdInput->NewIterator();
-    vtkUniformGridAMRDataIterator* hierIter = vtkUniformGridAMRDataIterator::SafeDownCast(iter);
+    vtkUniformGridAMRIterator* hierIter = vtkUniformGridAMRIterator::SafeDownCast(iter);
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkSelectionNode* curSel = this->LocateSelection(iter->GetCurrentFlatIndex(), sel);

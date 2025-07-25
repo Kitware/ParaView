@@ -20,7 +20,7 @@
 #include "vtkSplitColumnComponents.h"
 #include "vtkTable.h"
 #include "vtkUniformGridAMR.h"
-#include "vtkUniformGridAMRDataIterator.h"
+#include "vtkUniformGridAMRIterator.h"
 
 #include <cassert>
 #include <string>
@@ -116,7 +116,7 @@ int vtkDataTabulator::RequestData(
 
     auto iter = inputCD->NewIterator();
     auto treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter);
-    auto amrIter = vtkUniformGridAMRDataIterator::SafeDownCast(iter);
+    auto amrIter = vtkUniformGridAMRIterator::SafeDownCast(iter);
 
     const bool global_data =
       (treeIter && this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_NONE);

@@ -15,7 +15,7 @@
 #include "vtkPVStreamingMacros.h"
 #include "vtkPointData.h"
 #include "vtkUniformGrid.h"
-#include "vtkUniformGridAMRDataIterator.h"
+#include "vtkUniformGridAMRIterator.h"
 #include "vtkVoxel.h"
 
 #include <algorithm>
@@ -64,8 +64,8 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(vtkOverlappingAMR* amr)
   // Now, fill in values from datasets in the amr.
 
   bool something_changed = false;
-  vtkSmartPointer<vtkUniformGridAMRDataIterator> iter;
-  iter.TakeReference(vtkUniformGridAMRDataIterator::SafeDownCast(amr->NewIterator()));
+  vtkSmartPointer<vtkUniformGridAMRIterator> iter;
+  iter.TakeReference(vtkUniformGridAMRIterator::SafeDownCast(amr->NewIterator()));
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     // note: this iteration "naturally" goes from datasets at lower levels to

@@ -16,7 +16,7 @@
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
-#include "vtkUniformGridAMRDataIterator.h"
+#include "vtkUniformGridAMRIterator.h"
 
 #include <set>
 
@@ -206,7 +206,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(
     // Add meta-data about composite-index/hierarchical index to help
     // vtkSelectionStreamer.
     vtkCompositeDataIterator* iter = outputCD->NewIterator();
-    vtkUniformGridAMRDataIterator* ugIter = vtkUniformGridAMRDataIterator::SafeDownCast(iter);
+    vtkUniformGridAMRIterator* ugIter = vtkUniformGridAMRIterator::SafeDownCast(iter);
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkInformation* metaData = iter->GetCurrentMetaData();

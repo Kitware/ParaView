@@ -309,7 +309,7 @@ int vtkAMRStreamingVolumeRepresentation::RequestData(
     // FIXME: Currently, an empty overlapping AMR causes segfaults in the rest of the
     // pipeline. Until that's fixed, we initialize the dataset with 1 level and
     // 0 blocks.
-    amr->Initialize({ 0 });
+    amr->Initialize(std::vector<unsigned int>{ 0 });
     this->ProcessedData = amr;
     this->DataBounds.Reset();
   }

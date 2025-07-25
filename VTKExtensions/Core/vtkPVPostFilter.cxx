@@ -220,16 +220,7 @@ int vtkPVPostFilter::RequestData(
     }
     else
     {
-      csOutput->CopyStructure(csInput);
-      vtkCompositeDataIterator* iter = csInput->NewIterator();
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-        vtkDataObject* obj = iter->GetCurrentDataObject()->NewInstance();
-        obj->ShallowCopy(iter->GetCurrentDataObject());
-        csOutput->SetDataSet(iter, obj);
-        obj->FastDelete();
-      }
-      iter->Delete();
+      csOutput->CompositeShallowCopy(csInput);
     }
     if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()))
     {
