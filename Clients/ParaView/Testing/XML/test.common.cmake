@@ -1877,6 +1877,7 @@ set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ComputeArrayMagnitudeSetting_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ConfigurableCategories_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ColorAnnotationsVisibilitiesAndOpacities_FORCE_SERIAL TRUE) # since this uses context menu
 set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
@@ -1908,6 +1909,7 @@ set (SPTimeseries_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (SeriesPresetRegexp_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (SettingsOverrideDomain_FORCE_SERIAL TRUE) # since this uses context menu
 set (ShaderReplacements_FORCE_SERIAL TRUE)
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TestHTGHoverOnCell_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut

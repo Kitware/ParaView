@@ -2367,6 +2367,56 @@ struct Process_5_13_to_6_0
   }
 };
 
+//===========================================================================
+struct Process_6_0_to_6_1
+{
+  bool operator()(xml_document& document)
+  {
+    return HandleChartRepresentationCompositeDataSetIndex(document);
+  }
+
+  static std::string GetSelector(unsigned int cid)
+  {
+    return std::string("//*[@cid='") + std::to_string(cid) + "']";
+    ;
+  }
+
+  static void ConvertCompositeIdsToSelectors(pugi::xml_node& node)
+  {
+    for (auto child : node.children("Element"))
+    {
+      auto value_attribute = child.attribute("value");
+      value_attribute.set_value(GetSelector(value_attribute.as_uint()).c_str());
+    }
+  }
+
+  static bool HandleChartRepresentationCompositeDataSetIndex(xml_document& document)
+  {
+    std::vector<std::string> chartProxyNames = { "ImageChartRepresentation",
+      "XYChartRepresentationBase", "XYChartRepresentation", "XYPointChartRepresentation",
+      "XYBarChartRepresentation", "QuartileChartRepresentation",
+      "ParallelCoordinatesRepresentation", "BoxChartRepresentation", "PlotMatrixRepresentation",
+      "BagPlotMatrixRepresentation", "XYBagChartRepresentation",
+      "XYFunctionalBagChartRepresentation" };
+
+    for (const auto& chartName : chartProxyNames)
+    {
+      const std::string nodePath = "//ServerManagerState/Proxy[@group='representations' and "
+                                   "@type='" +
+        chartName + "']/Property[@name='CompositeDataSetIndex']";
+      auto xpath_set = document.select_nodes(nodePath.c_str());
+      for (auto xpath_node : xpath_set)
+      {
+        // convert CompositeDataSetIndex to "BlockSelectors".
+        auto node = xpath_node.node();
+        node.attribute("name").set_value("BlockSelectors");
+        ConvertCompositeIdsToSelectors(node);
+      }
+    }
+
+    return true;
+  }
+};
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -2500,6 +2550,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_13_to_6_0 converter;
     status = converter(document);
     version = vtkSMVersion(6, 0, 0);
+  }
+
+  if (status && (version < vtkSMVersion(6, 1, 0)))
+  {
+    Process_6_0_to_6_1 converter;
+    status = converter(document);
+    version = vtkSMVersion(6, 1, 0);
   }
 
   if (status)

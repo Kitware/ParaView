@@ -3,9 +3,10 @@
 #include "vtkPVImageChartRepresentation.h"
 
 #include "vtkChartHistogram2D.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
@@ -86,9 +87,12 @@ void vtkPVImageChartRepresentation::PrepareForRendering()
   vtkSmartPointer<vtkImageData> localGrid;
   if (this->LocalOutput)
   {
-    for (unsigned int idx = 0; idx < this->LocalOutput->GetNumberOfBlocks(); ++idx)
+    auto iter = vtk::TakeSmartPointer(this->LocalOutput->NewTreeIterator());
+    iter->SkipEmptyNodesOn();
+    iter->VisitOnlyLeavesOn();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-      localGrid = vtkImageData::SafeDownCast(this->LocalOutput->GetBlock(idx));
+      localGrid = vtkImageData::SafeDownCast(iter->GetCurrentDataObject());
       if (localGrid)
       {
         chart->SetInputData(localGrid);

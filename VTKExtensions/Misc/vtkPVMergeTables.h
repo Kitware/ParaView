@@ -33,6 +33,8 @@ public:
   vtkTypeMacro(vtkPVMergeTables, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  static vtkSmartPointer<vtkTable> MergeTables(const std::vector<vtkTable*>& tables);
+
 protected:
   vtkPVMergeTables();
   ~vtkPVMergeTables() override;

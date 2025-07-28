@@ -1262,9 +1262,9 @@ vtkSmartPointer<vtkDataObject> vtkPVDataInformation::GetSubset(vtkDataObject* do
 
   // vtkAMRUniformGrid needs to use the other path because indexing is done differently.
   // See issue #20947
-  if (cids.size() == 1 && !vtkUniformGridAMR::SafeDownCast(cd))
+  if (cids.size() == 1 && cids.front() != 0 && !cd->IsA("vtkUniformGridAMR"))
   {
-    auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(cd->NewIterator());
+    auto iter = vtk::TakeSmartPointer(cd->NewIterator());
     if (auto diter = vtkDataObjectTreeIterator::SafeDownCast(iter))
     {
       diter->VisitOnlyLeavesOff();

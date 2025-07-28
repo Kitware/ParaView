@@ -2252,6 +2252,21 @@
                           optional="1">
         </InputArrayDomain>
       </InputProperty>
+      <IntVectorProperty command="SetPlaceHolderDataType"
+                         default_values="38"
+                         name="PlaceHolderDataType"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <DataTypeQueryDomain name="data_type_query">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </DataTypeQueryDomain>
+        <Documentation>
+          Property to set the placeholder data type.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
@@ -5228,6 +5243,21 @@
           <DataType value="vtkImageData" />
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty command="SetPlaceHolderDataType"
+                         default_values="38"
+                         name="PlaceHolderDataType"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <DataTypeQueryDomain name="data_type_query">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </DataTypeQueryDomain>
+        <Documentation>
+          Property to set the placeholder data type.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
@@ -5262,28 +5292,48 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
-                   command="AddCompositeDataSetIndex"
-                   default_values="0"
-                   number_of_elements="1"
-                   name="CompositeDataSetIndex"
-                   number_of_elements_per_command="1"
-                   panel_visibility="default"
-                   repeat_command="1">
-        <CompositeTreeDomain mode="leaves" name="tree">
+      <StringVectorProperty name="Assembly"
+                            command="SetActiveAssembly"
+                            number_of_elements="1"
+                            default_values=""
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
-        </CompositeTreeDomain>
+        </DataAssemblyListDomain>
         <Documentation>
-          This property lists the ids of the blocks to extract
-          from the input multiblock dataset.
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
         </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="BlockSelectors"
+                            command="AddBlockSelector"
+                            clean_command="RemoveAllBlockSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1"
+                            panel_visibility="multiblock_inspector"
+                            number_of_elements="1"
+                            default_values="/">
+        <DataAssemblyDomain name="data_assembly" mode="leaves">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor"
+                     panel_visibility="multiblock_inspector">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="BlockSelectors" function="Selectors"/>
         <Hints>
-          <PropertyWidgetDecorator type="InputDataTypeDecorator"
-            mode="visibility" name="vtkMultiBlockDataSet" />
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="0"/>
         </Hints>
-      </IntVectorProperty>
+      </PropertyGroup>
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
@@ -5437,6 +5487,21 @@
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty command="SetPlaceHolderDataType"
+                         default_values="38"
+                         name="PlaceHolderDataType"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <DataTypeQueryDomain name="data_type_query">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </DataTypeQueryDomain>
+        <Documentation>
+          Property to set the placeholder data type.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
@@ -5471,27 +5536,48 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
-                         command="AddCompositeDataSetIndex"
-                         default_values="1"
-                         number_of_elements="1"
-                         name="CompositeDataSetIndex"
-                         number_of_elements_per_command="1"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <CompositeTreeDomain mode="leaves" name="tree">
+      <StringVectorProperty name="Assembly"
+                            command="SetActiveAssembly"
+                            number_of_elements="1"
+                            default_values=""
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
-        </CompositeTreeDomain>
-        <Documentation>This property lists the ids of the blocks to extract
-          from the input multiblock dataset.</Documentation>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="BlockSelectors"
+                            command="AddBlockSelector"
+                            clean_command="RemoveAllBlockSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1"
+                            panel_visibility="multiblock_inspector"
+                            number_of_elements="1"
+                            default_values="/">
+        <DataAssemblyDomain name="data_assembly" mode="leaves">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor"
+                     panel_visibility="multiblock_inspector">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="BlockSelectors" function="Selectors"/>
         <Hints>
-          <!-- we don't want to show this property, except for MBs. -->
-          <PropertyWidgetDecorator type="InputDataTypeDecorator"
-            mode="visibility" name="vtkMultiBlockDataSet" />
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="0"/>
         </Hints>
-      </IntVectorProperty>
+      </PropertyGroup>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
                          name="AttributeType"
@@ -5553,9 +5639,10 @@
                                     hide_partial_arrays="0"
                                     default_mode="visibility">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
         <Hints>
@@ -5575,9 +5662,10 @@
                                     hide_partial_arrays="0"
                                     default_mode="label">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -5592,9 +5680,10 @@
                                     hide_partial_arrays="0"
                                     default_mode="color">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -5610,9 +5699,10 @@
                                     default_mode="value"
                                     default_value="1.0">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -5628,9 +5718,10 @@
                                     default_mode="value"
                                     default_value="0">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -5906,6 +5997,21 @@
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty command="SetPlaceHolderDataType"
+                         default_values="38"
+                         name="PlaceHolderDataType"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <DataTypeQueryDomain name="data_type_query">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </DataTypeQueryDomain>
+        <Documentation>
+          Property to set the placeholder data type.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
@@ -5940,22 +6046,46 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetCompositeDataSetIndex"
-                         default_values="1"
-                         name="CompositeDataSetIndex"
-                         number_of_elements="1">
-        <Documentation>In case of Composite datasets, set the flat index of the
-        dataset to pass. The flat index must point to a non-empty,
-        non-composite dataset for anything to be passed through. If the input
-        is not a composite dataset, then this index is ignored.</Documentation>
-        <CompositeTreeDomain mode="leaves"
-                             name="tree">
+      <StringVectorProperty name="Assembly"
+                            command="SetActiveAssembly"
+                            number_of_elements="1"
+                            default_values=""
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
-        </CompositeTreeDomain>
-      </IntVectorProperty>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="BlockSelectors"
+                            command="AddBlockSelector"
+                            clean_command="RemoveAllBlockSelectors"
+                            panel_visibility="multiblock_inspector"
+                            number_of_elements="1"
+                            default_values="/">
+        <DataAssemblyDomain name="data_assembly" mode="leaves">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor"
+                     panel_visibility="multiblock_inspector">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="BlockSelectors" function="Selectors"/>
+        <Hints>
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="0"/>
+        </Hints>
+      </PropertyGroup>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
                          name="FieldAssociation"
@@ -5981,9 +6111,10 @@
                                     hide_partial_arrays="0"
                                     default_mode="visibility">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="FieldAssociation" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="FieldAssociation"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
         <Hints>
@@ -6074,6 +6205,21 @@
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty command="SetPlaceHolderDataType"
+                         default_values="38"
+                         name="PlaceHolderDataType"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <DataTypeQueryDomain name="data_type_query">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </DataTypeQueryDomain>
+        <Documentation>
+          Property to set the placeholder data type.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
@@ -6108,27 +6254,46 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetCompositeDataSetIndex"
-                         default_values="1"
-                         name="CompositeDataSetIndex"
-                         number_of_elements="1">
-        <Documentation>In case of Composite datasets, set the flat index of the
-        dataset to pass. The flat index must point to a non-empty,
-        non-composite dataset for anything to be passed through. If the input
-        is not a composite dataset, then this index is ignored.</Documentation>
-        <CompositeTreeDomain mode="leaves"
-                             name="tree">
+      <StringVectorProperty name="Assembly"
+                            command="SetActiveAssembly"
+                            number_of_elements="1"
+                            default_values=""
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
-        </CompositeTreeDomain>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="BlockSelectors"
+                            command="AddBlockSelector"
+                            clean_command="RemoveAllBlockSelectors"
+                            panel_visibility="multiblock_inspector"
+                            number_of_elements="1"
+                            default_values="/">
+        <DataAssemblyDomain name="data_assembly" mode="leaves">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor"
+                     panel_visibility="multiblock_inspector">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="BlockSelectors" function="Selectors"/>
         <Hints>
-          <!-- we don't want to show this property, except for MBs. -->
-          <PropertyWidgetDecorator type="InputDataTypeDecorator"
-            mode="visibility" name="vtkMultiBlockDataSet" />
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="0"/>
         </Hints>
-      </IntVectorProperty>
+      </PropertyGroup>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
                          name="FieldAssociation"
@@ -6154,9 +6319,10 @@
                                     hide_partial_arrays="0"
                                     default_mode="visibility">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="FieldAssociation" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="FieldAssociation"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
         <Hints>
@@ -6176,9 +6342,10 @@
                                     hide_partial_arrays="0"
                                     default_mode="color">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="FieldAssociation" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="FieldAssociation"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -6258,9 +6425,9 @@
     <!-- =================================================================== -->
     <ChartRepresentationProxy base_proxygroup="representations"
                               class="vtkPVPlotMatrixRepresentation"
-                              name="PlotMatrixRepresentation"
+                              name="PlotMatrixRepresentationBase"
                               processes="client|dataserver|renderserver">
-      <Documentation>Representation used by PlotMatrixView.</Documentation>
+      <Documentation>RepresentationBase used by PlotMatrixView.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <Documentation>Data input for the representation.</Documentation>
@@ -6268,6 +6435,21 @@
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty command="SetPlaceHolderDataType"
+                         default_values="38"
+                         name="PlaceHolderDataType"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <DataTypeQueryDomain name="data_type_query">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </DataTypeQueryDomain>
+        <Documentation>
+          Property to set the placeholder data type.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
@@ -6302,27 +6484,6 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetCompositeDataSetIndex"
-                         default_values="1"
-                         name="CompositeDataSetIndex"
-                         number_of_elements="1">
-        <Documentation>In case of Composite datasets, set the flat index of the
-        dataset to pass. The flat index must point to a non-empty,
-        non-composite dataset for anything to be passed through. If the input
-        is not a composite dataset, then this index is ignored.</Documentation>
-        <CompositeTreeDomain mode="leaves"
-                             name="tree">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-          <Hints>
-            <!-- we don't want to show this property, except for MBs. -->
-            <PropertyWidgetDecorator type="InputDataTypeDecorator"
-              mode="visibility" name="vtkMultiBlockDataSet" />
-          </Hints>
-        </CompositeTreeDomain>
-      </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
                          name="FieldAssociation"
@@ -6348,9 +6509,10 @@
                                     hide_partial_arrays="0"
                                     default_mode="visibility">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="FieldAssociation" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="FieldAssociation"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
         <Hints>
@@ -6468,6 +6630,56 @@
         <Property name="ActivePlotMarkerStyle" />
         <Property name="ActivePlotMarkerSize" />
       </PropertyGroup>
+      <!-- End of PlotMatrixRepresentationBase -->
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <ChartRepresentationProxy base_proxygroup="representations"
+                              base_proxyname="PlotMatrixRepresentationBase"
+                              class="vtkPVPlotMatrixRepresentation"
+                              name="PlotMatrixRepresentation"
+                              processes="client|dataserver|renderserver">
+      <Documentation>Representation used by PlotMatrixView.</Documentation>
+      <StringVectorProperty name="Assembly"
+                            command="SetActiveAssembly"
+                            number_of_elements="1"
+                            default_values=""
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="BlockSelectors"
+                            command="AddBlockSelector"
+                            clean_command="RemoveAllBlockSelectors"
+                            panel_visibility="multiblock_inspector"
+                            number_of_elements="1"
+                            default_values="/">
+        <DataAssemblyDomain name="data_assembly" mode="leaves">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor"
+                     panel_visibility="multiblock_inspector">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="BlockSelectors" function="Selectors"/>
+        <Hints>
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="0"/>
+        </Hints>
+      </PropertyGroup>
       <!-- End of PlotMatrixRepresentation -->
     </ChartRepresentationProxy>
 
@@ -6491,9 +6703,10 @@
                                     default_mode="value"
                                     default_value="1">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -6509,9 +6722,10 @@
                                     default_mode="value"
                                     default_value="2">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -6527,9 +6741,10 @@
                                     default_mode="value"
                                     default_value="0">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -6545,9 +6760,10 @@
                                     default_mode="value"
                                     default_value="4">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -6601,9 +6817,10 @@
                                     default_mode="value"
                                     default_value="0">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -6618,9 +6835,10 @@
                                     default_mode="value"
                                     default_value="1">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -6635,9 +6853,10 @@
                                     default_mode="value"
                                     default_value="2">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
@@ -6652,9 +6871,10 @@
                                     default_mode="value"
                                     default_value="4">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="FieldDataSelection" name="AttributeType" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+            <Property function="Input" name="Input"/>
+            <Property function="FieldDataSelection" name="AttributeType"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Selectors" name="BlockSelectors"/>
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>

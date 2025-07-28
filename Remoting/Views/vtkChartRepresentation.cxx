@@ -6,22 +6,21 @@
 #include "vtkBlockDeliveryPreprocessor.h"
 #include "vtkChart.h"
 #include "vtkChartSelectionRepresentation.h"
-#include "vtkClientServerMoveData.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkContextView.h"
+#include "vtkDataAssembly.h"
+#include "vtkDataAssemblyUtilities.h"
 #include "vtkDataObject.h"
-#include "vtkExtractBlock.h"
+#include "vtkDataObjectTreeIterator.h"
+#include "vtkDataObjectTypes.h"
+#include "vtkExtractBlockUsingDataAssembly.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
-#include "vtkPVMergeTablesMultiBlock.h"
+#include "vtkPVMergeTablesComposite.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPlot.h"
-#include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -31,12 +30,14 @@
 #include <sstream>
 #include <string>
 
-#define CLASSNAME(a) ((a) ? (a)->GetClassName() : "None")
-
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkChartRepresentation);
+
 //----------------------------------------------------------------------------
 vtkChartRepresentation::vtkChartRepresentation()
 {
+  this->SetActiveAssembly("Hierarchy");
+
   this->LastLocalOutputMTime = 0;
   this->DummyRepresentation = vtkSmartPointer<vtkChartSelectionRepresentation>::New();
 
@@ -86,7 +87,7 @@ int vtkChartRepresentation::ProcessViewRequest(
     // this is called before every render, so don't do expensive things here.
     // Hence, we'll use this check to avoid work unless really needed.
     auto deliveredData =
-      vtkMultiBlockDataSet::SafeDownCast(vtkPVView::GetDeliveredPiece(ininfo, this));
+      vtkDataObjectTree::SafeDownCast(vtkPVView::GetDeliveredPiece(ininfo, this));
     if ((this->LocalOutput != deliveredData) ||
       (deliveredData && deliveredData->GetMTime() != this->LastLocalOutputMTime) ||
       (this->PrepareForRenderingTime < this->GetMTime()))
@@ -164,37 +165,47 @@ int vtkChartRepresentation::RequestData(
     // Prune input dataset to only process blocks on interest.
     // If input is not a multiblock dataset, we make it one so the rest of the
     // pipeline is simple.
-    if (data->IsA("vtkMultiBlockDataSet"))
+    if (data->IsA("vtkDataObjectTree") || data->IsA("vtkUniformGridAMR"))
     {
-      vtkNew<vtkExtractBlock> extractBlock;
+      vtkNew<vtkExtractBlockUsingDataAssembly> extractBlock;
       extractBlock->SetInputData(data);
-      extractBlock->PruneOutputOff();
-      for (std::set<unsigned int>::const_iterator iter = this->CompositeIndices.begin();
-           iter != this->CompositeIndices.end(); ++iter)
+      extractBlock->PruneDataAssemblyOff();
+      extractBlock->SetAssemblyName(this->ActiveAssembly);
+      for (const auto& selector : this->BlockSelectors)
       {
-        extractBlock->AddIndex(*iter);
+        extractBlock->AddSelector(selector.c_str());
       }
       extractBlock->Update();
       data = extractBlock->GetOutputDataObject(0);
     }
-    else
+    if (auto pds = vtkPartitionedDataSet::SafeDownCast(data))
     {
-      vtkNew<vtkMultiBlockDataSet> mbdata;
-      mbdata->SetNumberOfBlocks(1);
-      mbdata->SetBlock(0, data);
-      data = mbdata.GetPointer();
+      vtkNew<vtkPartitionedDataSetCollection> pdc;
+      pdc->SetPartitionedDataSet(0, pds);
+      data = pdc.GetPointer();
+    }
+    else if (data->IsA("vtkDataSet") || data->IsA("vtkTable"))
+    {
+      vtkNew<vtkPartitionedDataSetCollection> pdc;
+      pdc->SetPartition(0, 0, data);
+      data = pdc.GetPointer();
     }
 
-    // data must be a multiblock dataset, no matter what
-    assert(data->IsA("vtkMultiBlockDataSet"));
+    // data must be a multiblock/pdc dataset, no matter what
+    assert(data->IsA("vtkMultiBlockDataSet") || data->IsA("vtkPartitionedDataSetCollection"));
 
     data = this->ReduceDataToRoot(data);
     data = this->TransformTable(data);
-    this->LocalOutputRequestData = vtkMultiBlockDataSet::SafeDownCast(data);
+    this->LocalOutputRequestData = vtkDataObjectTree::SafeDownCast(data);
   }
   else
   {
-    this->LocalOutputRequestData = vtkSmartPointer<vtkMultiBlockDataSet>::New();
+    auto placeHolderType = this->PlaceHolderDataType == VTK_MULTIBLOCK_DATA_SET
+      ? this->PlaceHolderDataType
+      : VTK_PARTITIONED_DATA_SET_COLLECTION;
+    auto placeHolder = vtk::TakeSmartPointer(vtkDataObjectTypes::NewDataObject(placeHolderType));
+    placeHolder->Initialize();
+    this->LocalOutputRequestData = vtkDataObjectTree::SafeDownCast(placeHolder);
   }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -219,7 +230,7 @@ vtkSmartPointer<vtkDataObject> vtkChartRepresentation::ReduceDataToRoot(vtkDataO
   preprocessor->SetInputData(data);
 
   vtkNew<vtkReductionFilter> reductionFilter;
-  vtkNew<vtkPVMergeTablesMultiBlock> algo;
+  vtkNew<vtkPVMergeTablesComposite> algo;
   reductionFilter->SetPostGatherHelper(algo.GetPointer());
   reductionFilter->SetInputConnection(preprocessor->GetOutputPort());
   reductionFilter->Update();
@@ -250,14 +261,6 @@ void vtkChartRepresentation::SetVisibility(bool visible)
 }
 
 //----------------------------------------------------------------------------
-void vtkChartRepresentation::SetCompositeDataSetIndex(unsigned int v)
-{
-  this->CompositeIndices.clear();
-  this->CompositeIndices.insert(v);
-  this->MarkModified();
-}
-
-//----------------------------------------------------------------------------
 // Forwarded to vtkBlockDeliveryPreprocessor.
 void vtkChartRepresentation::SetFieldAssociation(int v)
 {
@@ -266,6 +269,36 @@ void vtkChartRepresentation::SetFieldAssociation(int v)
     this->FieldAssociation = v;
     this->MarkModified();
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkChartRepresentation::AddBlockSelector(const char* selector)
+{
+  if (selector != nullptr &&
+    std::find(this->BlockSelectors.begin(), this->BlockSelectors.end(), selector) ==
+      this->BlockSelectors.end())
+  {
+    this->BlockSelectors.push_back(selector);
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkChartRepresentation::RemoveAllBlockSelectors()
+{
+  if (!this->BlockSelectors.empty())
+  {
+    this->BlockSelectors.clear();
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkChartRepresentation::SetCompositeDataSetIndex(unsigned int v)
+{
+  this->CompositeIndices.clear();
+  this->CompositeIndices.insert(v);
+  this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
@@ -289,6 +322,16 @@ void vtkChartRepresentation::ResetCompositeDataSetIndices()
 }
 
 //----------------------------------------------------------------------------
+void vtkChartRepresentation::SetPlaceHolderDataType(int datatype)
+{
+  if (this->PlaceHolderDataType != datatype)
+  {
+    this->PlaceHolderDataType = datatype;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
 unsigned int vtkChartRepresentation::Initialize(unsigned int minId, unsigned int maxId)
 {
   minId = this->SelectionRepresentation->Initialize(minId, maxId);
@@ -298,14 +341,15 @@ unsigned int vtkChartRepresentation::Initialize(unsigned int minId, unsigned int
 //----------------------------------------------------------------------------
 vtkTable* vtkChartRepresentation::GetLocalOutput(bool pre_delivery)
 {
-  auto mb = pre_delivery ? this->LocalOutputRequestData : this->LocalOutput;
-  if (!mb)
+  auto objTree = pre_delivery ? this->LocalOutputRequestData : this->LocalOutput;
+  if (!objTree)
   {
     return nullptr;
   }
 
-  vtkSmartPointer<vtkCompositeDataIterator> iter;
-  iter.TakeReference(mb->NewIterator());
+  auto iter = vtk::TakeSmartPointer(objTree->NewTreeIterator());
+  iter->SkipEmptyNodesOn();
+  iter->VisitOnlyLeavesOn();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     vtkTable* table = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
@@ -326,30 +370,50 @@ bool vtkChartRepresentation::GetLocalOutput(vtkChartRepresentation::MapOfTables&
     return false;
   }
 
-  vtkSmartPointer<vtkCompositeDataIterator> iter;
-  iter.TakeReference(this->LocalOutput->NewIterator());
+  const vtkNew<vtkDataAssembly> hierarchy;
+  if (!vtkDataAssemblyUtilities::GenerateHierarchy(this->LocalOutput, hierarchy))
+  {
+    return false;
+  }
+  const auto outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(this->LocalOutput);
+  const bool hasAssembly = outputPDC && outputPDC->GetDataAssembly();
+  const bool isAssemblySelected =
+    this->ActiveAssembly != nullptr && strcmp(this->ActiveAssembly, "Assembly") == 0;
+  auto getLabel = [](vtkDataAssembly* assembly, const std::string& selector) -> std::string
+  {
+    const auto node = assembly->SelectNodes({ selector }).front();
+    return assembly->GetAttributeOrDefault(node, "label", assembly->GetNodeName(node));
+  };
+  auto iter = vtk::TakeSmartPointer(this->LocalOutput->NewTreeIterator());
+  iter->SkipEmptyNodesOn();
+  iter->VisitOnlyLeavesOn();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     vtkTable* table = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
-    if (table)
+    if (!table)
     {
-      std::ostringstream stream;
-      if (iter->HasCurrentMetaData() &&
-        iter->GetCurrentMetaData()->Has(vtkCompositeDataSet::NAME()))
-      {
-        stream << iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
-      }
-      else
-      {
-        stream << iter->GetCurrentFlatIndex();
-      }
-      if (tables.find(stream.str()) != tables.end())
-      {
-        // duplicate name, argh! We make it unique by adding a flat index to it.
-        stream << "[" << iter->GetCurrentFlatIndex() << "]";
-      }
-      assert(tables.find(stream.str()) == tables.end());
-      tables[stream.str()] = { table, iter->GetCurrentFlatIndex() };
+      continue;
+    }
+    std::string blockName;
+    if (hasAssembly && isAssemblySelected)
+    {
+      auto selectors = vtkDataAssemblyUtilities::GetSelectorsForCompositeIds(
+        { iter->GetCurrentFlatIndex() }, hierarchy, outputPDC->GetDataAssembly());
+      blockName = getLabel(outputPDC->GetDataAssembly(), selectors.front());
+    }
+    else
+    {
+      auto selectors = vtkDataAssemblyUtilities::GetSelectorsForCompositeIds(
+        { iter->GetCurrentFlatIndex() }, hierarchy);
+      blockName = getLabel(hierarchy, selectors.front());
+    }
+    if (tables.find(blockName) != tables.end())
+    {
+      vtkWarningMacro("Duplicate table name found: " << blockName << ". It will be skipped.");
+    }
+    else
+    {
+      tables[blockName] = { table, iter->GetCurrentFlatIndex() };
     }
   }
 

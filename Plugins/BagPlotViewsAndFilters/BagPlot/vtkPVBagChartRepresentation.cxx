@@ -146,8 +146,8 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
 
   if (this->LocalOutput)
   {
-    this->LocalGrid = vtkImageData::SafeDownCast(this->LocalOutput->GetBlock(2));
-    this->LocalThreshold = vtkTable::SafeDownCast(this->LocalOutput->GetBlock(3));
+    this->LocalGrid = vtkImageData::SafeDownCast(this->LocalOutput->GetChild(2));
+    this->LocalThreshold = vtkTable::SafeDownCast(this->LocalOutput->GetChild(3));
   }
   else
   {

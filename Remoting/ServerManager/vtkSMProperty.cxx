@@ -28,6 +28,7 @@ vtkStandardNewMacro(vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, Documentation, vtkSMDocumentation);
 vtkCxxSetObjectMacro(vtkSMProperty, Hints, vtkPVXMLElement);
+vtkCxxSetObjectMacro(vtkSMProperty, Deprecated, vtkPVXMLElement);
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
@@ -79,6 +80,7 @@ vtkSMProperty::~vtkSMProperty()
   this->SetInformationProperty(nullptr);
   this->SetDocumentation(nullptr);
   this->SetHints(nullptr);
+  this->SetDeprecated(nullptr);
   this->SetParent(nullptr);
   this->SetPanelVisibility(nullptr);
   this->SetPanelVisibilityDefaultForRepresentation(nullptr);
@@ -430,84 +432,74 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
     this->SetDisableSubTrace(disable_sub_trace);
   }
 
-  // Manage deprecated XML definition
-  int deprecated_attr_value;
-  if (element->GetScalarAttribute("update_self", &deprecated_attr_value))
-  {
-    std::ostringstream proxyXML;
-    element->GetParent()->PrintXML(proxyXML, vtkIndent(1));
-    vtkWarningMacro(<< "Attribute update_self is not managed anymore."
-                    << "It is deprecated. " << endl
-                    << "Please FIX the decalaration of the following Proxy." << endl
-                    << proxyXML.str().c_str());
-  }
-
-  // Read and create domains.
+  // Read and create documentation, hints, deprecated, helpers, and domains.
   for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); ++i)
   {
-    vtkPVXMLElement* domainEl = element->GetNestedElement(i);
+    vtkPVXMLElement* subElem = element->GetNestedElement(i);
 
     // These are not domain elements.
-    if (strcmp(domainEl->GetName(), "Documentation") == 0)
+    if (strcmp(subElem->GetName(), "Documentation") == 0)
     {
       vtkSMDocumentation* doc = vtkSMDocumentation::New();
-      doc->SetDocumentationElement(domainEl);
+      doc->SetDocumentationElement(subElem);
       this->SetDocumentation(doc);
       doc->Delete();
-      continue;
     }
-    else if (strcmp(domainEl->GetName(), "Hints") == 0)
+    else if (strcmp(subElem->GetName(), "Hints") == 0)
     {
-      this->SetHints(domainEl);
-      continue;
+      this->SetHints(subElem);
     }
-    else if (std::string(domainEl->GetName()).find("InformationHelper") != std::string::npos)
+    else if (strcmp(subElem->GetName(), "Deprecated") == 0)
     {
-      // InformationHelper are used to extract information from VTK object
-      // therefore they are not used on the proxy side (SM).
-      continue;
+      this->SetDeprecated(subElem);
     }
-    else if (std::string(domainEl->GetName()).find("StringArrayHelper") != std::string::npos)
+    else if (std::string_view(subElem->GetName()).find("InformationHelper") != std::string::npos)
     {
       // InformationHelper are used to extract information from VTK object
       // therefore they are not used on the proxy side (SM).
-      continue;
     }
-
-    // Everything else is assumed to be a domain element.
-    vtkObjectBase* object = nullptr;
-    std::ostringstream name;
-    name << "vtkSM" << domainEl->GetName() << ends;
-    object = vtkClientServerStreamInstantiator::CreateInstance(name.str().c_str());
-    if (object)
+    else if (std::string_view(subElem->GetName()).find("StringArrayHelper") != std::string::npos)
     {
-      vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
-      if (domain)
-      {
-        domain->SetSession(proxy->GetSession());
-        if (domain->ReadXMLAttributes(this, domainEl))
-        {
-          const char* dname = domainEl->GetAttribute("name");
-          if (dname)
-          {
-            domain->SetXMLName(dname);
-            this->AddDomain(dname, domain);
-          }
-        }
-      }
-      else
-      {
-        vtkErrorMacro(
-          "Object created (type: " << name.str().c_str() << ") is not of a recognized type.");
-      }
-      object->Delete();
+      // InformationHelper are used to extract information from VTK object
+      // therefore they are not used on the proxy side (SM).
     }
     else
     {
-      vtkWarningMacro("Could not create object of type: "
-        << name.str().c_str()
-        << ". Make sure that this xml domain is correct.\nIf this occurred when loading a "
-           "plugin in client/server mode, first load the client plugin.");
+      // Everything else is assumed to be a domain element.
+      vtkObjectBase* object = nullptr;
+      std::ostringstream name;
+      name << "vtkSM" << subElem->GetName() << ends;
+      object = vtkClientServerStreamInstantiator::CreateInstance(name.str().c_str());
+      if (object)
+      {
+        vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
+        if (domain)
+        {
+          domain->SetSession(proxy->GetSession());
+          if (domain->ReadXMLAttributes(this, subElem))
+          {
+            const char* dname = subElem->GetAttribute("name");
+            if (dname)
+            {
+              domain->SetXMLName(dname);
+              this->AddDomain(dname, domain);
+            }
+          }
+        }
+        else
+        {
+          vtkErrorMacro(
+            "Object created (type: " << name.str().c_str() << ") is not of a recognized type.");
+        }
+        object->Delete();
+      }
+      else
+      {
+        vtkWarningMacro("Could not create object of type: "
+          << name.str().c_str()
+          << ". Make sure that this xml domain is correct.\nIf this occurred when loading a "
+             "plugin in client/server mode, first load the client plugin.");
+      }
     }
   }
 
@@ -618,11 +610,13 @@ void vtkSMProperty::SaveState(
   parent->AddNestedElement(propertyElement);
   propertyElement->Delete();
 }
+
 //---------------------------------------------------------------------------
 void vtkSMProperty::SaveStateValues(vtkPVXMLElement* /*propertyElement*/)
 {
   // Concreate class should override it !!!
 }
+
 //---------------------------------------------------------------------------
 void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement, const char* uid)
 {
@@ -635,6 +629,7 @@ void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement, const char
     this->DomainIterator->Next();
   }
 }
+
 //---------------------------------------------------------------------------
 int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement, vtkSMProxyLocator* loader)
 {
@@ -659,11 +654,28 @@ int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement, vtkSMProxyLocator
   }
   return 1;
 }
+
+//---------------------------------------------------------------------------
+bool vtkSMProperty::WarnIfDeprecated()
+{
+  if (this->Deprecated)
+  {
+    vtkWarningMacro("Property ("
+      << this->Proxy->GetXMLName() << ", " << this->XMLName << ")  has been deprecated in ParaView "
+      << this->Deprecated->GetAttribute("deprecated_in") << " and will be removed by ParaView "
+      << this->Deprecated->GetAttribute("to_remove_in") << ". "
+      << (this->Deprecated->GetCharacterData() ? this->Deprecated->GetCharacterData() : ""));
+    return true;
+  }
+  return false;
+}
+
 //---------------------------------------------------------------------------
 void vtkSMProperty::SetParent(vtkSMProxy* proxy)
 {
   this->Proxy = proxy;
 }
+
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProperty::GetParent()
 {

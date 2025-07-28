@@ -11,7 +11,8 @@ ParallelCoordinatesChartView1 = CreateParallelCoordinatesChartView()
 ParallelCoordinatesChartView1.ViewSize = [800, 800]
 
 DataRepresentation2 = Show()
-DataRepresentation2.CompositeDataSetIndex = 0
+DataRepresentation2.Assembly = "Hierarchy"
+DataRepresentation2.BlockSelectors = "/"
 DataRepresentation2.FieldAssociation = 'Row Data'
 DataRepresentation2.SeriesVisibility = ['Cylinders', '1', 'Displacement', '1', 'HP', '1', 'Weight', '1', 'Year', '1', 'Acceleration', '1', 'MPG', '1']
 Render(ParallelCoordinatesChartView1)

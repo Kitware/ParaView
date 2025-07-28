@@ -16,6 +16,7 @@ set(classes
   vtkPVCylinder
   vtkPVFrustum
   vtkPVMergeTables
+  vtkPVMergeTablesComposite
   vtkPVMergeTablesMultiBlock
   vtkPVPlane
   vtkPVTransform

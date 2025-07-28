@@ -14,6 +14,7 @@
 #include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -163,59 +164,60 @@ int vtkSMChartSeriesSelectionDomain::ReadXMLAttributes(
 void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
 {
   vtkSMProperty* input = this->GetRequiredProperty("Input");
-  vtkSMProperty* fieldDataSelection = this->GetRequiredProperty("FieldDataSelection");
-  vtkSMVectorProperty* compositeIndex =
-    vtkSMVectorProperty::SafeDownCast(this->GetRequiredProperty("CompositeIndexSelection"));
-
-  if (!input || !fieldDataSelection)
+  if (!input)
   {
-    vtkWarningMacro("Missing required properties. Update failed.");
+    vtkErrorMacro("Missing require property 'Input'. Update failed.");
     return;
   }
-
-  // build strings based on the current domain.
-  vtkPVDataInformation* dataInfo = this->GetInputInformation();
+  vtkPVDataInformation* dataInfo = this->GetInputDataInformation("Input");
   if (!dataInfo)
   {
     return;
   }
+  const auto fieldDataSelection =
+    vtkSMIntVectorProperty::SafeDownCast(this->GetRequiredProperty("FieldDataSelection"));
+  if (!fieldDataSelection)
+  {
+    vtkErrorMacro("Missing required property 'FieldDataSelection'. Update failed.");
+    return;
+  }
+  const auto activeAssembly =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetRequiredProperty("ActiveAssembly"));
+  const auto selectors =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetRequiredProperty("Selectors"));
 
   // clear old component names.
   this->Internals->VisibilityOverrides.clear();
 
-  if (compositeIndex == nullptr || !dataInfo->IsCompositeDataSet())
+  if (!activeAssembly || !selectors || !dataInfo->IsCompositeDataSet())
   {
     // since there's no way to choose which dataset from a composite one to use,
     // just look at the top-level array information (skipping partial arrays).
     std::vector<std::string> column_names;
-    int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
+    const int fieldAssociation = fieldDataSelection->GetUncheckedElement(0);
     this->PopulateAvailableArrays(
       std::string(), column_names, dataInfo, fieldAssociation, this->FlattenTable);
     this->SetStrings(column_names);
     return;
   }
 
-  std::vector<std::string> column_names;
-  int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
+  assert(activeAssembly->GetNumberOfUncheckedElements() == 1);
 
-  vtkSMUncheckedPropertyHelper compositeIndexHelper(compositeIndex);
-  unsigned int numElems = compositeIndexHelper.GetNumberOfElements();
+  std::vector<std::string> column_names;
+  const int fieldAssociation = fieldDataSelection->GetUncheckedElement(0);
+  const unsigned int numElems = selectors->GetNumberOfUncheckedElements();
   for (unsigned int cc = 0; cc < numElems; cc++)
   {
     std::string blockName;
-    if (compositeIndex->GetRepeatCommand())
+    if (selectors->GetRepeatCommand())
     {
-      // we don't need to add blockName is the proxy doesn't support selecting
-      // multiple blocks in the dataset.
-      blockName = dataInfo->GetBlockName(compositeIndexHelper.GetAsInt(cc));
-      if (blockName.empty())
-      {
-        blockName = std::to_string(compositeIndexHelper.GetAsInt(cc));
-      }
+      const auto blockNames = dataInfo->GetBlockNames(
+        { selectors->GetUncheckedElement(cc) }, activeAssembly->GetUncheckedElement(0));
+      blockName = blockNames.empty() ? selectors->GetUncheckedElement(cc) : blockNames.front();
     }
 
     auto childInfo = this->GetInputSubsetDataInformation(
-      static_cast<unsigned int>(compositeIndexHelper.GetAsInt(cc)), "Input");
+      selectors->GetUncheckedElement(cc), activeAssembly->GetUncheckedElement(0), "Input");
     this->PopulateAvailableArrays(
       blockName, column_names, childInfo, fieldAssociation, this->FlattenTable);
   }

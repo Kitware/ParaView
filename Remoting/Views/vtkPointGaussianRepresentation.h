@@ -175,6 +175,21 @@ public:
   vtkBooleanMacro(ScaleByArray, bool);
   ///@}
 
+  ///@{
+  /**
+   * Set/Get the placeholder data type.
+   *
+   * This value is set by the proxy and is needed to ensure that the client knows the type of the
+   * input that lives on the server.
+   *
+   * In the past, we were always creating a placeholder of type vtkMultiBlockDataSet when no
+   * input was available on the client. This is no longer valid.
+   *
+   * This can be potentially removed in the future once vtkMultiBlockDataSet is deprecated.
+   */
+  void SetPlaceHolderDataType(int datatype);
+  vtkGetMacro(PlaceHolderDataType, int);
+  ///@}
 protected:
   vtkPointGaussianRepresentation();
   ~vtkPointGaussianRepresentation() override;
@@ -210,6 +225,8 @@ protected:
 
   std::vector<std::string> PresetShaderStrings;
   std::vector<float> PresetShaderScales;
+
+  int PlaceHolderDataType = VTK_PARTITIONED_DATA_SET_COLLECTION;
 
 private:
   vtkPointGaussianRepresentation(const vtkPointGaussianRepresentation&) = delete;

@@ -229,10 +229,15 @@ vtkSMProperty* vtkSMProxy::GetProperty(const char* name, int selfOnly)
   {
     return nullptr;
   }
-  vtkSMProxyInternals::PropertyInfoMap::iterator it = this->Internals->Properties.find(name);
+  auto it = this->Internals->Properties.find(name);
   if (it != this->Internals->Properties.end())
   {
-    return it->second.Property.GetPointer();
+    auto prop = it->second.Property.GetPointer();
+    if (prop)
+    {
+      prop->WarnIfDeprecated();
+    }
+    return prop;
   }
   if (!selfOnly)
   {
@@ -248,7 +253,12 @@ vtkSMProperty* vtkSMProxy::GetProperty(const char* name, int selfOnly)
     vtkSMProxy* sp = this->GetSubProxy(subproxy_name);
     if (sp)
     {
-      return sp->GetProperty(property_name, 0);
+      auto prop = sp->GetProperty(property_name, 0);
+      if (prop)
+      {
+        prop->WarnIfDeprecated();
+      }
+      return prop;
     }
     // indicates that the internal dbase for exposed properties is
     // corrupt.. when a subproxy was removed, the exposed properties

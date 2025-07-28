@@ -431,7 +431,9 @@
                             panel_visibility="never"
                             default_values="vtkAppendFilter"
                             number_of_elements="1">
-        <!-- deprecated_in="6.0" to_remove_in="6.2" Proper deprecation for XML properties is not yet available https://gitlab.kitware.com/paraview/paraview/-/issues/22796 -->
+        <Deprecated deprecated_in="6.1" to_remove_in="6.3">
+          This property has been deprecated, has no effect.
+        </Deprecated>
         <Documentation>This property has been deprecated, has no effect
           and will be removed in a future version of ParaView.</Documentation>
       </StringVectorProperty>
