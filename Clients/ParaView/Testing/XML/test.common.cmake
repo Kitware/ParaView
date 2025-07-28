@@ -624,6 +624,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Slice_3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Surface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PBRSpheres.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PickCenter.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PickCenter_Vertex.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PLYWriter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteBlackBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteBlueGrayBackground.png}"
@@ -1151,6 +1153,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   ParallelCoordinatesView.xml
   PartitionedDataSet.xml
   PartitionedDataSetCollection.xml
+  PickCenter.xml
   PlotOverLine_3d.xml
   Preview.xml
   PreviewFontScaling.xml
@@ -1240,7 +1243,6 @@ list(APPEND TESTS_WITH_BASELINES
   ParticleTracerGlyph.xml
   PassArrays.xml
   PerlinNoise.xml
-  PickCenter.xml
   PointAndCellIdsHTG.xml
   Protractor.xml
   PVCellCentersHyperTreeGrid.xml
