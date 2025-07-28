@@ -1210,6 +1210,20 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(const int display_posi
     vtkSMPropertyHelper(pickingHelper, "Intersection").Get(world_position, 3);
     vtkSMPropertyHelper(pickingHelper, "IntersectionNormal").UpdateValueFromServer();
     vtkSMPropertyHelper(pickingHelper, "IntersectionNormal").Get(world_normal, 3);
+
+    // An intersection was expected but nothing found, set SnapOnMeshPoint to true (screen space
+    // selection) to ensure this is not a precision error (for example, trying to pick a vtkVertex).
+    if (world_position[0] == 0 && world_position[1] == 0 && world_position[2] == 0 &&
+      std::isnan(world_normal[0]) && std::isnan(world_normal[1]) && std::isnan(world_normal[2]))
+    {
+      vtkSMPropertyHelper(pickingHelper, "SnapOnMeshPoint").Set(true);
+      pickingHelper->UpdateVTKObjects();
+      pickingHelper->UpdateProperty("Update", 1);
+      vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();
+      vtkSMPropertyHelper(pickingHelper, "Intersection").Get(world_position, 3);
+      vtkSMPropertyHelper(pickingHelper, "IntersectionNormal").UpdateValueFromServer();
+      vtkSMPropertyHelper(pickingHelper, "IntersectionNormal").Get(world_normal, 3);
+    }
     pickingHelper->Delete();
 
     static constexpr double PI_2 = vtkMath::Pi() / 2.0f;
