@@ -306,8 +306,9 @@
     <SourceProxy name="VolumeOfRevolution"
                  class="vtkVolumeOfRevolutionFilter"
                  label="Volume Of Revolution">
-      <Documentation long_help="Create point attribute array by projecting points onto an elevation vector."
-                     short_help="Create a point array representing elevation.">
+      <Documentation long_help="This filter takes an input geometry and rotates it about given axis by
+a specified sweep angle."
+                     short_help="Rotates an input geometry about a given axis by a sweep angle.">
       </Documentation>
 
       <InputProperty name="Input" command="SetInputConnection">
