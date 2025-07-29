@@ -701,7 +701,7 @@
           <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <Documentation>
-          This property specified the input to the ghost cell generator.
+          This property specifies the input to the ghost cell generator.
         </Documentation>
       </InputProperty>
       <!-- End vtkHyperTreeGridGhostCellsGenerator -->
