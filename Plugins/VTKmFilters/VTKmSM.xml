@@ -546,6 +546,70 @@
       <!-- End VTKmExternalFaces -->
     </SourceProxy>
 
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkmHistogramSampling"
+                 label="VTKm Histogram Sampling"
+                 name="VTKmHistogramSampling">
+      <Documentation
+        long_help="Adaptively sample points to preserve tail features using point scalars."
+        short_help="Adaptively sample points to preserve tail features.">
+        The VTKm HistSampling randomly samples the points of a vtkDataSet and generates a new UnstructuredGrid with a subsampling of the points. The sampling is adaptively selected to preserve tail and outlying features of the active field.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input dataset to be used by
+        the Histogram Sampling filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Sample By"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies the name of the scalar array
+        from which the Histogram Sampling filter will resample the dataset.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetSampleFraction"
+                            default_values="0.1"
+                            name="SampleFraction"
+                            number_of_elements="1">
+
+        <Documentation>Specify the sampling rate</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty animateable="0"
+                         command="SetNumberOfBins"
+                         default_values="10"
+                         name="NumberOfBins"
+                         number_of_elements="1">
+        <Documentation>Specify the number of bins used when computing the histogram.</Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="VTKm" />
+      </Hints>
+
+      <!-- End vtkmHistogramSampling -->
+    </SourceProxy>
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkmAverageToCells"
                  label="VTKm Point Data to Cell Data"
