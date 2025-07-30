@@ -7,17 +7,23 @@
 #include "vtkCellArrayIterator.h"
 #include "vtkCompositePolyDataMapper.h"
 #include "vtkCompositePolyDataMapperDelegator.h"
+#include "vtkComputeTriangleNormals_gs.h"
 #include "vtkExtrudeCell_gs.h"
 #include "vtkExtrusionMapper.h"
 #include "vtkFloatArray.h"
+#include "vtkLogger.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLBatchedPolyDataMapper.h"
 #include "vtkOpenGLBufferObject.h"
+#include "vtkOpenGLError.h"
+#include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLRenderWindow.h"
+#include "vtkOpenGLVertexBufferObject.h"
 #include "vtkOpenGLVertexBufferObjectGroup.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataNormals.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkShaderProgram.h"
 #include "vtkTextureObject.h"
@@ -85,6 +91,13 @@ void GetTrianglesFromPolyData(
  */
 class vtkOpenGLBatchedExtrusionMapper : public vtkOpenGLBatchedPolyDataMapper
 {
+  enum ExtrusionDataType
+  {
+    None = 0,
+    Scalar = 1,
+    Vector3 = 3
+  };
+
 public:
   static vtkOpenGLBatchedExtrusionMapper* New();
   vtkTypeMacro(vtkOpenGLBatchedExtrusionMapper, vtkOpenGLBatchedPolyDataMapper);
@@ -144,6 +157,34 @@ protected:
 private:
   vtkOpenGLBatchedExtrusionMapper(const vtkOpenGLBatchedExtrusionMapper&) = delete;
   void operator=(const vtkOpenGLBatchedExtrusionMapper&) = delete;
+
+  /**
+   * Create a GPU vertex buffer object for the specified data array extrusionData.
+   * This function first checks if the given data is valid:
+   * - The data type can not be ID type.
+   * - The number of components has to be 1 (scalars) or 3 (vector 3).
+   */
+  void CreateExtrusionAttribtutesVBO(vtkDataArray* extrusionData);
+
+  /**
+   * Generate the vertex, geometry and fragment shader code to handle extrusion for point scalars
+   * input data.
+   */
+  void GeneratePointScalarsExtrusionShaders(std::map<vtkShader::Type, vtkShader*>& shaders);
+
+  /**
+   * Generate the vertex, geometry and fragment shader code to handle extrusion for point
+   * vectors input data.
+   */
+  void GeneratePointVector3ExtrusionShaders(std::map<vtkShader::Type, vtkShader*>& shaders);
+
+  /**
+   * Generate the vertex, geometry and fragment shader code to handle extrusion for cell
+   * scalars input data.
+   */
+  void GenerateCellScalarsExtrusionShaders(std::map<vtkShader::Type, vtkShader*>& shaders);
+
+  ExtrusionDataType ExtrusionVBODataType;
 };
 
 //----------------------------------------------------------------------------
@@ -152,6 +193,7 @@ vtkStandardNewMacro(vtkOpenGLBatchedExtrusionMapper);
 //-------------------------------------------------------------------------
 vtkOpenGLBatchedExtrusionMapper::vtkOpenGLBatchedExtrusionMapper()
 {
+  this->ExtrusionVBODataType = ExtrusionDataType::None;
   this->CellExtrudeBuffer->SetType(vtkOpenGLBufferObject::TextureBuffer);
 }
 
@@ -206,7 +248,9 @@ void vtkOpenGLBatchedExtrusionMapper::BuildBufferObjects(vtkRenderer* ren, vtkAc
   // if we have cell data, we construct a float texture
   if (parent->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
   {
-    this->CellExtrudeTexture->SetContext(static_cast<vtkOpenGLRenderWindow*>(ren->GetVTKWindow()));
+    this->ExtrusionVBODataType = ExtrusionDataType::Scalar;
+
+    this->CellExtrudeTexture->SetContext(vtkOpenGLRenderWindow::SafeDownCast(ren->GetVTKWindow()));
 
     std::vector<float> triangleArray;
     ::GetTrianglesFromPolyData(
@@ -231,6 +275,39 @@ void vtkOpenGLBatchedExtrusionMapper::GetDataRange(double range[2])
 }
 
 //-------------------------------------------------------------------------
+void vtkOpenGLBatchedExtrusionMapper::CreateExtrusionAttribtutesVBO(vtkDataArray* extrusionData)
+{
+  if (extrusionData->GetDataType() == VTK_ID_TYPE)
+  {
+    vtkErrorMacro(<< "Data type selected for extrusion is currently ID type which is not "
+                     "supported (64bit type)");
+    this->ExtrusionVBODataType = ExtrusionDataType::None;
+    return;
+  }
+
+  int numberOfComponents = extrusionData->GetNumberOfComponents();
+  this->ExtrusionVBODataType = static_cast<ExtrusionDataType>(numberOfComponents);
+  std::string arrayName;
+  switch (this->ExtrusionVBODataType)
+  {
+    case ExtrusionDataType::Scalar:
+      arrayName = "displacementScalar";
+      break;
+    case ExtrusionDataType::Vector3:
+      arrayName = "displacementVector";
+      break;
+    default:
+      vtkLogF(ERROR,
+        "Unsupported data type for extrusion! Extrusion surface currently supports scalars or "
+        "vector3, got %i components element.",
+        numberOfComponents);
+      return;
+  }
+
+  this->VBOs->AppendDataArray(arrayName.c_str(), extrusionData, extrusionData->GetDataType());
+}
+
+//-------------------------------------------------------------------------
 void vtkOpenGLBatchedExtrusionMapper::AppendOneBufferObject(vtkRenderer* ren, vtkActor* act,
   GLBatchElement* glBatchElement, vtkIdType& vertex_offset, std::vector<unsigned char>& colors,
   std::vector<float>& norms)
@@ -239,22 +316,14 @@ void vtkOpenGLBatchedExtrusionMapper::AppendOneBufferObject(vtkRenderer* ren, vt
 
   if (parent->FieldAssociation != vtkDataObject::FIELD_ASSOCIATION_CELLS)
   {
-    vtkDataArray* scalars = this->GetInputArrayToProcess(0, this->CurrentInput);
+    vtkDataArray* extrusionDataArray = this->GetInputArrayToProcess(0, this->CurrentInput);
 
-    if (scalars)
+    if (extrusionDataArray)
     {
-      if (scalars->GetDataType() != VTK_ID_TYPE)
-      {
-        // create "scalar" attribute on vertex buffer
-        this->VBOs->AppendDataArray("scalar", scalars, scalars->GetDataType());
-      }
-      else
-      {
-        vtkErrorMacro(<< "Data type selected for extrusion is currently ID type which is not "
-                         "supported (64bit type)");
-      }
+      this->CreateExtrusionAttribtutesVBO(extrusionDataArray);
     }
 
+    // Add or create normals
     vtkDataArray* normals = this->CurrentInput->GetPointData()->GetNormals();
     vtkNew<vtkPolyDataNormals> normalsFilter;
     if (!normals)
@@ -263,7 +332,7 @@ void vtkOpenGLBatchedExtrusionMapper::AppendOneBufferObject(vtkRenderer* ren, vt
       normalsFilter->Update();
       normals = normalsFilter->GetOutput()->GetPointData()->GetNormals();
     }
-    this->VBOs->AppendDataArray("normals", normals, normals->GetDataType());
+    this->VBOs->AppendDataArray("extrusionNormalsMC", normals, normals->GetDataType());
   }
   this->Superclass::AppendOneBufferObject(ren, act, glBatchElement, vertex_offset, colors, norms);
 }
@@ -272,62 +341,151 @@ void vtkOpenGLBatchedExtrusionMapper::AppendOneBufferObject(vtkRenderer* ren, vt
 void vtkOpenGLBatchedExtrusionMapper::ReplaceShaderValues(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
-
   vtkExtrusionMapper* parent = static_cast<vtkExtrusionMapper*>(this->Parent);
 
-  if (parent->GetExtrusionFactor() != 0.f)
+  if (parent->GetExtrusionFactor() != 0.f && this->ExtrusionVBODataType != ExtrusionDataType::None)
   {
-    std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
-    std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
-
     if (parent->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
-      vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
-        "//VTK::PositionVC::Dec\n" // other declarations will be done by the superclass
-        "out vec4 vertexMCVSOutput;\n");
-
-      vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
-        "//VTK::PositionVC::Impl\n" // other declarations will be done by the superclass
-        "  vertexMCVSOutput = vertexMC;\n");
-
-      shaders[vtkShader::Geometry]->SetSource(vtkExtrudeCell_gs);
-
-      vtkShaderProgram::Substitute(FSSource, "//VTK::Normal::Dec", "in vec3 normalVCGSOutput;\n");
-      vtkShaderProgram::Substitute(FSSource, "//VTK::Normal::Impl", "");
+      this->GenerateCellScalarsExtrusionShaders(shaders);
     }
     else
     {
-      vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
-        "//VTK::PositionVC::Dec\n" // other declarations will be done by the superclass
-        "uniform vec2 scalarRange;\n"
-        "uniform float extrusionFactor;\n"
-        "uniform int normalizeData;\n"
-        "in float scalar;\n"
-        "in vec3 normals;\n");
-
-      vtkShaderProgram::Substitute(
-        VSSource, "//VTK::PositionVC::Dec", "out vec4 vertexVCVSOutput;");
-
-      vtkShaderProgram::Substitute(VSSource, "//VTK::Camera::Dec",
-        "uniform mat4 MCDCMatrix;\n"
-        "uniform mat4 MCVCMatrix;\n");
-
-      vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
-        "float factor = scalar * extrusionFactor;\n"
-        "  if (normalizeData != 0)\n"
-        "    factor = extrusionFactor * clamp((scalar-scalarRange.x) / "
-        "(scalarRange.y-scalarRange.x), 0.0, 1.0);\n"
-        "  vec4 dirMC = inverse(MCVCMatrix)*normalize(MCVCMatrix*vec4(normals, 0.0));\n"
-        "  vec4 newPosMC = vertexMC + factor*dirMC;\n"
-        "  vertexVCVSOutput = MCVCMatrix * newPosMC;\n"
-        "  gl_Position = MCDCMatrix * newPosMC;\n");
+      switch (this->ExtrusionVBODataType)
+      {
+        case ExtrusionDataType::None:
+          vtkLogF(ERROR,
+            "Input data type has not been set correctly, unable to generate extrusion shader "
+            "code!");
+          break;
+        case ExtrusionDataType::Scalar:
+          this->GeneratePointScalarsExtrusionShaders(shaders);
+          break;
+        case ExtrusionDataType::Vector3:
+          this->GeneratePointVector3ExtrusionShaders(shaders);
+          break;
+      }
     }
-
-    shaders[vtkShader::Vertex]->SetSource(VSSource);
-    shaders[vtkShader::Fragment]->SetSource(FSSource);
   }
 
   this->Superclass::ReplaceShaderValues(shaders, ren, actor);
+}
+
+//-----------------------------------------------------------------------------
+void vtkOpenGLBatchedExtrusionMapper::GeneratePointScalarsExtrusionShaders(
+  std::map<vtkShader::Type, vtkShader*>& shaders)
+{
+  std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+
+  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
+    // other declarations will be done by the superclass, hence keeping the key here
+    R"(
+  //VTK::PositionVC::Dec
+  uniform vec2 scalarRange;
+  uniform float extrusionFactor;
+  uniform int normalizeData;
+  in float displacementScalar;
+  in vec3 extrusionNormalsMC;)");
+  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
+    R"(
+  float factor = displacementScalar * extrusionFactor;
+  if (normalizeData != 0)
+  {
+    factor = extrusionFactor * clamp((displacementScalar - scalarRange.x) / (scalarRange.y - scalarRange.x), 0.0, 1.0);
+  }
+  vec4 dirMC = inverse(MCVCMatrix) * normalize(MCVCMatrix*vec4(extrusionNormalsMC, 0.0));
+  vec4 newPosMC = vertexMC + factor * dirMC;
+  vertexVCVSOutput = MCVCMatrix * newPosMC;
+  gl_Position = MCDCMatrix * newPosMC;)");
+
+  shaders[vtkShader::Vertex]->SetSource(VSSource);
+}
+
+//-----------------------------------------------------------------------------
+void vtkOpenGLBatchedExtrusionMapper::GeneratePointVector3ExtrusionShaders(
+  std::map<vtkShader::Type, vtkShader*>& shaders)
+{
+  std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+  std::string GSSource = shaders[vtkShader::Geometry]->GetSource();
+  std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
+
+  vtkShaderProgram::Substitute(VSSource, "//VTK::Camera::Dec",
+    R"(
+  uniform mat4 MCDCMatrix;
+  uniform mat4 MCVCMatrix;)");
+
+  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
+    R"(
+  uniform float extrusionFactor;
+  uniform vec3 vertexScaleMC;
+  uniform vec2 scalarRange;
+  uniform int normalizeData;
+
+  in vec3 displacementVector;
+  in vec3 extrusionNormalsMC;
+
+  out vec3 vertexMCVSUnscaled;
+  out vec4 vertexMCVSOutput;
+  out vec4 vertexVCVSOutput;)");
+  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
+    R"(
+  vec3 normalizationFactor = vec3(1.0); // Make default 1 in case no normalization is needed.
+  if (normalizeData != 0)
+  {
+    normalizationFactor = (displacementVector - scalarRange.x) / (scalarRange.y - scalarRange.x);
+    normalizationFactor = clamp(normalizationFactor, 0.0, 1.0);
+  }
+  vec4 vertexDisplacementMC = vec4(displacementVector * vertexScaleMC * normalizationFactor * extrusionFactor, 0.0);
+  vec4 newPosMC = vertexMC + vertexDisplacementMC;
+  vertexMCVSUnscaled = newPosMC.xyz / vertexScaleMC;
+  vertexMCVSOutput = newPosMC;
+  vertexVCVSOutput = MCVCMatrix * vertexMCVSOutput;
+  gl_Position = MCDCMatrix * vertexMCVSOutput;)");
+
+  // If triangles are drawn, we need to recalculate their normals, hence attaching the geometry
+  // shader.
+  if (this->LastBoundBO->PrimitiveType == vtkOpenGLPolyDataMapper::PrimitiveTris ||
+    this->LastBoundBO->PrimitiveType == vtkOpenGLPolyDataMapper::PrimitiveTriStrips)
+  {
+    GSSource = vtkComputeTriangleNormals_gs;
+
+    vtkShaderProgram::Substitute(FSSource, "//VTK::Normal::Dec", "in vec3 normalVCGSOutput;\n");
+  }
+
+  shaders[vtkShader::Vertex]->SetSource(VSSource);
+  shaders[vtkShader::Geometry]->SetSource(GSSource);
+  shaders[vtkShader::Fragment]->SetSource(FSSource);
+}
+
+//-----------------------------------------------------------------------------
+void vtkOpenGLBatchedExtrusionMapper::GenerateCellScalarsExtrusionShaders(
+  std::map<vtkShader::Type, vtkShader*>& shaders)
+{
+  std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+  std::string GSSource = shaders[vtkShader::Geometry]->GetSource();
+  std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
+
+  vtkShaderProgram::Substitute(VSSource, "//VTK::Camera::Dec",
+    R"(
+  uniform mat4 MCDCMatrix;
+  uniform mat4 MCVCMatrix;)");
+
+  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
+    "//VTK::PositionVC::Dec\n" // other declarations will be done by the superclass
+    "out vec4 vertexMCVSOutput;\n");
+
+  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
+    "//VTK::PositionVC::Impl\n" // other declarations will be done by the superclass
+    "  vertexMCVSOutput = vertexMC;\n");
+
+  GSSource = vtkExtrudeCell_gs;
+
+  vtkShaderProgram::Substitute(FSSource, "//VTK::Normal::Dec", "in vec3 normalVCGSOutput;\n");
+  vtkShaderProgram::Substitute(FSSource, "//VTK::Normal::Impl", "");
+
+  shaders[vtkShader::Vertex]->SetSource(VSSource);
+  shaders[vtkShader::Geometry]->SetSource(GSSource);
+  shaders[vtkShader::Fragment]->SetSource(FSSource);
 }
 
 //-----------------------------------------------------------------------------
@@ -337,10 +495,14 @@ void vtkOpenGLBatchedExtrusionMapper::SetShaderValues(
   this->Superclass::SetShaderValues(prog, glBatchElement, primOffset); // update uniforms
   vtkExtrusionMapper* parent = static_cast<vtkExtrusionMapper*>(this->Parent);
 
-  // scale factor to [-MaxBoundsLength ; MaxBoundsLength]
-  double factor = (parent->GetExtrusionFactor() * 0.01) * parent->MaxBoundsLength;
+  // Component wise scale, used to scale the displacement before adding the displacement to the
+  // vertices.
+  const std::vector<double>& scale = this->VBOs->GetVBO("vertexMC")->GetScale();
+  prog->SetUniform3f("vertexScaleMC", scale.data());
 
+  double factor = parent->GetExtrusionFactor();
   prog->SetUniformf("extrusionFactor", factor);
+
   prog->SetUniformi("basisVisibility", parent->BasisVisibility);
   prog->SetUniformi("normalizeData", parent->GetNormalizeData() ? 1 : 0);
 
