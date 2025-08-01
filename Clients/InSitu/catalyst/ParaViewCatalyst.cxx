@@ -7,24 +7,22 @@
 #include <catalyst_conduit_blueprint.hpp>
 #include <catalyst_stub.h>
 
-#include "vtkCallbackCommand.h"
 #include "vtkCatalystBlueprint.h"
-#include "vtkCommand.h"
 #include "vtkConduitSource.h"
+#include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataObjectToConduit.h"
+#include "vtkDataObjectTree.h"
 #include "vtkInSituInitializationHelper.h"
 #include "vtkInSituPipelineIO.h"
 #include "vtkInSituPipelinePython.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkPVLogger.h"
 #include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtksys/SystemTools.hxx"
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
@@ -206,21 +204,23 @@ static bool convert_to_blueprint_mesh(
     return true;
   }
 
-  conduit_cpp::Node channel = node[name];
-  if (auto multi_block = vtkMultiBlockDataSet::SafeDownCast(outputDataObject))
+  if (auto object_tree = vtkDataObjectTree::SafeDownCast(outputDataObject))
   {
-    if (auto data_object = multi_block->GetBlock(0))
-    {
-      return vtkDataObjectToConduit::FillConduitNode(data_object, channel);
-    }
-  }
-  else if (auto partitioned = vtkPartitionedDataSet::SafeDownCast(outputDataObject))
-  {
-    return vtkDataObjectToConduit::FillConduitNode(
-      partitioned->GetPartitionAsDataObject(0), channel);
+    conduit_cpp::Node channel = node[name];
+    channel["type"] = "multimesh";
+
+    vtkNew<vtkConvertToPartitionedDataSetCollection> convertToPDC;
+    convertToPDC->SetInputDataObject(object_tree);
+    convertToPDC->Update();
+
+    vtkPartitionedDataSetCollection* pdc = convertToPDC->GetOutput();
+    conduit_cpp::Node channel_data = node[name]["data"];
+    return vtkDataObjectToConduit::FillConduitNode(pdc, channel_data);
   }
 
-  return vtkDataObjectToConduit::FillConduitNode(outputDataObject, channel);
+  node[name]["type"] = "mesh";
+  conduit_cpp::Node channel_data = node[name]["data"];
+  return vtkDataObjectToConduit::FillConduitNode(outputDataObject, channel_data);
 }
 
 enum paraview_catalyst_status
