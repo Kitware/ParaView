@@ -739,7 +739,7 @@
       <!-- End of TimerLog -->
     </Proxy>
 
-    <Proxy class="vtkExecutableRunner"
+    <Proxy class="vtkPExecutableRunner"
            name="ExecutableRunner" >
       <Documentation>
         Execute a process on server side.

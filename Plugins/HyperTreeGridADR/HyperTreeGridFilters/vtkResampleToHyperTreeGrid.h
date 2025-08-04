@@ -228,8 +228,6 @@ protected:
 
   int FillOutputPortInformation(int, vtkInformation*) override;
 
-  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-
   int RequestData(vtkInformation* request, vtkInformationVector**, vtkInformationVector*);
 
   int ProcessTrees(vtkHyperTreeGrid*, vtkDataObject*);

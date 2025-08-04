@@ -1289,8 +1289,8 @@ void vtkGeometryRepresentation::UpdateGeneralTextureTransform()
   if (this->Actor && this->Actor->GetPropertyKeys())
   {
     vtkInformation* info = this->Actor->GetPropertyKeys();
-    info->Remove(vtkProp::GeneralTextureTransform());
-    info->Set(vtkProp::GeneralTextureTransform(),
+    info->Remove(vtkProp::GENERAL_TEXTURE_TRANSFORM());
+    info->Set(vtkProp::GENERAL_TEXTURE_TRANSFORM(),
       &(this->TextureTransform->GetMatrix()->Element[0][0]), 16);
     this->Actor->Modified();
   }

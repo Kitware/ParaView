@@ -139,22 +139,6 @@ int vtkResampleToHyperTreeGrid::FillOutputPortInformation(int, vtkInformation* i
   return 1;
 }
 
-int vtkResampleToHyperTreeGrid::RequestInformation(
-  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
-{
-  // Get the information objects
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  // We cannot give the exact number of levels of the hypertrees
-  // because it is not generated yet and this process depends on the recursion formula.
-  // Just send an upper limit instead.
-  outInfo->Set(vtkHyperTreeGrid::LEVELS(), this->MaxDepth);
-  outInfo->Set(vtkHyperTreeGrid::DIMENSION(), 3);
-  outInfo->Set(vtkHyperTreeGrid::ORIENTATION(), 0);
-
-  return 1;
-}
-
 //----------------------------------------------------------------------------
 int vtkResampleToHyperTreeGrid::RequestData(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
@@ -1874,12 +1858,6 @@ int vtkResampleToHyperTreeGrid::ProcessRequest(
   if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()))
   {
     return this->RequestUpdateExtent(request, inputVector, outputVector);
-  }
-
-  // execute information
-  if (request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
-  {
-    return this->RequestInformation(request, inputVector, outputVector);
   }
 
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);

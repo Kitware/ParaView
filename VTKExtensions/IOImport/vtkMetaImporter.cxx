@@ -122,7 +122,7 @@ nlohmann::json to_json(vtkActor* actor, const std::string& name)
   if (actor->GetPropertyKeys())
   {
     // determine whether importer flipped the textures.
-    double* textureTransform = actor->GetPropertyKeys()->Get(vtkProp::GeneralTextureTransform());
+    double* textureTransform = actor->GetPropertyKeys()->Get(vtkProp::GENERAL_TEXTURE_TRANSFORM());
     const double mat[] = { 1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1 };
     for (int i = 0; i < 16; ++i)
     {
