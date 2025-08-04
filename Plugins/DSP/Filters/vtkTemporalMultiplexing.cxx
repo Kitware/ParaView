@@ -49,7 +49,7 @@ public:
 };
 
 template <typename ValueType>
-class TypedWorker : public Worker
+class TypedWorker final : public Worker
 {
 public:
   /**
