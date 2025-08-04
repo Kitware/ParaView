@@ -91,6 +91,7 @@ protected:
   {
     QString Label;
     QString FilePath;
+    QString Origin;
     int Type;
   };
 
@@ -98,6 +99,29 @@ protected:
   pqServer* Server = nullptr;
   QList<pqFileDialogFavoriteModelFileInfo> FavoriteList;
   QString SettingsKey;
+
+private:
+  /**
+   * Retrieves favorites from settings in ParaView.ini by parsing the UserFavorites group.
+   * This is called when the user has set the LoadAllFavorites setting to true.
+   */
+  void populateFavoritesFromSettings();
+
+  /**
+   * Retrieves favorites from the active server or the builtin server's file system.
+   * This is called when the user has set the LoadAllFavorites setting to false.
+   */
+  void populateFavoritesFromActiveServer();
+
+  /**
+   * Load favorites from a specific key in the settings.
+   */
+  void appendFavoritesFromKey(const QString& key);
+
+  /**
+   * Saves the favorites to the settings in ParaView.ini.
+   */
+  void saveFavoritesToSettings();
 };
 
 #endif // !pqFileDialogFavoriteModel_h

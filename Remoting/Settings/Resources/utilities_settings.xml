@@ -120,6 +120,18 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="LoadAllFavorites"
+        number_of_elements="1"
+        default_values="0" >
+        <Documentation>
+           Always load all favorites, disrespecting the servers they were added from.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty name="ForceSingleColumnMenus"
         number_of_elements="1"
         default_values="0"
@@ -669,6 +681,7 @@
         <Property name="AutoSave" />
         <Property name="AutoSaveStateFormat" />
         <Property name="AutoSaveDirectory" />
+        <Property name="LoadAllFavorites" />
       </PropertyGroup>
 
       <PropertyGroup label="GUI Font">
