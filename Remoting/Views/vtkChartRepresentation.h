@@ -176,6 +176,22 @@ public:
   virtual bool Export(vtkAbstractChartExporter* vtkNotUsed(exporter)) { return false; }
   ///@}
 
+  enum ArraySelectionModes
+  {
+    MERGED_BLOCKS = 0,
+    INDIVIDUAL_BLOCKS = 1,
+  };
+
+  ///@{
+  /**
+   * ArraySelectionMode controls how arrays are selected for charting in composite datasets.
+   * MERGED_BLOCKS means arrays are selected once and applied to all blocks.
+   * INDIVIDUAL_BLOCKS means arrays are selected independently for each leaf block.
+   */
+  vtkGetMacro(ArraySelectionMode, int);
+  void SetArraySelectionMode(int mode);
+  ///@}
+
   ///@{
   /**
    * Set/Get the placeholder data type.
@@ -278,6 +294,7 @@ protected:
   int FieldAssociation;
   vtkWeakPointer<vtkPVContextView> ContextView;
   int FlattenTable;
+  int ArraySelectionMode = MERGED_BLOCKS;
 
   // This is used to be able to create the correct placeHolder in RequestData for the client
   int PlaceHolderDataType = VTK_PARTITIONED_DATA_SET_COLLECTION;

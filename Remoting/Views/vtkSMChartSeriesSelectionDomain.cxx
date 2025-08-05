@@ -4,6 +4,7 @@
 
 #include "vtkChartRepresentation.h"
 #include "vtkCommand.h"
+#include "vtkDataAssembly.h"
 #include "vtkDataObject.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -171,6 +172,18 @@ std::vector<Key> GetKeys(const std::map<Key, Value>& map)
     [](const std::pair<Key, Value>& pair) { return pair.first; });
   return result;
 }
+//----------------------------------------------------------------------------
+// Get the intersection of two maps.
+template <typename Key, typename Value>
+std::map<Key, Value> GetIntersection(
+  const std::map<Key, Value>& map1, const std::map<Key, Value>& map2)
+{
+  std::map<Key, Value> intersection;
+  std::set_intersection(map1.begin(), map1.end(), map2.begin(), map2.end(),
+    std::inserter(intersection, intersection.begin()));
+
+  return intersection;
+}
 } // namespace
 
 //----------------------------------------------------------------------------
@@ -198,6 +211,8 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
     vtkSMStringVectorProperty::SafeDownCast(this->GetRequiredProperty("ActiveAssembly"));
   const auto selectors =
     vtkSMStringVectorProperty::SafeDownCast(this->GetRequiredProperty("Selectors"));
+  const auto arraySelectionMode =
+    vtkSMIntVectorProperty::SafeDownCast(this->GetRequiredProperty("ArraySelectionMode"));
 
   // clear old component names.
   this->Internals->VisibilityOverrides.clear();
@@ -216,26 +231,52 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
 
   assert(activeAssembly->GetNumberOfUncheckedElements() == 1);
 
+  auto assembly = dataInfo->GetDataAssembly(activeAssembly->GetUncheckedElement(0));
+  const bool intersectColumnNames =
+    arraySelectionMode && arraySelectionMode->GetUncheckedElement(0) == 0 /*MERGED_BLOCKS*/;
   std::vector<std::string> columnNames;
+  std::map<std::string, bool> intersectedColumnNameOverrides;
   const int fieldAssociation = fieldDataSelection->GetUncheckedElement(0);
   const unsigned int numElems = selectors->GetNumberOfUncheckedElements();
   for (unsigned int cc = 0; cc < numElems; cc++)
   {
     std::string blockName;
-    if (selectors->GetRepeatCommand())
+    if (selectors->GetRepeatCommand() && !intersectColumnNames)
     {
       const auto blockNames = dataInfo->GetBlockNames(
         { selectors->GetUncheckedElement(cc) }, activeAssembly->GetUncheckedElement(0));
       blockName = blockNames.empty() ? selectors->GetUncheckedElement(cc) : blockNames.front();
     }
-
+    const bool skipPartialArrays = intersectColumnNames && assembly &&
+      assembly->GetFirstNodeByPath(selectors->GetUncheckedElement(cc)) == assembly->GetRootNode();
     auto childInfo = this->GetInputSubsetDataInformation(
       selectors->GetUncheckedElement(cc), activeAssembly->GetUncheckedElement(0), "Input");
-    auto blockColumnNameOverrides =
-      this->CollectAvailableArrays(blockName, childInfo, fieldAssociation, this->FlattenTable);
-    this->SetDefaultVisibilityOverrides(blockColumnNameOverrides, false);
-    auto block_column_names = GetKeys(blockColumnNameOverrides);
-    columnNames.insert(columnNames.end(), block_column_names.begin(), block_column_names.end());
+    auto blockColumnNameOverrides = this->CollectAvailableArrays(
+      blockName, childInfo, fieldAssociation, this->FlattenTable, skipPartialArrays);
+    if (!intersectColumnNames)
+    {
+      this->SetDefaultVisibilityOverrides(blockColumnNameOverrides, false);
+      auto block_column_names = GetKeys(blockColumnNameOverrides);
+      columnNames.insert(columnNames.end(), block_column_names.begin(), block_column_names.end());
+    }
+    else if (!blockColumnNameOverrides.empty())
+    {
+      if (intersectedColumnNameOverrides.empty())
+      {
+        // if this is the first selector, we simply copy all names.
+        intersectedColumnNameOverrides = blockColumnNameOverrides;
+      }
+      else
+      {
+        intersectedColumnNameOverrides =
+          GetIntersection(intersectedColumnNameOverrides, blockColumnNameOverrides);
+      }
+    }
+  }
+  if (intersectColumnNames)
+  {
+    this->SetDefaultVisibilityOverrides(intersectedColumnNameOverrides, false);
+    columnNames = GetKeys(intersectedColumnNameOverrides);
   }
   this->SetStrings(columnNames);
 }
@@ -245,7 +286,7 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
 // used to "uniquify" the array names.
 std::map<std::string, bool> vtkSMChartSeriesSelectionDomain::CollectAvailableArrays(
   const std::string& blockName, vtkPVDataInformation* dataInfo, int fieldAssociation,
-  bool flattenTable)
+  bool flattenTable, bool skipPartialArrays)
 {
   vtkChartRepresentation* chartRepr =
     vtkChartRepresentation::SafeDownCast(this->GetProperty()->GetParent()->GetClientSideObject());
@@ -265,7 +306,8 @@ std::map<std::string, bool> vtkSMChartSeriesSelectionDomain::CollectAvailableArr
     for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkPVArrayInformation* arrayInfo = iter->GetCurrentArrayInformation();
-      this->CollectArrayComponents(chartRepr, blockName, stringOverrides, arrayInfo, flattenTable);
+      this->CollectArrayComponents(
+        chartRepr, blockName, stringOverrides, arrayInfo, flattenTable, skipPartialArrays);
     }
   }
 
@@ -283,9 +325,10 @@ std::map<std::string, bool> vtkSMChartSeriesSelectionDomain::CollectAvailableArr
 // used to "uniquify" the array names.
 void vtkSMChartSeriesSelectionDomain::CollectArrayComponents(vtkChartRepresentation* chartRepr,
   const std::string& blockName, std::map<std::string, bool>& stringOverrides,
-  vtkPVArrayInformation* arrayInfo, bool flattenTable)
+  vtkPVArrayInformation* arrayInfo, bool flattenTable, bool skipPartialArrays)
 {
-  if (arrayInfo && (!this->HidePartialArrays || arrayInfo->GetIsPartial() == 0))
+  auto showPartialArrays = !this->HidePartialArrays && !skipPartialArrays;
+  if (arrayInfo && (showPartialArrays || arrayInfo->GetIsPartial() == 0))
   {
     int dataType = arrayInfo->GetDataType();
     if (dataType != VTK_STRING && dataType != VTK_VARIANT)

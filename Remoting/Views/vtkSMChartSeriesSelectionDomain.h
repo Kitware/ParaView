@@ -118,7 +118,8 @@ protected:
    * used to "uniquify" the array names.
    */
   virtual std::map<std::string, bool> CollectAvailableArrays(const std::string& blockName,
-    vtkPVDataInformation* dataInfo, int fieldAssociation, bool flattenTable);
+    vtkPVDataInformation* dataInfo, int fieldAssociation, bool flattenTable,
+    bool skipPartialArrays = false);
 
   /**
    * Build up the domain with provided array.
@@ -127,7 +128,7 @@ protected:
    */
   virtual void CollectArrayComponents(vtkChartRepresentation* chartRepr,
     const std::string& blockName, std::map<std::string, bool>& stringOverrides,
-    vtkPVArrayInformation* dataInfo, bool flattenTable);
+    vtkPVArrayInformation* dataInfo, bool flattenTable, bool skipPartialArrays = false);
 
   /**
    * Call this method in PopulateAvailableArrays() to override a specific array's
