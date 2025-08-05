@@ -48,18 +48,20 @@ void vtkPVMergeTables::MergeTables(vtkTable* output, const std::vector<vtkTable*
   }
 
   vtkDataSetAttributes::FieldList fields;
+  vtkIdType totalRows = 0;
   for (auto& curTable : tables)
   {
     if (curTable->GetNumberOfRows() > 0 && curTable->GetNumberOfColumns() > 0)
     {
       fields.IntersectFieldList(curTable->GetRowData());
+      totalRows += curTable->GetNumberOfRows();
     }
   }
 
   auto outRD = output->GetRowData();
   // passing sz=0 ensures that fields simply uses the accumulated counts for
   // number of rows.
-  fields.CopyAllocate(outRD, vtkDataSetAttributes::PASSDATA, /*sz=*/0, /*ext=*/0);
+  fields.CopyAllocate(outRD, vtkDataSetAttributes::PASSDATA, totalRows, /*ext=*/0);
 
   vtkIdType outStartRow = 0;
   int fieldsInputIdx = 0;
@@ -76,6 +78,7 @@ void vtkPVMergeTables::MergeTables(vtkTable* output, const std::vector<vtkTable*
     outStartRow += inNumRows;
     ++fieldsInputIdx;
   }
+  assert(outStartRow == totalRows);
 }
 
 //----------------------------------------------------------------------------
