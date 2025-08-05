@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Save state file -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/AllProperties.py" />
+
+  <!-- Select All Properties -->
+  <pqevent object="StateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/PropertiesToTraceOnCreate/ComboBox" command="activated" arguments="all properties" />
+  <pqevent object="StateOptionsDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Load state file -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
+  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/AllProperties.py" />
+</pqevents>
