@@ -204,6 +204,27 @@ void vtkSMVRPythonInteractorStyleProxy::UpdateVTKObjects()
   this->ReloadPythonFile();
 }
 
+bool vtkSMVRPythonInteractorStyleProxy::Update()
+{
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
+  vtkPythonScopeGilEnsurer gilEnsurer;
+
+  if (!this->Internals->PythonObject)
+  {
+    vtkWarningMacro("No python object in Update()");
+    return true;
+  }
+
+  vtkSmartPyObject fname(PyUnicode_FromString("Update"));
+  vtkSmartPyObject vtkself(vtkPythonUtil::GetObjectFromPointer(this));
+  PyObject_CallMethodObjArgs(
+    this->Internals->PythonObject.GetPointer(), fname.GetPointer(), vtkself.GetPointer(), nullptr);
+  CheckAndFlushPythonErrors();
+#endif
+
+  return true;
+}
+
 // ----------------------------------------------------------------------------
 void vtkSMVRPythonInteractorStyleProxy::InvokeHandler(const char* mname, const vtkVREvent& event)
 {

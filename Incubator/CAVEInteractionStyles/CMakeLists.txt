@@ -1,17 +1,15 @@
 set(classes
-  vtkSMVRControlSliceOrientationStyleProxy
-  vtkSMVRControlSlicePositionStyleProxy
-  vtkSMVRGrabPointStyleProxy
-  vtkSMVRGrabTransformStyleProxy
-  vtkSMVRGrabWorldStyleProxy
+  vtkSMVRControlLocationEgoStyleProxy
+  vtkSMVRControlOrientationStyleProxy
+  vtkSMVRControlLocationStyleProxy
+  vtkSMVRTravelGrabEgoStyleProxy
+  vtkSMVRTravelGrabExoSplitStyleProxy
   vtkSMVRInteractorStyleProxy
-  vtkSMVRMovePointStyleProxy
+  vtkSMVRControlLocationRelativeStyleProxy
   vtkSMVRPythonInteractorStyleProxy
-  vtkSMVRResetTransformStyleProxy
-  vtkSMVRSkeletonStyleProxy
-  vtkSMVRStylusStyleProxy
+  vtkSMVRDebugStyleProxy
+  vtkSMVRTravelTrackballExoSplitStyleProxy
   vtkSMVRTrackStyleProxy
-  vtkSMVRVirtualHandStyleProxy
   vtkVRQueue)
 
 vtk_module_add_module(ParaViewIncubator::CAVEInteractionStyles

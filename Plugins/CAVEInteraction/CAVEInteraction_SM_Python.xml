@@ -20,6 +20,15 @@
                 panel_widget="command_button">
         <Documentation>Reload the python file</Documentation>
       </Property>
+      <Documentation>
+        This interactor style allows writing custom interaction code in Python.
+        Once added, you can select the style in the list to display the FileName
+        property in the UI, which allows you to choose the Python module to use.
+        The Refresh property in the UI triggers re-reading of the Python module,
+        and it requires you to reconfigure the events. For an example Python
+        interactor style, see Examples/CAVE/CustomPythonInteractorStyle.py in
+        the ParaView source repository.
+      </Documentation>
     </VRPythonInteractorStyleProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

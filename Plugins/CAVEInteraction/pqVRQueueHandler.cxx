@@ -9,6 +9,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMVRInteractorStyleProxy.h"
+#include "vtkTimerLog.h"
 #include "vtkVRInteractorStyleFactory.h"
 #include "vtkVRQueue.h"
 #include "vtkWeakPointer.h"
@@ -141,10 +142,7 @@ void pqVRQueueHandler::processEvents()
          (style = vtkSMVRInteractorStyleProxy::SafeDownCast(
             this->Internals->Styles->GetNextItemAsObject()));)
     {
-      if (style->HandleEvent(event))
-      {
-        break;
-      }
+      style->HandleEvent(event);
     }
   }
 
@@ -155,10 +153,7 @@ void pqVRQueueHandler::processEvents()
        (style = vtkSMVRInteractorStyleProxy::SafeDownCast(
           this->Internals->Styles->GetNextItemAsObject()));)
   {
-    if (style->Update())
-    {
-      break;
-    }
+    style->Update();
   }
 
   this->render();

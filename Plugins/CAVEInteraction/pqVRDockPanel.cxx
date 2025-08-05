@@ -172,10 +172,13 @@ void pqVRDockPanel::initStyles()
 {
   vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
   std::vector<std::string> styleDescs = styleFactory->GetInteractorStyleDescriptions();
+  std::vector<std::string> styleDocs = styleFactory->GetInteractorStyleDocStrings();
   this->Internals->stylesCombo->clear();
   for (size_t i = 0; i < styleDescs.size(); ++i)
   {
     this->Internals->stylesCombo->addItem(QString::fromStdString(styleDescs[i]));
+    this->Internals->stylesCombo->setItemData(
+      i, QString::fromStdString(styleDocs[i]), Qt::ToolTipRole);
   }
 
   QObject::connect(this->Internals->stylesCombo, &QComboBox::currentTextChanged, this,

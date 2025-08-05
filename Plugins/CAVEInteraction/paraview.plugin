@@ -13,6 +13,7 @@ REQUIRES_MODULES
   VTK::CommonCore
   VTK::CommonMath
   VTK::CommonTransforms
+  VTK::CommonSystem
   VTK::RenderingCore
   VTK::RenderingOpenGL2
   VTK::RenderingVR

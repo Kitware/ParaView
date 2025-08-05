@@ -3,68 +3,127 @@
     <VRTrackStyleProxy name="Track"
                        processes="client|renderserver|dataserver">
       <Documentation>
-        Implements head tracking
+        Implements head tracking if used on the render view proxy and the
+        "EyeTransformMatrix". If you have more than one RenderView, be sure to
+        select the one connected to the CAVE displays.
       </Documentation>
     </VRTrackStyleProxy>
-    <VRGrabWorldStyleProxy name="GrabWorld"
-                           processes="client|renderserver|dataserver">
-      <Documentation>
-        Grab World
-      </Documentation>
-    </VRGrabWorldStyleProxy>
-    <VRVirtualHandStyleProxy name="VirtualHand"
-                             processes="client">
-      <Documentation>
-        Virtual Hand
-      </Documentation>
-    </VRVirtualHandStyleProxy>
-    <VRStylusStyleProxy name="Stylus"
-                        processes="client|renderserver|dataserver">
-      <Documentation>
-        Stylus
-      </Documentation>
-    </VRStylusStyleProxy>
-    <VRGrabPointStyleProxy name="GrabPoint"
-                           processes="client|renderserver|dataserver">
-      <Documentation>
-        Grab Point
-      </Documentation>
-    </VRGrabPointStyleProxy>
-    <VRControlSliceOrientationStyleProxy name="ControlSliceOrientation"
-                                         processes="client|renderserver|dataserver">
-      <Documentation>
-        Control Slice Orientation
-      </Documentation>
-    </VRControlSliceOrientationStyleProxy>
-    <VRControlSlicePositionStyleProxy name="ControlSlicePosition"
-                                      processes="client|renderserver|dataserver">
-      <Documentation>
-        Control Slice Position
-      </Documentation>
-    </VRControlSlicePositionStyleProxy>
-    <VRSkeletonStyleProxy name="Skeleton"
-                          processes="client|renderserver|dataserver">
-      <Documentation>
-        Skeleton
-      </Documentation>
-    </VRSkeletonStyleProxy>
-    <VRMovePointStyleProxy name="MovePoint"
-                           processes="client|renderserver|dataserver">
-      <Documentation>
-        Move Point
-      </Documentation>
-    </VRMovePointStyleProxy>
-    <VRResetTransformStyleProxy name="ResetTransform"
-                                processes="client|renderserver|dataserver">
-      <Documentation>
-        Reset Transform
-      </Documentation>
-    </VRResetTransformStyleProxy>
-    <VRGrabTransformStyleProxy name="GrabTransform"
+    <VRTravelGrabEgoStyleProxy name="TravelGrabEgo"
                                processes="client|renderserver|dataserver">
       <Documentation>
-        Grab Transform
+        Uses a single button to control position and orientation of a 4x4 matrix
+        (really only useful with a RenderView proxy and ModelTransformMatrix).
+        The target matrix property appears to remain as if at the end of a stick,
+        and it orbits around the user or translates in 3D space, following the
+        orientation and position of the tracker. Does not require an active camera
+        or use view information to do any computations. Includes reset functionality.
+        Requires 2 buttons and 1 tracker.
       </Documentation>
-    </VRGrabTransformStyleProxy>
+    </VRTravelGrabEgoStyleProxy>
+    <VRTravelGrabExoSplitStyleProxy name="TravelGrabExoSplit"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        Uses separate buttons to control rotation and translation of a 4x4 matrix
+        property (really only useful with a RenderView proxy and ModelTransformMatrix).
+        Rotation is about the world origin, rather than the camera/eye point. In
+        contrast to TravelTrackballExoSplit, the matrix rotation follows the
+        orientation of the tracker. Does not require an active camera or use view
+        information to do any computations (e.g. scaling translation based on camera
+        distance). Includes reset functionality. Requires 3 buttons and 1 tracker.
+      </Documentation>
+    </VRTravelGrabExoSplitStyleProxy>
+    <VRTravelTrackballExoSplitStyleProxy name="TravelTrackballExoSplit"
+                        processes="client|renderserver|dataserver">
+      <Documentation>
+        (Previously named Stylus) Uses separate buttons and the screen space
+        position of the tracker (for example the stylus of the zSpace) to modify
+        rotation and translation of a 4x4 matrix. For the rotation component, the
+        2D location of the tracker in screen space is used to rotate the matrix,
+        similar to how a trackball can be used to control camera orientation and
+        position in the desktop view. Only works with a RenderView proxy, which
+        must have an active camera, as the camera distance is used to scale
+        translations. Includes reset functionality. Requires 3 buttons and 1
+        tracker.
+      </Documentation>
+    </VRTravelTrackballExoSplitStyleProxy>
+    <VRControlLocationEgoStyleProxy name="ControlLocationEgo"
+                             processes="client|renderserver|dataserver">
+      <Documentation>
+        Uses a single button along with tracker position and orientation to
+        control the position of an object by updating the targeted 3-element
+        vector property.  If this style is used to manipulate a "Center" property,
+        for example, the object follows the trackers position, and rotation of the
+        tracker causes the object to orbit around the viewer. Includes reset
+        functionality. Requires 2 buttons and a tracker.
+      </Documentation>
+    </VRControlLocationEgoStyleProxy>
+    <VRControlLocationStyleProxy name="ControlLocation"
+                                 processes="client|renderserver|dataserver">
+      <IntVectorProperty command="SetDeferredUpdate"
+                         name="DeferredUpdate"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set to true, UpdateVTKObjects() is not called on the associated proxy
+          until the button is released, rather than being called on every call to the
+          Update() method.
+        </Documentation>
+      </IntVectorProperty>
+      <Documentation>
+        Uses a single button and a tracker to control the position of a 3D point. Unlike
+        ControlLocationRelative, the desktop camera is not used in computing the movement,
+        and the movement is not scaled by the camera distance.  Provides only translation,
+        no rotation. The "DeferredUpdate" property allows you to select whether you want
+        to defer calling UpdateVTKObjects() until the button is released, or else call
+        UpdateVTKObjects() before each Render(). Includes reset functionality. Requires
+        2 buttons and a tracker.
+      </Documentation>
+    </VRControlLocationStyleProxy>
+    <VRControlLocationRelativeStyleProxy name="ControlLocationRelative"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        (Previously named MovePoint) Uses a single button and the position of the tracker
+        in screen space to modify the position of a 3D point. The tracker orientation is
+        ignored, provides only translation, no rotation. Unlike ControlLocation, uses the
+        active camera to scale movement by the camera's distance. Includes reset
+        functionality.  Requires two buttons and a tracker.
+      </Documentation>
+    </VRControlLocationRelativeStyleProxy>
+    <VRControlOrientationStyleProxy name="ControlOrientation"
+                                    processes="client|renderserver|dataserver">
+      <IntVectorProperty command="SetDeferredUpdate"
+                         name="DeferredUpdate"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set to true, UpdateVTKObjects() is not called on the associated proxy
+          until the button is released, rather than being called on every call to the
+          Update() method.
+        </Documentation>
+      </IntVectorProperty>
+      <Documentation>
+        Uses a single button along with tracker orientation to control a 3-element
+        vector property. The vector stored in the property is always unit, so this
+        interactor style is best used to control a normal or other direction vector.
+        The "DeferredUpdate" property allows you to select whether you want to defer
+        calling UpdateVTKObjects() until the button is released, or else call
+        UpdateVTKObjects() before each Render(). Includes reset functionality.
+        Requires 2 buttons and a tracker.
+      </Documentation>
+    </VRControlOrientationStyleProxy>
+    <VRDebugStyleProxy name="Debug"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        Demonstrates some incoming events by logging details to the terminal.
+        The "Report Tracker" button prints the latest tracker matrix on every render,
+        as long as the button is held down. The "Report Self" button dumps information
+        about the interactor style on each button press. The "X" valuator demonstrates
+        how any valuator event delivers all valuator channels, but the code only prints
+        the channel data associated with the "X" role. Requires two buttons, a valuator,
+        and a tracker.
+      </Documentation>
+    </VRDebugStyleProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

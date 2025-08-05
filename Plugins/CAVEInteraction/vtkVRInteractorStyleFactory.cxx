@@ -14,6 +14,18 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMVRInteractorStyleProxy.h"
 
+#include <regex>
+
+namespace
+{
+const std::regex WHITESPACE_REGEX("^\\s+|\\s+$|(\\s)\\s+");
+
+std::string TrimDocString(const std::string& input)
+{
+  return std::regex_replace(input, WHITESPACE_REGEX, "$1");
+}
+}
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRInteractorStyleFactory);
 vtkVRInteractorStyleFactory* vtkVRInteractorStyleFactory::Instance = nullptr;
@@ -52,6 +64,15 @@ void vtkVRInteractorStyleFactory::Initialize()
       std::string proxyClass = prefix + proxyElement->GetName();
       this->InteractorStyleClassNames.push_back(proxyClass);
       this->InteractorStyleDescriptions.push_back(iter->GetProxyName());
+      vtkPVXMLElement* docChildElt = proxyElement->FindNestedElementByName("Documentation");
+      if (docChildElt)
+      {
+        this->InteractorStyleDocStrings.push_back(TrimDocString(docChildElt->GetCharacterData()));
+      }
+      else
+      {
+        this->InteractorStyleDocStrings.push_back(std::string("No description available"));
+      }
       this->Initialized = true;
     }
 
@@ -85,6 +106,12 @@ vtkVRInteractorStyleFactory* vtkVRInteractorStyleFactory::GetInstance()
 std::vector<std::string> vtkVRInteractorStyleFactory::GetInteractorStyleClassNames()
 {
   return this->InteractorStyleClassNames;
+}
+
+//-----------------------------------------------------------------------------
+std::vector<std::string> vtkVRInteractorStyleFactory::GetInteractorStyleDocStrings()
+{
+  return this->InteractorStyleDocStrings;
 }
 
 //-----------------------------------------------------------------------------
