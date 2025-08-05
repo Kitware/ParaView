@@ -182,26 +182,12 @@ int vtkImageVolumeRepresentation::RequestData(
   {
     if (auto inputID = vtkImageData::GetData(inputVector[0], 0))
     {
-      vtkSmartPointer<vtkImageData> cache = nullptr;
-      if (auto inputUG = vtkUniformGrid::GetData(inputVector[0], 0))
-      {
-        cache = vtkSmartPointer<vtkUniformGrid>::New();
-        cache->ShallowCopy(inputUG);
+      vtkSmartPointer<vtkImageData> cache = vtkSmartPointer<vtkImageData>::New();
+      cache->ShallowCopy(inputID);
 
-        if (this->UseSeparateOpacityArray)
-        {
-          this->AppendOpacityComponent(cache);
-        }
-      }
-      else
+      if (this->UseSeparateOpacityArray)
       {
-        cache = vtkSmartPointer<vtkImageData>::New();
-        cache->ShallowCopy(inputID);
-
-        if (this->UseSeparateOpacityArray)
-        {
-          this->AppendOpacityComponent(cache);
-        }
+        this->AppendOpacityComponent(cache);
       }
       if (inputID->HasAnyGhostCells())
       {
