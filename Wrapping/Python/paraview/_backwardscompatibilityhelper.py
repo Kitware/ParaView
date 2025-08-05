@@ -621,9 +621,9 @@ def setattr(proxy, pname, value):
             selectors = ["//*[@cid='%s']" % cid for cid in value]
             return proxy.GetProperty("BlockSelectors").SetData(selectors)
         else:
-            raise NotSupportedException(
-                "SpreadSheetRepresentation no longer uses 'CompositeDataSetIndex' but instead "
-                "supports 'Selectors' to select blocks.")
+            raise NotSupportedException("Since ParaView 6.1, chart representations no longer "
+                                        "supports 'CompositeDataSetIndex' and it has been replaced by "
+                                        "'BlockSelectors'.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -1341,6 +1341,19 @@ def GetProxy(module, key, **kwargs):
             reader = builtins.getattr(module, key)(**kwargs)
             reader.Createcelltopointfiltereddata = 0
             return reader
+
+    if compatibility_version <= (6, 0):
+        chart_proxies = ["ImageChartRepresentation", "XYChartRepresentationBase", "XYChartRepresentation",
+                         "XYPointChartRepresentation", "XYBarChartRepresentation", "QuartileChartRepresentation",
+                         "ParallelCoordinatesRepresentation", "BoxChartRepresentation", "PlotMatrixRepresentation",
+                         "XYFunctionalBagChartRepresentation"]
+        if key in chart_proxies:
+            charRepresentation = builtins.getattr(module, key)(**kwargs)
+            if key == "XYFunctionalBagChartRepresentation":
+                charRepresentation.ArraySelectionMode = 1
+            else:
+                charRepresentation.ArraySelectionMode = 0
+            return charRepresentation
 
     # deprecation case
     if type(key) == tuple and len(key) == 2:
