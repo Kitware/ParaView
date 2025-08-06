@@ -369,18 +369,13 @@ int vtkSMChartSeriesSelectionDomain::SetDefaultValues(
     vtkErrorMacro("Property must be a vtkSMVectorProperty subclass.");
     return 0;
   }
-  if (use_unchecked_values)
-  {
-    vtkWarningMacro("Developer warning: use_unchecked_values not implemented yet.");
-  }
-
-  this->UpdateDefaultValues(property, false);
+  this->UpdateDefaultValues(property, false, use_unchecked_values);
   return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
-  vtkSMProperty* property, bool preserve_previous_values)
+  vtkSMProperty* property, bool preserve_previous_values, bool use_unchecked_values)
 {
   vtkSMStringVectorProperty* vp = vtkSMStringVectorProperty::SafeDownCast(property);
   assert(vp != nullptr);
@@ -409,8 +404,7 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
   {
     if (preserve_previous_values && seriesNames.find(domain_strings[cc]) != seriesNames.end())
     {
-      // skip this. This series had a value set already which we are requested
-      // to preserve.
+      // skip this. This series had a value set already which we are requested to preserve.
       continue;
     }
     std::vector<std::string> cur_values = this->GetDefaultValue(domain_strings[cc].c_str());
@@ -424,7 +418,14 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
     }
   }
 
-  vp->SetElements(values.GetPointer());
+  if (use_unchecked_values)
+  {
+    vp->SetUncheckedElements(values.GetPointer());
+  }
+  else
+  {
+    vp->SetElements(values.GetPointer());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -451,7 +452,7 @@ bool vtkSMChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* nam
 void vtkSMChartSeriesSelectionDomain::OnDomainModified()
 {
   vtkSMProperty* prop = this->GetProperty();
-  this->UpdateDefaultValues(prop, true);
+  this->UpdateDefaultValues(prop, true, false);
   if (prop->GetParent())
   {
     prop->GetParent()->UpdateProperty(prop->GetXMLName());

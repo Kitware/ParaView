@@ -156,8 +156,6 @@ protected:
    */
   bool HidePartialArrays;
 
-  static bool LoadNoVariables;
-
 private:
   vtkSMChartSeriesSelectionDomain(const vtkSMChartSeriesSelectionDomain&) = delete;
   void operator=(const vtkSMChartSeriesSelectionDomain&) = delete;
@@ -168,7 +166,8 @@ private:
   // The EXPERIMENTAL feature: everytime domain is modified we update the
   // property's value.
   void OnDomainModified();
-  void UpdateDefaultValues(vtkSMProperty*, bool preserve_previous_values);
+  void UpdateDefaultValues(
+    vtkSMProperty*, bool preserve_previous_values, bool use_unchecked_values);
 };
 
 #endif
