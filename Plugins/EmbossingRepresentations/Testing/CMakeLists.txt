@@ -13,5 +13,5 @@ if (BUILD_SHARED_LIBS)
   paraview_add_client_tests(
     LOAD_PLUGIN "EmbossingRepresentations"
     TEST_DATA_TARGET ParaViewData
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/ExtrusionRepresentationShaderGeneration.xml)
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TestExtrusionRepresentationShaderGeneration.xml)
 endif()
