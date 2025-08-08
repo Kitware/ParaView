@@ -176,7 +176,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "^pv\\.DecimatePolyline$"
     "^pvcrs\\.DecimatePolyline$"
     "^pvcs\\.DecimatePolyline$"
-    "^pv\\.ExtrusionRepresentationCellData$"
+    "^pv\\.TestExtrusionRepresentationCellData$"
     "^pvcrs\\.GroupDataSetOutputType$"
     "^pvcs\\.GroupDataSetOutputType$"
     "^pv\\.UndoRedo1$"
@@ -229,7 +229,7 @@ endif ()
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
   list(APPEND test_exclusions
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20743
-    "^pv\\.ExtrusionRepresentationCellData$"
+    "^pv\\.TestExtrusionRepresentationCellData$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22353
     "\\.FeatureEdgesFilterHTG$"
     "\\.FeatureEdgesRepresentationHTG$"
