@@ -79,3 +79,11 @@ void vtkExtrusionRepresentation::SetScalingRange(double minimum, double maximum)
     ->SetUserRange(static_cast<float>(minimum), static_cast<float>(maximum));
   this->Modified();
 }
+
+//----------------------------------------------------------------------------
+void vtkExtrusionRepresentation::SetRecalculateNormals(bool enable)
+{
+  vtkExtrusionMapper::SafeDownCast(this->Mapper)->SetRecalculateNormals(enable);
+  vtkExtrusionMapper::SafeDownCast(this->LODMapper)->SetRecalculateNormals(enable);
+  this->Modified();
+}

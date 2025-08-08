@@ -60,6 +60,11 @@ public:
    */
   void SetInputDataArray(int idx, int port, int connection, int fieldAssociation, const char* name);
 
+  /**
+   * Set the flag to recalculate normals on the GPU after the extrusion.
+   */
+  void SetRecalculateNormals(bool enable);
+
 protected:
   vtkExtrusionRepresentation();
   ~vtkExtrusionRepresentation() override = default;

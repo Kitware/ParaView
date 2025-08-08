@@ -370,16 +370,24 @@ void vtkOpenGLBatchedExtrusionMapper::GeneratePointScalarsExtrusionShaders(
   std::map<vtkShader::Type, vtkShader*>& shaders)
 {
   std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+  std::string GSSource = shaders[vtkShader::Geometry]->GetSource();
+  std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
 
   vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
     // other declarations will be done by the superclass, hence keeping the key here
     R"(
   //VTK::PositionVC::Dec
-  uniform vec2 scalarRange;
   uniform float extrusionFactor;
+  uniform vec3 vertexScaleMC;
+  uniform vec2 scalarRange;
   uniform int normalizeData;
+
   in float displacementScalar;
-  in vec3 extrusionNormalsMC;)");
+  in vec3 extrusionNormalsMC;
+  
+  out vec4 vertexMCVSOutput;
+  out vec3 vertexMCVSUnscaled;)");
+
   vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
     R"(
   float factor = displacementScalar * extrusionFactor;
@@ -389,10 +397,23 @@ void vtkOpenGLBatchedExtrusionMapper::GeneratePointScalarsExtrusionShaders(
   }
   vec4 dirMC = inverse(MCVCMatrix) * normalize(MCVCMatrix*vec4(extrusionNormalsMC, 0.0));
   vec4 newPosMC = vertexMC + factor * dirMC;
+  vertexMCVSOutput = newPosMC;
+  vertexMCVSUnscaled = newPosMC.xyz / vertexScaleMC;
   vertexVCVSOutput = MCVCMatrix * newPosMC;
   gl_Position = MCDCMatrix * newPosMC;)");
 
+  // Geometry shader
+  if (vtkExtrusionMapper::SafeDownCast(this->Parent)->RecalculateNormals)
+  {
+    GSSource = vtkComputeTriangleNormals_gs;
+
+    // Fragment shader
+    vtkShaderProgram::Substitute(FSSource, "//VTK::Normal::Dec", "in vec3 normalVCGSOutput;\n");
+  }
+
   shaders[vtkShader::Vertex]->SetSource(VSSource);
+  shaders[vtkShader::Geometry]->SetSource(GSSource);
+  shaders[vtkShader::Fragment]->SetSource(FSSource);
 }
 
 //-----------------------------------------------------------------------------
@@ -438,8 +459,9 @@ void vtkOpenGLBatchedExtrusionMapper::GeneratePointVector3ExtrusionShaders(
 
   // If triangles are drawn, we need to recalculate their normals, hence attaching the geometry
   // shader.
-  if (this->LastBoundBO->PrimitiveType == vtkOpenGLPolyDataMapper::PrimitiveTris ||
-    this->LastBoundBO->PrimitiveType == vtkOpenGLPolyDataMapper::PrimitiveTriStrips)
+  if (vtkExtrusionMapper::SafeDownCast(this->Parent)->RecalculateNormals &&
+    (this->LastBoundBO->PrimitiveType == vtkOpenGLPolyDataMapper::PrimitiveTris ||
+      this->LastBoundBO->PrimitiveType == vtkOpenGLPolyDataMapper::PrimitiveTriStrips))
   {
     GSSource = vtkComputeTriangleNormals_gs;
 

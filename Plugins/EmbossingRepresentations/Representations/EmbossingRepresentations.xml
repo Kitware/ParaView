@@ -141,6 +141,20 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="ExtrusionRecalculateNormals"
+                    label="Recalculate normals"
+                    command="SetRecalculateNormals"
+                    number_of_elements="1"
+                    default_values="0"
+                    panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When enabled, the normals will be recalculated on the GPU after the extrusion.
+          This may be useful when all normals are facing to the same direction like for a plane.
+          This option has an effect only if the input data array is point data.
+        </Documentation>
+      </IntVectorProperty>
+
     </RepresentationProxy>
 
     <!-- BumpMap Representation extensions -->
@@ -279,6 +293,7 @@
             <Property name="ExtrusionAutoScaling"/>
             <Property name="ExtrusionScalingRange"/>
             <Property name="ExtrusionBasisVisibility"/>
+            <Property name="ExtrusionRecalculateNormals"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -311,6 +326,7 @@
             <Property name="ExtrusionAutoScaling"/>
             <Property name="ExtrusionScalingRange"/>
             <Property name="ExtrusionBasisVisibility"/>
+            <Property name="ExtrusionRecalculateNormals"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -343,6 +359,7 @@
             <Property name="ExtrusionAutoScaling"/>
             <Property name="ExtrusionScalingRange"/>
             <Property name="ExtrusionBasisVisibility"/>
+            <Property name="ExtrusionRecalculateNormals"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -375,6 +392,7 @@
             <Property name="ExtrusionAutoScaling"/>
             <Property name="ExtrusionScalingRange"/>
             <Property name="ExtrusionBasisVisibility"/>
+            <Property name="ExtrusionRecalculateNormals"/>
              <Hints>
                 <PropertyWidgetDecorator type="GenericDecorator"
                                          mode="visibility"
