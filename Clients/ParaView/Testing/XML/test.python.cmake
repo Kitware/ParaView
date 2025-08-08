@@ -1,6 +1,7 @@
 # Tests that require python
 
 list(APPEND TESTS_WITHOUT_BASELINES
+  AllPropertiesSaveStatePython.xml
   FullNotation.xml
   IconBrowser.xml
   MacroEditor.xml
