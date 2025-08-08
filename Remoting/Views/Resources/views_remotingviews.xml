@@ -1483,6 +1483,32 @@
                                    values="1" />
         </Hints>
       </StringVectorProperty>
+      <StringVectorProperty command="SetANARIRenderer"
+                            default_values="default"
+                            name="ANARIRenderer"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="default" />
+          <String value="ao" />
+          <String value="dpt" />
+        </StringListDomain>
+        <Documentation>Set the ANARI renderer.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableANARI"
+                                       values="1" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ANARILibrary"
+                                       values="visrtx" />
+            </Expression>
+	        </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
       <StringVectorProperty name="OSPRayRendererType"
           command="SetOSPRayRendererType"
           label="Back End"

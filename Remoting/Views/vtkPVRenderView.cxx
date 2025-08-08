@@ -3684,6 +3684,31 @@ const char* vtkPVRenderView::GetANARILibrary()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetANARIRenderer(std::string r)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+  if (this->Internals->AnariPass)
+  {
+    this->Internals->AnariPass->GetAnariRenderer()->SetSubtype(r.c_str());
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVRenderView::GetANARIRenderer()
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+  if (this->Internals->AnariPass)
+  {
+    return this->Internals->AnariPass->GetAnariRenderer()->GetSubtype();
+  }
+  return "";
+#else
+  return nullptr;
+#endif
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetEnableOSPRay(bool v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
