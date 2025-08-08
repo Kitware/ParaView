@@ -1690,7 +1690,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       <IntVectorProperty
           name="Denoise"
           command="SetDenoise"
-          default_values="1"
+          default_values="0"
           animateable="0"
           number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -1711,11 +1711,19 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           </PropertyWidgetDecorator>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="or">
-              <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                <Property name="MaxFrames" function="greaterthan" value="3"/>
-              </PropertyWidgetDecorator>
-              <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                <Property name="SamplesPerPixel" function="greaterthan" value="3" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableANARI"
+                                       values="1" />
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="or">
+                  <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                    <Property name="MaxFrames" function="greaterthan" value="3"/>
+                  </PropertyWidgetDecorator>
+                  <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                    <Property name="SamplesPerPixel" function="greaterthan" value="3" />
+                  </PropertyWidgetDecorator>
+                </Expression>
               </PropertyWidgetDecorator>
             </Expression>
           </PropertyWidgetDecorator>
