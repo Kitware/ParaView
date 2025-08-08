@@ -3903,6 +3903,9 @@ void vtkPVRenderView::SetHardwareSelector(vtkPVHardwareSelector* selector)
   // Clear selection props registered with the previous hardware selector
   this->Internals->ClearSelectionProps();
 
-  this->Selector = selector;
-  this->Selector->SetView(this); // not reference counted.
+  if (selector)
+  {
+    this->Selector = selector;
+    this->Selector->SetView(this); // not reference counted.
+  }
 }
