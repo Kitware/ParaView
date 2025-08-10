@@ -610,7 +610,7 @@ int vtkTCPNetworkAccessManager::ParaViewHandshake(
     {
       controller->Send(handshake.c_str(), size, 1, 99991);
     }
-    int errorCode;
+    int errorCode = HANDSHAKE_NO_ERROR;
     controller->Receive(&errorCode, 1, 1, 99990);
     return errorCode;
   }
