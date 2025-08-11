@@ -1496,7 +1496,7 @@ vtkSmartPointer<vtkUnsignedIntArray> vtkSortedTableStreamer::GenerateCompositeIn
       const unsigned int composite_index = metadata->Get(vtkDataTabulator::COMPOSITE_INDEX());
       for (vtkIdType rows = 0, maxRows = table->GetNumberOfRows(); rows < maxRows; ++rows)
       {
-        compositeIndex->InsertNextTypedTuple(&composite_index);
+        compositeIndex->InsertNextValue(composite_index);
       }
     }
   }

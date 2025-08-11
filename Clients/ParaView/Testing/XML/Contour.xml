@@ -8,7 +8,7 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Contour" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Contour" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/DefaultPresetsComboBox" command="activated" arguments="Cool to Warm"/>
@@ -133,7 +133,7 @@
 
   <!-- now try contour values that are not at nice integral values -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Contour" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Contour" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/RemoveAll" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/AddRange" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/SeriesGeneratorDialog/nsamples" command="set_int" arguments="5" />

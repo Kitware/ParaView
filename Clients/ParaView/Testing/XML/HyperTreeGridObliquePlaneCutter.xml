@@ -8,7 +8,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/MaxDepth/LineEdit0" command="set_string" arguments="2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Depth" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Cut" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/HyperTreeGridImplicitFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/originX" command="set_string" arguments="0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/HyperTreeGridImplicitFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/originY" command="set_string" arguments="1" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/HyperTreeGridImplicitFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/originZ" command="set_string" arguments="1" />

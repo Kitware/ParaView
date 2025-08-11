@@ -31,7 +31,7 @@ bool pqItemViewSearchWidgetEventPlayer::playEvent(
         return false;
       }
       QPointer<pqItemViewSearchWidget> searchWidget = new pqItemViewSearchWidget(focusItemView);
-      searchWidget->setAttribute(Qt::WA_DeleteOnClose, true);
+      QObject::connect(searchWidget, &QWidget::close, searchWidget, &QObject::deleteLater);
       searchWidget->showSearchWidget();
     }
     return true;

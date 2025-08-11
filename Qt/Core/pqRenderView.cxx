@@ -379,7 +379,7 @@ bool pqRenderView::getCenterAxesVisibility() const
 void pqRenderView::linkToOtherView()
 {
   pqLinkViewWidget* linkWidget = new pqLinkViewWidget(this);
-  linkWidget->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(linkWidget, &QWidget::close, linkWidget, &QObject::deleteLater);
   QPoint pos = this->widget()->mapToGlobal(QPoint(2, 2));
   linkWidget->move(pos);
   linkWidget->show();

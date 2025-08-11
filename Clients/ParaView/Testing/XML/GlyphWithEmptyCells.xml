@@ -17,7 +17,7 @@
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/DefaultPresetsComboBox" command="activated" arguments="Cool to Warm"/>
   <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_closebutton" command="activate" arguments=""/>
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Glyph" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Glyph" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Source/ProxySelectionWidget/comboBox" command="activated" arguments="Sphere" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Source/ProxySelectionWidget/frame/ChosenProxyWidget/Radius/DoubleLineEdit0" command="set_string" arguments="0.8" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/OrientationArray/ComboBox" command="activated" arguments="No orientation array" />

@@ -89,6 +89,7 @@ fedora35-shared-debug-mpi-python-qt:build:
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
+    timeout: 90 minutes
 
 fedora35-shared-debug-mpi-python-qt:test:
     extends:

@@ -403,8 +403,13 @@ if (TARGET _have_vtk_pythoninterpreter)
 endif ()
 
 if (PARAVIEW_USE_PYTHON)
+  include(ParaViewFindPythonModules)
+  find_python_module(openpmd_api openpmd_api_found)
+  if (openpmd_api_found)
+    list(APPEND xml_files
+      Resources/readers_openpmd.xml)
+  endif()
   list(APPEND xml_files
-    Resources/readers_openpmd.xml
     Resources/readers_savg.xml)
   list(APPEND xml_files
     Resources/extractors_python.xml)

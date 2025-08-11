@@ -544,9 +544,11 @@ More advanced options:
     "${CMAKE_BINARY_DIR}/Testing/Temporary") to a location that is writable from
     the compute nodes. Typically the user home directory is not.
   * `PARAVIEW_LINKER_FATAL_WARNINGS`: Specify if linker warnings must
-    be considered as errors
+    be considered as errors.
   * `PARAVIEW_EXTRA_COMPILER_WARNINGS`: Add compiler flags to do
-    stricter checking when building debug
+    stricter checking when building.
+  * `PARAVIEW_ENABLE_EXTRA_BUILD_WARNINGS` (default `OFF`; requires CMake >= 3.19):
+    If set, PARAVIEW will enable additional build warnings.
 
 <!--
 These variables should be documented once they're effective again. Note that

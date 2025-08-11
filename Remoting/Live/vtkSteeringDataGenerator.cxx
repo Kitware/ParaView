@@ -60,7 +60,14 @@ public:
       vtkarray->Resize(512 * (static_cast<vtkIdType>(index + 512) / 512));
       vtkarray->SetNumberOfTuples(index + 1);
     }
-    vtkarray->SetTypedTuple(index, tuple.data());
+    if (NumComponents == 1)
+    {
+      vtkarray->SetValue(index, tuple[0]);
+    }
+    else
+    {
+      vtkarray->SetTypedTuple(index, tuple.data());
+    }
   }
 
   template <typename VTKArrayType, typename ValueType = typename VTKArrayType::ValueType>

@@ -7,6 +7,10 @@ if (BUILD_SHARED_LIBS)
     "DATA{Data/Baseline/BagPlotMatrixView_A.png}")
 
   set(BagPlots_METHOD LOOSE_VALID)
+  set(BagPlotMatrixView_FORCE_SERIAL TRUE) # since this uses popup-menu
+  set(BagPlots_FORCE_SERIAL TRUE) # since this uses popup-menu
+  set(BagPlotsSelection_FORCE_SERIAL TRUE) # since this uses popup-menu
+  set(FunctionalBagPlots_FORCE_SERIAL TRUE) # since this uses popup-menu
 
   paraview_add_client_tests(
     TEST_DATA_TARGET ParaViewData

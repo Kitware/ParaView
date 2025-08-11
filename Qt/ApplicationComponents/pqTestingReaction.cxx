@@ -127,6 +127,6 @@ void pqTestingReaction::lockViewSizeCustom()
   // Launch the dialog box.  The box will take care of everything else.
   pqLockViewSizeCustomDialog* sizeDialog =
     new pqLockViewSizeCustomDialog(pqCoreUtilities::mainWidget());
-  sizeDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+  QObject::connect(sizeDialog, &QWidget::close, sizeDialog, &QObject::deleteLater);
   sizeDialog->show();
 }

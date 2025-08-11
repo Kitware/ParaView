@@ -544,8 +544,7 @@ void vtkCTHSource::AddNeighborArray(Block& b)
     bool present = false;
     for (int j = 0; j < NeighborArray->GetNumberOfTuples(); j++)
     {
-      int compare;
-      NeighborArray->GetTypedTuple(j, &compare);
+      int compare = NeighborArray->GetValue(j);
       if (b.neighbor_proc[i] == compare)
       {
         present = true;

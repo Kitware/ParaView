@@ -16,7 +16,7 @@ class MultiServerClientMainWindow : public QMainWindow
   typedef QMainWindow Superclass;
 
 public:
-  MultiServerClientMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  MultiServerClientMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~MultiServerClientMainWindow();
 
 protected Q_SLOTS:

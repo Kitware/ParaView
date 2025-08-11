@@ -705,7 +705,7 @@ void pqMaterialEditor::addMaterial()
   pqNewMaterialDialog* dialog = new pqNewMaterialDialog(pqCoreUtilities::mainWidget());
   dialog->setWindowTitle(tr("New Material"));
   dialog->setMaterialLibrary(ml);
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(dialog, &QWidget::close, dialog, &QObject::deleteLater);
   dialog->show();
 
   vtkOSPRayRendererNode::SetMaterialLibrary(
