@@ -38,7 +38,7 @@ void vtkSMViewLink::EnableCameraLink(bool enable)
 {
   if (enable)
   {
-    for (auto propPair : vtkSMCameraLink::CameraProperties())
+    for (const auto& propPair : vtkSMCameraLink::CameraProperties())
     {
       this->RemoveException(propPair.first.c_str());
       this->RemoveException(propPair.second.c_str());
@@ -48,7 +48,7 @@ void vtkSMViewLink::EnableCameraLink(bool enable)
   else
   {
     // do not link cameras: this is the purpose of the vtkSMCameraLink
-    for (auto propPair : vtkSMCameraLink::CameraProperties())
+    for (const auto& propPair : vtkSMCameraLink::CameraProperties())
     {
       this->AddException(propPair.first.c_str());
       this->AddException(propPair.second.c_str());

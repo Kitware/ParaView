@@ -952,10 +952,10 @@ void pqMemoryInspectorPanel::Clear()
   this->DataServerSystemType = 0;
   this->RenderServerSystemType = 0;
 
-  this->StackTraceOnClient = 0;
-  this->StackTraceOnServer = 0;
-  this->StackTraceOnDataServer = 0;
-  this->StackTraceOnRenderServer = 0;
+  this->StackTraceOnClient = false;
+  this->StackTraceOnServer = false;
+  this->StackTraceOnDataServer = false;
+  this->StackTraceOnRenderServer = false;
 
   this->Ui->configView->clear();
 }

@@ -89,10 +89,7 @@ public:
 
   ~Model() override = default;
 
-  void addPixmap(const QString& key, QIcon&& pixmap)
-  {
-    this->Pixmaps.insert(key, std::move(pixmap));
-  }
+  void addPixmap(const QString& key, QIcon&& pixmap) { this->Pixmaps.insert(key, pixmap); }
 
   void setColumnData(int column, const QString& key, QMap<QString, QString>&& mapping)
   {

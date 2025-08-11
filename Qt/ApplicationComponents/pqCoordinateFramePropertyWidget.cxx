@@ -48,7 +48,7 @@ bool normalize(std::array<T, N>& vec)
 
 // Avoid any dimension having an extent of 0;
 // ensure that each dimension has some thickness and then scale.
-static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
+void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
 {
   double max_length = bbox.GetMaxLength();
   max_length = max_length > 0 ? max_length * 0.05 : 1;

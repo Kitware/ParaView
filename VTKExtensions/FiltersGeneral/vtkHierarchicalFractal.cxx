@@ -60,7 +60,7 @@ public:
     box.SetDimensions(ext[0], ext[2], ext[4], ext[1], ext[3], ext[5], this->GridDescription);
     for (int i = static_cast<int>(this->Boxes.size()); i <= index; i++)
     {
-      this->Boxes.push_back(vtkAMRBox());
+      this->Boxes.emplace_back();
     }
     this->Boxes[index] = box;
   }

@@ -90,7 +90,7 @@ public:
 //------------------------------------------------------------------------------
 // Creates an array for attribute 'name' and adds it to 'grid'.
 template <typename T>
-static int addAttribute(
+int addAttribute(
   vtkSmartPointer<vtkUnstructuredGrid> grid, const char* name, vtkIdType size, int nComponents)
 {
   vtkSmartPointer<T> a = vtkSmartPointer<T>::New();
@@ -105,7 +105,7 @@ void rotateAroundY(double q, const double value[3], double r[3])
 {
   std::vector<double> v(value, value + 3);
   double rotY[3][3] = { { cos(q), 0, sin(q) }, { 0, 1, 0 }, { -sin(q), 0, cos(q) } };
-  vtkMath::Multiply3x3(rotY, &v[0], r);
+  vtkMath::Multiply3x3(rotY, v.data(), r);
 }
 
 //------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ void rotateAroundZ(double q, const double value[3], double r[3])
 {
   std::vector<double> v(value, value + 3);
   double rotZ[3][3] = { { cos(q), -sin(q), 0 }, { sin(q), cos(q), 0 }, { 0, 0, 1 } };
-  vtkMath::Multiply3x3(rotZ, &v[0], r);
+  vtkMath::Multiply3x3(rotZ, v.data(), r);
 }
 
 //------------------------------------------------------------------------------
@@ -320,7 +320,7 @@ void Grid<gridType>::AddPointsAndCells(double lonRad, double latRad)
     // ostr.str("");
     // ostr << "After for index" << std::endl;
     // std::cerr << ostr.str();
-    int* index = &indexArray[i][0];
+    int* index = indexArray[i].data();
     // 2d grid
     {
       int pointIds[4];
@@ -423,7 +423,7 @@ void Grid<gridType>::SetAttributeValue(int chunkSize, double* lonRad, double* la
     this->GetValueIndex(lonRad[c], latRad[c], indexArray);
     for (size_t i = 0; i < indexArray.size(); ++i)
     {
-      int* index = &indexArray[i][0];
+      int* index = indexArray[i].data();
       // 2d attributes
       {
         int cellId = this->GetCellId(index);
@@ -980,7 +980,7 @@ size_t Grid<gridType>::CubeToIndex(double side, const std::vector<double>& cubeC
       assert(it1 != cubeCoordinates.end() && it2 != cubeCoordinates.end());
       int oneIndex[3] = { static_cast<int>(it1 - cubeCoordinates.begin()),
         static_cast<int>(it2 - cubeCoordinates.begin()), valIndex[i].face };
-      index.push_back(std::vector<int>(oneIndex, oneIndex + 3));
+      index.emplace_back(oneIndex, oneIndex + 3);
       if (valIndex[i].face < minFace)
       {
         minFace = valIndex[i].face;

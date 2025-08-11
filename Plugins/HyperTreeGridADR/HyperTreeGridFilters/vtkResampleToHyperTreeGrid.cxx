@@ -365,7 +365,7 @@ void vtkResampleToHyperTreeGrid::AddDataArray(const char* name)
     return;
   }
 
-  this->InputDataArrayNames.push_back(std::string(name));
+  this->InputDataArrayNames.emplace_back(name);
   this->Modified();
 }
 
@@ -628,7 +628,7 @@ bool vtkResampleToHyperTreeGrid::IntersectedVolume(const double bboxBounds[6], v
           sligthlyOutside = true;
         }
         else if (weights[vertexId] >= 1.0 - TOL)
-          if (0)
+          if (false)
           {
             switch (boxVertexId)
             {
@@ -1625,9 +1625,8 @@ void vtkResampleToHyperTreeGrid::ExtrapolateValuesOnGaps(vtkHyperTreeGrid* htg)
         ++invalidNeighbors;
       }
     }
-    buf.emplace_back(PriorityQueueElement(
-      key + static_cast<vtkIdType>(qe.InvalidNeighborIds.size()) - invalidNeighbors, id,
-      std::move(means), std::move(qe.InvalidNeighborIds)));
+    buf.emplace_back(key + static_cast<vtkIdType>(qe.InvalidNeighborIds.size()) - invalidNeighbors,
+      id, std::move(means), std::move(qe.InvalidNeighborIds)); // NOLINT(performance-move-const-arg)
     pq.pop();
     if (pq.empty() || pq.top().Key != key)
     {
@@ -1635,7 +1634,7 @@ void vtkResampleToHyperTreeGrid::ExtrapolateValuesOnGaps(vtkHyperTreeGrid* htg)
       {
         if (element.Means[0] != element.Means[0] || !element.Key)
         {
-          pq.emplace(std::move(element));
+          pq.emplace(element);
         }
         else
         {

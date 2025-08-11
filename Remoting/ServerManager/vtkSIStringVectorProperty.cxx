@@ -147,7 +147,7 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(vtkSIProxy* proxy, vtkPVXMLEle
   // This fails if attributes are strings
   // In this case, we treat them by their name
   if (!element->GetVectorAttribute(
-        "element_types", number_of_elements_per_command, &(*this->ElementTypes)[0]) &&
+        "element_types", number_of_elements_per_command, this->ElementTypes->data()) &&
     element->GetAttribute("element_types") != nullptr)
   {
     std::string element_types = element->GetAttribute("element_types");

@@ -308,7 +308,7 @@ void vtkLagrangianSeedHelper::SetArrayToGenerate(int index, const char* arrayNam
   if (flowOrConstant == vtkLagrangianSeedHelper::CONSTANT)
   {
     arrayVal.Constants.resize(numberOfComponents, 0);
-    this->ParseDoubleValues(arrayValues, numberOfComponents, &arrayVal.Constants[0]);
+    this->ParseDoubleValues(arrayValues, numberOfComponents, arrayVal.Constants.data());
   }
   else
   {

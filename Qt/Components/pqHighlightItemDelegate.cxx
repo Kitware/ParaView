@@ -13,7 +13,7 @@ void pqHighlightItemDelegate::paint(
 {
   if (index.data().isValid())
   {
-    QStyleOptionViewItem viewOption(option);
+    const QStyleOptionViewItem& viewOption(option);
     painter->save();
     painter->fillRect(option.rect, this->HighlightColor);
     painter->restore();

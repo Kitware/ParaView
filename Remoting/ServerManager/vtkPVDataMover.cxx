@@ -59,7 +59,7 @@ std::vector<vtkSmartPointer<vtkDataObject>> CollectDataSets(
     std::vector<vtkSmartPointer<vtkDataObject>> result;
     if (localData)
     {
-      result.push_back(localData);
+      result.emplace_back(localData);
     }
     return result;
   }
@@ -167,7 +167,7 @@ bool vtkPVDataMover::Execute()
     const auto vectorOfDataSets = ::CollectDataSets(this, pm->GetGlobalController());
     for (size_t cc = 0; cc < vectorOfDataSets.size(); ++cc)
     {
-      if (auto dObj = vectorOfDataSets[cc])
+      if (const auto& dObj = vectorOfDataSets[cc])
       {
         this->DataSets[static_cast<int>(cc)] = dObj;
       }
@@ -183,11 +183,11 @@ bool vtkPVDataMover::Execute()
     if (numDataSets > 0)
     {
       std::vector<int> ranks(numDataSets);
-      sController->Receive(&ranks[0], numDataSets, 1, 78112);
+      sController->Receive(ranks.data(), numDataSets, 1, 78112);
       for (int cc = 0; cc < numDataSets; ++cc)
       {
         auto dobj = vtk::TakeSmartPointer(sController->ReceiveDataObject(1, 78113));
-        this->DataSets[ranks[cc]] = std::move(dobj);
+        this->DataSets[ranks[cc]] = dobj;
       }
     }
   }
@@ -200,7 +200,7 @@ bool vtkPVDataMover::Execute()
       std::vector<int> ranks(numDataSets);
       std::transform(this->DataSets.begin(), this->DataSets.end(), ranks.begin(),
         [](const std::pair<int, vtkSmartPointer<vtkDataObject>>& pair) { return pair.first; });
-      cController->Send(&ranks[0], numDataSets, 1, 78112);
+      cController->Send(ranks.data(), numDataSets, 1, 78112);
       for (const auto& pair : this->DataSets)
       {
         cController->Send(pair.second, 1, 78113);

@@ -292,7 +292,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     m_volume_data.num_points = static_cast<mi::Uint32>(unstructured_grid->GetNumberOfPoints());
 
     // Tetrahedral mesh cells.
-    bool gave_error = 0;
+    bool gave_error = false;
     mi::Float64 max_cell_edge_size2 = 0.0;
     mi::Float64 min_cell_edge_size2 = std::numeric_limits<double>::max();
     mi::Float64 sum_inv_cell_edge_size2 = 0.0;

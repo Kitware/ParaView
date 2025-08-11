@@ -284,7 +284,7 @@ void vtkPVSelectionSource::AddBlockSelector(const char* selector)
   if (selector)
   {
     this->Mode = BLOCK_SELECTORS;
-    this->Internal->BlockSelectors.push_back(selector);
+    this->Internal->BlockSelectors.emplace_back(selector);
     this->Modified();
   }
 }

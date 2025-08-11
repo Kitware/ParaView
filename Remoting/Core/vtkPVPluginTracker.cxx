@@ -69,10 +69,10 @@ std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
 }
 
 using VectorOfSearchFunctions = std::vector<vtkPluginSearchFunction>;
-static VectorOfSearchFunctions RegisteredPluginSearchFunctions;
+VectorOfSearchFunctions RegisteredPluginSearchFunctions;
 
 using VectorOfListFunctions = std::vector<vtkPluginListFunction>;
-static VectorOfListFunctions RegisteredPluginListFunctions;
+VectorOfListFunctions RegisteredPluginListFunctions;
 
 /**
  * Locate a plugin library or a config file anchored at standard locations

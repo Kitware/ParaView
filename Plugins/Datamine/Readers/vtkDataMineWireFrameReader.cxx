@@ -180,7 +180,7 @@ bool vtkDataMineWireFrameReader::PopulateStopeMap()
 
   if (SID == -1)
   {
-    return 0;
+    return false;
   }
 
   // populate the map
@@ -201,7 +201,7 @@ bool vtkDataMineWireFrameReader::PopulateStopeMap()
   delete[] values; // this is causing the problems
   delete file;
 
-  return 1;
+  return true;
 }
 
 // --------------------------------------
@@ -471,9 +471,9 @@ bool vtkDataMineWireFrameReader::FindAndSetFilePath(
   if (vtksys::SystemTools::FileExists(dm))
   {
     this->SetFileName(dm.c_str(), update, type);
-    return 1;
+    return true;
   }
-  return 0;
+  return false;
 }
 
 // --------------------------------------

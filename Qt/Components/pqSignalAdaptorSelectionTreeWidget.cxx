@@ -112,7 +112,7 @@ void pqSignalAdaptorSelectionTreeWidget::setValues(const QList<QList<QVariant>>&
   bool changed = false;
   for (int cc = 0; cc < max; cc++)
   {
-    QList<QVariant> nval = new_values[cc];
+    const QList<QVariant>& nval = new_values[cc];
     QTreeWidgetItem* item = this->Internal->TreeWidget->topLevelItem(cc);
     if (item->text(0) != nval[0])
     {

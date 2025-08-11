@@ -260,14 +260,14 @@ int vtkSpyPlotReader::RequestInformation(
 #endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
   if (!this->TimeSteps->empty())
   {
-    outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &(*this->TimeSteps)[0],
+    outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), this->TimeSteps->data(),
       static_cast<int>(this->TimeSteps->size()));
     double timeRange[2];
     timeRange[0] = this->TimeSteps->front();
     timeRange[1] = this->TimeSteps->back();
     outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
 
-    outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &(*this->TimeSteps)[0],
+    outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), this->TimeSteps->data(),
       static_cast<int>(this->TimeSteps->size()));
 
     outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
@@ -793,7 +793,7 @@ int vtkSpyPlotReader::RequestData(vtkInformation* request,
       if (this->IsAMR)
       {
         hasBadGhostCells = this->PrepareAMRData(
-          hbds, block, &level, &blockId[0], extents, realExtents, realDims, &cd);
+          hbds, block, &level, blockId.data(), extents, realExtents, realDims, &cd);
       }
       else
       {
@@ -2410,7 +2410,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
           std::vector<vtkSmartPointer<vtkDataSet>> datasets;
           for (kk = 0; kk < numberOfDataSets; kk++)
           {
-            datasets.push_back(vtkDataSet::SafeDownCast(mbDS->GetBlock(kk)));
+            datasets.emplace_back(vtkDataSet::SafeDownCast(mbDS->GetBlock(kk)));
           }
           mbDS->SetNumberOfBlocks(0); // removes all current blocks.
           mbDS->SetNumberOfBlocks(totalNumberOfDataSets);
@@ -2437,7 +2437,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
         for (unsigned int kk = 0; kk < hbDS->GetNumberOfBlocks(level); kk++)
         {
           vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
-          datasetsAtLevel.push_back(ug);
+          datasetsAtLevel.emplace_back(ug);
         }
       }
       datasets.push_back(datasetsAtLevel);

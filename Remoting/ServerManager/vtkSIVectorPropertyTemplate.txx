@@ -134,7 +134,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(vtkSMMessage* message, i
   const Variant* variant = &prop->value();
   std::vector<T> values = VariantToVector<T, force_idtype>(*variant);
   return (values.size() > 0)
-    ? this->Push(&values[0], static_cast<int>(values.size()))
+    ? this->Push(values.data(), static_cast<int>(values.size()))
     : this->Push(static_cast<T*>(nullptr), static_cast<int>(values.size()));
 }
 
@@ -310,7 +310,8 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::ReadXMLAttributes(
     }
     else
     {
-      int numRead = element->GetVectorAttribute("default_values", number_of_elements, &values[0]);
+      int numRead =
+        element->GetVectorAttribute("default_values", number_of_elements, values.data());
       if (numRead > 0)
       {
         if (numRead != number_of_elements)
@@ -328,7 +329,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::ReadXMLAttributes(
       }
     }
     // don't push the values if the property in "internal".
-    return this->GetIsInternal() ? true : this->Push(&values[0], number_of_elements);
+    return this->GetIsInternal() ? true : this->Push(values.data(), number_of_elements);
   }
   return true;
 }

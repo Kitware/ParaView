@@ -309,7 +309,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   m_subset_ptrs[0] = scalar_array->GetVoidPointer(0);
 
   vtknvindex_regular_volume_data volume_data;
-  volume_data.scalars = &m_subset_ptrs[0];
+  volume_data.scalars = m_subset_ptrs.data();
 
   int extent[6];
   image_piece->GetExtent(extent);

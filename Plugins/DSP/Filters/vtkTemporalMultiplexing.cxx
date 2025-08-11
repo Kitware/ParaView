@@ -390,7 +390,7 @@ void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkDataSet* inputDS)
 {
   vtkDataSetAttributes* attributes = inputDS->GetAttributes(this->FieldAssociation);
 
-  for (auto worker : this->Internals->Workers)
+  for (const auto& worker : this->Internals->Workers)
   {
     vtkDataArray* array = attributes->GetArray(worker->ArrayName.c_str());
     if (!array)
@@ -406,7 +406,7 @@ void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkDataSet* inputDS)
 //------------------------------------------------------------------------------
 void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkCompositeDataSet* inputCDS)
 {
-  for (auto worker : this->Internals->Workers)
+  for (const auto& worker : this->Internals->Workers)
   {
     vtkIdType offset = 0;
 

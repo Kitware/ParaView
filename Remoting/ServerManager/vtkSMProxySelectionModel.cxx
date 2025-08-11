@@ -160,7 +160,7 @@ void vtkSMProxySelectionModel::Select(vtkSMProxy* proxy, int command)
   SelectionType selection;
   if (proxy)
   {
-    selection.push_back(proxy);
+    selection.emplace_back(proxy);
   }
   this->Select(selection, command);
 }
@@ -193,7 +193,7 @@ void vtkSMProxySelectionModel::Select(
     {
       if (std::find(new_selection.begin(), new_selection.end(), proxy) == new_selection.end())
       {
-        new_selection.push_back(proxy);
+        new_selection.emplace_back(proxy);
       }
     }
     if (proxy && (command & vtkSMProxySelectionModel::DESELECT) != 0)
@@ -349,7 +349,7 @@ void vtkSMProxySelectionModel::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
       // Just add the proxy in the set
       if (std::find(new_selection.begin(), new_selection.end(), proxy) == new_selection.end())
       {
-        new_selection.push_back(proxy);
+        new_selection.emplace_back(proxy);
       }
     }
   }

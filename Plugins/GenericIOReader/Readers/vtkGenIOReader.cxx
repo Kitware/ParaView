@@ -797,7 +797,7 @@ int vtkGenIOReader::RequestData(
 
     // override above if it's a position scalar
     if (paraviewData[i].position)
-      paraviewData[i].load = 1;
+      paraviewData[i].load = true;
 
     msgLog << "Var: " + std::string(_name) << " ~ show: " << paraviewData[i].show
            << " ~ load: " << paraviewData[i].load << "\n";
@@ -1008,8 +1008,8 @@ int vtkGenIOReader::RequestData(
         threadPool.reserve(concurentThreadsSupported);
         for (int t = 0; t < concurentThreadsSupported; t++)
         {
-          threadPool.push_back(std::thread(&vtkGenIOReader::theadedParsing, this, t,
-            concurentThreadsSupported, numRowsToSample, numLoadingRows, cells, pnts, -1));
+          threadPool.emplace_back(&vtkGenIOReader::theadedParsing, this, t,
+            concurentThreadsSupported, numRowsToSample, numLoadingRows, cells, pnts, -1);
         }
 
         for (auto& th : threadPool)
@@ -1145,9 +1145,8 @@ int vtkGenIOReader::RequestData(
         threadPool.reserve(concurentThreadsSupported);
         for (int t = 0; t < concurentThreadsSupported; t++)
         {
-          threadPool.push_back(
-            std::thread(&vtkGenIOReader::theadedParsing, this, t, concurentThreadsSupported,
-              numRowsToSample, numLoadingRows, cells, pnts, numSelections));
+          threadPool.emplace_back(&vtkGenIOReader::theadedParsing, this, t,
+            concurentThreadsSupported, numRowsToSample, numLoadingRows, cells, pnts, numSelections);
         }
 
         for (auto& th : threadPool)

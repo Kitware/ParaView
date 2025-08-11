@@ -561,7 +561,7 @@ void vtknvindex_regular_volume_properties::deserialize(mi::neuraylib::IDeseriali
   mi::Uint32 scalar_typename_size = 0;
   deserializer->read(&scalar_typename_size);
   m_scalar_type.resize(scalar_typename_size);
-  deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
+  deserializer->read(reinterpret_cast<mi::Uint8*>(m_scalar_type.data()), scalar_typename_size);
   deserializer->read(&m_scalar_components);
 
   deserializer->read(&m_voxel_range.x, 2);

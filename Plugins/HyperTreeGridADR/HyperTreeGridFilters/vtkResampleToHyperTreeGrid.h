@@ -341,7 +341,7 @@ protected:
       : Key(key)
       , Id(id)
       , Means(means)
-      , InvalidNeighborIds(std::move(invalidNeighborIds))
+      , InvalidNeighborIds(invalidNeighborIds)
     {
     }
 

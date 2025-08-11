@@ -278,7 +278,7 @@ void vtkChartRepresentation::AddBlockSelector(const char* selector)
     std::find(this->BlockSelectors.begin(), this->BlockSelectors.end(), selector) ==
       this->BlockSelectors.end())
   {
-    this->BlockSelectors.push_back(selector);
+    this->BlockSelectors.emplace_back(selector);
     this->MarkModified();
   }
 }

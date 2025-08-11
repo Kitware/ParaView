@@ -122,9 +122,9 @@ int vtkCPPythonPipeline::DetectScriptVersion(const char* fname)
     vtksys::RegularExpression regex1("paraview version ([0-9]+)\\.([0-9]+)");
     vtksys::RegularExpression regex2("#[ ]+script-version: ([0-9]+)");
     std::array<char, 1024> buffer;
-    while (ifp.getline(&buffer[0], 1024))
+    while (ifp.getline(buffer.data(), 1024))
     {
-      if (regex1.find(&buffer[0]))
+      if (regex1.find(buffer.data()))
       {
         int major = std::atoi(regex1.match(1).c_str());
         int minor = std::atoi(regex1.match(2).c_str());
@@ -142,7 +142,7 @@ int vtkCPPythonPipeline::DetectScriptVersion(const char* fname)
         }
         break;
       }
-      else if (regex2.find(&buffer[0]))
+      else if (regex2.find(buffer.data()))
       {
         vtkVLogF(
           PARAVIEW_LOG_CATALYST_VERBOSITY(), "Found 'script-version: %s'", regex2.match(1).c_str());
@@ -160,14 +160,14 @@ int vtkCPPythonPipeline::DetectScriptVersion(const char* fname)
         }
         break;
       }
-      else if (buffer[0] == '#' || non_empty_strlen(&buffer[0]) == 0)
+      else if (buffer[0] == '#' || non_empty_strlen(buffer.data()) == 0)
       {
         // empty or comment line, continue.
         continue;
       }
       else
       {
-        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "regex match failed for '%s'", &buffer[0]);
+        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "regex match failed for '%s'", buffer.data());
         break;
       }
     }

@@ -25,9 +25,9 @@ QString AutoSaveBaseName()
   return QString("%1-%3").arg(QApplication::applicationName()).arg("autosave");
 }
 
-static const QString AUTOSAVE_KEY = "GeneralSettings.AutoSave";
-static const QString AUTOSAVE_DIR_KEY = "GeneralSettings.AutoSaveDirectory";
-static const QString AUTOSAVE_FORMAT_KEY = "GeneralSettings.AutoSaveStateFormat";
+const QString AUTOSAVE_KEY = "GeneralSettings.AutoSave";
+const QString AUTOSAVE_DIR_KEY = "GeneralSettings.AutoSaveDirectory";
+const QString AUTOSAVE_FORMAT_KEY = "GeneralSettings.AutoSaveStateFormat";
 };
 
 //-----------------------------------------------------------------------------

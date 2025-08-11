@@ -35,7 +35,7 @@ extern int LoadVTKmFilterPluginDriver(int argc, char* argv[])
   {
     if (strcmp(argv[cc], "--script") == 0 && (cc + 1) < argc)
     {
-      scripts.push_back(argv[++cc]);
+      scripts.emplace_back(argv[++cc]);
     }
   }
 

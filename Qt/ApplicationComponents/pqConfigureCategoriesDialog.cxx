@@ -22,9 +22,9 @@
 
 namespace
 {
-static constexpr int PROXY_ROLE = Qt::UserRole + 1;
-static constexpr int CATEGORY_ROLE = Qt::UserRole + 2;
-static QString DEFAULT_NAME = "New Category";
+constexpr int PROXY_ROLE = Qt::UserRole + 1;
+constexpr int CATEGORY_ROLE = Qt::UserRole + 2;
+QString DEFAULT_NAME = "New Category";
 
 //----------------------------------------------------------------------------
 /**

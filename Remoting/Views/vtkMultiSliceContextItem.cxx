@@ -408,7 +408,7 @@ const double* vtkMultiSliceContextItem::GetVisibleSlices(int& nbSlices) const
 const double* vtkMultiSliceContextItem::GetSlices(int& nbSlices) const
 {
   nbSlices = static_cast<int>(this->Internal->Slices.size());
-  return nbSlices > 0 ? (&this->Internal->Slices[0]) : nullptr;
+  return nbSlices > 0 ? this->Internal->Slices.data() : nullptr;
 }
 
 //-----------------------------------------------------------------------------

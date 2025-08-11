@@ -594,7 +594,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
     stream.GetRawData(raw_message);
     for (int cc = 0; cc < num_controllers; cc++)
     {
-      controllers[cc]->TriggerRMIOnAllChildren(&raw_message[0],
+      controllers[cc]->TriggerRMIOnAllChildren(raw_message.data(),
         static_cast<int>(raw_message.size()), vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
     }
   }
@@ -632,7 +632,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
         stream << msg.SerializeAsString();
         std::vector<unsigned char> raw_message;
         stream.GetRawData(raw_message);
-        this->DataServerController->TriggerRMIOnAllChildren(&raw_message[0],
+        this->DataServerController->TriggerRMIOnAllChildren(raw_message.data(),
           static_cast<int>(raw_message.size()), vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
       }
       else if (!remoteObject)
@@ -686,7 +686,7 @@ void vtkSMSessionClient::PullState(vtkSMMessage* message)
     stream << message->SerializeAsString();
     std::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
-    controller->TriggerRMIOnAllChildren(&raw_message[0], static_cast<int>(raw_message.size()),
+    controller->TriggerRMIOnAllChildren(raw_message.data(), static_cast<int>(raw_message.size()),
       vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
 
     // Get the reply
@@ -741,7 +741,7 @@ void vtkSMSessionClient::ExecuteStream(
 
     for (int cc = 0; cc < num_controllers; cc++)
     {
-      controllers[cc]->TriggerRMIOnAllChildren(&raw_message[0],
+      controllers[cc]->TriggerRMIOnAllChildren(raw_message.data(),
         static_cast<int>(raw_message.size()), vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
       controllers[cc]->Send(
         data, static_cast<int>(size), 1, vtkPVSessionServer::EXECUTE_STREAM_TAG);
@@ -783,7 +783,7 @@ const vtkClientServerStream& vtkSMSessionClient::GetLastResult(vtkTypeUInt32 loc
     stream << static_cast<int>(vtkPVSessionServer::LAST_RESULT);
     std::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
-    controller->TriggerRMIOnAllChildren(&raw_message[0], static_cast<int>(raw_message.size()),
+    controller->TriggerRMIOnAllChildren(raw_message.data(), static_cast<int>(raw_message.size()),
       vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
 
     // Get the reply
@@ -857,7 +857,7 @@ bool vtkSMSessionClient::GatherInformation(
 
   if (controller)
   {
-    controller->TriggerRMIOnAllChildren(&raw_message[0], static_cast<int>(raw_message.size()),
+    controller->TriggerRMIOnAllChildren(raw_message.data(), static_cast<int>(raw_message.size()),
       vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
 
     int length2 = 0;
@@ -927,7 +927,7 @@ void vtkSMSessionClient::UnRegisterSIObject(vtkSMMessage* message)
     stream.GetRawData(raw_message);
     for (int cc = 0; cc < num_controllers; cc++)
     {
-      controllers[cc]->TriggerRMIOnAllChildren(&raw_message[0],
+      controllers[cc]->TriggerRMIOnAllChildren(raw_message.data(),
         static_cast<int>(raw_message.size()), vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
     }
   }
@@ -970,7 +970,7 @@ void vtkSMSessionClient::RegisterSIObject(vtkSMMessage* message)
     {
       if (controllers[cc] != nullptr)
       {
-        controllers[cc]->TriggerRMIOnAllChildren(&raw_message[0],
+        controllers[cc]->TriggerRMIOnAllChildren(raw_message.data(),
           static_cast<int>(raw_message.size()), vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
       }
     }

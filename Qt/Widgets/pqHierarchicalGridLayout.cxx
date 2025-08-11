@@ -232,7 +232,7 @@ void pqHierarchicalGridLayout::addItem(QLayoutItem* item)
   // 1. If tree is empty, simply add the item as the root node.
   if (internals.SBTree.empty())
   {
-    internals.SBTree.emplace_back(BTNode(item));
+    internals.SBTree.emplace_back(item);
     return;
   }
 
@@ -427,7 +427,7 @@ void pqHierarchicalGridLayout::split(int location, Qt::Orientation direction, do
     }
     assert(internals.SBTree[child0].Invalid && internals.SBTree[child1].Invalid);
 
-    internals.SBTree[child0] = std::move(internals.SBTree[location]);
+    internals.SBTree[child0] = internals.SBTree[location];
     internals.SBTree[child1] = BTNode(nullptr);
     internals.SBTree[location] = BTNode(direction, splitFraction);
   }

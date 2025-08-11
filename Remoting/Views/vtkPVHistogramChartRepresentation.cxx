@@ -276,7 +276,7 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
       node->GetSelectionList()->GetNumberOfTuples() > 0)
     {
       // potentially applicable selection node.
-      nodes.push_back(node);
+      nodes.emplace_back(node);
     }
   }
   sel->RemoveAllNodes();

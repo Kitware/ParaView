@@ -220,8 +220,7 @@ void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
   }
   if (this->Internal->DeferProxyRegistration)
   {
-    this->Internal->ProxyCreationOrder.push_back(
-      vtkSMStateLoaderInternals::ProxyCreationOrderItem(id, proxy));
+    this->Internal->ProxyCreationOrder.emplace_back(id, proxy);
   }
   else
   {
@@ -631,7 +630,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
       const char* group_name = currentElement->GetAttributeOrEmpty("name");
       if (strcmp(group_name, "animation") == 0 || strcmp(group_name, "timekeeper") == 0)
       {
-        deferredCollections.push_back(currentElement);
+        deferredCollections.emplace_back(currentElement);
       }
       else if (!this->HandleProxyCollection(currentElement))
       {
@@ -733,5 +732,5 @@ void vtkSMStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 vtkTypeUInt32* vtkSMStateLoader::GetMappingArray(int& size)
 {
   size = static_cast<int>(this->Internal->AlignedMappingIdTable.size());
-  return &this->Internal->AlignedMappingIdTable[0];
+  return this->Internal->AlignedMappingIdTable.data();
 }

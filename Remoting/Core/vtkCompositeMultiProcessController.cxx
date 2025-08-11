@@ -129,7 +129,7 @@ public:
       // CAUTION: This initialization is only correct for vtkSocketController
       ctrl->Initialize(nullptr, nullptr);
     }
-    this->Controllers.push_back(Controller(this->ControllerID++, ctrl));
+    this->Controllers.emplace_back(this->ControllerID++, ctrl);
     this->ActiveController = &this->Controllers.back();
 #if GENERATE_DEBUG_LOG
     this->LogFile << endl << "---- Making Active: " << ctrl << endl;
@@ -232,7 +232,7 @@ public:
   {
     // Save call back for new vtkMultiProcessController
     this->RMICallbackIdCounter++;
-    this->RMICallbacks.push_back(RMICallbackInfo(this->RMICallbackIdCounter, function, arg, tag));
+    this->RMICallbacks.emplace_back(this->RMICallbackIdCounter, function, arg, tag);
 
     // Register it to the previously registered controllers
     std::vector<Controller>::iterator iter = this->Controllers.begin();

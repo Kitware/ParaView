@@ -53,7 +53,7 @@ std::vector<std::string> GetWindowsSystemDirectories()
 //----------------------------------------------------------------------------
 std::string GetUnixUserSettingsDirectory()
 {
-  std::string organizationName(vtkInitializationHelper::GetOrganizationName());
+  const std::string& organizationName(vtkInitializationHelper::GetOrganizationName());
   std::string directoryPath;
   std::string separator("/");
 
@@ -97,15 +97,15 @@ std::vector<std::string> GetUnixSystemDirectories()
   if (vtksys::SystemTools::GetEnv("XDG_DATA_DIRS", dataDirs))
   {
     vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(), << "found XDG_DATA_DIRS env: " << dataDirs);
-    std::string envDir(dataDirs);
+    const std::string& envDir(dataDirs);
     std::vector<std::string> dirs = vtksys::SystemTools::SplitString(envDir, ':');
     for (const std::string& directory : dirs)
     {
       paths.push_back(directory);
     }
   }
-  paths.push_back("/usr/local/share");
-  paths.push_back("/usr/share");
+  paths.emplace_back("/usr/local/share");
+  paths.emplace_back("/usr/share");
   return paths;
 }
 #endif

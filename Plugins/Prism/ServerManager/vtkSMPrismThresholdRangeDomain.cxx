@@ -92,13 +92,13 @@ void vtkSMPrismThresholdRangeDomain::Update(vtkSMProperty*)
   switch (this->AxisId)
   {
     case 0:
-      values.push_back(vtkEntry(boundsHelper.GetAsDouble(0), boundsHelper.GetAsDouble(1)));
+      values.emplace_back(boundsHelper.GetAsDouble(0), boundsHelper.GetAsDouble(1));
       break;
     case 1:
-      values.push_back(vtkEntry(boundsHelper.GetAsDouble(2), boundsHelper.GetAsDouble(3)));
+      values.emplace_back(boundsHelper.GetAsDouble(2), boundsHelper.GetAsDouble(3));
       break;
     case 2:
-      values.push_back(vtkEntry(boundsHelper.GetAsDouble(4), boundsHelper.GetAsDouble(5)));
+      values.emplace_back(boundsHelper.GetAsDouble(4), boundsHelper.GetAsDouble(5));
       break;
     default:
       vtkErrorMacro("Invalid axis id: " << this->AxisId);

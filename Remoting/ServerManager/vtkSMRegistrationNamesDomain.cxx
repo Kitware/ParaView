@@ -61,7 +61,7 @@ int vtkSMRegistrationNamesDomain::SetDefaultValues(
       auto proxy = helper.GetAsProxy(cc);
       if (proxy == nullptr)
       {
-        values.push_back("None");
+        values.emplace_back("None");
       }
       else
       {
@@ -69,7 +69,7 @@ int vtkSMRegistrationNamesDomain::SetDefaultValues(
         {
           if (auto name = pxm->GetProxyName(group.c_str(), proxy))
           {
-            values.push_back(name);
+            values.emplace_back(name);
             break;
           }
         }

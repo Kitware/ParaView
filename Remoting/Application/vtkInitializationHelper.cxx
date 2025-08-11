@@ -142,7 +142,7 @@ bool vtkInitializationHelper::Initialize(const char* executable, int type)
   std::vector<char*> argv;
   argv.push_back(vtksys::SystemTools::DuplicateString(executable));
   argv.push_back(nullptr);
-  return vtkInitializationHelper::Initialize(static_cast<int>(argv.size()) - 1, &argv[0], type);
+  return vtkInitializationHelper::Initialize(static_cast<int>(argv.size()) - 1, argv.data(), type);
 }
 
 //----------------------------------------------------------------------------
@@ -154,7 +154,7 @@ bool vtkInitializationHelper::Initialize(vtkStringList* slist, int type)
     argv.push_back(const_cast<char*>(slist->GetString(cc)));
   }
   argv.push_back(nullptr);
-  return vtkInitializationHelper::Initialize(static_cast<int>(argv.size()) - 1, &argv[0], type);
+  return vtkInitializationHelper::Initialize(static_cast<int>(argv.size()) - 1, argv.data(), type);
 }
 
 //----------------------------------------------------------------------------

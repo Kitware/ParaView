@@ -20,7 +20,7 @@ vtkFeatureEdgesRepresentation::vtkFeatureEdgesRepresentation()
   // you cannot select the outline!
   this->SetPickable(0);
 
-  this->SetSuppressLOD(1);
+  this->SetSuppressLOD(true);
 }
 
 //----------------------------------------------------------------------------

@@ -197,7 +197,7 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
       // only add a Location entry if the env-var has a non-empty value.
       if (envInfo->GetVariable() && !std::string(envInfo->GetVariable()).empty())
       {
-        envVarList.push_back({ label.c_str(), envInfo->GetVariable() });
+        envVarList.emplace_back(label.c_str(), envInfo->GetVariable());
       }
     }
   }
@@ -217,7 +217,7 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
       envInfo->CopyFromObject(envHelper);
       if (envInfo->GetVariable() && !std::string(envInfo->GetVariable()).empty())
       {
-        envVarList.push_back({ label.c_str(), envInfo->GetVariable() });
+        envVarList.emplace_back(label.c_str(), envInfo->GetVariable());
       }
     }
   }

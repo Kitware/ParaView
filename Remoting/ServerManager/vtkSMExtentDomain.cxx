@@ -53,7 +53,7 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty* pp)
       entries.reserve(3);
       for (int j = 0; j < 3; j++)
       {
-        entries.push_back(vtkEntry(extent[2 * j], extent[2 * j + 1]));
+        entries.emplace_back(extent[2 * j], extent[2 * j + 1]);
       }
       this->SetEntries(entries);
       return;

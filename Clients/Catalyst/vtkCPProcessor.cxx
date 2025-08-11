@@ -85,7 +85,7 @@ int vtkCPProcessor::AddPipeline(vtkCPPipeline* pipeline)
     return 0;
   }
 
-  this->Internal->Pipelines.push_back(pipeline);
+  this->Internal->Pipelines.emplace_back(pipeline);
   return 1;
 }
 

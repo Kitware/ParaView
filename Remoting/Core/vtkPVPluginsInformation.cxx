@@ -105,7 +105,7 @@ public:
       {
         return false;
       }
-      this->XMLs.push_back(temp_ptr);
+      this->XMLs.emplace_back(temp_ptr);
     }
 
     if (!stream.GetArgument(0, offset++, &this->Loaded))
@@ -133,7 +133,7 @@ void operator<<(vtkClientServerStream& stream, const vtkItem& item)
          << item.Description.c_str() << item.Version.c_str() << item.AutoLoad << item.DelayedLoad;
 
   stream << item.XMLs.size();
-  for (std::string xml : item.XMLs)
+  for (const std::string& xml : item.XMLs)
   {
     stream << xml.c_str();
   }

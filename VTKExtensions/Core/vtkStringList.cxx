@@ -68,7 +68,7 @@ void vtkStringList::AddString(const char* str)
   }
 
   auto& internals = (*this->Internals);
-  internals.Strings.push_back(str);
+  internals.Strings.emplace_back(str);
 }
 
 //----------------------------------------------------------------------------

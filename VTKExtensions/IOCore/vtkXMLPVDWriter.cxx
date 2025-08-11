@@ -736,7 +736,7 @@ void vtkXMLPVDWriter::ProgressCallback(vtkAlgorithm* w)
 //----------------------------------------------------------------------------
 void vtkXMLPVDWriter::AppendEntry(const char* entry)
 {
-  this->Internal->Entries.push_back(entry);
+  this->Internal->Entries.emplace_back(entry);
 }
 
 //----------------------------------------------------------------------------

@@ -55,17 +55,17 @@ bool vtkSMRangeDomainTemplate<T>::IsInDomain(unsigned int idx, T val)
 {
   if (idx >= static_cast<unsigned int>(this->Entries.size()))
   {
-    return 1;
+    return true;
   }
   if (this->Entries[idx].Valid[0] && val < this->Entries[idx].Value[0])
   {
-    return 0;
+    return false;
   }
   if (this->Entries[idx].Valid[1] && val > this->Entries[idx].Value[1])
   {
-    return 0;
+    return false;
   }
-  return 1;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -322,7 +322,7 @@ int vtkSMRangeDomainTemplate<T>::SetDefaultValues(
     }
     if (!values.empty())
     {
-      helper.Set(&values[0], static_cast<unsigned int>(values.size()));
+      helper.Set(values.data(), static_cast<unsigned int>(values.size()));
       return 1;
     }
   }
@@ -337,7 +337,7 @@ int vtkSMRangeDomainTemplate<T>::SetDefaultValues(
         values[cc] = value;
       }
     }
-    helper.Set(&values[0], static_cast<unsigned int>(values.size()));
+    helper.Set(values.data(), static_cast<unsigned int>(values.size()));
     return 1;
   }
 

@@ -92,7 +92,7 @@ void vtkSMTestDriver::SeparateArguments(const char* str, std::vector<std::string
   std::string::size_type pos2 = arg.find_first_of(" ;");
   if (pos2 == arg.npos)
   {
-    flags.push_back(str);
+    flags.emplace_back(str);
     return;
   }
   while (pos2 != arg.npos)
@@ -1075,7 +1075,7 @@ int vtkSMTestDriver::WaitForLine(vtksysProcess* process, std::string& line, doub
   line = "";
   std::vector<char>::iterator outiter = out.begin();
   std::vector<char>::iterator erriter = err.begin();
-  while (1)
+  while (true)
   {
     // Check for a newline in stdout.
     for (; outiter != out.end(); ++outiter)
@@ -1093,7 +1093,7 @@ int vtkSMTestDriver::WaitForLine(vtksysProcess* process, std::string& line, doub
         }
         if (length > 0)
         {
-          line.append(&out[0], length);
+          line.append(out.data(), length);
         }
         out.erase(out.begin(), outiter + 1);
         return vtksysProcess_Pipe_STDOUT;
@@ -1116,7 +1116,7 @@ int vtkSMTestDriver::WaitForLine(vtksysProcess* process, std::string& line, doub
         }
         if (length > 0)
         {
-          line.append(&err[0], length);
+          line.append(err.data(), length);
         }
         err.erase(err.begin(), erriter + 1);
         return vtksysProcess_Pipe_STDERR;
@@ -1151,13 +1151,13 @@ int vtkSMTestDriver::WaitForLine(vtksysProcess* process, std::string& line, doub
       // Both stdout and stderr pipes have broken.  Return leftover data.
       if (!out.empty())
       {
-        line.append(&out[0], outiter - out.begin());
+        line.append(out.data(), outiter - out.begin());
         out.erase(out.begin(), out.end());
         return vtksysProcess_Pipe_STDOUT;
       }
       else if (!err.empty())
       {
-        line.append(&err[0], erriter - err.begin());
+        line.append(err.data(), erriter - err.begin());
         err.erase(err.begin(), err.end());
         return vtksysProcess_Pipe_STDERR;
       }
@@ -1214,8 +1214,8 @@ bool vtkSMTestDriver::SetupServer(vtksysProcess* server, const ExecutableInfo& i
       info.Type == SCRIPT ? this->MPIScriptNumProcessFlag.c_str()
                           : this->MPIServerNumProcessFlag.c_str(),
       info.ArgStart, info.ArgEnd, argv);
-    this->ReportCommand(&serverCommand[0], info.TypeName.c_str());
-    vtksysProcess_SetCommand(server, &serverCommand[0]);
+    this->ReportCommand(serverCommand.data(), info.TypeName.c_str());
+    vtksysProcess_SetCommand(server, serverCommand.data());
     vtksysProcess_SetWorkingDirectory(server, this->GetDirectory(info.Executable).c_str());
     return true;
   }
@@ -1238,8 +1238,8 @@ bool vtkSMTestDriver::SetupClient(vtksysProcess* process, const ExecutableInfo& 
       clientCommand.insert(iter, this->ServerURL.c_str());
       clientCommand.push_back(nullptr);
     }
-    this->ReportCommand(&clientCommand[0], "client");
-    vtksysProcess_SetCommand(process, &clientCommand[0]);
+    this->ReportCommand(clientCommand.data(), "client");
+    vtksysProcess_SetCommand(process, clientCommand.data());
     vtksysProcess_SetWorkingDirectory(process, this->GetDirectory(info.Executable).c_str());
     return true;
   }

@@ -1093,7 +1093,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   }
   std::vector<double> vec;
   vec.resize(timeStepsLength);
-  if (timeStepsLength > 0 && !css->GetArgument(0, argument++, &vec[0], timeStepsLength))
+  if (timeStepsLength > 0 && !css->GetArgument(0, argument++, vec.data(), timeStepsLength))
   {
     this->Initialize();
     vtkErrorMacro("Error parsing stream.");
@@ -1111,7 +1111,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   }
   this->UniqueBlockTypes.resize(uniqueBlockTypesLength);
   if (uniqueBlockTypesLength > 0 &&
-    !css->GetArgument(0, argument++, &this->UniqueBlockTypes[0], uniqueBlockTypesLength))
+    !css->GetArgument(0, argument++, this->UniqueBlockTypes.data(), uniqueBlockTypesLength))
   {
     this->Initialize();
     vtkErrorMacro("Error parsing stream.");
@@ -1157,7 +1157,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   this->AMRNumberOfDataSets.resize(this->NumberOfAMRLevels);
   if (this->NumberOfAMRLevels > 0 &&
     !css->GetArgument(
-      0, argument++, &this->AMRNumberOfDataSets[0], static_cast<int>(this->NumberOfAMRLevels)))
+      0, argument++, this->AMRNumberOfDataSets.data(), static_cast<int>(this->NumberOfAMRLevels)))
   {
     this->Initialize();
     vtkErrorMacro("Error parsing stream.");

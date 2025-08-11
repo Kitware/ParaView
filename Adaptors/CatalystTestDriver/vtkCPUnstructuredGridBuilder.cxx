@@ -18,7 +18,7 @@ vtkCPUnstructuredGridBuilder::vtkCPUnstructuredGridBuilder()
   vtkUnstructuredGrid* UG = vtkUnstructuredGrid::New();
   this->SetUnstructuredGrid(UG);
   UG->Delete();
-  this->IsGridModified = 1;
+  this->IsGridModified = true;
 }
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ vtkDataObject* vtkCPUnstructuredGridBuilder::GetGrid(
 
   fieldBuilder->BuildField(timeStep, time, this->UnstructuredGrid);
 
-  this->IsGridModified = 0;
+  this->IsGridModified = false;
   builtNewGrid = 1;
   return this->UnstructuredGrid;
 }
@@ -58,14 +58,14 @@ bool vtkCPUnstructuredGridBuilder::SetPoints(vtkPoints* points)
   if (!points || !this->UnstructuredGrid)
   {
     vtkWarningMacro("Unable to set points.");
-    return 0;
+    return false;
   }
   if (points != this->UnstructuredGrid->GetPoints())
   {
     this->UnstructuredGrid->SetPoints(points);
-    this->IsGridModified = 1;
+    this->IsGridModified = true;
   }
-  return 1;
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -77,14 +77,14 @@ void vtkCPUnstructuredGridBuilder::Allocate(vtkIdType numCells, int extSize)
     return;
   }
   this->UnstructuredGrid->Allocate(numCells, extSize);
-  this->IsGridModified = 1;
+  this->IsGridModified = true;
 }
 
 //----------------------------------------------------------------------------
 vtkIdType vtkCPUnstructuredGridBuilder::InsertNextCell(int type, vtkIdType npts, vtkIdType* pts)
 {
   // for efficiency this doesn't check if UnstructuredGrid is null
-  this->IsGridModified = 1;
+  this->IsGridModified = true;
   return this->UnstructuredGrid->InsertNextCell(type, npts, pts);
 }
 
@@ -92,7 +92,7 @@ vtkIdType vtkCPUnstructuredGridBuilder::InsertNextCell(int type, vtkIdType npts,
 vtkIdType vtkCPUnstructuredGridBuilder::InsertNextCell(int type, vtkIdList* ptIds)
 {
   // for efficiency this doesn't check if UnstructuredGrid is null
-  this->IsGridModified = 1;
+  this->IsGridModified = true;
   return this->UnstructuredGrid->InsertNextCell(type, ptIds);
 }
 

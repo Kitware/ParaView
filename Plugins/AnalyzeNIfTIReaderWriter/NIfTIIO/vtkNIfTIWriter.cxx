@@ -11,6 +11,8 @@
 #include "vtkFieldData.h"
 #include "vtkUnsignedCharArray.h"
 
+#include "vtksys/SystemTools.hxx"
+
 #define ANALYZE_HEADER_ARRAY "vtkAnalyzeReaderHeaderArray"
 
 vtkStandardNewMacro(vtkNIfTIWriter);
@@ -112,52 +114,20 @@ static int nifti_write_extensions(znzFile fp, nifti_image* nim)
   return nim->num_ext;
 }
 
-// GetExtension from uiig library.
-static std::string GetExtension(const std::string& filename)
-{
-
-  // This assumes that the final '.' in a file name is the delimiter
-  // for the file's extension type
-  const std::string::size_type it = filename.find_last_of('.');
-
-  // This determines the file's type by creating a new string
-  // who's value is the extension of the input filename
-  // eg. "myimage.gif" has an extension of "gif"
-  std::string fileExt(filename, it + 1, filename.length());
-
-  return (fileExt);
-}
-
-// GetRootName from uiig library.
-static std::string GetRootName(const std::string& filename)
-{
-  const std::string fileExt = GetExtension(filename);
-
-  // Create a base filename
-  // i.e Image.hdr --> Image
-  if (!fileExt.empty())
-  {
-    const std::string::size_type it = filename.find_last_of(fileExt);
-    std::string baseName(filename, 0, it - fileExt.length());
-    return (baseName);
-  }
-  // Default to return same as input when the extension is nothing (Analyze)
-  return (filename);
-}
-
 // Returns the base image filename.
 static std::string GetImageFileName(const std::string& filename)
 {
   // Why do we add ".nii" here?  Look in fileutils.h
-  std::string fileExt = GetExtension(filename);
-  std::string ImageFileName = GetRootName(filename);
-  if (!fileExt.compare("gz"))
+  std::string ImageFileName = vtksys::SystemTools::GetFilenameWithoutExtension(filename);
+  const std::string filePath = vtksys::SystemTools::GetFilenamePath(filename) + "/";
+  const std::string fileLastExt = vtksys::SystemTools::GetFilenameLastExtension(filename);
+  if (fileLastExt == ".gz")
   {
     // First strip both extensions off
-    ImageFileName = GetRootName(GetRootName(filename));
+    ImageFileName = vtksys::SystemTools::GetFilenameWithoutExtension(filename);
     ImageFileName += ".nii.gz";
   }
-  else if (!fileExt.compare("nii"))
+  else if (fileLastExt == ".nii")
   {
     ImageFileName += ".nii";
   }
@@ -169,7 +139,7 @@ static std::string GetImageFileName(const std::string& filename)
     // reporter->setMessage( temp );
     return ("");
   }
-  return (ImageFileName);
+  return filePath + ImageFileName;
 }
 
 void vtkNIfTIWriter::WriteFileHeader(

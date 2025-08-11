@@ -36,7 +36,7 @@ extern int TestDataEncoder(int argc, char* argv[])
     filename += filenames[cc];
     reader->SetFileName(filename.c_str());
     reader->Update();
-    images.push_back(reader->GetOutput());
+    images.emplace_back(reader->GetOutput());
   }
 
   int errors = 0;

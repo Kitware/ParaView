@@ -134,7 +134,7 @@ public:
         }
         sharingLink->AddLinkedProxy(src_subproxy, vtkSMLink::INPUT);
         sharingLink->AddLinkedProxy(plproxy, vtkSMLink::OUTPUT);
-        parent->Internals->SubProxyLinks.push_back(sharingLink.Get());
+        parent->Internals->SubProxyLinks.emplace_back(sharingLink.Get());
       }
     }
   }
@@ -288,7 +288,7 @@ int vtkSMProxyListDomain::IsInDomain(vtkSMProperty* vtkNotUsed(property))
 //-----------------------------------------------------------------------------
 void vtkSMProxyListDomain::AddProxy(const char* group, const char* name)
 {
-  this->Internals->ProxyTypeList.push_back(ProxyType(group, name));
+  this->Internals->ProxyTypeList.emplace_back(group, name);
 }
 
 //-----------------------------------------------------------------------------

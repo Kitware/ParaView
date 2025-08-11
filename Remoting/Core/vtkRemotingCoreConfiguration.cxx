@@ -16,17 +16,17 @@
 namespace
 {
 // Redefined from vtkRenderWindow.h
-static const int VTK_STEREO_CRYSTAL_EYES = 1;
-static const int VTK_STEREO_RED_BLUE = 2;
-static const int VTK_STEREO_INTERLACED = 3;
-static const int VTK_STEREO_LEFT = 4;
-static const int VTK_STEREO_RIGHT = 5;
-static const int VTK_STEREO_DRESDEN = 6;
-static const int VTK_STEREO_ANAGLYPH = 7;
-static const int VTK_STEREO_CHECKERBOARD = 8;
-static const int VTK_STEREO_SPLITVIEWPORT_HORIZONTAL = 9;
-static const int VTK_STEREO_FAKE = 10;
-static const int VTK_STEREO_EMULATE = 11;
+const int VTK_STEREO_CRYSTAL_EYES = 1;
+const int VTK_STEREO_RED_BLUE = 2;
+const int VTK_STEREO_INTERLACED = 3;
+const int VTK_STEREO_LEFT = 4;
+const int VTK_STEREO_RIGHT = 5;
+const int VTK_STEREO_DRESDEN = 6;
+const int VTK_STEREO_ANAGLYPH = 7;
+const int VTK_STEREO_CHECKERBOARD = 8;
+const int VTK_STEREO_SPLITVIEWPORT_HORIZONTAL = 9;
+const int VTK_STEREO_FAKE = 10;
+const int VTK_STEREO_EMULATE = 11;
 
 int ParseStereoType(const std::string& value)
 {

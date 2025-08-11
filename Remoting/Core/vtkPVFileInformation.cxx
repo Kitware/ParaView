@@ -649,7 +649,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     if (!username.empty())
     {
       std::vector<std::string> paths = { "/media/" + username, "/run/media/" + username };
-      for (std::string path : paths)
+      for (const std::string& path : paths)
       {
         if (vtksys::SystemTools::FileIsDirectory(path))
         {

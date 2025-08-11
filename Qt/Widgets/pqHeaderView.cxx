@@ -114,7 +114,7 @@ void pqHeaderView::paintSection(QPainter* painter, const QRect& rect, int logica
       QRect ciRect = checkRect;
       ciRect.moveTo(leftpos, ciRect.y());
       this->style()->drawItemPixmap(painter, ciRect, Qt::AlignCenter, icon.pixmap(ciRect.size()));
-      this->CustomIndicatorRects.push_back(std::make_pair(ciRect, role));
+      this->CustomIndicatorRects.emplace_back(ciRect, role);
 
       leftpos += checkRect.width();
     }
@@ -217,7 +217,7 @@ void pqHeaderView::addCustomIndicatorIcon(const QIcon& icon, const QString& role
     }
   }
 
-  this->CustomIndicatorIcons.push_back(std::make_pair(icon, role));
+  this->CustomIndicatorIcons.emplace_back(icon, role);
   this->update();
 }
 

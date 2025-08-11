@@ -88,7 +88,7 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMProxyGroupDomain::AddGroup(const char* group)
 {
-  this->PGInternals->Groups.push_back(group);
+  this->PGInternals->Groups.emplace_back(group);
 }
 
 //---------------------------------------------------------------------------

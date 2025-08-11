@@ -123,7 +123,7 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
 
     if (this->NoneString)
     {
-      values.push_back(this->NoneString);
+      values.emplace_back(this->NoneString);
     }
     if (svp->GetNumberOfElementsPerCommand() == 2)
     {
@@ -132,14 +132,14 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
       // second is it's status.
       for (unsigned int i = 0; i < numStrings; i += 2)
       {
-        values.push_back(svp->GetElement(i));
+        values.emplace_back(svp->GetElement(i));
       }
     }
     else
     {
       for (unsigned int i = 0; i < numStrings; i++)
       {
-        values.push_back(svp->GetElement(i));
+        values.emplace_back(svp->GetElement(i));
       }
     }
     this->SetStrings(values);
@@ -162,7 +162,7 @@ int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
   if (none_string)
   {
     this->SetNoneString(none_string);
-    values.push_back(none_string);
+    values.emplace_back(none_string);
   }
 
   // Loop over the top-level elements.
@@ -182,7 +182,7 @@ int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
       return 0;
     }
 
-    values.push_back(value);
+    values.emplace_back(value);
   }
   this->SetStrings(values);
   return 1;

@@ -28,14 +28,14 @@
 
 namespace
 {
-static const QString SERVER_FILE = "servers.pvsc";
+const QString SERVER_FILE = "servers.pvsc";
 
 /**
  * Get path to the user servers file.
  * As it is used with QFile, separator should be "/" regardless of the system.
  * see QFile doc
  */
-static QString userServers()
+QString userServers()
 {
   return pqCoreUtilities::getParaViewUserDirectory() + "/" + SERVER_FILE;
 }
@@ -43,7 +43,7 @@ static QString userServers()
 /**
  * Get path to custom servers file.
  */
-static const std::vector<std::string>& customServers()
+const std::vector<std::string>& customServers()
 {
   return vtkRemotingCoreConfiguration::GetInstance()->GetServerConfigurationsFiles();
 }
@@ -53,7 +53,7 @@ static const std::vector<std::string>& customServers()
  * As it is used with QFile, separator should be "/" regardless of the system.
  * see QFile doc
  */
-static QString systemServers()
+QString systemServers()
 {
   std::vector<std::string> systemDirs = vtkPVStandardPaths::GetSystemDirectories();
   for (const std::string& dir : systemDirs)
@@ -72,7 +72,7 @@ static QString systemServers()
   return QString();
 }
 
-static QString defaultServers()
+QString defaultServers()
 {
   auto vtk_libs = vtkGetLibraryPathForSymbol(GetVTKVersion);
   std::vector<std::string> prefixes = { ".", "bin", "lib", "MacOS" };

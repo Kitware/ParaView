@@ -43,7 +43,7 @@ void vtkCPNodalFieldBuilder::BuildField(unsigned long timeStep, double time, vtk
     {
       tupleValues[uj] = tensorFieldFunction->ComputeComponenentAtPoint(uj, point, timeStep, time);
     }
-    array->SetTypedTuple(i, &tupleValues[0]);
+    array->SetTypedTuple(i, tupleValues.data());
   }
   array->SetName(this->GetArrayName());
   grid->GetPointData()->AddArray(array);

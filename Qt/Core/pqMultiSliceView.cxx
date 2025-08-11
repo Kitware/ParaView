@@ -280,7 +280,7 @@ void pqMultiSliceView::updateViewModelCallBack(vtkObject*, unsigned long, void*)
   double emptyDouble = 0;
   if (!xSlices.empty())
   {
-    this->AxisX->updateSlices(&xSlices[0], visibility, static_cast<int>(xSlices.size()));
+    this->AxisX->updateSlices(xSlices.data(), visibility, static_cast<int>(xSlices.size()));
   }
   else // Reset slices
   {
@@ -289,7 +289,7 @@ void pqMultiSliceView::updateViewModelCallBack(vtkObject*, unsigned long, void*)
 
   if (!ySlices.empty())
   {
-    this->AxisY->updateSlices(&ySlices[0], visibility, static_cast<int>(ySlices.size()));
+    this->AxisY->updateSlices(ySlices.data(), visibility, static_cast<int>(ySlices.size()));
   }
   else // Reset slices
   {
@@ -298,7 +298,7 @@ void pqMultiSliceView::updateViewModelCallBack(vtkObject*, unsigned long, void*)
 
   if (!zSlices.empty())
   {
-    this->AxisZ->updateSlices(&zSlices[0], visibility, static_cast<int>(zSlices.size()));
+    this->AxisZ->updateSlices(zSlices.data(), visibility, static_cast<int>(zSlices.size()));
   }
   else // Reset slices
   {

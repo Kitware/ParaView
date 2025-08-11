@@ -46,13 +46,13 @@ protected:
     // Animation scene call render on each tick. We override that render call
     // since it's a waste of rendering, the code to save the images will call
     // render anyways.
-    this->AnimationScene->SetOverrideStillRender(1);
+    this->AnimationScene->SetOverrideStillRender(true);
     return true;
   }
 
   bool SaveFinalize() override
   {
-    this->AnimationScene->SetOverrideStillRender(0);
+    this->AnimationScene->SetOverrideStillRender(false);
     if (this->GenerateCinemaSpecification)
     {
       this->Controller->SaveSummaryTable("data.csv", this->ProxyManager);

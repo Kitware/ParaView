@@ -139,17 +139,17 @@ bool vtkSICompoundSourceProxy::ReadXMLAttributes(vtkPVXMLElement* element)
       if (!port_name && !currentElement->GetScalarAttribute("port_index", &index))
       {
         vtkErrorMacro("Missing output port 'index'.");
-        return 0;
+        return false;
       }
       if (!exposed_name)
       {
         vtkErrorMacro("Missing output port 'name'.");
-        return 0;
+        return false;
       }
       if (!proxy_name)
       {
         vtkErrorMacro("Missing output port 'proxy'.");
-        return 0;
+        return false;
       }
       if (port_name)
       {

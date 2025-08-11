@@ -853,7 +853,7 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
   if (numPts < 1)
   {
     vtkDebugMacro(<< "No points to glyph!");
-    return 1;
+    return true;
   }
 
   vtkSmartPointer<vtkPolyData> source = this->GetSource(0, sourceVector);

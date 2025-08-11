@@ -55,7 +55,7 @@ public:
       this->FilePaths.clear();
       for (auto child : this->XMLElement.children("Element"))
       {
-        this->FilePaths.push_back(child.attribute("value").value());
+        this->FilePaths.emplace_back(child.attribute("value").value());
       }
       this->OriginalFilePaths = this->FilePaths;
     }
@@ -122,7 +122,7 @@ public:
 
   std::string GetExposedPropertyName(int id, const std::string& pname) const
   {
-    for (auto pair : this->ExposedPropertyNameMap)
+    for (const auto& pair : this->ExposedPropertyNameMap)
     {
       const auto& tuple = pair.second;
       if (tuple.first == id &&
@@ -604,7 +604,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
           vtkInternals::PropertyInfo& info = pair2.second;
           if (pair2.first.find("FilePattern") == std::string::npos)
           {
-            bool path = pair2.first.compare("FilePrefix") == 0;
+            bool path = pair2.first == "FilePrefix";
             this->LocateFilesInDirectory(info.FilePaths, path, this->OnlyUseFilesInDataDirectory);
           }
         }
@@ -631,7 +631,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
             info.FilePaths.clear();
             for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
             {
-              info.FilePaths.push_back(helper.GetAsString(cc));
+              info.FilePaths.emplace_back(helper.GetAsString(cc));
             }
           }
         }

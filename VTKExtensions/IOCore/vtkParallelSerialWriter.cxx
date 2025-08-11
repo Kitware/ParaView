@@ -323,7 +323,7 @@ void vtkParallelSerialWriter::WriteATimestep(const std::string& fname, vtkPartit
 
   if (this->PostGatherHelper)
   {
-    for (auto piece : allDataSets)
+    for (const auto& piece : allDataSets)
     {
       this->PostGatherHelper->AddInputDataObject(piece);
     }

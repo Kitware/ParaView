@@ -150,6 +150,7 @@ vtkSMColorMapEditorHelper::HasBlockProperty(vtkSMProxy* proxy,
     return { "/", BlockPropertyState::Disabled };
   }
   std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  blockPropertyStates.reserve(blockSelectors.size());
   for (const std::string& blockSelector : blockSelectors)
   {
     blockPropertyStates.push_back(
@@ -165,6 +166,7 @@ vtkSMColorMapEditorHelper::HasBlockProperties(vtkSMProxy* proxy, const std::stri
   const std::vector<std::string>& propertyNames)
 {
   std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  blockPropertyStates.reserve(propertyNames.size());
   for (const std::string& propertyName : propertyNames)
   {
     blockPropertyStates.push_back(
@@ -184,6 +186,7 @@ vtkSMColorMapEditorHelper::HasBlocksProperties(vtkSMProxy* proxy,
     return { "/", BlockPropertyState::Disabled };
   }
   std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  blockPropertyStates.reserve(blockSelectors.size());
   for (const std::string& blockSelector : blockSelectors)
   {
     blockPropertyStates.push_back(
@@ -609,7 +612,7 @@ vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(
     for (size_t i = 0; i < blockSelectors.size(); ++i)
     {
       const ColorArray& blockColorArray = blocksColorArrays[i];
-      const std::string selector = blockSelectors[i];
+      const std::string& selector = blockSelectors[i];
       const std::vector<int>& colorArrayResults = arrayResults.find(blockColorArray)->second;
       const std::vector<std::string>& colorArrayBlockSelectors =
         commonColorArraysBlockSelectors.find(blockColorArray)->second;
@@ -2722,7 +2725,7 @@ void vtkSMColorMapEditorHelper::ResetBlocksProperties(vtkSMProxy* proxy,
   if (std::find(propertyNames.begin(), propertyNames.end(), "BlockColors") != propertyNames.end())
   {
     vtkSMColorMapEditorHelper::RemoveBlocksColors(proxy, blockSelectors);
-    removedPropertyNames.push_back("BlockColors");
+    removedPropertyNames.emplace_back("BlockColors");
   }
   if (std::find(propertyNames.begin(), propertyNames.end(), "BlockColorArrayNames") !=
       propertyNames.end() ||
@@ -2730,33 +2733,33 @@ void vtkSMColorMapEditorHelper::ResetBlocksProperties(vtkSMProxy* proxy,
       propertyNames.end())
   {
     vtkSMColorMapEditorHelper::SetBlocksScalarColoring(proxy, blockSelectors, nullptr, -1);
-    removedPropertyNames.push_back("BlockColorArrayNames");
-    removedPropertyNames.push_back("BlockLookupTables");
+    removedPropertyNames.emplace_back("BlockColorArrayNames");
+    removedPropertyNames.emplace_back("BlockLookupTables");
   }
   if (std::find(propertyNames.begin(), propertyNames.end(), "BlockUseSeparateColorMaps") !=
     propertyNames.end())
   {
     vtkSMColorMapEditorHelper::RemoveBlocksUseSeparateColorMaps(proxy, blockSelectors);
-    removedPropertyNames.push_back("BlockUseSeparateColorMaps");
-    removedPropertyNames.push_back("BlockColorArrayNames");
+    removedPropertyNames.emplace_back("BlockUseSeparateColorMaps");
+    removedPropertyNames.emplace_back("BlockColorArrayNames");
   }
   if (std::find(propertyNames.begin(), propertyNames.end(), "BlockMapScalars") !=
     propertyNames.end())
   {
     vtkSMColorMapEditorHelper::RemoveBlocksMapScalars(proxy, blockSelectors);
-    removedPropertyNames.push_back("BlockMapScalars");
+    removedPropertyNames.emplace_back("BlockMapScalars");
   }
   if (std::find(propertyNames.begin(), propertyNames.end(),
         "BlockInterpolateScalarsBeforeMappings") != propertyNames.end())
   {
     vtkSMColorMapEditorHelper::RemoveBlocksInterpolateScalarsBeforeMappings(proxy, blockSelectors);
-    removedPropertyNames.push_back("BlockInterpolateScalarsBeforeMappings");
+    removedPropertyNames.emplace_back("BlockInterpolateScalarsBeforeMappings");
   }
   if (std::find(propertyNames.begin(), propertyNames.end(), "BlockOpacities") !=
     propertyNames.end())
   {
     vtkSMColorMapEditorHelper::RemoveBlocksOpacities(proxy, blockSelectors);
-    removedPropertyNames.push_back("BlockOpacities");
+    removedPropertyNames.emplace_back("BlockOpacities");
   }
   std::vector<std::string> notRemovedPropertyNames;
   for (const std::string& propertyName : propertyNames)
@@ -3750,7 +3753,7 @@ vtkSMColorMapEditorHelper::GetBlocksProminentValuesInformationForColorArray(vtkS
   {
     if (vtkPVArrayInformation* blockArrayInfo = blockArrayInfos[i])
     {
-      const auto attributeTypeAndArrayName = blockColorArrays[i];
+      const auto& attributeTypeAndArrayName = blockColorArrays[i];
       blockProminentValuesInfos[i] = repr->GetBlockProminentValuesInformation(blockSelectors[i],
         vtkSMPropertyHelper(repr->GetProperty("Assembly"), true).GetAsString(),
         blockArrayInfo->GetName(), attributeTypeAndArrayName.first,

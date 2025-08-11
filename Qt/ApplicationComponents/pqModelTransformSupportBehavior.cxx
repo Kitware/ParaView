@@ -22,7 +22,7 @@
 
 namespace
 {
-static vtkSMSourceProxy* FindVisibleProducerWithChangeOfBasisMatrix(pqView* view)
+vtkSMSourceProxy* FindVisibleProducerWithChangeOfBasisMatrix(pqView* view)
 {
   Q_FOREACH (pqRepresentation* repr, view->getRepresentations())
   {

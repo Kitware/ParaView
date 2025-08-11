@@ -21,7 +21,7 @@ namespace
 // Implicit plane widget does not like it when any of the dimensions is 0. So
 // we ensure that each dimension has some thickness. Then we scale the bounds
 // by the given factor
-static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
+void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
 {
   double max_length = bbox.GetMaxLength();
   max_length = max_length > 0 ? max_length * 0.05 : 1;

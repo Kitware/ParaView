@@ -25,7 +25,7 @@ namespace
 
 //-----------------------------------------------------------------------------
 // Scale the bounds by the given factor
-static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
+void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
 {
   vtkVector3d minPoint, maxPoint;
   bbox.GetMinPoint(minPoint.GetData());

@@ -252,7 +252,7 @@ vtkSMDomainIterator* vtkSMProperty::NewDomainIterator()
 //---------------------------------------------------------------------------
 void vtkSMProperty::AddDependent(vtkSMDomain* dom)
 {
-  this->PInternals->Dependents.push_back(dom);
+  this->PInternals->Dependents.emplace_back(dom);
 }
 
 //---------------------------------------------------------------------------

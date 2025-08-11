@@ -458,7 +458,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->UseHiddenLineRemoval = false;
   this->GetRenderer()->SetUseDepthPeeling(1);
-  this->GetRenderer()->SetUseDepthPeelingForVolumes(1);
+  this->GetRenderer()->SetUseDepthPeelingForVolumes(true);
   this->GetRenderer()->AddCuller(this->Culler);
 
   this->LightKit = vtkLightKit::New();
@@ -1137,17 +1137,17 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
     // local process, all vtkWidgetRepresentations return wacky Z bounds which
     // screws up the renderer and we don't see any images. Hence we skip this on
     // non-rendering nodes.
-    this->CenterAxes->SetUseBounds(0);
+    this->CenterAxes->SetUseBounds(false);
     if (this->GridAxes3DActor)
     {
-      this->GridAxes3DActor->SetUseBounds(0);
+      this->GridAxes3DActor->SetUseBounds(false);
     }
     double prop_bounds[6];
     this->GetRenderer()->ComputeVisiblePropBounds(prop_bounds);
-    this->CenterAxes->SetUseBounds(1);
+    this->CenterAxes->SetUseBounds(true);
     if (this->GridAxes3DActor)
     {
-      this->GridAxes3DActor->SetUseBounds(1);
+      this->GridAxes3DActor->SetUseBounds(true);
     }
 
     bbox.AddBounds(prop_bounds);
@@ -2903,7 +2903,7 @@ void vtkPVRenderView::SetupAndSetRenderer(vtkRenderer* ren)
   // the initial renderer in the constructor.
   ren->GetActiveCamera()->ParallelProjectionOff();
   ren->SetUseDepthPeeling(1);
-  ren->SetUseDepthPeelingForVolumes(1);
+  ren->SetUseDepthPeelingForVolumes(true);
   ren->SetAutomaticLightCreation(0);
 
   ren->AddCuller(this->Culler);

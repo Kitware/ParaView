@@ -124,7 +124,7 @@ pqNodeEditorWidget::~pqNodeEditorWidget()
   auto* settings = pqApplicationCore::instance()->settings();
   settings->setValue("NodeEditor.autoUpdateLayout", this->autoUpdateLayout);
 
-  for (auto edgesIt : this->edgeRegistry)
+  for (const auto& edgesIt : this->edgeRegistry)
   {
     for (auto* edge : edgesIt.second)
     {

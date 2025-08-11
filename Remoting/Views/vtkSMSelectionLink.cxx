@@ -140,8 +140,7 @@ void vtkSMSelectionLink::AddLinkedSelection(vtkSMProxy* proxy, int updateDir)
 
     if (addToList)
     {
-      this->Internals->LinkedSelections.push_back(
-        vtkSMSelectionLinkInternals::LinkedSelection(sourceProxy, updateDir));
+      this->Internals->LinkedSelections.emplace_back(sourceProxy, updateDir);
     }
 
     if (addObserver)

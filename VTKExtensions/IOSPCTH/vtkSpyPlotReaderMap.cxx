@@ -179,7 +179,7 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   int found = currentNum;
   int minimum = currentNum;
   int maximum = currentNum;
-  while (1)
+  while (true)
   {
     snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
     // cerr << "buffer1 == " << buffer << endl;
@@ -207,7 +207,7 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   idx = currentNum + 100;
   last = currentNum;
   found = currentNum;
-  while (1)
+  while (true)
   {
     snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
     // cerr << "buffer2 == " << buffer << endl;
@@ -258,7 +258,7 @@ bool vtkSpyPlotReaderMap::InitializeFromCaseFile(const char* filename)
   if (!vtksys::SystemTools::GetLineFromStream(ifs, line)) // eat spycase line
   {
     vtkGenericWarningMacro("Syntax error in case file " << filename);
-    return 0;
+    return false;
   }
 
   while (vtksys::SystemTools::GetLineFromStream(ifs, line))

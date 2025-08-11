@@ -387,7 +387,7 @@ public:
         const int num_comps = array->GetNumberOfComponents();
 
         // save order of arrays written out in header
-        this->ColumnInfo.push_back(std::make_pair(std::string(array->GetName()), num_comps));
+        this->ColumnInfo.emplace_back(array->GetName(), num_comps);
 
         for (int comp = 0; comp < num_comps; ++comp)
         {
@@ -417,7 +417,7 @@ public:
         const int num_comps = array->GetNumberOfComponents();
 
         // save order of arrays written out in header
-        this->ColumnInfo.push_back(std::make_pair(std::string(array->GetName()), num_comps));
+        this->ColumnInfo.emplace_back(array->GetName(), num_comps);
       }
     }
     // push the floating point precision/notation type.

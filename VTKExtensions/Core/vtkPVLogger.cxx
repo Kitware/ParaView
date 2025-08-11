@@ -9,16 +9,16 @@
 
 namespace
 {
-static vtkLogger::Verbosity DefaultVerbosity = vtkLogger::VERBOSITY_TRACE;
+vtkLogger::Verbosity DefaultVerbosity = vtkLogger::VERBOSITY_TRACE;
 
 using MapType = std::map<int, vtkLogger::Verbosity>;
-static MapType& get_map()
+MapType& get_map()
 {
   static MapType the_map{};
   return the_map;
 }
 
-static vtkLogger::Verbosity get_verbosity(int key, const char* envvar = nullptr)
+vtkLogger::Verbosity get_verbosity(int key, const char* envvar = nullptr)
 {
   auto& map = get_map();
   auto iter = map.find(key);
@@ -55,18 +55,18 @@ static vtkLogger::Verbosity get_verbosity(int key, const char* envvar = nullptr)
   return DefaultVerbosity;
 }
 
-static void set_verbosity(int key, vtkLogger::Verbosity verbosity)
+void set_verbosity(int key, vtkLogger::Verbosity verbosity)
 {
   get_map()[key] = verbosity;
 }
 
-static const int PipelineVerbosityKey = 1;
-static const int PluginVerbosityKey = 2;
-static const int DataMovementVerbosityKey = 3;
-static const int RenderingVerbosityKey = 4;
-static const int ApplicationVerbosityKey = 5;
-static const int ExecutionVerbosityKey = 6;
-static const int CatalystVerbosityKey = 7;
+const int PipelineVerbosityKey = 1;
+const int PluginVerbosityKey = 2;
+const int DataMovementVerbosityKey = 3;
+const int RenderingVerbosityKey = 4;
+const int ApplicationVerbosityKey = 5;
+const int ExecutionVerbosityKey = 6;
+const int CatalystVerbosityKey = 7;
 }
 
 //----------------------------------------------------------------------------

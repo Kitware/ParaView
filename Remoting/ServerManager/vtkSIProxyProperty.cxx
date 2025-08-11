@@ -118,6 +118,7 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
   std::vector<vtkTypeUInt32> new_value;
+  new_value.reserve(prop->value().proxy_global_id_size());
   for (int cc = 0; cc < prop->value().proxy_global_id_size(); cc++)
   {
     new_value.push_back(prop->value().proxy_global_id(cc));

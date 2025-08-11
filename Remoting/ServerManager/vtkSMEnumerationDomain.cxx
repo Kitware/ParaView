@@ -213,7 +213,7 @@ void vtkSMEnumerationDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 //---------------------------------------------------------------------------
 void vtkSMEnumerationDomain::AddEntry(const char* text, int value, const char* info /*=nullptr*/)
 {
-  this->EInternals->Entries.push_back(EntryType(text, value, info));
+  this->EInternals->Entries.emplace_back(text, value, info);
   this->Modified();
 }
 

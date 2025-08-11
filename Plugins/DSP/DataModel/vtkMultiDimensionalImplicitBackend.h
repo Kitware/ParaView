@@ -43,7 +43,7 @@ public:
     }
 
     const std::size_t nbOfValues = static_cast<std::size_t>(nbOfTuples * nbOfComponents);
-    for (auto array : *arrays)
+    for (const auto& array : *arrays)
     {
       if (array.size() != nbOfValues)
       {

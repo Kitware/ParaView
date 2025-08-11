@@ -181,7 +181,7 @@ int vtkPVDReader::RequestInformation(
   std::sort(timeSteps.begin(), timeSteps.end());
   if (!timeSteps.empty())
   {
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &timeSteps[0], numTimeSteps);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), numTimeSteps);
     double timeRange[2];
     timeRange[0] = timeSteps[0];
     timeRange[1] = timeSteps[numTimeSteps - 1];

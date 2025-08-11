@@ -170,6 +170,7 @@ static bool process_script_args(vtkInSituPipelinePython* pipeline, const conduit
 {
   std::vector<std::string> args;
   conduit_index_t nchildren = node.number_of_children();
+  args.reserve(nchildren);
   for (conduit_index_t i = 0; i < nchildren; ++i)
   {
     args.push_back(node.child(i).as_string());

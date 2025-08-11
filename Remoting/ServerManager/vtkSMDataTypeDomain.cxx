@@ -152,7 +152,7 @@ std::string vtkSMDataTypeDomain::GetDomainDescription() const
   {
     if (typeInfo.ChildTypes.empty())
     {
-      phrases.push_back(vtkDataObjectTypes::GetClassNameFromTypeId(typeInfo.Type));
+      phrases.emplace_back(vtkDataObjectTypes::GetClassNameFromTypeId(typeInfo.Type));
     }
     else
     {

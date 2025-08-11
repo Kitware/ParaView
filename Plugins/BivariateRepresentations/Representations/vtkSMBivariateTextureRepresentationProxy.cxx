@@ -129,7 +129,7 @@ void vtkSMBivariateTextureRepresentationProxy::SetupPropertiesLinks()
     vtkNew<vtkSMPropertyLink> link;
     link->AddLinkedProperty(this, props[0].c_str(), vtkSMLink::INPUT);
     link->AddLinkedProperty(this->TexturedScalarBarProxy, props[1].c_str(), vtkSMLink::OUTPUT);
-    this->Links.push_back(link);
+    this->Links.emplace_back(link);
   }
 }
 

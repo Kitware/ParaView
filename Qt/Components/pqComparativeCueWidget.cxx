@@ -262,12 +262,12 @@ void pqComparativeCueWidget::editRange()
   if (range.rowCount() == 1 && range.columnCount() == this->size().width())
   {
     // user set an x-range.
-    acueProxy->UpdateXRange(range.topRow(), &minvalues[0], &maxvalues[0], numvalues);
+    acueProxy->UpdateXRange(range.topRow(), minvalues.data(), maxvalues.data(), numvalues);
   }
   else if (range.columnCount() == 1 && range.rowCount() == this->size().height())
   {
     // user set a y-range.
-    acueProxy->UpdateYRange(range.leftColumn(), &minvalues[0], &maxvalues[0], numvalues);
+    acueProxy->UpdateYRange(range.leftColumn(), minvalues.data(), maxvalues.data(), numvalues);
   }
   else if (range.columnCount() == this->size().width() && range.rowCount() == this->size().height())
   {
@@ -276,19 +276,19 @@ void pqComparativeCueWidget::editRange()
     {
       case HORZ_FIRST:
         // user set a t-range.
-        acueProxy->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues);
+        acueProxy->UpdateWholeRange(minvalues.data(), maxvalues.data(), numvalues);
         break;
 
       case VERT_FIRST:
-        acueProxy->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues, true);
+        acueProxy->UpdateWholeRange(minvalues.data(), maxvalues.data(), numvalues, true);
         break;
 
       case HORZ_ONLY:
-        acueProxy->UpdateXRange(-1, &minvalues[0], &maxvalues[0], numvalues);
+        acueProxy->UpdateXRange(-1, minvalues.data(), maxvalues.data(), numvalues);
         break;
 
       case VERT_ONLY:
-        acueProxy->UpdateYRange(-1, &minvalues[0], &maxvalues[0], numvalues);
+        acueProxy->UpdateYRange(-1, minvalues.data(), maxvalues.data(), numvalues);
         break;
 
       default:
@@ -332,7 +332,7 @@ void pqComparativeCueWidget::editRange()
           }
           newvalues[cc] = minvalues[cc] + scale_factor * (maxvalues[cc] - minvalues[cc]);
         }
-        acueProxy->UpdateValue(xx, yy, &newvalues[0], numvalues);
+        acueProxy->UpdateValue(xx, yy, newvalues.data(), numvalues);
       }
     }
   }

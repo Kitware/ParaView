@@ -944,7 +944,7 @@ void vtkHyperTreeGridRepresentation::UpdateShaderReplacements()
       return;
     }
     std::string replacement = repl["replacement"].asString();
-    replacements.push_back(std::make_tuple(shaderType, original, replacement));
+    replacements.emplace_back(shaderType, original, replacement);
   }
 
   for (const auto& r : replacements)

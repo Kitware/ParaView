@@ -434,7 +434,7 @@ std::vector<double> pqTimelinePainter::getTimes(QStandardItem* item)
 {
   std::vector<double> times;
   QVariant dataVariant = item->data(pqTimelineItemRole::TIMES);
-  for (auto time : dataVariant.toList())
+  for (const auto& time : dataVariant.toList())
   {
     double adjustedTime = time.toDouble();
     // animation keyframes store relative times.

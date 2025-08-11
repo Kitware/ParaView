@@ -110,9 +110,10 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& mergedMB,
       else if (block->IsA("vtkMultiPieceDataSet"))
       {
         std::vector<vtkSmartPointer<vtkDataObject>> sub;
+        sub.reserve(collected.size());
         for (auto& entry : collected)
         {
-          sub.push_back((vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i)));
+          sub.emplace_back(vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i));
         }
         vtkNew<vtkMultiPieceDataSet> mergedSub;
         ::Flatten(mergedSub.GetPointer(), sub);
@@ -125,9 +126,10 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& mergedMB,
       else if (block->IsA("vtkMultiBlockDataSet"))
       {
         std::vector<vtkSmartPointer<vtkDataObject>> sub;
+        sub.reserve(collected.size());
         for (auto& entry : collected)
         {
-          sub.push_back(vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i));
+          sub.emplace_back(vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i));
         }
 
         vtkNew<vtkMultiBlockDataSet> mergedSub;
@@ -163,9 +165,11 @@ void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedPCD,
   for (unsigned i = 0; i < numberOfPartitionedDatasets; ++i)
   {
     std::vector<vtkSmartPointer<vtkDataObject>> sub;
+    sub.reserve(collected.size());
     for (auto& entry : collected)
     {
-      sub.push_back(vtkPartitionedDataSetCollection::SafeDownCast(entry)->GetPartitionedDataSet(i));
+      sub.emplace_back(
+        vtkPartitionedDataSetCollection::SafeDownCast(entry)->GetPartitionedDataSet(i));
     }
     vtkNew<vtkPartitionedDataSet> mergedSub;
     ::Flatten(mergedSub.GetPointer(), sub);

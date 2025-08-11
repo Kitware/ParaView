@@ -98,13 +98,13 @@ public:
   vtkXMLCollectionReaderRestrictions Restrictions;
   std::vector<vtkSmartPointer<vtkXMLReader>> Readers;
 
-  typedef vtkXMLReader* (*Constructor)(void); // function pointer type
+  typedef vtkXMLReader* (*Constructor)(); // function pointer type
   typedef std::map<std::string, std::pair<std::string, Constructor>> ReaderConstructorsType;
   static const ReaderConstructorsType ReaderConstructors;
 };
 
 // clang-format off
-#define GET_NEW_FUNCTOR(x) { #x, [](void) -> vtkXMLReader* { return x::New(); } }
+#define GET_NEW_FUNCTOR(x) { #x, []() -> vtkXMLReader* { return x::New(); } }
 // clang-format on
 const vtkXMLCollectionReaderInternals::ReaderConstructorsType
   vtkXMLCollectionReaderInternals::ReaderConstructors = { { "vtp",
@@ -628,7 +628,7 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name, const char*
   if (n == this->Internal->AttributeNames.end())
   {
     // Need to create an entry for this attribute.
-    this->Internal->AttributeNames.push_back(name);
+    this->Internal->AttributeNames.emplace_back(name);
 
     this->Internal->AttributeValueSets.resize(this->Internal->AttributeValueSets.size() + 1);
     values = &*(this->Internal->AttributeValueSets.end() - 1);
@@ -647,7 +647,7 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name, const char*
   if (i == values->end())
   {
     // Need to add the value.
-    values->push_back(value);
+    values->emplace_back(value);
   }
 }
 

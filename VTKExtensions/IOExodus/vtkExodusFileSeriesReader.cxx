@@ -65,8 +65,8 @@ void vtkExodusFileSeriesReaderStatus::RecordStatus(vtkExodusIIReader* reader)
     this->ArrayStatuses[i].clear();
     for (int j = 0; j < reader->GetNumberOfObjectArrays(arrayType); j++)
     {
-      this->ArrayStatuses[i].push_back(ObjectStatus(
-        reader->GetObjectArrayName(arrayType, j), reader->GetObjectArrayStatus(arrayType, j)));
+      this->ArrayStatuses[i].emplace_back(
+        reader->GetObjectArrayName(arrayType, j), reader->GetObjectArrayStatus(arrayType, j));
     }
   }
 
@@ -76,8 +76,8 @@ void vtkExodusFileSeriesReaderStatus::RecordStatus(vtkExodusIIReader* reader)
     this->ObjectStatuses[i].clear();
     for (int j = 0; j < reader->GetNumberOfObjects(objectType); j++)
     {
-      this->ObjectStatuses[i].push_back(
-        ObjectStatus(reader->GetObjectName(objectType, j), reader->GetObjectStatus(objectType, j)));
+      this->ObjectStatuses[i].emplace_back(
+        reader->GetObjectName(objectType, j), reader->GetObjectStatus(objectType, j));
     }
   }
 }

@@ -110,7 +110,7 @@ std::vector<std::pair<QString, QString>> MergeAnnotations(
   for (const auto& pair : current_pairs)
   {
     // using old_values to get updated annotation texts, if any.
-    merged_pairs.push_back(std::pair<QString, QString>(pair.first, old_values[pair.first]));
+    merged_pairs.emplace_back(pair.first, old_values[pair.first]);
   }
   for (const auto& pair : real_new_pairs)
   {
@@ -366,18 +366,18 @@ bool pqColorAnnotationsWidget::pqInternals::updateAnnotations(vtkAbstractArray* 
     const auto val = values->GetVariantValue(idx);
     if (val.IsDouble())
     {
-      candidate_tuples.push_back(std::make_pair(pqCoreUtilities::formatFullNumber(val.ToDouble()),
-        pqCoreUtilities::formatNumber(val.ToDouble())));
+      candidate_tuples.emplace_back(pqCoreUtilities::formatFullNumber(val.ToDouble()),
+        pqCoreUtilities::formatNumber(val.ToDouble()));
     }
     else if (val.IsFloat())
     {
-      candidate_tuples.push_back(std::make_pair(pqCoreUtilities::formatFullNumber(val.ToFloat()),
-        pqCoreUtilities::formatNumber(val.ToFloat())));
+      candidate_tuples.emplace_back(pqCoreUtilities::formatFullNumber(val.ToFloat()),
+        pqCoreUtilities::formatNumber(val.ToFloat()));
     }
     else
     {
       auto str = val.ToString();
-      candidate_tuples.push_back(std::pair<QString, QString>(str.c_str(), str.c_str()));
+      candidate_tuples.emplace_back(str.c_str(), str.c_str());
     }
   }
 
@@ -640,8 +640,7 @@ void pqColorAnnotationsWidget::setAnnotations(const QList<QVariant>& value)
 
   for (int cc = 0; (cc + 1) < value.size(); cc += 2)
   {
-    annotationsData.push_back(
-      std::pair<QString, QString>(value[cc].toString(), value[cc + 1].toString()));
+    annotationsData.emplace_back(value[cc].toString(), value[cc + 1].toString());
   }
   this->Internals->Model->setAnnotations(annotationsData);
 
@@ -704,8 +703,8 @@ void pqColorAnnotationsWidget::setVisibilities(const QList<QVariant>& values)
 
   for (int cc = 0; (cc + 1) < values.size(); cc += 2)
   {
-    visibilities.push_back(std::make_pair(
-      values[cc].toString(), values[cc + 1].toString() == "1" ? Qt::Checked : Qt::Unchecked));
+    visibilities.emplace_back(
+      values[cc].toString(), values[cc + 1].toString() == "1" ? Qt::Checked : Qt::Unchecked);
   }
 
   this->Internals->Model->setVisibilities(visibilities);

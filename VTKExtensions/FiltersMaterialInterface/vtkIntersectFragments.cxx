@@ -334,7 +334,7 @@ int vtkIntersectFragments::Intersect()
       }
     }
     // free extra memory
-    vector<int>(ids).swap(ids);
+    ids.shrink_to_fit();
 
     this->Progress += this->ProgressIncrement;
     this->UpdateProgress(this->Progress);
@@ -944,7 +944,7 @@ int vtkIntersectFragments::SendGeometricAttributes(const int recipientProcId)
     // centers
     buffer.Pack(this->IntersectionCenters[blockId]);
     // ids
-    buffer.Pack(&this->IntersectionIds[blockId][0], 1, nFragments[blockId]);
+    buffer.Pack(this->IntersectionIds[blockId].data(), 1, nFragments[blockId]);
   }
 
   // send

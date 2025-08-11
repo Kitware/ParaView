@@ -2601,7 +2601,7 @@ int vtkClientServerStream::StreamFromString(const char* str)
 int vtkClientServerStream::StreamFromStringInternal(const char* begin, const char* end)
 {
   const char* position = begin;
-  while (1)
+  while (true)
   {
     // Skip whitespace and newlines.
     while (position < end &&
@@ -2671,7 +2671,7 @@ int vtkClientServerStream::AddMessageFromString(
   // Scan for arguments until the end of a line occurs outside an
   // argument.
   const char* position = commandEnd;
-  while (1)
+  while (true)
   {
     // Skip whitespace.
     while (position < end && (*position == ' ' || *position == '\t'))

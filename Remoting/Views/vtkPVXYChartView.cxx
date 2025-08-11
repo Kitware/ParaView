@@ -181,7 +181,7 @@ void vtkPVXYChartView::SetChartType(const char* type)
                                            "turn off log-scaling or specify a valid axis\n"
                                            "range; or scroll the view; or remove the line\n"
                                            "series from the chart in the Properties Tab.");
-      this->LogScaleWarningLabel->SetVisible(1);
+      this->LogScaleWarningLabel->SetVisible(true);
       this->LogScaleWarningLabel->SetDimensions(150, 150, 150, 150);
       this->Chart->AddItem(this->LogScaleWarningLabel);
     }

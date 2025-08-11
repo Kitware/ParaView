@@ -19,10 +19,10 @@
 //============================================================================
 namespace
 {
-static vtkRenderWindow* ProcessWindowSingleton = nullptr;
-static bool ProcessWindowSingletonPrepared = false;
-static int PVProcessWindowSingletonCleanerNiftyCounter = 0;
-static void DeleteProcessWindowSingleton()
+vtkRenderWindow* ProcessWindowSingleton = nullptr;
+bool ProcessWindowSingletonPrepared = false;
+int PVProcessWindowSingletonCleanerNiftyCounter = 0;
+void DeleteProcessWindowSingleton()
 {
   if (::ProcessWindowSingleton != nullptr)
   {

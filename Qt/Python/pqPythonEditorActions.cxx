@@ -137,7 +137,7 @@ void pqPythonEditorActions::updateScriptsList(pqPythonManager* python_mgr)
   for (auto const& script : scripts)
   {
     const QString filename = script.split(".", PV_QT_SKIP_EMPTY_PARTS).at(0);
-    this->ScriptActions.emplace_back(ScriptAction());
+    this->ScriptActions.emplace_back();
     const std::size_t position = this->ScriptActions.size() - 1;
     auto& actions = this->ScriptActions[position];
 

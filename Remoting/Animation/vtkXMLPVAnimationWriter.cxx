@@ -112,7 +112,7 @@ void vtkXMLPVAnimationWriter::AddInputInternal(const char* group)
   this->Internal->InputPartNumbers.push_back(partNum);
 
   // Add the group name for this input.
-  this->Internal->InputGroupNames.push_back(group);
+  this->Internal->InputGroupNames.emplace_back(group);
 
   // Allocate the mtime table entry for this input.
   this->Internal->InputMTimes.push_back(0);

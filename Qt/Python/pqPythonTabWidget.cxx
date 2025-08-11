@@ -376,7 +376,7 @@ void pqPythonTabWidget::generateTabName(const pqPythonTextArea* widget, QString&
   const auto ColorText = [&QColorToString](const QColor& color, const QString& text)
   { return "<span style=\"color:" + QColorToString(color) + "\">" + text + "</span>"; };
 
-  QString fileName = widget->getFilename();
+  const QString& fileName = widget->getFilename();
   const QFileInfo fileInfo(fileName);
   const QString macroDir = pqPythonScriptEditor::getMacrosDir();
   const QString scriptDir = pqPythonScriptEditor::getScriptsDir();

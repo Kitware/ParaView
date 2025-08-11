@@ -55,7 +55,7 @@ void vtkPVCameraCollection::RemoveAllCameras()
 //----------------------------------------------------------------------------
 int vtkPVCameraCollection::AddCamera(vtkCamera* camera)
 {
-  this->Internals->Cameras.push_back(camera);
+  this->Internals->Cameras.emplace_back(camera);
   this->Modified();
   return static_cast<int>(this->Internals->Cameras.size()) - 1;
 }

@@ -29,7 +29,7 @@ pqTranslationsTesting::~pqTranslationsTesting() = default;
 //-----------------------------------------------------------------------------
 bool pqTranslationsTesting::isIgnored(QObject* object, const char* property) const
 {
-  for (QPair<QString, QString> pair : TRANSLATION_IGNORE_STRINGS)
+  for (const QPair<QString, QString>& pair : TRANSLATION_IGNORE_STRINGS)
   {
     if (pqObjectNaming::GetName(*object) == pair.first &&
       (QString(property) == pair.second || QString(pair.second).isEmpty()))
@@ -37,7 +37,7 @@ bool pqTranslationsTesting::isIgnored(QObject* object, const char* property) con
       return true;
     }
   }
-  for (QPair<QRegularExpression, QString> pair : TRANSLATION_IGNORE_REGEXES)
+  for (const QPair<QRegularExpression, QString>& pair : TRANSLATION_IGNORE_REGEXES)
   {
     if (pqObjectNaming::GetName(*object).contains(pair.first) &&
       (QString(property) == pair.second || QString(pair.second).isEmpty()))

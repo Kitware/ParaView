@@ -71,7 +71,7 @@ QString pqUsageLoggingBehavior::configurationFile() const
   vtkNew<vtkResourceFileLocator> locator;
   locator->SetLogVerbosity(vtkPVLogger::GetApplicationVerbosity());
 
-  auto configFName = pqUsageLoggingBehavior::configFileName();
+  const auto& configFName = pqUsageLoggingBehavior::configFileName();
   auto path = locator->Locate(vtk_libs, prefixes, configFName.toUtf8().toStdString());
   if (!path.empty())
   {

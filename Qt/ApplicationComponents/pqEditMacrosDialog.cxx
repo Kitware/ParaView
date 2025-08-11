@@ -71,7 +71,7 @@ struct pqEditMacrosDialog::pqInternals
       {
         return result;
       }
-      const QString fileName = fileNames[row];
+      const QString& fileName = fileNames[row];
       if (column == pqInternals::Icons)
       {
         switch (role)
@@ -162,7 +162,7 @@ struct pqEditMacrosDialog::pqInternals
       {
         return false;
       }
-      const QString macroPath = fileNames[row];
+      const QString& macroPath = fileNames[row];
       const QString text = value.toString();
       if (column == pqInternals::Icons)
       {

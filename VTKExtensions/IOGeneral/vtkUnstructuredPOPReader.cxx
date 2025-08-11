@@ -513,9 +513,9 @@ int vtkUnstructuredPOPReader::ProcessGrid(
         std::vector<float> y(count[1]);
         std::vector<float> x(count[2]);
         // gets data from x,y,z axis (spacing)
-        nc_get_vars_float(this->NCDFFD, dimidsp[0], start, count, rStride, &(z[0]));
-        nc_get_vars_float(this->NCDFFD, dimidsp[1], start + 1, count + 1, rStride + 1, &(y[0]));
-        nc_get_vars_float(this->NCDFFD, dimidsp[2], start + 2, count + 2, rStride + 2, &(x[0]));
+        nc_get_vars_float(this->NCDFFD, dimidsp[0], start, count, rStride, z.data());
+        nc_get_vars_float(this->NCDFFD, dimidsp[1], start + 1, count + 1, rStride + 1, y.data());
+        nc_get_vars_float(this->NCDFFD, dimidsp[2], start + 2, count + 2, rStride + 2, x.data());
 
         vtkNew<vtkPoints> points;
         grid->SetPoints(points.GetPointer());
@@ -623,8 +623,8 @@ int vtkUnstructuredPOPReader::ProcessGrid(
     {
       this->LoadPointData(grid, netCDFFD, varidp, start, count, rStride, variableName);
       std::vector<std::string> scalarArrayNames;
-      scalarArrayNames.push_back("UVEL");
-      scalarArrayNames.push_back("VVEL");
+      scalarArrayNames.emplace_back("UVEL");
+      scalarArrayNames.emplace_back("VVEL");
       ConvertScalarsToVector(grid->GetPointData(), scalarArrayNames);
       this->VectorGrid = 2;
     }
@@ -698,7 +698,7 @@ bool vtkUnstructuredPOPReader::Transform(vtkUnstructuredGrid* grid, size_t* star
   if (this->VectorGrid != 1 && this->VectorGrid != 2)
   {
     vtkErrorMacro("Don't know if this should be a scalar or vector field grid.");
-    return 0;
+    return false;
   }
 
   int latlonFileId = 0;
@@ -708,7 +708,7 @@ bool vtkUnstructuredPOPReader::Transform(vtkUnstructuredGrid* grid, size_t* star
   {
     // we don't need to close the file if there was an error opening the file
     vtkErrorMacro(<< "Can't read file " << nc_strerror(retval));
-    return 0;
+    return false;
   }
 
   int varidp;
@@ -729,7 +729,7 @@ bool vtkUnstructuredPOPReader::Transform(vtkUnstructuredGrid* grid, size_t* star
   size_t latlonCount[2] = { dimensions[0], dimensions[1] };
 
   std::vector<float> realLongitude(dimensions[0] * dimensions[1]);
-  nc_get_vara_float(latlonFileId, varidp, zeros, latlonCount, &(realLongitude[0]));
+  nc_get_vara_float(latlonFileId, varidp, zeros, latlonCount, realLongitude.data());
 
   if (this->VectorGrid == 2)
   {
@@ -741,7 +741,7 @@ bool vtkUnstructuredPOPReader::Transform(vtkUnstructuredGrid* grid, size_t* star
   }
 
   std::vector<float> realLatitude(dimensions[0] * dimensions[1]);
-  nc_get_vara_float(latlonFileId, varidp, zeros, latlonCount, &(realLatitude[0]));
+  nc_get_vara_float(latlonFileId, varidp, zeros, latlonCount, realLatitude.data());
 
   nc_inq_varid(latlonFileId, "depth_t", &varidp);
   nc_inq_vardimid(latlonFileId, varidp, dimensionIds + 2);
@@ -749,7 +749,7 @@ bool vtkUnstructuredPOPReader::Transform(vtkUnstructuredGrid* grid, size_t* star
 
   std::vector<float> realHeight(dimensions[2]);
   ptrdiff_t stride = static_cast<ptrdiff_t>(this->Stride[2]);
-  nc_get_vars_float(latlonFileId, varidp, start, count, &stride, &(realHeight[0]));
+  nc_get_vars_float(latlonFileId, varidp, start, count, &stride, realHeight.data());
 
   // the vector arrays that need to be manipulated
   std::vector<vtkFloatArray*> vectorArrays;
@@ -921,7 +921,7 @@ public:
     // i probably don't need this whole array
     this->DeepestCellIndex.resize(this->HorizontalDimensions[0] * this->HorizontalDimensions[1]);
     nc_get_vara_int(
-      latlonFileId, varidp, zeros, this->HorizontalDimensions, &(this->DeepestCellIndex[0]));
+      latlonFileId, varidp, zeros, this->HorizontalDimensions, this->DeepestCellIndex.data());
 
     memcpy(this->Stride, stride, sizeof(int) * 3);
     this->CurrentColumn = 0;
@@ -1112,7 +1112,7 @@ void vtkUnstructuredPOPReader::LoadPointData(vtkUnstructuredGrid* grid, int netC
     if (length > 0)
     {
       std::string attribute(length, ' ');
-      nc_get_att_text(netCDFFD, varidp, "units", &attribute[0]);
+      nc_get_att_text(netCDFFD, varidp, "units", attribute.data());
       if (attribute == "centimeter/s")
       { // need to scale to meter/s
         for (vtkIdType i = 0; i < numberOfTuples; i++)
@@ -1213,7 +1213,7 @@ void vtkUnstructuredPOPReader::ComputeVerticalVelocity(vtkUnstructuredGrid* grid
         size_t w_depDimension;
         nc_inq_dimlen(latlonFileId, dimensionId, &w_depDimension);
         w_dep.resize(w_depDimension);
-        nc_get_vara_float(latlonFileId, varidp, &zero, &w_depDimension, &(w_dep[0]));
+        nc_get_vara_float(latlonFileId, varidp, &zero, &w_depDimension, w_dep.data());
       }
       // assuming no partial cell depths, the bottom cell is only integrated
       // over half of the distance.
@@ -1239,7 +1239,7 @@ void vtkUnstructuredPOPReader::ComputeVerticalVelocity(vtkUnstructuredGrid* grid
   if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
   {
     this->CommunicateParallelVerticalVelocity(
-      wholeExtent, subExtent, numberOfGhostLevels, pointIterator, &w[0]);
+      wholeExtent, subExtent, numberOfGhostLevels, pointIterator, w.data());
   }
 
   // now w[] should have the proper values and we need to add them back in
@@ -1310,8 +1310,8 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(int* wholeExt
       std::vector<int> iData(it->second * 3);
       std::vector<float> fData(it->second);
       vtkMPICommunicator::Request iRequest, fRequest;
-      controller->NoBlockReceive(&iData[0], it->second * 3, it->first, 4837, iRequest);
-      controller->NoBlockReceive(&fData[0], it->second, it->first, 4838, fRequest);
+      controller->NoBlockReceive(iData.data(), it->second * 3, it->first, 4837, iRequest);
+      controller->NoBlockReceive(fData.data(), it->second, it->first, 4838, fRequest);
       iRequest.Wait();
       fRequest.Wait();
       for (int i = 0; i < it->second; i++)
@@ -1364,10 +1364,10 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(int* wholeExt
     for (std::map<vtkIdType, std::vector<int>>::iterator it = sendIndexInfo.begin();
          it != sendIndexInfo.end(); it++)
     {
-      requests.push_back(vtkMPICommunicator::Request());
-      controller->NoBlockSend(&(it->second[0]), static_cast<int>(it->second.size()),
+      requests.emplace_back();
+      controller->NoBlockSend(it->second.data(), static_cast<int>(it->second.size()),
         static_cast<int>(it->first), 4837, requests.back());
-      controller->NoBlockSend(&(sendValueInfo[it->first][0]),
+      controller->NoBlockSend(sendValueInfo[it->first].data(),
         static_cast<int>(it->second.size() / 3), static_cast<int>(it->first), 4838,
         requests.back());
     }
@@ -1510,7 +1510,7 @@ bool vtkUnstructuredPOPReader::GetExtentInformation(
     }
     count = (count == 0 ? 1 : count * 2);
   } while (count < numberOfPieces);
-  extentTranslator->SetSplitPath(static_cast<int>(splitPath.size()), &(splitPath[0]));
+  extentTranslator->SetSplitPath(static_cast<int>(splitPath.size()), splitPath.data());
 
   extentTranslator->SetWholeExtent(wholeExtent);
 

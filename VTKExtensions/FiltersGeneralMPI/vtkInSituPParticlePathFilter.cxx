@@ -197,7 +197,7 @@ void vtkInSituPParticlePathFilter::AssignSeedsToProcessors(double t, vtkDataSet*
   }
   std::vector<int> realOwningProcess(numSeeds);
   this->Controller->AllReduce(
-    &owningProcess[0], &realOwningProcess[0], numSeeds, vtkCommunicator::MAX_OP);
+    owningProcess.data(), realOwningProcess.data(), numSeeds, vtkCommunicator::MAX_OP);
 
   for (size_t i = 0; i < realOwningProcess.size(); i++)
   {

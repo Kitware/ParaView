@@ -154,11 +154,11 @@ void vtkSMMultiSliceViewProxy::InitDefaultSlices(
       zSlices.push_back(center[2]);
 
       vtkSMPropertyHelper(this, "XSlicesValues")
-        .Set(&xSlices[0], static_cast<unsigned int>(xSlices.size()));
+        .Set(xSlices.data(), static_cast<unsigned int>(xSlices.size()));
       vtkSMPropertyHelper(this, "YSlicesValues")
-        .Set(&ySlices[0], static_cast<unsigned int>(ySlices.size()));
+        .Set(ySlices.data(), static_cast<unsigned int>(ySlices.size()));
       vtkSMPropertyHelper(this, "ZSlicesValues")
-        .Set(&zSlices[0], static_cast<unsigned int>(ySlices.size()));
+        .Set(zSlices.data(), static_cast<unsigned int>(ySlices.size()));
     }
     this->UpdateVTKObjects();
   }

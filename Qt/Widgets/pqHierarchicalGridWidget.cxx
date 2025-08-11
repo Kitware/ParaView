@@ -164,13 +164,13 @@ void pqHierarchicalGridWidget::setSplitters(
     {
       QRect r(s.Bounds.x() + s.Position - 2, s.Bounds.y(), 4, s.Bounds.height());
       internals.HSplitRegion = internals.HSplitRegion.united(r);
-      internals.Splitters.push_back(std::make_pair(s, r));
+      internals.Splitters.emplace_back(s, r);
     }
     else
     {
       QRect r(s.Bounds.x(), s.Bounds.y() + s.Position - 2, s.Bounds.width(), 4);
       internals.VSplitRegion = internals.VSplitRegion.united(r);
-      internals.Splitters.push_back(std::make_pair(s, r));
+      internals.Splitters.emplace_back(s, r);
     }
   }
 }

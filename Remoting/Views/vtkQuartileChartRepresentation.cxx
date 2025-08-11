@@ -14,7 +14,7 @@
 
 namespace
 {
-static vtksys::RegularExpression StatsArrayRe("^([^( ]+)\\((.+)\\)$");
+vtksys::RegularExpression StatsArrayRe("^([^( ]+)\\((.+)\\)$");
 }
 
 class vtkQuartileChartRepresentation::vtkQCRInternals
@@ -131,13 +131,13 @@ public:
           std::vector<std::pair<std::string, std::string>> yNames;
           if (role == "minmax")
           {
-            yNames.push_back(std::make_pair(columnName.replace(0, 3, "min"), "min " + label));
-            yNames.push_back(std::make_pair(columnName, "max " + label));
+            yNames.emplace_back(columnName.replace(0, 3, "min"), "min " + label);
+            yNames.emplace_back(columnName, "max " + label);
           }
           else
           {
-            yNames.push_back(std::make_pair(columnName.replace(0, 2, "q1"), "q1 " + label));
-            yNames.push_back(std::make_pair(columnName, "q3 " + label));
+            yNames.emplace_back(columnName.replace(0, 2, "q1"), "q1 " + label);
+            yNames.emplace_back(columnName, "q3 " + label);
           }
 
           for (const auto& apair : yNames)

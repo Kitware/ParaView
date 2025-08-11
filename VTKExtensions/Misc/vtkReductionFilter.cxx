@@ -417,7 +417,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
   // it contains the current process's result.
   if (!data_sets.empty())
   {
-    this->PostProcess(output, &data_sets[0], static_cast<unsigned int>(data_sets.size()));
+    this->PostProcess(output, data_sets.data(), static_cast<unsigned int>(data_sets.size()));
   }
 }
 //----------------------------------------------------------------------------

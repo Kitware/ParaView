@@ -69,8 +69,7 @@ private:
 };
 vtkStandardNewMacro(vtkPVGenericOutputWindow);
 
-static void UpdateThreadName(
-  vtkProcessModule::ProcessTypes type, vtkMultiProcessController* controller)
+void UpdateThreadName(vtkProcessModule::ProcessTypes type, vtkMultiProcessController* controller)
 {
   // set thread name based on application.
   std::string tname_suffix;
@@ -540,7 +539,7 @@ void vtkProcessModule::PushActiveSession(vtkSession* session)
 {
   assert(session != nullptr);
 
-  this->Internals->ActiveSessionStack.push_back(session);
+  this->Internals->ActiveSessionStack.emplace_back(session);
 }
 
 //----------------------------------------------------------------------------

@@ -122,7 +122,7 @@ void vtkPVPythonAlgorithmPlugin::Initialize(
       PyObject* borrowed_item = PyList_GET_ITEM(result.GetPointer(), cc);
       if (PyUnicode_Check(borrowed_item))
       {
-        internals.XMLs.push_back(PyUnicode_AsUTF8(borrowed_item));
+        internals.XMLs.emplace_back(PyUnicode_AsUTF8(borrowed_item));
       }
     }
   }

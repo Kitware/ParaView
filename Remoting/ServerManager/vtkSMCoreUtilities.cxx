@@ -111,7 +111,7 @@ std::vector<std::string> vtkSMCoreUtilities::GetFileNameProperties(vtkSMProxy* p
     {
       if (property->FindDomain<vtkSMFileListDomain>() != nullptr)
       {
-        result.push_back(piter->GetKey());
+        result.emplace_back(piter->GetKey());
       }
     }
   }
