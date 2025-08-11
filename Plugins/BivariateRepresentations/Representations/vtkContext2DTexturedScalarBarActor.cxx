@@ -5,18 +5,14 @@
 #include "vtkAxis.h"
 #include "vtkBoundingRectContextDevice2D.h"
 #include "vtkBrush.h"
-#include "vtkColorTransferFunction.h"
 #include "vtkContext2D.h"
 #include "vtkContextActor.h"
 #include "vtkContextDevice2D.h"
 #include "vtkContextItem.h"
 #include "vtkContextScene.h"
-#include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
-#include "vtkLookupTable.h"
-#include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLContextDevice2D.h"
@@ -29,14 +25,12 @@
 #include "vtkScalarsToColors.h"
 #include "vtkTextProperty.h"
 #include "vtkTransform2D.h"
-#include "vtkUnsignedCharArray.h"
 #include "vtkViewport.h"
 
 #include "vtkNetworkImageSource.h"
 #include "vtkPVLogoSource.h"
 
 #include <limits>
-#include <map>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 #define SNPRINTF _snprintf
@@ -352,7 +346,6 @@ void vtkContext2DTexturedScalarBarActor::PaintAxis(
   this->Axis->SetGridVisible(false);
   this->Axis->SetNotation(notation);
   this->Axis->SetLabelFormat(std::string(this->LabelFormat));
-  this->Axis->AutoScale();
   this->Axis->SetRangeLabelsVisible(this->AddRangeLabels);
   this->Axis->SetRangeLabelFormat(std::string(this->RangeLabelFormat));
   this->Axis->SetCustomTickPositions(cutomLabels);

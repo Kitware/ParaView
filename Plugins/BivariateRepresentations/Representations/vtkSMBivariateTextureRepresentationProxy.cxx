@@ -116,8 +116,8 @@ void vtkSMBivariateTextureRepresentationProxy::SetupPropertiesLinks()
 
   const std::array<std::array<std::string, 2>, 6> linkedProperties{
     { { "LookupTable", "LookupTable" }, { "BivariateTexture", "Texture" },
-      { "FirstArrayRange", "FirstRange" }, { "SecondArrayRange", "SecondRange" },
-      { "FirstArrayName", "FirstTitle" }, { "SecondArrayName", "SecondTitle" } }
+      { "XArrayRangeInfo", "FirstRange" }, { "YArrayRangeInfo", "SecondRange" },
+      { "XArrayName", "FirstTitle" }, { "YArrayName", "SecondTitle" } }
   };
 
   // Link the texture property of the representation with the texture

@@ -12,6 +12,7 @@
 #include "vtkSMSessionProxyManager.h"
 
 #include "vtkPVBivariatePluginLocation.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMRepresentationProxy.h"
@@ -21,6 +22,27 @@ namespace
 {
 // Nice to have : textures names can be retrieved from the ressources directly.
 const std::string TEXTURE_FILES[4]{ "Bremm.png", "Schumann.png", "Steiger.png", "Teulingfig2.png" };
+
+void SetDefaultArrayRanges(vtkSMRepresentationProxy* repr, const std::string& rangePropName)
+{
+  if (auto* prop =
+        vtkSMDoubleVectorProperty::SafeDownCast(repr->GetProperty(rangePropName.c_str())))
+  {
+    double* range = prop->GetElements();
+
+    if (range[0] == 0.0 && range[1] == 0.0)
+    {
+      if (auto* infoProp = vtkSMDoubleVectorProperty::SafeDownCast(
+            repr->GetProperty((rangePropName + "Info").c_str())))
+      {
+        double* infoRange = infoProp->GetInformationOnly() ? infoProp->GetElements() : nullptr;
+
+        vtkSMPropertyHelper(repr, rangePropName.c_str()).Set(infoRange, 2);
+        repr->UpdateVTKObjects();
+      }
+    }
+  }
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -84,13 +106,22 @@ void pqBivariateManager::onRenderEnded()
     {
       const char* rs = vtkSMPropertyHelper(repr, "Representation").GetAsString();
       const int visible = vtkSMPropertyHelper(repr, "Visibility").GetAsInt();
-      if (rs && !strcmp(rs, "Bivariate Noise Surface") && visible)
+
+      if (!rs || !visible)
+      {
+        continue;
+      }
+
+      if (!strcmp(rs, "Bivariate Noise Surface"))
       {
         // If the view has a visible bivariate noise representation,
         // then ask for a new render.
         view->render();
         break;
       }
+
+      ::SetDefaultArrayRanges(repr, "XArrayRange");
+      ::SetDefaultArrayRanges(repr, "YArrayRange");
     }
   }
 }

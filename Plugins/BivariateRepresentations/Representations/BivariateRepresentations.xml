@@ -229,29 +229,49 @@
         </ProxyGroupDomain>
       </ProxyProperty>
       <DoubleVectorProperty
-         name="FirstArrayRange"
-         command="GetFirstArrayRange"
+          name="XArrayRangeInfo"
+          command="GetXArrayRange"
          number_of_elements="2"
          default_values="0 0"
          information_only="1">
       </DoubleVectorProperty>
       <DoubleVectorProperty
-         name="SecondArrayRange"
-         command="GetSecondArrayRange"
+          name="XArrayRange"
+          label="X Array Range"
+          command="SetXArrayRange"
+          number_of_elements="2"
+          default_values="0 0">
+        <Documentation>
+          Manual override for the first array range.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="YArrayRangeInfo"
+          command="GetYArrayRange"
          number_of_elements="2"
          default_values="0 0"
          information_only="1">
       </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="YArrayRange"
+          label="Y Array Range"
+          command="SetYArrayRange"
+          number_of_elements="2"
+          default_values="0 0">
+        <Documentation>
+          Manual override for the second array range.
+        </Documentation>
+      </DoubleVectorProperty>
       <StringVectorProperty
-         name="FirstArrayName"
-         command="GetFirstArrayName"
+          name="XArrayName"
+          command="GetXArrayName"
          number_of_elements="1"
          default_values=""
          information_only="1">
       </StringVectorProperty>
       <StringVectorProperty
-         name="SecondArrayName"
-         command="GetSecondArrayName"
+          name="YArrayName"
+          command="GetYArrayName"
          number_of_elements="1"
          default_values=""
          information_only="1">
@@ -283,6 +303,10 @@
           <PropertyGroup label="Bivariate representation">
             <Property name="SecondArray"/>
             <Property name="BivariateTexture"/>
+            <Property name="XArrayRangeInfo"/>
+            <Property name="YArrayRangeInfo"/>
+            <Property name="XArrayRange"/>
+            <Property name="YArrayRange"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -319,6 +343,10 @@
           <PropertyGroup label="Bivariate representation">
             <Property name="SecondArray"/>
             <Property name="BivariateTexture"/>
+            <Property name="XArrayRangeInfo"/>
+            <Property name="YArrayRangeInfo"/>
+            <Property name="XArrayRange"/>
+            <Property name="YArrayRange"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -355,6 +383,10 @@
           <PropertyGroup label="Bivariate representation">
             <Property name="SecondArray"/>
             <Property name="BivariateTexture"/>
+            <Property name="XArrayRangeInfo"/>
+            <Property name="YArrayRangeInfo"/>
+            <Property name="XArrayRange"/>
+            <Property name="YArrayRange"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"

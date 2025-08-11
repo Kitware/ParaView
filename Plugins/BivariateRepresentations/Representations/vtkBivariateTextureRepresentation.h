@@ -27,7 +27,9 @@ class VTKBIVARIATEREPRESENTATIONS_EXPORT vtkBivariateTextureRepresentation
 {
 public:
   static vtkBivariateTextureRepresentation* New();
+
   vtkTypeMacro(vtkBivariateTextureRepresentation, vtkGeometryRepresentationWithFaces);
+
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -44,18 +46,26 @@ public:
 
   ///@{
   /**
-   * Get the range of the first / second array.
+   * Get/Set the range of the x/y array.
    */
-  vtkGetVectorMacro(FirstArrayRange, double, 2);
-  vtkGetVectorMacro(SecondArrayRange, double, 2);
+  VTK_DEPRECATED_IN_9_6_0("Method is deprecated. Please use GetXArrayRange instead.")
+  virtual double* GetFirstArrayRange() { return this->XArrayRange; }
+  VTK_DEPRECATED_IN_9_6_0("Method is deprecated. Please use GetYArrayRange instead.")
+  virtual double* GetSecondArrayRange() { return this->YArrayRange; }
+
+  void SetArrayRange(double range[2], double min, double max);
+  vtkGetVectorMacro(XArrayRange, double, 2);
+  void SetXArrayRange(double min, double max);
+  vtkGetVectorMacro(YArrayRange, double, 2);
+  void SetYArrayRange(double min, double max);
   ///@}
 
   ///@{
   /**
    * Get the name of the first / second array.
    */
-  vtkGetMacro(FirstArrayName, std::string);
-  vtkGetMacro(SecondArrayName, std::string);
+  vtkGetMacro(XArrayName, std::string);
+  vtkGetMacro(YArrayName, std::string);
   ///@}
 
   /**
@@ -76,7 +86,7 @@ protected:
    * Overriden to prevent coloring with color array, i.e. when we only select
    * the "first array".
    */
-  void UpdateColoringParameters() override{};
+  void UpdateColoringParameters() override {}
 
 private:
   vtkBivariateTextureRepresentation(const vtkBivariateTextureRepresentation&) = delete;
@@ -84,11 +94,11 @@ private:
 
   vtkNew<vtkDoubleArray> TCoordsArray;
 
-  double FirstArrayRange[2] = { 0, 0 };
-  double SecondArrayRange[2] = { 0, 0 };
+  double XArrayRange[2] = { 0, 0 };
+  double YArrayRange[2] = { 0, 0 };
 
-  std::string FirstArrayName;
-  std::string SecondArrayName;
+  std::string XArrayName;
+  std::string YArrayName;
 };
 
 #endif
