@@ -248,7 +248,7 @@ mi::base::ILogger* vtknvindex_forwarding_logger_factory::get_forwarding_logger()
 {
   if (!m_iindex_if.is_valid_interface())
   {
-    fprintf(stdout,
+    fprintf(stdout, // NOLINT(bugprone-unsafe-functions)
       "Error: The forwarding logger factory has not been initialized. Please note "
       "that this may cause to a segmentation fault.\n");
     return nullptr;
