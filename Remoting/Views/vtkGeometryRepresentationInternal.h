@@ -11,7 +11,7 @@
 // We'll use the VTKm decimation filter if TBB is enabled, otherwise we'll
 // fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
 // serial backend.
-#if VTK_MODULE_ENABLE_VTK_vtkviskores
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
 #include "vtkmConfigFilters.h" // for VISKORES_ENABLE_TBB
 #endif
 
