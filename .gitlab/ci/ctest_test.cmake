@@ -223,25 +223,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "^pvcs\\.FeatureEdgesRepresentationHTG$"
     "^pv\\.MultipleColorOnSelection$"
     "^pvcs\\.MultipleColorOnSelection$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22826
-    # SpyPlotUniReader error messages
-    "^pv\\.CTHAMRBaseline$"
-    "^pvcrs\\.CTHAMRBaseline$"
-    "^pvcs\\.CTHAMRBaseline$"
-    "^pv\\.CTHAMRClip$"
-    "^pv\\.CTHAMRContour$"
-    "^pv\\.CTHAMRDualClip$"
-    "^pv\\.CTHAMRMaterialInterfaceFilter$"
-    "^pv\\.CTHDerivedDensity2DCylinder$"
-    "^pvcrs\\.CTHDerivedDensity2DCylinder$"
-    "^pvcs\\.CTHDerivedDensity2DCylinder$"
-    "^pv\\.SPTimeseries$"
-    "^pvcrs\\.SPTimeseries$"
-    "^pvcs\\.SPTimeseries$"
-    "^pv\\.TestIsoVolume$"
-    "^pvcrs\\.TestIsoVolume$"
-    "^pvcs\\.TestIsoVolume$"
     )
 endif ()
 
