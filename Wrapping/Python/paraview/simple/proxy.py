@@ -177,6 +177,20 @@ def GetSources():
 # -----------------------------------------------------------------------------
 
 
+def GetSelections():
+    """Get all available selection sources.
+
+    :return: dictionary of selection sources. Keys are tuples consisting of the registration
+             name and integer ID of the proxy, and values are the selection sources themselves.
+    :rtype: dictionary
+
+    """
+    return servermanager.ProxyManager().GetProxiesInGroup("selections")
+
+
+# -----------------------------------------------------------------------------
+
+
 def GetRepresentations():
     """Returns all available representation proxies (display properties) in all views.
 

@@ -235,6 +235,8 @@ void pqPVApplicationCore::loadStateFromPythonFile(
   this->LoadingState = true;
   pythonMgr->executeScriptAndRender(filename, location);
   this->LoadingState = false;
+
+  Q_EMIT this->stateLoaded(nullptr, nullptr);
 #else
   // Avoid unused parameter warnings
   (void)filename;
