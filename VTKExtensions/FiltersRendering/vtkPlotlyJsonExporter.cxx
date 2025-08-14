@@ -14,7 +14,9 @@
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkPlotPoints.h" // for vtkPlotPoints
+#include "vtkStringFormatter.h"
 #include "vtkTextProperty.h"
+
 #include "vtksys/FStream.hxx"
 
 #include "vtk_nlohmannjson.h"
@@ -53,8 +55,8 @@ void AddArray(vtkNJson& parent, const std::string& key, vtkAbstractArray* array)
 
 std::string GetColorAsString(double rgb[3])
 {
-  return "rgb(" + std::to_string(rgb[0]) + "," + std::to_string(rgb[1]) + "," +
-    std::to_string(rgb[2]) + ")";
+  return "rgb(" + vtk::to_string(rgb[0]) + "," + vtk::to_string(rgb[1]) + "," +
+    vtk::to_string(rgb[2]) + ")";
 }
 
 void SetFontProperties(vtkNJson& font, vtkTextProperty* textProperty)

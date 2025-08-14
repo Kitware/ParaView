@@ -1671,8 +1671,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   const bool use_ordered_compositing = this->GetUseOrderedCompositing();
 
-  vtkTimerLog::FormatAndMarkEvent("Render (use_lod: %d), (use_distributed_rendering: %d), "
-                                  "(use_ordered_compositing: %d)",
+  vtkTimerLog::FormatAndMarkEvent("Render (use_lod: {:d}), (use_distributed_rendering: {:d}), "
+                                  "(use_ordered_compositing: {:d})",
     use_lod_rendering, use_distributed_rendering, use_ordered_compositing);
 
   vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(),

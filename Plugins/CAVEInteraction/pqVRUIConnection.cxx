@@ -4,31 +4,31 @@
 #include "pqVRUIConnection.h"
 
 #include "pqActiveObjects.h"
+#include "pqDataRepresentation.h"
 #include "pqView.h"
+
+#include "vtkCamera.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkStringFormatter.h"
+#include "vtkStringScanner.h"
 #include "vtkTransform.h"
 #include "vtkVRQueue.h"
 #include "vtkVRUIPipe.h"
 #include "vtkVRUIServerState.h"
 #include "vtkVRUITrackerState.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QMutex>
-#include <algorithm>
-#include <iostream>
-#include <pqDataRepresentation.h>
-#include <sstream>
-#include <vector>
-#include <vtkCamera.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
 #ifdef QTSOCK
 #include <QTcpSocket>
 #else
@@ -38,6 +38,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #endif
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 // ----------------------------------------------------------------------------
 class pqVRUIConnection::pqInternals
@@ -114,13 +118,15 @@ public:
     hp = gethostbyname(address.c_str());
     if (hp == 0)
     {
-      fprintf(stderr, "%s: unknown host\n", address.c_str());
+      vtk::print(stderr, "{:s}: unknown host\n", address);
       return;
     }
     bcopy(hp->h_addr, &client_addr.sin_addr, hp->h_length);
 
     client_addr.sin_family = AF_INET;
-    client_addr.sin_port = htons((uint16_t)atoi(port.c_str()));
+    uint16_t sin_port;
+    VTK_FROM_CHARS_IF_ERROR_RETURN(port, sin_port, );
+    client_addr.sin_port = htons(sin_port);
 
     if (::connect(this->Socket, (struct sockaddr*)&client_addr, sizeof(struct sockaddr_in)) < 0)
     { /* TODO: why is this "sockaddr", when the type is "sockaddr_in" ?? */

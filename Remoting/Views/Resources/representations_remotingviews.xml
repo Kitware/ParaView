@@ -7353,14 +7353,14 @@
       </IntVectorProperty>
 
       <StringVectorProperty command="SetLabelFormat"
-                            default_values="%6.3g"
+                            default_values="{:6.3g}"
                             name="LabelFormat"
                             number_of_elements="1">
         <Documentation>
-          This should be a printf-style format string. You can do things
+          This should be a std::format style format string. You can do things
           like limit the number of significant digits, add prefixes/suffixes,
           basically anything that printf can do. An empty string or a string
-          without the % symbol results in no label.
+          without the std::format style specifier results in no label.
         </Documentation>
       </StringVectorProperty>
 
@@ -7548,15 +7548,15 @@
       </SubProxy>
 
       <StringVectorProperty command="SetLabelFormat"
-                            default_values="%6.3g"
+                            default_values="{:6.3g}"
                             name="LabelFormat"
                             panel_visibility="advanced"
                             number_of_elements="1">
         <Documentation>
-          This should be a printf-style format string. You can do things
+          This should be a std::format style format string. You can do things
           like limit the number of significant digits, add prefixes/suffixes,
           basically anything that printf can do. An empty string or a string
-          without the % symbol results in no label.
+          without the std::format style specifier results in no label.
         </Documentation>
       </StringVectorProperty>
 

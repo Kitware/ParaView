@@ -3,6 +3,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2022 Verein zur Foerderung der Software openCFS
 // SPDX-License-Identifier: BSD-3-Clause
 #include "hdf5Common.h"
+
+#include "vtkStringFormatter.h"
+
 #include <algorithm>
 #include <cassert>
 
@@ -31,7 +34,7 @@ std::string GetObjNameByIdx(hid_t loc, hsize_t idx)
     0)
   {
     throw std::runtime_error(std::string("error obtaining obj name with index ") +
-      std::to_string(idx) + " of size " + std::to_string(nameLen));
+      vtk::to_string(idx) + " of size " + vtk::to_string(nameLen));
   }
 
   std::string name(buf.data());
@@ -320,7 +323,7 @@ std::string GetMultiStepKey(unsigned int msStep, bool isHistory)
   ss << "/Results/";
   ss << (isHistory ? "History" : "Mesh");
   ss << "/MultiStep_";
-  ss << std::to_string(msStep);
+  ss << vtk::to_string(msStep);
   return ss.str();
 }
 
@@ -335,7 +338,7 @@ hid_t GetStepGroup(hid_t root, unsigned int msStep, unsigned int stepNum)
 {
   // no history but element/node result
   std::string key = H5CFS::GetMultiStepKey(msStep, false) + std::string("/Step_") +
-    std::string(std::to_string(stepNum));
+    std::string(vtk::to_string(stepNum));
   return H5CFS::OpenGroup(root, key);
 }
 

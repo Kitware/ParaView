@@ -27,6 +27,7 @@
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkType.h"
 
 //-----------------------------------------------------------------------------
@@ -592,7 +593,7 @@ void vtkPlotEdges::ProcessMultiBlockDataSet(
     std::string name =
       input->HasMetaData(i) && input->GetMetaData(i)->Get(vtkCompositeDataSet::NAME())
       ? input->GetMetaData(i)->Get(vtkCompositeDataSet::NAME())
-      : "Block_" + std::to_string(i);
+      : "Block_" + vtk::to_string(i);
     if (auto inputBlockMBS = vtkMultiBlockDataSet::SafeDownCast(inputBlockDO))
     {
       vtkNew<vtkMultiBlockDataSet> outputBlockMB;
@@ -636,7 +637,7 @@ void vtkPlotEdges::ProcessPartitionedDataSet(
       std::string name =
         input->HasMetaData(i) && input->GetMetaData(i)->Has(vtkCompositeDataSet::NAME())
         ? input->GetMetaData(i)->Get(vtkCompositeDataSet::NAME())
-        : "dataset_" + std::to_string(i);
+        : "dataset_" + vtk::to_string(i);
       this->Process(partitionPD, tempMB);
       if (controller->GetLocalProcessId() == 0)
       {
@@ -1044,7 +1045,7 @@ void vtkPlotEdges::SaveToMultiBlockDataSet(vtkCollection* segments, vtkMultiBloc
     vtkPolyData* polyData = segment->GetPolyData();
 
     vtkNew<vtkPolyData> pd;
-    std::string partitionName = "segment_" + std::to_string(cc);
+    std::string partitionName = "segment_" + vtk::to_string(cc);
     outputMB->GetMetaData(cc)->Set(vtkCompositeDataSet::NAME(), partitionName);
     outputMB->SetBlock(cc++, pd);
 

@@ -10,6 +10,7 @@
 #include "vruiThread.h"
 #include "vtkMath.h"
 #include "vtkSMCaveRenderViewProxy.h"
+#include "vtkStringFormatter.h"
 #include <QMutex>
 #include <QTcpSocket>
 #include <QWaitCondition>
@@ -58,30 +59,29 @@ public:
 };
 
 #if 0
-void VRUI_CALLBACK handleTrackerPosQuat(void *userdata,
-                                        const vrpn_TRACKERCB t)
+void VRUI_CALLBACK handleTrackerPosQuat(void* userdata, const vrpn_TRACKERCB t)
 {
-  t_user_callback *tData=static_cast<t_user_callback *>(userdata);
+  t_user_callback* tData = static_cast<t_user_callback*>(userdata);
 
   // Make sure we have a count value for this sensor
-  while(tData->t_counts.size() <= static_cast<unsigned>(t.sensor))
-    {
+  while (tData->t_counts.size() <= static_cast<unsigned>(t.sensor))
+  {
     tData->t_counts.push_back(0);
-    }
+  }
 
   // See if we have gotten enough reports from this sensor that we should
   // print this one.  If so, print and reset the count.
-  const unsigned tracker_stride = 1;    // Every nth report will be printed
+  const unsigned tracker_stride = 1; // Every nth report will be printed
 
-  if ( ++tData->t_counts[t.sensor] >= tracker_stride )
-    {
+  if (++tData->t_counts[t.sensor] >= tracker_stride)
+  {
     tData->t_counts[t.sensor] = 0;
-    printf("Tracker %s, sensor %d:\n        pos (%5.2f, %5.2f, %5.2f); quat (%5.2f, %5.2f, %5.2f, %5.2f)\n",
-           tData->t_name,
-           t.sensor,
-           t.pos[0], t.pos[1], t.pos[2],
-           t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
-    }
+    vtk::print(
+      "Tracker {:s}, sensor %d:\n        pos ({{:{5.2f}}}, {{:{5.2f}}}, {{:{5.2f}}}); quat "
+      "({{:{5.2f}}}, {{:{5.2f}}}, {{:{5.2f}}}, {{:{5.2f}}})\n",
+      tData->t_name, t.sensor, t.pos[0], t.pos[1], t.pos[2], t.quat[0], t.quat[1], t.quat[2],
+      t.quat[3]);
+  }
 }
 #endif
 

@@ -17,6 +17,8 @@
 #include "vtkSMPTools.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
+#include "vtkStringScanner.h"
 
 #include "vtksys/SystemTools.hxx"
 
@@ -83,7 +85,6 @@ void vtkPrismSESAMEReader::PrintSelf(ostream& os, vtkIndent indent)
 namespace
 {
 constexpr int SESAME_NUM_CHARS = 512;
-const std::string TableLineFormat = "%2i%6i%6i";
 
 //------------------------------------------------------------------------------
 struct TablesInformation
@@ -203,7 +204,7 @@ vtkStringArray* vtkPrismSESAMEReader::GetFlatArraysOfTables()
   this->FlatArraysOfTables->Initialize();
   for (auto& arraysOfTable : this->ArraysOfTables)
   {
-    this->FlatArraysOfTables->InsertNextValue(std::to_string(arraysOfTable.first));
+    this->FlatArraysOfTables->InsertNextValue(vtk::to_string(arraysOfTable.first));
     auto tableArrays = arraysOfTable.second;
     for (auto i = 0; i < tableArrays->GetNumberOfValues(); ++i)
     {
@@ -286,14 +287,10 @@ bool vtkPrismSESAMEReader::OpenFile(std::FILE*& file)
 //------------------------------------------------------------------------------
 bool vtkPrismSESAMEReader::ReadTableHeader(char* buffer, int& tableId)
 {
-  int dummy;
-  int internalId;
-  int table;
-
   // see if the line matches the  " 0 9999 602" format
-  if (sscanf(buffer, TableLineFormat.c_str(), &dummy, &internalId, &table) == 3)
+  if (auto result1 = vtk::scan<int, int, int>(std::string_view(buffer), "{:2d}{:6d}{:6d}"))
   {
-    tableId = table;
+    tableId = std::get<2>(result1->values());
     this->FileFormat = SESAMEFormat::LANL;
     return true;
   }
@@ -308,10 +305,12 @@ bool vtkPrismSESAMEReader::ReadTableHeader(char* buffer, int& tableId)
 
     if (recordPos != std::string::npos && typePos != std::string::npos)
     {
-      char buffer2[SESAME_NUM_CHARS];
-      if (sscanf(buffer, "%s%s%s%d%s", buffer2, buffer2, buffer2, &table, buffer2) == 5)
+      auto result2 =
+        vtk::scan<std::string_view, std::string_view, std::string_view, int, std::string_view>(
+          std::string_view(buffer, header.size()), "{:s}{:s}{:s}{:d}{:s}");
+      if (result2)
       {
-        tableId = table;
+        tableId = std::get<3>(result2->values());
         this->FileFormat = SESAMEFormat::ASC;
         return true;
       }
@@ -349,8 +348,7 @@ bool vtkPrismSESAMEReader::ReadTableHeader(std::FILE* f, int& tableId)
 }
 
 //------------------------------------------------------------------------------
-int vtkPrismSESAMEReader::ReadTableValueLine(
-  std::FILE* file, float* v1, float* v2, float* v3, float* v4, float* v5)
+int vtkPrismSESAMEReader::ReadTableValueLine(std::FILE* file, std::array<float, 5>& values)
 {
   // by definition, a line of this file is 80 characters long
   // when we start reading the data values, for the LANL format the end of the
@@ -375,7 +373,18 @@ int vtkPrismSESAMEReader::ReadTableValueLine(
         // ignore the last 5 characters of the line (see notes above)
         buffer[75] = '\0';
       }
-      numRead = sscanf(buffer, "%e%e%e%e%e", v1, v2, v3, v4, v5);
+      std::string_view current(buffer);
+      for (auto& value : values)
+      {
+        auto result = vtk::scan_value<float>(current);
+        if (!result)
+        {
+          break;
+        }
+        ++numRead;
+        value = result->value();
+        current = std::string_view(result->range().data(), result->range().size());
+      }
     }
   }
 
@@ -435,10 +444,10 @@ void vtkPrismSESAMEReader::ReadSurfaceTable(std::FILE* file, vtkPolyData* output
   // 6)   The following NR*NT words are used to define a scalar point array
 
   const auto tableArrays = this->ArraysOfTables[tableId];
-  float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+  std::array<float, 5> v = { { 0.0, 0.0, 0.0, 0.0, 0.0 } };
 
   // get the table's first line to extract NR and NT
-  int readFromTable = this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]));
+  int readFromTable = this->ReadTableValueLine(file, v);
   if (readFromTable == 0)
   {
     vtkErrorMacro("Error reading table " << tableId);
@@ -519,8 +528,7 @@ void vtkPrismSESAMEReader::ReadSurfaceTable(std::FILE* file, vtkPolyData* output
     }
     // for all the next lines, we need to read all the values
     kBegin = 0;
-  } while ((readFromTable =
-               this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]))) != 0);
+  } while ((readFromTable = this->ReadTableValueLine(file, v)) != 0);
 
   // in case there are empty scalars arrays, fill them with zeros
   for (vtkIdType i = scalarIndex + 1; i < tableArrays->GetNumberOfValues(); ++i)
@@ -601,10 +609,10 @@ void vtkPrismSESAMEReader::ReadCurveTable(std::FILE* file, vtkPolyData* output, 
   // 6)   The following NR words are used to define a scalar point array
 
   const auto tableArrays = this->ArraysOfTables[tableId];
-  float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+  std::array<float, 5> v = { { 0.0, 0.0, 0.0, 0.0, 0.0 } };
 
   // get the table's first line to extract NR
-  int readFromTable = this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]));
+  int readFromTable = this->ReadTableValueLine(file, v);
   if (readFromTable == 0)
   {
     vtkErrorMacro("Error reading table " << tableId);
@@ -659,8 +667,7 @@ void vtkPrismSESAMEReader::ReadCurveTable(std::FILE* file, vtkPolyData* output, 
     }
     // for all the next lines, we need to read all the values
     kBegin = 0;
-  } while ((readFromTable =
-               this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]))) != 0);
+  } while ((readFromTable = this->ReadTableValueLine(file, v)) != 0);
 
   // in case there are empty scalars arrays, fill them with zeros
   for (vtkIdType i = scalarIndex + 1; i < tableArrays->GetNumberOfValues(); ++i)
@@ -751,10 +758,10 @@ void vtkPrismSESAMEReader::ReadVaporizationCurveTable(
   // 3)   The following NT words are used to define a scalar point array
 
   const auto tableArrays = this->ArraysOfTables[tableId];
-  float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+  std::array<float, 5> v = { { 0.0, 0.0, 0.0, 0.0, 0.0 } };
 
   // get the table's first line to extract NR
-  int readFromTable = this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]));
+  int readFromTable = this->ReadTableValueLine(file, v);
   if (readFromTable == 0)
   {
     vtkErrorMacro("Error reading table " << tableId);
@@ -802,8 +809,7 @@ void vtkPrismSESAMEReader::ReadVaporizationCurveTable(
     }
     // for all the next lines, we need to read all the values
     kBegin = 0;
-  } while ((readFromTable =
-               this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]))) != 0);
+  } while ((readFromTable = this->ReadTableValueLine(file, v)) != 0);
 
   // in case there are empty scalars arrays, fill them with zeros
   for (vtkIdType i = scalarIndex + 1; i < tableArrays->GetNumberOfValues(); ++i)
@@ -960,7 +966,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
   {
     tableId = this->TableIds->GetValue(i);
 
-    float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+    std::array<float, 5> v = { { 0.0, 0.0, 0.0, 0.0, 0.0 } };
     int NR;                      // number of densities
     int NT;                      // number of temperatures
     int readFromTable;           // number of values in read line
@@ -976,7 +982,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
     {
       this->JumpToTable(file, tableId);
 
-      readFromTable = this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]));
+      readFromTable = this->ReadTableValueLine(file, v);
       if (readFromTable == 0)
       {
         vtkErrorMacro("Error reading table " << tableId);
@@ -1006,8 +1012,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
           ++valuesRead;
         }
         kBegin = 0;
-      } while ((readFromTable = this->ReadTableValueLine(
-                  file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]))) != 0);
+      } while ((readFromTable = this->ReadTableValueLine(file, v)) != 0);
       tableProcessed = true;
     }
     // see ReadCurveTable function to understand the format of what we are reading
@@ -1015,7 +1020,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
     {
       this->JumpToTable(file, tableId);
 
-      readFromTable = this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]));
+      readFromTable = this->ReadTableValueLine(file, v);
       if (readFromTable == 0)
       {
         vtkErrorMacro("Error reading table " << tableId);
@@ -1044,8 +1049,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
           ++valuesRead;
         }
         kBegin = 0;
-      } while ((readFromTable = this->ReadTableValueLine(
-                  file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]))) != 0);
+      } while ((readFromTable = this->ReadTableValueLine(file, v)) != 0);
       tableProcessed = true;
     }
     // see ReadVaporizationCurveTable function to understand the format of what we are reading
@@ -1053,7 +1057,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
     {
       this->JumpToTable(file, tableId);
 
-      readFromTable = this->ReadTableValueLine(file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]));
+      readFromTable = this->ReadTableValueLine(file, v);
       if (readFromTable == 0)
       {
         vtkErrorMacro("Error reading table " << tableId);
@@ -1076,8 +1080,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
           }
         }
         kBegin = 0;
-      } while ((readFromTable = this->ReadTableValueLine(
-                  file, &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]))) != 0);
+      } while ((readFromTable = this->ReadTableValueLine(file, v)) != 0);
       tableProcessed = true;
     }
     else
@@ -1094,7 +1097,7 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
       {
         const std::string arrayName = j < numVarNames
           ? TablesInformation::TablesInfo[tableIndex].ArrayNames[j]
-          : "Variable " + std::to_string(j + 1);
+          : "Variable " + vtk::to_string(j + 1);
         tableArrays->InsertNextValue(arrayName);
       }
       this->ArraysOfTables[tableId] = tableArrays;
@@ -1362,7 +1365,7 @@ void vtkPrismSESAMEReader::RequestCurvesData(
       }
     }
     // set partitioned dataset name
-    const auto curveName = "Table " + std::to_string(tableId);
+    const auto curveName = "Table " + vtk::to_string(tableId);
     curves->GetMetaData(curveIndex)->Set(vtkCompositeDataSet::NAME(), curveName.c_str());
   }
 }
@@ -1390,7 +1393,7 @@ int vtkPrismSESAMEReader::RequestData(
       {
         const int tableId = this->CurveTableIds->GetValue(static_cast<int>(curveIndex));
         curvesOutput->SetNumberOfPartitions(curveIndex, tableId != 401 ? 1 : 2);
-        const auto curveName = "Table " + std::to_string(tableId);
+        const auto curveName = "Table " + vtk::to_string(tableId);
         curvesOutput->GetMetaData(curveIndex)->Set(vtkCompositeDataSet::NAME(), curveName.c_str());
       }
     }

@@ -17,7 +17,7 @@ def CreateCoProcessor():
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(imageDataWriter1, filename='fullgrid_%t.pvti', freq=100)
+      coprocessor.RegisterWriter(imageDataWriter1, filename='fullgrid_{time}.pvti', freq=100)
 
       SetActiveSource(filename_2_pvti)
       Slice1 = Slice( guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
@@ -31,7 +31,7 @@ def CreateCoProcessor():
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_%t.pvtp', freq=10)
+      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_{time}.pvtp', freq=10)
 
     return Pipeline()
 

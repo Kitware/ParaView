@@ -18,6 +18,7 @@
 #include "vtkPartitionedDataSetCollection.h"
 #include "vtkPlane.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringFormatter.h"
 #include "vtkType.h"
 
 #include <vector>
@@ -279,7 +280,7 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
             if (!this->ProcessPDS(inputPDS, plane, outputPDC, outputHierarchy, nodeId))
             {
               vtkErrorMacro(
-                "Unable to process partitioned dataset at index " + std::to_string(index));
+                "Unable to process partitioned dataset at index " + vtk::to_string(index));
             }
           }
         }
@@ -299,11 +300,11 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
         unsigned int hyperTreeGridCount = 0;
         for (unsigned int pdsIdx = 0; pdsIdx < inputPDC->GetNumberOfPartitionedDataSets(); pdsIdx++)
         {
-          std::string htgNodeName = "HyperTreeGrid" + std::to_string(++hyperTreeGridCount);
+          std::string htgNodeName = "HyperTreeGrid" + vtk::to_string(++hyperTreeGridCount);
           int htgNodeId = outputHierarchy->AddNode(htgNodeName.c_str(), rootId);
           if (htgNodeId == -1)
           {
-            vtkErrorMacro("Unable to a add new child node for node " + std::to_string(rootId));
+            vtkErrorMacro("Unable to a add new child node for node " + vtk::to_string(rootId));
             continue;
           }
 
@@ -311,7 +312,7 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
           if (!this->ProcessPDS(inputPDS, plane, outputPDC, outputHierarchy, htgNodeId))
           {
             vtkErrorMacro(
-              "Unable to process partitioned dataset at index " + std::to_string(pdsIdx));
+              "Unable to process partitioned dataset at index " + vtk::to_string(pdsIdx));
           }
         }
         outputPDC->SetDataAssembly(outputHierarchy);
@@ -429,7 +430,7 @@ bool vtkAxisAlignedCutter::ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPlane*
     auto nextDataSetId = outputPDC->GetNumberOfPartitionedDataSets();
     outputPDC->SetPartitionedDataSet(nextDataSetId, pds);
 
-    const std::string sliceNodeName = "Slice" + std::to_string(nbInserted + 1);
+    const std::string sliceNodeName = "Slice" + vtk::to_string(nbInserted + 1);
     int sliceNodeId = outputHierarchy->AddNode(sliceNodeName.c_str(), nodeId);
     outputHierarchy->AddDataSetIndex(sliceNodeId, nextDataSetId);
     nbInserted++;
@@ -476,7 +477,7 @@ bool vtkAxisAlignedCutter::ProcessHTG(
     pds->SetNumberOfPartitions(1);
     pds->SetPartition(0, outputHTG);
     outputSlices->SetPartitionedDataSet(nbInserted, pds);
-    const std::string sliceName = "Slice" + std::to_string(nbInserted);
+    const std::string sliceName = "Slice" + vtk::to_string(nbInserted);
     outputSlices->GetMetaData(nbInserted)->Set(vtkCompositeDataSet::NAME(), sliceName);
     nbInserted++;
   }

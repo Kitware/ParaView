@@ -15,6 +15,7 @@
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringScanner.h"
 #include "vtkStructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -574,11 +575,13 @@ int vtkPVEnSightMasterServerReader2::ParseMasterServerFile()
       vtkPVEnSightMasterServerReader2StartsWith(line.c_str(), "number of servers:"))
     {
       // Found the number of servers line.
-      if (sscanf(line.c_str(), "number of servers: %i", &numServers) < 1)
+      auto resultServers = vtk::scan<int>(line, "number of servers: {:d}");
+      if (!resultServers)
       {
         vtkErrorMacro("Error parsing number of servers from: " << line.c_str());
         return VTK_ERROR;
       }
+      numServers = resultServers->value();
       // Check the number of servers is > 0.
       if (numServers < 1)
       {

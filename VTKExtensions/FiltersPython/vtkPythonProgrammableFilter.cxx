@@ -13,6 +13,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 
 #include <algorithm>
 #include <map>
@@ -381,7 +382,8 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
 
   // Set self to point to this
   char addrofthis[1024];
-  snprintf(addrofthis, sizeof(addrofthis), "%p", this);
+  auto result = vtk::format_to_n(addrofthis, sizeof(addrofthis), "{:p}", static_cast<void*>(this));
+  *result.out = '\0';
   char* aplusthis = addrofthis;
   if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
   {
@@ -400,7 +402,9 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
   {
     // Set pointer to request
     char addrofrequest[1024];
-    snprintf(addrofrequest, sizeof(addrofrequest), "%p", this->Request);
+    result = vtk::format_to_n(
+      addrofrequest, sizeof(addrofrequest), "{:p}", static_cast<void*>(this->Request));
+    *result.out = '\0';
     char* aplusrequest = addrofrequest;
     if ((addrofrequest[0] == '0') && ((addrofrequest[1] == 'x') || addrofrequest[1] == 'X'))
     {

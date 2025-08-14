@@ -24,13 +24,13 @@ def CreateCoProcessor():
       # writer for 2D rectilinear grid
       h02D = coprocessor.CreateProducer(datadescription, 'input')
       h02DWriter = servermanager.writers.XMLPUnstructuredGridWriter(Input=h02D)
-      h02DWriter.FileName = 'h02D_%t.pvtu'
+      h02DWriter.FileName = 'h02D_{time}.pvtu'
       coprocessor.RegisterWriter(h02DWriter, filename=h02DWriter.FileName, freq=48)
 
       # writer for 3D rectilinear grid
       h03D = coprocessor.CreateProducer(datadescription, 'input3D')
       h03DWriter = servermanager.writers.XMLPUnstructuredGridWriter(Input=h03D)
-      h03DWriter.FileName = 'h03D_%t.pvtu'
+      h03DWriter.FileName = 'h03D_{time}.pvtu'
       coprocessor.RegisterWriter(h03DWriter, filename=h03DWriter.FileName, freq=48)
 
     return Pipeline()

@@ -15,11 +15,11 @@
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/FullNotationHighExponent/IntRangeWidget/LineEdit" command="set_string" arguments="2" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="source.StandardDeviation = 1234.56789" />
-  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StandardDeviation/DoubleLineEdit0" property="text" arguments="1.23456789e+3" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StandardDeviation/DoubleLineEdit0" property="text" arguments="1.23456789000000003e+03" />
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="source.StandardDeviation = 12.3456789" />
   <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StandardDeviation/DoubleLineEdit0" property="text" arguments="12.3456789" />
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="source.StandardDeviation = 0.0123456789" />
-  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StandardDeviation/DoubleLineEdit0" property="text" arguments="0.0123456789" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StandardDeviation/DoubleLineEdit0" property="text" arguments="1.23456789000000004e-02" />
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="source.StandardDeviation = 0.00123456789" />
-  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StandardDeviation/DoubleLineEdit0" property="text" arguments="1.23456789e-3" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StandardDeviation/DoubleLineEdit0" property="text" arguments="1.23456788999999991e-03" />
 </pqevents>

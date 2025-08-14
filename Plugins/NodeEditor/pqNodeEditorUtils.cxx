@@ -7,6 +7,7 @@
 #include <pqProxy.h>
 
 #include <vtkSMProxy.h>
+#include <vtkStringFormatter.h>
 
 #include <chrono>
 #include <iostream>
@@ -30,5 +31,5 @@ std::string pqNodeEditorUtils::getLabel(pqProxy* proxy)
     return "nullptr Proxy";
   }
 
-  return proxy->getSMName().toStdString() + "<" + std::to_string(getID(proxy)) + ">";
+  return proxy->getSMName().toStdString() + "<" + vtk::to_string(getID(proxy)) + ">";
 };

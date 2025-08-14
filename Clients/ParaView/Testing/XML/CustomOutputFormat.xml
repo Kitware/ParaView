@@ -15,13 +15,13 @@
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionSaveData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/can.vtpc" />
   <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/WriteTimeSteps/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FileNameSuffix/FileNameSuffix" command="set_string" arguments="-%.3d" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FileNameSuffix/FileNameSuffix" command="set_string" arguments="-{:03d}" />
   <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
   <!-- Write file series as can-DAT0, can-DAT1, can-DAT2 etc. -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionSaveData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/can.vtpc" />
   <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/WriteTimeSteps/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FileNameSuffix/FileNameSuffix" command="set_string" arguments="-DAT%d" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FileNameSuffix/FileNameSuffix" command="set_string" arguments="-DAT{:d}" />
   <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
   <!-- Read file series can_..vtpc -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />

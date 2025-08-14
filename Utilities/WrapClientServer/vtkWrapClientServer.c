@@ -14,6 +14,8 @@ static FunctionInfo* wrappedFunctions[1000];
 static FunctionInfo* currentFunction;
 static HierarchyInfo* hierarchyInfo = NULL;
 
+// NOLINTBEGIN(bugprone-unsafe-functions)
+
 /* make a guess about whether a class is wrapped */
 static int class_is_wrapped(const char* classname)
 {
@@ -1475,3 +1477,5 @@ int main(int argc, char* argv[])
 
   return vtkParse_FinalizeMain(0);
 }
+
+// NOLINTEND(bugprone-unsafe-functions)

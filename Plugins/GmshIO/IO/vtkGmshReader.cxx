@@ -12,6 +12,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "gmsh.h"
@@ -225,7 +226,7 @@ void vtkGmshReader::LoadPhysicalGroups()
       gmsh::model::getPhysicalName(grp.first, grp.second, name);
       if (name.empty())
       {
-        name = "PhysicalGroup" + std::to_string(grp.second);
+        name = "PhysicalGroup" + vtk::to_string(grp.second);
       }
 
       PhysicalGroup currentGrp;
@@ -327,10 +328,10 @@ void vtkGmshReader::FillSubDataArray(int viewTag, int viewIdx, int step)
   gmsh::view::getHomogeneousModelData(viewTag, step, dataType, tags, data, time, nbOfComponents);
 
   const int idxView = gmsh::view::getIndex(viewTag);
-  gmsh::option::getString("View[" + std::to_string(idxView) + "].Name", name);
+  gmsh::option::getString("View[" + vtk::to_string(idxView) + "].Name", name);
   if (name.empty())
   {
-    name = "DataArray" + std::to_string(viewTag);
+    name = "DataArray" + vtk::to_string(viewTag);
   }
 
   if (dataType == "NodeData")
@@ -412,7 +413,7 @@ void vtkGmshReader::LoadPhysicalGroupsData()
     const int viewTag = tags[i];
     double nbTimeStepsDbl;
 
-    std::string viewStr = "View[" + std::to_string(gmsh::view::getIndex(viewTag));
+    std::string viewStr = "View[" + vtk::to_string(gmsh::view::getIndex(viewTag));
     std::string timeStepStr = viewStr + "].TimeStep";
     gmsh::option::getNumber(viewStr + "].NbTimeStep", nbTimeStepsDbl);
     const int nbTimeSteps = static_cast<int>(nbTimeStepsDbl);

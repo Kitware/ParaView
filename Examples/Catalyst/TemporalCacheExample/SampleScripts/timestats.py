@@ -20,13 +20,13 @@ def CreateCoProcessor():
 
       # write out each volume like you might do normally
       imageDataWriter1 = servermanager.writers.XMLPImageDataWriter(Input=data)
-      coprocessor.RegisterWriter(imageDataWriter1, filename="tcache_pyex_%t.pvti", freq=10)
+      coprocessor.RegisterWriter(imageDataWriter1, filename="tcache_pyex_{time}.pvti", freq=10)
 
       # The fun part do something across timesteps
       # We will output a temporal statistics volume every 10 frames
       temporalStatistics1 = TemporalStatistics(Input=data)
       imageDataWriter2 = servermanager.writers.XMLPImageDataWriter(Input=temporalStatistics1)
-      coprocessor.RegisterWriter(imageDataWriter2, filename="tcache_pyex_tstats_%t.pvti", freq=10)
+      coprocessor.RegisterWriter(imageDataWriter2, filename="tcache_pyex_tstats_{time}.pvti", freq=10)
 
     return Pipeline()
 

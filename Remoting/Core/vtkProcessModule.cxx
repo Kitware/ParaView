@@ -21,6 +21,7 @@
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkSessionIterator.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkTCPNetworkAccessManager.h"
 #include "vtkThreadedCallbackQueue.h"
 #include "vtkUnstructuredGrid.h"
@@ -75,7 +76,7 @@ void UpdateThreadName(vtkProcessModule::ProcessTypes type, vtkMultiProcessContro
   std::string tname_suffix;
   if (controller->GetNumberOfProcesses() > 1)
   {
-    tname_suffix = "." + std::to_string(controller->GetLocalProcessId());
+    tname_suffix = "." + vtk::to_string(controller->GetLocalProcessId());
   }
   switch (type)
   {
@@ -112,11 +113,8 @@ void HandleDisplay(int& argc, char**& argv)
   {
     if (strcmp(argv[i], "-display") == 0)
     {
-      size_t size = strlen(argv[i + 1]) + 10;
-      char* displayenv = new char[size];
-      snprintf(displayenv, size, "DISPLAY=%s", argv[i + 1]);
+      auto displayenv = vtk::format("DISPLAY={:s}", argv[i + 1]);
       vtksys::SystemTools::PutEnv(displayenv);
-      delete[] displayenv;
       // safe to delete since PutEnv keeps a copy of the string.
       argc -= 2;
       for (int j = i; j < argc; j++)

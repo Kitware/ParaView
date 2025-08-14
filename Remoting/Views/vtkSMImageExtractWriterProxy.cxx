@@ -11,6 +11,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
+#include "vtkStringFormatter.h"
 #include "vtkVector.h"
 
 #include <algorithm>
@@ -231,10 +232,12 @@ bool vtkSMImageExtractWriterProxy::WriteInternal(vtkSMExtractsController* extrac
 
         vtkSMExtractsController::SummaryParametersT tparams = params;
         char buffer[128];
-        std::snprintf(buffer, 128, "%06.2f", phi);
+        auto result = vtk::format_to_n(buffer, 128, "{:06.2f}", phi);
+        *result.out = '\0';
         tparams["phi"] = buffer;
 
-        std::snprintf(buffer, 128, "%06.2f", theta);
+        result = vtk::format_to_n(buffer, 128, "{:06.2f}", theta);
+        *result.out = '\0';
         tparams["theta"] = buffer;
 
         if (!this->WriteImage(extractor, tparams))

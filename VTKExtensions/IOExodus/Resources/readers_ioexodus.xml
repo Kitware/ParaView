@@ -716,8 +716,8 @@
                             number_of_elements="1">
         <FileListDomain name="default_value" optional="1"/>
         <Documentation>This property contains a text string specifying the
-        pattern used to load files. There are two parts to it: the prefix (%s)
-        and the file number (%i). The format used is the same as that used for
+        pattern used to load files. There are two parts to it: the prefix ({:s})
+        and the file number ({:d}). The format used is the same as that used for
         printf.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"

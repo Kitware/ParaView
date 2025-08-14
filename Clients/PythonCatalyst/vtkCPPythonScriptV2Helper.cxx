@@ -22,6 +22,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSmartPyObject.h"
 #include "vtkStringList.h"
+#include "vtkStringScanner.h"
 
 #include <cassert>
 #include <map>
@@ -724,7 +725,7 @@ void vtkCPPythonScriptV2Helper::DoLive(int timestep, double time)
     else
     {
       hostname = url.substr(0, split_idx);
-      port = std::atoi(url.substr(split_idx + 1).c_str());
+      VTK_FROM_CHARS_IF_ERROR_RETURN(url.substr(split_idx + 1), port, );
     }
     internals.LiveLink->SetHostname(hostname.empty() ? "localhost" : hostname.c_str());
     internals.LiveLink->SetInsituPort(port <= 0 ? 22222 : port);

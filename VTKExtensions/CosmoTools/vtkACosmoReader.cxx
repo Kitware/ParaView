@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringScanner.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "vtksys/FStream.hxx"
@@ -160,13 +161,13 @@ void vtkACosmoReader::ReadMetaDataFile(const int levelIdx, std::string file)
     block_t block;
     block.Level = levelIdx;
     block.IndexWithinLevel = blockCount;
-    block.FileOffSet = atoi(tokens[0].c_str());
-    block.Bounds[0] = atof(tokens[1].c_str()); // x-min
-    block.Bounds[1] = atof(tokens[2].c_str()); // x-max
-    block.Bounds[2] = atof(tokens[3].c_str()); // y-min
-    block.Bounds[3] = atof(tokens[4].c_str()); // y-max
-    block.Bounds[4] = atof(tokens[5].c_str()); // z-min
-    block.Bounds[5] = atof(tokens[6].c_str()); // z-max
+    VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[0], block.FileOffSet, );
+    VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[1], block.Bounds[0], ); // x-min
+    VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[2], block.Bounds[1], ); // x-max
+    VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[3], block.Bounds[2], ); // y-min
+    VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[4], block.Bounds[3], ); // y-max
+    VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[5], block.Bounds[4], ); // z-min
+    VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[6], block.Bounds[5], ); // z-max
 
     // Push to list of blocks
     this->ParticleBlocks.push_back(block);
@@ -237,8 +238,8 @@ bool ExtractFileNameComponents(
   }
 
   basename = tokens[0];
-  process = atoi(tokens[1].c_str());
-  number_of_levels = atoi(tokens[2].c_str());
+  VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[1], process, false);
+  VTK_FROM_CHARS_IF_ERROR_RETURN(tokens[2], number_of_levels, false);
   return true;
 }
 }

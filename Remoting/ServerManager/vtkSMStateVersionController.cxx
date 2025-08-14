@@ -13,6 +13,8 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSelectionNode.h"
+#include "vtkStringFormatter.h"
+#include "vtkStringScanner.h"
 #include "vtkWeakPointer.h"
 
 #include <set>
@@ -795,7 +797,7 @@ struct Process_5_9_to_5_10
 
   static std::string GetSelector(unsigned int cid)
   {
-    return std::string("//*[@cid='") + std::to_string(cid) + "']";
+    return std::string("//*[@cid='") + vtk::to_string(cid) + "']";
     ;
   }
 
@@ -1763,7 +1765,7 @@ struct Process_5_12_to_5_13
 
       // add the new child values
       node.remove_children();
-      const std::string proxyId = std::to_string(generator.GetNextUniqueId());
+      const std::string proxyId = vtk::to_string(generator.GetNextUniqueId());
 
       auto proxyNode = node.append_child("Proxy");
       proxyNode.append_attribute("value").set_value(proxyId.c_str());
@@ -2377,8 +2379,7 @@ struct Process_6_0_to_6_1
 
   static std::string GetSelector(unsigned int cid)
   {
-    return std::string("//*[@cid='") + std::to_string(cid) + "']";
-    ;
+    return std::string("//*[@cid='") + vtk::to_string(cid) + "']";
   }
 
   static void ConvertCompositeIdsToSelectors(pugi::xml_node& node)
@@ -2444,9 +2445,9 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
   vtkSMVersion version(0, 0, 0);
   if (const char* str_version = root->GetAttribute("version"))
   {
-    int v[3];
-    sscanf(str_version, "%d.%d.%d", &v[0], &v[1], &v[2]);
-    version = vtkSMVersion(v[0], v[1], v[2]);
+    auto result = vtk::scan<int, int, int>(std::string_view(str_version), "{:d}.{:d}.{:d}");
+    const auto& [major, minor, patch] = result->values();
+    version = vtkSMVersion(major, minor, patch);
   }
 
   bool status = true;

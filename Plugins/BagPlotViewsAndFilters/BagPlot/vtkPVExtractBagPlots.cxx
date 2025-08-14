@@ -17,6 +17,7 @@
 #include "vtkPSciVizPCAStats.h"
 #include "vtkPointData.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
 #include "vtkTable.h"
 #include "vtkTransposeTable.h"
 
@@ -308,7 +309,7 @@ int vtkPVExtractBagPlots::RequestData(
     char* str = arr->GetName();
     if (strstr(str, "PCA"))
     {
-      std::string name = "x" + std::to_string(iArray);
+      std::string name = "x" + vtk::to_string(iArray);
       arr->SetName(name.c_str());
       cArrays.push_back(vtkDataArray::SafeDownCast(arr));
       if (iArray < 2)

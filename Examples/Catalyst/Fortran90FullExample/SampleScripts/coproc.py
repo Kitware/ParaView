@@ -23,7 +23,7 @@ def CreateCoProcessor():
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_%t.pvtp', freq=10)
+      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_{time}.pvtp', freq=10)
 
     return Pipeline()
 

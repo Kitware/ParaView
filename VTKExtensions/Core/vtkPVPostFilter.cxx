@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVPostFilterExecutive.h"
 #include "vtkPointData.h"
+#include "vtkStringScanner.h"
 
 #if VTK_MODULE_ENABLE_VTK_FiltersCore
 #include "vtkCellDataToPointData.h"
@@ -501,7 +502,7 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa, const char* req
   // go onto doing a pure conversion of the string to integer and using that.
   if (!found)
   {
-    cIndex = atoi(demangled_component_name);
+    VTK_FROM_CHARS_IF_ERROR_RETURN(demangled_component_name, cIndex, 0);
   }
 
   // when we compute the magnitude we must place

@@ -22,7 +22,7 @@ def CreateCoProcessor():
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_%t.pvtp', freq=10)
+      coprocessor.RegisterWriter(parallelPolyDataWriter1, filename='slice_{time}.pvtp', freq=10)
 
       # create a new 'Parallel UnstructuredGrid Writer'
       unstructuredGridWriter1 = servermanager.writers.XMLPUnstructuredGridWriter(Input=filename_3_pvtu)
@@ -30,7 +30,7 @@ def CreateCoProcessor():
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(unstructuredGridWriter1, filename='fullgrid_%t.pvtu', freq=100)
+      coprocessor.RegisterWriter(unstructuredGridWriter1, filename='fullgrid_{time}.pvtu', freq=100)
 
     return Pipeline()
 

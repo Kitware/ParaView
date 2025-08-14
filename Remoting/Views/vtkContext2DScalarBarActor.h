@@ -199,17 +199,17 @@ public:
 
   ///@{
   /**
-   * Printf format for range labels.
+   * std::format style format for range labels.
    */
-  vtkSetStringMacro(RangeLabelFormat);
+  virtual void SetRangeLabelFormat(const char* format);
   vtkGetStringMacro(RangeLabelFormat);
   ///@}
 
   ///@{
   /**
-   * Printf format for range labels.
+   * std::format style format for range labels.
    */
-  vtkSetStringMacro(DataRangeLabelFormat);
+  virtual void SetDataRangeLabelFormat(const char* format);
   vtkGetStringMacro(DataRangeLabelFormat);
   ///@}
 

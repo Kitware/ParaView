@@ -20,17 +20,13 @@
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <string>
 #include <vtksys/SystemTools.hxx>
-
-// clang-format off
-#include <vtk_fmt.h> // needed for `fmt`
-#include VTK_FMT(fmt/core.h)
-// clang-format on
 
 namespace
 {
@@ -94,6 +90,21 @@ vtkParallelSerialWriter::~vtkParallelSerialWriter()
   this->SetPostGatherHelper(nullptr);
   this->SetInterpreter(nullptr);
   this->SetController(nullptr);
+}
+
+//-----------------------------------------------------------------------------
+void vtkParallelSerialWriter::SetFileNameSuffix(const char* suffix)
+{
+  std::string format = suffix ? suffix : "";
+  if (vtk::is_printf_format(format))
+  {
+    // PARAVIEW_DEPRECATED_IN_6_1_0
+    vtkWarningMacro(<< "The given format " << format << " is a printf format. The format will be "
+                    << "converted to std::format. This conversion has been deprecated in 6.1.0");
+    format = vtk::printf_to_std_format(format);
+  }
+  const char* formatStr = format.c_str();
+  vtkSetStringBodyMacro(FileNameSuffix, formatStr);
 }
 
 //----------------------------------------------------------------------------
@@ -244,7 +255,7 @@ int vtkParallelSerialWriter::RequestData(vtkInformation* request,
     for (unsigned int cc = 0, max = pdc->GetNumberOfPartitionedDataSets(); cc < max; ++cc)
     {
       // Create filename for the block.
-      auto fname = fmt::format("{0}/{1}{2:{3}}{4}", path, fnameNoExt, cc, precision, ext);
+      auto fname = vtk::format("{0}/{1}{2:{3}}{4}", path, fnameNoExt, cc, precision, ext);
       this->WriteATimestep(fname, pdc->GetPartitionedDataSet(cc));
     }
   }
@@ -360,12 +371,14 @@ void vtkParallelSerialWriter::WriteAFile(const std::string& filename_arg, vtkDat
     {
       // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
       char suffix[100];
-      snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
-      filename = fmt::format("{0}/{1}{2}{3}", path, fnamenoext, suffix, ext);
+      auto result =
+        vtk::format_to_n(suffix, sizeof(suffix), this->FileNameSuffix, this->CurrentTimeIndex);
+      *result.out = '\0';
+      filename = vtk::format("{0}/{1}{2}{3}", path, fnamenoext, std::string_view(suffix), ext);
     }
     else
     {
-      filename = fmt::format("{0}/{1}.{2}{3}", path, fnamenoext, this->CurrentTimeIndex, ext);
+      filename = vtk::format("{0}/{1}.{2}{3}", path, fnamenoext, this->CurrentTimeIndex, ext);
     }
   }
 
@@ -413,7 +426,7 @@ std::string vtkParallelSerialWriter::GetPartitionFileName(const std::string& fna
     std::string path = vtksys::SystemTools::GetFilenamePath(fname);
     std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(fname);
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fname);
-    return path + "/" + fnamenoext + "-" + std::to_string(this->SubControllerColor) + ext;
+    return path + "/" + fnamenoext + "-" + vtk::to_string(this->SubControllerColor) + ext;
   }
   return fname;
 }

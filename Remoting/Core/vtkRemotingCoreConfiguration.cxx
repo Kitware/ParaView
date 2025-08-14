@@ -8,6 +8,8 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringFormatter.h"
+#include "vtkStringScanner.h"
 
 #include <vtk_cli11.h>
 #include <vtksys/SystemInformation.hxx>
@@ -163,15 +165,9 @@ int vtkRemotingCoreConfiguration::GetEGLDeviceIndex()
   const auto display = this->GetDisplay();
   if (!display.empty())
   {
-    try
-    {
-      this->EGLDeviceIndex = std::stoi(display);
-      vtkLogF(TRACE, "Setting EGLDeviceIndex to %d", this->EGLDeviceIndex);
-      return this->EGLDeviceIndex;
-    }
-    catch (std::invalid_argument&)
-    {
-    }
+    VTK_FROM_CHARS_IF_ERROR_RETURN(display, this->EGLDeviceIndex, -1);
+    vtkLogF(TRACE, "Setting EGLDeviceIndex to %d", this->EGLDeviceIndex);
+    return this->EGLDeviceIndex;
   }
   return -1;
 }
@@ -435,23 +431,28 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
         // no error when values are empty or accepted strings
         if (value.empty())
         {
-          return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_DEFAULT);
+          return vtk::to_string(
+            static_cast<int>(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_DEFAULT));
         }
         if (value == "GLX")
         {
-          return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_GLX);
+          return vtk::to_string(
+            static_cast<int>(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_GLX));
         }
         if (value == "EGL")
         {
-          return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_EGL);
+          return vtk::to_string(
+            static_cast<int>(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_EGL));
         }
         if (value == "OSMesa")
         {
-          return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_OSMESA);
+          return vtk::to_string(
+            static_cast<int>(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_OSMESA));
         }
         if (value == "Win32")
         {
-          return std::to_string(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_WIN32);
+          return vtk::to_string(
+            static_cast<int>(vtkRemotingCoreConfiguration::OPENGL_WINDOW_BACKEND_WIN32));
         }
         else
         {
@@ -483,11 +484,11 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
       {
         if (value == "contiguous")
         {
-          return std::to_string(vtkRemotingCoreConfiguration::CONTIGUOUS);
+          return vtk::to_string(static_cast<int>(vtkRemotingCoreConfiguration::CONTIGUOUS));
         }
         if (value == "round-robin")
         {
-          return std::to_string(vtkRemotingCoreConfiguration::ROUNDROBIN);
+          return vtk::to_string(static_cast<int>(vtkRemotingCoreConfiguration::ROUNDROBIN));
         }
         throw CLI::ValidationError("Invalid displays-assignment-mode specified.");
       })
@@ -503,7 +504,7 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
       "'Red-Blue', 'Interlaced', 'Dresden', 'Anaglyph', 'Checkerboard', or "
       "'SplitViewportHorizontal'.")
     ->needs("--stereo")
-    ->transform([](const std::string& value) { return std::to_string(::ParseStereoType(value)); });
+    ->transform([](const std::string& value) { return vtk::to_string(::ParseStereoType(value)); });
 
   stereoGroup
     ->add_option("--eye-separation", this->EyeSeparation, "Specify eye separation distance.")

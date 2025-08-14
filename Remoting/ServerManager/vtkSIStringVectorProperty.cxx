@@ -8,6 +8,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSMMessage.h"
+#include "vtkStringScanner.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -244,18 +245,34 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings& values)
     for (iter = values.begin(); iter != values.end(); ++iter, ++i)
     {
       // Convert to the appropriate type and add to stream
-      int type =
+      const int type =
         (i < static_cast<int>(this->ElementTypes->size())) ? (*this->ElementTypes)[i] : STRING;
+      const auto& value = values[i];
       switch (type)
       {
         case INT:
-          stream << atoi(values[i].c_str());
+        {
+          int intValue = 0;
+          if (!value.empty())
+          {
+            VTK_FROM_CHARS_IF_ERROR_RETURN(value, intValue, false);
+          }
+          stream << intValue;
           break;
+        }
         case DOUBLE:
-          stream << atof(values[i].c_str());
+        {
+          double doubleValue = 0.0;
+          if (!value.empty())
+          {
+            VTK_FROM_CHARS_IF_ERROR_RETURN(value, doubleValue, false);
+          }
+          stream << doubleValue;
           break;
+        }
         case STRING:
-          stream << values[i].c_str();
+        default:
+          stream << value;
           break;
       }
     }
@@ -287,18 +304,34 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings& values)
       for (int j = 0; j < this->NumberOfElementsPerCommand; j++)
       {
         // Convert to the appropriate type and add to stream
-        int type =
+        const int type =
           (j < static_cast<int>(this->ElementTypes->size())) ? (*this->ElementTypes)[j] : STRING;
+        const auto& value = values[i * this->NumberOfElementsPerCommand + j];
         switch (type)
         {
           case INT:
-            stream << atoi(values[i * this->NumberOfElementsPerCommand + j].c_str());
+          {
+            int intValue = 0;
+            if (!value.empty())
+            {
+              VTK_FROM_CHARS_IF_ERROR_RETURN(value, intValue, false);
+            }
+            stream << intValue;
             break;
+          }
           case DOUBLE:
-            stream << atof(values[i * this->NumberOfElementsPerCommand + j].c_str());
+          {
+            double doubleValue = 0.0;
+            if (!value.empty())
+            {
+              VTK_FROM_CHARS_IF_ERROR_RETURN(value, doubleValue, false);
+            }
+            stream << doubleValue;
             break;
+          }
           case STRING:
-            stream << values[i * this->NumberOfElementsPerCommand + j].c_str();
+          default:
+            stream << value;
             break;
         }
       }

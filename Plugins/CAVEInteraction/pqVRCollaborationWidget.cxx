@@ -13,6 +13,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkStringList.h"
+#include "vtkStringScanner.h"
 
 #include <QComboBox>
 #include <QDebug>
@@ -341,7 +342,7 @@ public:
       const char* portstr = child->GetAttributeOrEmpty("value");
       if (strcmp(portstr, "") != 0)
       {
-        this->CollabPort = atoi(portstr);
+        VTK_FROM_CHARS_IF_ERROR_BREAK(portstr, this->CollabPort);
       }
     }
 
@@ -363,7 +364,7 @@ public:
       const char* upxstr = child->GetAttributeOrEmpty("value");
       if (strcmp(upxstr, "") != 0)
       {
-        this->CollabAvatarUpX = atof(upxstr);
+        VTK_FROM_CHARS_IF_ERROR_BREAK(upxstr, this->CollabAvatarUpX);
       }
     }
 
@@ -373,7 +374,7 @@ public:
       const char* upystr = child->GetAttributeOrEmpty("value");
       if (strcmp(upystr, "") != 0)
       {
-        this->CollabAvatarUpY = atof(upystr);
+        VTK_FROM_CHARS_IF_ERROR_BREAK(upystr, this->CollabAvatarUpY);
       }
     }
 
@@ -383,7 +384,7 @@ public:
       const char* upzstr = child->GetAttributeOrEmpty("value");
       if (strcmp(upzstr, "") != 0)
       {
-        this->CollabAvatarUpZ = atof(upzstr);
+        VTK_FROM_CHARS_IF_ERROR_BREAK(upzstr, this->CollabAvatarUpZ);
       }
     }
 

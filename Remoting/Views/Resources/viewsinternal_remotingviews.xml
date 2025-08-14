@@ -301,11 +301,11 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <Documentation>
-          Set a printf-style string to build custom tooltip labels from.
+          Set a std::format style string with name variables to build custom tooltip labels from.
           An empty string generates the default tooltip labels.
           The following case-sensitive format tags (without quotes) are recognized:
-          '%x' The X value of the plot element
-          '%y' The Y value of the plot element
+          '{x}' The X value of the plot element
+          '{y}' The Y value of the plot element
           Other characters may be supported depending on plot type. Other characters or
           unrecognized format tags are printed in the tooltip label verbatim.
         </Documentation>

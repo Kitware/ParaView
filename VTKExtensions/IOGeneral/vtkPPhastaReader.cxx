@@ -16,6 +16,7 @@
 #include "vtkPointData.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -203,21 +204,30 @@ int vtkPPhastaReader::RequestData(
   char* field_name = new char[field_name_sz];
 
   // now loop over all of the files that I should load
+  const std::string geometryPatternFormat = vtk::is_printf_format(geometryPattern)
+    ? vtk::printf_to_std_format(geometryPattern)
+    : geometryPattern;
+  const std::string fieldPatternFormat =
+    vtk::is_printf_format(fieldPattern) ? vtk::printf_to_std_format(fieldPattern) : fieldPattern;
   for (int loadingPiece = piece; loadingPiece < numPieces; loadingPiece += numProcPieces)
   {
     if (geomHasTime && geomHasPiece)
     {
-      snprintf(geom_name, geom_name_sz, geometryPattern,
+      auto result = vtk::format_to_n(geom_name, geom_name_sz, geometryPatternFormat,
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, loadingPiece + 1);
+      *result.out = '\0';
     }
     else if (geomHasPiece)
     {
-      snprintf(geom_name, geom_name_sz, geometryPattern, loadingPiece + 1);
+      auto result =
+        vtk::format_to_n(geom_name, geom_name_sz, geometryPatternFormat, loadingPiece + 1);
+      *result.out = '\0';
     }
     else if (geomHasTime)
     {
-      snprintf(geom_name, geom_name_sz, geometryPattern,
+      auto result = vtk::format_to_n(geom_name, geom_name_sz, geometryPatternFormat,
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
+      *result.out = '\0';
     }
     else
     {
@@ -227,17 +237,21 @@ int vtkPPhastaReader::RequestData(
 
     if (fieldHasTime && fieldHasPiece)
     {
-      snprintf(field_name, field_name_sz, fieldPattern,
+      auto result = vtk::format_to_n(field_name, field_name_sz, fieldPatternFormat,
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex, loadingPiece + 1);
+      *result.out = '\0';
     }
     else if (fieldHasPiece)
     {
-      snprintf(field_name, field_name_sz, fieldPattern, loadingPiece + 1);
+      auto result =
+        vtk::format_to_n(field_name, field_name_sz, fieldPatternFormat, loadingPiece + 1);
+      *result.out = '\0';
     }
     else if (fieldHasTime)
     {
-      snprintf(field_name, field_name_sz, fieldPattern,
+      auto result = vtk::format_to_n(field_name, field_name_sz, fieldPatternFormat,
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex);
+      *result.out = '\0';
     }
     else
     {

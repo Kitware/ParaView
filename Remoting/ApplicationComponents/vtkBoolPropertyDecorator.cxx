@@ -10,6 +10,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStringScanner.h"
 
 #include <cassert>
 
@@ -60,7 +61,8 @@ void vtkBoolPropertyDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy* p
       const char* function = child->GetAttributeOrDefault("function", "boolean");
       const char* value = child->GetAttributeOrDefault("value", "");
 
-      int index = atoi(child->GetAttributeOrDefault("index", "0"));
+      int index;
+      VTK_FROM_CHARS_IF_ERROR_RETURN(child->GetAttributeOrDefault("index", "0"), index, );
       if (strcmp(function, "boolean") != 0 && strcmp(function, "boolean_invert") != 0 &&
         strcmp(function, "greaterthan") != 0 && strcmp(function, "lessthan") != 0 &&
         strcmp(function, "equals") != 0 && strcmp(function, "contains") != 0)
@@ -106,13 +108,15 @@ void vtkBoolPropertyDecorator::UpdateBoolPropertyState()
   }
   if (this->Property && this->Function == "greaterthan")
   {
-    double number = std::stod(this->Value);
+    double number;
+    VTK_FROM_CHARS_IF_ERROR_BREAK(this->Value, number);
     bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsDouble(this->Index) > number;
     this->SetBoolProperty(enabled);
   }
   if (this->Property && this->Function == "lessthan")
   {
-    double number = std::stod(this->Value);
+    double number;
+    VTK_FROM_CHARS_IF_ERROR_BREAK(this->Value, number);
     bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsDouble(this->Index) < number;
     this->SetBoolProperty(enabled);
   }

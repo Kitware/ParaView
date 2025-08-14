@@ -13,12 +13,14 @@
 #include "vtkPVTrivialProducer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
 #include "vtk_jsoncpp.h"
 
 #include <algorithm>
+#include <regex>
 #include <sstream>
 #include <string>
 
@@ -40,6 +42,21 @@ vtkFileSeriesWriter::~vtkFileSeriesWriter()
   this->SetFileName(nullptr);
   this->SetInterpreter(nullptr);
   this->SetFileNameSuffix(nullptr);
+}
+
+//-----------------------------------------------------------------------------
+void vtkFileSeriesWriter::SetFileNameSuffix(const char* suffix)
+{
+  std::string format = suffix ? suffix : "";
+  if (vtk::is_printf_format(format))
+  {
+    // PARAVIEW_DEPRECATED_IN_6_1_0
+    vtkWarningMacro(<< "The given format " << format << " is a printf format. The format will be "
+                    << "converted to std::format. This conversion has been deprecated in 6.1.0");
+    format = vtk::printf_to_std_format(format);
+  }
+  const char* formatStr = format.c_str();
+  vtkSetStringBodyMacro(FileNameSuffix, formatStr);
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +202,8 @@ bool vtkFileSeriesWriter::AppendFileNameForTimeStep(
   {
     // timeIndex to a string using this->FileNameSuffix as format
     char suffix[100];
-    snprintf(suffix, 100, this->FileNameSuffix, timeIndex);
+    auto result = vtk::format_to_n(suffix, sizeof(suffix), this->FileNameSuffix, timeIndex);
+    *result.out = '\0';
     if (appendPath && !path.empty())
     {
       fname << path << "/";
@@ -194,8 +212,9 @@ bool vtkFileSeriesWriter::AppendFileNameForTimeStep(
   }
   else
   {
-    vtkErrorMacro("Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
-                                         << ". Expected valid % format specifiers!");
+    vtkErrorMacro(
+      "Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
+                             << ". Expected valid std::format style format specifiers!");
     return false;
   }
   return true;
@@ -331,33 +350,11 @@ void vtkFileSeriesWriter::SetWriterFileName(const char* fname)
 //-----------------------------------------------------------------------------
 bool vtkFileSeriesWriter::SuffixValidation(char* fileNameSuffix)
 {
-  std::string suffix(fileNameSuffix);
-  // Only allow this format: ABC%.Xd
-  // ABC is an arbitrary string which may or may not exist
-  // % and d must exist and d must be the last char
-  // . and X may or may not exist, X must be an integer if it exists
-  if (suffix.empty() || suffix[suffix.size() - 1] != 'd')
-  {
-    return false;
-  }
-  std::string::size_type lastPercentage = suffix.find_last_of('%');
-  if (lastPercentage == std::string::npos)
-  {
-    return false;
-  }
-  if (suffix.size() - lastPercentage > 2 && !isdigit(suffix[lastPercentage + 1]) &&
-    suffix[lastPercentage + 1] != '.')
-  {
-    return false;
-  }
-  for (std::string::size_type i = lastPercentage + 2; i < suffix.size() - 1; ++i)
-  {
-    if (!isdigit(suffix[i]))
-    {
-      return false;
-    }
-  }
-  return true;
+  // Only allow this format: ABC{:Xd} where ABC is an arbitrary string which may
+  // or may not exist and d must exist and X may or may not exist,
+  // X must be an integer if it exists.
+  static const std::regex pattern{ R"(.*\{\d*:\d*d\}$)" };
+  return std::regex_match(fileNameSuffix, pattern);
 }
 
 //-----------------------------------------------------------------------------

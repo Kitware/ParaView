@@ -19,28 +19,28 @@ def CreateCoProcessor():
       filename = None
       if  grid.IsA('vtkImageData') or grid.IsA('vtkUniformGrid'):
         writer = servermanager.writers.XMLPImageDataWriter(Input=adaptorinput)
-        filename = 'input_%t.pvti'
+        filename = 'input_{time}.pvti'
       elif  grid.IsA('vtkRectilinearGrid'):
         writer = servermanager.writers.XMLPRectilinearGridWriter(Input=adaptorinput)
-        filename = 'input_%t.pvtr'
+        filename = 'input_{time}.pvtr'
       elif  grid.IsA('vtkStructuredGrid'):
         writer = servermanager.writers.XMLPStructuredGridWriter(Input=adaptorinput)
-        filename = 'input_%t.pvts'
+        filename = 'input_{time}.pvts'
       elif  grid.IsA('vtkPolyData'):
         writer = servermanager.writers.XMLPPolyDataWriter(Input=adaptorinput)
-        filename = 'input_%t.pvtp'
+        filename = 'input_{time}.pvtp'
       elif  grid.IsA('vtkUnstructuredGrid'):
         writer = servermanager.writers.XMLPUnstructuredGridWriter(Input=adaptorinput)
-        filename = 'input_%t.pvtu'
+        filename = 'input_{time}.pvtu'
       elif  grid.IsA('vtkUniformGridAMR'):
         writer = servermanager.writers.XMLHierarchicalBoxDataWriter(Input=adaptorinput)
-        filename = 'input_%t.vthb'
+        filename = 'input_{time}.vthb'
       elif  grid.IsA('vtkMultiBlockDataSet'):
         writer = servermanager.writers.XMLMultiBlockDataWriter(Input=adaptorinput)
-        filename = 'input_%t.vtm'
+        filename = 'input_{time}.vtm'
       elif  grid.IsA('vtkHyperTreeGrid'):
         writer = servermanager.writers.HyperTreeGridWriter(Input=adaptorinput)
-        filename = 'input_%t.htg'
+        filename = 'input_{time}.htg'
       else:
         print("Don't know how to create a writer for a ", grid.GetClassName())
 

@@ -19,6 +19,7 @@
 #include <vtkPolygon.h>
 #include <vtkPolyhedron.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkStringFormatter.h>
 #include <vtkUnstructuredGrid.h>
 
 #include <vtkSmartPointer.h>
@@ -228,14 +229,11 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron* cell)
 
   std::map<std::string, int> edge_map;
 
-  char key[100];
   for (i = 0; i < num_edges; i++)
   {
     vtkCell* e = cell->GetEdge(i);
-
-    sprintf(key, "%d_%d", (int)e->GetPointId(0), (int)e->GetPointId(1));
-    std::string key_str = std::string(key);
-    edge_map[key_str] = i;
+    auto key = vtk::format("{}_{}", (int)e->GetPointId(0), (int)e->GetPointId(1));
+    edge_map[key] = i;
   }
 
   for (i = 0; i < num_faces; i++)
@@ -246,16 +244,14 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron* cell)
 
     for (j = 0; j < num_verts; j++)
     {
-      sprintf(
-        key, "%d_%d", (int)verts->GetId(j % num_verts), (int)verts->GetId((j + 1) % num_verts));
-      std::string key_str = std::string(key);
-      std::map<std::string, int>::iterator it = edge_map.find(key_str);
+      auto key = vtk::format(
+        "{}_{}", (int)verts->GetId(j % num_verts), (int)verts->GetId((j + 1) % num_verts));
+      std::map<std::string, int>::iterator it = edge_map.find(key);
       if (it == edge_map.end())
       {
-        sprintf(
-          key, "%d_%d", (int)verts->GetId((j + 1) % num_verts), (int)verts->GetId(j % num_verts));
-        key_str = std::string(key);
-        it = edge_map.find(key_str);
+        key = vtk::format(
+          "{}_{}", (int)verts->GetId((j + 1) % num_verts), (int)verts->GetId(j % num_verts));
+        it = edge_map.find(key);
       }
 
       if (it == edge_map.end())

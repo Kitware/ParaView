@@ -38,12 +38,6 @@
 #include <limits>
 #include <map>
 
-#if defined(_WIN32) && !defined(__CYGWIN__)
-#define SNPRINTF _snprintf
-#else
-#define SNPRINTF snprintf
-#endif
-
 /**
  * NOTE FOR DEVELOPERS
  * The color bar is defined so that the origin (0, 0) is the bottom left
@@ -337,7 +331,7 @@ void vtkContext2DTexturedScalarBarActor::PaintAxis(
 
   auto* range = orientation == VTK_ORIENT_VERTICAL ? this->FirstRange : this->SecondRange;
   auto notation =
-    this->AutomaticLabelFormat ? vtkAxis::STANDARD_NOTATION : vtkAxis::PRINTF_NOTATION;
+    this->AutomaticLabelFormat ? vtkAxis::STANDARD_NOTATION : vtkAxis::STD_FORMAT_NOTATION;
   auto* cutomLabels = this->UseCustomLabels ? this->CustomLabels : nullptr;
 
   // NOTE: the order of calls to this->Axis is important and should be

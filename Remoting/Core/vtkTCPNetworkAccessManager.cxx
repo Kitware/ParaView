@@ -10,6 +10,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
+#include "vtkStringScanner.h"
 #include "vtkTimerLog.h"
 #include "vtkWeakPointer.h"
 
@@ -70,7 +71,8 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(
   if (re_connect.find(url))
   {
     std::string hostname = re_connect.match(1);
-    int port = atoi(re_connect.match(2).c_str());
+    int port;
+    VTK_FROM_CHARS_IF_ERROR_RETURN(re_connect.match(2), port, nullptr);
 
     // there some issue with RegularExpression that I cannot extract parameters.
     // hence we do this:
@@ -94,7 +96,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(
     int timeout_in_seconds = 60;
     if (parameters.find("timeout") != parameters.end())
     {
-      timeout_in_seconds = atoi(parameters["timeout"].c_str());
+      VTK_FROM_CHARS_IF_ERROR_RETURN(parameters["timeout"], timeout_in_seconds, nullptr);
     }
 
     this->WrongConnectID = false;

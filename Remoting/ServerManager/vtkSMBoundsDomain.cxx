@@ -12,6 +12,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStringScanner.h"
 
 #include <algorithm>
 #include <cmath>
@@ -436,7 +437,7 @@ int vtkSMBoundsDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* e
   const char* scalefactor = element->GetAttribute("scale_factor");
   if (scalefactor)
   {
-    sscanf(scalefactor, "%lf", &this->ScaleFactor);
+    this->ScaleFactor = vtk::scan_value<double>(std::string_view(scalefactor))->value();
   }
   return 1;
 }

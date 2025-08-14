@@ -198,15 +198,15 @@
       </IntVectorProperty>
 
       <StringVectorProperty command="SetFileNameSuffix"
-                            default_values="_%d"
+                            default_values="_{:d}"
                             label = "File name suffix"
                             name="FileNameSuffix"
                             number_of_elements="1">
         <Documentation>
         The suffix to append to the file name when writing files at different timesteps.
         File extensions such as .vtk should be excluded.
-        The `%` format specifiers are used. For example, _%d will write files as FileName_0,
-        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        The std::format style format specifiers are used. For example, _{:d} will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _{:03d} will write files as FileName_000,
         FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>
@@ -348,15 +348,15 @@
       </IntVectorProperty>
 
       <StringVectorProperty command="SetFileNameSuffix"
-                            default_values="_%d"
+                            default_values="_{:d}"
                             label = "File name suffix"
                             name="FileNameSuffix"
                             number_of_elements="1">
         <Documentation>
         The suffix to append to the file name when writing files at different timesteps.
         File extensions such as .vtk should be excluded.
-        The `%` format specifiers are used. For example, _%d will write files as FileName_0,
-        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        The std::format style format specifiers are used. For example, _{:d} will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _{:03d} will write files as FileName_000,
         FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>
@@ -486,15 +486,15 @@
       </IntVectorProperty>
 
       <StringVectorProperty command="SetFileNameSuffix"
-                            default_values="_%d"
+                            default_values="_{:d}"
                             label = "File name suffix"
                             name="FileNameSuffix"
                             number_of_elements="1">
         <Documentation>
           The suffix to append to the file name when writing files at different timesteps.
           File extensions such as .vtk should be excluded.
-          The % format specifiers are used. For example, _%d will write files as FileName_0,
-          FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+          The std::format style format specifiers are used. For example, _{:d} will write files as FileName_0,
+          FileName_1, FileName_2, etc., and _{:03d} will write files as FileName_000,
           FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>
@@ -555,15 +555,15 @@
       </IntVectorProperty>
 
       <StringVectorProperty command="SetFileNameSuffix"
-                            default_values="_%d"
+                            default_values="_{:d}"
                             label = "File name suffix"
                             name="FileNameSuffix"
                             number_of_elements="1">
         <Documentation>
         The suffix to append to the file name when writing files at different timesteps.
-        (File extensions such as .vtk should be excluded.)
-        The % format specifiers are used. For example, _%d will write files as FileName_0,
-        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        File extensions such as .vtk should be excluded.
+        The std::format style format specifiers are used. For example, _{:d} will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _{:03d} will write files as FileName_000,
         FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>

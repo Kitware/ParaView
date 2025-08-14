@@ -19,13 +19,13 @@ def CreateCoProcessor():
     class Pipeline:
       adaptorinput = coprocessor.CreateProducer( datadescription, "GridCellData" )
       grid = adaptorinput.GetClientSideObject().GetOutputDataObject(0)
-      fileName = dumpPath + "/insitu/GridCellData_%t.vth"
+      fileName = dumpPath + "/insitu/GridCellData_{time}.vth"
       writer = coprocessor.CreateWriter( XMLHierarchicalBoxDataWriter, fileName, 1 )
 #     writer = coprocessor.CreateWriter(vtkXMLPUniformGridAMRWriter, fileName, 1 )
 
       adaptorinput2 = coprocessor.CreateProducer( datadescription, "MarkerPointData" )
       grid2 = adaptorinput2.GetClientSideObject().GetOutputDataObject(0)
-      fileName2 = dumpPath + "/insitu/MarkerPointData_%t.vtm"
+      fileName2 = dumpPath + "/insitu/MarkerPointData_{time}.vtm"
       writer2 = coprocessor.CreateWriter( XMLMultiBlockDataWriter, fileName2, 1 )
 
     return Pipeline()

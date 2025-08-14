@@ -27,6 +27,7 @@
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringScanner.h"
 #include "vtkTimerLog.h"
 
 #include "vtk_zlib.h"
@@ -1062,10 +1063,15 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
       // need a more intrusive fix in the reader/writer itself.
       int extent[6] = { 0, 0, 0, 0, 0, 0 };
       float origin[3] = { 0, 0, 0 };
-      int values_read = sscanf(reader->GetHeader(), "EXTENT %d %d %d %d %d %d ORIGIN %f %f %f",
-        &extent[0], &extent[1], &extent[2], &extent[3], &extent[4], &extent[5], &origin[0],
-        &origin[1], &origin[2]);
-      if (values_read != 9)
+      auto result = vtk::scan<int, int, int, int, int, int, float, float, float>(
+        std::string_view(reader->GetHeader()),
+        "EXTENT {:d} {:d} {:d} {:d} {:d} {:d} ORIGIN {:f} {:f} {:f}");
+      if (result)
+      {
+        std::tie(extent[0], extent[1], extent[2], extent[3], extent[4], extent[5], origin[0],
+          origin[1], origin[2]) = result->values();
+      }
+      else
       {
         vtkWarningMacro("EXTENT and ORIGIN may not have been read correctly.");
       }

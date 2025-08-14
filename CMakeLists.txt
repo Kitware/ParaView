@@ -1250,6 +1250,12 @@ install(
   DESTINATION "${CMAKE_INSTALL_LICENSEDIR}"
   COMPONENT   "license")
 
+# Some generated code has some warnings that we need to exclude for now.
+# Create a clang-tidy file for the build tree that excludes bugprone-unsafe-functions
+file(READ "${CMAKE_SOURCE_DIR}/.clang-tidy" CLANG_TIDY_CONTENTS)
+string(REPLACE "clang-analyzer-*," "-bugprone-unsafe-functions,\\\nclang-analyzer-*," CLANG_TIDY_CONTENTS "${CLANG_TIDY_CONTENTS}")
+file(WRITE "${CMAKE_BINARY_DIR}/.clang-tidy" "${CLANG_TIDY_CONTENTS}")
+
 #-----------------------------------------------------------------------------
 if (PARAVIEW_ENABLE_EXAMPLES)
   add_subdirectory(Examples)

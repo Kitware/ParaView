@@ -1541,7 +1541,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.pvti">
+                            default_values="filename_{:t}.pvti">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1583,7 +1583,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.pvtr">
+                            default_values="filename_{time}.pvtr">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1625,7 +1625,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.pvts">
+                            default_values="filename_{t}.pvts">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1667,7 +1667,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.pvtp">
+                            default_values="filename_{t}.pvtp">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1709,7 +1709,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.pvtu">
+                            default_values="filename_{t}.pvtu">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1751,7 +1751,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.vtm">
+                            default_values="filename_{t}.vtm">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1793,7 +1793,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.vth">
+                            default_values="filename_{t}.vth">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1835,7 +1835,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.vth">
+                            default_values="filename_{t}.vth">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1877,7 +1877,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.csv">
+                            default_values="filename_{t}.csv">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
@@ -1964,7 +1964,7 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename_%t.htg">
+                            default_values="filename_{t}.htg">
       </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"

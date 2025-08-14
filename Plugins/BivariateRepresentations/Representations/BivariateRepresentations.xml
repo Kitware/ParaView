@@ -555,7 +555,7 @@
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetLabelFormat"
-                            default_values="%-#6.3g"
+                            default_values="{:&lt;#6.3g}"
                             name="LabelFormat"
                             number_of_elements="1">
         <Hints>
@@ -583,7 +583,7 @@
       <StringVectorProperty animateable="0"
                             command="SetRangeLabelFormat"
                             number_of_elements="1"
-                            default_values="%-#6.1e"
+                            default_values="{:&lt;#6.1e}"
                             name="RangeLabelFormat"
                             label="Range Label Format">
         <Hints>

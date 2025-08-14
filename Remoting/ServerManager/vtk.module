@@ -23,7 +23,6 @@ PRIVATE_DEPENDS
   VTK::vtksys
   VTK::pugixml
   VTK::cli11
-  VTK::doubleconversion
   VTK::fmt
 OPTIONAL_DEPENDS
   VTK::IOIOSS

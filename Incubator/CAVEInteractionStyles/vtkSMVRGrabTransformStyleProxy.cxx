@@ -10,6 +10,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkStringFormatter.h"
 #include "vtkTransform.h"
 #include "vtkVRQueue.h"
 
@@ -45,11 +46,12 @@ void sendMatrixToPVtest(int marker, int freq, vtkMatrix4x4* mat)
       return;
     }
   }
-  printf("pos %d %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n", marker, mat->Element[0][0],
-    mat->Element[1][0], mat->Element[2][0], mat->Element[3][0], mat->Element[0][1],
-    mat->Element[1][1], mat->Element[2][1], mat->Element[3][1], mat->Element[0][2],
-    mat->Element[1][2], mat->Element[2][2], mat->Element[3][2], mat->Element[0][3],
-    mat->Element[1][3], mat->Element[2][3], mat->Element[3][3]);
+  vtk::print(
+    "pos {:d} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f} {:f}\n",
+    marker, mat->Element[0][0], mat->Element[1][0], mat->Element[2][0], mat->Element[3][0],
+    mat->Element[0][1], mat->Element[1][1], mat->Element[2][1], mat->Element[3][1],
+    mat->Element[0][2], mat->Element[1][2], mat->Element[2][2], mat->Element[3][2],
+    mat->Element[0][3], mat->Element[1][3], mat->Element[2][3], mat->Element[3][3]);
   fflush(stdout);
 }
 
@@ -73,7 +75,7 @@ void sendLocationToPVtest(int marker, int freq, float x, float y, float z)
       return;
     }
   }
-  printf("loc %d %f %f %f\n", marker, x, y, z);
+  vtk::print("loc {:d} {:f} {:f} {:f}\n", marker, x, y, z);
   fflush(stdout);
 }
 #endif /* OUTPUT_DATA_FOR_DEBUGGING */
@@ -185,7 +187,7 @@ void vtkSMVRGrabTransformStyleProxy::HandleTracker(const vtkVREvent& event)
 #if 1
       if (std::isnan(speed))
       {
-        fprintf(stderr, "Hey, 'speed' is not-a-number! -- last value was %f\n", lastspeed);
+        vtk::print(stderr, "Hey, 'speed' is not-a-number! -- last value was {:f}\n", lastspeed);
       }
       else
       {
@@ -215,7 +217,7 @@ void vtkSMVRGrabTransformStyleProxy::HandleTracker(const vtkVREvent& event)
 #if 1
       if (std::isnan(speed))
       {
-        fprintf(stderr, "Hey, 'speed' is not-a-number! -- last value was %f\n", lastspeed);
+        vtk::print(stderr, "Hey, 'speed' is not-a-number! -- last value was {:f}\n", lastspeed);
       }
       else
       {
@@ -285,8 +287,8 @@ float vtkSMVRGrabTransformStyleProxy::GetSpeedFactor(vtkCamera* cam, vtkMatrix4x
 
   if (std::isnan(result))
   {
-    fprintf(stderr, "GetSpeedFactor -- nan -- pos = (%f %f %f), foc = (%f %f %f)\n", pos[0], pos[1],
-      pos[2], foc[0], foc[1], foc[2]);
+    vtk::print(stderr, "GetSpeedFactor -- nan -- pos = ({:f} {:f} {:f}), foc = ({:f} {:f} {:f})\n",
+      pos[0], pos[1], pos[2], foc[0], foc[1], foc[2]);
     return 1.0;
   }
 

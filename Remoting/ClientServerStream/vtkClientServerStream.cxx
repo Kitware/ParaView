@@ -8,6 +8,7 @@
 #include "vtkArrayIteratorIncludes.h"
 #include "vtkByteSwap.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringScanner.h"
 #include "vtkType.h"
 #include "vtkTypeTraits.h"
 #include "vtkVariantExtract.h"
@@ -2717,14 +2718,18 @@ int vtkClientServerStreamPointerFromString(
   ptr[end - begin] = 0;
 
   // Try to convert the value.
-  int result = sscanf(ptr, "%p", value) ? 1 : 0;
+  auto result = vtk::scan<void*>(std::string_view(ptr), "{:p}");
+  if (result)
+  {
+    *value = static_cast<vtkObjectBase*>(result->value());
+  }
 
   // Free the buffer.
   if (ptr != buffer)
   {
     delete[] ptr;
   }
-  return result;
+  return result.has_value();
 }
 
 //----------------------------------------------------------------------------
@@ -2742,11 +2747,10 @@ int vtkClientServerStreamValueFromString(const char* begin, const char* end, T* 
   ptr[end - begin] = 0;
 
   // Try to convert the value.
-  VTK_CSS_TYPENAME vtkTypeTraits<T>::PrintType pvalue;
-  int result = sscanf(ptr, vtkTypeTraits<T>::ParseFormat(), &pvalue) ? 1 : 0;
+  auto result = vtk::scan_value<T>(std::string_view(ptr));
   if (result)
   {
-    *value = static_cast<T>(pvalue);
+    *value = result->value();
   }
 
   // Free the buffer.
@@ -2754,7 +2758,7 @@ int vtkClientServerStreamValueFromString(const char* begin, const char* end, T* 
   {
     delete[] ptr;
   }
-  return result;
+  return result.has_value();
 }
 
 //----------------------------------------------------------------------------

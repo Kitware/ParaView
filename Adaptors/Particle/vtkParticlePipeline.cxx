@@ -34,13 +34,11 @@
 #include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkSynchronizedRenderWindows.h"
 #include "vtkTrivialProducer.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkXMLPUnstructuredGridReader.h"
-#include "vtkXMLPUnstructuredGridWriter.h"
-#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 vtkStandardNewMacro(vtkParticlePipeline);
 
@@ -113,6 +111,20 @@ void vtkParticlePipeline::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AttributeMinimum: " << this->AttributeMinimum << endl;
 }
 
+void vtkParticlePipeline::SetFilename(const char* filename)
+{
+  std::string format = filename ? filename : "";
+  if (vtk::is_printf_format(format))
+  {
+    // PARAVIEW_DEPRECATED_IN_6_1_0
+    vtkWarningMacro(<< "The given format " << format << " is a printf format. The format will be "
+                    << "converted to std::format. This conversion has been deprecated in 6.1.0");
+    format = vtk::printf_to_std_format(format);
+  }
+  const char* formatStr = format.c_str();
+  vtkSetStringBodyMacro(Filename, formatStr);
+}
+
 int vtkParticlePipeline::RequestDataDescription(vtkCPDataDescription* desc)
 {
   if (!desc)
@@ -161,21 +173,21 @@ void vtkParticlePipeline::SetupPipeline()
 
   this->lightKit->AddLightsToRenderer(renderer);
 
-  VTK_CREATE(vtkRenderPassCollection, passes);
-  VTK_CREATE(vtkLightsPass, lights);
+  vtkNew<vtkRenderPassCollection> passes;
+  vtkNew<vtkLightsPass> lights;
   passes->AddItem(lights);
-  VTK_CREATE(vtkOpaquePass, opaque);
+  vtkNew<vtkOpaquePass> opaque;
   passes->AddItem(opaque);
 
-  VTK_CREATE(vtkSequencePass, seq);
+  vtkNew<vtkSequencePass> seq;
   seq->SetPasses(passes);
 
-  VTK_CREATE(vtkIceTCompositePass, iceTPass);
+  vtkNew<vtkIceTCompositePass> iceTPass;
   iceTPass->SetController(ctrl);
   iceTPass->SetRenderPass(seq);
   iceTPass->SetDataReplicatedOnAllProcesses(false);
 
-  VTK_CREATE(vtkCameraPass, cameraP);
+  vtkNew<vtkCameraPass> cameraP;
   cameraP->SetDelegatePass(iceTPass);
   vtkOpenGLRenderer* glRenderer = vtkOpenGLRenderer::SafeDownCast(this->renderer);
   if (glRenderer != nullptr)
@@ -256,11 +268,9 @@ int vtkParticlePipeline::CoProcess(vtkCPDataDescription* desc)
   if (ctrl->GetLocalProcessId() == 0)
   {
     this->w2i->Modified();
-    char* outstring = new char[strlen(this->Filename) + 32];
-    sprintf(outstring, this->Filename, timestep);
-    this->writer->SetFileName(outstring);
+    auto outString = vtk::format(this->Filename, timestep);
+    this->writer->SetFileName(outString.c_str());
     this->writer->Write();
-    delete[] outstring;
   }
 
   return 1;

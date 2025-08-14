@@ -16,6 +16,7 @@
 #include "vtkPointData.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 
@@ -108,7 +109,8 @@ void vtkCTHSource::SetMaterialFieldName(int field_id, char* field_name, char* co
       char* end = strchr(comment, '!');
       std::string s(comment, end - comment);
       char n[24];
-      sprintf(n, " - %zu", i + 1);
+      auto result = vtk::format_to(n, " - {:d}", i + 1);
+      *result.out = '\0';
       s.append(n);
       MFieldNames[i][field_id] = s;
     }

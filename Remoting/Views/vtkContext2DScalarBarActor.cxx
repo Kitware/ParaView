@@ -27,6 +27,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkScalarsToColors.h"
+#include "vtkStringFormatter.h"
 #include "vtkTextProperty.h"
 #include "vtkTransform2D.h"
 #include "vtkUnsignedCharArray.h"
@@ -34,12 +35,6 @@
 
 #include <limits>
 #include <map>
-
-#if defined(_WIN32) && !defined(__CYGWIN__)
-#define SNPRINTF _snprintf
-#else
-#define SNPRINTF snprintf
-#endif
 
 // NOTE FOR DEVELOPERS
 // The color bar is defined so that the origin (0, 0) is the bottom left
@@ -134,9 +129,9 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->AutomaticAnnotations = 0;
   this->AddRangeAnnotations = 0;
   this->RangeLabelFormat = nullptr;
-  this->SetRangeLabelFormat("%g");
+  this->SetRangeLabelFormat("{:g}");
   this->DataRangeLabelFormat = nullptr;
-  this->SetDataRangeLabelFormat("%g");
+  this->SetDataRangeLabelFormat("{:g}");
 
   this->DrawScalarBarOutline = true;
   this->ScalarBarOutlineColor[0] = 1.0;
@@ -192,6 +187,36 @@ vtkContext2DScalarBarActor::~vtkContext2DScalarBarActor()
   this->SetLabelTextProperty(nullptr);
   this->Axis->Delete();
   this->SetRangeLabelFormat(nullptr);
+}
+
+//----------------------------------------------------------------------------
+void vtkContext2DScalarBarActor::SetRangeLabelFormat(const char* formatArg)
+{
+  std::string format = formatArg ? formatArg : "";
+  if (vtk::is_printf_format(format))
+  {
+    // PARAVIEW_DEPRECATED_IN_6_1_0
+    vtkWarningMacro(<< "The given format " << format << " is a printf format. The format will be "
+                    << "converted to std::format. This conversion has been deprecated in 6.1.0");
+    format = vtk::printf_to_std_format(format);
+  }
+  const char* formatStr = format.c_str();
+  vtkSetStringBodyMacro(RangeLabelFormat, formatStr);
+}
+
+//----------------------------------------------------------------------------
+void vtkContext2DScalarBarActor::SetDataRangeLabelFormat(const char* formatArg)
+{
+  std::string format = formatArg ? formatArg : "";
+  if (vtk::is_printf_format(format))
+  {
+    // PARAVIEW_DEPRECATED_IN_5_14_0
+    vtkWarningMacro(<< "The given format " << format << " is a printf format. The format will be "
+                    << "converted to std::format. This conversion has been deprecated in 5.14.0");
+    format = vtk::printf_to_std_format(format);
+  }
+  const char* formatStr = format.c_str();
+  vtkSetStringBodyMacro(DataRangeLabelFormat, formatStr);
 }
 
 //----------------------------------------------------------------------------
@@ -763,7 +788,8 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
             {
               annotatedValue = pow(10.0, annotatedValue);
             }
-            SNPRINTF(annotation, 1023, this->LabelFormat, annotatedValue);
+            auto result = vtk::format_to_n(annotation, 1023, this->LabelFormat, annotatedValue);
+            *result.out = '\0';
             annotationAnchors[barPosition] = annotation;
           }
         }
@@ -797,10 +823,12 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
     {
       char annotation[1024];
 
-      SNPRINTF(annotation, 1023, this->RangeLabelFormat, lutRange[0]);
+      auto result = vtk::format_to_n(annotation, 1023, this->RangeLabelFormat, lutRange[0]);
+      *result.out = '\0';
       annotationAnchors[low] = annotation;
 
-      SNPRINTF(annotation, 1023, this->RangeLabelFormat, lutRange[1]);
+      result = vtk::format_to_n(annotation, 1023, this->RangeLabelFormat, lutRange[1]);
+      *result.out = '\0';
       annotationAnchors[high] = annotation;
     }
 
@@ -951,7 +979,7 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
   }
   else
   {
-    this->Axis->SetNotation(vtkAxis::PRINTF_NOTATION);
+    this->Axis->SetNotation(vtkAxis::STD_FORMAT_NOTATION);
   }
   this->Axis->SetLabelFormat(std::string(this->LabelFormat));
   this->Axis->SetLogScale(this->LookupTable->UsingLogScale() == 1);
@@ -1125,7 +1153,9 @@ void vtkContext2DScalarBarActor::PaintRange(vtkContext2D* painter, double size[2
       std::string("\nMin: ") + std::string(this->DataRangeLabelFormat);
     char rangeString[256];
 
-    SNPRINTF(rangeString, 255, range.c_str(), this->DataRangeMax, this->DataRangeMin);
+    auto result =
+      vtk::format_to_n(rangeString, 255, range.c_str(), this->DataRangeMax, this->DataRangeMin);
+    *result.out = '\0';
 
     // Apply the text property so that range size is up to date.
     double textOrientation = 0.0;
@@ -1135,7 +1165,7 @@ void vtkContext2DScalarBarActor::PaintRange(vtkContext2D* painter, double size[2
 
     // Get range size
     float rangeBounds[4];
-    painter->ComputeStringBounds(range, rangeBounds);
+    painter->ComputeStringBounds(rangeString, rangeBounds);
     float rangeHeight = rangeBounds[3];
 
     float rangeX = barAndAxisRect.GetX();
@@ -1153,7 +1183,9 @@ void vtkContext2DScalarBarActor::PaintRange(vtkContext2D* painter, double size[2
 
     char rangeString[256];
 
-    SNPRINTF(rangeString, 255, range.c_str(), this->DataRangeMin, this->DataRangeMax);
+    auto result =
+      vtk::format_to_n(rangeString, 255, range.c_str(), this->DataRangeMin, this->DataRangeMax);
+    *result.out = '\0';
 
     // Apply the text property so that range size is up to date.
     double textOrientation = 0.0;
@@ -1162,7 +1194,7 @@ void vtkContext2DScalarBarActor::PaintRange(vtkContext2D* painter, double size[2
 
     // Get range size
     float rangeBounds[4];
-    painter->ComputeStringBounds(range, rangeBounds);
+    painter->ComputeStringBounds(rangeString, rangeBounds);
     float rangeHeight = rangeBounds[3];
 
     float rect[4] = { barAndAxisRect.GetX(),

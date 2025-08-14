@@ -12,6 +12,7 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkXMLWriter.h"
 
 #include <map>
@@ -314,12 +315,14 @@ std::string vtkXMLPVAnimationWriterInternals::CreateFileName(
   char pt[100];
   if (this->GroupMap[this->InputGroupNames[index]] > 1)
   {
-    snprintf(pt, sizeof(pt), "P%02dT%04d", this->InputPartNumbers[index],
-      this->InputChangeCounts[index] - 1);
+    auto result = vtk::format_to_n(
+      pt, 99, "P{:02d}T{:04d}", this->InputPartNumbers[index], this->InputChangeCounts[index] - 1);
+    *result.out = '\0';
   }
   else
   {
-    snprintf(pt, sizeof(pt), "T%04d", this->InputChangeCounts[index] - 1);
+    auto result = vtk::format_to_n(pt, 99, "T{:04d}", this->InputChangeCounts[index] - 1);
+    *result.out = '\0';
   }
   fn_with_warning_C4701 << pt;
 

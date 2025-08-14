@@ -20,6 +20,7 @@
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 #include "vtkVector.h"
 
 #include "vtksys/FStream.hxx"
@@ -741,11 +742,8 @@ int vtkParFlowMetaReader::FindPFBFiles(std::vector<std::string>& filesToLoad,
                 currentTime = times[0] + delta * frac;
               }
               size_t maxLen = filePattern.size() + 20;
-              char* curFile = new char[maxLen];
-              std::snprintf(curFile, maxLen - 1, filePattern.c_str(), currentTime);
-              curFile[maxLen - 1] = '\0';
+              auto curFile = vtk::format(vtk::printf_to_std_format(filePattern), currentTime);
               filesToLoad.push_back(curFile);
-              delete[] curFile;
             }
             else if (times[0] > timestep)
             {
@@ -776,9 +774,7 @@ int vtkParFlowMetaReader::FindPFBFiles(std::vector<std::string>& filesToLoad,
               int tbHi = tbLo + timesPerStack - 1;
               size_t maxLen = filePattern.size() + 40;
               slice = currentTime - tbLo;
-              char* curFile = new char[maxLen];
-              std::snprintf(curFile, maxLen - 1, filePattern.c_str(), tbLo, tbHi);
-              curFile[maxLen - 1] = '\0';
+              auto curFile = vtk::format(vtk::printf_to_std_format(filePattern), tbLo, tbHi);
               filesToLoad.push_back(curFile);
               delete[] curFile;
             }

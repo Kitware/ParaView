@@ -3,6 +3,7 @@
 #include "vtkFileSequenceParser.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkStringScanner.h"
 
 #include <set>
 #include <string>
@@ -108,7 +109,11 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
   }
   if (match)
   {
-    this->SequenceIndex = atoi(this->SequenceIndexString.c_str());
+    this->SequenceIndex = 0;
+    if (!this->SequenceIndexString.empty())
+    {
+      VTK_FROM_CHARS_IF_ERROR_RETURN(this->SequenceIndexString, this->SequenceIndex, false);
+    }
   }
   return match;
 }

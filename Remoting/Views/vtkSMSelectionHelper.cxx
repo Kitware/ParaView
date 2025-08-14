@@ -30,6 +30,8 @@
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
+#include "vtkStringScanner.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
@@ -193,7 +195,7 @@ bool vtkSMSelectionHelper::CombineSelection(vtkSMSourceProxy* appendSelections1,
 
   unsigned int numInputsAP1 = vtkSMPropertyHelper(appendSelections1, "Input").GetNumberOfElements();
   // find the largest selection name id of the appendSelections2
-  int maxId = -1;
+  int maxId = -1, id;
   for (unsigned int i = 0; i < numInputsAP1; ++i)
   {
     // get the selection name
@@ -202,7 +204,8 @@ bool vtkSMSelectionHelper::CombineSelection(vtkSMSourceProxy* appendSelections1,
     // remove the S prefix
     selectionName.erase(0, vtkSMSelectionHelper::SubSelectionBaseName.size());
     // get the id
-    maxId = std::max(maxId, std::stoi(selectionName));
+    VTK_FROM_CHARS_IF_ERROR_RETURN(selectionName, id, false);
+    maxId = std::max(maxId, id);
   }
 
   // create new expression and selection names from appendSelections2's selections sources
@@ -217,8 +220,9 @@ bool vtkSMSelectionHelper::CombineSelection(vtkSMSourceProxy* appendSelections1,
     // remove the S prefix
     newSelectionName.erase(0, vtkSMSelectionHelper::SubSelectionBaseName.size());
     // compute new selection name id
-    int selectionNameId = std::atoi(newSelectionName.c_str()) + maxId + 1;
-    newSelectionName = vtkSMSelectionHelper::SubSelectionBaseName + std::to_string(selectionNameId);
+    VTK_FROM_CHARS_IF_ERROR_RETURN(newSelectionName, id, false);
+    int selectionNameId = id + maxId + 1;
+    newSelectionName = vtkSMSelectionHelper::SubSelectionBaseName + vtk::to_string(selectionNameId);
     // save new selection name
     newSelectionNamesAP2.push_front(newSelectionName);
     // update the expression

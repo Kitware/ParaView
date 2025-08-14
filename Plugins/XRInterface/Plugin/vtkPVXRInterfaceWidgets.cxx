@@ -39,6 +39,8 @@
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkStringArray.h"
+#include "vtkStringFormatter.h"
+#include "vtkStringScanner.h"
 #include "vtkTextActor3D.h"
 #include "vtkTextProperty.h"
 #include "vtkTexture.h"
@@ -149,7 +151,7 @@ vtkPVXRInterfaceWidgets::vtkPVXRInterfaceWidgets()
   drep->SetHandleRepresentation(hr.Get());
   hr->SetHandleSize(40);
 
-  drep->SetLabelFormat("Dist: %g\ndeltaX: %g\ndeltaY: %g\ndeltaZ: %g");
+  drep->SetLabelFormat("Dist: {:g}\ndeltaX: {:g}\ndeltaY: {:g}\ndeltaZ: {:g}");
 
   vtkNew<vtkPolyDataMapper> mapper;
   mapper->SetInputConnection(this->Internals->ImagePlane->GetOutputPort());
@@ -1121,7 +1123,7 @@ bool vtkPVXRInterfaceWidgets::FindCellImage(
         if (fname == "from")
         {
           image += "&dp=";
-          image += std::to_string(da->GetComponent(currCell, 0));
+          image += vtk::to_string(da->GetComponent(currCell, 0));
           return true;
         }
       }
@@ -1539,20 +1541,11 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
     vtkDataArray* darray = vtkDataArray::SafeDownCast(array);
     if (darray)
     {
-      char* pEnd;
       double d1;
-      d1 = strtod(value.c_str(), &pEnd);
-      if (pEnd == value.c_str() + value.size())
+      VTK_FROM_CHARS_IF_ERROR_RETURN(value, d1, );
+      for (vtkIdType cidx : this->Internals->SelectedCells)
       {
-        for (vtkIdType cidx : this->Internals->SelectedCells)
-        {
-          darray->SetTuple1(cidx, d1);
-        }
-      }
-      else
-      {
-        vtkErrorMacro("unable to convert field value " << value << " to double.");
-        return;
+        darray->SetTuple1(cidx, d1);
       }
     }
   }

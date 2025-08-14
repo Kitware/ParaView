@@ -30,7 +30,7 @@ def DoCoProcessing(datadescription):
     Slice1.SliceType.Origin = [0.25, 0.5, 0.5]
     Slice1.SliceType.Normal = [0.0, 1.0, 0.0]
 
-    ParallelPolyDataWriter1 = CreateWriter( XMLPPolyDataWriter, "filename_%t.pvtp", 2 )
+    ParallelPolyDataWriter1 = CreateWriter( XMLPPolyDataWriter, "filename_{time}.pvtp", 2 )
 
 
 
