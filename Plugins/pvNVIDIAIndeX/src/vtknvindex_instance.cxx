@@ -162,8 +162,8 @@ bool is_compatible_revision(const std::string& build_revision_str,
         std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_MINOR)); // NOLINT(bugprone-unsafe-functions)
       if (NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 0)
       {
-        build_revision.push_back(std::to_string(
-          NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR)); // NOLINT(bugprone-unsafe-functions)
+        build_revision.push_back(std::to_string( // NOLINT(bugprone-unsafe-functions)
+          NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR));
       }
     }
 
