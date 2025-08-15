@@ -49,6 +49,13 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
     # see paraview/paraview#20741
     "pvcs\\.CategoricalAutomaticAnnotations$"
     "pvcrs\\.CategoricalAutomaticAnnotations$"
+
+    # see https://gitlab.kitware.com/paraview/paraview/-/issues/23071
+    "pvcs\\.LagrangianParticleTrackerParallelDistributed$"
+    "pvcrs\\.LagrangianParticleTrackerParallelDistributed$"
+    "pvcs\\.LagrangianParticleTrackerParallel$"
+    "pvcrs\\.LagrangianParticleTrackerParallel$"
+    "ParaViewExample-Plugins/LagrangianIntegrationModel$"
   )
 endif()
 
