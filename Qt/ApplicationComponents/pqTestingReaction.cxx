@@ -63,15 +63,23 @@ void pqTestingReaction::recordTest(const QString& filename)
     QTimer::singleShot(
       50, [=]() { pqApplicationCore::instance()->testUtility()->recordTests(filename); });
 #else
-    // The `activateWindow` function schedules a request on the platform's event queue to set the
-    // active widget. To enable the test recorder to check the active window, we use a one-time
-    // connection to the activeChanged signal of the window. This ensures that  platform's windowing
-    // system has processed the request for the active window change, before we query it.
-    QObject::connect(
-      pqCoreUtilities::mainWidget()->window()->windowHandle(), &QWindow::activeChanged,
-      pqCoreUtilities::mainWidget(),
-      [filename]() { pqApplicationCore::instance()->testUtility()->recordTests(filename); },
-      Qt::SingleShotConnection);
+    auto* windowHandle = pqCoreUtilities::mainWidget()->window()->windowHandle();
+    if (windowHandle && windowHandle->isActive())
+    {
+      pqApplicationCore::instance()->testUtility()->recordTests(filename);
+    }
+    else
+    {
+      // The `activateWindow` function schedules a request on the platform's event queue to set the
+      // active widget. To enable the test recorder to check the active window, we use a one-time
+      // connection to the activeChanged signal of the window. This ensures that  platform's window-
+      // ing system has processed the request for the active window change, before we query it.
+      QObject::connect(
+        pqCoreUtilities::mainWidget()->window()->windowHandle(), &QWindow::activeChanged,
+        pqCoreUtilities::mainWidget(),
+        [filename]() { pqApplicationCore::instance()->testUtility()->recordTests(filename); },
+        Qt::SingleShotConnection);
+    }
 #endif
   }
 }
