@@ -925,7 +925,7 @@ void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelI
   {
     vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
 
-    if (matName == vtkSMPropertyHelper(proxy, "OSPRayMaterial").GetAsString())
+    if (matName == vtkSMPropertyHelper(proxy, "OSPRayMaterial", true).GetAsString())
     {
       vtkSMPropertyHelper(proxy, "OSPRayMaterial").Set("None");
       proxy->UpdateVTKObjects();
