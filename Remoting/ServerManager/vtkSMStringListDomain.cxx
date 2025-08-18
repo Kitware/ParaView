@@ -95,13 +95,7 @@ int vtkSMStringListDomain::IsInDomain(vtkSMProperty* property)
 //---------------------------------------------------------------------------
 int vtkSMStringListDomain::IsInDomain(const char* val, unsigned int& idx)
 {
-  unsigned int numStrings = this->GetNumberOfStrings();
-  if (numStrings == 0)
-  {
-    return 1;
-  }
-
-  for (unsigned int i = 0; i < numStrings; i++)
+  for (unsigned int i = 0, numStrings = this->GetNumberOfStrings(); i < numStrings; ++i)
   {
     if (strcmp(val, this->GetString(i)) == 0)
     {
