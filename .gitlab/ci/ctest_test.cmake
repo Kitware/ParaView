@@ -127,7 +127,27 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22743
     "^pv.SimpleSSHServerTermExec$"
-    )
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23073
+    "^pvcrs\\.AMReXParticlesReader$"
+    "^pvcrs\\.ComputeConnectedSurfaceProperties$"
+    "^pvcrs\\.CONVERGECFDReaderWithVisItBridge$"
+    "^pvcrs\\.EDLWithSubsampling$"
+    "^pvcrs\\.ExtractLevel$"
+    "^pvcrs\\.FidesReaderADIOS2$"
+    "^pvcrs\\.Glyph3DRepresentation$"
+    "^pvcrs\\.LoadState$"
+    "^pvcrs\\.MemoryInspectorPanel$"
+    "^pvcrs\\.MultiBlockInspectorMultiBlock$"
+    "^pvcrs\\.OctreeImageFilters$"
+    "^pvcrs\\.OMFReader$"
+    "^pvcrs\\.PropertyLink$"
+    "^pvcrs\\.ReadPartitionedCGNS$"
+    "^pvcrs\\.SelectedProxyPanelVisibility$"
+    "^pvcrs\\.TestGroupDataFromTimeSeries$"
+    "^pvcrs\\.TestOpacityRendering$"
+    "^pvcrs\\.UnstructuredVolumeRenderingVectorComponent$"
+  )
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
     list(APPEND test_exclusions
