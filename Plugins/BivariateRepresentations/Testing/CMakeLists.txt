@@ -12,6 +12,8 @@ ExternalData_Expand_Arguments("ParaViewData" _
   "DATA{Data/Baseline/BivariateNoise_D.png}"
   "DATA{Data/Baseline/BivariateTexture_XX.png}"
   "DATA{Data/Baseline/BivariateTexture_XY.png}"
+  "DATA{Data/Baseline/BivariateTexture_XY_Sphere.png}"
+  "DATA{Data/Baseline/BivariateTexture_XY_Sphere_RangeX.png}"
   "DATA{Data/Baseline/BivariateTexture_YX.png}"
   "DATA{Data/Baseline/BivariateTexture_YY.png}"
   "DATA{Data/Baseline/BivariateTexture_SurfaceRepr.png}")
@@ -19,13 +21,11 @@ ExternalData_Expand_Arguments("ParaViewData" _
 set(tests
   "BivariateNoiseRepresentation.xml"
   "BivariateTextureRepresentation.xml"
+  "BivariateTextureRepresentationEditRanges.xml"
 )
 
 paraview_add_client_tests(
   LOAD_PLUGIN "BivariateRepresentations"
   TEST_DATA_TARGET ParaViewData
   TEST_SCRIPTS ${tests}
-  # The test lists OpenGL features, some containing the keyword error. This
-  # result in false positive errors.
-  SMTESTING_ALLOW_ERRORS
 )

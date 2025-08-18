@@ -8,10 +8,45 @@
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
-#include "vtkInformationVector.h"
+#include "vtkMapper.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkView.h"
+
+namespace
+{
+//----------------------------------------------------------------------------
+void InitializeRangeIfUnset(double range[2], const double actualRange[2])
+{
+  if (range[0] == 0.0 && range[1] == 0.0)
+  {
+    range[0] = actualRange[0];
+    range[1] = actualRange[1];
+  }
+}
+
+//----------------------------------------------------------------------------
+double ComputeDenominator(const double range[2])
+{
+  const double denom = range[1] - range[0];
+  const double epsilon = 1e-6;
+  return denom < epsilon ? epsilon : denom;
+}
+
+//----------------------------------------------------------------------------
+void FillTCoordsFromArrays(vtkDataArray* array1, const double range1[2], vtkDataArray* array2,
+  const double range2[2], vtkDataArray* tcoords)
+{
+  const double denom1 = ComputeDenominator(range1);
+  const double denom2 = ComputeDenominator(range2);
+
+  for (vtkIdType i = 0; i < tcoords->GetNumberOfTuples(); ++i)
+  {
+    const double firstValue = (array1->GetTuple1(i) - range1[0]) / denom1;
+    const double secondValue = (array2->GetTuple1(i) - range2[0]) / denom2;
+    tcoords->SetTuple2(i, firstValue, secondValue);
+  }
+}
+}
 
 vtkStandardNewMacro(vtkBivariateTextureRepresentation);
 
@@ -29,12 +64,41 @@ void vtkBivariateTextureRepresentation::SetTexture(vtkTexture* texture)
 }
 
 //----------------------------------------------------------------------------
+void vtkBivariateTextureRepresentation::SetArrayRange(double range[2], double min, double max)
+{
+  if (min > max)
+  {
+    std::swap(min, max);
+  }
+  range[0] = min;
+  range[1] = max;
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkBivariateTextureRepresentation::SetXArrayRange(double min, double max)
+{
+  this->SetArrayRange(this->XArrayRange, min, max);
+}
+
+//----------------------------------------------------------------------------
+void vtkBivariateTextureRepresentation::SetYArrayRange(double min, double max)
+{
+  this->SetArrayRange(this->YArrayRange, min, max);
+}
+
+//----------------------------------------------------------------------------
 int vtkBivariateTextureRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->Superclass::RequestData(request, inputVector, outputVector))
   {
     return false;
+  }
+
+  if (this->Mapper)
+  {
+    this->Mapper->SetScalarVisibility(false);
   }
 
   vtkDataObjectTree* inputDOT = vtkDataObjectTree::SafeDownCast(this->GetRenderedDataObject(0));
@@ -99,21 +163,16 @@ int vtkBivariateTextureRepresentation::RequestData(
 
     // Update arrays name & ranges
     auto* range1 = array1->GetRange();
-    this->FirstArrayRange[0] = range1[0];
-    this->FirstArrayRange[1] = range1[1];
-    this->FirstArrayName = arrayName1;
-
     auto* range2 = array2->GetRange();
-    this->SecondArrayRange[0] = range2[0];
-    this->SecondArrayRange[1] = range2[1];
-    this->SecondArrayName = arrayName2;
 
-    for (int i = 0; i < this->TCoordsArray->GetNumberOfTuples(); i++)
-    {
-      auto firstValue = (array1->GetTuple1(i) - range1[0]) / (range1[1] - range1[0]);
-      auto secondValue = (array2->GetTuple1(i) - range2[0]) / (range2[1] - range2[0]);
-      this->TCoordsArray->SetTuple2(i, firstValue, secondValue);
-    }
+    ::InitializeRangeIfUnset(this->XArrayRange, range1);
+    ::InitializeRangeIfUnset(this->YArrayRange, range2);
+
+    this->XArrayName = arrayName1;
+    this->YArrayName = arrayName2;
+
+    ::FillTCoordsFromArrays(
+      array1, this->XArrayRange, array2, this->YArrayRange, this->TCoordsArray);
 
     inputDS->GetAttributes(vtkDataObject::POINT)->SetTCoords(this->TCoordsArray);
   }
@@ -149,10 +208,10 @@ void vtkBivariateTextureRepresentation::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "TCoordsArray: (None)" << endl;
   }
 
-  os << indent << "FirstArrayRange: [" << this->FirstArrayRange[0] << ", "
-     << this->FirstArrayRange[1] << "]" << endl;
-  os << indent << "SecondArrayRange: [" << this->SecondArrayRange[0] << ", "
-     << this->SecondArrayRange[1] << "]" << endl;
-  os << indent << "FirstArrayName: " << this->FirstArrayName << endl;
-  os << indent << "SecondArrayName: " << this->SecondArrayName << endl;
+  os << indent << "XArrayRange: [" << this->XArrayRange[0] << ", " << this->XArrayRange[1] << "]"
+     << endl;
+  os << indent << "YArrayRange: [" << this->YArrayRange[0] << ", " << this->YArrayRange[1] << "]"
+     << endl;
+  os << indent << "XArrayName: " << this->XArrayName << endl;
+  os << indent << "YArrayName: " << this->YArrayName << endl;
 }

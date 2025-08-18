@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Create sphere source -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources"/>
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical"/>
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource"/>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments=""/>
+
+  <!-- Create 1st test array : X coordinates -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters"/>
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Alphabetical"/>
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Calculator"/>
+  <pqevent
+      object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ResultArrayName/ResultArrayName"
+      command="set_string" arguments="X"/>
+  <pqevent
+      object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OneLiner"
+      command="set_string" arguments="coordsX"/>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments=""/>
+
+  <!-- Create 2nd test array : Y coordinates -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources"/>
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Alphabetical"/>
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Calculator"/>
+  <pqevent
+      object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ResultArrayName/ResultArrayName"
+      command="set_string" arguments="Y"/>
+  <pqevent
+      object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OneLiner"
+      command="set_string" arguments="coordsY"/>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments=""/>
+
+  <!-- Test BivariateTextureRepresentation with X Y -->
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated"
+           arguments="Bivariate Texture Surface"/>
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="X"/>
+  <pqevent
+      object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SecondArray/ComboBox"
+      command="activated" arguments="Y"/>
+  <pqevent
+      object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/BivariateTexture/1pqTextureComboBox0"
+      command="activated" arguments="Schumann"/>
+  <pqcompareview
+      object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0"
+      baseline="$PARAVIEW_DATA_ROOT/Plugins/BivariateRepresentations/Testing/Data/Baseline/BivariateTexture_XY_Sphere.png"/>
+
+  <!--  Modify the first field's range-->
+  <pqevent
+      object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/XArrayRange/DoubleLineEdit1"
+      command="set_string" arguments="5"/>
+  <pqcompareview
+      object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0"
+      baseline="$PARAVIEW_DATA_ROOT/Plugins/BivariateRepresentations/Testing/Data/Baseline/BivariateTexture_XY_Sphere_RangeX.png"/>
+</pqevents>
