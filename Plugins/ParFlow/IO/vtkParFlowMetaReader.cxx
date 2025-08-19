@@ -741,7 +741,6 @@ int vtkParFlowMetaReader::FindPFBFiles(std::vector<std::string>& filesToLoad,
                 frac = (times[1] - times[0]) / delta;
                 currentTime = times[0] + delta * frac;
               }
-              size_t maxLen = filePattern.size() + 20;
               auto curFile = vtk::format(vtk::printf_to_std_format(filePattern), currentTime);
               filesToLoad.push_back(curFile);
             }
@@ -772,11 +771,9 @@ int vtkParFlowMetaReader::FindPFBFiles(std::vector<std::string>& filesToLoad,
               int frac = (currentTime - times[0]) / timesPerStack;
               int tbLo = times[0] + timesPerStack * frac;
               int tbHi = tbLo + timesPerStack - 1;
-              size_t maxLen = filePattern.size() + 40;
               slice = currentTime - tbLo;
               auto curFile = vtk::format(vtk::printf_to_std_format(filePattern), tbLo, tbHi);
               filesToLoad.push_back(curFile);
-              delete[] curFile;
             }
           }
           else
