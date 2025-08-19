@@ -1177,7 +1177,7 @@ int vtkParFlowMetaReader::LoadPFB(vtkDataSet* data, const int extent[6],
       // extent[3] << " " << extent[5] << " )\n";
       data->GetCellData()->AddArray(array);
       int comp = 0;
-      for (auto file : fileList)
+      for (auto const& file : fileList)
       {
         status &= this->LoadPFBComponent(dom, array, file, comp, extent);
         ++comp;

@@ -66,7 +66,7 @@ public:
 
 protected:
   vtkParFlowReader();
-  virtual ~vtkParFlowReader();
+  ~vtkParFlowReader() override;
 
   /// Update the reader's output.
   int RequestData(
