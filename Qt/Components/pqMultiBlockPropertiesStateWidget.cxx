@@ -131,31 +131,28 @@ public:
 
   QIcon stateIcon(BlockPropertyState state)
   {
-    static QIcon icons[BlockPropertyState::NumberOfStates] = {
-      [BlockPropertyState::Disabled] = //
-      QIcon{ ":/pqWidgets/Icons/pqStateDisabled.svg" },
-
-      [BlockPropertyState::RepresentationInherited] = //
-      QIcon{ ":/pqWidgets/Icons/pqStateRepresentationInherited.svg" },
-
-      [BlockPropertyState::BlockInherited] = //
-      QIcon{ ":/pqWidgets/Icons/pqStateBlockInherited.svg" },
-
-      [BlockPropertyState::MixedInherited] = //
-      QIcon{ ":/pqWidgets/Icons/pqStateMixedInherited.svg" },
-
-      [BlockPropertyState::Set] = //
-      QIcon{ ":/pqWidgets/Icons/pqStateSet.svg" },
-
-      [BlockPropertyState::SetAndRepresentationInherited] = //
-      QIcon{ ":/pqWidgets/Icons/pqStateSetAndRepresentationInherited.svg" },
-
-      [BlockPropertyState::SetAndBlockInherited] = //
-      QIcon{ ":/pqWidgets/Icons/pqStateSetAndBlockInherited.svg" },
-
-      [BlockPropertyState::SetAndMixedInherited] = //
-      QIcon{ ":/pqWidgets/Icons/pqStateSetAndMixedInherited.svg" },
-    };
+    static bool initialized = false;
+    static QIcon icons[BlockPropertyState::NumberOfStates];
+    if (!initialized)
+    {
+      initialized = true;
+      icons[BlockPropertyState::Disabled] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateDisabled.svg" };
+      icons[BlockPropertyState::RepresentationInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateRepresentationInherited.svg" };
+      icons[BlockPropertyState::BlockInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateBlockInherited.svg" };
+      icons[BlockPropertyState::MixedInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateMixedInherited.svg" };
+      icons[BlockPropertyState::Set] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateSet.svg" };
+      icons[BlockPropertyState::SetAndRepresentationInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateSetAndRepresentationInherited.svg" };
+      icons[BlockPropertyState::SetAndBlockInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateSetAndBlockInherited.svg" };
+      icons[BlockPropertyState::SetAndMixedInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateSetAndMixedInherited.svg" };
+    }
 
     return icons[state];
   }
