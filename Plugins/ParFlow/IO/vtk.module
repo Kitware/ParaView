@@ -1,5 +1,5 @@
 NAME
-  ParFlow::IO
+  ParFlow::ParFlowIO
 LIBRARY_NAME
   vtkParFlowIO
 SPDX_LICENSE_IDENTIFIER

@@ -11,7 +11,7 @@ paraview_add_plugin(
   REQUIRED_ON_SERVER
   REQUIRED_ON_CLIENT
   VERSION "1.0"
-  MODULES ParFlow::IO
+  MODULES ParFlow::ParFlowIO
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/IO/vtk.module"
   PYTHON_MODULES ${python_modules}
 )
