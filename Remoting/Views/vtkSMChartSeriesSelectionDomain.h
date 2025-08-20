@@ -33,7 +33,7 @@
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMStringListDomain.h"
 
-#include <set> // For std::set
+#include <map> // For std::map
 
 class vtkPVDataInformation;
 class vtkPVArrayInformation;
@@ -117,25 +117,26 @@ protected:
    * Add arrays from dataInfo to strings. If blockName is non-empty, then it's
    * used to "uniquify" the array names.
    */
-  virtual void PopulateAvailableArrays(const std::string& blockName,
-    std::vector<std::string>& strings, vtkPVDataInformation* dataInfo, int fieldAssociation,
-    bool flattenTable);
+  virtual std::map<std::string, bool> CollectAvailableArrays(const std::string& blockName,
+    vtkPVDataInformation* dataInfo, int fieldAssociation, bool flattenTable,
+    bool skipPartialArrays = false);
 
   /**
    * Build up the domain with provided array.
    * Add array component from dataArray to strings. If blockName is non-empty, then it's
    * used to "uniquify" the array names.
    */
-  virtual void PopulateArrayComponents(vtkChartRepresentation* chartRepr,
-    const std::string& blockName, std::vector<std::string>& strings,
-    std::set<std::string>& unique_strings, vtkPVArrayInformation* dataInfo, bool flattenTable);
+  virtual void CollectArrayComponents(vtkChartRepresentation* chartRepr,
+    const std::string& blockName, std::map<std::string, bool>& stringOverrides,
+    vtkPVArrayInformation* dataInfo, bool flattenTable, bool skipPartialArrays = false);
 
   /**
    * Call this method in PopulateAvailableArrays() to override a specific array's
    * default visibility. Used for hiding array components, by default, for
    * example.
    */
-  virtual void SetDefaultVisibilityOverride(const std::string& arrayname, bool visibility);
+  virtual void SetDefaultVisibilityOverrides(
+    const std::map<std::string, bool>& arrayNames, bool visibility);
 
   int DefaultMode;
 
@@ -156,8 +157,6 @@ protected:
    */
   bool HidePartialArrays;
 
-  static bool LoadNoVariables;
-
 private:
   vtkSMChartSeriesSelectionDomain(const vtkSMChartSeriesSelectionDomain&) = delete;
   void operator=(const vtkSMChartSeriesSelectionDomain&) = delete;
@@ -168,7 +167,8 @@ private:
   // The EXPERIMENTAL feature: everytime domain is modified we update the
   // property's value.
   void OnDomainModified();
-  void UpdateDefaultValues(vtkSMProperty*, bool preserve_previous_values);
+  void UpdateDefaultValues(
+    vtkSMProperty*, bool preserve_previous_values, bool use_unchecked_values);
 };
 
 #endif

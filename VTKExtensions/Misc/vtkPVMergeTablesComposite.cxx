@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVMergeTablesComposite.h"
 
-#include "vtkCompositeDataIterator.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPartitionedDataSetCollection.h"
@@ -56,10 +57,8 @@ int vtkPVMergeTablesComposite::RequestDataObject(vtkInformation* vtkNotUsed(requ
 int vtkPVMergeTablesComposite::RequestData(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkDataObjectTree* input0 = vtkDataObjectTree::GetData(inputVector[0], 0);
   vtkDataObjectTree* output = vtkDataObjectTree::GetData(outputVector, 0);
   assert(output);
-  output->CopyStructure(input0);
 
   // let's start by collecting all non-trivial inputs to merge.
   std::vector<vtkDataObjectTree*> nonempty_inputs;
@@ -83,19 +82,35 @@ int vtkPVMergeTablesComposite::RequestData(
   {
     return 1;
   }
+  if (this->MergeStrategy == vtkPVMergeTablesComposite::ALL)
+  {
+    this->MergeAllTables(nonempty_inputs, output);
+  }
+  else // MergeStrategy == vtkPVMergeTablesComposite::LEAVES
+  {
+    this->MergeLeavesTables(nonempty_inputs, output);
+  }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMergeTablesComposite::MergeLeavesTables(
+  const std::vector<vtkDataObjectTree*>& inputs, vtkDataObjectTree* output)
+{
+  output->CopyStructure(inputs[0]);
 
   auto nameKey = vtkCompositeDataSet::NAME();
-
   if (output->IsA("vtkMultiBlockDataSet"))
   {
-    vtkSmartPointer<vtkCompositeDataIterator> iter = vtk::TakeSmartPointer(output->NewIterator());
+    auto iter = vtk::TakeSmartPointer(output->NewTreeIterator());
     iter->SkipEmptyNodesOff();
+    iter->VisitOnlyLeavesOn();
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       std::vector<vtkTable*> leaves;
       const char* bname =
         iter->HasCurrentMetaData() ? iter->GetCurrentMetaData()->Get(nameKey) : nullptr;
-      for (auto dObjTree : nonempty_inputs)
+      for (auto dObjTree : inputs)
       {
         if (auto* table = vtkTable::SafeDownCast(dObjTree->GetDataSet(iter)))
         {
@@ -128,7 +143,7 @@ int vtkPVMergeTablesComposite::RequestData(
       const char* bname =
         outputPDC->HasChildMetaData(i) ? outputPDC->GetChildMetaData(i)->Get(nameKey) : nullptr;
       std::vector<vtkTable*> leaves;
-      for (auto dObjTree : nonempty_inputs)
+      for (auto dObjTree : inputs)
       {
         auto inputPDCI = vtkPartitionedDataSetCollection::SafeDownCast(dObjTree);
         if (bname == nullptr && inputPDCI->HasChildMetaData(i))
@@ -158,7 +173,36 @@ int vtkPVMergeTablesComposite::RequestData(
       }
     }
   }
-  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMergeTablesComposite::MergeAllTables(
+  const std::vector<vtkDataObjectTree*>& inputs, vtkDataObjectTree* output)
+{
+  std::vector<vtkTable*> tables;
+  for (const auto& input : inputs)
+  {
+    auto iter = vtk::TakeSmartPointer(input->NewTreeIterator());
+    iter->SkipEmptyNodesOff();
+    iter->VisitOnlyLeavesOn();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      vtkTable* table = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
+      if (table && table->GetNumberOfRows() > 0 && table->GetNumberOfColumns() > 0)
+      {
+        tables.push_back(table);
+      }
+    }
+  }
+  auto mergedTable = vtkPVMergeTables::MergeTables(tables);
+  if (auto mb = vtkMultiBlockDataSet::SafeDownCast(output))
+  {
+    mb->SetBlock(0, mergedTable);
+  }
+  else if (auto pdc = vtkPartitionedDataSetCollection::SafeDownCast(output))
+  {
+    pdc->SetPartition(0, 0, mergedTable);
+  }
 }
 
 //----------------------------------------------------------------------------

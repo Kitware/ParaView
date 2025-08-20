@@ -1217,18 +1217,25 @@ void pqDataAssemblyPropertyWidget::updateDataAssembly(vtkObject* sender)
   internals.ProxyModel->initializeStateWidgets(assembly);
 
   auto domain = vtkSMDomain::SafeDownCast(sender);
-  if (internals.UseInputNameAsHeader && domain)
+  if (domain)
   {
-    vtkSMPropertyHelper inputHelper(domain->GetRequiredProperty("Input"));
-    auto proxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy(0));
-    auto port = inputHelper.GetOutputPort(0);
-    if (proxy && proxy)
+    if (auto da = vtkSMDataAssemblyDomain::SafeDownCast(domain))
     {
-      auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
-      auto pqport = smmodel->findItem<pqOutputPort*>(proxy->GetOutputPort(port));
-      if (pqport)
+      internals.LeafNodesOnly = da->GetMode() == vtkSMDataAssemblyDomain::LEAVES;
+    }
+    if (internals.UseInputNameAsHeader)
+    {
+      vtkSMPropertyHelper inputHelper(domain->GetRequiredProperty("Input"));
+      auto proxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy(0));
+      auto port = inputHelper.GetOutputPort(0);
+      if (proxy)
       {
-        internals.ProxyModel->setHeaderText(pqport->prettyName());
+        auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
+        auto pqport = smmodel->findItem<pqOutputPort*>(proxy->GetOutputPort(port));
+        if (pqport)
+        {
+          internals.ProxyModel->setHeaderText(pqport->prettyName());
+        }
       }
     }
   }

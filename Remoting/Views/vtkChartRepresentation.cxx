@@ -231,6 +231,7 @@ vtkSmartPointer<vtkDataObject> vtkChartRepresentation::ReduceDataToRoot(vtkDataO
 
   vtkNew<vtkReductionFilter> reductionFilter;
   vtkNew<vtkPVMergeTablesComposite> algo;
+  algo->SetMergeStrategy(this->ArraySelectionMode);
   reductionFilter->SetPostGatherHelper(algo.GetPointer());
   reductionFilter->SetInputConnection(preprocessor->GetOutputPort());
   reductionFilter->Update();
@@ -317,6 +318,19 @@ void vtkChartRepresentation::ResetCompositeDataSetIndices()
   if (!this->CompositeIndices.empty())
   {
     this->CompositeIndices.clear();
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkChartRepresentation::SetArraySelectionMode(int mode)
+{
+  if (this->ArraySelectionMode !=
+    (mode < MERGED_BLOCKS ? MERGED_BLOCKS : (mode > INDIVIDUAL_BLOCKS ? INDIVIDUAL_BLOCKS : mode)))
+  {
+    this->ArraySelectionMode =
+      (mode < MERGED_BLOCKS ? MERGED_BLOCKS
+                            : (mode > INDIVIDUAL_BLOCKS ? INDIVIDUAL_BLOCKS : mode));
     this->MarkModified();
   }
 }

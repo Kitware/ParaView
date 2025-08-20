@@ -2400,11 +2400,16 @@ struct Process_6_0_to_6_1
       "BagPlotMatrixRepresentation", "XYBagChartRepresentation",
       "XYFunctionalBagChartRepresentation" };
 
+    UniqueIdGenerator generator(document);
     for (const auto& chartName : chartProxyNames)
     {
       const std::string nodePath = "//ServerManagerState/Proxy[@group='representations' and "
                                    "@type='" +
         chartName + "']/Property[@name='CompositeDataSetIndex']";
+      const bool skipArraySelectionMode =
+        chartName == "BagPlotMatrixRepresentation" || chartName == "XYBagChartRepresentation";
+      const std::string arraySelectionModeValue =
+        chartName == "XYFunctionalBagChartRepresentation" ? "1" : "0";
       auto xpath_set = document.select_nodes(nodePath.c_str());
       for (auto xpath_node : xpath_set)
       {
@@ -2412,6 +2417,32 @@ struct Process_6_0_to_6_1
         auto node = xpath_node.node();
         node.attribute("name").set_value("BlockSelectors");
         ConvertCompositeIdsToSelectors(node);
+        if (skipArraySelectionMode)
+        {
+          continue;
+        }
+        // add a ArraySelectionMode property to the representation and set its default value to 1
+        auto arraySelectionModeId = vtk::to_string(generator.GetNextUniqueId());
+        auto parent = node.parent();
+        auto arraySelectionModeNode = parent.append_child("Property");
+        arraySelectionModeNode.append_attribute("name").set_value("ArraySelectionMode");
+        arraySelectionModeNode.append_attribute("id").set_value(
+          (arraySelectionModeId + ".ArraySelectionMode").c_str());
+        arraySelectionModeNode.append_attribute("number_of_elements").set_value(1);
+        auto elementNode = arraySelectionModeNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(arraySelectionModeValue.c_str());
+        // create the domain of the property
+        auto domainNode = arraySelectionModeNode.append_child("Domain");
+        domainNode.append_attribute("name").set_value("enum");
+        domainNode.append_attribute("id").set_value(
+          (arraySelectionModeId + ".ArraySelectionMode.enum").c_str());
+        auto allNode = domainNode.append_child("Entry");
+        allNode.append_attribute("value").set_value("0");
+        allNode.append_attribute("text").set_value("Merged Blocks");
+        auto leavesNode = domainNode.append_child("Entry");
+        leavesNode.append_attribute("value").set_value("1");
+        leavesNode.append_attribute("text").set_value("Individual Blocks");
       }
     }
 

@@ -68,41 +68,6 @@ int vtkSMDataAssemblyDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElem
       return 0;
     }
   }
-  const char* mode_string = element->GetAttribute("mode");
-  if (mode_string)
-  {
-    if (strcmp(mode_string, "all") == 0)
-    {
-      this->Mode = ALL;
-    }
-    else if (strcmp(mode_string, "leaves") == 0)
-    {
-      this->Mode = LEAVES;
-    }
-    else
-    {
-      vtkErrorMacro("Unrecognized mode: " << mode_string);
-      return 0;
-    }
-  }
-  const char* default_mode_string = element->GetAttribute("default_mode");
-  if (default_mode_string)
-  {
-    this->DefaultMode = DEFAULT; // default is DEFAULT.
-    if (strcmp(default_mode_string, "nonempty-leaf") == 0)
-    {
-      this->DefaultMode = NONEMPTY_LEAF;
-    }
-    else if (strcmp(default_mode_string, "default") == 0)
-    {
-      this->DefaultMode = DEFAULT;
-    }
-    else
-    {
-      vtkErrorMacro("Unrecognized default_mode: " << default_mode_string);
-      return 0;
-    }
-  }
 
   return 1;
 }
@@ -141,6 +106,21 @@ void vtkSMDataAssemblyDomain::Update(vtkSMProperty*)
         {
           this->ChooseAssembly(name, dinfo->GetDataAssembly());
         }
+      }
+    }
+    auto modeProperty = this->GetRequiredProperty("Mode");
+    if (modeProperty)
+    {
+      int mode = vtkSMPropertyHelper(modeProperty).GetAsInt();
+      if (mode != ALL && mode != LEAVES)
+      {
+        vtkErrorMacro("Unrecognized mode: " << mode);
+        return;
+      }
+      if (mode != this->Mode)
+      {
+        this->Mode = mode;
+        this->DomainModified();
       }
     }
   }
@@ -196,31 +176,8 @@ int vtkSMDataAssemblyDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unch
   helper.SetUseUnchecked(use_unchecked_values);
   if (this->Assembly)
   {
-#if VTK_MODULE_ENABLE_VTK_IOIOSS
-    if (this->EntityType >= 0)
-    {
-      std::string path;
-      if (this->EntityType < vtkIOSSReader::EntityType::NUMBER_OF_ENTITY_TYPES)
-      {
-        path = std::string("/IOSS/") +
-          vtkIOSSReader::GetDataAssemblyNodeNameForEntityType(this->EntityType);
-        const int idx = this->Assembly->GetFirstNodeByPath(path.c_str());
-        if (idx != -1)
-        {
-          helper.Set(0, path.c_str());
-          return 1;
-        }
-        // if it's element block, and we couldn't find it, then all blocks will be element blocks.
-        else if (this->EntityType == vtkIOSSReader::EntityType::ELEMENTBLOCK)
-        {
-          helper.Set(0, "/");
-          return 1;
-        }
-      }
-    }
-    else
-#endif
-      if (this->Mode == LEAVES || this->DefaultMode == NONEMPTY_LEAF)
+    auto modeProperty = this->GetRequiredProperty("Mode");
+    if (modeProperty && this->Mode == LEAVES)
     {
       auto dInfo = this->GetInputDataInformation("Input");
       auto activeAssembly = this->GetRequiredProperty("ActiveAssembly");
@@ -246,6 +203,29 @@ int vtkSMDataAssemblyDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unch
         }
       }
     }
+#if VTK_MODULE_ENABLE_VTK_IOIOSS
+    else if (this->EntityType >= 0)
+    {
+      std::string path;
+      if (this->EntityType < vtkIOSSReader::EntityType::NUMBER_OF_ENTITY_TYPES)
+      {
+        path = std::string("/IOSS/") +
+          vtkIOSSReader::GetDataAssemblyNodeNameForEntityType(this->EntityType);
+        const int idx = this->Assembly->GetFirstNodeByPath(path.c_str());
+        if (idx != -1)
+        {
+          helper.Set(0, path.c_str());
+          return 1;
+        }
+        // if it's element block, and we couldn't find it, then all blocks will be element blocks.
+        else if (this->EntityType == vtkIOSSReader::EntityType::ELEMENTBLOCK)
+        {
+          helper.Set(0, "/");
+          return 1;
+        }
+      }
+    }
+#endif
   }
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }

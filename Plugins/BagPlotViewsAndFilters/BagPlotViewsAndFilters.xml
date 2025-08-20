@@ -596,6 +596,24 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetArraySelectionMode"
+                         default_values="1"
+                         name="ArraySelectionMode"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <EnumerationDomain name="enum">
+          <Entry text="Merged Blocks"
+                 value="0"/>
+          <Entry text="Individual Blocks"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          In "Merged Blocks" mode, arrays present in all selected blocks are listed as plottable series and the
+          aggregated array values from the selected arrays are plotted. In "Individual Blocks" mode, arrays in each
+          selected block are listed separately as plottable series and array values from selected arrays are plotted as
+          separate series. The selected blocks can be changed within the MultiBlock Inspector.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty name="Assembly"
                             command="SetActiveAssembly"
                             number_of_elements="1"
@@ -617,10 +635,11 @@
                             panel_visibility="multiblock_inspector"
                             number_of_elements="1"
                             default_values="/">
-        <DataAssemblyDomain name="data_assembly" mode="leaves">
+        <DataAssemblyDomain name="data_assembly">
           <RequiredProperties>
             <Property function="Input" name="Input"/>
             <Property function="ActiveAssembly" name="Assembly"/>
+            <Property function="Mode" name="ArraySelectionMode"/>
           </RequiredProperties>
         </DataAssemblyDomain>
         <Documentation>
