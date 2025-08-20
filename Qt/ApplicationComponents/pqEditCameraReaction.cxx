@@ -54,7 +54,6 @@ void pqEditCameraReaction::editCamera(pqView* view)
     dialog->setWindowTitle(tr("Adjust Camera"));
     QObject::connect(dialog, &QWidget::close, dialog, &QObject::deleteLater);
     dialog->setRenderModule(renModule);
-    dialog->show();
   }
   else
   {
@@ -63,6 +62,7 @@ void pqEditCameraReaction::editCamera(pqView* view)
     dialog->raise();
     dialog->activateWindow();
   }
+  dialog->show();
 }
 
 //-----------------------------------------------------------------------------
