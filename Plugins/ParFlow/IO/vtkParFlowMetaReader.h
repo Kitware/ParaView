@@ -123,7 +123,7 @@ public:
 
 protected:
   vtkParFlowMetaReader();
-  virtual ~vtkParFlowMetaReader();
+  ~vtkParFlowMetaReader() override;
 
   /// Set/get the directory holding the .pfmetadata file (for use in relative paths).
   vtkGetStringMacro(Directory);

@@ -7,7 +7,7 @@ set(private_headers
   vtkVectorJSON.h
 )
 
-vtk_module_add_module(ParFlow::IO
+vtk_module_add_module(ParFlow::ParFlowIO
   CLASSES ${classes}
   PRIVATE_HEADERS ${private_headers}
 )
