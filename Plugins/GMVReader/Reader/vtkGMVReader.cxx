@@ -2523,6 +2523,7 @@ int vtkGMVReader::CanReadFile(const char* name)
     }
   }
 
+  fclose(gmvin);
   rc = 1;
   return rc;
 }

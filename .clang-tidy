@@ -6,6 +6,8 @@ bugprone-*,\
 -bugprone-argument-comment,\
 -bugprone-assignment-in-if-condition,\
 -bugprone-branch-clone,\
+-bugprone-casting-through-void,\
+-bugprone-crtp-constructor-accessibility,\
 -bugprone-easily-swappable-parameters,\
 -bugprone-empty-catch,\
 -bugprone-implicit-widening-of-multiplication-result,\
@@ -17,6 +19,7 @@ bugprone-*,\
 -bugprone-narrowing-conversions,\
 -bugprone-not-null-terminated-result,\
 -bugprone-parent-virtual-call,\
+-bugprone-pointer-arithmetic-on-polymorphic-object,\
 -bugprone-reserved-identifier,\
 -bugprone-signed-char-misuse,\
 -bugprone-sizeof-expression,\
@@ -24,9 +27,11 @@ bugprone-*,\
 -bugprone-suspicious-include,\
 -bugprone-swapped-arguments,\
 -bugprone-switch-missing-default-case,\
+-bugprone-tagged-union-member-count,\
 -bugprone-throw-keyword-missing,\
 -bugprone-unhandled-self-assignment,\
 clang-analyzer-*,\
+-clang-analyzer-core.BitwiseShift,\
 -clang-analyzer-core.CallAndMessage,\
 -clang-analyzer-core.DivideZero,\
 -clang-analyzer-core.NonNullParamChecker,\
@@ -42,6 +47,8 @@ clang-analyzer-*,\
 -clang-analyzer-optin.core.EnumCastOutOfRange,\
 -clang-analyzer-optin.cplusplus.UninitializedObject,\
 -clang-analyzer-optin.cplusplus.VirtualCall,\
+-clang-analyzer-optin.performance.Padding,\
+-clang-analyzer-optin.portability.UnixAPI,\
 -clang-analyzer-security.FloatLoopCounter,\
 -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,\
 -clang-analyzer-security.insecureAPI.strcpy,\
@@ -56,6 +63,7 @@ misc-*,\
 -misc-redundant-expression,\
 -misc-unconventional-assign-operator,\
 -misc-use-anonymous-namespace,\
+-misc-use-internal-linkage,\
 modernize-*,\
 -modernize-avoid-c-arrays,\
 -modernize-loop-convert,\
@@ -82,12 +90,15 @@ performance-*,\
 -performance-type-promotion-in-math-fn,\
 -performance-unnecessary-value-param,\
 portability-*,\
+-portability-template-virtual-member-function,\
 readability-*,\
 -readability-avoid-nested-conditional-operator,\
 -readability-avoid-unconditional-preprocessor-if,\
 -readability-braces-around-statements,\
+-readability-container-contains,\
 -readability-convert-member-functions-to-static,\
 -readability-else-after-return,\
+-readability-enum-initial-value,\
 -readability-function-cognitive-complexity,\
 -readability-function-size,\
 -readability-identifier-length,\

@@ -240,10 +240,7 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(const double view_plan
     //    if (item.Distance + item.Refinement <= 0 || item.Refinement < 1)
     double diagonal = item.Bounds.GetDiagonalLength();
     // avoid division by 0
-    if (diagonal < 1e-10)
-    {
-      diagonal = 1e-10;
-    }
+    diagonal = std::max(diagonal, 1e-10);
     double factor = item.Refinement == 0 ? 0 : this->DetailLevelToLoad / item.Refinement;
     bool detailMethodNeedsBlock =
       (item.Refinement <= 0 || (item.Distance / diagonal < factor && item.ScreenCoverage > 0));

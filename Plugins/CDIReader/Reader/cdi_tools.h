@@ -6,6 +6,9 @@
 #ifndef CDI_TOOLS
 #define CDI_TOOLS
 
+// Needed because of an issue in libcdi:
+// https://gitlab.dkrz.de/mpim-sw/libcdi/-/issues/21
+#define CDI_SIZE_TYPE size_t
 #include "cdi.h"
 #include <string>
 

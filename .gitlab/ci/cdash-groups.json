@@ -2,12 +2,12 @@
     "latest-master": [
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[el7_shared_mindeps_mpi_python]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[el8_shared_icc_mpi_python]" },
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora35_documentation_mpi_python]" },
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora35_doxygen]" },
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora35_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride]" },
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora35_shared_mpi_python_qt]" },
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora35_shared_mpi_python_qt_tidy]" },
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora35_shared_mpi_python_qt_viskoresoverride]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_documentation_mpi_python]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_doxygen]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_python_qt]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_python_qt_tidy]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_python_qt_viskoresoverride]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[macos_arm64_python_qt]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[macos_x86_64_python_qt]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[windows_vs2022_kits_mpi_python_qt]" },
@@ -15,7 +15,7 @@
         { "group": "master-packages", "site": "ANY", "buildname": "paraview-branch-master-[paraview-spack-paraview+osmesa^mesa~glx^mpich]" }
     ],
     "latest-master-editions": [
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora35_shared_mpi_core]" },
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora35_shared_mpi_python_core]" }
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_core]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_python_core]" }
     ]
 }

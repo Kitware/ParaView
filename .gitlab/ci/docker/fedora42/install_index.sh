@@ -14,7 +14,8 @@ cd "$index_root"
 echo "$sha256sum  $tarball" > index.sha256sum
 curl -OL "https://www.paraview.org/files/dependencies/$tarball"
 sha256sum --check index.sha256sum
-tar -C "/usr/local" --strip-components=1 -xf "$tarball"
+tar -C "/usr/local" --strip-components=1 -xf "$tarball" \
+    --exclude="._*" --no-same-owner
 
 cd
 

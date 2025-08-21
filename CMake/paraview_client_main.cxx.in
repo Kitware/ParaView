@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     &platform_args_data[1].front(),
   };
   std::vector<char*> new_argc(argc + 2 + 1);
-  std::memcpy(new_argc.data(), argv, argc * sizeof(char*));
+  std::copy_n(argv, argc, new_argc.data());
   new_argc[argc] = platform_args[0];
   new_argc[argc + 1] = platform_args[1];
   new_argc[argc + 2] = nullptr;

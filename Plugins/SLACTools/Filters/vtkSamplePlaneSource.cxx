@@ -16,6 +16,7 @@
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
+#include <algorithm>
 #include <cmath>
 
 //=============================================================================
@@ -109,18 +110,12 @@ void vtkSamplePlaneSource::ComputeLocalBounds(vtkDataObject* input, double bound
     {
       double subbounds[6];
       this->ComputeLocalBounds(iter->GetCurrentDataObject(), subbounds);
-      if (bounds[0] > subbounds[0])
-        bounds[0] = subbounds[0];
-      if (bounds[1] < subbounds[1])
-        bounds[1] = subbounds[1];
-      if (bounds[2] > subbounds[2])
-        bounds[2] = subbounds[2];
-      if (bounds[3] < subbounds[3])
-        bounds[3] = subbounds[3];
-      if (bounds[4] > subbounds[4])
-        bounds[4] = subbounds[4];
-      if (bounds[5] < subbounds[5])
-        bounds[5] = subbounds[5];
+      bounds[0] = std::min(bounds[0], subbounds[0]);
+      bounds[1] = std::max(bounds[1], subbounds[1]);
+      bounds[2] = std::min(bounds[2], subbounds[2]);
+      bounds[3] = std::max(bounds[3], subbounds[3]);
+      bounds[4] = std::min(bounds[4], subbounds[4]);
+      bounds[5] = std::max(bounds[5], subbounds[5]);
     }
     return;
   }
@@ -146,8 +141,7 @@ void vtkSamplePlaneSource::CreatePlane(const double bounds[6], vtkPolyData* outp
   for (int i = 0; i < 3; i++)
   {
     dims[i] = bounds[2 * i + 1] - bounds[2 * i];
-    if (dims[i] < 0)
-      dims[i] = 0;
+    dims[i] = std::max<double>(dims[i], 0);
   }
 
   double diagonal = sqrt(dims[0] * dims[0] + dims[1] * dims[1] + dims[2] * dims[2]);

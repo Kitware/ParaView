@@ -89,14 +89,8 @@ inline double vtkComputeScreenCoverage(const double planes[24], const double bou
 
   // If the object is off the edge of the screen, treat it as if it is just
   // inside the edge (which we know it is since it wasn't culled)
-  if (measure_w < 0.01)
-  {
-    measure_w = 0.01;
-  }
-  if (measure_h < 0.01)
-  {
-    measure_h = 0.01;
-  }
+  measure_w = std::max(measure_w, 0.01);
+  measure_h = std::max(measure_h, 0.01);
   centeredness = measure_w * measure_h;
 
   double w = 2 * radius;

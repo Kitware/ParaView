@@ -1,4 +1,4 @@
-FROM fedora:35
+FROM fedora:42
 MAINTAINER Vicente Adolfo Bolea Sanchez <vicente.bolea@kitware.com>
 
 COPY install_deps.sh /root/install_deps.sh
@@ -22,8 +22,5 @@ RUN sh /root/install_cdi.sh
 COPY install_catalyst.sh /root/install_catalyst.sh
 RUN sh /root/install_catalyst.sh
 
-COPY install_pythonqt.sh /root/install_pythonqt.sh
-RUN sh /root/install_pythonqt.sh
-
-COPY install_openturns.sh /root/install_openturns.sh
-RUN sh /root/install_openturns.sh
+# COPY install_pythonqt.sh /root/install_pythonqt.sh
+# RUN sh /root/install_pythonqt.sh
