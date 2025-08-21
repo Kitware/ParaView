@@ -122,12 +122,14 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         skipRenderingComponents = options.SkipRenderingComponents
         skipActiveComponents = options.SkipActiveComponents
         skipLayoutComponents = options.SkipLayoutComponents
+        skipAnimationComponents = options.SkipAnimationComponents
     else:
         propertiesToTraceOnCreate = RECORD_MODIFIED_PROPERTIES
         skipHiddenRepresentations = True
         skipRenderingComponents = False
         skipActiveComponents = False
         skipLayoutComponents = False
+        skipAnimationComponents = False
 
     # essential to ensure any obsolete accessors don't linger - can cause havoc
     # when saving state following a Python trace session
@@ -386,7 +388,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         # There should be only one but keep the code generic
         anims = set([x for x in proxies_of_interest \
                      if smtrace.Trace.get_registered_name(x, "animation")])
-        if not skipRenderingComponents and anims:
+        if not skipRenderingComponents and anims and not skipAnimationComponents:
             trace.append_separated([ \
                 "# ----------------------------------------------------------------",
                 "# setup animation scene, tracks and keyframes",
