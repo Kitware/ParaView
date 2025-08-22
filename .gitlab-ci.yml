@@ -22,7 +22,9 @@ stages:
 #   - a build script
 #   - tags for the jobs
 #     - already provided for upload and CI update jobs
-#   - rules for when to run the job
+#   - the `.rules` block
+#     - see `.gitlab/rules.yml` for variables jobs may set to control when the
+#       job is executed
 #
 # Additionally, jobs may also contain:
 #
@@ -39,7 +41,10 @@ stages:
 #         - .centos7
 #         - .spack_build_linux
 #         - .linux_builder_tags
-#         - .run_scheduled
+#         - .rules
+#     variables:
+#         PV_CI_MERGED_ONLY: "true"
+#         PV_CI_NIGHTLY_ONLY: "true"
 
 ## Linux
 
@@ -49,7 +54,9 @@ el7-mindeps-shared-mpi-python:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 # Disable testing for now. Even with a modern Mesa and the llvmpipe backend,
 # modern enough OpenGL is just not working in CI. Rather than disabling just
@@ -60,7 +67,7 @@ el7-mindeps-shared-mpi-python:build:
 #         - .cmake_test_linux
 #         - .linux_tester_tags
 #         - .cmake_test_artifacts
-#         - .run_automatically
+#         - .rules
 #     needs:
 #         - el7-mindeps-shared-mpi-python:build
 
@@ -70,7 +77,9 @@ el8-shared-icc-mpi-python:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 el8-shared-icc-mpi-python:test:
     extends:
@@ -78,7 +87,7 @@ el8-shared-icc-mpi-python:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - el8-shared-icc-mpi-python:build
 
@@ -88,7 +97,9 @@ fedora42-shared-debug-mpi-python-qt:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
     timeout: 90 minutes
 
 fedora42-shared-debug-mpi-python-qt:test:
@@ -97,7 +108,7 @@ fedora42-shared-debug-mpi-python-qt:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-debug-mpi-python-qt:build
     timeout: 240 minutes
@@ -108,7 +119,9 @@ fedora42-shared-mpi-python-qt-viskoresoverride:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 fedora42-shared-mpi-python-qt-viskoresoverride:test:
     extends:
@@ -116,7 +129,7 @@ fedora42-shared-mpi-python-qt-viskoresoverride:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-mpi-python-qt-viskoresoverride:build
     timeout: 180 minutes
@@ -127,7 +140,7 @@ fedora42-shared-mpi-offscreen-osmesa-python-qt-viskoresoverride:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-mpi-python-qt-viskoresoverride:build
     timeout: 180 minutes
@@ -140,7 +153,9 @@ translations:test:
         - .cmake_translations_linux
         - .linux_tester_tags
         - .cmake_translations_artifacts
-        - .merged_only
+        - .rules
+    variables:
+        PV_CI_MERGED_ONLY: "true"
     needs:
         - fedora42-shared-debug-mpi-python-qt:build
     timeout: 15 minutes
@@ -153,7 +168,9 @@ fedora42-shared-mpi-core:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 fedora42-shared-mpi-core:test:
     extends:
@@ -161,7 +178,7 @@ fedora42-shared-mpi-core:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-mpi-core:build
 
@@ -171,7 +188,9 @@ fedora42-shared-mpi-python-core:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 fedora42-shared-mpi-python-core:test:
     extends:
@@ -179,7 +198,7 @@ fedora42-shared-mpi-python-core:test:
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - fedora42-shared-mpi-python-core:build
 
@@ -191,7 +210,9 @@ fedora42-tidy:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_tidy_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
     # clang-tidy is *really* slow because it isn't cached.
     timeout: 4 hours
 
@@ -203,7 +224,9 @@ macos-arm64-python-qt:build:
         - .cmake_build_macos
         - .macos_arm64_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 macos-arm64-python-qt:test:
     extends:
@@ -211,7 +234,7 @@ macos-arm64-python-qt:test:
         - .cmake_test_macos
         - .macos_arm64_builder_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - macos-arm64-python-qt:build
     timeout: 180 minutes
@@ -222,7 +245,9 @@ macos-x86_64-python-qt:build:
         - .cmake_build_macos
         - .macos_x86_64_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 macos-x86_64-python-qt:test:
     extends:
@@ -230,7 +255,7 @@ macos-x86_64-python-qt:test:
         - .cmake_test_macos
         - .macos_x86_64_builder_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - macos-x86_64-python-qt:build
 
@@ -242,7 +267,9 @@ windows-vs2022-kits-mpi-python-qt:build:
         - .cmake_build_windows
         - .windows_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
     timeout: 90 minutes
 
 windows-vs2022-kits-mpi-python-qt:test:
@@ -251,7 +278,7 @@ windows-vs2022-kits-mpi-python-qt:test:
         - .cmake_test_windows
         - .windows_test_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - windows-vs2022-kits-mpi-python-qt:build
     timeout: 90 minutes
@@ -262,7 +289,9 @@ windows-vs2022-qt:build:
         - .cmake_build_windows
         - .windows_builder_tags
         - .cmake_build_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
     timeout: 90 minutes
 
 windows-vs2022-qt:test:
@@ -271,7 +300,7 @@ windows-vs2022-qt:test:
         - .cmake_test_windows
         - .windows_test_tags
         - .cmake_test_artifacts
-        - .run_automatically
+        - .rules
     needs:
         - windows-vs2022-qt:build
     timeout: 90 minutes
@@ -286,7 +315,10 @@ documentation:build:
         - .doxygen_build_linux
         - .linux_builder_tags
         - .doxygen_log_artifacts
-        - .doxygen_only
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
+        PV_CI_NIGHTLY_ONLY: "true"
 
 fedora42-doxygen:build:
     extends:
@@ -294,7 +326,9 @@ fedora42-doxygen:build:
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_doxygen_artifacts
-        - .run_manually
+        - .rules
+    variables:
+        PV_CI_RUN_MANUALLY: "true"
 
 # Triggers
 
@@ -302,10 +336,13 @@ fedora42-doxygen:build:
 
 superbuild:build:
     extends:
-        - .run_superbuild_trigger
+        - .rules
     stage: build
     variables:
+        PV_CI_MERGED_ONLY: "true"
         PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
+        ENABLE_PACKAGE_UPLOAD: "true"
+        # FIXME: remove when pvsb uses the `ENABLE_PACKAGE_UPLOAD` variable.
         RSYNC_UPLOAD_ENABLE: "true"
     trigger:
         project: paraview/paraview-superbuild
