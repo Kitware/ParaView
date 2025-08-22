@@ -20,6 +20,7 @@ def _get_catalyst_state(options):
     soptions.SkipRenderingComponents = False
     soptions.SkipActiveComponents = True
     soptions.SkipLayoutComponents = True
+    soptions.SkipAnimationComponents = True
     soptions.ExtractsOutputDirectory = options.ExtractsOutputDirectory
     return smstate.get_state(options=soptions, source_set=extractors,
                              preamble=_get_catalyst_preamble(options),
