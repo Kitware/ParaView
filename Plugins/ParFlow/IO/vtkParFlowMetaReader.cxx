@@ -1076,14 +1076,8 @@ int vtkParFlowMetaReader::LoadPFBComponent(Domain dom, vtkDoubleArray* variable,
     {
       if (extent[2 * ii] <= divisions[dd + 1] && extent[2 * ii + 1] >= divisions[dd])
       {
-        if (lo[ii] > dd)
-        {
-          lo[ii] = dd;
-        }
-        if (hi[ii] < dd)
-        {
-          hi[ii] = dd;
-        }
+        lo[ii] = std::min(lo[ii], dd);
+        hi[ii] = std::max(hi[ii], dd);
       }
     }
   }
