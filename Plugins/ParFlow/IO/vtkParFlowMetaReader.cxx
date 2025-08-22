@@ -251,7 +251,7 @@ bool vtkParFlowMetaReader::BroadcastMetadata(std::vector<uint8_t>& metadata)
     {
       metadata.resize(msz);
     }
-    status &= mpc->Broadcast(&metadata[0], metadata.size(), 0);
+    status &= mpc->Broadcast(metadata.data(), metadata.size(), 0);
   }
   if (!status || metadata.empty())
   {
@@ -897,7 +897,7 @@ bool vtkParFlowMetaReader::ReadComponentSubgridOverlap(istream& pfb, const vtkVe
   double* dest = variable->GetPointer(0);
   std::vector<double> buffer;
   buffer.resize(subgridSize);
-  pfb.read(reinterpret_cast<char*>(&buffer[0]), sizeof(double) * subgridSize);
+  pfb.read(reinterpret_cast<char*>(buffer.data()), sizeof(double) * subgridSize);
 
   vtkVector3i oLo;
   vtkVector3i oHi;
@@ -975,7 +975,7 @@ bool vtkParFlowMetaReader::ReadComponentSubgridOverlap(istream& pfb, const vtkVe
     const vtkVector3i& m_sn; // subgrid size
   };
   FileBufferToDataArray translator(lineSize, oLo[1], oHi[1], variable->GetNumberOfComponents(),
-    &buffer[0], dest + component, extent, oLo, si, sn);
+    buffer.data(), dest + component, extent, oLo, si, sn);
   vtkSMPTools::For(oLo[2], oHi[2], translator);
   // variable->FillComponent(component, 0.0);
   return true;
@@ -1069,14 +1069,8 @@ int vtkParFlowMetaReader::LoadPFBComponent(Domain dom, vtkDoubleArray* variable,
     {
       if (extent[2 * ii] <= divisions[dd + 1] && extent[2 * ii + 1] >= divisions[dd])
       {
-        if (lo[ii] > dd)
-        {
-          lo[ii] = dd;
-        }
-        if (hi[ii] < dd)
-        {
-          hi[ii] = dd;
-        }
+        lo[ii] = std::min(lo[ii], dd);
+        hi[ii] = std::max(hi[ii], dd);
       }
     }
   }
@@ -1323,7 +1317,7 @@ int vtkParFlowMetaReader::RequestInformation(
       pfb.seekg(0, std::ios::end);
       contents.resize(pfb.tellg());
       pfb.seekg(0, std::ios::beg);
-      pfb.read(reinterpret_cast<char*>(&contents[0]), contents.size());
+      pfb.read(reinterpret_cast<char*>(contents.data()), contents.size());
       pfb.close();
     }
     else
@@ -1367,8 +1361,8 @@ int vtkParFlowMetaReader::RequestInformation(
     for (int ii = 0; ii < 2; ++ii)
     {
       auto info = outInfo->GetInformationObject(ii);
-      info->Set(
-        vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &times[0], static_cast<int>(times.size()));
+      info->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), times.data(),
+        static_cast<int>(times.size()));
       info->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
     }
   }
