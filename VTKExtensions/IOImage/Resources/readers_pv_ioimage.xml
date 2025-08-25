@@ -124,6 +124,15 @@
           Set the spacing to use for the image output by this reader.
         </Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDataOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="DataOrigin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the coordinates of the first pixel of the image.
+        </Documentation>
+      </DoubleVectorProperty>
       <StringVectorProperty command="GetTextKeys"
                             information_only="1"
                             name="TextKeys">
@@ -503,6 +512,7 @@
                proxyname="PNGReader"></Proxy>
         <ExposedProperties>
           <Property name="DataSpacing" />
+          <Property name="DataOrigin" />
           <Property name="TextKeys" />
           <Property name="TextValues" />
         </ExposedProperties>
