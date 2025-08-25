@@ -32,16 +32,16 @@ void vtkExtrusionRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkExtrusionRepresentation::SetExtrusionFactor(double val)
 {
-  static_cast<vtkExtrusionMapper*>(this->Mapper)->SetExtrusionFactor(static_cast<float>(val));
-  static_cast<vtkExtrusionMapper*>(this->LODMapper)->SetExtrusionFactor(static_cast<float>(val));
+  vtkExtrusionMapper::SafeDownCast(this->Mapper)->SetExtrusionFactor(static_cast<float>(val));
+  vtkExtrusionMapper::SafeDownCast(this->LODMapper)->SetExtrusionFactor(static_cast<float>(val));
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkExtrusionRepresentation::SetBasisVisibility(bool val)
 {
-  static_cast<vtkExtrusionMapper*>(this->Mapper)->SetBasisVisibility(val);
-  static_cast<vtkExtrusionMapper*>(this->LODMapper)->SetBasisVisibility(val);
+  vtkExtrusionMapper::SafeDownCast(this->Mapper)->SetBasisVisibility(val);
+  vtkExtrusionMapper::SafeDownCast(this->LODMapper)->SetBasisVisibility(val);
   this->Modified();
 }
 
@@ -57,25 +57,33 @@ void vtkExtrusionRepresentation::SetInputDataArray(
 //----------------------------------------------------------------------------
 void vtkExtrusionRepresentation::SetNormalizeData(bool val)
 {
-  static_cast<vtkExtrusionMapper*>(this->Mapper)->SetNormalizeData(val);
-  static_cast<vtkExtrusionMapper*>(this->LODMapper)->SetNormalizeData(val);
+  vtkExtrusionMapper::SafeDownCast(this->Mapper)->SetNormalizeData(val);
+  vtkExtrusionMapper::SafeDownCast(this->LODMapper)->SetNormalizeData(val);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkExtrusionRepresentation::SetAutoScaling(bool val)
 {
-  static_cast<vtkExtrusionMapper*>(this->Mapper)->SetAutoScaling(val);
-  static_cast<vtkExtrusionMapper*>(this->LODMapper)->SetAutoScaling(val);
+  vtkExtrusionMapper::SafeDownCast(this->Mapper)->SetAutoScaling(val);
+  vtkExtrusionMapper::SafeDownCast(this->LODMapper)->SetAutoScaling(val);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkExtrusionRepresentation::SetScalingRange(double minimum, double maximum)
 {
-  static_cast<vtkExtrusionMapper*>(this->Mapper)
+  vtkExtrusionMapper::SafeDownCast(this->Mapper)
     ->SetUserRange(static_cast<float>(minimum), static_cast<float>(maximum));
-  static_cast<vtkExtrusionMapper*>(this->LODMapper)
+  vtkExtrusionMapper::SafeDownCast(this->LODMapper)
     ->SetUserRange(static_cast<float>(minimum), static_cast<float>(maximum));
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkExtrusionRepresentation::SetRecalculateNormals(bool enable)
+{
+  vtkExtrusionMapper::SafeDownCast(this->Mapper)->SetRecalculateNormals(enable);
+  vtkExtrusionMapper::SafeDownCast(this->LODMapper)->SetRecalculateNormals(enable);
   this->Modified();
 }

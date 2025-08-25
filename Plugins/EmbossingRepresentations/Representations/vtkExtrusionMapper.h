@@ -99,6 +99,16 @@ public:
 
   ///@{
   /**
+   * Set/Get the normal recalculation flag.
+   * By default, this is disabled.
+   */
+  vtkSetMacro(RecalculateNormals, bool);
+  vtkGetMacro(RecalculateNormals, bool);
+  vtkBooleanMacro(RecalculateNormals, bool);
+  ///@}
+
+  ///@{
+  /**
    * Override SetInputArrayToProcess to update data range and save field association.
    */
   using vtkAlgorithm::SetInputArrayToProcess;
@@ -142,6 +152,7 @@ protected:
   float UserRange[2];
   bool BasisVisibility = false;
   bool AutoScaling = true;
+  bool RecalculateNormals = false;
 
   friend class vtkOpenGLBatchedExtrusionMapper;
 
