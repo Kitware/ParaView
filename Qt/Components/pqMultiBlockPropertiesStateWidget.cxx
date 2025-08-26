@@ -52,7 +52,6 @@ public:
   QPointer<QHBoxLayout> HLayout;
   QPointer<QLabel> StateLabel;
   QPointer<pqHighlightableToolButton> ResetButton;
-  QPixmap Icons[BlockPropertyState::NumberOfStates];
   QString ToolTips[BlockPropertyState::NumberOfStates];
 
   vtkNew<vtkSMColorMapEditorHelper> ColorMapEditorHelper;
@@ -61,7 +60,7 @@ public:
    * The set/blockInherited/representationInherited colors were selected from the IBM Design library
    * palette. See https://davidmathlogic.com/colorblind.
    */
-  static QPixmap statePixMap(vtkSMColorMapEditorHelper::BlockPropertyState state, int iconSize,
+  static QPixmap generateStatePixmap(BlockPropertyState state, int iconSize,
     QColor setColor = QColor("#D91D86") /*magenta*/,
     QColor blockInheritedColor = QColor("#F6BB00") /*yellow*/,
     QColor representationInheritedColor = QColor("#3665B7"), /*blue*/
@@ -127,6 +126,42 @@ public:
     }
     return pixmap;
   }
+
+  QPixmap pixmap(const QIcon& icon) { return icon.pixmap(IconSize, IconSize); }
+
+  QIcon stateIcon(BlockPropertyState state)
+  {
+    static bool initialized = false;
+    static QIcon icons[BlockPropertyState::NumberOfStates];
+    if (!initialized)
+    {
+      initialized = true;
+      icons[BlockPropertyState::Disabled] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateDisabled.svg" };
+      icons[BlockPropertyState::RepresentationInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateRepresentationInherited.svg" };
+      icons[BlockPropertyState::BlockInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateBlockInherited.svg" };
+      icons[BlockPropertyState::MixedInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateMixedInherited.svg" };
+      icons[BlockPropertyState::Set] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateSet.svg" };
+      icons[BlockPropertyState::SetAndRepresentationInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateSetAndRepresentationInherited.svg" };
+      icons[BlockPropertyState::SetAndBlockInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateSetAndBlockInherited.svg" };
+      icons[BlockPropertyState::SetAndMixedInherited] = //
+        QIcon{ ":/pqWidgets/Icons/pqStateSetAndMixedInherited.svg" };
+    }
+
+    return icons[state];
+  }
+
+  QIcon resetIcon()
+  {
+    static QIcon icon{ ":/pqWidgets/Icons/pqReset.svg" };
+    return icon;
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -156,33 +191,11 @@ pqMultiBlockPropertiesStateWidget::pqMultiBlockPropertiesStateWidget(vtkSMProxy*
   // create the icons
   // for (int state = 0; state < BlockPropertyState::NumberOfStates; ++state)
   // {
-  //   QPixmap pixmap = internals.statePixMap(static_cast<BlockPropertyState>(state), 512);
+  //   QPixmap pixmap = internals.generateStatePixmap(static_cast<BlockPropertyState>(state), 512);
   //   QString fileName = QFileDialog::getSaveFileName(this, "Save Image", "", "PNG Files (*.png)");
   //   pixmap.save(fileName, "PNG");
   // }
-  // load the icons
-  internals.Icons[BlockPropertyState::Disabled] =
-    QIcon(":/pqWidgets/Icons/pqStateDisabled.svg").pixmap(internals.IconSize, internals.IconSize);
-  internals.Icons[BlockPropertyState::RepresentationInherited] =
-    QIcon(":/pqWidgets/Icons/pqStateRepresentationInherited.svg")
-      .pixmap(internals.IconSize, internals.IconSize);
-  internals.Icons[BlockPropertyState::BlockInherited] =
-    QIcon(":/pqWidgets/Icons/pqStateBlockInherited.svg")
-      .pixmap(internals.IconSize, internals.IconSize);
-  internals.Icons[BlockPropertyState::MixedInherited] =
-    QIcon(":/pqWidgets/Icons/pqStateMixedInherited.svg")
-      .pixmap(internals.IconSize, internals.IconSize);
-  internals.Icons[BlockPropertyState::Set] =
-    QIcon(":/pqWidgets/Icons/pqStateSet.svg").pixmap(internals.IconSize, internals.IconSize);
-  internals.Icons[BlockPropertyState::SetAndRepresentationInherited] =
-    QIcon(":/pqWidgets/Icons/pqStateSetAndRepresentationInherited.svg")
-      .pixmap(internals.IconSize, internals.IconSize);
-  internals.Icons[BlockPropertyState::SetAndBlockInherited] =
-    QIcon(":/pqWidgets/Icons/pqStateSetAndBlockInherited.svg")
-      .pixmap(internals.IconSize, internals.IconSize);
-  internals.Icons[BlockPropertyState::SetAndMixedInherited] =
-    QIcon(":/pqWidgets/Icons/pqStateSetAndMixedInherited.svg")
-      .pixmap(internals.IconSize, internals.IconSize);
+
   // create the tooltips
   const QString toolTipFirstPart =
     internals.BlockPropertyNames.size() > 1 ? tr("Properties are ") : tr("Property is ");
@@ -214,7 +227,7 @@ pqMultiBlockPropertiesStateWidget::pqMultiBlockPropertiesStateWidget(vtkSMProxy*
   // create the reset button
   internals.ResetButton = new pqHighlightableToolButton(this);
   internals.ResetButton->setObjectName("Reset");
-  internals.ResetButton->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
+  internals.ResetButton->setIcon(internals.resetIcon());
   internals.ResetButton->setIconSize(QSize(iconSize - 4, iconSize - 4));
   internals.ResetButton->setToolTip(
     pqWidgetUtilities::formatTooltip(tr("Reset to value(s) inherited from block/representation")));
@@ -223,7 +236,8 @@ pqMultiBlockPropertiesStateWidget::pqMultiBlockPropertiesStateWidget(vtkSMProxy*
   internals.StateLabel = new QLabel("BlockPropertyState", this);
   internals.StateLabel->setToolTip(
     pqWidgetUtilities::formatTooltip(internals.ToolTips[BlockPropertyState::Disabled]));
-  internals.StateLabel->setPixmap(internals.Icons[BlockPropertyState::Disabled]);
+  internals.StateLabel->setPixmap(
+    internals.pixmap(internals.stateIcon(BlockPropertyState::Disabled)));
 
   // add the widgets to the layout
   internals.HLayout->addWidget(internals.StateLabel);
@@ -274,7 +288,7 @@ void pqMultiBlockPropertiesStateWidget::updateState()
   {
     internals.CurrentState = state;
 
-    internals.StateLabel->setPixmap(internals.Icons[state]);
+    internals.StateLabel->setPixmap(internals.pixmap(internals.stateIcon(state)));
     internals.StateLabel->setToolTip(pqWidgetUtilities::formatTooltip(internals.ToolTips[state]));
     internals.StateLabel->setEnabled(state != BlockPropertyState::Disabled);
 
@@ -294,7 +308,7 @@ pqMultiBlockPropertiesStateWidget::BlockPropertyState pqMultiBlockPropertiesStat
 //-----------------------------------------------------------------------------
 QPixmap pqMultiBlockPropertiesStateWidget::getStatePixmap(BlockPropertyState state) const
 {
-  return this->Internals->Icons[state];
+  return this->Internals->pixmap(this->Internals->stateIcon(state));
 }
 
 //-----------------------------------------------------------------------------
