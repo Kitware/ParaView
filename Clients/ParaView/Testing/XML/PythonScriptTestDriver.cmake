@@ -10,11 +10,11 @@ endif()
 set(ENV{DASHBOARD_TEST_FROM_CTEST} "1")
 
 message(
-  "${PARAVIEW_EXECUTABLE} -dr --test-directory=${TEMPORARY_DIR} --data-directory=${DATA_DIR} --test-script=${TEST_SCRIPT} --exit"
+  "${PARAVIEW_EXECUTABLE} --dr --test-directory=${TEMPORARY_DIR} --data-directory=${DATA_DIR} --test-script=${TEST_SCRIPT} --exit"
 )
 
 execute_process(
-  COMMAND ${PARAVIEW_EXECUTABLE} -dr
+  COMMAND ${PARAVIEW_EXECUTABLE} --dr
           --test-directory=${TEMPORARY_DIR}
           --data-directory=${DATA_DIR}
           --test-script=${TEST_SCRIPT}
@@ -26,11 +26,11 @@ if (NOT rv EQUAL 0)
 endif()
 
 message(
-  "${PVPYTHON_EXECUTABLE} -dr ${TEST_VERIFIER} -T ${TEMPORARY_DIR} -N ${TEST_NAME}"
+  "${PVPYTHON_EXECUTABLE} --dr ${TEST_VERIFIER} -T ${TEMPORARY_DIR} -N ${TEST_NAME}"
 )
 
 execute_process(
-  COMMAND ${PVPYTHON_EXECUTABLE} -dr
+  COMMAND ${PVPYTHON_EXECUTABLE} --dr
   ${TEST_VERIFIER}
   -T ${TEMPORARY_DIR}
   -N ${TEST_NAME}
