@@ -2478,7 +2478,7 @@ def _get_standard_postamble_comment():
 # SaveAnimation()
 #
 ## Please refer to the documentation of paraview.simple
-## https://www.paraview.org/paraview-docs/latest/python/paraview.simple.html
+## https://www.paraview.org/paraview-docs/nightly/python/
 ##--------------------------------------------"""
 
 
