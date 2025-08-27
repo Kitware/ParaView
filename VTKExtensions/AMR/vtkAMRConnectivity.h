@@ -20,7 +20,7 @@
 #include <vector>                        // STL required.
 
 class vtkNonOverlappingAMR;
-class vtkUniformGrid;
+class vtkCartesianGrid;
 class vtkIdTypeArray;
 class vtkIntArray;
 class vtkAMRDualGridHelper;
@@ -97,7 +97,7 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   int DoRequestData(vtkNonOverlappingAMR*, const char*);
-  int WavePropagation(vtkIdType cellIdStart, vtkUniformGrid* grid, vtkIdTypeArray* regionId,
+  int WavePropagation(vtkIdType cellIdStart, vtkCartesianGrid* grid, vtkIdTypeArray* regionId,
     vtkDataArray* volArray, vtkUnsignedCharArray* ghostArray);
 
   vtkAMRDualGridHelperBlock* GetBlockNeighbor(vtkAMRDualGridHelperBlock* block, int dir);

@@ -189,13 +189,13 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
 
   // locate first non-nullptr uniform grid in the AMR. That's the one we use to
   // model the field arrays.
-  vtkImageData* reference = nullptr;
+  vtkCartesianGrid* reference = nullptr;
   for (unsigned int level = 0; reference == nullptr && level < amr->GetNumberOfLevels(); level++)
   {
     for (unsigned int index = 0; reference == nullptr && index < amr->GetNumberOfBlocks(level);
          index++)
     {
-      reference = amr->GetDataSet(level, index);
+      reference = amr->GetDataSetAsCartesianGrid(level, index);
     }
   }
   if (!reference)

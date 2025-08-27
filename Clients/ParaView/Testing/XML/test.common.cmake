@@ -84,6 +84,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/nek5000/eddy_uv/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/amr/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/amr/wavelet/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/amr/amr_rg/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/amr/amr_ug/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/amr/noamr_rg/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/amr/noamr_ug/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/artifact.dta}"
   "DATA{${paraview_test_data_directory_input}/Data/amr_gaussian_pulse.vtkhdf}"
   "DATA{${paraview_test_data_directory_input}/Data/blow.vtk}"
@@ -1228,6 +1232,10 @@ if(NOT APPLE)
 endif()
 
 list(APPEND TESTS_WITH_BASELINES
+  AMRRectGridOutline.xml
+  AMRRectGridSurface.xml
+  AMRUniformGridOutline.xml
+  AMRUniformGridSurface.xml
   AnnulusWidget.xml
   AxisAlignedCutterAMR.xml
   AxisAlignedCutterHTG.xml
@@ -1255,6 +1263,8 @@ list(APPEND TESTS_WITH_BASELINES
   MoleculeScalarBar.xml
   MultiSliceHTG.xml
   NetCDFUGRID.xml
+  NOAMRRectGridSurface.xml
+  NOAMRUniformGridSurface.xml
   PartialFieldDataMultiBlock.xml
   ParticleTracerGlyph.xml
   PassArrays.xml
@@ -1980,6 +1990,13 @@ set(VolumeCrop_DISABLE_CRS TRUE)
 set(VolumeSliceBlendMode_DISABLE_CRS TRUE)
 set(VolumeIsosurfaceBlendMode_DISABLE_CRS TRUE)
 set(PointVolumeInterpolator_DISABLE_CRS TRUE)
+
+# Distributed AMR rendering is broken
+# https://gitlab.kitware.com/paraview/paraview/-/issues/23096
+set(AMRRectGridSurface_DISABLE_CS TRUE)
+set(AMRRectGridSurface_DISABLE_CRS TRUE)
+set(AMRUniformGridSurface_DISABLE_CS TRUE)
+set(AMRUniformGridSurface_DISABLE_CRS TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRContour_DISABLE_CS TRUE)

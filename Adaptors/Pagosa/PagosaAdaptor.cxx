@@ -187,7 +187,13 @@ void addgridfield_(
   unsigned int level = 0;
   unsigned int blockId = *my_id;
 
-  vtkUniformGrid* img = vtkUniformGrid::SafeDownCast(grid->GetDataSet(level, blockId));
+  vtkImageData* img = grid->GetDataSetAsImageData(level, blockId);
+  if (!img)
+  {
+    vtkErrorWithObjectMacro(nullptr, "Unsupported datatype in AMR");
+    return;
+  }
+
   vtkIdType numCells = (*mx + 1) * (*my + 1) * (*mz + 1);
 
   if (*down_convert)

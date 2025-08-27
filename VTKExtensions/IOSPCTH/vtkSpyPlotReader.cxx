@@ -1348,43 +1348,12 @@ void vtkSpyPlotReader::SetMergeXYZComponents(int merge)
   this->Modified();
 }
 //-----------------------------------------------------------------------------
-void vtkSpyPlotReader::PrintBlockList(vtkNonOverlappingAMR* hbds, int vtkNotUsed(myProcId))
+// PARAVIEW_DEPRECATED_IN_6_1_0
+void vtkSpyPlotReader::PrintBlockList(
+  vtkNonOverlappingAMR* vtkNotUsed(hbds), int vtkNotUsed(myProcId))
 {
-  unsigned int numberOfLevels = hbds->GetNumberOfLevels();
-  unsigned int level;
-  //  Display the block list for each level
-  numberOfLevels = hbds->GetNumberOfLevels();
-  for (level = 0; level < numberOfLevels; level++)
-  {
-    // cout<<myProcId<<" level="<<level<<"/"<<numberOfLevels<<endl;
-    int totalNumberOfDataSets = hbds->GetNumberOfBlocks(level);
-    int i;
-    for (i = 0; i < totalNumberOfDataSets; i++)
-    {
-      // cout<<myProcId<<" dataset="<<i<<"/"<<totalNumberOfDataSets;
-      if (hbds->GetDataSet(level, i) == nullptr)
-      {
-        // cout<<" Void"<<endl;
-      }
-      else
-      {
-        // cout<<" Exists"<<endl;
-      }
-    }
-  }
-  /*
-    std::vector<vtkRectilinearGrid*>::iterator it;
-    for ( it = grids.begin(); it != grids.end(); ++ it )
-    {
-    (*it)->Print(cout);
-    int cc;
-    for ( cc = 0; cc < (*it)->GetCellData()->GetNumberOfArrays(); ++ cc )
-    {
-    (*it)->GetCellData()->GetArray(cc)->Print(cout);
-    }
-    }
-  */
 }
+
 //-----------------------------------------------------------------------------
 void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -2436,7 +2405,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
       {
         for (unsigned int kk = 0; kk < hbDS->GetNumberOfBlocks(level); kk++)
         {
-          vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
+          vtkUniformGrid* ug = vtkUniformGrid::SafeDownCast(hbDS->GetDataSetAsImageData(level, kk));
           datasetsAtLevel.emplace_back(ug);
         }
       }

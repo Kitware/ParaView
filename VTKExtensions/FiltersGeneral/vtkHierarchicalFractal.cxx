@@ -1226,8 +1226,7 @@ void vtkHierarchicalFractal::AddDepthArray(vtkOverlappingAMR* output)
     int block = 0;
     while (block < blocks)
     {
-      vtkUniformGrid* grid;
-      grid = vtkUniformGrid::SafeDownCast(output->GetDataSet(level, block));
+      vtkCartesianGrid* grid = output->GetDataSetAsCartesianGrid(level, block);
       if (grid)
       {
         vtkIntArray* array = vtkIntArray::New();

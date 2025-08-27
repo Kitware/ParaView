@@ -37,7 +37,7 @@ void AssignNamesToBlocks(vtkUniformGridAMR* amr)
     {
       const std::string label =
         fmt::format("amr_index {} {:{}}", levelString, idx, GetNumberOfDigits(idx));
-      if (auto ds = amr->GetDataSet(l, idx))
+      if (auto ds = amr->GetDataSetAsCartesianGrid(l, idx))
       {
         ds->GetInformation()->Set(vtkCompositeDataSet::NAME(), label.c_str());
       }

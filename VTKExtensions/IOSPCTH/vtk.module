@@ -19,6 +19,7 @@ GROUPS
 KIT
   ParaView::CoreKit
 DEPENDS
+  ParaView::Versioning
   ParaView::VTKExtensionsIOCore
 PRIVATE_DEPENDS
   VTK::ParallelCore

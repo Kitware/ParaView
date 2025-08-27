@@ -19,6 +19,8 @@
  * \code{.cpp}
  * #define vtkMaterialInterfaceFilterPROFILE
  * \endcode
+ *
+ * @warning: Does not support AMR of vtkRectilinearGrid
  */
 
 #ifndef vtkMaterialInterfaceFilter_h
