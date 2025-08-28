@@ -110,6 +110,9 @@ static bool update_producer_ioss(const std::string& channel_name, const conduit_
 
   auto algo = vtkIOSSReader::SafeDownCast(producer->GetClientSideObject());
   algo->SetDatabaseTypeOverride("catalyst");
+  // The memory address of the conduit node may or may not change over time. So we need to always
+  // set the property. To accomplish that, we first remove the property and then add it back.
+  algo->RemoveProperty("CATALYST_CONDUIT_NODE");
   algo->AddProperty(
     "CATALYST_CONDUIT_NODE", conduit_cpp::c_node(const_cast<conduit_cpp::Node*>(node)));
   /*
