@@ -2374,7 +2374,8 @@ struct Process_6_0_to_6_1
 {
   bool operator()(xml_document& document)
   {
-    return HandleChartRepresentationCompositeDataSetIndex(document);
+    return HandleChartRepresentationCompositeDataSetIndex(document) &&
+      HandleRawImageReaderDataExtent(document);
   }
 
   static std::string GetSelector(unsigned int cid)
@@ -2448,7 +2449,106 @@ struct Process_6_0_to_6_1
 
     return true;
   }
+
+  static bool HandleRawImageReaderDataExtent(xml_document& document)
+  {
+    // Convert the source image reader properties from:
+    //   DataExtent = (xmin, xmax, ymin, ymax, zmin, zmax)
+    // to:
+    //   MinimumIndex = (xmin, ymin, zmin)
+    //   Dimensions = (xmax-xmin+1, ymax-ymin+1, zmax-zmin+1)
+    // When file dimensionality is 2, Dimensions[2] is set to 0.
+    pugi::xpath_node_set xpath_set =
+      document.select_nodes("//ServerManagerState/Proxy[@group='sources' and @type='ImageReader']");
+    for (auto xpath_proxy : xpath_set)
+    {
+      pugi::xml_node readerNode = xpath_proxy.node();
+      auto extPropertyProxy = readerNode.select_node("child::Property[@name='DataExtent']");
+      if (!extPropertyProxy)
+      {
+        continue;
+      }
+      pugi::xml_node extPropertyNode = extPropertyProxy.node();
+      int numExtentElements = extPropertyNode.attribute("number_of_elements").as_int();
+
+      // process all "Element" nodes under the "DataExtent" property
+      int dimensions[3] = { 0, 0, 0 };
+      int minimumIndex[3] = { 0, 0, 0 };
+      for (auto elementProxy : extPropertyNode.select_nodes("child::Element"))
+      {
+        pugi::xml_node elementNode = elementProxy.node();
+        int elementIdx = elementNode.attribute("index").as_int();
+        if (elementIdx >= numExtentElements)
+        {
+          return false; // unexpected entry
+        }
+        int newIdx = elementIdx / 2;
+        int elementValue = elementProxy.node().attribute("value").as_int();
+        if (elementIdx % 2 == 0)
+        {
+          // set the start indices
+          minimumIndex[newIdx] = elementValue;
+        }
+        else
+        {
+          // set the dimensions based on the start and end indices
+          dimensions[newIdx] = elementValue - minimumIndex[newIdx] + 1;
+        }
+      }
+
+      // check the file dimensionality
+      auto fileDimsProxy = readerNode.select_node("child::Property[@name='FileDimensionality']");
+      if (!fileDimsProxy)
+      {
+        return false;
+      }
+      if (fileDimsProxy.node().child("Element").attribute("value").as_int() == 2)
+      {
+        dimensions[2] = 0; // handle special case for 2D files
+      }
+
+      // remove the DataExtent node
+      readerNode.remove_child(extPropertyNode);
+
+      // add new nodes for MinimumIndex and Dimensions
+      addPropertyElement(readerNode, "MinimumIndex", minimumIndex);
+      addPropertyElement(readerNode, "Dimensions", dimensions);
+    }
+
+    return true;
+  }
+
+private:
+  static void addPropertyElement(
+    pugi::xml_node& parent, const std::string& name, const int values[3])
+  {
+    std::string parentId = parent.attribute("id").as_string();
+    pugi::xml_node propertyNode = parent.append_child();
+    propertyNode.set_name("Property");
+
+    propertyNode.append_attribute("name") = name.c_str();
+
+    std::string propertyId = parentId + "." + name;
+    propertyNode.append_attribute("id") = propertyId.c_str();
+    propertyNode.append_attribute("number_of_elements") = "3";
+
+    // add Element nodes
+    for (int i = 0; i < 3; ++i)
+    {
+      pugi::xml_node elementNode = propertyNode.append_child();
+      elementNode.set_name("Element");
+      elementNode.append_attribute("index") = std::to_string(i).c_str();
+      elementNode.append_attribute("value") = std::to_string(values[i]).c_str();
+    }
+
+    // add Domain node
+    pugi::xml_node domainNode = propertyNode.append_child();
+    domainNode.set_name("Domain");
+    domainNode.append_attribute("name") = "range";
+    domainNode.append_attribute("id") = (propertyId + ".range").c_str();
+  }
 };
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);

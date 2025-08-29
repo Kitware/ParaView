@@ -32,10 +32,15 @@ public:
 
   ///@{
   /**
-   * Get/Set the extent of the data on disk.
+   * Dimensions defines the size of the data, and MinimumIndex defines
+   * the starting index. Together, they give the DataExtent as:
+   *   DataExtent[i] = MinimumIndex[i] + Dimensions[i] - 1
    */
-  vtkSetVector6Macro(DataExtent, int);
-  vtkGetVector6Macro(DataExtent, int);
+  vtkSetVector3Macro(Dimensions, int);
+  vtkGetVector3Macro(Dimensions, int);
+
+  vtkGetVector3Macro(MinimumIndex, int);
+  vtkSetVector3Macro(MinimumIndex, int);
   ///@}
 
 protected:
@@ -59,7 +64,8 @@ protected:
    * in case the user switches between reading as a stack or reading as a
    * time series.
    */
-  int DataExtent[6];
+  int Dimensions[3];
+  int MinimumIndex[3];
   ///@}
 
   ///@{

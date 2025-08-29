@@ -210,6 +210,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_0.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_1.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/random_torus.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/raw2DImageBackwardCompat.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/raw3DImageBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/room.cas}"
   "DATA{${paraview_test_data_directory_input}/Data/room.dat}"
   "DATA{${paraview_test_data_directory_input}/Data/room.cas.h5}"
@@ -1024,6 +1026,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   QuickLaunchCreateProxy.xml
   QuickLaunchNavigation.xml
   QuickLaunchRequest.xml
+  RawImageDataReaderBackwardCompat.xml
   ReadIOHDFAMRMaxLevels.xml
   ReaderRegistrationName.xml
   ReflectBackwardCompat.xml
