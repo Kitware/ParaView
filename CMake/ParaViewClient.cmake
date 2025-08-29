@@ -501,7 +501,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
           MACOSX_BUNDLE_ICON_FILE "${_paraview_client_bundle_icon_file}")
       install(
         FILES       "${_paraview_client_BUNDLE_ICON}"
-        DESTINATION "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_APPLICATION_NAME}.app/Contents/Resources"
+        DESTINATION "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources"
         COMPONENT   "runtime")
     endif ()
     if (DEFINED _paraview_client_BUNDLE_PLIST)
