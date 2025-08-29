@@ -110,6 +110,7 @@ void vtkPVGridAxes3DRepresentation::SetScale(double scale[3])
   if (this->Scale[0] != scale[0] || this->Scale[1] != scale[1] || this->Scale[2] != scale[2])
   {
     std::copy(scale, scale + 3, this->Scale);
+    this->GridAxes->SetDisplayTransformScale(this->Scale);
     this->MarkModified();
   }
 }
