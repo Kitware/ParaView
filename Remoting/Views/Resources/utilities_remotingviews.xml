@@ -2771,6 +2771,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="InvertDisplayTransformScaleForTickLabels"
+                         name="IgnoreDisplayTransformScale"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          By default the scale specified in the display option will affect the tick values of the grid axes and show the dimensions after scaling.
+          When enabling this option, the grid axes will keep the bounds of the object after scale but will show the tick values of the non-scaled data.</Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="AxesToLabel"
                          command="SetLabelMask"
                          number_of_elements="1"
