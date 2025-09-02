@@ -165,6 +165,7 @@ void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStri
     {
       PyErr_Print();
       PyErr_Clear();
+      return;
     }
   }
 
