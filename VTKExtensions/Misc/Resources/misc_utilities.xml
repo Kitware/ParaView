@@ -58,6 +58,10 @@
                             name="Position"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify the translation to apply to the input dataset.
+          Shortcut: SHIFT + [x/y/z] + Left-Click to translate freely or along the selected axis.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="GetAbsolutePosition"
                             default_values="0.0 0.0 0.0"
@@ -71,6 +75,10 @@
                             name="Rotation"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify the rotation to apply to the input dataset.
+          Shortcut: [x/y/z] + Left-Click on a face to rotate freely or along the selected axis.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="GetAbsoluteRotation"
                             default_values="0.0 0.0 0.0"
@@ -84,6 +92,10 @@
                             name="Scale"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify the scale to apply to the input dataset.
+          Shortcut: Right-Click to scale the whole dataset, or Left-Click on the handles to scale a single axis.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="GetAbsoluteScale"
                             default_values="1.0 1.0 1.0"
