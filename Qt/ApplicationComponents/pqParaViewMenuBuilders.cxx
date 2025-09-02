@@ -354,7 +354,7 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   mgr->addProxyDefinitionUpdateListener("filters");
 
   QAction* configureCategoriesAction =
-    menu.addAction(QCoreApplication::translate("pqToolsMenu", "Configure Categories"))
+    menu.addAction(QCoreApplication::translate("pqToolsMenu", "Configure Filter Categories"))
     << pqSetName("actionConfigureCategories");
   configureCategoriesAction->setMenuRole(QAction::NoRole);
   new pqConfigureCategoriesReaction(configureCategoriesAction, mgr);

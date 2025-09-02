@@ -13,7 +13,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Configure Categories</string>
+   <string>Configure Filter Categories</string>
   </property>
   <layout class="QGridLayout">
    <item row="0" column="0" rowspan="4">
