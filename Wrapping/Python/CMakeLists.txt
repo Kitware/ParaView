@@ -59,6 +59,7 @@ set(python_files
   paraview/servermanager.py
   paraview/simple/__init__.py
   paraview/simple/animation.py
+  paraview/simple/autocomplete.py
   paraview/simple/camera.py
   paraview/simple/catalyst.py
   paraview/simple/color.py
