@@ -17,7 +17,7 @@ Page | Description
 [ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
 [String Formatting Arguments](@ref StringFormattingArguments) | String formatting arguments that are used for formatting formattable strings.
 
-Developping with servermanager XML
+Developing with servermanager XML
 -----------------
 
 Page | Description
