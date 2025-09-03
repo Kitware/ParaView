@@ -2573,6 +2573,24 @@ void vtkPVRenderView::SetCenterAxesVisibility(bool v)
   this->CenterAxes->SetVisibility(v);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCenterAxesXColor(double r, double g, double b)
+{
+  this->CenterAxes->SetXAxisColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCenterAxesYColor(double r, double g, double b)
+{
+  this->CenterAxes->SetYAxisColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCenterAxesZColor(double r, double g, double b)
+{
+  this->CenterAxes->SetZAxisColor(r, g, b);
+}
+
 //*****************************************************************
 // Forward to vtkPVInteractorStyle instances.
 //----------------------------------------------------------------------------
