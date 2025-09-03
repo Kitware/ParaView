@@ -28,7 +28,6 @@ Page | Description
 [Property Hints](@ref PropertyHints) | ServerManager XML hints for Properties.
 [Proxy Documentation Formatting](@ref ProxyDocumentationFormatting) | Formatting options for proxy documentation.
 
-
 ParaView Catalyst
 -----------------
 
@@ -52,6 +51,7 @@ Page | Description
 [Slice View](@ref DesignSliceView) | Implementing the **Slice View**
 [String Encoding](@ref DesignStringEncoding) | How to encode string when developing for ParaView
 [Localization Howto](@ref LocalizationHowto) | Description of the translation workflow and how comply to it.
+[Restart and File Series Readers](@ref RestartAndFileSeriesReaders) | How to implement restart and file series readers.
 
 Developer notes
 ----------------
