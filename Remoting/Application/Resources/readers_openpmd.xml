@@ -119,8 +119,7 @@
       <StringVectorProperty name="XCoordinate"
         command="SetXCoordinate"
         number_of_elements="1"
-        information_property="XCoordinateInfo"
-        default_values="x">
+        information_property="XCoordinateInfo">
         <Documentation>Select which species position coordinate to use for X axis</Documentation>
         <StringListDomain name="array_list">
           <RequiredProperties>
@@ -132,8 +131,7 @@
       <StringVectorProperty name="YCoordinate"
         command="SetYCoordinate"
         number_of_elements="1"
-        information_property="YCoordinateInfo"
-        default_values="y">
+        information_property="YCoordinateInfo">
         <Documentation>Select which species position coordinate to use for Y axis</Documentation>
         <StringListDomain name="array_list">
           <RequiredProperties>
@@ -145,8 +143,7 @@
       <StringVectorProperty name="ZCoordinate"
         command="SetZCoordinate"
         number_of_elements="1"
-        information_property="ZCoordinateInfo"
-        default_values="z">
+        information_property="ZCoordinateInfo">
         <Documentation>Select which species position coordinate to use for Z axis</Documentation>
         <StringListDomain name="array_list">
           <RequiredProperties>

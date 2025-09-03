@@ -414,15 +414,34 @@ class openPMDReader(VTKPythonAlgorithmBase):
         for coord in sorted_coords:
             self._position_coordinates_info.AddArray(coord)
             self._position_coordinates_info.EnableArray(coord)  # Enable all by default
-
         # Set defaults based on actually available coordinates for backward compatibility
-        # This ensures we don't try to access non-existent coordinates
-        if len(sorted_coords) >= 1:
-            self.SetXCoordinate(sorted_coords[0])
-        if len(sorted_coords) >= 2:
-            self.SetYCoordinate(sorted_coords[1])
-        if len(sorted_coords) >= 3:
-            self.SetZCoordinate(sorted_coords[2])
+        # Keep track of which coordinates have been used to avoid duplicates
+        remaining_coords = sorted_coords.copy()
+
+        # Check X coordinate
+        if self._x_coord in sorted_coords:
+            # Current X exists, remove it from consideration for Y and Z
+            if self._x_coord in remaining_coords:
+                remaining_coords.remove(self._x_coord)
+        elif len(remaining_coords) >= 1:
+            # X doesn't exist, assign first available
+            self.SetXCoordinate(remaining_coords[0])
+            remaining_coords.pop(0)
+
+        # Check Y coordinate
+        if self._y_coord in sorted_coords:
+            # Current Y exists, remove it from consideration for Z
+            if self._y_coord in remaining_coords:
+                remaining_coords.remove(self._y_coord)
+        elif len(remaining_coords) >= 1:
+            # Y doesn't exist, assign first remaining available
+            self.SetYCoordinate(remaining_coords[0])
+            remaining_coords.pop(0)
+
+        # Check Z coordinate
+        if self._z_coord not in sorted_coords and len(remaining_coords) >= 1:
+            # Z doesn't exist, assign first remaining available
+            self.SetZCoordinate(remaining_coords[0])
 
         # make available the time steps and their corresponding physical time (float)
         # known. sets the time range to their min/max.
@@ -541,6 +560,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
         # Use the configured coordinate mapping, filtering out coordinates that don't exist
         mapping = [coord for coord in [self._x_coord, self._y_coord, self._z_coord]
                    if coord and coord in var]
+        print("*coords mapping : ", mapping)
         position_arrays = []
 
         for name in mapping:
