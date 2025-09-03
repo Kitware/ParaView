@@ -410,9 +410,19 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
         # Populate available position coordinates for UI dropdowns
         self._position_coordinates_info.RemoveAllArrays()
-        for coord in sorted(position_coords):  # Sort for consistent UI ordering
+        sorted_coords = sorted(position_coords)  # Sort for consistent UI ordering
+        for coord in sorted_coords:
             self._position_coordinates_info.AddArray(coord)
             self._position_coordinates_info.EnableArray(coord)  # Enable all by default
+
+        # Set defaults based on actually available coordinates for backward compatibility
+        # This ensures we don't try to access non-existent coordinates
+        if len(sorted_coords) >= 1:
+            self.SetXCoordinate(sorted_coords[0])
+        if len(sorted_coords) >= 2:
+            self.SetYCoordinate(sorted_coords[1])
+        if len(sorted_coords) >= 3:
+            self.SetZCoordinate(sorted_coords[2])
 
         # make available the time steps and their corresponding physical time (float)
         # known. sets the time range to their min/max.
@@ -528,8 +538,9 @@ class openPMDReader(VTKPythonAlgorithmBase):
         var = sp["position"]
         ovar = sp["positionOffset"]
 
-        # Use the configured coordinate mapping
-        mapping = [self._x_coord, self._y_coord, self._z_coord]
+        # Use the configured coordinate mapping, filtering out coordinates that don't exist
+        mapping = [coord for coord in [self._x_coord, self._y_coord, self._z_coord]
+                   if coord and coord in var]
         position_arrays = []
 
         for name in mapping:
