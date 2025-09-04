@@ -132,10 +132,10 @@ void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStri
   // Check if we have a function from paraview.simple
   PyObject* pvtag = PyObject_GetAttrString(function, "__paraview_create_object_tag");
   vtkSmartPyObject simpleModule;
-  simpleModule.TakeReference(PyImport_ImportModule("paraview.simple"));
+  simpleModule.TakeReference(PyImport_ImportModule("paraview.simple.session"));
   if (!simpleModule)
   {
-    qWarning() << "Failed to import 'paraview.simple'";
+    qWarning() << "Failed to import 'paraview.simple.session'";
     if (PyErr_Occurred())
     {
       PyErr_Print();
@@ -165,6 +165,7 @@ void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStri
     {
       PyErr_Print();
       PyErr_Clear();
+      return;
     }
   }
 
