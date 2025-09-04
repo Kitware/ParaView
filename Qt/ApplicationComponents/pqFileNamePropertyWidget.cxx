@@ -91,19 +91,19 @@ void pqFileNamePropertyWidget::resetButtonClicked()
   vtkSMProxy* smproxy = this->proxy();
   vtkSMProperty* smproperty = this->property();
 
-  const char* fileName = "";
+  std::string fileName;
   if (auto domain = smproperty->FindDomain<vtkSMInputFileNameDomain>())
   {
     if (!domain->GetFileName().empty())
     {
-      fileName = domain->GetFileName().c_str();
+      fileName = domain->GetFileName();
     }
   }
 
   vtkSMUncheckedPropertyHelper helper(smproperty);
-  if (strcmp(helper.GetAsString(), fileName) != 0)
+  if (helper.GetAsString() != fileName)
   {
-    vtkSMUncheckedPropertyHelper(smproxy, "FileName").Set(fileName);
+    vtkSMUncheckedPropertyHelper(smproxy, "FileName").Set(fileName.c_str());
     Q_EMIT this->changeAvailable();
     Q_EMIT this->changeFinished();
     return;

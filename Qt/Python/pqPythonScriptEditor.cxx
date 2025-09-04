@@ -66,6 +66,12 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
   this->TabWidget->updateActions(this->Actions);
   pqPythonEditorActions::connect(this->Actions, this);
 
+  // monitor parent's events so we can intercept the close event
+  if (p)
+  {
+    p->installEventFilter(this);
+  }
+
   this->createStatusBar();
 }
 
@@ -81,17 +87,30 @@ void pqPythonScriptEditor::runCurrentTab()
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonScriptEditor::closeEvent(QCloseEvent* e)
+bool pqPythonScriptEditor::eventFilter(QObject* watched, QEvent* event)
 {
-  if (this->TabWidget->saveOnClose())
+  if (watched == this->parentWidget() && event->type() == QEvent::Close)
   {
-    pqApplicationCore::instance()->settings()->saveState(*this, "PythonScriptEditor");
-    e->accept();
+    QCloseEvent* closeEvent = static_cast<QCloseEvent*>(event);
+
+    // if the python editor is closed when the main window is closing, force it to show
+    if (!this->isVisible())
+    {
+      this->show();
+    }
+
+    // prompt the user to save any open files if not already saved
+    if (this->TabWidget->saveOnClose())
+    {
+      pqApplicationCore::instance()->settings()->saveState(*this, "PythonScriptEditor");
+      closeEvent->accept();
+    }
+    else
+    {
+      closeEvent->ignore();
+    }
   }
-  else
-  {
-    e->ignore();
-  }
+  return QWidget::eventFilter(watched, event);
 }
 
 //-----------------------------------------------------------------------------
