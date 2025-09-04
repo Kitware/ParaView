@@ -477,6 +477,22 @@ bool vtkInitializationHelper::InitializeOthers()
   // Make sure the ProxyManager get created...
   vtkSMProxyManager::GetProxyManager();
 
+  // Set up any virtual environment prior to loading plugins which may be Python plugins.
+#if PARAVIEW_USE_PYTHON
+  // Set up virtual environment if requested.
+  auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
+  if (!pmConfig->GetVirtualEnvironmentPath().empty())
+  {
+    // Note - this may initialize Python at server startup, even if
+    // Python is not invoked later on, which could add some startup
+    // cost. We need to do it here because there are many
+    // places Python could be initialized in the ParaView and VTK
+    // code base, and we can't initialize the virtual environment
+    // in all those places.
+    InitializePythonVirtualEnvironment();
+  }
+#endif
+
   // Now load any plugins located in the PV_PLUGIN_PATH environment variable.
   // These are always loaded (not merely located).
   vtkNew<vtkPVPluginLoader> loader;
@@ -514,21 +530,6 @@ bool vtkInitializationHelper::InitializeOthers()
   {
     cout << "Process started" << endl;
   }
-
-#if PARAVIEW_USE_PYTHON
-  // Set up virtual environment if requested.
-  auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
-  if (!pmConfig->GetVirtualEnvironmentPath().empty())
-  {
-    // Note - this may initialize Python at server startup, even if
-    // Python is not invoked later on, which could add some startup
-    // cost. We need to do it here because there are many
-    // places Python could be initialized in the ParaView and VTK
-    // code base, and we can't initialize the virtual environment
-    // in all those places.
-    InitializePythonVirtualEnvironment();
-  }
-#endif
 
   // This checks if the environment has VTK_DEFAULT_OPENGL_WINDOW set. If it is not set,
   // it sets the environment variable to the OpenGL window backend specified in the
