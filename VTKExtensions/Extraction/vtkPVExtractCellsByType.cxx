@@ -3,6 +3,7 @@
 #include "vtkPVExtractCellsByType.h"
 
 #include <vtkCellType.h>
+#include <vtkCellTypeUtilities.h>
 #include <vtkCommand.h>
 #include <vtkDataArraySelection.h>
 #include <vtkInformation.h>
@@ -49,31 +50,22 @@ const std::map<std::string, unsigned int> SupportedCellTypes = { { "Vertex", VTK
 // ----------------------------------------------------------------------------
 vtkPVExtractCellsByType::vtkPVExtractCellsByType()
 {
-  // Add cell types to selection (disabled by default)
-  for (const auto& type : SupportedCellTypes)
-  {
-    this->CellTypeSelection->AddArray(type.first.c_str(), false);
-  }
-
   // Add observer for selection update
   this->CellTypeSelection->AddObserver(
-    vtkCommand::ModifiedEvent, this, &vtkPVExtractCellsByType::Modified);
+    vtkCommand::ModifiedEvent, this, &vtkPVExtractCellsByType::UpdateFromSelection);
 }
 
 //------------------------------------------------------------------------------
-int vtkPVExtractCellsByType::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+void vtkPVExtractCellsByType::UpdateFromSelection()
 {
-  // Update selection of cell types
   this->RemoveAllCellTypes();
 
-  for (const auto& type : SupportedCellTypes)
+  for (int idx = 0; idx < this->CellTypeSelection->GetNumberOfArrays(); idx++)
   {
-    if (this->CellTypeSelection->ArrayIsEnabled(type.first.c_str()))
+    if (this->CellTypeSelection->GetArraySetting(idx))
     {
-      this->AddCellType(type.second);
+      auto typeName = this->CellTypeSelection->GetArrayName(idx);
+      this->AddCellType(vtkCellTypeUtilities::GetTypeIdFromName(typeName));
     }
   }
-
-  return this->Superclass::RequestData(request, inputVector, outputVector);
 }

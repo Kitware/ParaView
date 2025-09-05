@@ -10,6 +10,10 @@
 
 class vtkDataArraySelection;
 
+/**
+ * vtkPVExtractCellsByType extends vtkExtractCellsByType with a
+ * vtkDataArraySelection to control the list of extracted cells types.
+ */
 class VTKPVVTKEXTENSIONSEXTRACTION_EXPORT vtkPVExtractCellsByType : public vtkExtractCellsByType
 {
 public:
@@ -18,6 +22,8 @@ public:
 
   /**
    * Get the current selection of cell types for extraction.
+   * You can add/remove/enable/disable cell types from this object.
+   * See AddCellsType RemoveCellType
    */
   vtkGetNewMacro(CellTypeSelection, vtkDataArraySelection);
 
@@ -25,11 +31,11 @@ protected:
   vtkPVExtractCellsByType();
   ~vtkPVExtractCellsByType() override = default;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
 private:
   vtkPVExtractCellsByType(const vtkPVExtractCellsByType&) = delete;
   void operator=(const vtkPVExtractCellsByType&) = delete;
+
+  void UpdateFromSelection();
 
   vtkNew<vtkDataArraySelection> CellTypeSelection;
 };
