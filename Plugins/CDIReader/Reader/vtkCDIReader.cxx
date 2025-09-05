@@ -1308,11 +1308,7 @@ void vtkCDIReader::RemoveDuplicates(
       curr_lon -= 2 * vtkMath::Pi();
     }
 
-    if (curr_lat > threshold)
-    {
-      curr_lon = 0.0;
-    }
-    else if (curr_lat < (-1.0 * threshold))
+    if (curr_lat > threshold or curr_lat < (-1.0 * threshold))
     {
       curr_lon = 0.0;
     }
@@ -2293,8 +2289,7 @@ void vtkCDIReader::OutputPoints(bool init)
           }
         }
       }
-
-      if (this->ProjectionMode != projection::SPHERICAL)
+      else
       {
         z = this->Layer0Offset * adjustedLayerThickness; // to avoid 0 layer thickness / ...
       }
