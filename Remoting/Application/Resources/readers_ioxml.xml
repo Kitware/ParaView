@@ -1062,17 +1062,15 @@
       <IntVectorProperty command="SetMaximumLevelsToReadByDefault"
                          name="DefaultNumberOfLevels"
                          number_of_elements="1"
-                         default_values="1"
+                         default_values="0"
                          panel_visibility="default">
         <IntRangeDomain name="range" min="0" max="10" />
         <Documentation>
           This reader supports demand-driven heavy data reading i.e. downstream
-          pipeline can request specific blocks from the AMR using
-          vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES() key in
-          RequestUpdateExtent() pass. However, when down-stream doesn't provide
-          any specific keys, the default behavior can be setup to read at-most N
+          filters and writers may require specific blocks the AMR. However,
+          when downstream doesn't require anything, the default behavior can be setup to read at-most N
           levels by default. The number of levels read can be set using this
-          method.  Set this to 0 to imply no limit. Default is 1.
+          method. Set this to 0 to imply no limit. Default is 0.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty information_only="1"
