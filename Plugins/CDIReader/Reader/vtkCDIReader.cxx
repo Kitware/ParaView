@@ -1295,12 +1295,11 @@ void vtkCDIReader::RemoveDuplicates(
 
   for (int i = 0; i < temp_nbr_vertices; ++i)
   {
-    double curr_lon, curr_lat;
     double threshold = (vtkMath::Pi() / 2.0) - 1e-4;
-    curr_lon = pointLon[i];
-    curr_lat = pointLat[i];
+    double& curr_lon = pointLon[i];
+    double& curr_lat = pointLat[i];
 
-    while (curr_lon < 0.0)
+    while (curr_lon < -vtkMath::Pi())
     {
       curr_lon += 2 * vtkMath::Pi();
     }
