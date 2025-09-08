@@ -36,7 +36,26 @@ vtkPVDataInformation* vtkSMOutputPort::GetDataInformation()
     std::ostringstream mystr;
     mystr << this->GetSourceProxy()->GetXMLName() << "::GatherInformation";
     vtkTimerLog::MarkStartEvent(mystr.str().c_str());
-    this->GatherDataInformation();
+    this->DataInformation->SetPortNumber(this->PortIndex);
+    this->GatherInformation(this->DataInformation);
+    this->DataInformationValid = true;
+    vtkTimerLog::MarkEndEvent(mystr.str().c_str());
+  }
+  return this->DataInformation;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMOutputPort::GetDataSetInformation()
+{
+  if (!this->DataSetInformationValid)
+  {
+    std::ostringstream mystr;
+    mystr << this->GetSourceProxy()->GetXMLName() << "::GatherSetInformation";
+    vtkTimerLog::MarkStartEvent(mystr.str().c_str());
+    this->DataInformation->SetInspectCells(true);
+    this->DataInformation->SetPortNumber(this->PortIndex);
+    this->GatherInformation(this->DataInformation);
+    this->DataSetInformationValid = true;
     vtkTimerLog::MarkEndEvent(mystr.str().c_str());
   }
   return this->DataInformation;
@@ -47,7 +66,9 @@ vtkPVTemporalDataInformation* vtkSMOutputPort::GetTemporalDataInformation()
 {
   if (!this->TemporalDataInformationValid)
   {
-    this->GatherTemporalDataInformation();
+    this->TemporalDataInformation->SetPortNumber(this->PortIndex);
+    this->GatherInformation(this->TemporalDataInformation);
+    this->TemporalDataInformationValid = true;
   }
   return this->TemporalDataInformation;
 }
@@ -86,17 +107,13 @@ vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(
     }
   }
 
-  this->SourceProxy->GetSession()->PrepareProgress();
-
   vtkNew<vtkPVDataInformation> subsetInfo;
-  subsetInfo->Initialize();
   subsetInfo->SetPortNumber(this->PortIndex);
   subsetInfo->SetSubsetSelector(selector);
   subsetInfo->SetSubsetAssemblyName(assemblyName);
-  this->SourceProxy->GatherInformation(subsetInfo);
+  this->GatherInformation(subsetInfo);
 
   this->SubsetDataInformations[key][nodes.front()] = subsetInfo;
-  this->SourceProxy->GetSession()->CleanupPendingProgress();
   return subsetInfo;
 }
 
@@ -134,18 +151,15 @@ vtkPVTemporalDataInformation* vtkSMOutputPort::GetTemporalSubsetDataInformation(
     }
   }
 
-  this->SourceProxy->GetSession()->PrepareProgress();
-
   vtkNew<vtkPVTemporalDataInformation> temporalSubsetInfo;
-  temporalSubsetInfo->Initialize();
   temporalSubsetInfo->SetPortNumber(this->PortIndex);
   temporalSubsetInfo->SetSubsetSelector(selector);
   temporalSubsetInfo->SetSubsetAssemblyName(assemblyName);
-  this->SourceProxy->GatherInformation(temporalSubsetInfo);
-  temporalSubsetInfo->Modified();
+
+  this->GatherInformation(temporalSubsetInfo);
 
   this->TemporalSubsetDataInformations[key][nodes.front()] = temporalSubsetInfo;
-  this->SourceProxy->GetSession()->CleanupPendingProgress();
+
   return temporalSubsetInfo;
 }
 
@@ -234,7 +248,7 @@ void vtkSMOutputPort::InvalidateDataInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMOutputPort::GatherDataInformation()
+void vtkSMOutputPort::GatherInformation(vtkPVDataInformation* info)
 {
   if (!this->SourceProxy)
   {
@@ -243,32 +257,27 @@ void vtkSMOutputPort::GatherDataInformation()
   }
 
   this->SourceProxy->GetSession()->PrepareProgress();
-  this->DataInformation->Initialize();
-  this->DataInformation->SetPortNumber(this->PortIndex);
-  this->SourceProxy->GatherInformation(this->DataInformation);
-  this->DataInformation->Modified();
+  info->Initialize();
+  this->SourceProxy->GatherInformation(info);
+  info->Modified();
 
-  this->DataInformationValid = true;
   this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMOutputPort::GatherTemporalDataInformation()
 {
-  if (!this->SourceProxy)
-  {
-    vtkErrorMacro("Invalid vtkSMOutputPort.");
-    return;
-  }
-
-  this->SourceProxy->GetSession()->PrepareProgress();
-  this->TemporalDataInformation->Initialize();
   this->TemporalDataInformation->SetPortNumber(this->PortIndex);
-  this->SourceProxy->GatherInformation(this->TemporalDataInformation);
-  this->TemporalDataInformation->Modified();
-
+  this->GatherInformation(this->TemporalDataInformation);
   this->TemporalDataInformationValid = true;
-  this->SourceProxy->GetSession()->CleanupPendingProgress();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::GatherDataInformation()
+{
+  this->DataInformation->SetPortNumber(this->PortIndex);
+  this->GatherInformation(this->DataInformation);
+  this->DataInformationValid = true;
 }
 
 //----------------------------------------------------------------------------

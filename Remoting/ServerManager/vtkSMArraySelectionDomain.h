@@ -16,6 +16,10 @@
  * Supported Required-Property functions:
  * \li \c ArrayList : points a string-vector property that produces the
  * (array_name, status) tuples. This is typically an information-only property.
+ *
+ * Supported attribute:
+ * \li mode: if present and set to "cell_types", the string list is initialized
+ * with the input dataset cell types.
  */
 
 #ifndef vtkSMArraySelectionDomain_h
@@ -39,6 +43,13 @@ public:
   int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
   /**
+   * Override property update.
+   * If UseCellTypes is true, initialize Strings with the list
+   * of available cell types name from the input dataset.
+   */
+  void Update(vtkSMProperty*) override;
+
+  /**
    * Global flag to toggle between (a) the default behavior of setting default
    * values according to infoProperty and (b) setting all default values to on.
    */
@@ -49,9 +60,17 @@ protected:
   vtkSMArraySelectionDomain();
   ~vtkSMArraySelectionDomain() override;
 
+  /**
+   * Read XML attributes to configure the domain.
+   * Handle "mode" attribute when set to "cell_type".
+   */
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
+
 private:
   vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&) = delete;
   void operator=(const vtkSMArraySelectionDomain&) = delete;
+
+  bool UseCellTypes = false;
 };
 
 #endif

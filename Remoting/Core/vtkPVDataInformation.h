@@ -57,6 +57,14 @@ public:
   vtkGetMacro(PortNumber, int);
   ///@}
 
+  /**
+   * Flag to ask for deeper cell inspection.
+   * When true, this browses the vtkDataSet cells to generate the UniqueCellTypes list.
+   * Note that it can be a time-consuming operation.
+   * Default is false.
+   */
+  vtkSetMacro(InspectCells, bool);
+
   ///@{
   /**
    * Indicates which rank to gather the information from. Default is -1 which
@@ -462,6 +470,13 @@ public:
    */
   unsigned int ComputeCompositeIndexForAMR(unsigned int level, unsigned int index) const;
 
+  /**
+   * Return a list of unique cell types (see vtkCellType.h).
+   * This requires InspectCells to be true and that the input is a vtkDataSet subclass.
+   * Returns an empty vector otherwise.
+   */
+  const std::vector<unsigned char>& GetUniqueCellTypes() const { return this->UniqueCellTypes; }
+
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation() override;
@@ -521,6 +536,9 @@ private:
 
   vtkNew<vtkDataAssembly> Hierarchy;
   vtkNew<vtkDataAssembly> DataAssembly;
+
+  bool InspectCells = false;
+  std::vector<unsigned char> UniqueCellTypes;
 
   friend class vtkPVDataInformationAccumulator;
 };

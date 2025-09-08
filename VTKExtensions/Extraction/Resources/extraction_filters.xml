@@ -623,9 +623,9 @@
                             element_types="2 0"
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
-        <ArraySelectionDomain name="array_list">
+        <ArraySelectionDomain name="array_list" mode="cell_types">
           <RequiredProperties>
-            <Property function="ArrayList" name="CellTypeSelectionInfo" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
         </ArraySelectionDomain>
         <Documentation>

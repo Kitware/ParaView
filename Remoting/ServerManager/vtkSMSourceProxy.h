@@ -130,6 +130,16 @@ public:
   vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
   ///@}
 
+  /**
+   * Return the DataInformation of the source proxy.
+   * This is populated as needed by the server.
+   *
+   * It differ from GetDataInformation in that it contains more specific
+   * informations about the vtkDataSet, like the list of cell types.
+   * Thus, this can require more time call this than the simple GetDataInformation.
+   */
+  vtkPVDataInformation* GetDataSetInformation(unsigned int outputIdx);
+
   ///@{
   /**
    * For composite datasets, `GetDataInformation` returns summary data information for

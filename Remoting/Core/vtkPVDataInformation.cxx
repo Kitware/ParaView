@@ -62,6 +62,7 @@ public:
     assert(vtkCompositeDataSet::SafeDownCast(dobj) == nullptr);
 
     this->Current->Initialize();
+    this->Current->SetInspectCells(info->InspectCells);
     this->Current->CopyFromDataObject(dobj);
     if (this->Current->GetDataSetType() != -1)
     {
@@ -152,7 +153,8 @@ vtkPVDataInformation::~vtkPVDataInformation()
 void vtkPVDataInformation::CopyParametersToStream(vtkMultiProcessStream& str)
 {
   str << 828792 << this->PortNumber << std::string(this->SubsetSelector ? SubsetSelector : "")
-      << std::string(this->SubsetAssemblyName ? this->SubsetAssemblyName : "") << this->Rank;
+      << std::string(this->SubsetAssemblyName ? this->SubsetAssemblyName : "") << this->Rank
+      << this->InspectCells;
 }
 
 //----------------------------------------------------------------------------
@@ -160,7 +162,7 @@ void vtkPVDataInformation::CopyParametersFromStream(vtkMultiProcessStream& str)
 {
   int magic_number;
   std::string path, name;
-  str >> magic_number >> this->PortNumber >> path >> name >> this->Rank;
+  str >> magic_number >> this->PortNumber >> path >> name >> this->Rank >> this->InspectCells;
   if (magic_number != 828792)
   {
     vtkErrorMacro("Magic number mismatch.");
@@ -559,6 +561,19 @@ void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
       esg->GetExtent(this->Extent);
     }
 
+    if (this->InspectCells)
+    {
+      vtkNew<vtkCellTypes> cellTypes;
+      ds->GetDistinctCellTypes(cellTypes);
+      std::set<unsigned int> uniqueTypeSet;
+      for (int idx = 0; idx < cellTypes->GetNumberOfTypes(); idx++)
+      {
+        uniqueTypeSet.insert(cellTypes->GetCellType(idx));
+      }
+      this->UniqueCellTypes =
+        std::vector<unsigned char>{ uniqueTypeSet.begin(), uniqueTypeSet.end() };
+    }
+
     if (auto ps = vtkPointSet::SafeDownCast(dobj))
     {
       if (ps->GetPoints() && ps->GetPoints()->GetData())
@@ -646,6 +661,12 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
   this->UniqueBlockTypes.clear();
   this->UniqueBlockTypes.insert(this->UniqueBlockTypes.end(), types.begin(), types.end());
 
+  std::set<unsigned char> cellTypes{ this->UniqueCellTypes.begin(), this->UniqueCellTypes.end() };
+  std::set<unsigned char> otherCellTypes{ other->UniqueCellTypes.begin(),
+    other->UniqueCellTypes.end() };
+  cellTypes.merge(otherCellTypes);
+  this->UniqueCellTypes = std::vector<unsigned char>(cellTypes.begin(), cellTypes.end());
+
   for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
   {
     switch (cc)
@@ -701,6 +722,7 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation* other)
   this->TimeSteps = other->TimeSteps;
   this->TimeLabel = other->TimeLabel;
   this->UniqueBlockTypes = other->UniqueBlockTypes;
+  this->UniqueCellTypes = other->UniqueCellTypes;
   std::copy(other->NumberOfElements,
     other->NumberOfElements + vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES, this->NumberOfElements);
   for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
@@ -1026,6 +1048,14 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
       &this->UniqueBlockTypes.front(), static_cast<int>(this->UniqueBlockTypes.size()));
   }
 
+  *css << static_cast<int>(this->UniqueBlockTypes.size());
+  if (!this->UniqueCellTypes.empty())
+  {
+    std::vector<int> uniqueVector{ this->UniqueCellTypes.begin(), this->UniqueCellTypes.end() };
+    *css << vtkClientServerStream::InsertArray(
+      uniqueVector.data(), static_cast<int>(uniqueVector.size()));
+  }
+
   vtkClientServerStream temp;
   this->PointArrayInformation->CopyToStream(&temp);
   *css << temp;
@@ -1115,6 +1145,22 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   {
     this->Initialize();
     vtkErrorMacro("Error parsing stream.");
+    return;
+  }
+
+  // read UniqueCellTypes
+  int uniqueCellTypesLength = 0;
+  if (!css->GetArgument(0, argument++, &uniqueCellTypesLength))
+  {
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream");
+    return;
+  }
+  if (uniqueCellTypesLength > 0 &&
+    !css->GetArgument(0, argument++, this->UniqueCellTypes.data(), uniqueCellTypesLength))
+  {
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream");
     return;
   }
 
