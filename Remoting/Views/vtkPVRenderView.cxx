@@ -3618,13 +3618,6 @@ void vtkPVRenderView::SetEnableANARI(bool v)
     this->Internals->AnariPass = vtkSmartPointer<vtkAnariPass>::New();
     this->Internals->AnariPass->GetSceneGraph()->SetCompositeOnGL(ren, 1);
   }
-  // if (!vtkAnariPass::IsSupported())
-  // {
-  //   vtkWarningMacro(
-  //     "Refusing to enable OSPRay because it is not supported running in this configuration.");
-  //   // Force disable.
-  //   v = false;
-  // }
   if (this->Internals->IsInAnari == v)
   {
     return;
@@ -3952,7 +3945,6 @@ void vtkPVRenderView::SetLightScale(double v)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkOSPRayLightNode::SetLightScale(v);
   vtkRenderer* ren = this->GetRenderer();
-  // vtkAnariRendererNode::SetLightFalloff(v, ren);
 #else
   (void)v;
 #endif
