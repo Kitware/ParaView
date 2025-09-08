@@ -66,6 +66,44 @@ public:
     this->insert("SetStatus", QIcon(":/pqWidgets/Icons/pqSideSetData.svg"));
   }
 };
+
+/**
+ * A QSortFilterProxyModel aware of numerical values for sorting operation.
+ * For non-numerical data, falls back to usual string comparison.
+ * While QCollator seems to do that its numeric support is not guarantee
+ * so doing that by ourself. (https://doc.qt.io/qt-6.9/qcollator.html#posix-fallback-implementation)
+ */
+class pqNumericSortModel : public QSortFilterProxyModel
+{
+public:
+  pqNumericSortModel(QObject* parent)
+    : QSortFilterProxyModel(parent)
+  {
+  }
+
+protected:
+  bool lessThan(const QModelIndex& left, const QModelIndex& right) const override
+  {
+    QVariant leftData = sourceModel()->data(left);
+    QVariant rightData = sourceModel()->data(right);
+
+    bool isNum = false;
+    double leftVal = leftData.toDouble(&isNum);
+    if (isNum)
+    {
+      double rightVal = rightData.toDouble(&isNum);
+      if (isNum)
+      {
+        return leftVal < rightVal;
+      }
+    }
+
+    QString leftString = leftData.toString();
+    QString rightString = rightData.toString();
+
+    return leftString.localeAwareCompare(rightString) < 0;
+  }
+};
 }
 
 class pqArraySelectionWidget::Model : public QStandardItemModel
@@ -405,7 +443,7 @@ pqArraySelectionWidget::pqArraySelectionWidget(int numColumns, QWidget* parentOb
   }
 
   auto mymodel = new pqArraySelectionWidget::Model(0, numColumns, this);
-  auto sortmodel = new QSortFilterProxyModel(this);
+  auto sortmodel = new pqNumericSortModel(this);
   sortmodel->setSourceModel(mymodel);
   this->setModel(sortmodel);
   // use underlying structure by default - no alphabetic sort until header clicked.
