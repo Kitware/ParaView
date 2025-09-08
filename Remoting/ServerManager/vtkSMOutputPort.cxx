@@ -3,20 +3,14 @@
 #include "vtkSMOutputPort.h"
 
 #include "vtkAlgorithm.h"
-#include "vtkCollection.h"
-#include "vtkCollectionIterator.h"
-#include "vtkCommand.h"
+#include "vtkClientServerStream.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
-#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVTemporalDataInformation.h"
-#include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
 #include "vtkSMCompoundSourceProxy.h"
-#include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"
 
@@ -28,26 +22,11 @@ vtkStandardNewMacro(vtkSMOutputPort);
 //----------------------------------------------------------------------------
 vtkSMOutputPort::vtkSMOutputPort()
 {
-  this->ClassNameInformation = vtkPVClassNameInformation::New();
-  this->DataInformation = vtkPVDataInformation::New();
-  this->TemporalDataInformation = vtkPVTemporalDataInformation::New();
-  this->ClassNameInformationValid = 0;
-  this->DataInformationValid = false;
-  this->TemporalDataInformationValid = false;
-  this->PortIndex = 0;
-  this->SourceProxy = nullptr;
-  this->CompoundSourceProxy = nullptr;
   this->ObjectsCreated = 1;
 }
 
 //----------------------------------------------------------------------------
-vtkSMOutputPort::~vtkSMOutputPort()
-{
-  this->SetSourceProxy(nullptr);
-  this->ClassNameInformation->Delete();
-  this->DataInformation->Delete();
-  this->TemporalDataInformation->Delete();
-}
+vtkSMOutputPort::~vtkSMOutputPort() = default;
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMOutputPort::GetDataInformation()
@@ -230,7 +209,7 @@ vtkPVDataInformation* vtkSMOutputPort::GetRankDataInformation(int rank)
 //----------------------------------------------------------------------------
 vtkPVClassNameInformation* vtkSMOutputPort::GetClassNameInformation()
 {
-  if (this->ClassNameInformationValid == 0)
+  if (!this->ClassNameInformationValid)
   {
     this->GatherClassNameInformation();
   }
@@ -312,7 +291,7 @@ void vtkSMOutputPort::GatherClassNameInformation()
   {
     this->SourceProxy->GatherInformation(this->ClassNameInformation);
   }
-  this->ClassNameInformationValid = 1;
+  this->ClassNameInformationValid = true;
 }
 
 //----------------------------------------------------------------------------

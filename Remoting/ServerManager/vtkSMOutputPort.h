@@ -162,19 +162,19 @@ protected:
 
   // The index of the port the output is obtained from.
   vtkSetMacro(PortIndex, int);
-  int PortIndex;
+  int PortIndex = 0;
 
   vtkWeakPointer<vtkSMSourceProxy> SourceProxy;
   vtkWeakPointer<vtkSMCompoundSourceProxy> CompoundSourceProxy;
 
-  vtkPVClassNameInformation* ClassNameInformation;
-  int ClassNameInformationValid;
+  vtkNew<vtkPVClassNameInformation> ClassNameInformation;
+  bool ClassNameInformationValid = false;
 
-  vtkPVDataInformation* DataInformation;
-  bool DataInformationValid;
+  vtkNew<vtkPVDataInformation> DataInformation;
+  bool DataInformationValid = false;
 
-  vtkPVTemporalDataInformation* TemporalDataInformation;
-  bool TemporalDataInformationValid;
+  vtkNew<vtkPVTemporalDataInformation> TemporalDataInformation;
+  bool TemporalDataInformationValid = false;
 
   std::map<std::string, std::map<int, vtkSmartPointer<vtkPVDataInformation>>>
     SubsetDataInformations;
