@@ -4728,5 +4728,88 @@ Every Nth Point.
     </SourceProxy>
     <!-- End vtkEqualizerFilter -->
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVTableToStructuredGrid"
+                 label="Table To Structured Grid"
+                 name="TableToStructuredGrid">
+      <Documentation long_help="Converts a table to structured grid."
+                     short_help="Converts a table to structured grid.">The
+                     TableToStructuredGrid filter converts a vtkTable to a
+                     vtkStructuredGrid. One must specify the columns in the
+                     input table to use as the X, Y and Z coordinates for the
+                     points in the output, and the dimensions of the data.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_array"
+                          number_of_components="1" />
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetDimensions"
+                         default_values="0 0 0"
+                         name="Dimensions"
+                         number_of_elements="3">
+        <Documentation>This property specifies the number of data points along
+        each axes in the dataset.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMinimumIndex"
+                         default_values="0 0 0"
+                         name="MinimumIndex"
+                         number_of_elements="3"
+                         panel_visibility="advanced">
+          <IntRangeDomain name="range" />
+        <Documentation>This property specifies the minimum index values of the
+        data in each dimension (xmin, ymin, zmin).</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetXColumn"
+                            name="XColumn"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies which data array is going to be
+        used as the X coordinate in the generated polydata
+        dataset.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetYColumn"
+                            name="YColumn"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies which data array is going to be
+        used as the Y coordinate in the generated polydata
+        dataset.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetZColumn"
+                            name="ZColumn"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies which data array is going to be
+        used as the Z coordinate in the generated polydata
+        dataset.</Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+    <!-- End vtkPVTableToStructuredGrid -->
+
   </ProxyGroup>
 </ServerManagerConfiguration>
