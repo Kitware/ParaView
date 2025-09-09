@@ -1827,7 +1827,7 @@ int vtkCDIReader::CheckForMaskData()
     if (this->ShowMultilayerView)
     {
       this->CellMask.resize(this->MaximumCells * this->Bloat);
-      float* dataTmpMask = new float[this->MaximumCells * sizeof(float)];
+      float* dataTmpMask = new float[this->MaximumCells];
       CHECK_NEW(dataTmpMask);
 
       cdi_set_cur(cdiVar, 0, 0);
