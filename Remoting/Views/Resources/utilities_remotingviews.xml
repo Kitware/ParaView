@@ -2616,10 +2616,10 @@
           <Property exposed_name="XTitleOpacity" name="Opacity"/>
           <Property exposed_name="XTitleFontFamily" name="FontFamily"/>
           <Property exposed_name="XTitleFontFile" name="FontFile"/>
-          <Property exposed_name="XTitleBold" name="Bold"/>
+          <Property exposed_name="XTitleBold" name="Bold" default_values="1"/>
           <Property exposed_name="XTitleItalic" name="Italic"/>
           <Property exposed_name="XTitleShadow" name="Shadow"/>
-          <Property exposed_name="XTitleFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="XTitleFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -2641,10 +2641,10 @@
           <Property exposed_name="YTitleOpacity" name="Opacity"/>
           <Property exposed_name="YTitleFontFamily" name="FontFamily"/>
           <Property exposed_name="YTitleFontFile" name="FontFile"/>
-          <Property exposed_name="YTitleBold" name="Bold"/>
+          <Property exposed_name="YTitleBold" name="Bold" default_values="1"/>
           <Property exposed_name="YTitleItalic" name="Italic"/>
           <Property exposed_name="YTitleShadow" name="Shadow"/>
-          <Property exposed_name="YTitleFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="YTitleFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -2666,10 +2666,10 @@
           <Property exposed_name="ZTitleOpacity" name="Opacity"/>
           <Property exposed_name="ZTitleFontFamily" name="FontFamily"/>
           <Property exposed_name="ZTitleFontFile" name="FontFile"/>
-          <Property exposed_name="ZTitleBold" name="Bold"/>
+          <Property exposed_name="ZTitleBold" name="Bold" default_values="1"/>
           <Property exposed_name="ZTitleItalic" name="Italic"/>
           <Property exposed_name="ZTitleShadow" name="Shadow"/>
-          <Property exposed_name="ZTitleFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="ZTitleFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -2855,10 +2855,10 @@
           <Property exposed_name="XLabelOpacity" name="Opacity"/>
           <Property exposed_name="XLabelFontFamily" name="FontFamily"/>
           <Property exposed_name="XLabelFontFile" name="FontFile"/>
-          <Property exposed_name="XLabelBold" name="Bold"/>
+          <Property exposed_name="XLabelBold" name="Bold" default_values="1"/>
           <Property exposed_name="XLabelItalic" name="Italic"/>
           <Property exposed_name="XLabelShadow" name="Shadow"/>
-          <Property exposed_name="XLabelFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="XLabelFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -2880,10 +2880,10 @@
           <Property exposed_name="YLabelOpacity" name="Opacity"/>
           <Property exposed_name="YLabelFontFamily" name="FontFamily"/>
           <Property exposed_name="YLabelFontFile" name="FontFile"/>
-          <Property exposed_name="YLabelBold" name="Bold"/>
+          <Property exposed_name="YLabelBold" name="Bold" default_values="1"/>
           <Property exposed_name="YLabelItalic" name="Italic"/>
           <Property exposed_name="YLabelShadow" name="Shadow"/>
-          <Property exposed_name="YLabelFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="YLabelFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -2905,10 +2905,10 @@
           <Property exposed_name="ZLabelOpacity" name="Opacity"/>
           <Property exposed_name="ZLabelFontFamily" name="FontFamily"/>
           <Property exposed_name="ZLabelFontFile" name="FontFile"/>
-          <Property exposed_name="ZLabelBold" name="Bold"/>
+          <Property exposed_name="ZLabelBold" name="Bold" default_values="1"/>
           <Property exposed_name="ZLabelItalic" name="Italic"/>
           <Property exposed_name="ZLabelShadow" name="Shadow"/>
-          <Property exposed_name="ZLabelFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="ZLabelFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -3340,10 +3340,10 @@
         <ExposedProperties>
           <Property exposed_name="AxesLabelColor" name="Color"/>
           <Property exposed_name="AxesLabelFontFamily" name="FontFamily"/>
-          <Property exposed_name="AxesLabelBold" name="Bold"/>
+          <Property exposed_name="AxesLabelBold" name="Bold" default_values="1"/>
           <Property exposed_name="AxesLabelItalic" name="Italic"/>
           <Property exposed_name="AxesLabelShadow" name="Shadow"/>
-          <Property exposed_name="AxesLabelFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="AxesLabelFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
 
