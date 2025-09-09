@@ -1320,7 +1320,7 @@
         </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetBackground"
-                            default_values="0.329 0.349 0.427"
+                            default_values="0.384313725 0.364705882 0.352941176"
                             name="Background"
                             panel_widget="color_selector"
                             number_of_elements="3">
@@ -1677,7 +1677,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEnvironmentalBG"
-                            default_values="0.329 0.349 0.427"
+                            default_values="0.384313725 0.364705882 0.352941176"
                             name="EnvironmentalBG"
                             panel_widget="color_selector_with_palette"
                             number_of_elements="3">
