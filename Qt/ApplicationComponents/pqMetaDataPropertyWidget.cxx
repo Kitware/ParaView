@@ -74,7 +74,7 @@ pqMetaDataPropertyWidget::pqMetaDataPropertyWidget(
   {
     auto smproperty = smgroup->GetProperty(i);
     const char* smkey = smgroup->GetPropertyName(i);
-    auto layoutLocal = new QHBoxLayout(this);
+    auto layoutLocal = new QHBoxLayout();
     auto widget = pqProxyWidget::createWidgetForProperty(smproperty, proxy, this);
 
     widget->setObjectName(QString(smkey).remove(' '));
