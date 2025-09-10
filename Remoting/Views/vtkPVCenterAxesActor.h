@@ -10,6 +10,7 @@
 #ifndef vtkPVCenterAxesActor_h
 #define vtkPVCenterAxesActor_h
 
+#include "vtkLookupTable.h"
 #include "vtkOpenGLActor.h"
 #include "vtkRemotingViewsModule.h" // needed for export macro
 
@@ -33,16 +34,23 @@ public:
    */
   void SetComputeNormals(int);
 
+  void SetXAxisColor(double r, double g, double b);
+  void SetYAxisColor(double r, double g, double b);
+  void SetZAxisColor(double r, double g, double b);
+
 protected:
   vtkPVCenterAxesActor();
   ~vtkPVCenterAxesActor() override;
 
   vtkAxes* Axes;
   vtkPolyDataMapper* Mapper;
+  vtkNew<vtkLookupTable> LUT;
 
 private:
   vtkPVCenterAxesActor(const vtkPVCenterAxesActor&) = delete;
   void operator=(const vtkPVCenterAxesActor&) = delete;
+
+  void SetAxisColor(int axis, double r, double g, double b);
 };
 
 #endif

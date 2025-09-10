@@ -257,6 +257,36 @@
         <Documentation>Toggle the visibility of the axes showing the center of
         rotation in the scene.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty name="CenterAxesXColor"
+                            number_of_elements="3"
+                            default_values="1 0 0"
+                            command="SetCenterAxesXColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CenterAxesVisibility" value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="CenterAxesYColor"
+                            number_of_elements="3"
+                            default_values="1 1 0"
+                            command="SetCenterAxesYColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CenterAxesVisibility" value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="CenterAxesZColor"
+                            number_of_elements="3"
+                            default_values="0 1 0"
+                            command="SetCenterAxesZColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CenterAxesVisibility" value="1" />
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetOrientationAxesVisibility"
                          default_values="1"
                          name="OrientationAxesVisibility"

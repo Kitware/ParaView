@@ -656,6 +656,10 @@ public:
    */
   virtual void SetCenterAxesVisibility(bool);
 
+  virtual void SetCenterAxesXColor(double r, double g, double b);
+  virtual void SetCenterAxesYColor(double r, double g, double b);
+  virtual void SetCenterAxesZColor(double r, double g, double b);
+
   ///@{
   /**
    * Forward to vtkPVInteractorStyle instances.
