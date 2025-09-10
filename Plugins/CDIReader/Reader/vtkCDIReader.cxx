@@ -1299,18 +1299,18 @@ void vtkCDIReader::RemoveDuplicates(
     double& curr_lon = pointLon[i];
     double& curr_lat = pointLat[i];
 
-    while (curr_lon < -vtkMath::Pi())
+    if (this->ProjectionMode != projection::CATALYST)
     {
-      curr_lon += 2 * vtkMath::Pi();
-    }
-    while (curr_lon >= vtkMath::Pi())
-    {
-      curr_lon -= 2 * vtkMath::Pi();
-    }
+      while (curr_lon < -vtkMath::Pi())
+        curr_lon += 2 * vtkMath::Pi();
 
-    if (curr_lat > threshold or curr_lat < (-1.0 * threshold))
-    {
-      curr_lon = 0.0;
+      while (curr_lon >= vtkMath::Pi())
+        curr_lon -= 2 * vtkMath::Pi();
+
+      if (curr_lat > threshold || curr_lat < (-1.0 * threshold))
+      {
+        curr_lon = 0.0;
+      }
     }
 
     sort_array[i].Pt.Lon = curr_lon;
