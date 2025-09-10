@@ -17,7 +17,7 @@ set(ENV{DASHBOARD_TEST_FROM_CTEST} "1")
 
 # run paraview to setup and save the python state file
 execute_process(
-  COMMAND ${PARAVIEW_EXECUTABLE} -dr
+  COMMAND ${PARAVIEW_EXECUTABLE} --dr
           --test-directory=${TEMPORARY_DIR}
           --test-script=${TEST_SCRIPT}
           --data-directory=${DATA_DIR}
@@ -29,7 +29,7 @@ endif()
 
 # run pvpython to load the state file and verify the result
 execute_process(
-  COMMAND ${PVPYTHON_EXECUTABLE} -dr --force-offscreen-rendering
+  COMMAND ${PVPYTHON_EXECUTABLE} --dr --force-offscreen-rendering
   ${TEST_DRIVER}
   ${TEMPORARY_DIR}/${PYTHON_STATE_TEST_NAME}-StateFile.py
   -T ${TEMPORARY_DIR}

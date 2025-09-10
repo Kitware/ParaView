@@ -253,7 +253,7 @@ if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
       -t 10
       --size 21
       --delay 2
-    --client $<TARGET_FILE:ParaView::pvpython> --force-offscreen-rendering -dr)
+    --client $<TARGET_FILE:ParaView::pvpython> --force-offscreen-rendering --dr)
   vtk_add_test_python(NO_DATA NO_RT TestCatalystClient.py)
   unset(_vtk_testing_python_exe)
   unset(_vtk_test_python_args)
