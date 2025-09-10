@@ -17523,7 +17523,7 @@
   },
   {
     "Name": "Fast",
-    "ColorSpace": "RGB",
+    "ColorSpace": "Lab",
     "Creator": "Francesca Samsel, and Alan W. Scott",
     "DefaultMap": true,
     "NanColor": [
