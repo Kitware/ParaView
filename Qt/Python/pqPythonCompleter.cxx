@@ -130,7 +130,6 @@ void pqPythonCompleter::appendPyObjectAttributes(PyObject* object, QStringList& 
 void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStringList& results)
 {
   // Check if we have a function from paraview.simple
-  PyObject* pvtag = PyObject_GetAttrString(function, "__paraview_create_object_tag");
   vtkSmartPyObject simpleModule;
   simpleModule.TakeReference(PyImport_ImportModule("paraview.simple.session"));
   if (!simpleModule)
@@ -144,11 +143,17 @@ void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStri
     }
   }
   std::string argumentExtractorUtility;
-  if (pvtag && PyBool_Check(pvtag))
+  int hasPvTag = PyObject_HasAttrString(function, "__paraview_create_object_tag");
+  if (hasPvTag)
   {
-    // Hard-code this non-property default argument
-    results.append("registrationName");
-    argumentExtractorUtility = "ListProperties";
+    // Verify the attribute is a bool with value True
+    PyObject* pvtag = PyObject_GetAttrString(function, "__paraview_create_object_tag");
+    if (pvtag && PyObject_IsTrue(pvtag))
+    {
+      // Hard-code this non-property default argument
+      results.append("registrationName");
+      argumentExtractorUtility = "ListProperties";
+    }
   }
   else
   {
