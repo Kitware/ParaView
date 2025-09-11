@@ -2291,7 +2291,7 @@ void vtkCDIReader::OutputPoints(bool init)
           }
         }
       }
-      else
+      else // if (this->ProjectionMode != projection::SPHERICAL)
       {
         z = this->Layer0Offset * adjustedLayerThickness; // to avoid 0 layer thickness / ...
       }
