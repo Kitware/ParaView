@@ -1307,7 +1307,9 @@ void vtkCDIReader::RemoveDuplicates(
       }
 
       while (curr_lon >= vtkMath::Pi())
+      {
         curr_lon -= 2 * vtkMath::Pi();
+      }
 
       if (curr_lat > threshold || curr_lat < (-1.0 * threshold))
       {
