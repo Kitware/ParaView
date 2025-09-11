@@ -1302,7 +1302,9 @@ void vtkCDIReader::RemoveDuplicates(
     if (this->ProjectionMode != projection::CATALYST)
     {
       while (curr_lon < -vtkMath::Pi())
+      {
         curr_lon += 2 * vtkMath::Pi();
+      }
 
       while (curr_lon >= vtkMath::Pi())
         curr_lon -= 2 * vtkMath::Pi();
