@@ -943,6 +943,7 @@
       </PropertyGroup>
       <Hints>
         <Representation view="RenderView" type="RulerSourceRepresentation" />
+        <RepositionToView />
       </Hints>
     </SourceProxy>
 

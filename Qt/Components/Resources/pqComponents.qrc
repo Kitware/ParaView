@@ -154,6 +154,7 @@
         <file>Icons/pqResetActorsPosition.svg</file>
         <file>Icons/pqResetCamera.svg</file>
         <file>Icons/pqResetCameraClosest.svg</file>
+        <file>Icons/pqResetCameraData.svg</file>
         <file>Icons/pqResetCenter.svg</file>
         <file>Icons/pqResetRange.svg</file>
         <file>Icons/pqResetRangeCustom.svg</file>
@@ -221,6 +222,7 @@
         <file>Icons/pqSurfaceSelectionPointDataInteractive.svg</file>
         <file>Icons/pqSurfaceSelectionPointInteractive.svg</file>
         <file>Icons/pqSurfaceSelectionPoint.svg</file>
+        <file>Icons/pqSwapVector.svg</file>
         <file>Icons/pqTextAlignRight.svg</file>
         <file>Icons/pqTextAlignLeft.svg</file>
         <file>Icons/pqTextAlignCenter.svg</file>
