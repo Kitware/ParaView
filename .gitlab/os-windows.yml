@@ -74,6 +74,8 @@
     - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\cmake\bin;$env:PATH"
     - powershell -File ".gitlab/ci/ninja.ps1"
     - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab;$env:PATH"
+    - powershell -File ".gitlab/ci/xsltproc.ps1"
+    - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\xsltproc\bin;$env:PATH"
     - cmake --version
     - ninja --version
     # Support submodule references to the user's fork.

@@ -57,7 +57,8 @@
 .before_script_macos: &before_script_macos
     - .gitlab/ci/cmake.sh
     - .gitlab/ci/ninja.sh
-    - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PATH
+    - .gitlab/ci/xsltproc.sh
+    - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PWD/.gitlab/xsltproc/bin:$PATH
     - cmake --version
     - ninja --version
     # Download Qt
