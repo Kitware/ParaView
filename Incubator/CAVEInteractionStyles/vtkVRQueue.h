@@ -7,6 +7,7 @@
 #include "vtkNew.h"
 #include "vtkObject.h"
 #include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
+#include "vtkType.h"
 
 #include <condition_variable>
 #include <mutex>
@@ -48,7 +49,7 @@ struct vtkVREvent
   std::string name; // Specified from configuration
   unsigned int eventType;
   vtkVREventCommonData data;
-  unsigned int timeStamp;
+  vtkTypeInt64 timeStamp;
 };
 
 class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkVRQueue : public vtkObject
