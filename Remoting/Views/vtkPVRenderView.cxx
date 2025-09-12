@@ -22,16 +22,13 @@
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationIntegerKey.h"
-#include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
-#include "vtkInformationStringKey.h"
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkInteractorStyleDrawPolygon.h"
 #include "vtkInteractorStyleRubberBand3D.h"
 #include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkLegendScaleActor.h"
-#include "vtkLight.h"
 #include "vtkLightKit.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMath.h"
@@ -77,7 +74,6 @@
 #include "vtkSelectionNode.h"
 #include "vtkSkybox.h"
 #include "vtkSmartPointer.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 #include "vtkTextRepresentation.h"
@@ -85,7 +81,7 @@
 #include "vtkTimerLog.h"
 #include "vtkToneMappingPass.h"
 #include "vtkTrackballPan.h"
-#include "vtkTrivialProducer.h"
+#include "vtkTransform.h"
 #include "vtkValuePass.h"
 #include "vtkVector.h"
 #include "vtkWeakPointer.h"
@@ -432,6 +428,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseRenderViewSettingsForBackground = true;
   this->Background[0] = this->Background[1] = this->Background[2] = 0.0;
   this->Background2[0] = this->Background2[1] = this->Background2[2] = 0.0;
+  this->SkyboxRotation[0] = this->SkyboxRotation[1] = this->SkyboxRotation[2] = 0.0;
   this->UseTexturedEnvironmentalBG = false;
 
   auto window = this->GetRenderWindow();
@@ -2884,6 +2881,34 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
   {
     this->Skybox->SetVisibility(0);
     renderer->SetEnvironmentTexture(this->EnvironmentalBGTexture);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetSkyboxRotation(double x, double y, double z)
+{
+  if (this->SkyboxRotation[0] != x || this->SkyboxRotation[1] != y || this->SkyboxRotation[2] != z)
+  {
+    this->SkyboxRotation[0] = x;
+    this->SkyboxRotation[1] = y;
+    this->SkyboxRotation[2] = z;
+
+    vtkNew<vtkTransform> transform;
+    transform->Identity();
+    transform->RotateX(x);
+    transform->RotateY(y);
+    transform->RotateZ(z);
+
+    vtkMatrix4x4* mat4 = transform->GetMatrix();
+    vtkNew<vtkMatrix3x3> rotMat;
+    for (int i = 0; i < 3; ++i)
+    {
+      for (int j = 0; j < 3; ++j)
+      {
+        rotMat->SetElement(i, j, mat4->GetElement(i, j));
+      }
+    }
+    this->GetRenderer()->SetEnvironmentRotationMatrix(rotMat);
   }
 }
 

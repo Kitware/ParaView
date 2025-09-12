@@ -1330,6 +1330,32 @@
             property="UseColorPaletteForBackground" values="0" />
         </Hints>
       </ProxyProperty>
+      <DoubleVectorProperty command="SetSkyboxRotation"
+                            default_values="0.0 0.0 0.0"
+                            information_property="SkyboxRotationInfo"
+                            name="SkyboxRotation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the rotation parameters of the skybox in degree angles.
+        </Documentation>
+        <Hints>
+          <!-- hide widget unless mode is "Skybox" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                   property="BackgroundColorMode" value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetSkyboxRotation"
+                            default_values="0.0 0.0 0.0"
+                            information_only="1"
+                            name="SkyboxRotationInfo"
+                            number_of_elements="3">
+        <Hints>
+          <!-- hide widget unless mode is "Skybox" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                   property="BackgroundColorMode" value="3" />
+        </Hints>
+      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetBackground2"
                             default_values="0 0 0.165"
                             name="Background2"
@@ -1880,6 +1906,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="BackgroundColorMode" />
         <Property name="Background2"/>
         <Property name="Background"/>
+        <Property name="SkyboxRotation"/>
         <Property name="BackgroundTexture"/>
         <Property name="UseEnvironmentLighting"/>
       </PropertyGroup>
@@ -2817,6 +2844,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="BackgroundColorMode" />
             <Property name="Background2"/>
             <Property name="Background"/>
+            <Property name="SkyboxRotation"/>
             <Property name="BackgroundTexture"/>
             <Property name="UseEnvironmentLighting"/>
           </PropertyGroup>

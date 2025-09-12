@@ -730,6 +730,12 @@ public:
   vtkSetVector3Macro(Background2, double);
   vtkGetVector3Macro(Background2, double);
   vtkSetMacro(UseEnvironmentLighting, bool);
+
+  /**
+   * Generate and set the renderer's environment rotation matrix from the parameter angles.
+   */
+  virtual void SetSkyboxRotation(double x, double y, double z);
+  vtkGetVector3Macro(SkyboxRotation, double);
   ///@}
 
   ///@{
@@ -1383,6 +1389,7 @@ private:
   bool UseRenderViewSettingsForBackground;
   double Background[3];
   double Background2[3];
+  double SkyboxRotation[3];
 
   vtkSmartPointer<vtkCuller> Culler;
   vtkNew<vtkTimerLog> Timer;
