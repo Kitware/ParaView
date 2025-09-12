@@ -170,8 +170,10 @@
     - .gitlab/ci/doxygen.sh
     - .gitlab/ci/sccache.sh
     - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PWD/.gitlab/doxygen/bin:$PATH
+    # Download Qt
+    - cmake -P .gitlab/ci/download_qt6.cmake
     - cmake -P .gitlab/ci/download_onnxruntime.cmake
-    - export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$PWD/.gitlab/onnxruntime
+    - export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$PWD/.gitlab/qt6:$PWD/.gitlab/onnxruntime
     - cmake --version
     - ninja --version
     - doxygen --version

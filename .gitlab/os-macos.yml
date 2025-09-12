@@ -62,10 +62,10 @@
     - cmake --version
     - ninja --version
     # Download Qt
-    - cmake -P .gitlab/ci/download_qt.cmake
+    - cmake -P .gitlab/ci/download_qt6.cmake
     - cmake -P .gitlab/ci/download_cdi.cmake
     - cmake -P .gitlab/ci/download_onnxruntime.cmake
-    - export CMAKE_PREFIX_PATH=$PWD/.gitlab/qt:$PWD/.gitlab/cdi:$PWD/.gitlab/onnxruntime
+    - export CMAKE_PREFIX_PATH=$PWD/.gitlab/qt6:$PWD/.gitlab/cdi:$PWD/.gitlab/onnxruntime
     - git submodule foreach --recursive cmake -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
     - git submodule update --init --recursive
