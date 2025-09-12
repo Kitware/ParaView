@@ -22,7 +22,7 @@
 
 .fedora42:
     extends: .linux
-    image: "kitware/paraview:ci-fedora42-20250818"
+    image: "kitware/paraview:ci-fedora42-20250915"
     variables:
         LC_ALL: "en_US.utf8"
 
