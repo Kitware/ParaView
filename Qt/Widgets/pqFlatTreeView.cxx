@@ -3079,11 +3079,7 @@ int pqFlatTreeView::getDataWidth(const QModelIndex& index, const QFontMetrics& f
 
     return pixmapSize.width();
   }
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  else if (indexData.canConvert(QVariant::Icon))
-#else
-  else if (indexData.canConvert(QMetaType(QMetaType::QIcon)))
-#endif
+  else if (indexData.canConvert<QIcon>())
   {
     // Icons will be scaled to fit the style options.
     return this->getViewOptions().decorationSize.width();
@@ -3591,19 +3587,11 @@ bool pqFlatTreeView::drawDecoration(QPainter& painter, int px, int py, const QMo
   QIcon icon;
   QPixmap pixmap;
   QVariant decoration = this->Model->data(index, Qt::DecorationRole);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  if (decoration.canConvert(QVariant::Pixmap))
-#else
-  if (decoration.canConvert(QMetaType(QMetaType::QPixmap)))
-#endif
+  if (decoration.canConvert<QPixmap>())
   {
     icon = qvariant_cast<QPixmap>(decoration);
   }
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  else if (decoration.canConvert(QVariant::Icon))
-#else
-  else if (decoration.canConvert(QMetaType(QMetaType::QIcon)))
-#endif
+  else if (decoration.canConvert<QIcon>())
   {
     icon = qvariant_cast<QIcon>(decoration);
   }
@@ -3643,11 +3631,7 @@ void pqFlatTreeView::drawData(QPainter& painter, int px, int py, const QModelInd
 #else
   auto typeId = indexData.typeId();
 #endif
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  if (typeId == QMetaType::QPixmap || indexData.canConvert(QVariant::Icon))
-#else
-  if (typeId == QMetaType::QPixmap || indexData.canConvert(QMetaType(QMetaType::QIcon)))
-#endif
+  if (typeId == QMetaType::QPixmap || indexData.canConvert<QIcon>())
   {
     QIcon icon;
     QPixmap pixmap;
