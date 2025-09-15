@@ -1999,6 +1999,11 @@ set (XYBarChart_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-menu
 
+if (APPLE)
+  # On macOS, global menu access can interfere with widget paths.
+  set (MultiBlockInspectorMultiBlock_FORCE_SERIAL TRUE)
+endif ()
+
 # those tests load and remove macros. Serial avoid side effects
 set(MacroEditor_FORCE_SERIAL TRUE)
 set(IconBrowser_FORCE_SERIAL TRUE)
