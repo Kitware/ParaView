@@ -2002,6 +2002,8 @@ set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-men
 if (APPLE)
   # On macOS, global menu access can interfere with widget paths.
   set (MultiBlockInspectorMultiBlock_FORCE_SERIAL TRUE)
+  # Context menu access
+  set (FileDialogOpenInteractClose_FORCE_SERIAL TRUE)
 endif ()
 
 # those tests load and remove macros. Serial avoid side effects
