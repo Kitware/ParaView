@@ -34,9 +34,15 @@
 #include <stack>
 #include <unordered_map>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+using pqHashType = uint;
+#else
+using pqHashType = size_t;
+#endif
+
 // necessary for using QPointer in a QSet
 template <class T>
-static uint qHash(QPointer<T> p)
+static pqHashType qHash(QPointer<T> p)
 {
   return qHash(static_cast<T*>(p));
 }
