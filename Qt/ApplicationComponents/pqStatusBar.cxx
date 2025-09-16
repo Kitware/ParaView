@@ -47,14 +47,14 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
 
   // Force to fusion or cleanlooks style
   // to make sure that the formatted text is displayed
-  QStyle* style = QStyleFactory::create("fusion");
-  if (!style)
+  this->ProgressBarStyle.reset(QStyleFactory::create("fusion"));
+  if (!this->ProgressBarStyle)
   {
-    style = QStyleFactory::create("cleanlooks");
+    this->ProgressBarStyle.reset(QStyleFactory::create("cleanlooks"));
   }
-  if (style)
+  if (this->ProgressBarStyle)
   {
-    this->MemoryProgressBar->setStyle(style);
+    this->MemoryProgressBar->setStyle(this->ProgressBarStyle.get());
   }
 
   auto& activeObjects = pqActiveObjects::instance();

@@ -4,6 +4,7 @@
 #ifndef pqStatusBar_h
 #define pqStatusBar_h
 
+#include <QScopedPointer>
 #include <QStatusBar>
 
 #include "vtkNew.h"
@@ -13,6 +14,7 @@
 class vtkPVSystemConfigInformation;
 class QToolButton;
 class QProgressBar;
+class QStyle;
 
 /**
  * pqStatusBar extends QStatusBar to support showing paraview progress.
@@ -52,6 +54,8 @@ private:
 
   void updateWarningIndicator();
   void updateErrorIndicator();
+
+  QScopedPointer<QStyle> ProgressBarStyle;
 };
 
 #endif
