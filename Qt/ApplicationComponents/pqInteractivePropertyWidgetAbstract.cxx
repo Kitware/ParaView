@@ -67,6 +67,7 @@ pqInteractivePropertyWidgetAbstract::~pqInteractivePropertyWidgetAbstract()
   {
     this->proxy()->RemoveObserver(this->Internals->UserEventObserverId);
     this->Internals->UserEventObserverId = 0;
+    this->proxy()->UnRegister(nullptr);
   }
 }
 
@@ -114,6 +115,7 @@ void pqInteractivePropertyWidgetAbstract::setupUserObserver(vtkSMProxy* smproxy)
 {
   this->Internals->UserEventObserverId = smproxy->AddObserver(
     vtkCommand::UserEvent, this, &pqInteractivePropertyWidgetAbstract::handleUserEvent);
+  smproxy->Register(nullptr);
 }
 
 //-----------------------------------------------------------------------------
