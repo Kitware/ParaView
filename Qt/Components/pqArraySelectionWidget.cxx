@@ -426,7 +426,7 @@ pqArraySelectionWidget::pqArraySelectionWidget(QWidget* parent)
 pqArraySelectionWidget::pqArraySelectionWidget(int numColumns, QWidget* parentObject)
   : Superclass(parentObject, /*use_pqHeaderView=*/true)
   , UpdatingProperty(false)
-  , Timer(new pqTimer())
+  , Timer(new pqTimer(this))
 {
   this->setObjectName("ArraySelectionWidget");
   this->setRootIsDecorated(false);
