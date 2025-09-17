@@ -317,3 +317,18 @@ paraview_add_test_python(
   TestHTG3DContourPolyhedron.py
   TestHTGContourMonoHT.py
 )
+
+#------------------------------------------------------------------------------
+# Add log file option and envvar tests
+set(paraview_python_args "--log=${CMAKE_BINARY_DIR}/Testing/Temporary/pv_option.log")
+paraview_add_test_python(
+  NO_DATA NO_VALID
+  LogFileOption.py
+)
+unset(paraview_python_args)
+
+paraview_add_test_python(
+  NO_DATA NO_VALID
+  LogFileEnvVar.py
+)
+set_tests_properties("paraviewPython-LogFileEnvVar" PROPERTIES ENVIRONMENT "PARAVIEW_LOG_FILE=${CMAKE_BINARY_DIR}/Testing/Temporary/pv_envvar.log")
