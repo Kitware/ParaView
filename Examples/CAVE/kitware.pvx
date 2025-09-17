@@ -1,8 +1,6 @@
 <?xml version="1.0" ?>
 <pvx>
- <Process Type="client" />
-  <Process Type="server">
-    <!-- Tiled wall in Kitware -->
+  <!-- Tiled wall in Kitware -->
   <Machine Name="Amber1"
            Environment="DISPLAY=:0"
            LowerLeft=" -0.5588      -0.3048  -0.0762"
@@ -127,5 +125,4 @@
   <!--          LowerLeft=" -0.201 1.08 -3.2" -->
   <!--          LowerRight=" 1.525 1.08 -3.2" -->
   <!--          UpperRight=" 1.525 2.38 -3.2" /> -->
- </Process>
 </pvx>

@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<pvx>
+  <!--
+      Three screen configuration: left, right, floor
+      Screens are 2.26 x 1.27 in physical coordinates
+  -->
+  <Machine Name="Left"
+    Geometry="640x360+100+1200"
+    ShowBorders="0"
+    LowerLeft="-1.13 -0.635 1.04"
+    LowerRight="-1.13 -0.635 -1.22"
+    UpperRight="-1.13  0.635 -1.22"
+  />
+  <Machine Name="Right"
+    Geometry="640x360+740+1200"
+    ShowBorders="0"
+    LowerLeft="-1.13 -0.635  -1.22"
+    LowerRight="1.13 -0.635 -1.22"
+    UpperRight="1.13  0.635 -1.22"
+  />
+  <Machine Name="Floor"
+    Geometry="640x360+740+1560"
+    ShowBorders="0"
+    LowerLeft="-1.13 -0.635  0.05"
+    LowerRight="1.13 -0.635  0/05"
+    UpperRight="1.13 -0.635 -1.22"
+  />
+</pvx>
