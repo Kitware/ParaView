@@ -170,15 +170,27 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
   auto root = doc.child("pvx");
   auto process = root;
 
-  // if `Process` nodes exist, find the one which says "server" since that's the
-  // only one where Cave config was specified.
+  // PARAVIEW_DEPRECATED_IN_6_1_0
+  // Specifying a process is not needed and deprecated, warn user to remove it
+  bool warnProcess = false;
   for (auto child : root.children("Process"))
   {
+    warnProcess = true;
+
+    // Use the last one OR the one of Type "server" if any.
+    process = child;
     if (strcmp(child.attribute("Type").as_string(), "server") == 0)
     {
-      process = child;
       break;
     }
+  }
+
+  // PARAVIEW_DEPRECATED_IN_6_1_0
+  if (warnProcess)
+  {
+    vtkLogF(WARNING,
+      "\"Process\" and \"Type\" specification is not needed in .pvx file and therefore deprecated, "
+      "please remove that layer");
   }
 
   if (auto showBorders = process.select_node("/Option[@Name='ShowBorders']").node())
