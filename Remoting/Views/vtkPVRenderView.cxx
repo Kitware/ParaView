@@ -16,6 +16,7 @@
 #include "vtkCommunicator.h"
 #include "vtkCuller.h"
 #include "vtkDataRepresentation.h"
+#include "vtkDisplayConfiguration.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
@@ -66,6 +67,7 @@
 #include "vtkPointData.h"
 #include "vtkPolarAxesActor2D.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -136,6 +138,7 @@ public:
   bool OSPRayShadows;
   bool OSPRayDenoise;
   int OSPRayCount;
+  bool Hide2DOverlays;
   vtkNew<vtkFloatArray> ArrayHolder;
   vtkNew<vtkWindowToImageFilter> ZGrabber;
 
@@ -438,11 +441,32 @@ vtkPVRenderView::vtkPVRenderView()
   this->RenderView = vtkRenderViewBase::New();
   this->RenderView->SetRenderWindow(window);
 
+  // The default is to always draw the NonCompositedRenderer
+  this->Internals->Hide2DOverlays = false;
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  int procId = controller->GetLocalProcessId();
+  vtkProcessModule::ProcessTypes procType = vtkProcessModule::GetProcessType();
+
+  // In cave mode, user can disable drawing the NonCompositedRenderer on any displays
+  if (procType == vtkProcessModule::PROCESS_RENDER_SERVER ||
+    procType == vtkProcessModule::PROCESS_SERVER)
+  {
+    if (this->InCaveDisplayMode())
+    {
+      auto displayConfig = vtkRemotingCoreConfiguration::GetInstance()->GetDisplayConfiguration();
+      if (displayConfig != nullptr)
+      {
+        this->Internals->Hide2DOverlays = !displayConfig->GetShow2DOverlays(procId);
+      }
+    }
+  }
+
   this->NonCompositedRenderer = vtkRenderer::New();
   this->NonCompositedRenderer->EraseOff();
   this->NonCompositedRenderer->InteractiveOff();
   this->NonCompositedRenderer->SetLayer(2);
   this->NonCompositedRenderer->SetActiveCamera(this->RenderView->GetRenderer()->GetActiveCamera());
+  this->NonCompositedRenderer->SetDraw(!this->Internals->Hide2DOverlays);
   window->AddRenderer(this->NonCompositedRenderer);
   window->SetNumberOfLayers(3);
   this->RenderView->GetRenderer()->GetActiveCamera()->ParallelProjectionOff();

@@ -51,7 +51,9 @@ public:
    * field is only used on X windows systems, and indicates that the
    * window should be manageable by the window manager.  This means it
    * can be covered by other windows, and a taskbar item is available
-   * to bring it back to the front.
+   * to bring it back to the front. The `Show2DOverlays` field allows
+   * user to select which displays show/hide things like scalar bar,
+   * annotation, etc.
    */
   const char* GetEnvironment(int index) const;
   vtkTuple<int, 4> GetGeometry(int index) const;
@@ -60,6 +62,7 @@ public:
   vtkTuple<double, 3> GetUpperRight(int index) const;
   bool GetHasCorners(int index) const;
   bool GetCoverable(int index) const;
+  bool GetShow2DOverlays(int index) const;
   ///@}
 
   /**

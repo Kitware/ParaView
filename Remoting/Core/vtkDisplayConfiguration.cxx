@@ -22,6 +22,7 @@ public:
     std::string Environment;
     bool HasCorners = false;
     bool Coverable = false;
+    bool Show2DOverlays = true;
 
     void Print(ostream& os, vtkIndent indent) const
     {
@@ -29,6 +30,7 @@ public:
          << this->Geometry[2] << ", " << this->Geometry[3] << endl;
       os << indent << "HasCorners: " << this->HasCorners << endl;
       os << indent << "Coverable: " << this->Coverable << endl;
+      os << indent << "Show2DOverlays: " << this->Show2DOverlays << endl;
       os << indent << "LoweLeft: " << this->LowerLeft[0] << ", " << this->LowerLeft[1] << ", "
          << this->LowerLeft[2] << endl;
       os << indent << "LowerRight: " << this->LowerRight[0] << ", " << this->LowerRight[1] << ", "
@@ -133,6 +135,14 @@ bool vtkDisplayConfiguration::GetCoverable(int index) const
 }
 
 //----------------------------------------------------------------------------
+bool vtkDisplayConfiguration::GetShow2DOverlays(int index) const
+{
+  const auto& internals = (*this->Internals);
+  auto& config = internals.Displays.at(index);
+  return config.Show2DOverlays;
+}
+
+//----------------------------------------------------------------------------
 vtkTuple<double, 3> vtkDisplayConfiguration::GetLowerLeft(int index) const
 {
   const auto& internals = (*this->Internals);
@@ -221,6 +231,12 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
       display.attribute("LowerRight").as_string(), display.attribute("UpperRight").as_string());
 
     info.Coverable = display.attribute("Coverable").as_bool();
+
+    auto showAttr = display.attribute("Show2DOverlays");
+    if (!showAttr.empty())
+    {
+      info.Show2DOverlays = showAttr.as_bool();
+    }
 
     internals.Displays.push_back(std::move(info));
   }
