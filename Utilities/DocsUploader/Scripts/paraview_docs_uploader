@@ -112,5 +112,13 @@ fi
 
 if [ -f "${SSH_PRIVATE_KEY_PATH}" ]
 then
-  rsync -e "ssh -o StrictHostKeyChecking=accept-new -i $SSH_PRIVATE_KEY_PATH" -rtv --progress . kitware@web:
+  # We want to strictly mirror only the content of the local folders not all the CWD
+  rsync \
+    --delete \
+    --progress \
+    --recursive \
+    --times \
+    --verbose \
+    --rsh="ssh -o stricthostkeychecking=accept-new -i $SSH_PRIVATE_KEY_PATH" \
+    ./* ../out
 fi
