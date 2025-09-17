@@ -287,7 +287,7 @@
             MAYBE_SSH_KEY_PATH="-k $RSYNC_SSH_PRIVATE_KEY";
           fi
         - if [ -n "$CI_COMMIT_TAG" ]; then
-            CURRENT_RELEASE="$CI_COMMIT_TAG";
+            CURRENT_RELEASE="${CI_COMMIT_TAG%%-RC*}";
             MAYBE_UPDATE_LATEST="-u";
           fi
         - sccache --start-server
