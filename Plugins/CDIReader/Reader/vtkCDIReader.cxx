@@ -1297,27 +1297,26 @@ void vtkCDIReader::RemoveDuplicates(
 
   for (int i = 0; i < temp_nbr_vertices; ++i)
   {
-    double curr_lon, curr_lat;
     double threshold = (vtkMath::Pi() / 2.0) - 1e-4;
-    curr_lon = pointLon[i];
-    curr_lat = pointLat[i];
+    double& curr_lon = pointLon[i];
+    double& curr_lat = pointLat[i];
 
-    while (curr_lon < 0.0)
+    if (this->ProjectionMode != projection::CATALYST)
     {
-      curr_lon += 2 * vtkMath::Pi();
-    }
-    while (curr_lon >= vtkMath::Pi())
-    {
-      curr_lon -= 2 * vtkMath::Pi();
-    }
+      while (curr_lon < -vtkMath::Pi())
+      {
+        curr_lon += 2 * vtkMath::Pi();
+      }
 
-    if (curr_lat > threshold)
-    {
-      curr_lon = 0.0;
-    }
-    else if (curr_lat < (-1.0 * threshold))
-    {
-      curr_lon = 0.0;
+      while (curr_lon >= vtkMath::Pi())
+      {
+        curr_lon -= 2 * vtkMath::Pi();
+      }
+
+      if (curr_lat > threshold || curr_lat < (-1.0 * threshold))
+      {
+        curr_lon = 0.0;
+      }
     }
 
     sort_array[i].Pt.Lon = curr_lon;
@@ -1834,7 +1833,7 @@ int vtkCDIReader::CheckForMaskData()
     if (this->ShowMultilayerView)
     {
       this->CellMask.resize(this->MaximumCells * this->Bloat);
-      float* dataTmpMask = new float[this->MaximumCells * sizeof(float)];
+      float* dataTmpMask = new float[this->MaximumCells];
       CHECK_NEW(dataTmpMask);
 
       cdi_set_cur(cdiVar, 0, 0);
@@ -2296,8 +2295,7 @@ void vtkCDIReader::OutputPoints(bool init)
           }
         }
       }
-
-      if (this->ProjectionMode != projection::SPHERICAL)
+      else // if (this->ProjectionMode != projection::SPHERICAL)
       {
         z = this->Layer0Offset * adjustedLayerThickness; // to avoid 0 layer thickness / ...
       }
