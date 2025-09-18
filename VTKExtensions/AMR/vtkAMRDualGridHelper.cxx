@@ -2301,12 +2301,15 @@ int vtkAMRDualGridHelper::Initialize(vtkNonOverlappingAMR* input)
     numBlocks = input->GetNumberOfBlocks(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
     {
-      //      vtkAMRBox box;
-      //      vtkImageData* image = input->GetDataSet(level,blockId,box);
-      vtkImageData* image = input->GetDataSet(level, blockId);
+      vtkCartesianGrid* cg = input->GetDataSetAsCartesianGrid(level, blockId);
+      vtkImageData* image = vtkImageData::SafeDownCast(cg);
       if (image)
       {
         this->AddBlock(level, blockId, image);
+      }
+      else if (cg)
+      {
+        vtkWarningMacro("Non vtkImageData in AMR are not supported and are skipped");
       }
     }
   }
@@ -2345,7 +2348,8 @@ int vtkAMRDualGridHelper::SetupData(vtkNonOverlappingAMR* input, const char* arr
     numBlocks = input->GetNumberOfBlocks(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
     {
-      vtkImageData* image = input->GetDataSet(level, blockId);
+      vtkImageData* image =
+        vtkImageData::SafeDownCast(input->GetDataSetAsCartesianGrid(level, blockId));
       if (image)
       {
         vtkDataArray* da = image->GetCellData()->GetArray(this->ArrayName);
@@ -2731,9 +2735,8 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
     numBlocks = input->GetNumberOfBlocks(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
     {
-      //      vtkAMRBox box;
-      //      vtkImageData* image = input->GetDataSet(level,blockId,box);
-      vtkImageData* image = input->GetDataSet(level, blockId);
+      vtkCartesianGrid* cg = input->GetDataSetAsCartesianGrid(level, blockId);
+      vtkImageData* image = vtkImageData::SafeDownCast(cg);
       if (image)
       {
         ++this->NumberOfBlocksInThisProcess;
@@ -2772,6 +2775,10 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
           // lowestDims[1] = cellDims[1];
           // lowestDims[2] = cellDims[2];
         }
+      }
+      else if (cg)
+      {
+        vtkWarningMacro("Non vtkImageData in AMR are not supported and are skipped");
       }
     }
   }
