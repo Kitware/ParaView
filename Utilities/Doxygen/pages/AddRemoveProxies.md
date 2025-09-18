@@ -52,7 +52,7 @@ When a proxy is deprecated, the following files should probably be updated:
 ### Python
 To enable backwards compatibility in a python script, use the following lines
 at the top of the script:
-```
+```python
 import paraview
 paraview.compatibility.major = 5
 paraview.comptatbility.minor = 6

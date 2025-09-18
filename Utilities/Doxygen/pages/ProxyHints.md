@@ -13,12 +13,14 @@ This is used to indicate to the pqDisplayRepresentationWidget that the user must
 be prompted with a *'Are you sure?'* if they manually switch to this
 representation from the UI.
 
-    <RepresentationProxy ...>
-      ...
-      <Hints>
-        <WarnOnRepresentationChange value="Volume" />
-      </Hints>
-    </RepresentationProxy>
+```xml
+<RepresentationProxy ...>
+  ...
+  <Hints>
+    <WarnOnRepresentationChange value="Volume" />
+  </Hints>
+</RepresentationProxy>
+```
 
 WarnOnCreate
 ------------
@@ -29,17 +31,19 @@ like **Temporal Statistics** filter since they can potentially take a long time
 for large file series or when a filter may uses too much memory relative to
 the remaining memory.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <WarnOnCreate>
-          <Text title="Potentially slow operations">
-            **Temporal Statistics** filter needs to process all timesteps
-            available in your dataset and can potentially take a long time to complete.
-            Do you want to continue?
-          </Text>
-        </WarnOnCreate>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <WarnOnCreate>
+      <Text title="Potentially slow operations">
+        **Temporal Statistics** filter needs to process all timesteps
+        available in your dataset and can potentially take a long time to complete.
+        Do you want to continue?
+      </Text>
+    </WarnOnCreate>
+</SourceProxy>
+```
 
 It is possible to specify some conditions for the warn based on memory usage and inputs types.
 In the below example, the warning will be presented to the user only if the input is a vtkImageData
@@ -47,20 +51,22 @@ and the remaining memory is smaller than the expected size of the output, which 
 If relative is not set, a default value of `1` will be used.
 The DataTypeDomain syntax is the same as the one for the DataTypeDomain with InputProperty.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <WarnOnCreate>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkImageData" />
-          </DataTypeDomain>
-          <MemoryUsage relative="10" />
-          <Text title="Potentially running out of memory">
-            This filter may not have enough memory to process
-            Do you want to continue?
-          </Text>
-        </WarnOnCreate>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <WarnOnCreate>
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkImageData" />
+      </DataTypeDomain>
+      <MemoryUsage relative="10" />
+      <Text title="Potentially running out of memory">
+        This filter may not have enough memory to process
+        Do you want to continue?
+      </Text>
+    </WarnOnCreate>
+</SourceProxy>
+```
 
 ReaderFactory
 -------------
@@ -75,15 +81,17 @@ files named as `somename.foo` or `somename.foo.bar`.
 The format is similar to what one would use for `ls` or `dir` using wildcards e.g.
 spcth\* to match spcta, spctb etc.
 
-    <!-- using extensions -->
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <ReaderFactory extensions="[space separated extensions w/o leading '.']"
-            filename_patterns="[space separated filename patters (using wildcards)]"
-            file_description="[user-friendly description]" />
-      </Hints>
-    </SourceProxy>
+```xml
+<!-- using extensions -->
+<SourceProxy ...>
+  ...
+  <Hints>
+    <ReaderFactory extensions="[space separated extensions w/o leading '.']"
+        filename_patterns="[space separated filename patters (using wildcards)]"
+        file_description="[user-friendly description]" />
+  </Hints>
+</SourceProxy>
+```
 
 View
 ----
@@ -94,12 +102,14 @@ This hint is used to indicate the name of the view to use by default for showing
 the output of this source/filter on first *Apply*. To specify the view type for
 a specific output port, you can use the optional attribute **port**.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <View type="XYChartView" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <View type="XYChartView" />
+  </Hints>
+</SourceProxy>
+```
 
 In certain cases, in addition to showing the data in the "preferred" default
 view, you may want to show the result in the current view as well e.g. when
@@ -108,33 +118,39 @@ view, you may want to show the result in the current view as well e.g. when
 plotted in the current Render View too. For that one can add the
 `also_show_in_current_view` attribute to the `<View/>` tag.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <View type="XYChartView" also_show_in_current_view="1" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <View type="XYChartView" also_show_in_current_view="1" />
+  </Hints>
+</SourceProxy>
+```
 
 If the source/filter has more than 1 output ports, you can choose which port the
 hint corresponds to by using the optional `port` attribute.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <View type="XYChartView" port="1" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <View type="XYChartView" port="1" />
+  </Hints>
+</SourceProxy>
+```
 
 The `<View/>` hint can also be used to prevent automatic display of an output in
 any view. To do that, use the **None** type. Such source can then still be
 displayed manually by toggling the visibility when an appropriate View is active.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <View type="None" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <View type="None" />
+  </Hints>
+</SourceProxy>
+```
 
 PipelineIcon
 ------------
@@ -145,22 +161,26 @@ This hint is used to indicate the icon to use in the pipeline browser.
 It can be either the full name of a qt resource icon or the name of a view type
 for which an icon as already been defined.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <PipelineIcon name="XYChartView" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <PipelineIcon name="XYChartView" />
+  </Hints>
+</SourceProxy>
+```
 
 If the source/filter has more than 1 output port, you can choose which port the
 hint corresponds to by using the optional `port` attribute.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <PipelineIcon name="XYChartView" port="1" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <PipelineIcon name="XYChartView" port="1" />
+  </Hints>
+</SourceProxy>
+```
 
 At the time of writing, the supported stock icon names were:
  * "SERVER"
@@ -186,24 +206,28 @@ At the time of writing, the supported stock icon names were:
 
 If the desired icon is not present in the list, it is possible to use a Qt resource icon name directly.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <PipelineIcon name=":/pqWidgets/Icons/pqCalculator.svg" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <PipelineIcon name=":/pqWidgets/Icons/pqCalculator.svg" />
+  </Hints>
+</SourceProxy>
+```
 
 Available icons are visible in the sources of ParaView
 
 If the desired icon is not present, it can be added, for example in the context of a plugin, using
 GUI_RESOURCES in your ADD_PARAVIEW_PLUGIN macro, a .qrc file and your own icon file.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <PipelineIcon name=":/MyPluginQtResource/Icons/myIcon.png" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <PipelineIcon name=":/MyPluginQtResource/Icons/myIcon.png" />
+  </Hints>
+</SourceProxy>
+```
 
 Plotable
 --------
@@ -216,11 +240,13 @@ by default can only show sources/filters that produce `vtkTable` as the output.
 If a source/filter doesn't produce  a `vtkTable`, but produces data that should
 indeed be plotted by such views, one can use this hint.
 
-    <SourceProxy ...>
-      <Hints>
-        <Plotable />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  <Hints>
+    <Plotable />
+  </Hints>
+</SourceProxy>
+```
 
 RepresentationType
 ------------------
@@ -237,13 +263,15 @@ Note, this hint doesn't control which representation proxy gets created, but the
 default value for the "Representation" property on the representation proxy
 set using `vtkSMRepresentationProxy::SetRepresentationType()`.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <RepresentationType view="ComparativeRenderView" type="Surface" port="1"/>
-        <RepresentationType view="RenderView" type="Wireframe" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <RepresentationType view="ComparativeRenderView" type="Surface" port="1"/>
+    <RepresentationType view="RenderView" type="Wireframe" />
+  </Hints>
+</SourceProxy>
+```
 
 Representation
 --------------
@@ -261,12 +289,14 @@ should be set to the XML proxy name of the view. The required **type** attribute
 specifies the XML proxy name for representation to create. The optional
 **port** attribute can be used to limit the hint to specific output port.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <Representation view="RenderView" type="TextSourceRepresentation" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <Representation view="RenderView" type="TextSourceRepresentation" />
+  </Hints>
+</SourceProxy>
+```
 
 OutputPort
 --------------------------
@@ -279,14 +309,16 @@ Type can be either "text", "logo" or "progress".
 The representation part of this hint may be deprecated soon.
 Use Representation hint instead.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <OutputPort index="0"
-                    name="Output-0"
-                    type="text" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <OutputPort index="0"
+                name="Output-0"
+                type="text" />
+  </Hints>
+</SourceProxy>
+```
 
 ShowProxyDocumentationInPanel
 -----------------------------
@@ -303,15 +335,17 @@ possible values are:
 2. *short_help*: to use vtkSMDocumentation::GetShortHelp(), and
 3. *long_help*: to use vtkSMDocumentation::GetLongHelp().
 
-    <SourceProxy ...>
-      <Documentation>
-        Some text that will be shown in the label.
-      </Documentation>
-      ...
-      <Hints>
-        <ShowProxyDocumentationInPanel type="description"/>
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  <Documentation>
+    Some text that will be shown in the label.
+  </Documentation>
+  ...
+  <Hints>
+    <ShowProxyDocumentationInPanel type="description"/>
+  </Hints>
+</SourceProxy>
+```
 
 ReloadFiles
 -----------
@@ -324,12 +358,14 @@ simply recreated the reader thus forgoing any previous data cached by the
 reader. The attribute **property** indicates the name of the property on the
 reader proxy to invoke to make the reader refresh.
 
-    <SourceProxy>
-    ...
-      <Hints>
-        <ReloadFiles property="Refresh" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy>
+...
+  <Hints>
+    <ReloadFiles property="Refresh" />
+  </Hints>
+</SourceProxy>
+```
 
 View Annotations
 ----------------
@@ -346,12 +382,14 @@ check with the algorithm if it has new data and update the application, if so.
 
 For that, one simply adds a hint to the proxy as follows:
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <LiveSource interval="100" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <LiveSource interval="100" />
+  </Hints>
+</SourceProxy>
+```
 
 The algorithm subclass must have `bool GetNeedsUpdate()` method that returns
 true if the algorithm needs update.
@@ -370,12 +408,14 @@ is an algorithm updated at regular time intervals based on real-time and
 its available time steps (in seconds). Note that the proxy class must
 inherit from the `vtkEmulatedTimeAlgorithm` class.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <LiveSource interval="50" emulated_time="1" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <LiveSource interval="50" emulated_time="1" />
+  </Hints>
+</SourceProxy>
+```
 
 ConnectToPortIndex
 --------------------------
@@ -386,12 +426,14 @@ other than the default (index = 0). Currently, this is only used to
 modify the input port for the selection representation subproxy in
 vtkSMPVRepresentationProxy.
 
-    <RepresentationProxy ...>
-      ...
-      <Hints>
-        <ConnectToPortIndex value="2" />
-      </Hints>
-    </RepresentationProxy>
+```xml
+<RepresentationProxy ...>
+  ...
+  <Hints>
+    <ConnectToPortIndex value="2" />
+  </Hints>
+</RepresentationProxy>
+```
 
 ShowInMenu
 --------------------------
@@ -401,12 +443,14 @@ This is used **in plugins only** to configure how a source or filter
 should be shown in the filters/sources menu. It enables to place them
 into an existing category or a new category, as well as set the icon.
 
-    <SourceProxy ...>
-      ...
-      <Hints>
-        <ShowInMenu category="Category" icon=":/path/to/resource/icon.png" />
-      </Hints>
-    </SourceProxy>
+```xml
+<SourceProxy ...>
+  ...
+  <Hints>
+    <ShowInMenu category="Category" icon=":/path/to/resource/icon.png" />
+  </Hints>
+</SourceProxy>
+```
 
 NoSolidColor
 --------------------------
@@ -416,21 +460,25 @@ This is used to indicate to the pqDisplayColorWidget to disable the
 "Solid Color" option because this representation type doesn't handle it
 usefully.
 
-    <RepresentationProxy ...>
-      ...
-      <Hints>
-        <NoSolidColor representation="Slice" />
-        <NoSolidColor representation="Volume" />
-      </Hints>
-    </RepresentationProxy>
+```xml
+<RepresentationProxy ...>
+  ...
+  <Hints>
+    <NoSolidColor representation="Slice" />
+    <NoSolidColor representation="Volume" />
+  </Hints>
+</RepresentationProxy>
+```
 
 HideCursor
 --------------------------
 Hide the mouse cursor when hovering a render view.
 
-    <RenderViewProxy ...>
-      ...
-      <Hints>
-        <HideCursor/>
-      </Hints>
-    </RenderViewProxy>
+```xml
+<RenderViewProxy ...>
+  ...
+  <Hints>
+    <HideCursor/>
+  </Hints>
+</RenderViewProxy>
+```
