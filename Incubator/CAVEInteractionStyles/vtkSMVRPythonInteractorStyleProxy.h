@@ -15,7 +15,7 @@ class vtkSMIntVectorProperty;
 class vtkSMProxy;
 class vtkSMRenderViewProxy;
 class vtkTransform;
-class vtkVREvent;
+struct vtkVREvent;
 
 class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRPythonInteractorStyleProxy
   : public vtkSMVRInteractorStyleProxy

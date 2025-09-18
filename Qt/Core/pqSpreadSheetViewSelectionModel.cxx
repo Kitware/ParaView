@@ -41,7 +41,13 @@ public:
 };
 }
 
-static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+using pqHashType = uint;
+#else
+using pqHashType = size_t;
+#endif
+
+static size_t qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
   return qHash(index[2]);
 }

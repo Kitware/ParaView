@@ -51,7 +51,9 @@ protected Q_SLOTS:
   /**
    * Slots handling application state changes
    */
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   void onPlayerStateChanged(QAudio::State newState);
+#endif
   void onActiveSourceChanged(pqPipelineSource* activeSource);
   void onPipelineUpdated();
   ///@}

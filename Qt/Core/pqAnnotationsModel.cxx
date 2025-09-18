@@ -78,12 +78,7 @@ public:
     {
       case pqAnnotationsModel::COLOR:
       {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        bool canConvert = value.canConvert(QVariant::Color);
-#else
-        bool canConvert = value.canConvert(QMetaType(QMetaType::QColor));
-#endif
-        if (canConvert)
+        if (value.canConvert<QColor>())
         {
           if (this->Color != value.value<QColor>())
           {
