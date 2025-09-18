@@ -33,6 +33,11 @@ public:
   std::vector<std::string> GetInteractorStyleDescriptions();
 
   // Description:
+  // Get a list of docstrings for the styles, Like the names and descriptions,
+  // these are read from the proxy definition xml.
+  std::vector<std::string> GetInteractorStyleDocStrings();
+
+  // Description:
   // Get the action description for a style classname
   std::string GetDescriptionFromClassName(const std::string& className);
 
@@ -63,6 +68,7 @@ protected:
   std::vector<std::string> InteractorStyleClassNames; // store the name of each Interactor class
   std::vector<std::string>
     InteractorStyleDescriptions; // store a short description of each Interactor
+  std::vector<std::string> InteractorStyleDocStrings; // store docstring of each interactor style
   std::vector<std::string> InteractorStyleNewMethods; // store the New() method of each Interactor
                                                       // // WRS-TODO: this was deleted in "Kitware"
                                                       // version.  Why?

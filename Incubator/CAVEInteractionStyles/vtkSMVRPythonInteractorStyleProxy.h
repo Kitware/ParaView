@@ -1,5 +1,12 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
+/**
+ * @class   vtkSMVRPythonInteractorStyleProxy
+ * @brief   an interaction style allowing users to write custom python interactors
+ *
+ * vtkSMVRPythonInteractorStyleProxy is an interaction style that supports loading
+ * (at runtime) a dynamic interactor style written in Python.
+ */
 #ifndef vtkSMVRPythonInteractorStyleProxy_h
 #define vtkSMVRPythonInteractorStyleProxy_h
 
@@ -57,6 +64,14 @@ public:
    * A reference will be taken on the object.
    */
   void SetPythonObject(void* obj);
+  ///@}
+
+  ///@{
+  /**
+   * Overridden to allow custom python interactors to defer expensive
+   * operations until just before rendering.
+   */
+  bool Update() override;
   ///@}
 
   ///@{

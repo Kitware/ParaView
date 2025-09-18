@@ -1,20 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
-/***********************************************************************/
-/*                                                                     */
-/* Style for the head tracking interface -- vtkSMVRTrackStyleProxy     */
-/*                                                                     */
-/* NOTES:                                                              */
-/*    * The simplest of interface styles -- simply maps head tracking  */
-/*        data to the eye location.                                    */
-/*                                                                     */
-/*    * It is expected that the RenderView EyeTransformMatrix is the   */
-/*        property that will be connected to the head tracker.         */
-/*                                                                     */
-/***********************************************************************/
 #include "vtkSMVRTrackStyleProxy.h"
 
+#include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -30,7 +19,6 @@
 vtkStandardNewMacro(vtkSMVRTrackStyleProxy);
 
 // ----------------------------------------------------------------------------
-// Constructor method
 vtkSMVRTrackStyleProxy::vtkSMVRTrackStyleProxy()
   : Superclass()
 {
@@ -38,30 +26,33 @@ vtkSMVRTrackStyleProxy::vtkSMVRTrackStyleProxy()
 }
 
 // ----------------------------------------------------------------------------
-// Destructor method
-vtkSMVRTrackStyleProxy::~vtkSMVRTrackStyleProxy() = default;
-
-// ----------------------------------------------------------------------------
-// PrintSelf() method
 void vtkSMVRTrackStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
+//----------------------------------------------------------------------------
+bool vtkSMVRTrackStyleProxy::Update()
+{
+  if (this->ControlledProxy != nullptr && this->ControlledPropertyName != nullptr &&
+    this->ControlledPropertyName[0] != '\0')
+  {
+    vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName)
+      .Set(*this->TrackerMatrix->Element, 16);
+  }
+
+  this->ControlledProxy->UpdateVTKObjects();
+
+  return true;
+}
+
 // ----------------------------------------------------------------------------
-// HandleTracker() method
 void vtkSMVRTrackStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   std::string role = this->GetTrackerRole(event.name);
 
   if (role == "Tracker")
   {
-    if (this->ControlledProxy && this->ControlledPropertyName != nullptr &&
-      this->ControlledPropertyName[0] != '\0')
-    {
-      vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName)
-        .Set(event.data.tracker.matrix, 16);
-      this->ControlledProxy->UpdateVTKObjects();
-    }
+    this->TrackerMatrix->DeepCopy(event.data.tracker.matrix);
   }
 }

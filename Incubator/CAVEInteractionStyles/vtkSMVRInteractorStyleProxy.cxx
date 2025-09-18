@@ -31,7 +31,6 @@ vtkStandardNewMacro(vtkSMVRInteractorStyleProxy);
 vtkCxxSetObjectMacro(vtkSMVRInteractorStyleProxy, ControlledProxy, vtkSMProxy);
 
 // ----------------------------------------------------------------------------
-// Constructor method
 vtkSMVRInteractorStyleProxy::vtkSMVRInteractorStyleProxy()
   : vtkSMProxy()
   , ControlledProxy(nullptr)
@@ -41,7 +40,6 @@ vtkSMVRInteractorStyleProxy::vtkSMVRInteractorStyleProxy()
 }
 
 // ----------------------------------------------------------------------------
-// Destructor method
 vtkSMVRInteractorStyleProxy::~vtkSMVRInteractorStyleProxy()
 {
   this->SetControlledProxy(nullptr);
@@ -49,7 +47,6 @@ vtkSMVRInteractorStyleProxy::~vtkSMVRInteractorStyleProxy()
 }
 
 // ----------------------------------------------------------------------------
-// PrintSelf() method
 void vtkSMVRInteractorStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -85,7 +82,7 @@ void vtkSMVRInteractorStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
   }
 }
 // ----------------------------------------------------------------------------
-// Configure() method -- to reread from a State file (PVSM file)
+// Read from a State file (PVSM file)
 bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
 {
   if (!child->GetName() || strcmp(child->GetName(), "Style") != 0 ||
@@ -223,7 +220,7 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
 }
 
 // ----------------------------------------------------------------------------
-// SaveConfiguration() method -- store into a State file (PVSM file)
+// Save to a State file (PVSM file)
 vtkPVXMLElement* vtkSMVRInteractorStyleProxy::SaveConfiguration()
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
@@ -279,34 +276,21 @@ vtkPVXMLElement* vtkSMVRInteractorStyleProxy::SaveConfiguration()
 }
 
 // -----------------------------------------------------------------------------
-// Update() method -- empty in the generic class
 bool vtkSMVRInteractorStyleProxy::Update()
 {
   return true;
 }
 
 // ----------------------------------------------------------------------------
-// HandleButton() method -- empty in the generic class
 void vtkSMVRInteractorStyleProxy::HandleButton(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
-// HandleValuator() method -- empty in the generic class
 void vtkSMVRInteractorStyleProxy::HandleValuator(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
-// HandleTracker() method -- empty in the generic class
 void vtkSMVRInteractorStyleProxy::HandleTracker(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// The methods below this divider are ones that are NOT over-written by the
-// descendent classes.
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-
 std::vector<std::string> vtkSMVRInteractorStyleProxy::Tokenize(std::string input)
 {
   std::replace(input.begin(), input.end(), '.', ' ');
@@ -419,7 +403,7 @@ unsigned int vtkSMVRInteractorStyleProxy::GetChannelIndexForValuatorRole(const s
   std::vector<std::string> eventTokens = vtkSMVRInteractorStyleProxy::Tokenize(eventIter->second);
 
   unsigned int channelIndex;
-  VTK_FROM_CHARS_IF_ERROR_RETURN(eventTokens[0], channelIndex, 0);
+  VTK_FROM_CHARS_IF_ERROR_RETURN(eventTokens[1], channelIndex, 0);
   return channelIndex;
 }
 
@@ -555,34 +539,65 @@ vtkCamera* vtkSMVRInteractorStyleProxy::GetActiveCamera()
 }
 
 // ----------------------------------------------------------------------------
-vtkMatrix4x4* vtkSMVRInteractorStyleProxy::GetNavigationMatrix()
+vtkMatrix4x4* vtkSMVRInteractorStyleProxy::GetNavigationMatrix(vtkSMRenderViewProxy* proxy)
 {
-  vtkCamera* activeCamera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
-  if (activeCamera)
+  vtkSMRenderViewProxy* viewProxy = proxy;
+  if (viewProxy == nullptr)
   {
-    return activeCamera->GetModelTransformMatrix();
+    viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
   }
 
-  return nullptr;
+  if (viewProxy == nullptr)
+  {
+    vtkWarningMacro("Getting the navigation matrix requires a render view proxy");
+    return nullptr;
+  }
+
+  vtkSMPropertyHelper(viewProxy, "ModelTransformMatrix").Get(*this->NavigationMatrix->Element, 16);
+
+  return this->NavigationMatrix.GetPointer();
 }
 
 // ----------------------------------------------------------------------------
-void vtkSMVRInteractorStyleProxy::SetNavigationMatrix(vtkMatrix4x4* matrix)
+void vtkSMVRInteractorStyleProxy::SetNavigationMatrix(
+  vtkMatrix4x4* matrix, vtkSMRenderViewProxy* proxy)
 {
-  vtkCamera* activeCamera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
-  if (activeCamera)
+  vtkSMRenderViewProxy* viewProxy = proxy;
+  if (viewProxy == nullptr)
   {
-    activeCamera->SetModelTransformMatrix(matrix);
+    viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+  }
 
-    vtkNew<vtkMatrix4x4> physicalToWorld;
-    physicalToWorld->DeepCopy(matrix);
-    physicalToWorld->Invert();
-    double matrixBuffer[16];
-    vtkMatrix4x4::DeepCopy(matrixBuffer, physicalToWorld);
+  if (viewProxy == nullptr)
+  {
+    vtkWarningMacro("Setting the navigation matrix requires an active render view proxy");
+    return;
+  }
 
-    vtkSMRenderViewProxy* viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
-    vtkSMPropertyHelper(viewProxy, "PhysicalToWorldMatrix").Set(matrixBuffer, 16);
-    viewProxy->InvokeEvent(INTERACTOR_STYLE_NAVIGATION, physicalToWorld);
+  vtkSMPropertyHelper(viewProxy, "ModelTransformMatrix").Set(*matrix->Element, 16);
+
+  vtkNew<vtkMatrix4x4> physicalToWorld;
+  physicalToWorld->DeepCopy(matrix);
+  physicalToWorld->Invert();
+
+  vtkSMPropertyHelper(viewProxy, "PhysicalToWorldMatrix").Set(physicalToWorld->Element[0], 16);
+
+  viewProxy->InvokeEvent(INTERACTOR_STYLE_NAVIGATION, physicalToWorld);
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRInteractorStyleProxy::UpdateMatrixProperty(
+  vtkSMProxy* proxy, const char* propertyName, vtkMatrix4x4* matrix)
+{
+  vtkSMRenderViewProxy* rvProxy = vtkSMRenderViewProxy::SafeDownCast(proxy);
+
+  if (rvProxy != nullptr && strcmp(propertyName, "ModelTransformMatrix") == 0)
+  {
+    this->SetNavigationMatrix(matrix, rvProxy);
+  }
+  else
+  {
+    vtkSMPropertyHelper(proxy, propertyName).Set(*matrix->Element, 16);
   }
 }
 

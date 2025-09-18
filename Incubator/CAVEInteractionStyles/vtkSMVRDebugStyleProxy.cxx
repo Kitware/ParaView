@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
-#include "vtkSMVRSkeletonStyleProxy.h"
+#include "vtkSMVRDebugStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -22,46 +22,43 @@
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkSMVRSkeletonStyleProxy);
+vtkStandardNewMacro(vtkSMVRDebugStyleProxy);
 
 // ----------------------------------------------------------------------------
-// Constructor method
-vtkSMVRSkeletonStyleProxy::vtkSMVRSkeletonStyleProxy()
+vtkSMVRDebugStyleProxy::vtkSMVRDebugStyleProxy()
   : Superclass()
 {
-  this->AddButtonRole("Rotate Tracker");
+  this->AddButtonRole("Report Tracker");
   this->AddButtonRole("Report Self");
   this->AddValuatorRole("X");
   this->AddTrackerRole("Tracker");
   this->EnableReport = false;
-
-  // leftover stuff:
-  this->IsInitialTransRecorded = false;
-  this->IsInitialRotRecorded = false;
-  this->CachedTransMatrix->Identity();
-  this->CachedRotMatrix->Identity();
 }
 
 // ----------------------------------------------------------------------------
-// Destructor method
-vtkSMVRSkeletonStyleProxy::~vtkSMVRSkeletonStyleProxy() = default;
-
-// ----------------------------------------------------------------------------
-// PrintSelf() method
-void vtkSMVRSkeletonStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRDebugStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "EnableReport: " << this->EnableReport << endl;
-  os << indent << "IsInitialTransRecorded: " << this->IsInitialTransRecorded << endl;
-  os << indent << "IsInitialRotRecorded: " << this->IsInitialRotRecorded << endl;
-  os << indent << "InverseInitialTransMatrix:" << endl;
-  this->InverseInitialTransMatrix->PrintSelf(os, indent.GetNextIndent());
 }
 
 // ----------------------------------------------------------------------------
-// HandleButton() method
-void vtkSMVRSkeletonStyleProxy::HandleButton(const vtkVREvent& event)
+bool vtkSMVRDebugStyleProxy::Update()
+{
+  // Any computationally expensive operations (e.g. UpdateVTKObjects()) belong
+  // here, in the Update() method.
+  if (this->EnableReport)
+  {
+    cout << "Tracker matrix\n";
+    this->TrackerMatrix->PrintSelf(cout, vtkIndent(0));
+  }
+
+  return true;
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRDebugStyleProxy::HandleButton(const vtkVREvent& event)
 {
   std::string role = this->GetButtonRole(event.name);
 
@@ -84,25 +81,20 @@ void vtkSMVRSkeletonStyleProxy::HandleButton(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-// HandleValuator() method
-void vtkSMVRSkeletonStyleProxy::HandleValuator(const vtkVREvent& event)
+void vtkSMVRDebugStyleProxy::HandleValuator(const vtkVREvent& event)
 {
   unsigned int xIdx = this->GetChannelIndexForValuatorRole("X");
   cout << "Got a value for 'X' of " << event.data.valuator.channel[xIdx] << std::endl;
 }
 
 // ----------------------------------------------------------------------------
-// HandleTracker() method
-void vtkSMVRSkeletonStyleProxy::HandleTracker(const vtkVREvent& event)
+void vtkSMVRDebugStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   std::string role = this->GetTrackerRole(event.name);
 
-  if (role == "Tracker")
+  if (role == "Tracker" && this->EnableReport)
   {
-    if (this->EnableReport)
-    {
-      // do something interesting here
-      cout << "Do a tracker report\n";
-    }
+    // Best practice is to do the least amount of work here, saving any work for Update()
+    this->TrackerMatrix->DeepCopy(event.data.tracker.matrix);
   }
 }

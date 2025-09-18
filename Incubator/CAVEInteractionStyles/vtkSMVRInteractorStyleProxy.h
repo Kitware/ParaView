@@ -1,6 +1,16 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
+/**
+ * @class   vtkSMVRInteractorStyleProxy
+ * @brief   the base class for all interactor styles
+ *
+ * vtkSMVRInteractorStyleProxy is derived from vtkSMProxy and is the base class
+ * for all interactor style classes. Deriving from vtkSMProxy allows describing
+ * each subclasses properties in xml, which allows UI to be generated for
+ * properties automatically, and supports interacting with the classes from
+ * Python.
+ */
 #ifndef vtkSMVRInteractorStyleProxy_h
 #define vtkSMVRInteractorStyleProxy_h
 
@@ -121,9 +131,18 @@ public:
   static vtkCamera* GetActiveCamera();
 
   // Description:
-  // Get/Set the matrix used to navigate the scene.
-  vtkMatrix4x4* GetNavigationMatrix();
-  void SetNavigationMatrix(vtkMatrix4x4*);
+  // Get/Set the matrix used to navigate the scene. If no proxy argument
+  // is provided, the active view proxy will be used.
+  vtkMatrix4x4* GetNavigationMatrix(vtkSMRenderViewProxy* proxy = nullptr);
+  void SetNavigationMatrix(vtkMatrix4x4*, vtkSMRenderViewProxy* proxy = nullptr);
+
+  // Description:
+  // Update a matrix property on a proxy. If the proxy is a render view
+  // proxy and the property name is "ModelTransformMatrix", then internally
+  // the steps required for proper navigation are taken (inverting the matrix
+  // and storing it in the PhysicalToWorldMatrix, as well as invoking the
+  // navigation event).
+  void UpdateMatrixProperty(vtkSMProxy* proxy, const char* propertyName, vtkMatrix4x4* matrix);
 
   typedef std::map<std::string, std::string> StringMap;
   typedef std::map<std::string, StringMap> StringMapMap;
@@ -158,6 +177,8 @@ protected:
 private:
   vtkSMVRInteractorStyleProxy(const vtkSMVRInteractorStyleProxy&) = delete;
   void operator=(const vtkSMVRInteractorStyleProxy&) = delete;
+
+  vtkNew<vtkMatrix4x4> NavigationMatrix;
 };
 
 #endif

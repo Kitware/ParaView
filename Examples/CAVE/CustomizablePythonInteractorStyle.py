@@ -46,7 +46,9 @@ class SimpleFlyer(PythonInteractorBase):
 
         # Initialize some internal state variables
         self.currentSpeed = 0.0
+        self.restingSpeed = 0.0
         self.speedUpdated = False
+        self.trackerMatrix = vtkMatrix4x4()
         self.savedMatrix = vtkMatrix4x4()
         self.transform = vtkTransform()
 
@@ -85,6 +87,41 @@ class SimpleFlyer(PythonInteractorBase):
         # a button we can hit to undo any navigation (return to origin)
         vtkSelf.AddButtonRole("Reset")
 
+    def Update(self, vtkSelf):
+        # Since Update() is called on this style only once per render, while the
+        # Handle...() methods may be called many times per render, we do all
+        # computation and UpdateVTKObjects() in Update(), in order to maximize
+        # the effective framerate of the plugin.
+        if self.speedUpdated and self.currentSpeed != self.restingSpeed:
+            # Pull out the column we use for flight direction
+            direction = [
+                self.trackerMatrix.GetElement(0, self.flyDirectionColumn),
+                self.trackerMatrix.GetElement(1, self.flyDirectionColumn),
+                self.trackerMatrix.GetElement(2, self.flyDirectionColumn)
+            ]
+
+            # Translate in the direction the controller is pointed, scaled by the speed
+            self.transform.Identity()
+            self.transform.Translate(
+                self.currentSpeed * direction[0],
+                self.currentSpeed * direction[1],
+                self.currentSpeed * direction[2]
+            )
+
+            # Get the current navigation matrix, transform it with the translation
+            # matrix computed above, and then update the navigation matrix.
+            self.savedMatrix.DeepCopy(vtkSelf.GetNavigationMatrix())
+            vtkMatrix4x4.Multiply4x4(
+                self.transform.GetMatrix(), self.savedMatrix, self.savedMatrix)
+            vtkSelf.SetNavigationMatrix(self.savedMatrix)
+
+            rvProxy = GetActiveView()
+            rvProxy.UpdateVTKObjects()
+
+            # Avoid unnecessary updates when flying by valuator
+            self.speedUpdated = False
+
+
     def HandleTracker(self, vtkSelf, role, sensor, matrix):
         """Handle a tracker event.
 
@@ -109,36 +146,9 @@ class SimpleFlyer(PythonInteractorBase):
                 the tracker matrix object.
 
         """
-        if role == "Controller" and self.speedUpdated:
-            # Pull out the column we use for flight direction
-            direction = [
-                matrix[self.flyDirectionColumn],
-                matrix[self.flyDirectionColumn + 4],
-                matrix[self.flyDirectionColumn + 8],
-                matrix[self.flyDirectionColumn + 12]
-            ]
+        if role == "Controller" and self.currentSpeed != self.restingSpeed:
+            self.trackerMatrix.DeepCopy(matrix)
 
-            # Translate in the direction the controller is pointed, scaled by the speed
-            self.transform.Identity()
-            self.transform.Translate(
-                self.currentSpeed * direction[0],
-                self.currentSpeed * direction[1],
-                self.currentSpeed * direction[2]
-            )
-
-            # Get the current navigation matrix, transform it with the translation
-            # matrix computed above, and then update the navigation matrix.
-            self.savedMatrix.DeepCopy(vtkSelf.GetNavigationMatrix())
-            vtkMatrix4x4.Multiply4x4(
-                self.transform.GetMatrix(), self.savedMatrix, self.savedMatrix)
-            vtkSelf.SetNavigationMatrix(self.savedMatrix)
-
-            # This is required to apply the change to the NavigationMatrix
-            rvProxy = GetActiveView()
-            rvProxy.UpdateVTKObjects()
-
-            # Avoid unnecessary updates when flying by valuator
-            self.speedUpdated = False
 
     def HandleButton(self, vtkSelf, role, button, state):
         """Handle a button event.
@@ -167,9 +177,7 @@ class SimpleFlyer(PythonInteractorBase):
             # set the navigation matrix back to identity, returning us to the
             # origin.
             rvProxy = GetActiveView()
-            navMat = vtkMatrix4x4()
-            navMat.Identity()
-            vtkSelf.SetNavigationMatrix(navMat)
+            vtkSelf.SetNavigationMatrix(vtkMatrix4x4())
             rvProxy.UpdateVTKObjects()
 
     def HandleValuator(self, vtkSelf, numChannels, channelData):

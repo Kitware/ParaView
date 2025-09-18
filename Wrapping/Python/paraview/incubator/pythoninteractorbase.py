@@ -21,11 +21,14 @@ class PythonInteractorBase():
     def Initialize(self, vtkSelf):
         pass
 
+    def Update(self, vtkSelf):
+        pass
+
     def HandleTracker(self, vtkSelf, role, sensor, matrix):
         pass
 
     def HandleButton(self, vtkSelf, role, button, state):
         pass
 
-    def HandleValuator(self, vtkSelf, role, numChannels, channelData):
+    def HandleValuator(self, vtkSelf, numChannels, channelData):
         pass
