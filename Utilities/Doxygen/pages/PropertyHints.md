@@ -15,12 +15,14 @@ or removing values by default. However, you may want to restore default values,
 so adding a button makes it easier than using the context menu.
 In that case, use this property hint as follows.
 
-    <IntVectorProperty ...>
-      ...
-      <Hints>
-        <AllowRestoreDefaults />
-      </Hints>
-    </IntVectorProperty>
+```xml
+<IntVectorProperty ...>
+  ...
+  <Hints>
+    <AllowRestoreDefaults />
+  </Hints>
+</IntVectorProperty>
+```
 
 NoDefault
 ----------
@@ -33,12 +35,14 @@ resets the property value during initialization of the newly created proxy
 be undesirable and one may want the property to simply use the XML default.
 In that case, use this property hint as follows.
 
-    <IntVectorProperty ...>
-      ...
-      <Hints>
-        <NoDefault />
-      </Hints>
-    </IntVectorProperty>
+```xml
+<IntVectorProperty ...>
+  ...
+  <Hints>
+    <NoDefault />
+  </Hints>
+</IntVectorProperty>
+```
 
 IsSelectable
 ------------
@@ -50,12 +54,14 @@ checkable but non-editable table.
 For now, can be used only with the timesteps domain that fills a double vector
 property values.
 
-    <DoubleVectorProperty ...>
-      ...
-      <Hints>
-        <IsSelectable />
-      </Hints>
-    </DoubleVectorProperty>
+```xml
+<DoubleVectorProperty ...>
+  ...
+  <Hints>
+    <IsSelectable />
+  </Hints>
+</DoubleVectorProperty>
+```
 
 ShowLabel
 -----------------
@@ -65,12 +71,14 @@ A repeatable vector property won't show the label of the property by default,
 as the table can have component labels and takes more space. This hint forces
 the label to show up in this case.
 
-    <DoubleVectorProperty ...>
-      ...
-      <Hints>
-        <ShowLabel />
-      </Hints>
-    </DoubleVectorProperty>
+```xml
+<DoubleVectorProperty ...>
+  ...
+  <Hints>
+    <ShowLabel />
+  </Hints>
+</DoubleVectorProperty>
+```
 
 ShowComponentLabels
 -----------------
@@ -81,15 +89,17 @@ of coordinates.  It may be useful to provide labels for each component's input
 to designate which type of vector is being represented. Labels may also be
 provided for multi-component string vector properties.
 
-    <DoubleVectorProperty ...>
+```xml
+<DoubleVectorProperty ...>
+  ...
+  <Hints>
+    <ShowComponentLabels>
+      <ComponentLabel component="0" label="X"/>
       ...
-      <Hints>
-        <ShowComponentLabels>
-          <ComponentLabel component="0" label="X"/>
-          ...
-        </ShowComponentLabels>
-      </Hints>
-    </DoubleVectorProperty>
+    </ShowComponentLabels>
+  </Hints>
+</DoubleVectorProperty>
+```
 
 PlaceholderText
 ---------------
@@ -98,12 +108,14 @@ Put a PlaceHolder text in the Text entry widget.
 For StringVectorProperty elements, one can suggest a place-holder text to use
 in the UI using the `<PlaceholderText/>` tag.
 
-    <StringVectorProperty...>
-      ...
-      <Hints>
-        <PlaceholderText>Enter label</PlaceholderText>
-      </Hints>
-    </StringVectorProperty>
+```xml
+<StringVectorProperty...>
+  ...
+  <Hints>
+    <PlaceholderText>Enter label</PlaceholderText>
+  </Hints>
+</StringVectorProperty>
+```
 
 PropertyLink
 ------------
@@ -119,17 +131,19 @@ That way, when the properties on RenderViewSettings proxy are changed, those on 
 the RenderView proxy instances also change. We use `<PropertyLink/>` hint for such a case.
 For example, consider the following:
 
-    <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
-                        name="UseOffscreenRenderingForScreenshots"
-                        number_of_elements="1"
-                        default_values="0"
-                        panel_visibility="never">
-      <Hints>
-        <PropertyLink group="settings"
-                      proxy="RenderViewSettings"
-                      property="UseOffscreenRenderingForScreenshots"/>
-      </Hints>
-    </IntVectorProperty>
+```xml
+<IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
+                    name="UseOffscreenRenderingForScreenshots"
+                    number_of_elements="1"
+                    default_values="0"
+                    panel_visibility="never">
+  <Hints>
+    <PropertyLink group="settings"
+                  proxy="RenderViewSettings"
+                  property="UseOffscreenRenderingForScreenshots"/>
+  </Hints>
+</IntVectorProperty>
+```
 
 Here, we want the UseOffscreenRenderingForScreenshots property linked with the corresponding
 property on the RenderViewSettings proxy. When this tag is encountered by
@@ -145,15 +159,17 @@ The optional attribute `unlink_if_modified` can be set to 1 if the link should
 be broken if the user explicitly modifies the property. This is useful when
 linking color-related properties with the active color palette, for example:
 
-    <DoubleVectorProperty command="SetBackground"
-                          default_values="0.329 0.349 0.427"
-                          name="Background"
-                          panel_widget="color_selector_with_palette"
-                          number_of_elements="3">
-      <Hints>
-        <PropertyLink group="settings" proxy="ColorPalette" property="BackgroundColor" unlink_if_modified="1" />
-      </Hints>
-    </DoubleVectorProperty>
+```xml
+<DoubleVectorProperty command="SetBackground"
+                      default_values="0.329 0.349 0.427"
+                      name="Background"
+                      panel_widget="color_selector_with_palette"
+                      number_of_elements="3">
+  <Hints>
+    <PropertyLink group="settings" proxy="ColorPalette" property="BackgroundColor" unlink_if_modified="1" />
+  </Hints>
+</DoubleVectorProperty>
+```
 
 
 SelectionInput
@@ -167,12 +183,14 @@ from prompting the user to pick the second input when the filter is created.
 To indicate to the UI that this input is a selection input, use the
 `<SelectionInput/>` hint.
 
-    <InputProperty ...>
-      ...
-      <Hints>
-        <SelectionInput />
-      </Hints>
-    </InputProperty>
+```xml
+<InputProperty ...>
+  ...
+  <Hints>
+    <SelectionInput />
+  </Hints>
+</InputProperty>
+```
 
 WidgetHeight
 ------------
@@ -183,31 +201,35 @@ that uses a `pqTreeWidget` including the ones for  `ArrayListDomain`, `ArraySele
 `EnumerationDomain`, `CompositeTreeDomain`, respect this hint to setup the default size for the
 tabular/tree widget.
 
-    <IntVectorProperty command="..." name="...">
-      <CompositeTreeDomain mode="all" name="tree">
-        <RequiredProperties>
-          <Property function="Input" name="Input" />
-        </RequiredProperties>
-      </CompositeTreeDomain>
-      <Hints>
-        <!-- This tag sets the height of the CompositeTreeDomain -->
-        <WidgetHeight number_of_rows="20" />
-      </Hints>
-    </IntVectorProperty>
+```xml
+<IntVectorProperty command="..." name="...">
+  <CompositeTreeDomain mode="all" name="tree">
+    <RequiredProperties>
+      <Property function="Input" name="Input" />
+    </RequiredProperties>
+  </CompositeTreeDomain>
+  <Hints>
+    <!-- This tag sets the height of the CompositeTreeDomain -->
+    <WidgetHeight number_of_rows="20" />
+  </Hints>
+</IntVectorProperty>
+```
 
 `WidgetHeight` hint can also be used on properties that use a `QComboBox` such as `EnumerationDomain`, `ProxyListDomains` or `StringListDomain`. It controls the maximum allowed number of item in the combobox before a scroll appear.
 
-    <StringVectorProperty command="" name="...">
-      <StringListDomain name="array_list">
-        <RequiredProperties>
-          <Property function="..." name="..."/>
-        </RequiredProperties>
-      </StringListDomain>
-      <Hints>
-        <!-- This tag sets the height of the QComboBox -->
-        <WidgetHeight number_of_rows="5" />
-      </Hints>
-    </StringVectorProperty>
+```xml
+<StringVectorProperty command="" name="...">
+  <StringListDomain name="array_list">
+    <RequiredProperties>
+      <Property function="..." name="..."/>
+    </RequiredProperties>
+  </StringListDomain>
+  <Hints>
+    <!-- This tag sets the height of the QComboBox -->
+    <WidgetHeight number_of_rows="5" />
+  </Hints>
+</StringVectorProperty>
+```
 
 Expansion
 ---------
@@ -220,17 +242,19 @@ for the tree widget.
 
 0 is the minimal expansion, -1 is expand all.
 
-    <IntVectorProperty command="..." name="...">
-      <CompositeTreeDomain mode="all" name="tree">
-        <RequiredProperties>
-          <Property function="Input" name="Input" />
-        </RequiredProperties>
-      </CompositeTreeDomain>
-      <Hints>
-        <!-- This tag sets the expansion depth of the CompositeTreeDomain -->
-        <Expansion depth="3" />
-      </Hints>
-    </IntVectorProperty>
+```xml
+<IntVectorProperty command="..." name="...">
+  <CompositeTreeDomain mode="all" name="tree">
+    <RequiredProperties>
+      <Property function="Input" name="Input" />
+    </RequiredProperties>
+  </CompositeTreeDomain>
+  <Hints>
+    <!-- This tag sets the expansion depth of the CompositeTreeDomain -->
+    <Expansion depth="3" />
+  </Hints>
+</IntVectorProperty>
+```
 
 FileChooser
 ------------
@@ -249,18 +273,20 @@ It is possible to add `<UseDirectoryName/>` in the `<Hints>` section to accept o
 `<BrowseLocalFileSystem/>` to browse local file-system irrespective of the
 connection type.
 
-    <StringVectorProperty animateable="0"
-                          command="SetQFileName"
-                          name="QFileName"
-                          number_of_elements="1"
-                          panel_visibility="default">
-      <FileListDomain name="files" />
-      <Documentation>This property specifies the .q (solution) file name for
-        the PLOT3D reader.</Documentation>
-      <Hints>
-        <FileChooser extensions="q" file_description="Solution files" />
-      </Hints>
-    </StringVectorProperty>
+```xml
+<StringVectorProperty animateable="0"
+                      command="SetQFileName"
+                      name="QFileName"
+                      number_of_elements="1"
+                      panel_visibility="default">
+  <FileListDomain name="files" />
+  <Documentation>This property specifies the .q (solution) file name for
+    the PLOT3D reader.</Documentation>
+  <Hints>
+    <FileChooser extensions="q" file_description="Solution files" />
+  </Hints>
+</StringVectorProperty>
+```
 
 OmitFromLoadAllVariables
 ------------
@@ -272,31 +298,33 @@ file. This hint allows certain values to be omitted from that list
 (e.g. sidesets, edgesets) so they will not be included by default. The
 user can still manually select these values to be loaded.
 
-    <StringVectorProperty command="SetSideSetArrayStatus"
-                            element_types="2 0"
-                            information_property="SideSetInfo"
-                            name="SideSetArrayStatus"
-                            number_of_elements_per_command="2"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="SideSetInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>An Exodus II file may define subsets of all the
-        <i>boundaries</i>of all the elements in a file as sets in their own
-        right. This property specifies which of those sets should be loaded.
-        Variables, such as boundary conditions, may then be defined over these
-        sets by specifying a single number per side. For example, a hexahedron
-        has 18 sides: 6 faces and 12 edges. Any of these sides may be
-        individually called out in a set and assigned a result value. The
-        accompanying SideSetResultArrayStatus property specifies which
-        variables defined over those sets should be loaded.</Documentation>
-        <Hints>
-          <OmitFromLoadAllVariables />
-        </Hints>
-    </StringVectorProperty>
+```xml
+<StringVectorProperty command="SetSideSetArrayStatus"
+                        element_types="2 0"
+                        information_property="SideSetInfo"
+                        name="SideSetArrayStatus"
+                        number_of_elements_per_command="2"
+                        repeat_command="1">
+    <ArraySelectionDomain name="array_list">
+      <RequiredProperties>
+        <Property function="ArrayList"
+                  name="SideSetInfo" />
+      </RequiredProperties>
+    </ArraySelectionDomain>
+    <Documentation>An Exodus II file may define subsets of all the
+    <i>boundaries</i>of all the elements in a file as sets in their own
+    right. This property specifies which of those sets should be loaded.
+    Variables, such as boundary conditions, may then be defined over these
+    sets by specifying a single number per side. For example, a hexahedron
+    has 18 sides: 6 faces and 12 edges. Any of these sides may be
+    individually called out in a set and assigned a result value. The
+    accompanying SideSetResultArrayStatus property specifies which
+    variables defined over those sets should be loaded.</Documentation>
+    <Hints>
+      <OmitFromLoadAllVariables />
+    </Hints>
+</StringVectorProperty>
+```
 
 ProxySelectionWidget
 ---------------------
@@ -307,15 +335,16 @@ To hide the combo-box widget, add `visibility="0"` attribute.
 To disable the combo-box widget, so that the user cannot change the selection,
 add `enabled="0"` attribute.
 
-    <ProxyProperty name="Format">
-         <ProxyListDomain name="proxy_list">
-           <Group name="screenshot_writers" />
-         </ProxyListDomain>
-         <Hints>
-           <ProxySelectionWidget enabled="0" />
-         </Hints>
-    </ProxyProperty>
-
+```xml
+<ProxyProperty name="Format">
+     <ProxyListDomain name="proxy_list">
+       <Group name="screenshot_writers" />
+     </ProxyListDomain>
+     <Hints>
+       <ProxySelectionWidget enabled="0" />
+     </Hints>
+</ProxyProperty>
+```
 
 ArraySelectionWidget
 ---------------------
@@ -324,25 +353,27 @@ For a property that uses `pqArraySelectionWidget`, one can specify the icon to
 use for the arrays listed using this hint. See
 `pqArraySelectionWidget::setIconType` for supported icon types.
 
-    <StringVectorProperty
-          name="RowDataArrays"
-          command="GetRowDataArraySelection"
-          number_of_elements_per_command="1"
-          repeat_command="1"
-          si_class="vtkSIDataArraySelectionProperty">
-          <ArrayListDomain name="array_list" input_domain_name="row_arrays">
-            <RequiredProperties>
-              <Property name="Input" function="Input" />
-            </RequiredProperties>
-          </ArrayListDomain>
-          <Documentation>
-            Select the row data arrays to pass through
-          </Documentation>
-          <Hints>
-            <ArraySelectionWidget icon_type="row"/>
-          </Hints>
-      </StringVectorProperty>
-    </SourceProxy>
+```xml
+<StringVectorProperty
+      name="RowDataArrays"
+      command="GetRowDataArraySelection"
+      number_of_elements_per_command="1"
+      repeat_command="1"
+      si_class="vtkSIDataArraySelectionProperty">
+      <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+        <RequiredProperties>
+          <Property name="Input" function="Input" />
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Documentation>
+        Select the row data arrays to pass through
+      </Documentation>
+      <Hints>
+        <ArraySelectionWidget icon_type="row"/>
+      </Hints>
+  </StringVectorProperty>
+</SourceProxy>
+```
 
 DoubleRangeSliderPropertyWidget
 -------------------------------
@@ -355,22 +386,24 @@ Customize the `pqDoubleRangeSliderPropertyWidget` with these hints:
 
 The snippet below shows these hints in use.
 
-    <DoubleVectorProperty command="SetClippingLimits"
-        default_values="0.8 1.2"
-        name="ClippingLimits"
-        panel_visibility="advanced"
-        number_of_elements="2"
-        panel_widget="double_range">
-        <DoubleRangeDomain
-            max="2.0"
-            min="0.65"
-            name="range" />
-        <Hints>
-          <MinimumLabel text="Near Clipping Limit"/>
-          <MaximumLabel text="Far Clipping Limit" />
-          <HideResetButton/>
-        </Hints>
-    </DoubleVectorProperty>
+```xml
+<DoubleVectorProperty command="SetClippingLimits"
+    default_values="0.8 1.2"
+    name="ClippingLimits"
+    panel_visibility="advanced"
+    number_of_elements="2"
+    panel_widget="double_range">
+    <DoubleRangeDomain
+        max="2.0"
+        min="0.65"
+        name="range" />
+    <Hints>
+      <MinimumLabel text="Near Clipping Limit"/>
+      <MaximumLabel text="Far Clipping Limit" />
+      <HideResetButton/>
+    </Hints>
+</DoubleVectorProperty>
+```
 
 TextureSelectorPropertyWidget
 -------------------------------

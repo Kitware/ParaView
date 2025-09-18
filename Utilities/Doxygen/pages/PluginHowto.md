@@ -104,8 +104,8 @@ There are four ways for loading plugins:
 </Plugins>
 ```
 
-      Plugins listed this way will always be loaded, irrespective of the status
-      of the `Auto Load` checkbox in the `Plugin Manager`.
+Plugins listed this way will always be loaded, irrespective of the status
+of the `Auto Load` checkbox in the `Plugin Manager`.
   * *Using the ParaView internal plugin configuration file `.plugins`*
      (Make plugins available and possibly Auto-load plugins)
     - Plugins that are listed in the `.plugins` file on the client and server
@@ -148,7 +148,7 @@ syntax of the plugin configuration file comes into play.
 
 A plugin configuration file for a delayed load plugin would look like this:
 
-```
+```xml
 <?xml version="1.0"?>
 <Plugins>
   <Plugin name="ElevationFilter" auto_load="0" delayed_load="1">
@@ -163,7 +163,7 @@ Such file can be automatically generated during the compilation of a ParaView pl
 
 It would look like this in the `CMakeLists.txt` of a plugin:
 
-```
+```cmake
 paraview_plugin_build(
   RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}"
   LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
@@ -182,7 +182,7 @@ Here is the exhaustive plugin configuration file XML schema
 
 Complete example:
 
-```
+```xml
 <?xml version="1.0"?>
 <Plugins>
   <Plugin name="PluginName" filename="relative/or/absolute/path/to/plugin.ext" auto_load="bool" delayed_load="bool">
@@ -1084,7 +1084,7 @@ options:
    accessed when selected in the UI. A section that contains other
    sections can be folded into the UI. An example of such a string is:
 
-```html
+```xml
 <toc>
   <section title="Top level section title" ref="page1.html">
     <section title="Page Title 1" ref="page1.html"/>
