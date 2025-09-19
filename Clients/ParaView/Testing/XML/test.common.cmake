@@ -935,6 +935,20 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToEmptyData.png}"
 )
 
+# Set INTEL_MACOS so we can avoid running some tests on macos
+# with intel CPUs. This is because there are OpenGL issues and
+# intel-based macs are end-of-life soon.
+set(INTEL_MACOS FALSE)
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_x86_64")
+  # This is the most reliable detection method but is specific to Kitware's CI machines.
+  set(INTEL_MACOS TRUE)
+elseif(APPLE AND "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "x86_64")
+  # Builders may report arm architectures even when targeting x86_64 machines
+  # depending on the cmake executable's architecture. However, this is likely to
+  # work outside of Kitware's CI infrastructure.
+  set(INTEL_MACOS TRUE)
+endif()
+
 # Some tests can take a long time; increase their timeouts.
 # Really very long (300 seconds):
 set(SeparateOpacityArray_TIMEOUT 300)
@@ -1172,7 +1186,6 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   ParallelCoordinatesView.xml
   PartitionedDataSet.xml
   PartitionedDataSetCollection.xml
-  PickCenter.xml
   PlotOverLine_3d.xml
   Preview.xml
   PreviewFontScaling.xml
@@ -1252,8 +1265,6 @@ list(APPEND TESTS_WITH_BASELINES
   FeatureEdgesFilterHTG.xml
   FeatureEdgesRepresentationHTG.xml
   FrustumWidget.xml
-  IOSSCellGridHCurl.xml
-  IOSSCellGridHDiv.xml
   IOSSMergeExodusEntityBlocks.xml
   ImageChartView.xml
   IntegrateVariablesPDC.xml
@@ -1288,7 +1299,6 @@ list(APPEND TESTS_WITH_BASELINES
   TestParallelProjectionAnnotations.xml
   TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
-  TransferFunction2DYScalars.xml
   UnlinkCameraView.xml
   VolumeOfRevolution.xml
   ZoomClosestOffsetRatio.xml
@@ -1297,6 +1307,17 @@ list(APPEND TESTS_WITH_BASELINES
   ZoomToEmptyData.xml
   PCANormalEstimation.xml
 )
+
+if (NOT INTEL_MACOS)
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    PickCenter.xml
+  )
+  list(APPEND TESTS_WITH_BASELINES
+    IOSSCellGridHCurl.xml
+    IOSSCellGridHDiv.xml
+    TransferFunction2DYScalars.xml
+  )
+endif()
 
 if(PARAVIEW_ENABLE_VISITBRIDGE)
   list(APPEND TESTS_WITH_BASELINES
