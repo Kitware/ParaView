@@ -48,6 +48,7 @@ private: // NOLINT(readability-redundant-access-specifiers)
   vtkPVXMLElement* WidgetHint = nullptr;
   vtkPVXMLElement* WarnOnChangeHint = nullptr;
   bool WarningTriggered = false;
+  QScopedPointer<QStyle> ComboBoxStyle;
 };
 
 #endif // pqStringVectorPropertyWidget_h

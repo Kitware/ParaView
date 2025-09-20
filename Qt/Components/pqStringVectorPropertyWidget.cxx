@@ -285,7 +285,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `QComboBox`.");
     QComboBox* comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
-    comboBox->setStyle(new pqComboBoxStyle(/*showPopup=*/false));
+    this->ComboBoxStyle.reset(new pqComboBoxStyle(/*showPopup=*/false));
+    comboBox->setStyle(this->ComboBoxStyle.get());
     comboBox->setMaxVisibleItems(
       pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 

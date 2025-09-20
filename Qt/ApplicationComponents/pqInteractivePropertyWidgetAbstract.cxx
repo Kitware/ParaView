@@ -11,6 +11,7 @@
 #include "pqServer.h"
 #include "pqView.h"
 #include "vtkCommand.h"
+#include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
@@ -67,6 +68,7 @@ pqInteractivePropertyWidgetAbstract::~pqInteractivePropertyWidgetAbstract()
   {
     this->proxy()->RemoveObserver(this->Internals->UserEventObserverId);
     this->Internals->UserEventObserverId = 0;
+    this->proxy()->UnRegister(nullptr);
   }
 }
 
@@ -112,8 +114,23 @@ void pqInteractivePropertyWidgetAbstract::setupConnections(
 //-----------------------------------------------------------------------------
 void pqInteractivePropertyWidgetAbstract::setupUserObserver(vtkSMProxy* smproxy)
 {
+  if (this->Internals->UserEventObserverId > 0)
+  {
+    vtkLogF(ERROR,
+      "pqInteractivePropertyWidgetAbstract::setupUserObserver may only be called once per "
+      "instance");
+    return;
+  }
+  if (smproxy != this->proxy())
+  {
+    vtkLogF(ERROR,
+      "pqInteractivePropertyWidgetAbstract::setupUserObserver may only be called with the widget's "
+      "own proxy");
+    return;
+  }
   this->Internals->UserEventObserverId = smproxy->AddObserver(
     vtkCommand::UserEvent, this, &pqInteractivePropertyWidgetAbstract::handleUserEvent);
+  smproxy->Register(nullptr);
 }
 
 //-----------------------------------------------------------------------------

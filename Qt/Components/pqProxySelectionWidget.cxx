@@ -28,6 +28,7 @@ public:
   vtkSmartPointer<vtkSMProxyListDomain> Domain;
   Ui::ProxySelectionWidget Ui;
   QPointer<pqProxyWidget> ProxyWidget;
+  QScopedPointer<QStyle> ComboBoxStyle;
   bool ShowingAdvancedProperties;
   bool HideProxyWidgetsInDefaultView;
   bool HideProxyWidgets;
@@ -101,7 +102,8 @@ pqProxySelectionWidget::pqProxySelectionWidget(
   assert(this->Internal->Domain);
   this->connect(
     this->Internal->Ui.comboBox, SIGNAL(currentIndexChanged(int)), SLOT(currentIndexChanged(int)));
-  this->Internal->Ui.comboBox->setStyle(new pqComboBoxStyle(/*showPopup=*/false));
+  this->Internal->ComboBoxStyle.reset(new pqComboBoxStyle(/*showPopup=*/false));
+  this->Internal->Ui.comboBox->setStyle(this->Internal->ComboBoxStyle.get());
   this->Internal->Ui.comboBox->setMaxVisibleItems(
     pqPropertyWidget::hintsWidgetHeightNumberOfRows(smproperty->GetHints()));
   new pqComboBoxDomain(this->Internal->Ui.comboBox, smproperty, this->Internal->Domain);
