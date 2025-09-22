@@ -17572,7 +17572,7 @@
   },
   {
     "Name": "Fast (Reds)",
-    "ColorSpace": "RGB",
+    "ColorSpace": "Lab",
     "Creator": "Francesca Samsel, and Alan W. Scott",
     "NanColor": [
       0.0,
@@ -17604,7 +17604,7 @@
   },
   {
     "Name": "Fast (Blues)",
-    "ColorSpace": "RGB",
+    "ColorSpace": "Lab",
     "Creator": "Francesca Samsel, and Alan W. Scott",
     "NanColor": [
       0.0,
