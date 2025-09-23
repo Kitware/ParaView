@@ -1507,3 +1507,31 @@ def lookupTableUpdate(lutName):
             pass
 
     return lutName, reverseLut
+
+
+def handle_legacy_view_creation(view_xml_name, view, controller):
+    """
+    Provide backwards compatibility for view creation
+    """
+    if paraview.compatibility.GetVersion() <= (5, 6):
+        # older versions automatically assigned view to a
+        # layout.
+        controller.AssignViewToLayout(view)
+
+    if paraview.compatibility.GetVersion() <= (5, 9):
+        if hasattr(view, "UseColorPaletteForBackground"):
+            view.UseColorPaletteForBackground = 0
+
+    if paraview.compatibility.GetVersion() <= (6, 0):
+        # default font size of axis labels was changed from 18 to 14 in 6.1
+        chart_view_proxies = ["XYBagChartView", "XYFunctionalBagChartView", "XYChartViewBase",
+                              "XYChartViewBase4Axes", "XYChartView", "XYPointChartView",
+                              "QuartileChartView", "XYBarChartView", "XYHistogramChartView",
+                              "ImageChartView"]
+        if view_xml_name in chart_view_proxies:
+            view.LeftAxisTitleFontSize = 18
+            view.BottomAxisTitleFontSize = 18
+            view.RightAxisTitleFontSize = 18
+            view.TopAxisTitleFontSize = 18
+
+    return view

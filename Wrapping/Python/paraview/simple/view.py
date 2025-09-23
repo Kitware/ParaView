@@ -1,5 +1,6 @@
 import paraview
 from paraview import servermanager
+from paraview import _backwardscompatibilityhelper
 from paraview.util import proxy as proxy_util
 
 from paraview.simple.session import GetActiveView
@@ -44,14 +45,7 @@ def CreateView(view_xml_name, **params):
     controller.PostInitializeProxy(view)
     controller.RegisterViewProxy(view, registrationName)
 
-    if paraview.compatibility.GetVersion() <= (5, 6):
-        # older versions automatically assigned view to a
-        # layout.
-        controller.AssignViewToLayout(view)
-
-    if paraview.compatibility.GetVersion() <= (5, 9):
-        if hasattr(view, "UseColorPaletteForBackground"):
-            view.UseColorPaletteForBackground = 0
+    view = _backwardscompatibilityhelper.handle_legacy_view_creation(view_xml_name, view, controller)
 
     # setup an interactor if current process support interaction if an
     # interactor hasn't already been set. This overcomes the problem where VTK
