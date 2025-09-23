@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pvx>
+  <Process Type="server">
+    <Machine Name="Left"
+      LowerLeft="-2 -1 -2"
+      LowerRight="0 -1 -2"
+      UpperRight="0  1 -2"
+      Show2DOverlays="0" />
+    <Machine Name="Right"
+      LowerLeft="0 -1 -2"
+      LowerRight="2 -1 -2"
+      UpperRight="2  1 -2" />
+  </Process>
+</pvx>
