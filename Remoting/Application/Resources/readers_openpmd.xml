@@ -97,6 +97,61 @@
         </Hints>
       </StringVectorProperty>
 
+      <!-- Position coordinate mapping properties -->
+      <StringVectorProperty name="PositionCoordinatesInfo"
+        command="GetPositionCoordinatesInfo"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="XCoordinateInfo"
+        command="GetXCoordinate"
+        information_only="1" />
+
+      <StringVectorProperty name="YCoordinateInfo"
+        command="GetYCoordinate"
+        information_only="1" />
+
+      <StringVectorProperty name="ZCoordinateInfo"
+        command="GetZCoordinate"
+        information_only="1" />
+
+      <StringVectorProperty name="XCoordinate"
+        command="SetXCoordinate"
+        number_of_elements="1"
+        information_property="XCoordinateInfo">
+        <Documentation>Select which species position coordinate to use for X axis</Documentation>
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PositionCoordinatesInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YCoordinate"
+        command="SetYCoordinate"
+        number_of_elements="1"
+        information_property="YCoordinateInfo">
+        <Documentation>Select which species position coordinate to use for Y axis</Documentation>
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PositionCoordinatesInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ZCoordinate"
+        command="SetZCoordinate"
+        number_of_elements="1"
+        information_property="ZCoordinateInfo">
+        <Documentation>Select which species position coordinate to use for Z axis</Documentation>
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PositionCoordinatesInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
       <Hints>
         <ReaderFactory extensions="pmd" file_description="openPMD files" />
       </Hints>
