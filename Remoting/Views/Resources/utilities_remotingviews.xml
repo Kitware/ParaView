@@ -1465,7 +1465,7 @@
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetColorSpace"
-                         default_values="3"
+                         default_values="2"
                          name="ColorSpace"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
