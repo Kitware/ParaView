@@ -51,6 +51,25 @@ public:
   vtkGetVector3Macro(DataScale, double);
   ///@}
 
+  ///@{
+  /**
+   * Specify the scale used in the display transformation.
+   */
+  void SetDisplayTransformScale(double scaleX, double scaleY, double scaleZ);
+  void SetDisplayTransformScale(double scale[3])
+  {
+    this->SetDisplayTransformScale(scale[0], scale[1], scale[2]);
+  }
+  vtkGetVector3Macro(DisplayTransformScale, double);
+  ///@}
+
+  /**
+   * If enabled, the scale will be applied to the data but the tick values will still show the
+   * non-scaled model dimensions.
+   * By default, this option is false.
+   */
+  void InvertDisplayTransformScaleForTickLabels(bool enabled);
+
   vtkSetVector3Macro(DataPosition, double);
   vtkGetVector3Macro(DataPosition, double);
 
@@ -120,6 +139,8 @@ protected:
   double DataPosition[3];
   double DataBoundsScaleFactor;
   double TransformedBounds[6];
+
+  double DisplayTransformScale[3];
 
   bool UseModelTransform;
   double ModelBounds[6];

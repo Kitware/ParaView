@@ -391,6 +391,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid2X.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid-Custom.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid-CustomWithReset.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid-IgnoreScaling.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineAngle.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineCustomFieldHigh.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineCustomFieldLow.png}"
@@ -1135,6 +1136,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   ContourRange.xml
   CriticalTime.xml
   DataAxesGrid2X.xml
+  DataAxesGridIgnoreScaling.xml
   DataDimDefaultAxes.xml
   DecimatePolyline.xml
   DeleteSubtreePipelineBrowser.xml

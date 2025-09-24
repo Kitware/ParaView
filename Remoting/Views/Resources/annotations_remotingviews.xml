@@ -172,6 +172,9 @@
             <Property name="UseCustomBounds" />
             <Property name="CustomBounds" />
           </PropertyGroup>
+          <PropertyGroup label="Tick values">
+            <Property name="IgnoreDisplayTransformScale" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of GridAxesRepresentation -->
