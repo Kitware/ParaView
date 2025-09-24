@@ -17,7 +17,7 @@ Page | Description
 [ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
 [String Formatting Arguments](@ref StringFormattingArguments) | String formatting arguments that are used for formatting formattable strings.
 
-Developping with servermanager XML
+Developing with servermanager XML
 -----------------
 
 Page | Description
@@ -27,7 +27,6 @@ Page | Description
 [Proxy Hints And Annotations](@ref ProxyHints) | ServerManager XML hints for Proxies.
 [Property Hints](@ref PropertyHints) | ServerManager XML hints for Properties.
 [Proxy Documentation Formatting](@ref ProxyDocumentationFormatting) | Formatting options for proxy documentation.
-
 
 ParaView Catalyst
 -----------------
@@ -52,6 +51,7 @@ Page | Description
 [Slice View](@ref DesignSliceView) | Implementing the **Slice View**
 [String Encoding](@ref DesignStringEncoding) | How to encode string when developing for ParaView
 [Localization Howto](@ref LocalizationHowto) | Description of the translation workflow and how comply to it.
+[Restart and File Series Readers](@ref RestartAndFileSeriesReaders) | How to implement restart and file series readers.
 
 Developer notes
 ----------------
