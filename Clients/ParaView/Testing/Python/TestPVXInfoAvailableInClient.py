@@ -26,7 +26,7 @@ def runTest():
 
     assert renderView.GetIsInCAVE()
 
-    # Ensure we correctly get the values from "../XML/LeftRight.pvx"
+    # Ensure we correctly get the values from "../XML/LeftRightHide2DOverlay.pvx"
 
     lower_left_d0 = renderView.GetLowerLeft(0)
     assert len(lower_left_d0) == 3
@@ -63,6 +63,9 @@ def runTest():
     assert upper_right_d1[0] == 2
     assert upper_right_d1[1] == 1
     assert upper_right_d1[2] == -2
+
+    assert renderView.GetShow2DOverlays(0) is False
+    assert renderView.GetShow2DOverlays(1) is True
 
     simple.Disconnect()
 

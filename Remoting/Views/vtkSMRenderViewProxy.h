@@ -322,6 +322,13 @@ public:
   vtkTuple<int, 4> GetGeometry(int index);
 
   /**
+   * @brief Get whether or not the given display shows 2D overlays.
+   *
+   * @return bool
+   */
+  bool GetShow2DOverlays(int index);
+
+  /**
    * @brief Get whether or not the given display has screen corner
    * set.
    *
