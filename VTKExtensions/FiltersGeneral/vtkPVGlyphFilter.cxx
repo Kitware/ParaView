@@ -3,6 +3,7 @@
 #include "vtkPVGlyphFilter.h"
 
 // VTK includes
+#include "vtkAMRDataObject.h"
 #include "vtkBoundingBox.h"
 #include "vtkCellCenters.h"
 #include "vtkCellData.h"
@@ -30,7 +31,6 @@
 #include "vtkTriangleFilter.h"
 #include "vtkTuple.h"
 #include "vtkUniformGrid.h"
-#include "vtkUniformGridAMR.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -608,7 +608,7 @@ int vtkPVGlyphFilter::RequestDataObject(
       clone->FastDelete();
     }
   }
-  else if (vtkUniformGridAMR::GetData(inputVector[0], 0))
+  else if (vtkAMRDataObject::GetData(inputVector[0], 0))
   {
     // eventually, this will be PDC.
     auto output = vtkMultiBlockDataSet::GetData(outputVector, 0);

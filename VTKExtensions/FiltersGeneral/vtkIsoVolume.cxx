@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkIsoVolume.h"
 
+#include "vtkAMRDataObject.h"
 #include "vtkCell.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
@@ -19,7 +20,6 @@
 #include "vtkPointData.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkUniformGridAMR.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <cassert>
@@ -152,7 +152,7 @@ int vtkIsoVolume::RequestDataObject(vtkInformation* vtkNotUsed(request),
   }
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  if (vtkUniformGridAMR::GetData(inInfo))
+  if (vtkAMRDataObject::GetData(inInfo))
   {
     // Currently, we're creating a MB here since that's what the internal clip produce
     // when it encounters an AMR. This will need to change in future to be a PDC
