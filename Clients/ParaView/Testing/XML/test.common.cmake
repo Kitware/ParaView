@@ -1601,7 +1601,6 @@ list(APPEND TESTS_WITH_BASELINES
   PropertyConversion4.xml
   PropertyLink.xml
   QuadraticGhostCells.xml
-  ReadPIOWithHTG.xml
   ReadXMLPolyDataFileSeries.xml
   RecentFiles.xml
   RecentFilesHardFilename.xml
