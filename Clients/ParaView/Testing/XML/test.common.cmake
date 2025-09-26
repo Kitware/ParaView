@@ -2250,6 +2250,9 @@ endif()
 paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRight.pvx"
   TEST_SCRIPTS TestCAVE.xml TestCAVEVolumeRendering.xml)
 
+paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRightDeprecated.pvx"
+  TEST_SCRIPTS TestCAVE.xml)
+
 #------------------------------------------------------------------
 # Add tests that test command line arguments (among other things).
 #------------------------------------------------------------------
