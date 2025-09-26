@@ -32,6 +32,11 @@ configuration_flag(PARAVIEW_USE_PYTHON "python")
 
 # qt
 configuration_flag(PARAVIEW_USE_QT "qt")
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "qt5")
+  set(VTK_QT_VERSION 5 CACHE STRING "")
+else ()
+  set(VTK_QT_VERSION 6 CACHE STRING "")
+endif ()
 
 # edition
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "catalyst_rendering")

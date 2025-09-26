@@ -22,7 +22,7 @@
 
 .fedora42:
     extends: .linux
-    image: "kitware/paraview:ci-fedora42-20250818"
+    image: "kitware/paraview:ci-fedora42-20250915"
     variables:
         LC_ALL: "en_US.utf8"
 
@@ -66,13 +66,13 @@
         # Disable shared memory; it doesn't work so well inside of containers.
         I_MPI_SHM: disable
 
-.el7_mindeps_shared_mpi_python:
+.el7_mindeps_shared_mpi_python_qt5:
     extends:
         - .el7_mindeps
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: el7_shared_mindeps_mpi_python
+        CMAKE_CONFIGURATION: el7_shared_mindeps_mpi_python_qt5
 
 .el8_shared_icc_mpi_python:
     extends:
@@ -170,8 +170,10 @@
     - .gitlab/ci/doxygen.sh
     - .gitlab/ci/sccache.sh
     - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PWD/.gitlab/doxygen/bin:$PATH
+    # Download Qt
+    - cmake -P .gitlab/ci/download_qt6.cmake
     - cmake -P .gitlab/ci/download_onnxruntime.cmake
-    - export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$PWD/.gitlab/onnxruntime
+    - export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$PWD/.gitlab/qt6:$PWD/.gitlab/onnxruntime
     - cmake --version
     - ninja --version
     - doxygen --version

@@ -1,6 +1,6 @@
 {
     "latest-master": [
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[el7_shared_mindeps_mpi_python]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[el7_shared_mindeps_mpi_python_qt5]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[el8_shared_icc_mpi_python]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_documentation_mpi_python]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_doxygen]" },

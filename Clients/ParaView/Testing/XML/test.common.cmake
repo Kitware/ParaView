@@ -629,6 +629,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice_2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice_3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Surface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Slice_1.png}"
@@ -1998,6 +1999,13 @@ set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (XYBarChart_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-menu
+
+if (APPLE)
+  # On macOS, global menu access can interfere with widget paths.
+  set (MultiBlockInspectorMultiBlock_FORCE_SERIAL TRUE)
+  # Context menu access
+  set (FileDialogOpenInteractClose_FORCE_SERIAL TRUE)
+endif ()
 
 # those tests load and remove macros. Serial avoid side effects
 set(MacroEditor_FORCE_SERIAL TRUE)
