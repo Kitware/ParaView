@@ -185,7 +185,6 @@ void pqONNXPropertyGroupWidget::updateFromJson()
   int parameterIndex = 0;
   for (const auto& inputJsonValue : jsonInputArray)
   {
-    parameterIndex++;
     QJsonObject dataObject = inputJsonValue.toObject();
     if (pqONNXJsonVerify::isTime(dataObject))
     {
@@ -199,6 +198,7 @@ void pqONNXPropertyGroupWidget::updateFromJson()
       pqONNXInputParameter param(dataObject);
       this->MultiWidget->addWidget(&param);
     }
+    parameterIndex++;
   }
 
   QJsonObject outputJson = root[JsonNames::Output].toObject();
