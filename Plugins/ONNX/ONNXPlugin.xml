@@ -52,7 +52,7 @@
                             set_number_command="SetNumberOfInputParameters"
                             number_of_elements_per_command="1"
                             use_index="1"
-                            panel_visibility="never"
+                            panel_visibility="default"
                             animateable="0" >
       </DoubleVectorProperty>
 
