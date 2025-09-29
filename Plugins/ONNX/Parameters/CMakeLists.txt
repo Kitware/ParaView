@@ -1,3 +1,7 @@
+vtk_module_find_package(
+  PACKAGE     "Qt${PARAVIEW_QT_MAJOR_VERSION}"
+  COMPONENTS  Widgets)
+
 set(CMAKE_AUTOMOC 1)
 
 vtk_module_add_module(ONNXPlugin::ONNXParameters
