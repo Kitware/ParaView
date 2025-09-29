@@ -7,6 +7,7 @@ runtime.
 Variable | Description
 ---------|---------------------------------------------------------
 `PARAVIEW_DATA_ROOT`  | Change the location of the data root for testing.
+`PARAVIEW_LOG_FILE` | Additional log files to generate, separated by `+`. Same as `--log`.
 `PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY` | Override output directory used to save extracts.
 `PARAVIEW_USE_MPI_SSEND` | When set on the server processes, `MPI_Send` may be replaced with `MPI_Ssend` (useful for debugging purposes).
 `PV_DEBUG_PANELS` | When set, debugging text will be printed out explaining the reason for creation of various widgets on the properties panel (pqPropertiesPanel).

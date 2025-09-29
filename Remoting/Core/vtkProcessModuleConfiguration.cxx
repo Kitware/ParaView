@@ -95,7 +95,8 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
       "are same as those accepted for `--verbosity` argument.")
     ->delimiter('+') // reset delimiter. For log files ',' is used to separate verbosity.
     ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll)
-    ->type_name("TEXT:filename[,ENUM:verbosity] ...");
+    ->type_name("TEXT:filename[,ENUM:verbosity] ...")
+    ->envname("PARAVIEW_LOG_FILE");
 
   auto group = app->add_option_group("MPI", "MPI-specific options");
   auto mpi = group->add_flag(
