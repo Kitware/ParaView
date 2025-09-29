@@ -10,7 +10,7 @@
 
 pqONNXTimeParameter::pqONNXTimeParameter(const QJsonObject& json)
 {
-  this->Name = json["Name"].toString();
+  this->setName(json["Name"].toString());
 
   if (!pqONNXJsonVerify::isTime(json))
   {
@@ -20,16 +20,16 @@ pqONNXTimeParameter::pqONNXTimeParameter(const QJsonObject& json)
 
   if (json.contains("NumSteps"))
   {
-    this->Min = json["Min"].toDouble();
-    this->Max = json["Max"].toDouble();
+    this->setMin(json["Min"].toDouble());
+    this->setMax(json["Max"].toDouble());
     int numSteps = json.value("NumSteps").toInt(0);
-    double deltaTime = (this->Max - this->Min) / numSteps;
+    double deltaTime = (this->getMax() - this->getMin()) / numSteps;
     // Manually handle maximum to avoid rounding issues
     for (int idx = 0; idx < numSteps - 1; idx++)
     {
-      this->Times.append(this->Min + idx * deltaTime);
+      this->Times.append(this->getMin() + idx * deltaTime);
     }
-    this->Times.append(this->Max);
+    this->Times.append(this->getMax());
   }
   else if (json.contains("TimeValues"))
   {
@@ -42,7 +42,7 @@ pqONNXTimeParameter::pqONNXTimeParameter(const QJsonObject& json)
 
     assert(!this->Times.isEmpty());
 
-    this->Min = this->Times.first();
-    this->Max = this->Times.last();
+    this->setMin(this->Times.first());
+    this->setMax(this->Times.last());
   }
 }
