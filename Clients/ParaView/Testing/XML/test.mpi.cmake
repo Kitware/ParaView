@@ -9,6 +9,8 @@ list(APPEND TESTS_WITH_BASELINES
   ManyTypesXMLWriterReaderMPI.xml
   # Test Use Data Partitions for volume rendering
   #UseDataPartitions.xml
+  # This tests uses PIOReader which requires MPI
+  ReadPIOWithHTG.xml
   )
 
 list(APPEND TESTS_WITH_INLINE_COMPARES

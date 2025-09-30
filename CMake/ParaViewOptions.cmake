@@ -575,7 +575,6 @@ paraview_require_module(
             VTK::IOOMF
             VTK::IOParallelExodus
             VTK::IOParallelLSDyna
-            VTK::IOPIO
             VTK::IOHDF
             VTK::IOSegY
             VTK::IOTRUCHAS
@@ -603,7 +602,8 @@ paraview_require_module(
 
 paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
-  MODULES   VTK::IOParallelNetCDF)
+  MODULES   VTK::IOParallelNetCDF
+            VTK::IOPIO)
 
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_ENABLE_NONESSENTIAL
