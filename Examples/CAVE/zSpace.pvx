@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<pvx>
+  <!--
+    Configuration for zSpace 200 device
+  -->
+  <EyeSeparation Value="0.065"/>
+  <Machine Name="localhost"
+           Environment="DISPLAY=:0"
+           Geometry="1920x1080+1920+0"/>
+</pvx>

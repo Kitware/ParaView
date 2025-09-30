@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pvx>
+  <Process Type="server">
+    <!-- Two screen configuration Left and right (YAY)  -->
+    <Machine Name="Right"
+      LowerLeft="-2 -1 -2"
+      LowerRight="0 -1 -2"
+      UpperRight="0  1 -2" />
+    <Machine Name="Left"
+      LowerLeft="0 -1 -2"
+      LowerRight="2 -1 -2"
+      UpperRight="2  1 -2" />
+  </Process>
+</pvx>
