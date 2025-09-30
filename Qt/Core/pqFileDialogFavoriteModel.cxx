@@ -4,10 +4,10 @@
 
 #include "pqFileDialogFavoriteModel.h"
 
-#include <QApplication>
 #include <QBrush>
 #include <QDir>
 #include <QFont>
+#include <QGuiApplication>
 #include <QStyle>
 #include <pqApplicationCore.h>
 #include <pqCoreConfiguration.h>
@@ -177,7 +177,7 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
       else
       {
         QBrush brush;
-        brush.setColor(QApplication::palette().color(QPalette::Disabled, QPalette::WindowText));
+        brush.setColor(QGuiApplication::palette().color(QPalette::Disabled, QPalette::WindowText));
         return brush;
       }
 
