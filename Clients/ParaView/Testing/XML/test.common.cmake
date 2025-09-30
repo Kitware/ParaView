@@ -651,6 +651,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PlotOverLine_Boundary.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PlotOverLine_Center.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PlotOverLine_Uniform.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointDataSetInterpolator_SourceData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PolarAxes1.png}"
@@ -1281,6 +1282,7 @@ list(APPEND TESTS_WITH_BASELINES
   NOAMRUniformGridSurface.xml
   PartialFieldDataMultiBlock.xml
   ParticleTracerGlyph.xml
+  PointDataSetInterpolator.xml
   PassArrays.xml
   PerlinNoise.xml
   PointAndCellIdsHTG.xml
@@ -1310,6 +1312,10 @@ list(APPEND TESTS_WITH_BASELINES
   ZoomToEmptyData.xml
   PCANormalEstimation.xml
 )
+
+# PointDataSetInterpolator does not support distributed processing
+set(PointDataSetInterpolator_DISABLE_CS TRUE)
+set(PointDataSetInterpolator_DISABLE_CRS TRUE)
 
 if (NOT INTEL_MACOS)
   list(APPEND TESTS_WITH_INLINE_COMPARES
