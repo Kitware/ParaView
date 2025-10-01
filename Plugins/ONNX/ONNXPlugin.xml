@@ -6,7 +6,7 @@
       label="ONNX Prediction">
       <Documentation short_help="Run an ONNX model.">
         Run an ONNX model on input and store result as a new data array.
-        Result can be on Cells or on Points (see OnCellData).
+        Result can be on Cells or on Points (see ArrayAssociation).
         The actual model should be provided, as well as a Json
         that describes the different parameters for this model.
       </Documentation>
@@ -18,7 +18,7 @@
           <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkUnstructuredGrid"/>
+          <DataType value="vtkDataObject"/>
         </DataTypeDomain>
         <Documentation>
           Specifies the input to the ONNX Inference filter.
@@ -85,16 +85,21 @@
         <Property name="TimeStepIndex"/>
       </PropertyGroup>
 
-      <IntVectorProperty name="OnCellData"
-                         command="SetOnCellData"
+      <IntVectorProperty name="ArrayAssociation"
+                         command="SetArrayAssociation"
                          number_of_elements="1"
                          default_values="0"
                          panel_visibility="advanced"
                          animateable="0">
         <Documentation>
-
+          The Association for the resulting array.
         </Documentation>
-        <BooleanDomain name="bool"/>
+        <FieldDataDomain name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
       </IntVectorProperty>
 
       <IntVectorProperty name="OutputDimension"
@@ -108,7 +113,7 @@
 
       <PropertyGroup
          name="ONNX Output">
-         <Property name="OnCellData"/>
+         <Property name="ArrayAssociation"/>
          <Property name="OutputDimension" />
       </PropertyGroup>
 

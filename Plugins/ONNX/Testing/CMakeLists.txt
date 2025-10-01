@@ -11,9 +11,18 @@ paraview_add_client_tests(
   PREFIX "ONNX"
   LOAD_PLUGIN "ONNXPlugin"
   TEST_SCRIPTS
+    TestInputType.xml
     TestLoadState.xml
-    TestONNXPlugin.xml
     TestOutputParameters.xml
     TestTemporalEntries.xml
     TestWidgets.xml
+)
+
+# with baselines
+paraview_add_client_tests(
+  PREFIX "ONNX"
+  LOAD_PLUGIN "ONNXPlugin"
+  TEST_SCRIPTS
+    TestONNXPlugin.xml
+  BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
 )
