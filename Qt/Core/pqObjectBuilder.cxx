@@ -76,7 +76,6 @@ QString recoverRegistrationName(vtkSMProxy* proxy)
   {
     proxy->UpdatePropertyInformation(nameProperty);
     std::string newName = vtkSMPropertyHelper(nameProperty).GetAsString();
-    newName = vtkSMCoreUtilities::SanitizeName(newName);
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
     newName = spxm->GetUniqueProxyName(proxy->GetXMLGroup(), newName.c_str(), false);
