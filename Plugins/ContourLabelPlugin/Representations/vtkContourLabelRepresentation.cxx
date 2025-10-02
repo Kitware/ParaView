@@ -172,7 +172,7 @@ int vtkContourLabelRepresentation::RequestData(
   if (validDs != nullptr)
   {
     vtkNew<vtkCellTypes> cellTypes;
-    validDs->GetCellTypes(cellTypes);
+    validDs->GetDistinctCellTypes(cellTypes);
     for (vtkIdType i = 0; i < cellTypes->GetNumberOfTypes(); ++i)
     {
       if (cellTypes->GetCellType(i) != VTK_LINE && cellTypes->GetCellType(i) != VTK_POLY_LINE)
