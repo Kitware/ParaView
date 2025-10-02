@@ -213,7 +213,7 @@ struct ExplodeFunctor
     vtkCellData* outCellData = this->Output->GetCellData();
 
     outPoints->SetNumberOfPoints(totalNbPts);
-    outCells->GetData()->Allocate(totalNbCells * 5);
+    outCells->AllocateEstimate(totalNbCells, 5);
     outCellData->CopyAllocate(inPointData, totalNbCells);
 
     vtkIdType newPts[4], cntPts = 0;

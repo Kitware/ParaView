@@ -1177,7 +1177,8 @@ int vtkIntersectFragments::CopyAttributesToStatsOutput(const int controllingProc
     statsPd->SetPoints(pts);
     pts->Delete();
     vtkCellArray* cells = vtkCellArray::New();
-    cells->SetCells(nCenters, va);
+    cells->AllocateExact(nCenters, va->GetNumberOfValues() - nCenters);
+    cells->ImportLegacyFormat(va);
     statsPd->SetVerts(cells);
     cells->Delete();
     va->Delete();

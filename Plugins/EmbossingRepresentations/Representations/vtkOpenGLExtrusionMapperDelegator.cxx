@@ -42,8 +42,8 @@ void GetTrianglesFromPolyData(
   // create [N-2] values per cell (N number of points on cell)
   vtkCellArray* array[2] = { pd->GetPolys(), pd->GetStrips() };
   vtkIdType nbCells[2] = { pd->GetNumberOfPolys(), pd->GetNumberOfStrips() };
-  triangleArray.reserve(
-    array[0]->GetSize() - 3 * nbCells[0] + array[1]->GetSize() - 3 * nbCells[1]);
+  triangleArray.reserve(array[0]->GetNumberOfConnectivityIds() - 3 * nbCells[0] +
+    array[1]->GetNumberOfConnectivityIds() - 3 * nbCells[1]);
 
   for (int typeIdx = 0; typeIdx < 2; typeIdx++)
   {

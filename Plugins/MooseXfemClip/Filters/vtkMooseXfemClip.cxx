@@ -96,7 +96,6 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   int cellType = 0;
   vtkIdType i;
   int j;
-  vtkIdType estimatedSize;
 
   vtkDebugMacro(<< "Clipping dataset");
 
@@ -108,17 +107,13 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
     return 1;
   }
 
-  // allocate the output and associated helper classes
-  estimatedSize = numCells;
-  estimatedSize = estimatedSize / 1024 * 1024; // multiple of 1024
-  estimatedSize = std::max<vtkIdType>(estimatedSize, 1024);
   vtkNew<vtkFloatArray> cellScalars;
-  cellScalars->Allocate(VTK_CELL_SIZE);
+  cellScalars->Allocate(8 /*hex*/);
   vtkNew<vtkCellArray> conn;
-  conn->Allocate(estimatedSize, estimatedSize / 2);
+  conn->AllocateEstimate(numCells, 8 /*hex*/);
   conn->InitTraversal();
   vtkNew<vtkUnsignedCharArray> types;
-  types->Allocate(estimatedSize, estimatedSize / 2);
+  types->Allocate(numCells);
   vtkNew<vtkPoints> newPoints;
 
   // set precision for the points in the output
@@ -145,9 +140,9 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
 
   vtkNew<vtkDataSetAttributes> tempDSA;
   tempDSA->InterpolateAllocate(inPD, 1, 2);
-  outPD->InterpolateAllocate(inPD, estimatedSize, estimatedSize / 2);
+  outPD->InterpolateAllocate(inPD, numCells);
   outCD = output->GetCellData();
-  outCD->CopyAllocate(inCD, estimatedSize, estimatedSize / 2);
+  outCD->CopyAllocate(inCD, numCells);
 
   // Process all cells and clip each in turn
   //
