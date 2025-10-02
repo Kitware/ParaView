@@ -9,6 +9,7 @@
 #include "vtkPVLogger.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -506,7 +507,19 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
   // If proxyname is nullptr, the proxy manager makes up a name.
   if (proxyname == nullptr || proxyname[0] == 0)
   {
-    auto pname = proxy->GetSessionProxyManager()->RegisterProxy("sources", proxy);
+    std::optional<std::string> registrationName =
+      vtkSMCoreUtilities::RecoverRegistrationName(proxy);
+    std::string pname;
+    if (registrationName.has_value())
+    {
+      proxy->GetSessionProxyManager()->RegisterProxy(
+        "sources", registrationName.value().c_str(), proxy);
+      pname = registrationName.value();
+    }
+    else
+    {
+      pname = proxy->GetSessionProxyManager()->RegisterProxy("sources", proxy);
+    }
 
     // assign a name for logging
     proxy->SetLogName(pname.c_str());
