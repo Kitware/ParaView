@@ -35,12 +35,34 @@ QStringList pqPythonCompleter::getCompletions(const QString& prompt)
 
   // Variable to lookup is the name before the last dot or paren if there is one.
   QString lookup{};
-  int dot = textToComplete.lastIndexOf('.');
+
+  int dot;
   int paren = textToComplete.lastIndexOf('(');
+  int close_paren = textToComplete.lastIndexOf(')');
+
+  if (close_paren > paren)
+  {
+    dot = -1;
+    paren = -1;
+  }
+  else if (paren != -1)
+  {
+    dot = textToComplete.left(paren).lastIndexOf('.');
+  }
+  else
+  {
+    dot = textToComplete.lastIndexOf('.');
+  }
   // look the first equal sign to extract the name in case a contructor is used
   // i.e. with prompt " s = Sphere( Radius=1,End<TAB> " we want to get "Sphere"
   int equal = textToComplete.indexOf('=') + 1;
+  if (equal > paren)
+  {
+    equal = -1;
+  }
+
   int maxPos = std::max<int>(dot, paren);
+  bool call = paren > dot;
   if (maxPos != -1)
   {
     lookup = textToComplete.mid(equal, maxPos - equal);
@@ -51,7 +73,7 @@ QStringList pqPythonCompleter::getCompletions(const QString& prompt)
   if (this->getCompleteEmptyPrompts() || !lookup.isEmpty() ||
     !this->getCompletionPrefix(prompt).isEmpty())
   {
-    return this->getPythonCompletions(lookup);
+    return this->getPythonCompletions(lookup, call);
   }
 
   return QStringList{};
@@ -220,4 +242,27 @@ PyObject* pqPythonCompleter::derivePyObject(const QString& pythonObjectName, PyO
   PyErr_Clear();
 
   return derivedObject;
+}
+
+PyObject* pqPythonCompleter::getBuiltins(PyObject* locals)
+{
+  if (!PyDict_Check(locals))
+  {
+    return nullptr;
+  }
+
+  PyObject* builtins = PyDict_GetItemString(locals, "__builtins__");
+
+  if (PyDict_Check(builtins))
+  {
+    return builtins;
+  }
+  else if (PyModule_Check(builtins))
+  {
+    return PyModule_GetDict(builtins);
+  }
+  else
+  {
+    return nullptr;
+  }
 }

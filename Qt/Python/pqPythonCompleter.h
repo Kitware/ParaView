@@ -48,9 +48,16 @@ protected:
   PyObject* derivePyObject(const QString& pythonObjectName, PyObject* locals);
 
   /**
+   * Given the locals namespace return the builtins objects as a dict.
+   *
+   * Returns a borrowed reference (or possibly nulltpr).
+   */
+  PyObject* getBuiltins(PyObject* locals);
+
+  /**
    * Given a text prompt, return a list of possible completions.
    * This method must be implemented in concrete classes.
    */
-  virtual QStringList getPythonCompletions(const QString& pythonObjectName) = 0;
+  virtual QStringList getPythonCompletions(const QString& pythonObjectName, bool call) = 0;
 };
 #endif
