@@ -47,19 +47,53 @@ public:
 
   ///@{
   /**
-   * Returns information about each display specified.  The `Coverable`
-   * field is only used on X windows systems, and indicates that the
-   * window should be manageable by the window manager.  This means it
-   * can be covered by other windows, and a taskbar item is available
-   * to bring it back to the front.
+   * Returns environment string for the given display index.
    */
   const char* GetEnvironment(int index) const;
+  ///@}
+
+  ///@{
+  /**
+   * Returns geometry (screen space size and position) for the given display
+   * index.
+   */
   vtkTuple<int, 4> GetGeometry(int index) const;
+  ///@}
+
+  ///@{
+  /**
+   * Returns positions of screen corners (in physical coordinates) for the
+   * given display.
+   */
   vtkTuple<double, 3> GetLowerLeft(int index) const;
   vtkTuple<double, 3> GetLowerRight(int index) const;
   vtkTuple<double, 3> GetUpperRight(int index) const;
+  ///@}
+
+  ///@{
+  /**
+   * Returns whether given display index has lower left, lower right, and
+   * upper right screen corners defined.
+   */
   bool GetHasCorners(int index) const;
+  ///@}
+
+  ///@{
+  /**
+   * Only used on X windows systems. Indicates that the window should be
+   * manageable by the window manager.  This means it can be covered by
+   * other windows, and a taskbar item is available to bring it back to the
+   * front.
+   */
   bool GetCoverable(int index) const;
+  ///@}
+
+  ///@{
+  /**
+   * Allows user to select which displays show/hide things like scalar bar,
+   * annotation, etc.
+   */
+  bool GetShow2DOverlays(int index) const;
   ///@}
 
   /**

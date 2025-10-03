@@ -179,6 +179,16 @@ public:
     return info->GetGeometry(index);
   }
 
+  bool GetShow2DOverlays(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, false);
+    vtkCheckNumDisplaysMacro(info, index, false);
+
+    return info->GetShow2DOverlays(index);
+  }
+
   bool GetHasCorners(vtkSMSession* session, int index)
   {
     vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
@@ -1709,6 +1719,12 @@ bool vtkSMRenderViewProxy::GetFullScreen()
 vtkTuple<int, 4> vtkSMRenderViewProxy::GetGeometry(int index)
 {
   return this->Internal->GetGeometry(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetShow2DOverlays(int index)
+{
+  return this->Internal->GetShow2DOverlays(this->GetSession(), index);
 }
 
 //----------------------------------------------------------------------------
