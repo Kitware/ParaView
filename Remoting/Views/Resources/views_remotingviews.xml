@@ -1433,6 +1433,22 @@
         <Documentation>A helper function to force consistent Z buffer
         captures from a RenderView.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="EnableOSPRay"
+          label="Enable Ray Tracing"
+          command="SetEnableOSPRay"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enables ray tracing with OSPRay.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="EnableANARI"
+                                   values="0" />
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty name="EnableANARI"
           label="Enable Ray Tracing with ANARI"
           command="SetEnableANARI"
@@ -1446,22 +1462,6 @@
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="enabled_state"
                                    property="EnableOSPRay"
-                                   values="0" />
-        </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty name="EnableOSPRay"
-          label="Enable Ray Tracing with OSPRay"
-          command="SetEnableOSPRay"
-          default_values="0"
-          animateable="0"
-          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Enables ray tracing with OSPRay.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="enabled_state"
-                                   property="EnableANARI"
                                    values="0" />
         </Hints>
       </IntVectorProperty>
