@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Open 'img1.mypng' file and check its registration name. -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/img1.mypng" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButtons/PropertiesButton/label" property="text" arguments="Properties ('MyPNGReaderFile-img1' / PNG reader)" />
+
+  <!-- Change image file with 'img2.mypng' and check if the registration name is correct. -->
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionChangeFile" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/img2.mypng" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButtons/PropertiesButton/label" property="text" arguments="Properties ('MyPNGReaderFile-img2' / PNG reader)" />
+</pqevents>
