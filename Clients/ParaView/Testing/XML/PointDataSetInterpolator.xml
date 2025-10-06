@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Wavelet + Append (UG) -->
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Append" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- PointSource (50 points) + Elevation (Data) -->
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="PointSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/NumberOfPoints/LineEdit0" command="set_string" arguments="50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Radius/DoubleLineEdit0" command="set_string" arguments="5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ElevationFilter" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- PointDataSetInterpolator: Interpolate the points into the volume -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,101,6,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,101,6,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PointDatasetInterpolator" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/buttonFrame/Source" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/pipelineView" command="mousePress" arguments="1,1,0,83,9,/0:0/1:0/0:0" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/pipelineView" command="mouseRelease" arguments="1,0,0,83,9,/0:0/1:0/0:0" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Enable Pass*Arrays to test that feature -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PassPointArrays/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PassCellArrays/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PassFieldArrays/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Render as PointGaussians for visibility -->
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Point Gaussian" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/GaussianRadius/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+
+  <!-- Check Points PointData is available -->
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Elevation" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/PointDataSetInterpolator_SourceData.png" threshold="0.05" />
+
+  <!-- Final Render with volume data -->
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="RTData" />
+</pqevents>

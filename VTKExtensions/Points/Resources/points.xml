@@ -1057,7 +1057,7 @@
         command="SetPassPointArrays"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="never">
+        panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Indicate whether to shallow copy the input point data arrays to the output.
@@ -1068,7 +1068,7 @@
         command="SetPassCellArrays"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="never">
+        panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Indicate whether to shallow copy the input cell data arrays to the output.
@@ -1079,7 +1079,7 @@
         command="SetPassFieldArrays"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="never">
+        panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Indicate whether to shallow copy the input field data arrays to the output.
