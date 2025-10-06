@@ -175,7 +175,7 @@ endif ()
 #========================================================================
 
 vtk_deprecated_setting(raytracing_default PARAVIEW_ENABLE_RAYTRACING PARAVIEW_USE_RAYTRACING "OFF")
-option(PARAVIEW_ENABLE_RAYTRACING "Build ParaView with OSPray and/or OptiX ray-tracing support" "${raytracing_default}")
+option(PARAVIEW_ENABLE_RAYTRACING "Build ParaView with OSPray, ANARI and/or OptiX ray-tracing support" "${raytracing_default}")
 
 set(paraview_web_default ON)
 if (PARAVIEW_USE_PYTHON AND WIN32)
@@ -392,6 +392,7 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_RAYTRACING AND PARAVIEW_ENABLE_RENDERING
   MODULES   VTK::RenderingRayTracing
+            VTK::RenderingAnari
   EXCLUSIVE)
 
 paraview_require_module(

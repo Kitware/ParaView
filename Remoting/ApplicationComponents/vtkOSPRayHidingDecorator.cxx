@@ -26,10 +26,10 @@ void vtkOSPRayHidingDecorator::PrintSelf(ostream& os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 bool vtkOSPRayHidingDecorator::CanShow(bool show_advanced) const
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  const bool enableVisRTX = vtkOSPRayPass::IsBackendAvailable("optix pathtracer") &&
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
+  bool enableVisRTX = vtkOSPRayPass::IsBackendAvailable("optix pathtracer") &&
     vtksys::SystemTools::GetEnv("VTK_DISABLE_VISRTX") == nullptr;
-  const bool enableOSPRay = vtkOSPRayPass::IsBackendAvailable("OSPRay pathtracer") &&
+  bool enableOSPRay = vtkOSPRayPass::IsBackendAvailable("OSPRay pathtracer") &&
     vtksys::SystemTools::GetEnv("VTK_DISABLE_OSPRAY") == nullptr;
   if (enableOSPRay || enableVisRTX)
   {

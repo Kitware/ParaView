@@ -66,6 +66,7 @@ OPTIONAL_DEPENDS
   VTK::AcceleratorsVTKmFilters
   VTK::FiltersOpenTURNS
   VTK::ParallelMPI
+  VTK::RenderingAnari
   VTK::RenderingRayTracing
   VTK::vtkviskores
 TEST_DEPENDS

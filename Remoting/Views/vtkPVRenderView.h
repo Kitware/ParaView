@@ -1005,6 +1005,31 @@ public:
   void SetEnableOSPRay(bool);
   bool GetEnableOSPRay();
   ///@}
+
+  ///@{
+  /**
+   * Enable/disable ray tracing with ANARI
+   */
+  void SetEnableANARI(bool);
+  bool GetEnableANARI();
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the ANARI library name
+   */
+  void SetANARILibrary(std::string);
+  const char* GetANARILibrary();
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the ANARI renderer
+   */
+  void SetANARIRenderer(std::string);
+  const char* GetANARIRenderer();
+  ///@}
+
   ///@{
   /**
    * Controls whether OSPRay sends casts shadow rays or not.
