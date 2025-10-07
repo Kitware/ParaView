@@ -18,7 +18,7 @@ list(APPEND TESTS_WITHOUT_BASELINES
 
 # This test rely on copy being Ctrl-C
 if(NOT APPLE)
-  list(APPEND TESTS_WITHOUT_BASELINES
+  list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
     TooltipCopy.xml
     TestHTGHoverOnCell.xml
     )
@@ -111,6 +111,7 @@ if (numpy_found)
     HTGPlotSelectionOverTime.xml
     MultipleNumberOfComponents.xml
     ProgrammableFilterFieldData.xml
+    PythonCalculatorInput.xml
     )
 
   list(APPEND TESTS_WITHOUT_BASELINES
@@ -123,7 +124,6 @@ if (numpy_found)
     PythonCalculatorAutocomplete.xml
     PythonCalculatorCrossComposite.xml
     PythonCalculatorFieldData.xml
-    PythonCalculatorInput.xml
     PythonCalculatorMultiline.xml
     SelectionAndAutoSaveState.xml
     )
