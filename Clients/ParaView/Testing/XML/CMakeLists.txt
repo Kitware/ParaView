@@ -50,7 +50,7 @@ paraview_add_client_server_tests(
 )
 
 paraview_add_client_server_tests(
-  TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
+  TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
 )
 
 if (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
@@ -60,6 +60,6 @@ if (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
   )
 
   paraview_add_client_server_render_tests(
-    TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
+    TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
   )
 endif ()
