@@ -126,6 +126,11 @@ private Q_SLOTS:
    */
   void onItemRemoved(pqServerManagerModelItem* item);
 
+  /**
+   * Called at the end of the state loading process to handle selections.
+   */
+  void onStateLoaded();
+
 protected:
   void onSelect(pqOutputPort*, bool forceGlobalIds);
 

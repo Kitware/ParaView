@@ -17,9 +17,11 @@
 #include "vtkPVDataInformation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSelectionLink.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -63,6 +65,9 @@ pqSelectionManager::pqSelectionManager(QObject* _parent /*=nullptr*/)
     model, SIGNAL(sourceAdded(pqPipelineSource*)), this, SLOT(onSourceAdded(pqPipelineSource*)));
   QObject::connect(model, SIGNAL(sourceRemoved(pqPipelineSource*)), this,
     SLOT(onSourceRemoved(pqPipelineSource*)));
+
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)), this, SLOT(onStateLoaded()));
 
   pqApplicationCore::instance()->registerManager("SelectionManager", this);
 
@@ -119,6 +124,38 @@ void pqSelectionManager::onItemRemoved(pqServerManagerModelItem* item)
       // Remove it from set
       this->Implementation->SelectedPorts.remove(port);
       return;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::onStateLoaded()
+{
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  vtkSMSession* activeSession = vtkSMProxyManager::GetProxyManager()->GetActiveSession();
+
+  vtkSMSourceProxy* appendSelectionProxy =
+    vtkSMSourceProxy::SafeDownCast(pxm->GetProxy("selections", "AppendSelections"));
+  if (!appendSelectionProxy)
+  {
+    return;
+  }
+
+  vtkSMProxy* inputProxy = vtkSMProxy::SafeDownCast(
+    activeSession->GetRemoteObject(appendSelectionProxy->GetSelectionId()));
+  vtkSMSourceProxy* inputSourceProxy = vtkSMSourceProxy::SafeDownCast(inputProxy);
+  inputSourceProxy->SetSelectionInput(
+    appendSelectionProxy->GetSelectionPort(), appendSelectionProxy, 0);
+
+  pqPipelineSource* pqSource =
+    pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(inputProxy);
+  if (pqSource)
+  {
+    pqOutputPort* port = pqSource->getOutputPort(appendSelectionProxy->GetSelectionPort());
+    if (port)
+    {
+      this->select(port);
     }
   }
 }

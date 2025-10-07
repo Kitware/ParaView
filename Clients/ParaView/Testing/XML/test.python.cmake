@@ -96,10 +96,15 @@ if (numpy_found)
     IndexedLookupInitialization.xml # needs Python Calculator/numpy
     PlotOverLine_surface.xml # needs find data
     ProgrammableAnnotation.xml
+    SelectionSaveStatePVSM.xml # find data needs python/numpy
+    SelectionSaveStatePython.xml # find data needs python/numpy
     SpreadSheetSelectionTrace.xml
     StructuredGridCellBlanking.xml
     VolumeNoMapScalars.xml # needs programmable filter + numpy
     )
+
+  # Selection non-functional on CRS mode
+  set(SelectionSaveStatePVSM_DISABLE_CRS TRUE)
 
   list(APPEND TESTS_WITHOUT_BASELINES
     ExpressionChooser.xml

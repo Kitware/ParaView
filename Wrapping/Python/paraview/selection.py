@@ -68,7 +68,7 @@ def _createSelection(proxyname, **args):
     return s
 
 
-def CreateSelection(proxyname, registrationname, **args):
+def CreateSelection(proxyname, registrationname, groupname='selection_sources', **args):
     """Make a new selection source proxy. Can be either vtkSelection or vtkAppendSelection.
     Use this so that selection don't show up in the pipeline."""
 
@@ -77,7 +77,7 @@ def CreateSelection(proxyname, registrationname, **args):
     session = sm.ActiveConnection.Session
     pxm = sm.ProxyManager(session)
 
-    pxm.RegisterProxy('selection_sources', registrationname, s)
+    pxm.RegisterProxy(groupname, registrationname, s)
     return sm._getPyProxy(s)
 
 
