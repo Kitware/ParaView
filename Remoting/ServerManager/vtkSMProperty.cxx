@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkSMProperty.h"
 
-#include "vtkClientServerStream.h"
 #include "vtkClientServerStreamInstantiator.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
@@ -14,7 +13,6 @@
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
 
@@ -521,7 +519,9 @@ bool vtkSMProperty::ResetToDomainDefaults(bool use_unchecked_values)
 {
   if (vtkProcessModule::GetProcessModule() &&
     vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode() &&
-    vtkSMProxyProperty::SafeDownCast(this) == nullptr)
+    !this->IsA("vtkSMProxyProperty") && !this->FindDomain("vtkSMFileListDomain") &&
+    !this->FindDomain("vtkSMFrameStrideQueryDomain") &&
+    !this->FindDomain("vtkSMAnimationFrameWindowDomain"))
   {
     // when using symmetric mpi, we disable domains since they don't always have
     // the most updated information.
