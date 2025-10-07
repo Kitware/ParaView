@@ -219,6 +219,8 @@ public:
                                QXcbWindow::setNetWmStateOnUnmappedWindow() called on mapped window"
                                */
                             << "QXcbWindow::setNetWmStateOnUnmappedWindow"
+                            // Suppress DISPLAY not found error for XOpenGLRenderWindow
+                            << "bad X server connection. DISPLAY="
                             /* suppress "warning: In unknown, line 0" and
                                "warning: Populating font family aliases took"
                              */
