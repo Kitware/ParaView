@@ -41,14 +41,17 @@ Please run the command in a terminal to install the following dependencies depen
 ##### Ubuntu 18.04 LTS / Debian 10
 `sudo apt-get install git cmake build-essential libgl1-mesa-dev libxt-dev qt5-default libqt5x11extras5-dev libqt5help5 qttools5-dev qtxmlpatterns5-dev-tools libqt5svg5-dev python3-dev python3-numpy libopenmpi-dev libtbb-dev ninja-build`
 
-##### Centos 7
+##### Centos 7 / Rocky 8
 
 ###### CMake
 Download and install [cmake][cmake-download]) as the packaged version is not enough considering that
 CMake 3.12 or higher is needed.
 
-###### Others
+###### Others Centos 7
 `sudo yum install python3-devel openmpi-devel mesa-libGL-devel libX11-devel libXt-devel qt5-qtbase-devel qt5-qtx11extras-devel qt5-qttools-devel qt5-qtxmlpatterns-devel tbb-devel ninja-build git`
+
+###### Others Rocky 8
+`sudo yum install python3-devel openmpi-devel mesa-libGL-devel libX11-devel libXt-devel qt5-qtbase-devel qt5-qtx11extras-devel qt5-qttools-devel qt5-qtxmlpatterns-devel qt5-qtsvg-devel tbb-devel ninja-build git`
 
 ###### Environment
 ```sh
