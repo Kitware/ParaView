@@ -2,9 +2,9 @@
 
 This change introduces ANARI rendering in ParaView via pre-defined ANARI renderer properties.
 
-To access, enable the CMake configure time option `PARAVIEW_ENABLE_RAYTRACING`.
-That would automatically enable the `vtkRenderingRayTracing` and
-`vtkRenderingAnari` modules.
+To access, enable the CMake configure time option `PARAVIEW_ENABLE_RAYTRACING`
+and `PARAVIEW_ENABLE_ANARI`. That would automatically enable the `vtkRenderingRayTracing`
+and `vtkRenderingAnari` modules.
 
 ![ANARI integration](anari_in_paraview.png)
 
