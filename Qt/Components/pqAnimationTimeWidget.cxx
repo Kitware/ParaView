@@ -193,30 +193,61 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
   ui.timestepCountLabel->setVisible(state.playModeSnapToTimeSteps());
 
   // update combo-box.
-  ui.timeValueComboBox->clear();
   int currentIndex = -1;
-  for (const auto& val : state.timeSteps())
-  {
-    if (val == state.time())
-    {
-      currentIndex = ui.timeValueComboBox->count();
-    }
-    else if (currentIndex == -1 && state.time() < val)
-    {
-      // `state.time()` is not part of the current timesteps, insert it.
-      currentIndex = ui.timeValueComboBox->count();
-      ui.timeValueComboBox->addItem(pqCoreUtilities::formatTime(state.time())), state.time();
-    }
 
-    ui.timeValueComboBox->addItem(pqCoreUtilities::formatTime(val), val);
+  // check first if the existing time-steps have changed.
+  const int oldCount = ui.timeValueComboBox->count();
+  bool timestepsChanged = (oldCount == 0 || oldCount != static_cast<int>(state.timeSteps().size()));
+  if (!timestepsChanged)
+  {
+    for (int i = 0; i < oldCount; ++i)
+    {
+      const double oldVal = ui.timeValueComboBox->itemData(i).toDouble();
+      // check for equality of the time-steps.
+      if (oldVal != state.timeSteps()[i])
+      {
+        timestepsChanged = true;
+        break;
+      }
+      // find the current index.
+      if (oldVal == state.time())
+      {
+        currentIndex = i;
+      }
+    }
+    // if currentIndex is still -1, it means that the current time is not part of the
+    // current time-steps. So we need to update the combo-box.
+    timestepsChanged = timestepsChanged || currentIndex == -1;
   }
 
-  if (currentIndex == -1)
+  if (timestepsChanged)
   {
-    // `state.time()` is not part of the current timesteps, append it.
-    currentIndex = ui.timeValueComboBox->count();
-    ui.timeValueComboBox->addItem(
-      QString("%1 (?)").arg(pqCoreUtilities::formatTime(state.time())), state.time());
+    ui.timeValueComboBox->clear();
+    currentIndex = -1;
+
+    for (const auto& val : state.timeSteps())
+    {
+      if (val == state.time())
+      {
+        currentIndex = ui.timeValueComboBox->count();
+      }
+      else if (currentIndex == -1 && state.time() < val)
+      {
+        // `state.time()` is not part of the current timesteps, insert it.
+        currentIndex = ui.timeValueComboBox->count();
+        ui.timeValueComboBox->addItem(pqCoreUtilities::formatTime(state.time()), state.time());
+      }
+
+      ui.timeValueComboBox->addItem(pqCoreUtilities::formatTime(val), val);
+    }
+
+    if (currentIndex == -1)
+    {
+      // `state.time()` is not part of the current timesteps, append it.
+      currentIndex = ui.timeValueComboBox->count();
+      ui.timeValueComboBox->addItem(
+        QString("%1 (?)").arg(pqCoreUtilities::formatTime(state.time())), state.time());
+    }
   }
   ui.timeValueComboBox->setCurrentIndex(currentIndex);
 
@@ -225,19 +256,9 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
   {
     const int count = static_cast<int>(state.timeSteps().size());
     ui.timestepValue->setMaximum(count - 1);
-    int idx = 0;
-    bool found = false;
-    for (auto ts : state.timeSteps())
-    {
-      if (ts >= state.time())
-      {
-        found = true;
-        break;
-      }
-      idx++;
-    }
 
-    if (found)
+    const int idx = currentIndex;
+    if (idx < count)
     {
       ui.timestepValue->setValue(idx);
       ui.timestepValue->setSuffix(state.timeSteps()[idx] == state.time() ? "" : " (?)");
