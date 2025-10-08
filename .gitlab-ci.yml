@@ -342,8 +342,6 @@ superbuild:build:
         PV_CI_MERGED_ONLY: "true"
         PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
         ENABLE_PACKAGE_UPLOAD: "true"
-        # FIXME: remove when pvsb uses the `ENABLE_PACKAGE_UPLOAD` variable.
-        RSYNC_UPLOAD_ENABLE: "true"
     trigger:
         project: paraview/paraview-superbuild
         branch: $CI_COMMIT_REF_NAME
