@@ -3956,7 +3956,6 @@ void vtkPVRenderView::SetLightScale(double v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayLightNode::SetLightScale(v);
-  vtkRenderer* ren = this->GetRenderer();
 #else
   (void)v;
 #endif
