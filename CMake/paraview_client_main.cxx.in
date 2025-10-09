@@ -9,6 +9,7 @@
 
 #include "pq@_paraview_client_NAME@Initializer.h"
 #include "pqQtWidgetsConfig.h"
+#include "vtkLogger.h"
 
 #if PARAVIEW_USE_QTWEBENGINE
 #include <QWebEngineUrlScheme>
@@ -114,6 +115,32 @@ int main(int argc, char* argv[])
     case InitializerT::ExitFailure:
       return EXIT_FAILURE;
     case InitializerT::RunApplication:
-      return QApplication::exec();
+      {
+        // On Wayland, we prefer EGL based rendering over GLX.
+        // This is to ensure that we use the same GL implementation in VTK as Qt.
+        // Mixing GLX and EGL in the same application leads to crashes.
+        if (QGuiApplication::platformName().compare("wayland", Qt::CaseInsensitive) == 0)
+        {
+          vtkLogF(WARNING,
+            "ParaView is not fully tested on Wayland. You may experience issues. Please report "
+            "them to the issue tracker "
+            "https://gitlab.kitware.com/paraview/paraview/-/issues/23124");
+          if (vtksys::SystemTools::HasEnv("VTK_DEFAULT_OPENGL_WINDOW"))
+          {
+            if (const char* currentValue = vtksys::SystemTools::GetEnv("VTK_DEFAULT_OPENGL_WINDOW"))
+            {
+              if (strcmp(currentValue, "vtkEGLRenderWindow") != 0)
+              {
+                vtkLogF(WARNING,
+                  "VTK_DEFAULT_OPENGL_WINDOW is set to '%s' but should be vtkEGLRenderWindow on "
+                  "Wayland. Overriding.",
+                  currentValue);
+              }
+            }
+          }
+          vtksys::SystemTools::PutEnv("VTK_DEFAULT_OPENGL_WINDOW=vtkEGLRenderWindow");
+        }
+        return QApplication::exec();
+      }
   }
 }
