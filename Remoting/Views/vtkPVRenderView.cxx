@@ -3782,16 +3782,12 @@ void vtkPVRenderView::SetOSPRayRendererType(std::string name)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetShadows(bool v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   this->Internals->OSPRayShadows = v;
   vtkRenderer* ren = this->GetRenderer();
   if (this->Internals->IsInOSPRay || this->Internals->IsInAnari)
   {
     ren->SetUseShadows(v);
   }
-#else
-  (void)v;
-#endif
 }
 
 //----------------------------------------------------------------------------
