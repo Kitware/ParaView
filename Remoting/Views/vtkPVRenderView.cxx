@@ -3806,8 +3806,12 @@ void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayRendererNode::SetAmbientSamples(v, ren);
+#endif
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
   // vtkAnariRendererNode::SetAmbientSamples((v < 1 ? -1 : v), ren);
+#endif
 #else
   (void)v;
 #endif
@@ -3851,8 +3855,12 @@ void vtkPVRenderView::SetSamplesPerPixel(int v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayRendererNode::SetSamplesPerPixel(v, ren);
+#endif
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
   // vtkAnariRendererNode::SetSamplesPerPixel(v, ren);
+#endif
 #else
   (void)v;
 #endif
@@ -3874,11 +3882,15 @@ void vtkPVRenderView::SetMaxFrames(int v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
+#endif
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
   if (this->Internals->AnariPass)
   {
     this->Internals->AnariPass->GetSceneGraph()->SetAccumulationCount(ren, v);
   }
+#endif
   static bool warned_once = false;
   if (!warned_once && v > 1 && vtkPVView::GetEnableStreaming() == false)
   {
@@ -3908,11 +3920,15 @@ void vtkPVRenderView::SetDenoise(bool v)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   this->Internals->OSPRayDenoise = v;
   vtkRenderer* ren = this->GetRenderer();
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayRendererNode::SetEnableDenoiser(v, ren);
+#endif
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
   if (this->Internals->AnariPass)
   {
     this->Internals->AnariPass->GetAnariRenderer()->SetParameterb("denoise", v);
   }
+#endif
 #else
   (void)v;
 #endif
