@@ -3820,7 +3820,7 @@ void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetAmbientOcclusionSamples()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetAmbientSamples(ren);
 #else
@@ -3954,7 +3954,7 @@ bool vtkPVRenderView::GetDenoise()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetLightScale(double v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayLightNode::SetLightScale(v);
   vtkRenderer* ren = this->GetRenderer();
 #else
