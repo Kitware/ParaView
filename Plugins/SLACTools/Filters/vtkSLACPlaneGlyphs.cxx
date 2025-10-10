@@ -13,8 +13,7 @@
 #include "vtkSamplePlaneSource.h"
 #include "vtkThresholdPoints.h"
 
-#include "vtkSmartPointer.h"
-#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#include "vtkNew.h"
 
 //=============================================================================
 vtkStandardNewMacro(vtkSLACPlaneGlyphs);
@@ -72,22 +71,23 @@ int vtkSLACPlaneGlyphs::RequestData(vtkInformation* vtkNotUsed(request),
   inputCopy->ShallowCopy(input);
 
   // Create a plane that we will use to place the glyphs.
-  VTK_CREATE(vtkSamplePlaneSource, plane);
+  vtkNew<vtkSamplePlaneSource> plane;
   plane->SetInputData(inputCopy);
   plane->SetCenter(this->Center);
   plane->SetNormal(this->Normal);
   plane->SetResolution(this->Resolution);
 
   // Create a probe that will extract the points of the plane.
-  VTK_CREATE(vtkCompositeDataProbeFilter, probe);
+  vtkNew<vtkCompositeDataProbeFilter> probe;
   probe->SetSourceData(inputCopy);
   probe->SetInputConnection(plane->GetOutputPort());
 
   // Extract the points that are actually in the geometry.
-  VTK_CREATE(vtkThresholdPoints, threshold);
+  vtkNew<vtkThresholdPoints> threshold;
   threshold->SetExecutive(vtkSmartPointer<vtkCompositeDataPipeline>::New());
   threshold->SetInputConnection(probe->GetOutputPort());
-  threshold->ThresholdByUpper(0.5);
+  threshold->SetThresholdFunction(vtkThresholdPoints::THRESHOLD_UPPER);
+  threshold->SetUpperThreshold(0.5);
   threshold->SetInputArrayToProcess(
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "vtkValidPointMask");
 
