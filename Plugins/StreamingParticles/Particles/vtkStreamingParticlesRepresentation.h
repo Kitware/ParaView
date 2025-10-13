@@ -30,6 +30,7 @@ public:
   vtkTypeMacro(vtkStreamingParticlesRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  using vtkPVDataRepresentation::SetInputArrayToProcess;
   // Description:
   // Set the input data arrays that this algorithm will process. Overridden to
   // pass the array selection to the mapper.

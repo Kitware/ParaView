@@ -3653,7 +3653,7 @@ bool vtkPVRenderView::GetEnableANARI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetANARILibrary(std::string l)
+void vtkPVRenderView::SetANARILibrary([[maybe_unused]] std::string l)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
@@ -3677,7 +3677,7 @@ const char* vtkPVRenderView::GetANARILibrary()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetANARIRenderer(std::string r)
+void vtkPVRenderView::SetANARIRenderer([[maybe_unused]] std::string r)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   if (this->Internals->AnariPass)
