@@ -357,8 +357,8 @@ std::string vtkSMCoreUtilities::FindLargestPrefix(const std::vector<std::string>
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCoreUtilities::ReplaceReaderFileName(
-  vtkSMProxy* proxy, const std::vector<std::string>& files, const char* propName)
+void vtkSMCoreUtilities::ReplaceReaderFileName(vtkSMProxy* proxy,
+  const std::vector<std::string>& files, const char* propName, bool userModifiedName)
 {
   auto newProxy = vtkSmartPointer<vtkSMSourceProxy>::Take(vtkSMSourceProxy::SafeDownCast(
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->NewProxy(
@@ -472,20 +472,33 @@ void vtkSMCoreUtilities::ReplaceReaderFileName(
   }
   newProxy->UpdateVTKObjects();
 
-  std::string fileName = files.size() > 1 ? vtkSMCoreUtilities::FindLargestPrefix(files)
-                                          : vtksys::SystemTools::GetFilenameName(files[0]);
-
-  // If the user renamed the proxy, keep its name.
-  const char* proxyName =
+  // First we recover the current proxy name that is displayed in the UI. In case we know that the
+  // user changed it intentionally, we keep it. Hence, the if statement right after.
+  std::string newRegistrationName =
     vtkSMProxyManager::GetProxyManager()->GetProxyName(proxy->GetXMLGroup(), proxy);
-  if (std::string(proxyName) != vtksys::SystemTools::GetFilenameName(*fileNames.begin()))
+  if (!userModifiedName)
   {
-    fileName = proxyName;
+    std::string fileName = vtkSMCoreUtilities::GetFileNameFromFileNameList(fileNameProp);
+    // We make this check to comply with the python behavior:
+    // - If we create a proxy with a registration name different than the file name, the
+    // registration name has to be kept (see test: ReplaceReaderFileNameNoExtensions.py).
+    // - If we create a proxy with a registration name similar to the file name, then the current
+    // proxy name has to be changed with the new file name (see test: ReplaceReaderFileName.py)
+    if (newRegistrationName == fileName)
+    {
+      std::string newFileName = vtkSMCoreUtilities::GetFileNameFromFileNameList(files);
+      newRegistrationName = newFileName;
+    }
+
+    // If a custom registration name exists, then we have to use it.
+    std::optional<std::string> registrationName =
+      vtkSMCoreUtilities::RecoverRegistrationName(newProxy);
+    newRegistrationName = registrationName.value_or(newRegistrationName);
   }
 
   // We need to register the new proxy before we change the input property of the consumers of the
   // legacy proxy
-  controller->RegisterPipelineProxy(newProxy, fileName.c_str());
+  controller->RegisterPipelineProxy(newProxy, newRegistrationName.c_str());
 
   // For some reason, consumers from proxy get wiped out when setting new input proxies,
   // so we rely on a copy of the consumers
@@ -524,6 +537,41 @@ void vtkSMCoreUtilities::ReplaceReaderFileName(
   controller->UnRegisterPipelineProxy(proxy);
 
   newProxy->UpdatePipeline();
+}
+
+//----------------------------------------------------------------------------
+std::optional<std::string> vtkSMCoreUtilities::RecoverRegistrationName(vtkSMProxy* proxy)
+{
+  vtkSMProperty* nameProperty = proxy->GetProperty("RegistrationName");
+  if (nameProperty)
+  {
+    proxy->UpdatePropertyInformation(nameProperty);
+    std::string newName = vtkSMPropertyHelper(nameProperty).GetAsString();
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
+    newName = spxm->GetUniqueProxyName(proxy->GetXMLGroup(), newName.c_str(), false);
+    return newName;
+  }
+
+  return std::nullopt;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMCoreUtilities::GetFileNameFromFileNameList(
+  const std::vector<std::string>& fileNames)
+{
+  assert(!fileNames.empty() && "fileNames argument should have at least one element.");
+
+  return fileNames.size() > 1 ? vtkSMCoreUtilities::FindLargestPrefix(fileNames)
+                              : vtksys::SystemTools::GetFilenameName(fileNames[0]);
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMCoreUtilities::GetFileNameFromFileNameList(
+  vtkSMStringVectorProperty* stringVectorProperty)
+{
+  const std::vector<std::string>& fileNames = stringVectorProperty->GetElements();
+  return GetFileNameFromFileNameList(fileNames);
 }
 
 //----------------------------------------------------------------------------

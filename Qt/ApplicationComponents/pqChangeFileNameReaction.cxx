@@ -154,7 +154,8 @@ void pqChangeFileNameReaction::changeFileName()
           .arg(proxy)
           .arg(allFilesStd)
           .arg(propertyName);
-        vtkSMCoreUtilities::ReplaceReaderFileName(proxy, allFilesStd, propertyName);
+        vtkSMCoreUtilities::ReplaceReaderFileName(
+          proxy, allFilesStd, propertyName, source->userModifiedSMName());
         CLEAR_UNDO_STACK();
         break;
       }

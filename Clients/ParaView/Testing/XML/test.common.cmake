@@ -1005,6 +1005,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ComputeArrayMagnitudeSetting.xml
   CSVPreview.xml
   CellQualityForPixel.xml
+  ChangeFileNameReaction.xml
   CustomOutputFormat.xml
   DefaultReadersSetting.xml
   DelimitedTextReader.xml

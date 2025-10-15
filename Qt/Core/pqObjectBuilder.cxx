@@ -71,18 +71,8 @@ bool processEvents()
 //-----------------------------------------------------------------------------
 QString recoverRegistrationName(vtkSMProxy* proxy)
 {
-  vtkSMProperty* nameProperty = proxy->GetProperty("RegistrationName");
-  if (nameProperty)
-  {
-    proxy->UpdatePropertyInformation(nameProperty);
-    std::string newName = vtkSMPropertyHelper(nameProperty).GetAsString();
-    newName = vtkSMCoreUtilities::SanitizeName(newName);
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
-    newName = spxm->GetUniqueProxyName(proxy->GetXMLGroup(), newName.c_str(), false);
-    return QString::fromStdString(newName);
-  }
-  return QString();
+  std::optional<std::string> newName = vtkSMCoreUtilities::RecoverRegistrationName(proxy);
+  return QString::fromStdString(newName.value_or(""));
 }
 
 //-----------------------------------------------------------------------------

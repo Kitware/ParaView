@@ -332,6 +332,7 @@
   <addaction name="actionDeleteTree"/>
   <addaction name="actionRename"/>
   <addaction name="actionChangeInput"/>
+  <addaction name="actionChangeFile"/>
   <addaction name="actionIgnoreTime"/>
   <addaction name="separator"/>
   <addaction name="actionShow_All"/>
