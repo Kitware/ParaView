@@ -657,6 +657,15 @@ def setattr(proxy, pname, value):
                                         "supports 'CompositeDataSetIndex' and it has been replaced by "
                                         "'BlockSelectors'.")
 
+    if pname == "ReadGlobalFields" and proxy.SMProxy.GetXMLName() in ["IOSSReader", "IOSSCellGridReader"]:
+        if compatibility_version <= (6, 0):
+            globalFields = proxy.GetProperty("GlobalFields")
+            newGlobalFieldValues = []
+            for i in range(0, len(globalFields), 2):
+                newGlobalFieldValues.append(globalFields[i])
+                newGlobalFieldValues.append(str(value))
+            return globalFields.SetData(newGlobalFieldValues)
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -1337,6 +1346,17 @@ def getattr(proxy, pname):
             raise NotSupportedException("'WholeExtent' has been removed in ParaView 6.1. Please use the "
                                         "'Dimensions' property to get the sizes of each dimension in "
                                         "the grid data instead.")
+
+    if pname == "ReadGlobalFields" and proxy.SMProxy.GetXMLName() in ["IOSSReader", "IOSSCellGridReader"]:
+        if compatibility_version < (6, 1):
+            globalFields = proxy.GetProperty("GlobalFields")
+            for i in range(1, len(globalFields), 2):
+                if globalFields[i] is not str(1):
+                    return 0
+            return 1
+        else:
+            raise NotSupportedException("'ReadGlobalFields' property has been removed in ParaView 6.1. Please use the "
+                                        "'GlobalFields' property to get/set the list of global fields to read instead.")
 
     raise Continue()
 
