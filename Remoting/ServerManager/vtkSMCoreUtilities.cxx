@@ -525,8 +525,19 @@ void vtkSMCoreUtilities::ReplaceReaderFileName(vtkSMProxy* proxy,
       if (proxy == prop->GetProxy(proxyId))
       {
         vtkSMPropertyHelper helper(prop);
-        helper.Set(proxyId, newProxy,
-          vtkSMInputProperty::SafeDownCast(prop) ? helper.GetOutputPort(proxyId) : 0);
+
+        if (helper.Contains(newProxy))
+        {
+          // new proxy is already present, simply remove the old proxy
+          helper.Remove(proxy);
+        }
+        else
+        {
+          // new proxy is not present, replace old proxy by new proxy
+          helper.Set(proxyId, newProxy,
+            vtkSMInputProperty::SafeDownCast(prop) ? helper.GetOutputPort(proxyId) : 0);
+        }
+
         consumer->UpdateVTKObjects();
         break;
       }

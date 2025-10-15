@@ -943,6 +943,33 @@ void vtkSMPropertyHelper::Remove(vtkSMProxy* value)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMPropertyHelper::Contains(const vtkSMProxy* value) const
+{
+  if (this->Type == PROXY || this->Type == INPUT)
+  {
+    const unsigned int count = this->UseUnchecked
+      ? this->ProxyProperty->GetNumberOfUncheckedProxies()
+      : this->ProxyProperty->GetNumberOfProxies();
+
+    for (unsigned int i = 0; i < count; ++i)
+    {
+      const vtkSMProxy* proxy = this->UseUnchecked ? this->ProxyProperty->GetUncheckedProxy(i)
+                                                   : this->ProxyProperty->GetProxy(i);
+      if (proxy == value)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+  else
+  {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    return false;
+  }
+}
+
+//----------------------------------------------------------------------------
 vtkSMProxy* vtkSMPropertyHelper::GetAsProxy(unsigned int index /*=0*/) const
 {
   return this->GetProperty<vtkSMProxy*>(index);

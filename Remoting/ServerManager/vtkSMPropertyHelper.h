@@ -162,19 +162,42 @@ public:
   const char* GetAsString(unsigned int index = 0) const;
   ///@}
 
-  ///@{
-  /**
-   * Set/Get methods for vtkSMProxyProperty or vtkSMInputProperty.
-   * Calling these methods on any other type of property will raise errors.
-   * The option \c outputport(s) argument is used only for vtkSMInputProperty.
+  /** @name Proxy convenience methods
+   * Helper functions for setting and getting proxies on `vtkSMProxyProperty`
+   * and `vtkSMInputProperty` instances.
+   *
+   * These methods simplify proxy management by supporting operations such as
+   * replacing, adding, or querying proxies and their associated output ports.
+   *
+   * The `outputport` argument is only relevant for `vtkSMInputProperty`.
    */
+  ///@{
+
+  /// Replace the proxy at index 0 with a new one (optionally specifying output port).
   void Set(vtkSMProxy* value, unsigned int outputport = 0) { this->Set(0, value, outputport); }
+
+  /// Replace the proxy at a given index (optionally specifying output port).
   void Set(unsigned int index, vtkSMProxy* value, unsigned int outputport = 0);
+
+  /// Set multiple proxies at once (optionally with associated output ports).
   void Set(vtkSMProxy** value, unsigned int count, unsigned int* outputports = nullptr);
+
+  /// Append a proxy to the list (optionally specifying output port).
   void Add(vtkSMProxy* value, unsigned int outputport = 0);
+
+  /// Remove a specific proxy from the property.
   void Remove(vtkSMProxy* value);
+
+  /// Check if a proxy is present in the property.
+  bool Contains(const vtkSMProxy* value) const;
+
+  /// Get the proxy at the given index.
   vtkSMProxy* GetAsProxy(unsigned int index = 0) const;
+
+  /// Get the output port index associated with a proxy.
   unsigned int GetOutputPort(unsigned int index = 0) const;
+
+  /// Get the corresponding `vtkSMOutputPort` instance.
   vtkSMOutputPort* GetAsOutputPort(unsigned int index = 0) const;
   ///@}
 
