@@ -1464,6 +1464,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
+          <DataType value="vtkCompositeDataSet"/>
         </DataTypeDomain>
         <Documentation>
           The input from which the selection is extracted.
