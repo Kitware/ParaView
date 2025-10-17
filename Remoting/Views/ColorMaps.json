@@ -225,7 +225,7 @@
     ]
   },
   {
-    "ColorSpace": "Diverging",
+    "ColorSpace": "Lab",
     "Name": "Inferno",
     "NanColor": [
       0,
@@ -1484,7 +1484,7 @@
     ]
   },
   {
-    "ColorSpace": "Diverging",
+    "ColorSpace": "Lab",
     "Name": "Viridis",
     "NanColor": [
       1,
@@ -13421,7 +13421,7 @@
     ]
   },
   {
-    "ColorSpace": "Diverging",
+    "ColorSpace": "Lab",
     "Name": "Magma",
     "NanColor": [
       0,
@@ -14459,7 +14459,7 @@
     ]
   },
   {
-    "ColorSpace": "Diverging",
+    "ColorSpace": "Lab",
     "Name": "Plasma",
     "NanColor": [
       0,
