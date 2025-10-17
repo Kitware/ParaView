@@ -23,6 +23,7 @@
 #include <vtkProcessModule.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
+#include <vtkSMSession.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkSmartPointer.h>
@@ -54,9 +55,9 @@ pqFileDialogFavoriteModel::pqFileDialogFavoriteModel(
   pqSettings* settings = core->settings();
 
   // We need to determine the URI for this server to get the list of favorites directories
-  // from the pqSettings. If server==nullptr, we use the "builtin:" resource.
+  // from the pqSettings. If server==nullptr, we use the vtkSMSession::GetBuiltinName() resource.
   pqServerResource resource =
-    this->Server ? this->Server->getResource() : pqServerResource("builtin:");
+    this->Server ? this->Server->getResource() : pqServerResource(vtkSMSession::GetBuiltinName());
 
   QString key = ::FAVORITES_GROUP_IN_SETTINGS;
   if (resource.serverName().isEmpty())

@@ -44,10 +44,15 @@ public:
   //---------------------------------------------------------------------------
 
   /**
+   * Get the URI name for the builtin session.
+   */
+  static const char* GetBuiltinName() { return "builtin:"; }
+
+  /**
    * Return the URL that define where the session is connected to. URI has
    * enough information to know the type of connection, server hosts and ports.
    */
-  virtual const char* GetURI() { return "builtin:"; }
+  virtual const char* GetURI() { return vtkSMSession::GetBuiltinName(); }
 
   ///@{
   /**

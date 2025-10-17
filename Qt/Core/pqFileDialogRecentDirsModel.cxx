@@ -14,6 +14,8 @@
 #include "pqServerResource.h"
 #include "pqSettings.h"
 
+#include "vtkSMSession.h"
+
 #include <string>
 #include <vtksys/SystemTools.hxx>
 
@@ -30,8 +32,9 @@ pqFileDialogRecentDirsModel::pqFileDialogRecentDirsModel(
   this->FileDialogModel = fileDialogModel;
 
   // We need to determine the URI for this server to get the list of recent dirs
-  // from the pqSettings. If server==nullptr, we use the "builtin:" resource.
-  pqServerResource resource = server ? server->getResource() : pqServerResource("builtin:");
+  // from the pqSettings. If server==nullptr, we use the vtkSMSession::GetBuiltinName() resource.
+  pqServerResource resource =
+    server ? server->getResource() : pqServerResource(vtkSMSession::GetBuiltinName());
 
   QString uri = resource.toURI();
   pqApplicationCore* core = pqApplicationCore::instance();

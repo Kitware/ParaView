@@ -14,6 +14,7 @@
 #include "vtkPVXMLParser.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkResourceFileLocator.h"
+#include "vtkSMSession.h"
 #include "vtkVersion.h"
 
 #include <string>
@@ -93,7 +94,7 @@ pqServerConfigurationCollection::pqServerConfigurationCollection(QObject* parent
   : Superclass(parentObject)
 {
   // Add a configuration for the builtin server.
-  pqServerResource resource("builtin:");
+  pqServerResource resource(vtkSMSession::GetBuiltinName());
   pqServerConfiguration config;
   config.setName("builtin");
   config.setResource(resource);

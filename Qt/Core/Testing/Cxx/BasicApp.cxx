@@ -24,6 +24,7 @@
 #include "vtkProcessModule.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
@@ -36,7 +37,8 @@ MainWindow::MainWindow()
   // automatically make a server connection
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
-  pqServer* server = core->getObjectBuilder()->createServer(pqServerResource("builtin:"));
+  pqServer* server =
+    core->getObjectBuilder()->createServer(pqServerResource(vtkSMSession::GetBuiltinName()));
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
 

@@ -23,6 +23,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
@@ -66,7 +67,7 @@ MainPipelineWindow::MainPipelineWindow()
   this->PipelineWidget = new pqPipelineBrowserWidget(nullptr);
 
   // Create server only after a pipeline browser get created...
-  pqServer* server = ob->createServer(pqServerResource("builtin:"));
+  pqServer* server = ob->createServer(pqServerResource(vtkSMSession::GetBuiltinName()));
 
   // Init and layout the UI
   QWidget* container = new QWidget(this);

@@ -9,13 +9,14 @@
 #include "pqServerManagerModel.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkProcessModule.h"
+#include "vtkSMSession.h"
 
 #include <cassert>
 
 //-----------------------------------------------------------------------------
 pqAlwaysConnectedBehavior::pqAlwaysConnectedBehavior(QObject* parentObject)
   : Superclass(parentObject)
-  , DefaultServer("builtin:")
+  , DefaultServer(vtkSMSession::GetBuiltinName())
 {
   auto core = pqPVApplicationCore::instance();
   assert(core != nullptr);
