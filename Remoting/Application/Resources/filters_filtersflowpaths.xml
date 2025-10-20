@@ -996,8 +996,7 @@
                         name="input_type">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="point"
-                          name="input_array"
+        <InputArrayDomain name="input_array"
                           number_of_components="3"/>
         <Documentation>
           This property specifies the input to the Stream Tracer filter.
