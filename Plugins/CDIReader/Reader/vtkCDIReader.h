@@ -182,7 +182,6 @@ protected:
   int AllocLatLonGeometry();
   int Wrap(int axis);
   void OutputPoints(bool init);
-  void OutputCells(bool init);
   void InsertPolyhedron(std::vector<vtkIdType> polygon);
   unsigned char GetCellType();
   void LoadGeometryData(int var, double dTime);
@@ -351,6 +350,8 @@ private:
 
   class Internal;
   std::unique_ptr<Internal> Internals;
+
+  void OutputCells();
 
   template <typename ValueType>
   int LoadCellVarDataTemplate(int variable, double dTime, vtkDataArray* dataArray);
