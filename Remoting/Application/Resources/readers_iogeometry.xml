@@ -657,7 +657,7 @@
         </ExposedProperties>
       </SubProxy>
       <Hints>
-        <ReaderFactory extensions="tec TEC Tec tp TP dat"
+        <ReaderFactory extensions="tec tp dat"
                        file_description="Tecplot Files" />
       </Hints>
       <!-- End TecplotReader -->

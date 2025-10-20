@@ -73,7 +73,7 @@
         </Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="dm DM Dm"
+        <ReaderFactory extensions="dm"
           file_description="Datamine wireframe" />
       </Hints>
     </SourceProxy>
@@ -114,7 +114,7 @@
         </Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="dm DM Dm"
+        <ReaderFactory extensions="dm"
           file_description="Datamine block model" />
       </Hints>
     </SourceProxy>
@@ -155,7 +155,7 @@
         </Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="dm DM Dm"
+        <ReaderFactory extensions="dm"
           file_description="Datamine drill hole" />
       </Hints>
     </SourceProxy>
@@ -195,7 +195,7 @@
         </Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="dm DM Dm"
+        <ReaderFactory extensions="dm"
           file_description="Datamine perimeter" />
       </Hints>
     </SourceProxy>
@@ -236,7 +236,7 @@
         </Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="dm DM Dm"
+        <ReaderFactory extensions="dm"
           file_description="Datamine point" />
       </Hints>
     </SourceProxy>
@@ -252,7 +252,7 @@
       </StringVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="dm DM Dm"
+        <ReaderFactory extensions="dm"
           file_description="Datamine dummy" />
       </Hints>
     </SourceProxy>
