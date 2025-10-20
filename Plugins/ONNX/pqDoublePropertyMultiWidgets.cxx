@@ -99,3 +99,19 @@ void pqDoublePropertyMultiWidgets::addWidget(pqNumericParameter* param)
   connect(
     widget, &pqDoubleRangeWidget::valueChanged, this, &pqDoublePropertyMultiWidgets::valuesChanged);
 }
+
+//-----------------------------------------------------------------------------
+void pqDoublePropertyMultiWidgets::hideParameterWidgets(const QString& name)
+{
+  int rowToHide = 0;
+  for (auto widget : this->DynamicWidgets)
+  {
+    if (widget->objectName() == name)
+    {
+      widget->hide();
+      this->DynamicLabels[rowToHide]->hide();
+      return;
+    }
+    rowToHide++;
+  }
+}

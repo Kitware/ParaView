@@ -1733,7 +1733,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
 
   // create a vtkCellArray for the surfaces of greater-than-isovalue sub-volumes
   surfaces = vtkCellArray::New();
-  surfaces->Allocate(estiSize, estiSize >> 1);
+  surfaces->AllocateEstimate(estiSize >> 1, /*quad*/ 4);
 
   // Create a vtkIdTypeArray for the global volume Ids assigned to the surfaces.
   // In fact the volume Ids might not necessarily be global since their ultimate
@@ -2695,7 +2695,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
 
   // the polygons / cells of the output vtkPolyData (with exterior faces only)
   plyCells = vtkCellArray::New();
-  plyCells->Allocate(numFaces, numFaces >> 4);
+  plyCells->AllocateEstimate(numFaces >> 4, /*quad*/ 4);
 
   // array of fragment Ids (one per constituent polygon)
   // here the fragment Ids are unnecessarily global since they are used for
@@ -3416,7 +3416,7 @@ void vtkRectilinearGridConnectivity::CreateInterProcessPolygons(vtkPolyData* fra
 
   // allocate an array of cells
   polygons = vtkCellArray::New();
-  polygons->Allocate(numCells);
+  polygons->AllocateEstimate(numCells, /*quad*/ 4);
 
   // allocate five arrays of data attributes
   uniPIdxs = vtkIdTypeArray::New();

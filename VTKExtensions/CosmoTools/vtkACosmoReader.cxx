@@ -559,7 +559,7 @@ void vtkACosmoReader::ReadBlockFromFile(
   points->SetNumberOfPoints(numParticles);
 
   vtkCellArray* cells = vtkCellArray::New();
-  cells->Allocate(cells->EstimateSize(numParticles, 1));
+  cells->AllocateEstimate(numParticles, 1);
 
   vtkFloatArray* velocity = vtkFloatArray::New();
   velocity->SetNumberOfComponents(3);

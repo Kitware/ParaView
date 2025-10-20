@@ -346,7 +346,7 @@ void vtkDataMineWireFrameReader::ParseCells(
   Data* values = new Data[file->nVars];
   file->OpenRecVarFile(this->GetTopoFileName());
   int numRecords = file->GetNumberOfRecords();
-  cells->Allocate(numRecords * 4);
+  cells->AllocateEstimate(numRecords, 4);
 
   for (int i = 0; i < numRecords; i++)
   {

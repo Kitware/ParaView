@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
-#include "vtkCellTypes.h"
+#include "vtkCellTypeUtilities.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPGenericEnSightReader.h"
@@ -38,8 +38,8 @@ extern int TestPEnSightBinaryGoldReader(int argc, char* argv[])
       case VTK_POLYHEDRON:
         continue;
       default:
-        std::cerr << "Unexpected cell type (" << vtkCellTypes::GetClassNameFromTypeId(type) << ")."
-                  << std::endl;
+        std::cerr << "Unexpected cell type (" << vtkCellTypeUtilities::GetClassNameFromTypeId(type)
+                  << ")." << std::endl;
         return EXIT_FAILURE;
     }
   }

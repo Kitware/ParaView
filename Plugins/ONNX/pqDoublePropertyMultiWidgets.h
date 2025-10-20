@@ -40,15 +40,13 @@ public:
 
   /**
    * Set the values on widgets.
-   * Order matches `addParameterWidget` calls.
-   *
-   * Size must also match: value is not enough to create slider (min/max required).
+   * Order matches `addWidget` calls.
    */
   void setValues(const QVariantList& values);
 
   /**
    * Return the list of values.
-   * Order matches `addParameterWidget` calls.
+   * Order matches `addWidget` calls.
    */
   QVariantList values() const;
 
@@ -58,9 +56,15 @@ public:
   void clear();
 
   /**
-   * Append a new slider.
+   * Append a new widget.
    */
   void addWidget(pqNumericParameter* param);
+
+  /**
+   * Hide the widgets for given parameter.
+   * Name should match pqNumericParameter::getName()
+   */
+  void hideParameterWidgets(const QString& name);
 
 Q_SIGNALS:
   /**

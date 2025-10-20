@@ -2378,16 +2378,14 @@ void vtkCDIReader::OutputCells(bool init)
   if (init)
   {
     cells = vtkSmartPointer<vtkCellArray>::New();
-    cells->Allocate(this->MaximumCells, this->MaximumCells);
+    cells->AllocateEstimate(this->MaximumCells, this->PointsPerCell);
     output->SetCells(cellType, cells);
-    cells->SetNumberOfCells(this->MaximumCells);
   }
   else
   {
     cells = output->GetCells();
     cells->Initialize();
-    cells->Allocate(this->MaximumCells, this->MaximumCells);
-    cells->SetNumberOfCells(this->MaximumCells);
+    cells->AllocateEstimate(this->MaximumCells, this->PointsPerCell);
   }
 
   vtkDebugMacro("OutputCells: init: " << init << " this->MaximumCells: " << this->MaximumCells

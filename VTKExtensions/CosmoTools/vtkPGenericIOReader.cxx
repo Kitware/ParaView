@@ -627,7 +627,7 @@ void vtkPGenericIOReader::LoadCoordinates(
   void* zBuffer = this->MetaData->RawCache[zaxis];
 
   vtkCellArray* cells = vtkCellArray::New();
-  cells->Allocate(cells->EstimateSize(this->MetaData->NumberOfElements, 1));
+  cells->AllocateEstimate(this->MetaData->NumberOfElements, 1);
 
   vtkPoints* pnts = vtkPoints::New();
   pnts->SetDataTypeToDouble();

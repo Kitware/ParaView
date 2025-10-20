@@ -341,7 +341,7 @@ void vtkPVGeometryFilter::ExecuteAMRBlockOutline(
   points->SetPoint(7, bounds[1], bounds[3], bounds[5]);
 
   auto lines = vtkSmartPointer<vtkCellArray>::New();
-  lines->Allocate(lines->EstimateSize(12, 2));
+  lines->AllocateEstimate(lines->GetNumberOfCells(), 2);
 
   // xmin face
   if (extractface[0])

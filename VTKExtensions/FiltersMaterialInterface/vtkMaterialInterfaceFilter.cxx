@@ -8957,7 +8957,9 @@ void vtkMaterialInterfaceFilter::CopyAttributesToOutput1()
   resolvedFragmentCenters->SetPoints(pts);
   pts->Delete();
   vtkCellArray* cells = vtkCellArray::New();
-  cells->SetCells(static_cast<vtkIdType>(this->NumberOfResolvedFragments), va);
+  cells->AllocateExact(static_cast<vtkIdType>(this->NumberOfResolvedFragments),
+    va->GetNumberOfValues() - this->NumberOfResolvedFragments);
+  cells->ImportLegacyFormat(va);
   resolvedFragmentCenters->SetVerts(cells);
   cells->Delete();
   va->Delete();

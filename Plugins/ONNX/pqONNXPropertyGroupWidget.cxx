@@ -9,6 +9,7 @@
 
 #include "pqDoublePropertyMultiWidgets.h"
 #include "pqFileChooserWidget.h"
+#include "vtkDataObject.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
@@ -29,7 +30,7 @@ static const char* ParametersFile = "ParametersFile";
 static const char* InputParameters = "InputParameters";
 static const char* TimeValues = "TimeValues";
 static const char* TimeStepIndex = "TimeStepIndex";
-static const char* OnCellData = "OnCellData";
+static const char* ArrayAssociation = "ArrayAssociation";
 static const char* OutputDimension = "OutputDimension";
 }
 
@@ -185,18 +186,20 @@ void pqONNXPropertyGroupWidget::updateFromJson()
   int parameterIndex = 0;
   for (const auto& inputJsonValue : jsonInputArray)
   {
-    parameterIndex++;
     QJsonObject dataObject = inputJsonValue.toObject();
     if (pqONNXJsonVerify::isTime(dataObject))
     {
       pqONNXTimeParameter param(dataObject);
       this->setupTimeValues(param, parameterIndex);
+      this->MultiWidget->addWidget(&param);
+      this->MultiWidget->hideParameterWidgets(param.getName());
     }
     else
     {
       pqONNXInputParameter param(dataObject);
       this->MultiWidget->addWidget(&param);
     }
+    parameterIndex++;
   }
 
   QJsonObject outputJson = root[JsonNames::Output].toObject();
@@ -220,8 +223,8 @@ void pqONNXPropertyGroupWidget::setupTimeValues(
 //-----------------------------------------------------------------------------
 void pqONNXPropertyGroupWidget::setupOutputProperties(const pqONNXOutputParameters& outParameters)
 {
-  vtkSMPropertyHelper onCellProp(this->proxy()->GetProperty(XMLNames::OnCellData));
-  onCellProp.Set(outParameters.getOnCell());
+  vtkSMPropertyHelper onCellProp(this->proxy()->GetProperty(XMLNames::ArrayAssociation));
+  onCellProp.Set(outParameters.getOnCell() ? vtkDataObject::CELL : vtkDataObject::POINT);
 
   vtkSMPropertyHelper dimensionProp(this->proxy()->GetProperty(XMLNames::OutputDimension));
   dimensionProp.Set(outParameters.getDimension());

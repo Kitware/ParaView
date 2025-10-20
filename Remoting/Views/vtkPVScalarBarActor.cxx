@@ -636,7 +636,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
   this->P->TextActors.reserve(ticks.size());
 
   vtkNew<vtkCellArray> tickCells;
-  tickCells->Allocate(tickCells->EstimateSize(ticks.size() * 10, 2));
+  tickCells->AllocateEstimate(ticks.size(), 20);
 
   vtkNew<vtkPoints> tickPoints;
   tickPoints->Allocate(ticks.size() * 20);

@@ -716,7 +716,7 @@ void vtkPGenericIOMultiBlockReader::LoadCoordinatesForBlock(
   int nparticles = dataBlock.NumberOfElements;
 
   vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-  cells->Allocate(cells->EstimateSize(nparticles, 1));
+  cells->AllocateEstimate(nparticles, 1);
 
   vtkSmartPointer<vtkPoints> pnts = vtkSmartPointer<vtkPoints>::New();
   pnts->SetDataTypeToDouble();

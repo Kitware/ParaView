@@ -14,9 +14,7 @@
 // needed for VTK_OPENGL_HAS_OSMESA, VTK_OPENGL_HAS_EGL, VTK_USE_COCOA, VTK_USE_X.
 #include "vtkRenderingOpenGLConfigure.h"
 
-#if defined(VTK_USE_X)
-#include <X11/Xlib.h>
-#endif
+#include "vtkX11Functions.h"
 
 #if defined(VTK_OPENGL_HAS_EGL)
 #include "vtkEGLRenderWindow.h"
@@ -72,12 +70,14 @@ vtkTypeUInt32 vtkPVRenderingCapabilitiesInformation::GetLocalCapabilities()
   // if using X, need to check if display is accessible.
   if (!SkipDisplayTest())
   {
-    Display* dId = XOpenDisplay((char*)nullptr);
+    vtkX11FunctionsInitialize();
+    Display* dId = vtkXOpenDisplay((char*)nullptr);
     if (dId)
     {
-      XCloseDisplay(dId);
+      vtkXCloseDisplay(dId);
       capabilities |= ONSCREEN_RENDERING;
     }
+    vtkX11FunctionsFinalize();
   }
   else
   {
