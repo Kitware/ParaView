@@ -4,9 +4,6 @@
 
 #include "pqFileDialogFilter.h"
 
-#include <QDateTime>
-#include <QFileIconProvider>
-#include <QIcon>
 #include <QRegularExpression>
 #include <QStringBuilder>
 
@@ -18,14 +15,11 @@ pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent
   , showHidden(false)
 {
   this->setSourceModel(model);
-  this->Wildcards.setPatternSyntax(QRegExp::RegExp2);
-  this->Wildcards.setCaseSensitivity(Qt::CaseSensitive);
+  this->Wildcards.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   this->setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
 pqFileDialogFilter::~pqFileDialogFilter() = default;
-
-#include <cstdio>
 
 void pqFileDialogFilter::setFilter(const QString& filter)
 {
@@ -52,7 +46,7 @@ void pqFileDialogFilter::setFilter(const QString& filter)
 
     QStringList strings = f.split("|");
     QStringList extensions_list, filepatterns_list;
-    Q_FOREACH (QString string, strings)
+    for (QString string : strings)
     {
       if (string.startsWith("*."))
       {
@@ -129,7 +123,7 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
     for (int row = 0; row < rowCount; ++row)
     {
       QString str = sourceModel->data(sourceModel->index(row, 0, idx)).toString();
-      if (!this->Wildcards.exactMatch(str))
+      if (!this->Wildcards.match(str).hasMatch())
       {
         return false;
       }
@@ -139,7 +133,7 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
   else
   {
     QString str = sourceModel->data(idx).toString();
-    return this->Wildcards.exactMatch(str);
+    return this->Wildcards.match(str).hasMatch();
   }
 }
 

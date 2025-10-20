@@ -6,8 +6,9 @@
 #define pqFileDialogFilter_h
 
 #include "pqCoreModule.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSortFilterProxyModel>
+
 class pqFileDialogModel;
 
 class PQCORE_EXPORT pqFileDialogFilter : public QSortFilterProxyModel
@@ -22,14 +23,14 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setFilter(const QString& filter);
   void setShowHidden(const bool& hidden);
   bool getShowHidden() { return showHidden; };
-  QRegExp const& getWildcards() const { return Wildcards; }
+  QRegularExpression const& getWildcards() const { return Wildcards; }
 
 protected:
   bool filterAcceptsRow(int row_source, const QModelIndex& source_parent) const override;
   bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
 
   pqFileDialogModel* Model;
-  QRegExp Wildcards;
+  QRegularExpression Wildcards;
   bool showHidden;
 };
 

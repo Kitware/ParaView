@@ -1343,8 +1343,9 @@ QString pqFileDialog::fixFileExtension(const QString& filename, const QString& f
       {
         // we only need to validate the extension, not the filename.
         wildcard = QString("*.%1").arg(wildcard.mid(wildcard.indexOf('.') + 1));
-        QRegExp regEx = QRegExp(wildcard, Qt::CaseInsensitive, QRegExp::Wildcard);
-        if (regEx.exactMatch(fileInfo.fileName()))
+        QString regexPattern = QRegularExpression::wildcardToRegularExpression(wildcard);
+        QRegularExpression regEx(regexPattern, QRegularExpression::CaseInsensitiveOption);
+        if (regEx.match(fileInfo.fileName()).hasMatch())
         {
           pass = true;
           break;
@@ -1699,7 +1700,7 @@ void pqFileDialog::updateButtonStates(vtkTypeUInt32 location)
     QString const currentDirName = QFileInfo(impl.Model->getCurrentPath()).fileName();
     // Enables "Ok" only if the current directory can be opened
     impl.Ui.OK->setEnabled((impl.Mode == Directory || impl.Mode == ExistingFilesAndDirectories) &&
-      impl.FileFilter.getWildcards().exactMatch(currentDirName));
+      impl.FileFilter.getWildcards().match(currentDirName).hasMatch());
 
     impl.Ui.Navigate->setEnabled(false);
     return;
@@ -1733,7 +1734,7 @@ void pqFileDialog::updateButtonStates(vtkTypeUInt32 location)
             {
               const QString fileNameWithoutPath =
                 vtksys::SystemTools::GetFilenameName(fileName.toStdString()).c_str();
-              return impl.FileFilter.getWildcards().exactMatch(fileNameWithoutPath);
+              return impl.FileFilter.getWildcards().match(fileNameWithoutPath).hasMatch();
             });
         });
       impl.Ui.OK->setEnabled(filesMatching);
