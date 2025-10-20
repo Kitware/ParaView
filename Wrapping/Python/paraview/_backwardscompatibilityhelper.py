@@ -1434,6 +1434,12 @@ def GetProxy(module, key, **kwargs):
             else:
                 charRepresentation.ArraySelectionMode = 0
             return charRepresentation
+        if key in ["IOSSReader", "IOSSCellGridReader"]:
+            # in PV 6.1 we changed the default for IOSSReader's ReadAllFilesToDetermineStructure
+            # property to 0 instead of 1.
+            ioss_reader = builtins.getattr(module, key)(**kwargs)
+            ioss_reader.ReadAllFilesToDetermineStructure = 1
+            return ioss_reader
 
     # deprecation case
     if type(key) == tuple and len(key) == 2:
