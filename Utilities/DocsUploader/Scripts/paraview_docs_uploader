@@ -120,5 +120,5 @@ then
     --times \
     --verbose \
     --rsh="ssh -o stricthostkeychecking=accept-new -i $SSH_PRIVATE_KEY_PATH" \
-    ./* ../out
+    ./* kitware@web:
 fi
