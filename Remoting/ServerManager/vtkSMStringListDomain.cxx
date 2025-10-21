@@ -225,13 +225,7 @@ int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchec
     unsigned int temp;
     vtkSMStringVectorProperty* infoProperty =
       vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty());
-    int exists = 0;
-    if (exists && this->IsInDomain(svp->GetDefaultValue(0), temp))
-    {
-      helper.Set(0, svp->GetDefaultValue(0));
-      return 1;
-    }
-    else if (this->NoneString)
+    if (this->NoneString)
     {
       return 1;
     }
