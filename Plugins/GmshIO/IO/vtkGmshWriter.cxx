@@ -8,23 +8,17 @@
 #include "vtkArrayDispatch.h"
 #include "vtkCellData.h"
 #include "vtkCellType.h"
-#include "vtkCellTypes.h"
-#include "vtkCharArray.h"
+#include "vtkCellTypeUtilities.h"
 #include "vtkDataArray.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkLongArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkShortArray.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkType.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkUnsignedLongArray.h"
-#include "vtkUnsignedShortArray.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "gmsh.h"
@@ -235,14 +229,14 @@ vtkDataArray* GetIntegralArray(vtkUnstructuredGrid* input, char* name)
 void AddInverseMapping(
   vtkUnstructuredGrid* input, vtkDataArray* mapping, GmshWriterInternal::InverseMap& invMap)
 {
-  vtkUnsignedCharArray* cellTypes = input->GetCellTypesArray();
-  auto cTypeRange = vtk::DataArrayValueRange<1>(cellTypes);
+  auto cTypeRange = vtk::DataArrayValueRange<1, unsigned char>(input->GetCellTypes());
   auto mappingRange = vtk::DataArrayValueRange<1>(mapping);
   auto cTypeIt = cTypeRange.begin();
   auto mapIt = mappingRange.begin();
   for (vtkIdType iCell = 0; iCell < input->GetNumberOfCells(); ++iCell)
   {
-    std::pair<std::size_t, std::size_t> dimEnt = { vtkCellTypes::GetDimension(*cTypeIt), *mapIt };
+    std::pair<std::size_t, std::size_t> dimEnt = { vtkCellTypeUtilities::GetDimension(*cTypeIt),
+      *mapIt };
     mapIt++, cTypeIt++;
     auto it = invMap.find(dimEnt);
     if (it == invMap.end())
@@ -293,11 +287,12 @@ void vtkGmshWriter::SetUpEntities()
       entityIDs->SetName("gmshEntityId");
       entityIDs->SetNumberOfComponents(1);
       entityIDs->SetNumberOfTuples(this->Internal->Input->GetNumberOfCells());
-      vtkUnsignedCharArray* cellType = this->Internal->Input->GetCellTypesArray();
+      auto cTypeRange =
+        vtk::DataArrayValueRange<1, unsigned char>(this->Internal->Input->GetCellTypes());
       for (vtkIdType iCell = 0; iCell < this->Internal->Input->GetNumberOfCells(); ++iCell)
       {
         entityIDs->SetComponent(
-          iCell, 0, vtkCellTypes::GetDimension(cellType->GetValue(iCell)) + 1);
+          iCell, 0, vtkCellTypeUtilities::GetDimension(cTypeRange[iCell]) + 1);
       }
     }
   }
@@ -404,7 +399,7 @@ void vtkGmshWriter::LoadCells()
 
   // Build list of gmsh indexes per type
   vtkCellArray* cells = input->GetCells();
-  vtkUnsignedCharArray* cellType = input->GetCellTypesArray();
+  auto cTypeRange = vtk::DataArrayValueRange<1, unsigned char>(input->GetCellTypes());
   vtkIdType cellCounterId = 1;
 
   this->Internal->CellDataIndex.clear();
@@ -415,7 +410,7 @@ void vtkGmshWriter::LoadCells()
     std::vector<std::size_t> indexesPerTypes[GmshWriterInternal::MAX_TAG];
     for (int iCell : pair.second)
     {
-      const unsigned char vtkCellType = cellType->GetValue(iCell);
+      const unsigned char vtkCellType = cTypeRange[iCell];
       if (!GmshWriterInternal::TRANSLATE_CELLS_TYPE.count(vtkCellType))
       {
         continue;
