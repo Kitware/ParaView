@@ -12,6 +12,7 @@ class vtkSMPropertyHelperTest : public QObject
 
 private Q_SLOTS:
   void Set();
+  void Contains();
 };
 
 #endif

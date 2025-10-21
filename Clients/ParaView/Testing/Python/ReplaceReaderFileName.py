@@ -39,6 +39,8 @@ renderView1.Update()
 ReplaceReaderFileName(disk_out_ref,
         [canFile], 'FileName')
 
+assert len(GetTimeKeeper().TimeSources) == 1
+
 can = FindSource('can.ex2')
 
 if (can == None):
