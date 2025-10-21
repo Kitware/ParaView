@@ -603,7 +603,7 @@ void vtkGmshReader::FillOutputTimeInformation(vtkInformation* outInfo) const
     double timeRange[2] = { inlineTimes.front(), inlineTimes.back() };
 
     std::copy(timesteps.begin(), timesteps.end(), inlineTimes.begin());
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &inlineTimes[0],
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), inlineTimes.data(),
       static_cast<int>(inlineTimes.size()));
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   }

@@ -300,7 +300,7 @@ void vtkGmshWriter::SetUpEntities()
   this->Internal->EntityIDs = entityIDs;
 
   ::AddInverseMapping(this->Internal->Input, entityIDs, this->Internal->InverseEntityMapping);
-  for (auto pair : this->Internal->InverseEntityMapping)
+  for (const auto& pair : this->Internal->InverseEntityMapping)
   {
     gmsh::model::addDiscreteEntity(pair.first.first, pair.first.second);
   }
@@ -405,7 +405,7 @@ void vtkGmshWriter::LoadCells()
   this->Internal->CellDataIndex.clear();
   this->Internal->CellDataIndex.reserve(input->GetNumberOfCells());
 
-  for (auto pair : this->Internal->InverseEntityMapping)
+  for (const auto& pair : this->Internal->InverseEntityMapping)
   {
     std::vector<std::size_t> indexesPerTypes[GmshWriterInternal::MAX_TAG];
     for (int iCell : pair.second)
@@ -453,7 +453,7 @@ void vtkGmshWriter::LoadNodeData()
 
     // Store it in a structure Gmsh can understand
     std::vector<double> gmshData(totNodeTags * numComponents, 0.0);
-    for (auto ent : this->Internal->VtkGmshNodeMap)
+    for (const auto& ent : this->Internal->VtkGmshNodeMap)
     {
       for (auto nodeTags : ent.second)
       {
@@ -632,11 +632,10 @@ int vtkGmshWriter::RequestData(
   // If this is the first request
   if (this->Internal->CurrentTimeStep == 0)
   {
-    std::string file(this->FileName);
     gmsh::initialize();
     gmsh::option::setNumber("General.Verbosity", 1);
     gmsh::option::setNumber("PostProcessing.SaveMesh", 0);
-    gmsh::model::add(this->Internal->ModelName.c_str());
+    gmsh::model::add(this->Internal->ModelName);
     this->SetUpEntities();
     if (!this->SetUpPhysicalGroups())
     {
