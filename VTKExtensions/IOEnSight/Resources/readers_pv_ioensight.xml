@@ -80,7 +80,7 @@
         </Documentation>
       </IntVectorProperty>
       <Hints>
-        <ReaderFactory extensions="case CASE Case encas ENCAS Encas"
+        <ReaderFactory extensions="case encas"
                        file_description="EnSight Files" />
       </Hints>
       <!-- End ensight -->
@@ -176,7 +176,7 @@
         read.</Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="sos SOS"
+        <ReaderFactory extensions="sos"
                        file_description="EnSight Master Server Files" />
       </Hints>
       <!-- End ensightMS -->

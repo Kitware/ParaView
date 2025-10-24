@@ -660,7 +660,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="Flash flash"
+        <ReaderFactory extensions="flash"
                        file_description="FLASH AMR Particles Reader" />
       </Hints>
     </SourceProxy>
@@ -772,7 +772,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="Flash flash"
+        <ReaderFactory extensions="flash"
                        file_description="AMR Flash Files" />
       </Hints>
     </SourceProxy>
@@ -882,7 +882,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="xamr Xamr XAMR"
+        <ReaderFactory extensions="xamr"
                        file_description="AMR Velodyne Files" />
       </Hints>
     </SourceProxy>

@@ -24,7 +24,7 @@
         </Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="case CASE Case encas ENCAS Encas"
+        <ReaderFactory extensions="case encas"
                        file_description="EnSight Gold files" />
       </Hints>
 
@@ -132,7 +132,7 @@
         </Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="sos SOS"
+        <ReaderFactory extensions="sos"
                        file_description="EnSight Gold Server of Server (SOS) files" />
       </Hints>
       <StringVectorProperty name="BlockInfo"

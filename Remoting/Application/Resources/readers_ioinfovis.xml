@@ -179,7 +179,7 @@
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="SpreadSheetView" />
-        <ReaderFactory extensions="csv tsv txt CSV TSV TXT"
+        <ReaderFactory extensions="csv tsv txt"
                        file_description="Delimited Text" />
         <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
       </Hints>
