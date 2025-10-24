@@ -51,7 +51,7 @@ struct PhysicalGroup
   Array2D<vtkIdType> ElemNodeTags; // [typeIndex]{nodeTags}
   // -------------------- Elements
 
-  std::vector<DataArray> Data; // [arrayIdx]
+  std::vector<struct DataArray> Data; // [arrayIdx]
 };
 
 //-----------------------------------------------------------------------------
@@ -453,7 +453,7 @@ int vtkGmshReader::FetchData()
     this->Internal->Timesteps.clear();
     for (const PhysicalGroup& group : this->Internal->Groups)
     {
-      for (const DataArray& data : group.Data)
+      for (const auto& data : group.Data)
       {
         this->Internal->Timesteps.insert(data.Times.begin(), data.Times.end());
       }
@@ -557,7 +557,7 @@ void vtkGmshReader::FillGrid(vtkUnstructuredGrid* grid, int groupIdx, double tim
     grid->GetCellData()->AddArray(physicalTags);
   }
 
-  for (const DataArray& data : group.Data)
+  for (const auto& data : group.Data)
   {
     int arrayIndex = -1;
     if (time < 0 && !data.VtkArrays.empty())
@@ -603,7 +603,7 @@ void vtkGmshReader::FillOutputTimeInformation(vtkInformation* outInfo) const
     double timeRange[2] = { inlineTimes.front(), inlineTimes.back() };
 
     std::copy(timesteps.begin(), timesteps.end(), inlineTimes.begin());
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &inlineTimes[0],
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), inlineTimes.data(),
       static_cast<int>(inlineTimes.size()));
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   }

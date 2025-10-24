@@ -1269,7 +1269,7 @@ int vtkCDIReader::ReadAndOutputGrid(bool init)
     this->AddClonClatHalo();
   }
   this->OutputPoints(init);
-  this->OutputCells(init);
+  this->OutputCells();
 
   vtkDebugMacro("Leaving vtkCDIReader::ReadAndOutputGrid");
 
@@ -2362,7 +2362,7 @@ unsigned char vtkCDIReader::GetCellType()
 //----------------------------------------------------------------------------
 //  Add cells to vtk data structures
 //----------------------------------------------------------------------------
-void vtkCDIReader::OutputCells(bool init)
+void vtkCDIReader::OutputCells()
 {
   vtkDebugMacro("In OutputCells...");
   vtkUnstructuredGrid* output = this->Output;
@@ -2371,29 +2371,16 @@ void vtkCDIReader::OutputCells(bool init)
   output->GetCellData()->SetNumberOfTuples(this->MaximumCells);
   output->Allocate(this->MaximumCells, this->MaximumCells);
 
-  vtkSmartPointer<vtkCellArray> cells;
-  int pointsPerPolygon = this->PointsPerCell * (this->ShowMultilayerView ? 2 : 1);
-  int cellType = this->GetCellType();
+  const int pointsPerPolygon = this->PointsPerCell * (this->ShowMultilayerView ? 2 : 1);
+  const int cellType = this->GetCellType();
 
-  if (init)
-  {
-    cells = vtkSmartPointer<vtkCellArray>::New();
-    cells->AllocateEstimate(this->MaximumCells, this->PointsPerCell);
-    output->SetCells(cellType, cells);
-  }
-  else
-  {
-    cells = output->GetCells();
-    cells->Initialize();
-    cells->AllocateEstimate(this->MaximumCells, this->PointsPerCell);
-  }
+  output->AllocateEstimate(this->MaximumCells, pointsPerPolygon);
 
-  vtkDebugMacro("OutputCells: init: " << init << " this->MaximumCells: " << this->MaximumCells
-                                      << " cellType: " << cellType
-                                      << " this->MaximumNVertLevels: " << this->MaximumNVertLevels
-                                      << " LayerThickness: " << this->LayerThickness
-                                      << " ShowMultilayerView: " << this->ShowMultilayerView
-                                      << " CurrentExtraCell: " << this->CurrentExtraCell);
+  vtkDebugMacro("OutputCells: this->MaximumCells : "
+    << this->MaximumCells << " cellType: " << cellType << " this->MaximumNVertLevels: "
+    << this->MaximumNVertLevels << " LayerThickness: " << this->LayerThickness
+    << " ShowMultilayerView: " << this->ShowMultilayerView
+    << " CurrentExtraCell: " << this->CurrentExtraCell);
 
   if (this->DepthVar.empty())
   {
