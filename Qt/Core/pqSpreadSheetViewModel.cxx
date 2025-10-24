@@ -15,14 +15,12 @@
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 #include "vtkSpreadSheetView.h"
-#include "vtkTable.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkVariant.h"
 #include "vtkWeakPointer.h"
@@ -30,13 +28,11 @@
 // Qt Includes.
 #include <QIODevice>
 #include <QItemSelectionModel>
-#include <QPointer>
 #include <QtDebug>
 
 // ParaView Includes.
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
-#include "pqPipelineSource.h"
 #include "pqTimer.h"
 
 #include <algorithm>
@@ -419,7 +415,8 @@ void pqSpreadSheetViewModel::sortSection(int section, Qt::SortOrder order)
 bool pqSpreadSheetViewModel::isSortable(int section)
 {
   vtkSpreadSheetView* view = this->GetView();
-  if (view->GetNumberOfColumns() > section)
+  if (view->GetNumberOfColumns() > section && view->GetNumberOfRows() > 0 &&
+    view->GetValue(0, section).IsNumeric())
   {
     const char* columnName = view->GetColumnName(section);
     return columnName && strcmp(columnName, "Structured Coordinates") != 0;

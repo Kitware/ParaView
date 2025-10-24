@@ -1753,13 +1753,15 @@ void vtkSortedTableStreamer::SetInvertOrder(int newValue)
 vtkDataArray* vtkSortedTableStreamer::GetDataArrayToProcess(vtkTable* input)
 {
   // Get a default array to sort just in case
-  vtkDataArray* requestedArray = nullptr;
-
-  if (this->GetColumnToSort())
+  vtkAbstractArray* array =
+    this->GetColumnToSort() ? input->GetColumnByName(this->GetColumnToSort()) : nullptr;
+  vtkDataArray* dataArray = vtkDataArray::SafeDownCast(array);
+  if (array && !dataArray)
   {
-    requestedArray = vtkDataArray::SafeDownCast(input->GetColumnByName(this->GetColumnToSort()));
+    vtkWarningMacro(<< array->GetName() << " of class " << this->GetClassName()
+                    << " is not supported");
   }
-  return requestedArray;
+  return dataArray;
 }
 
 //----------------------------------------------------------------------------
