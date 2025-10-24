@@ -10,8 +10,11 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPythonInterpreter.h"
 
-QStringList pqPythonCalculatorCompleter::getPythonCompletions(const QString& pythonObjectName)
+QStringList pqPythonCalculatorCompleter::getPythonCompletions(
+  const QString& pythonObjectName, bool call)
 {
+  Q_UNUSED(call);
+
   vtkPythonInterpreter::Initialize();
   vtkPythonScopeGilEnsurer gilEnsurer;
 

@@ -11,7 +11,7 @@
 #include "vtkPythonInteractiveInterpreter.h"
 
 //-----------------------------------------------------------------------------
-QStringList pqPythonShellCompleter::getPythonCompletions(const QString& pythonObjectName)
+QStringList pqPythonShellCompleter::getPythonCompletions(const QString& pythonObjectName, bool call)
 {
   vtkPythonScopeGilEnsurer gilEnsurer;
   if (this->Interpreter == nullptr ||
@@ -21,9 +21,14 @@ QStringList pqPythonShellCompleter::getPythonCompletions(const QString& pythonOb
   }
 
   // Complete prompt using all local shell variable
-  PyObject* object =
+  PyObject* locals =
     reinterpret_cast<PyObject*>(this->Interpreter->GetInteractiveConsoleLocalsPyObject());
-  Py_INCREF(object);
+  Py_INCREF(locals);
+
+  PyObject* builtins = this->getBuiltins(locals);
+  Py_XINCREF(builtins);
+
+  PyObject* object = locals;
 
   QStringList results;
 
@@ -31,15 +36,35 @@ QStringList pqPythonShellCompleter::getPythonCompletions(const QString& pythonOb
   // in which case we can only complete with object's attributes
   if (!pythonObjectName.isEmpty())
   {
-    object = this->derivePyObject(pythonObjectName, object);
-    if (object && PyFunction_Check(object))
+    object = this->derivePyObject(pythonObjectName, locals);
+
+    if (object)
     {
-      this->appendFunctionKeywordArguments(object, results);
-      return results;
+      Py_XDECREF(builtins);
+    }
+    else
+    {
+      object = this->derivePyObject(pythonObjectName, builtins);
+    }
+
+    if (call)
+    {
+      if (object && PyFunction_Check(object))
+      {
+        this->appendFunctionKeywordArguments(object, results);
+      }
+      Py_XDECREF(object);
+    }
+    else
+    {
+      this->appendPyObjectAttributes(object, results);
     }
   }
-
-  this->appendPyObjectAttributes(object, results);
+  else
+  {
+    this->appendPyObjectAttributes(locals, results);
+    this->appendPyObjectAttributes(builtins, results);
+  }
 
   return results;
 }
