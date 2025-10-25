@@ -32,6 +32,18 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetGroupAlphabeticVectorFieldComponents"
+                         default_values="1"
+                         name="GroupAlphabeticVectorFieldComponents"
+                         label="Group Alphabetic Vector Field Components"
+                         number_of_elements="1">
+      <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether the reader should treat alphabetic suffices for a vector field as vector components
+          of a vtkDataArray. By default, fields with alphabetic suffices are grouped into a single vtkDataArray.
+        </Documentation>
+      </IntVectorProperty>
+
       <StringVectorProperty command="SetFieldSuffixSeparator"
                             default_values=""
                             name="FieldSuffixSeparator"
@@ -625,6 +637,32 @@
         </Hints>
       </StringVectorProperty>
 
+      <StringVectorProperty name="GlobalFieldInfo"
+                            command="GetGlobalFieldSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty"/>
+
+      <StringVectorProperty name="GlobalFields"
+                            command="GetGlobalFieldSelection"
+                            information_property="GlobalFieldInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="GlobalFieldInfo"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Select the global fields / arrays to read.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="field"/>
+        </Hints>
+      </StringVectorProperty>
+
       <IntVectorProperty name="Caching"
                          command="SetCaching"
                          number_of_elements="1"
@@ -653,7 +691,7 @@
       <IntVectorProperty name="ReadAllFilesToDetermineStructure"
                          command="SetReadAllFilesToDetermineStructure"
                          number_of_elements="1"
-                         default_values="1"
+                         default_values="0"
                          panel_visibility="advanced">
         <BooleanDomain name="bool"/>
         <Documentation>
@@ -758,17 +796,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="ReadGlobalFields"
-                         command="SetReadGlobalFields"
-                         number_of_elements="1"
-                         default_values="1"
-                         panel_visibility="advanced">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          When checked, the reader will read global fields, if available.
-        </Documentation>
-      </IntVectorProperty>
-
       <IntVectorProperty name="ReadQAAndInformationRecords"
                          label="Read QA And Information Records"
                          command="SetReadQAAndInformationRecords"
@@ -785,6 +812,7 @@
                      label="Database Properties"
                      panel_widget="MetaDataPropertyWidget">
         <Property name="GroupNumericVectorFieldComponents"/>
+        <Property name="GroupAlphabeticVectorFieldComponents"/>
         <Property name="FieldSuffixSeparator"/>
       </PropertyGroup>
 
@@ -851,6 +879,13 @@
         <Property name="SideSetFields"/>
       </PropertyGroup>
 
+      <PropertyGroup label="Global Arrays"
+                     name="GlobalArrays"
+                     panel_widget="ArrayStatus"
+                     panel_visibility="advanced">
+        <Property name="GlobalFields" />
+      </PropertyGroup>
+
       <PropertyGroup label="Files">
         <Property name="ScanForRelatedFiles"/>
         <Property name="ReadAllFilesToDetermineStructure"/>
@@ -865,7 +900,6 @@
         <Property name="RemoveUnusedPoints"/>
         <Property name="GenerateFileId"/>
         <Property name="ReadIds"/>
-        <Property name="ReadGlobalFields"/>
         <Property name="ReadQAAndInformationRecords"/>
       </PropertyGroup>
 
@@ -904,6 +938,18 @@
         <Documentation>
           Set whether the reader should treat numeric suffices for a vector field as vector components
           of a vtkDataArray. By default, fields with numeric suffices are not grouped into a single vtkDataArray.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetGroupAlphabeticVectorFieldComponents"
+                         default_values="1"
+                         name="GroupAlphabeticVectorFieldComponents"
+                         label="Group Alphabetic Vector Field Components"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether the reader should treat alphabetic suffices for a vector field as vector components
+          of a vtkDataArray. By default, fields with alphabetic suffices are grouped into a single vtkDataArray.
         </Documentation>
       </IntVectorProperty>
 
@@ -1466,6 +1512,31 @@
         </Hints>
       </StringVectorProperty>
 
+      <StringVectorProperty name="GlobalFieldInfo"
+                            command="GetGlobalFieldSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty"/>
+
+      <StringVectorProperty name="GlobalFields"
+                            command="GetGlobalFieldSelection"
+                            information_property="GlobalFieldInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="GlobalFieldInfo"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Select the global fields / arrays to read.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="field"/>
+        </Hints>
+      </StringVectorProperty>
 
       <IntVectorProperty name="ScanForRelatedFiles"
         command="SetScanForRelatedFiles"
@@ -1483,7 +1554,7 @@
       <IntVectorProperty name="ReadAllFilesToDetermineStructure"
                          command="SetReadAllFilesToDetermineStructure"
                          number_of_elements="1"
-                         default_values="1"
+                         default_values="0"
                          panel_visibility="advanced">
         <BooleanDomain name="bool"/>
         <Documentation>
@@ -1592,17 +1663,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="ReadGlobalFields"
-        command="SetReadGlobalFields"
-        number_of_elements="1"
-        default_values="1"
-        panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When checked, the reader will read global fields, if available.
-        </Documentation>
-      </IntVectorProperty>
-
       <IntVectorProperty name="ReadQAAndInformationRecords"
         label="Read QA And Information Records"
         command="SetReadQAAndInformationRecords"
@@ -1620,6 +1680,7 @@
         label="Database Properties"
         panel_widget="MetaDataPropertyWidget">
         <Property name="GroupNumericVectorFieldComponents"/>
+        <Property name="GroupAlphabeticVectorFieldComponents"/>
         <Property name="FieldSuffixSeparator"/>
       </PropertyGroup>
 
@@ -1692,6 +1753,13 @@
         <Property name="SideSetFields" />
       </PropertyGroup>
 
+      <PropertyGroup label="Global Arrays"
+        name="GlobalArrays"
+        panel_widget="ArrayStatus"
+        panel_visibility="advanced">
+        <Property name="GlobalFields" />
+      </PropertyGroup>
+
       <PropertyGroup label="Files">
         <Property name="ScanForRelatedFiles" />
         <Property name="ReadAllFilesToDetermineStructure"/>
@@ -1706,7 +1774,6 @@
         <!-- Property name="RemoveUnusedPoints" / -->
         <Property name="GenerateFileId" />
         <Property name="ReadIds" />
-        <Property name="ReadGlobalFields" />
         <Property name="ReadQAAndInformationRecords" />
       </PropertyGroup>
 

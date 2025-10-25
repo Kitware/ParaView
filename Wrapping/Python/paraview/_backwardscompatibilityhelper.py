@@ -657,6 +657,15 @@ def setattr(proxy, pname, value):
                                         "supports 'CompositeDataSetIndex' and it has been replaced by "
                                         "'BlockSelectors'.")
 
+    if pname == "ReadGlobalFields" and proxy.SMProxy.GetXMLName() in ["IOSSReader", "IOSSCellGridReader"]:
+        if compatibility_version <= (6, 0):
+            globalFields = proxy.GetProperty("GlobalFields")
+            newGlobalFieldValues = []
+            for i in range(0, len(globalFields), 2):
+                newGlobalFieldValues.append(globalFields[i])
+                newGlobalFieldValues.append(str(value))
+            return globalFields.SetData(newGlobalFieldValues)
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -1338,6 +1347,17 @@ def getattr(proxy, pname):
                                         "'Dimensions' property to get the sizes of each dimension in "
                                         "the grid data instead.")
 
+    if pname == "ReadGlobalFields" and proxy.SMProxy.GetXMLName() in ["IOSSReader", "IOSSCellGridReader"]:
+        if compatibility_version < (6, 1):
+            globalFields = proxy.GetProperty("GlobalFields")
+            for i in range(1, len(globalFields), 2):
+                if globalFields[i] is not str(1):
+                    return 0
+            return 1
+        else:
+            raise NotSupportedException("'ReadGlobalFields' property has been removed in ParaView 6.1. Please use the "
+                                        "'GlobalFields' property to get/set the list of global fields to read instead.")
+
     raise Continue()
 
 
@@ -1414,6 +1434,12 @@ def GetProxy(module, key, **kwargs):
             else:
                 charRepresentation.ArraySelectionMode = 0
             return charRepresentation
+        if key in ["IOSSReader", "IOSSCellGridReader"]:
+            # in PV 6.1 we changed the default for IOSSReader's ReadAllFilesToDetermineStructure
+            # property to 0 instead of 1.
+            ioss_reader = builtins.getattr(module, key)(**kwargs)
+            ioss_reader.ReadAllFilesToDetermineStructure = 1
+            return ioss_reader
 
     # deprecation case
     if type(key) == tuple and len(key) == 2:

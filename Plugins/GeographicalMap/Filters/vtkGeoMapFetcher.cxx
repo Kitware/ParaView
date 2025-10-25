@@ -6,6 +6,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMemoryResourceStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGReader.h"
@@ -261,10 +262,11 @@ bool vtkGeoMapFetcher::FetchVtkPNG(const std::string& url, vtkImageData* dest)
     return false;
   }
 
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer.data(), buffer.size());
   // convert to image
   vtkNew<vtkPNGReader> pngReader;
-  pngReader->SetMemoryBufferLength(static_cast<vtkIdType>(buffer.size()));
-  pngReader->SetMemoryBuffer(buffer.data());
+  pngReader->SetStream(stream);
   pngReader->Update();
   dest->ShallowCopy(pngReader->GetOutput());
 
