@@ -4,7 +4,7 @@
 /**
  * @class   vtkGeoMapFetcherMesh
  *
- * Download a map using a provider (GoogleMap or MapQuest) and position it
+ * Download a map using a provider (GoogleMap, MapQuest or OpenStreetMap) and position it
  * using X=lon and Y=lat (in degrees).
  * Instead of vtkGeMapFetcher that relies on properties to get the position
  * of the requested data, vtkGeoMapFetcherMesh use the input geometry to set

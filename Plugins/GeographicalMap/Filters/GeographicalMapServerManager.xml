@@ -21,11 +21,13 @@
         <EnumerationDomain name="enum">
           <Entry value="0" text="GoogleMap"/>
           <Entry value="1" text="MapQuest"/>
+          <Entry value="2" text="OpenStreetMap"/>
         </EnumerationDomain>
         <Documentation>
-          Which provider to use. (An account is required)
+          Which provider to use. (An account is required for GoogleMap/MapQuest)
           GoogleMap: https://developers.google.com/maps/documentation/maps-static/get-api-key
           MapQuest: https://developer.mapquest.com/plan_purchase/steps/business_edition/business_edition_free/register
+          OpenStreetMap: https://tile.openstreetmap.org/ (no API key required, usage policies apply)
         </Documentation>
       </IntVectorProperty>
 
@@ -43,6 +45,13 @@
         <Documentation>
           Defines the map format to construct.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Provider"
+                                   value="2"
+                                   inverse="1" />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -55,6 +64,13 @@
           If this property is enabled, the dimension are upscaled.
           Note that the download of the map can be longer.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Provider"
+                                   value="2"
+                                   inverse="1" />
+        </Hints>
       </IntVectorProperty>
 
       <StringVectorProperty name="APIKey"
@@ -65,6 +81,13 @@
           API key used for the selected provider.
           This key can be generated from the provider website when an account has been created.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Provider"
+                                   value="2"
+                                   inverse="1" />
+        </Hints>
       </StringVectorProperty>
 
       <IntVectorProperty
