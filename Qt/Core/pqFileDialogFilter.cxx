@@ -4,6 +4,7 @@
 
 #include "pqFileDialogFilter.h"
 
+#include <QDateTime>
 #include <QRegularExpression>
 #include <QStringBuilder>
 
