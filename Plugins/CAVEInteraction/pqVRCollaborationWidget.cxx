@@ -726,13 +726,16 @@ void pqVRCollaborationWidget::restoreCollaborationState(
   dialog->setNavigationSharing(this->Internals->NavigationSharingEnabled);
 }
 #else
-pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::WindowFlags f) {}
+pqVRCollaborationWidget::pqVRCollaborationWidget(
+  [[maybe_unused]] QWidget* parentObject, [[maybe_unused]] Qt::WindowFlags f)
+{
+}
 pqVRCollaborationWidget::~pqVRCollaborationWidget() {}
-void pqVRCollaborationWidget::initializeCollaboration(pqView* view) {}
+void pqVRCollaborationWidget::initializeCollaboration([[maybe_unused]] pqView* view) {}
 void pqVRCollaborationWidget::stopCollaboration() {}
 void pqVRCollaborationWidget::configureAvatar() {}
 void pqVRCollaborationWidget::updateCollabWidgetState() {}
-void pqVRCollaborationWidget::collabEnabledChanged(Qt::CheckState state) {}
+void pqVRCollaborationWidget::collabEnabledChanged([[maybe_unused]] Qt::CheckState state) {}
 void pqVRCollaborationWidget::collabServerChanged() {}
 void pqVRCollaborationWidget::collabSessionChanged() {}
 void pqVRCollaborationWidget::collabNameChanged() {}
@@ -740,9 +743,9 @@ void pqVRCollaborationWidget::collabPortChanged() {}
 void pqVRCollaborationWidget::collabAvatarUpXChanged() {}
 void pqVRCollaborationWidget::collabAvatarUpYChanged() {}
 void pqVRCollaborationWidget::collabAvatarUpZChanged() {}
-void pqVRCollaborationWidget::saveCollaborationState(vtkPVXMLElement* root) {}
+void pqVRCollaborationWidget::saveCollaborationState([[maybe_unused]] vtkPVXMLElement* root) {}
 void pqVRCollaborationWidget::restoreCollaborationState(
-  vtkPVXMLElement* root, vtkSMProxyLocator* locator)
+  [[maybe_unused]] vtkPVXMLElement* root, [[maybe_unused]] vtkSMProxyLocator* locator)
 {
 }
 #endif

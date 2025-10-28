@@ -29,6 +29,7 @@ public:
     : Superclass(_parent)
   {
   }
+  using Superclass::playEvent;
   virtual bool playEvent(QObject*, const QString& command, const QString& arguments, bool& error)
   {
     if (command == "pqVREvent")

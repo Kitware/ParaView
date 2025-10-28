@@ -262,47 +262,47 @@ void pqVRPNConnection::newTrackerValue(vrpn_TRACKERCB data)
   vtkMatrix4x4* matrix = vtkMatrix4x4::New();
 #define COLUMN_MAJOR 1
 #if COLUMN_MAJOR
-  matrix->Element[0][0] = rotMatrix[0][0];
-  matrix->Element[0][1] = rotMatrix[0][1];
-  matrix->Element[0][2] = rotMatrix[0][2];
-  matrix->Element[0][3] = data.pos[0] * 1;
+  matrix->SetElement(0, 0, rotMatrix[0][0]);
+  matrix->SetElement(0, 1, rotMatrix[0][1]);
+  matrix->SetElement(0, 2, rotMatrix[0][2]);
+  matrix->SetElement(0, 3, data.pos[0] * 1);
 
-  matrix->Element[1][0] = rotMatrix[1][0];
-  matrix->Element[1][1] = 1 * rotMatrix[1][1];
-  matrix->Element[1][2] = rotMatrix[1][2];
-  matrix->Element[1][3] = data.pos[1];
+  matrix->SetElement(1, 0, rotMatrix[1][0]);
+  matrix->SetElement(1, 1, 1 * rotMatrix[1][1]);
+  matrix->SetElement(1, 2, rotMatrix[1][2]);
+  matrix->SetElement(1, 3, data.pos[1]);
 
-  matrix->Element[2][0] = rotMatrix[2][0];
-  matrix->Element[2][1] = rotMatrix[2][1];
-  matrix->Element[2][2] = rotMatrix[2][2];
-  matrix->Element[2][3] = data.pos[2];
+  matrix->SetElement(2, 0, rotMatrix[2][0]);
+  matrix->SetElement(2, 1, rotMatrix[2][1]);
+  matrix->SetElement(2, 2, rotMatrix[2][2]);
+  matrix->SetElement(2, 3, data.pos[2]);
 
-  matrix->Element[3][0] = 0.0f;
-  matrix->Element[3][1] = 0.0f;
-  matrix->Element[3][2] = 0.0f;
-  matrix->Element[3][3] = 1.0f;
+  matrix->SetElement(3, 0, 0.0f);
+  matrix->SetElement(3, 1, 0.0f);
+  matrix->SetElement(3, 2, 0.0f);
+  matrix->SetElement(3, 3, 1.0f);
 
 #else
 
-  matrix->Element[0][0] = rotMatrix[0][0];
-  matrix->Element[1][0] = rotMatrix[0][1];
-  matrix->Element[2][0] = rotMatrix[0][2];
-  matrix->Element[3][0] = 0.0;
+  matrix->SetElement(0, 0, rotMatrix[0][0]);
+  matrix->SetElement(1, 0, rotMatrix[0][1]);
+  matrix->SetElement(2, 0, rotMatrix[0][2]);
+  matrix->SetElement(3, 0, 0.0);
 
-  matrix->Element[0][1] = rotMatrix[1][0];
-  matrix->Element[1][1] = rotMatrix[1][1];
-  matrix->Element[2][1] = rotMatrix[1][2];
-  matrix->Element[3][1] = 0.0;
+  matrix->SetElement(0, 1, rotMatrix[1][0]);
+  matrix->SetElement(1, 1, rotMatrix[1][1]);
+  matrix->SetElement(2, 1, rotMatrix[1][2]);
+  matrix->SetElement(3, 1, 0.0);
 
-  matrix->Element[0][2] = rotMatrix[2][0];
-  matrix->Element[1][2] = rotMatrix[2][1];
-  matrix->Element[2][2] = rotMatrix[2][2];
-  matrix->Element[3][2] = 0.0;
+  matrix->SetElement(0, 2, rotMatrix[2][0]);
+  matrix->SetElement(1, 2, rotMatrix[2][1]);
+  matrix->SetElement(2, 2, rotMatrix[2][2]);
+  matrix->SetElement(3, 2, 0.0);
 
-  matrix->Element[0][3] = data.pos[0] * 1;
-  matrix->Element[1][3] = data.pos[1];
-  matrix->Element[2][3] = data.pos[2];
-  matrix->Element[3][3] = 1.0f;
+  matrix->SetElement(0, 3, data.pos[0] * 1);
+  matrix->SetElement(1, 3, data.pos[1]);
+  matrix->SetElement(2, 3, data.pos[2]);
+  matrix->SetElement(3, 3, 1.0f);
 #endif
 
   vtkMatrix4x4::Multiply4x4(this->Transformation, matrix, matrix);
