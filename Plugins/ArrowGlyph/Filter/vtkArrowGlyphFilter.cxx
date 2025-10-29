@@ -266,8 +266,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, v
   //
   if (!this->ArrowSourceObject)
   {
-    vtkSmartPointer<vtkArrowSource> arrow = this->ArrowSourceObject->NewInstance();
-    this->SetArrowSourceObject(arrow);
+    this->SetArrowSourceObject(vtkNew<vtkArrowSource>());
   }
   // Make sure its up-to-date so we get the num points from it correctly
   this->ArrowSourceObject->Update();

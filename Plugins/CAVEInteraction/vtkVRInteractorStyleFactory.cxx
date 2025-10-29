@@ -154,7 +154,6 @@ vtkSMVRInteractorStyleProxy* vtkVRInteractorStyleFactory::NewInteractorStyleFrom
   const std::string& desc)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
   vtkSMProxy* genericProxy = pxm->NewProxy("cave_interaction", desc.c_str());
 
   if (genericProxy != nullptr)
