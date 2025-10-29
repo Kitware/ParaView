@@ -79,6 +79,12 @@ class PythonSuperquadricSource(VTKPythonAlgorithmBase):
         self._realAlgorithm.SetThickness(x)
         self.Modified()
 
+    @smproperty.intvector(name="Toroidal", default_values="0")
+    @smdomain.boolean()
+    def SetToroidal(self, value):
+        self._realAlgorithm.SetToroidal(value)
+        self.Modified()
+
     # "ValueRangeInfo" and "Value" demonstrate how one can have a slider in the
     # UI for a property with its range fetched at runtime. For int values,
     # use `intvector` and `IntRangeDomain` instead of the double variants used
