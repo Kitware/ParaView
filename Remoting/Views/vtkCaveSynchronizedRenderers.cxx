@@ -15,29 +15,19 @@
 #include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
 
+#include <vtksys/SystemTools.hxx>
+
+#include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkCaveSynchronizedRenderers);
 //----------------------------------------------------------------------------
 vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
 {
-  this->NumberOfDisplays = 0;
-  this->Displays = nullptr;
+  // Allocate one display on creation
   this->SetNumberOfDisplays(1);
-  this->SetEyeSeparation(0.065);
-  this->DisplayOrigin[0] = -0.5;
-  this->DisplayOrigin[1] = -0.5;
-  this->DisplayOrigin[2] = -0.5;
-  this->DisplayX[0] = 0.5;
-  this->DisplayX[1] = -0.5;
-  this->DisplayX[2] = -0.5;
-  this->DisplayY[0] = 0.5;
-  this->DisplayY[1] = 0.5;
-  this->DisplayY[2] = -0.5;
 
-  once = 1;
   this->SetParallelController(vtkMultiProcessController::GetGlobalController());
 
   // Initialize using pvx file specified on the command line options.
@@ -71,117 +61,68 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
 }
 
 //----------------------------------------------------------------------------
-vtkCaveSynchronizedRenderers::~vtkCaveSynchronizedRenderers()
-{
-  this->SetNumberOfDisplays(0);
-}
-
-//----------------------------------------------------------------------------
 void vtkCaveSynchronizedRenderers::HandleStartRender()
 {
   this->ImageReductionFactor = 1;
   this->Superclass::HandleStartRender();
-  this->ComputeCamera(this->GetRenderer()->GetActiveCamera());
+  this->InitializeCamera(this->GetRenderer()->GetActiveCamera());
   this->GetRenderer()->ResetCameraClippingRange();
 }
 
 //-----------------------------------------------------------------------------
-void vtkCaveSynchronizedRenderers::SetEyeSeparation(double eyeSeparation)
-{
-  this->EyeSeparation = eyeSeparation;
-}
-//-----------------------------------------------------------------------------
 void vtkCaveSynchronizedRenderers::SetNumberOfDisplays(int numberOfDisplays)
 {
-  if (numberOfDisplays == this->NumberOfDisplays)
+  if (numberOfDisplays != this->NumberOfDisplays)
   {
-    return;
+    this->Displays.resize(
+      numberOfDisplays, { -0.5, -0.5, -0.5, 1.0, 0.5, -0.5, -0.5, 1.0, 0.5, 0.5, -0.5, 1.0 });
+    this->NumberOfDisplays = numberOfDisplays;
+    this->Modified();
   }
-  double** newDisplays = nullptr;
-  if (numberOfDisplays > 0)
-  {
-    newDisplays = new double*[numberOfDisplays];
-    for (int i = 0; i < numberOfDisplays; ++i)
-    {
-      newDisplays[i] = new double[12];
-      if (i < this->NumberOfDisplays)
-      {
-
-        memcpy(newDisplays[i], this->Displays[i], 12 * sizeof(double));
-      }
-      else
-      {
-        newDisplays[i][0] = -0.5;
-        newDisplays[i][1] = -0.5;
-        newDisplays[i][2] = -0.5;
-        newDisplays[i][3] = 1.0;
-
-        newDisplays[i][4] = 0.5;
-        newDisplays[i][5] = -0.5;
-        newDisplays[i][6] = -0.5;
-        newDisplays[i][7] = 1.0;
-
-        newDisplays[i][8] = 0.5;
-        newDisplays[i][9] = 0.5;
-        newDisplays[i][10] = -0.5;
-        newDisplays[i][11] = 1.0;
-      }
-    }
-  }
-  for (int i = 0; i < this->NumberOfDisplays; ++i)
-  {
-    delete[] this->Displays[i];
-  }
-  delete[] this->Displays;
-  this->Displays = newDisplays;
-
-  this->NumberOfDisplays = numberOfDisplays;
-  this->Modified();
 }
 
 //-------------------------------------------------------------------------
-void vtkCaveSynchronizedRenderers::DefineDisplay(
+bool vtkCaveSynchronizedRenderers::DefineDisplay(
   int idx, double origin[3], double x[3], double y[3])
 {
   if (idx >= this->NumberOfDisplays)
   {
-    vtkErrorMacro("idx is too high !");
-    return;
+    vtkErrorMacro("idx is higher than the number of displays, aborting.");
+    return false;
   }
-  memcpy(&this->Displays[idx][0], origin, 3 * sizeof(double));
-  memcpy(&this->Displays[idx][4], x, 3 * sizeof(double));
-  memcpy(&this->Displays[idx][8], y, 3 * sizeof(double));
+
+  std::copy(origin, origin + 3, this->Displays[idx].data());
+  std::copy(x, x + 3, this->Displays[idx].data() + 4);
+  std::copy(y, y + 3, this->Displays[idx].data() + 8);
   if (idx == this->GetParallelController()->GetLocalProcessId())
   {
-    memcpy(this->DisplayOrigin, origin, 3 * sizeof(double));
-    memcpy(this->DisplayX, x, 3 * sizeof(double));
-    memcpy(this->DisplayY, y, 3 * sizeof(double));
+    std::copy(origin, origin + 3, this->DisplayOrigin.data());
+    std::copy(x, x + 3, this->DisplayX.data());
+    std::copy(y, y + 3, this->DisplayY.data());
   }
   this->Modified();
+  return true;
 }
 
 //-------------------------------------------------------------------------
-// Room camera is a camera in room coordinates that points at the display.
-// Client camera is the camera on the client.  The out camera is the
-// combination of the two used for the final cave display.
-// It is the room camera transformed by the world camera.
-void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* camera)
+void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)
 {
-  if (once)
+  this->InitializeCamera(cam);
+}
+
+//-------------------------------------------------------------------------
+void vtkCaveSynchronizedRenderers::InitializeCamera(vtkCamera* camera)
+{
+  if (!this->CameraInitialized)
   {
     double eyePosition[3] = { 0.0, 0.0, 0.5 };
-    camera->SetScreenBottomLeft(this->DisplayOrigin);
-    camera->SetScreenBottomRight(this->DisplayX);
-    camera->SetScreenTopRight(this->DisplayY);
+    camera->SetScreenBottomLeft(this->DisplayOrigin.data());
+    camera->SetScreenBottomRight(this->DisplayX.data());
+    camera->SetScreenTopRight(this->DisplayY.data());
     camera->SetUseOffAxisProjection(true);
     camera->SetEyePosition(eyePosition);
     camera->SetEyeSeparation(this->EyeSeparation);
-
-    // cam->SetHeadTracked( true );
-    // cam->SetScreenConfig( this->DisplayOrigin,
-    //                       this->DisplayX,
-    //                       this->DisplayY ,0.065, 1.0);
-    once = 0;
+    this->CameraInitialized = true;
   }
 }
 
