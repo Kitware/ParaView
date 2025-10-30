@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- run this test with ReaderNamePlugin plugin loaded from command line -->
+  <!-- without the plugin the `.mypng` extention will not be recognized and test should fail-->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/img1.mypng" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+</pqevents>
