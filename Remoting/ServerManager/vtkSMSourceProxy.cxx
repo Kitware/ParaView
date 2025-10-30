@@ -614,6 +614,18 @@ vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMSourceProxy::GetDataSetInformation(unsigned int idx)
+{
+  this->CreateOutputPorts();
+  if (idx >= this->GetNumberOfOutputPorts())
+  {
+    return nullptr;
+  }
+
+  return this->GetOutputPort(idx)->GetDataSetInformation();
+}
+
+//----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMSourceProxy::GetRankDataInformation(unsigned int idx, int rank)
 {
   this->CreateOutputPorts();

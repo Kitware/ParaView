@@ -26,6 +26,7 @@
 #include "vtkClientServerID.h"              // needed for saving animation in batch script
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
+#include "vtkSMSourceProxy.h"
 
 class vtkPVDataInformation;
 class vtkPVXMLElement;
@@ -120,6 +121,8 @@ public:
    * required property with the given function and provided input index.
    */
   virtual vtkPVDataInformation* GetInputDataInformation(
+    const char* function, unsigned int index = 0);
+  virtual vtkPVDataInformation* GetInputDataSetInformation(
     const char* function, unsigned int index = 0);
   virtual vtkPVDataInformation* GetInputSubsetDataInformation(
     unsigned int compositeIndex, const char* function, unsigned int index = 0);
@@ -277,6 +280,13 @@ protected:
 private:
   vtkSMDomain(const vtkSMDomain&) = delete;
   void operator=(const vtkSMDomain&) = delete;
+
+  /**
+   * Return the vtkSMSourceProxy handled at index in the ProxyProperty
+   * referenced under the given function.
+   * Also fill port with the output port in use.
+   */
+  vtkSMSourceProxy* GetProxy(const char* function, unsigned int index, int& port);
 
   friend class DeferDomainModifiedEvents;
   unsigned int DeferDomainModifiedEventsCount;

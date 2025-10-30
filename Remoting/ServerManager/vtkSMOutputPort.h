@@ -18,6 +18,7 @@
 #ifndef vtkSMOutputPort_h
 #define vtkSMOutputPort_h
 
+#include "vtkPVInformation.h"
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
@@ -47,6 +48,14 @@ public:
    * vtkCommand::UpdateInformationEvent event.
    */
   virtual vtkPVDataInformation* GetDataInformation();
+
+  /**
+   * Returns dataset information.
+   * This is similar to GetDataInformation() but it adds more
+   * vtkDataSet related informations, like the list of unique cell types.
+   * Thus this is longer to generate.
+   */
+  vtkPVDataInformation* GetDataSetInformation();
 
   /**
    * Get rank-specific data information.
@@ -162,19 +171,20 @@ protected:
 
   // The index of the port the output is obtained from.
   vtkSetMacro(PortIndex, int);
-  int PortIndex;
+  int PortIndex = 0;
 
   vtkWeakPointer<vtkSMSourceProxy> SourceProxy;
   vtkWeakPointer<vtkSMCompoundSourceProxy> CompoundSourceProxy;
 
-  vtkPVClassNameInformation* ClassNameInformation;
-  int ClassNameInformationValid;
+  vtkNew<vtkPVClassNameInformation> ClassNameInformation;
+  bool ClassNameInformationValid = false;
 
-  vtkPVDataInformation* DataInformation;
-  bool DataInformationValid;
+  vtkNew<vtkPVDataInformation> DataInformation;
+  bool DataInformationValid = false;
+  bool DataSetInformationValid = false;
 
-  vtkPVTemporalDataInformation* TemporalDataInformation;
-  bool TemporalDataInformationValid;
+  vtkNew<vtkPVTemporalDataInformation> TemporalDataInformation;
+  bool TemporalDataInformationValid = false;
 
   std::map<std::string, std::map<int, vtkSmartPointer<vtkPVDataInformation>>>
     SubsetDataInformations;
@@ -192,6 +202,11 @@ private:
 
   // Update Pipeline with the given timestep request.
   void UpdatePipeline(double time);
+
+  /**
+   * Actually gather the information from the proxy.
+   */
+  void GatherInformation(vtkPVDataInformation* info);
 };
 
 #endif

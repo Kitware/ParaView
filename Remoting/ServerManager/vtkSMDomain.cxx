@@ -171,7 +171,7 @@ unsigned int vtkSMDomain::GetNumberOfInputConnections(const char* function)
 }
 
 //---------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function, unsigned int index)
+vtkSMSourceProxy* vtkSMDomain::GetProxy(const char* function, unsigned int index, int& port)
 {
   vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
   if (!inputProperty)
@@ -182,11 +182,36 @@ vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function,
   vtkSMUncheckedPropertyHelper helper(inputProperty);
   if (helper.GetNumberOfElements() > index)
   {
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(index));
-    if (sp)
-    {
-      return sp->GetDataInformation(helper.GetOutputPort());
-    }
+    port = helper.GetOutputPort();
+    return vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(index));
+  }
+
+  port = -1;
+  return nullptr;
+}
+
+//---------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function, unsigned int index)
+{
+  int port = 0;
+  vtkSMSourceProxy* sp = this->GetProxy(function, index, port);
+  if (sp)
+  {
+    return sp->GetDataInformation(port);
+  }
+
+  return nullptr;
+}
+
+//---------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMDomain::GetInputDataSetInformation(
+  const char* function, unsigned int index)
+{
+  int port = 0;
+  vtkSMSourceProxy* sp = this->GetProxy(function, index, port);
+  if (sp)
+  {
+    return sp->GetDataSetInformation(port);
   }
 
   return nullptr;
@@ -196,20 +221,11 @@ vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function,
 vtkPVDataInformation* vtkSMDomain::GetInputSubsetDataInformation(
   unsigned int compositeIndex, const char* function, unsigned int index)
 {
-  vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
-  if (!inputProperty)
+  int port = 0;
+  vtkSMSourceProxy* sp = this->GetProxy(function, index, port);
+  if (sp)
   {
-    return nullptr;
-  }
-
-  vtkSMUncheckedPropertyHelper helper(inputProperty);
-  if (helper.GetNumberOfElements() > index)
-  {
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(index));
-    if (sp)
-    {
-      return sp->GetSubsetDataInformation(helper.GetOutputPort(), compositeIndex);
-    }
+    return sp->GetSubsetDataInformation(port, compositeIndex);
   }
 
   return nullptr;
@@ -219,20 +235,11 @@ vtkPVDataInformation* vtkSMDomain::GetInputSubsetDataInformation(
 vtkPVDataInformation* vtkSMDomain::GetInputSubsetDataInformation(
   const char* selector, const char* assemblyName, const char* function, unsigned int index)
 {
-  vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
-  if (!inputProperty)
+  int port = 0;
+  vtkSMSourceProxy* sp = this->GetProxy(function, index, port);
+  if (sp)
   {
-    return nullptr;
-  }
-
-  vtkSMUncheckedPropertyHelper helper(inputProperty);
-  if (helper.GetNumberOfElements() > index)
-  {
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(index));
-    if (sp)
-    {
-      return sp->GetSubsetDataInformation(helper.GetOutputPort(), selector, assemblyName);
-    }
+    return sp->GetSubsetDataInformation(port, selector, assemblyName);
   }
 
   return nullptr;
