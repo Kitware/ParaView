@@ -6,8 +6,11 @@
 #define pqFileDialog_h
 
 #include "pqCoreModule.h"
+#include "pqFileDialogModel.h"
 
 #include "vtkType.h" // needed for vtkTypeUInt32
+
+#include <optional>
 
 #include <QDialog>
 #include <QMap>
@@ -93,6 +96,20 @@ public:
   };
 
   /**
+   * Callback to evaluate the validity of a selected file group.
+   *
+   * The callback must return `true` for valid file groups and `false` for invalid ones. If the
+   * group is invalid, a reason may be given in the `reason` out-variable.
+   *
+   * See `pqLoadStateReaction::pngStatefileValidityCallback` for example usage.
+   */
+  using pqFileValidityCallback = std::function<bool( //
+    QStringList group,                               //
+    vtkTypeUInt32 location,                          //
+    QString& reason                                  //
+    )>;
+
+  /**
    * Creates a file dialog with the specified server
    * if the server is nullptr, files are browsed locally. else remotely and optionally locally.
    * the title, and start directory may be specified
@@ -127,6 +144,19 @@ public:
   void setRecentlyUsedExtension(const QString& fileExtension, vtkTypeUInt32 location);
   void setRecentlyUsedExtension(const QString& fileExtension);
   ///@}
+
+  /**
+   * Set the FileValidityCallback that is used to enable or disable the "accept" button when the
+   * file selection changes. The callback must return `true` for valid file groups. If no callback
+   * is set (via std::nullopt) then the "accept" button is always enabled.
+   */
+  void setFileValidityCallback(
+    const std::optional<pqFileValidityCallback>& callback = std::nullopt);
+
+  /**
+   * Get the current FileValidityCallback
+   */
+  std::optional<pqFileValidityCallback> getFileValidityCallback();
 
   /**
    * Returns the group of files for the given index
@@ -214,6 +244,7 @@ protected:
   bool acceptDefault(const bool& checkForGrouping);
 
   QStringList buildFileGroup(const QString& filename);
+  bool areFilesValid(const QStringList& filenames, QString& reason);
 
   void showEvent(QShowEvent* showEvent) override;
 
@@ -295,6 +326,7 @@ private: // NOLINT(readability-redundant-access-specifiers)
   bool SupportsGroupFiles;
   vtkTypeUInt32 DefaultLocation;
   QString RecentlyUsedExtension;
+  std::optional<pqFileValidityCallback> FileValidityCallback;
 
   void addImplementation(vtkTypeUInt32 location);
 
