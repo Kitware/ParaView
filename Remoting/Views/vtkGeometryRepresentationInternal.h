@@ -69,7 +69,8 @@ protected:
     // deduce if we only have triangles. We use maxCellSize+1 so
     // that we handle the length entry in the cell array for each cell
     polys->Squeeze();
-    const bool allSameType = ((numCells * (maxPolySize + 1)) == polys->GetSize());
+    const bool allSameType = polys->GetNumberOfCells() == numCells &&
+      polys->GetNumberOfConnectivityIds() == numCells * maxPolySize;
     if (allSameType && maxPolySize == 3)
     { // All triangles. Try the accelerated implementation:
       if (this->Superclass::RequestData(request, inputVector, outputVector))
