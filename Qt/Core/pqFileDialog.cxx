@@ -452,6 +452,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   , StartDirectory(startDirectory)
   , NameFilter(nameFilter)
   , SupportsGroupFiles(supportsGroupFiles)
+  , FileValidityCallback(std::nullopt)
 {
   // remove do-nothing "?" title bar button on Windows.
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
@@ -824,6 +825,19 @@ void pqFileDialog::setFileMode(FileMode mode)
 }
 
 //-----------------------------------------------------------------------------
+void pqFileDialog::setFileValidityCallback(
+  const std::optional<pqFileDialog::pqFileValidityCallback>& callback)
+{
+  this->FileValidityCallback = callback;
+}
+
+//-----------------------------------------------------------------------------
+std::optional<pqFileDialog::pqFileValidityCallback> pqFileDialog::getFileValidityCallback()
+{
+  return this->FileValidityCallback;
+}
+
+//-----------------------------------------------------------------------------
 void pqFileDialog::setRecentlyUsedExtension(const QString& fileExtension, vtkTypeUInt32 location)
 {
   auto& impl = *this->Implementations[location];
@@ -1033,6 +1047,25 @@ QStringList pqFileDialog::buildFileGroup(const QString& filename)
   }
 
   return files;
+}
+
+bool pqFileDialog::areFilesValid(const QStringList& filenames, QString& reason)
+{
+  if (this->FileValidityCallback.has_value())
+  {
+    const auto& callback = this->FileValidityCallback.value();
+
+    for (const auto& filename : filenames)
+    {
+      const QStringList group = buildFileGroup(filename);
+      if (!callback(group, this->SelectedLocation, reason))
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1441,6 +1474,16 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
       return false;
     }
   }
+  else if (impl.InDoubleClickHandler && this->FileValidityCallback.has_value())
+  {
+    QString reason;
+    if (!this->areFilesValid(impl.FileNames, reason))
+    {
+      QMessageBox::warning(
+        this, this->windowTitle(), reason, QMessageBox::Ok, QMessageBox::NoButton);
+      return false;
+    }
+  }
 
   // User chose an existing file-or-files
   if (impl.Model->fileExists(file, file))
@@ -1737,7 +1780,19 @@ void pqFileDialog::updateButtonStates(vtkTypeUInt32 location)
               return impl.FileFilter.getWildcards().match(fileNameWithoutPath).hasMatch();
             });
         });
-      impl.Ui.OK->setEnabled(filesMatching);
+
+      if (filesMatching)
+      {
+        QString reason;
+        const bool allFilesValid = this->areFilesValid(impl.FileNames, reason);
+        impl.Ui.OK->setEnabled(allFilesValid);
+        impl.Ui.OK->setToolTip(reason);
+      }
+      else
+      {
+        impl.Ui.OK->setEnabled(false);
+        impl.Ui.OK->setToolTip("");
+      }
   }
 
   // show the Navigate button.

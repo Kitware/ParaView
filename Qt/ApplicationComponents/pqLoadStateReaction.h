@@ -54,6 +54,12 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqLoadStateReaction)
+
+  /**
+   * FileValidityCallback for file dialog to check that PNG files have ParaViewState property.
+   */
+  static bool pngStatefileValidityCallback(
+    QStringList group, vtkTypeUInt32 location, QString& reason);
 };
 
 #endif
