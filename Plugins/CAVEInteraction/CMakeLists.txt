@@ -8,6 +8,10 @@ mark_as_advanced(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)
 option(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI "Build CAVEInteraction plugin with VRUI support" OFF)
 mark_as_advanced(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI)
 
+if (NOT PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN AND NOT PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI)
+  message(WARNING "CAVEInteraction plugin with neither VRPN nor VRUI enabled is unusable, please enable either or both of them")
+endif ()  
+
 # TODO: Should something be done with the files in samples/?
 
 configure_file(
