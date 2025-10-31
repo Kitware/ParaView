@@ -68,14 +68,7 @@ vtkPVZSpaceView::vtkPVZSpaceView()
 }
 
 //----------------------------------------------------------------------------
-vtkPVZSpaceView::~vtkPVZSpaceView()
-{
-  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
-  if (sdkManager)
-  {
-    sdkManager->ShutDown();
-  }
-}
+vtkPVZSpaceView::~vtkPVZSpaceView() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVZSpaceView::SetupInteractor(vtkRenderWindowInteractor* vtkNotUsed(rwi))
