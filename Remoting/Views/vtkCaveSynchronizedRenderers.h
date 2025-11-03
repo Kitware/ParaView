@@ -18,8 +18,12 @@
 #ifndef vtkCaveSynchronizedRenderers_h
 #define vtkCaveSynchronizedRenderers_h
 
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_6_1_0
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSynchronizedRenderers.h"
+
+#include <array>  // For array
+#include <vector> // For vector
 
 class vtkCamera;
 class vtkMatrix4x4;
@@ -33,7 +37,7 @@ public:
 
 protected:
   vtkCaveSynchronizedRenderers();
-  ~vtkCaveSynchronizedRenderers() override;
+  ~vtkCaveSynchronizedRenderers() override = default;
 
   /**
    * Called at the start of each render. Overridden to ensure that the camera is
@@ -48,40 +52,54 @@ protected:
   void ProcessCaveConfiguration();
 
   /**
-   * These are to initialize the displays. (This is directly copied from
-   * vtkCaveRenderManager).
+   * Set the number of displays to be defined, must be called before DefineDisplay
    */
   void SetNumberOfDisplays(int numberOfDisplays);
 
   /**
-   * Set the eye separation for all the displays.
+   * Set the eye separation which will be used when defined displays.
    */
-  void SetEyeSeparation(double eyeSeparation);
+  vtkSetMacro(EyeSeparation, double);
 
-  void DefineDisplay(int idx, double origin[3], double x[3], double y[3]);
+  /**
+   * Define a display origin, x and y coordinates at index idx.
+   * If idx is the local process id, also set Origin, DisplayX and DisplayY
+   * Call SetNumberOfDisplays before calling this method.
+   * Return true on success, false otherwise.
+   */
+  bool DefineDisplay(int idx, double origin[3], double x[3], double y[3]);
 
   /**
    * Method to update the camera.
    */
+  PARAVIEW_DEPRECATED_IN_6_1_0("Use InitializeCamera instead")
   void ComputeCamera(vtkCamera* cam);
+
+  /**
+   * Initialize the camera for CAVE mode using display information.
+   * Initialization will be performed only once for a given vtkCaveSynchronizedRenderers instance
+   * further call will do nothing
+   */
+  void InitializeCamera(vtkCamera* cam);
 
   /**
    * Override Superclass to compute Displays parameters in case
    * of a single screen cave (e.g. zSpace)
+   * Does not do anything if NumberOfDisplays != 1.
    */
   void SetRenderer(vtkRenderer* renderer) override;
-
-  double EyeSeparation;
-  int NumberOfDisplays;
-  double** Displays;
-  double DisplayOrigin[3];
-  double DisplayX[3];
-  double DisplayY[3];
-  int once;
 
 private:
   vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&) = delete;
   void operator=(const vtkCaveSynchronizedRenderers&) = delete;
+
+  double EyeSeparation = 0.065;
+  int NumberOfDisplays = 0;
+  std::vector<std::array<double, 12>> Displays;
+  std::array<double, 3> DisplayOrigin = { -0.5, -0.5, -0.5 };
+  std::array<double, 3> DisplayX = { 0.5, -0.5, -0.5 };
+  std::array<double, 3> DisplayY = { 0.5, 0.5, -0.5 };
+  bool CameraInitialized = false;
 };
 
 #endif
