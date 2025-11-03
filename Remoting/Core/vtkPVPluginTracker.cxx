@@ -56,7 +56,7 @@ public:
  * Convert a plugin name to its library name i.e. add platform specific
  * library prefix and suffix.
  */
-std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
+std::string vtkGetPluginLibraryFileNameFromName(const std::string& pluginname)
 {
 #if defined(_WIN32) && !defined(__CYGWIN__)
   return pluginname + ".dll";
@@ -126,7 +126,18 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
     std::string()
   };
 
-  const std::string landmark = isPlugin ? vtkGetPluginFileNameFromName(plugin) : plugin;
+  const std::string pluginName{ plugin };
+  std::vector<std::string> possibleFiles;
+  if (isPlugin)
+  {
+    possibleFiles.push_back(vtkGetPluginLibraryFileNameFromName(pluginName));
+    possibleFiles.push_back(pluginName + ".py");
+    possibleFiles.push_back(pluginName + ".xml");
+  }
+  else
+  {
+    possibleFiles.push_back(pluginName);
+  }
 
   vtkNew<vtkPResourceFileLocator> locator;
   locator->SetLogVerbosity(PARAVIEW_LOG_PLUGIN_VERBOSITY());
@@ -134,10 +145,13 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
   if (hint && *hint)
   {
     const std::string hintdir = vtksys::SystemTools::GetFilenamePath(hint);
-    auto path = locator->Locate(std::string(hintdir).append("/").append(plugin), landmark);
-    if (!path.empty())
+    for (const auto& file : possibleFiles)
     {
-      return std::string(path).append("/").append(landmark);
+      auto path = locator->Locate(std::string(hintdir).append("/").append(plugin), file);
+      if (!path.empty())
+      {
+        return std::string(path).append("/").append(file);
+      }
     }
   }
 
@@ -145,10 +159,13 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
   for (const auto& spath : vtkRemotingCoreConfiguration::GetInstance()->GetPluginSearchPaths())
   {
     vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "check `plugin-search-path` first.");
-    auto path = locator->Locate(spath, landmark);
-    if (!path.empty())
+    for (const auto& file : possibleFiles)
     {
-      return std::string(path).append("/").append(landmark);
+      auto path = locator->Locate(spath, file);
+      if (!path.empty())
+      {
+        return std::string(path).append("/").append(file);
+      }
     }
   }
 
@@ -156,10 +173,13 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
   {
     vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
       "check various prefixes relative to executable location: `%s`", exe_dir.c_str());
-    auto pluginpath = locator->Locate(exe_dir, prefixes, landmark);
-    if (!pluginpath.empty())
+    for (const auto& file : possibleFiles)
     {
-      return std::string(pluginpath).append("/").append(landmark);
+      auto pluginpath = locator->Locate(exe_dir, prefixes, file);
+      if (!pluginpath.empty())
+      {
+        return std::string(pluginpath).append("/").append(file);
+      }
     }
   }
 

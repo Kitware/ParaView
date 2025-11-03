@@ -266,7 +266,9 @@ bool vtkRemotingCoreConfiguration::PopulatePluginOptions(
   // the one that handles loading the plugins. we should fix that at some point.
   // I am leaving these arguments as is since tests seems to pass them to server
   // processes.
-  groupPlugins->add_option("--plugins", this->Plugins, "Specify plugins to load on startup.");
+  groupPlugins->add_option("--plugins", this->Plugins,
+    "Specify plugins to load on startup. Libraries (.so and .dll), xml and Python plugins are "
+    "supported");
 
   groupPlugins->add_option(
     "--test-plugin,--test-plugins", this->Plugins, "Use '--plugins' instead.");

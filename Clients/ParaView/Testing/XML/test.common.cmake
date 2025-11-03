@@ -2399,3 +2399,8 @@ paraview_add_client_tests(
   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/PropertyPanelVisibilitiesOverride.xml
   TEST_DIRECTORY ${PropertyPanelVisibilitiesOverrideDir}
 )
+
+# Adds a test to check the `--plugins` works with `xml` plugins too.
+paraview_add_client_tests(
+    ARGS --plugins=ReaderNamePlugin "--plugin-search-paths=${paraview_test_data_directory_output}/Testing/Data"
+    TEST_SCRIPTS PluginCommandLine.xml)
