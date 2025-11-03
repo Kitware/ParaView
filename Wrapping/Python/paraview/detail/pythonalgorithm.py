@@ -297,6 +297,13 @@ class smdomain(object):
                                  generate_xml_func=smdomain._generate_xml)
 
     @staticmethod
+    def boolean(**kwargs):
+        attrs = {"type": "BooleanDomain", "name": "bool"}
+        attrs.update(kwargs)
+        return _create_decorator(attrs,
+                                 generate_xml_func=smdomain._generate_xml)
+
+    @staticmethod
     def filelist(**kwargs):
         attrs = {"type": "FileListDomain", "name": "files"}
         attrs.update(kwargs)
