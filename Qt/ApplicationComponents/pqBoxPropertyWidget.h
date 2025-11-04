@@ -7,6 +7,11 @@
 #include "pqInteractivePropertyWidget.h"
 #include <QPointer> // For QScopedPointer
 
+// Forward declarations to avoid heavy includes in the header
+class vtkSMProxy;
+class vtkSMPropertyGroup;
+class vtkSMProperty;
+
 /**
  * @class pqBoxPropertyWidget
  * @brief custom property widget using vtkBoxWidget2 and vtkBoxRepresentation.
@@ -41,6 +46,12 @@
  *
  * Note while all of the above are optional, it really doesn't make much sense
  * to use this widget if any of them are not specified.
+ *
+ * In addition to the PRS editors, this widget also provides a "Matrix" tab to
+ * edit the transform as a 4×4 matrix. The tab is enabled only when the
+ * "Position", "Rotation" and "Scale" properties are available on the group.
+ * The 4×4 values are converted to/from PRS; a dedicated 16‑element "Matrix"
+ * property is not required.
  */
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqBoxPropertyWidget : public pqInteractivePropertyWidget
@@ -53,13 +64,34 @@ public:
     bool hideReferenceBounds = false);
   ~pqBoxPropertyWidget() override;
 
+  /**
+   * Applies unchecked values; in matrix mode parses text to properties and refreshes.
+   */
+  void apply() override;
+
 protected Q_SLOTS:
   /**
    * Places the interactive widget using current data source information.
    */
   void placeWidget() override;
 
-private:
+private Q_SLOTS:
+  /**
+   * Reacts to tab changes: index points to Fields or Matrix page.
+   */
+  void onTabChanged(int index);
+
+  /**
+   * Refresh matrix text when SM properties change.
+   */
+  void onSMPropertiesChanged();
+
+  /**
+   * Marks pending changes when the matrix text is edited by the user.
+   */
+  void matrixTextEdited();
+
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqBoxPropertyWidget)
   class pqUi;
   QScopedPointer<pqUi> Ui;
@@ -67,6 +99,17 @@ private:
   bool BoxIsRelativeToInput;
 
   QMetaObject::Connection PlaceWidgetConnection;
+
+  // Matrix edit integration
+  vtkSMProperty* Position = nullptr;
+  vtkSMProperty* Rotation = nullptr;
+  vtkSMProperty* Scale = nullptr;
+
+  /**
+   * Reads current transform data from Matrix or Position/Rotation/Scale, constructs
+   * the corresponding 4×4 matrix, and updates the matrix text displayed in the UI.
+   */
+  void fillMatrixTextFromProperties();
 };
 
 #endif

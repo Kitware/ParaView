@@ -8,14 +8,203 @@
 #include "pqUndoStack.h"
 #include "pqWidgetUtilities.h"
 
+#include "vtkMath.h"
+#include "vtkMatrix4x4.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkTransform.h"
+
+#include <QCoreApplication>
+#include <QLocale>
+#include <QPlainTextEdit>
 
 //-----------------------------------------------------------------------------
 class pqBoxPropertyWidget::pqUi : public Ui::BoxPropertyWidget
 {
 };
+namespace
+{
+//-----------------------------------------------------------------------------
+// Strict C-locale floating-point token parser.
+// Valid form:
+//   [sign] (integer | decimal) [exponent]
+//     sign     = '+' | '-'
+//     integer  = digits
+//     decimal  = digits '.' [digits] | '.' digits
+//     exponent = ('e' | 'E') [sign] digits
+bool parseStrictNumberToken(const QString& token, double& value)
+{
+  // Trim whitespace before checking
+  const QString trimmedToken = token.trimmed();
+  if (trimmedToken.isEmpty())
+  {
+    return false;
+  }
+  // Parse strictly with C-locale rules, using '.' as decimal separator.
+  // QLocale::c().toDouble() returns false on invalid formats such as "1e", "1.2.3", etc.
+  bool parseOk = false;
+  value = QLocale::c().toDouble(trimmedToken, &parseOk);
+  return parseOk;
+}
+
+//-----------------------------------------------------------------------------
+// Parse a 4×4 matrix from a text block.
+//
+// Expected format:
+//   - Exactly 4 non-empty lines
+//   - Each line contains exactly 4 numeric values
+//   - Values may be separated by whitespace and/or commas
+//   - Numbers must follow strict C-locale floating-point syntax
+//       (digits, optional sign, optional decimal point, optional exponent)
+//
+// Acceptance examples:
+//   1 0 0 0
+//   0,1,0,0
+//   0 0.0e0 1.0E-3 0
+//   .5 0 0 1
+//
+// Rejected examples:
+//   3 lines / 5 lines
+//   non-numeric tokens (inf, nan, 1e, 1.2.3)
+//   locale formats (1,2 meaning 1.2)
+//   trailing characters or mixed text ("1.0f", "[1 0 0 0]")
+bool parseMatrixText(const QString& text, double matrix[16])
+{
+  // Split into lines, keeping empty ones so we can trim leading/trailing empties.
+  QStringList lines = text.split(QLatin1Char('\n'), Qt::KeepEmptyParts);
+
+  // Trim whitespace on each line.
+  for (QString& lineStr : lines)
+  {
+    lineStr = lineStr.trimmed();
+  }
+  // Remove empty leading lines.
+  while (!lines.isEmpty() && lines.first().isEmpty())
+  {
+    lines.removeFirst();
+  }
+  // Remove empty trailing lines.
+  while (!lines.isEmpty() && lines.last().isEmpty())
+  {
+    lines.removeLast();
+  }
+  if (lines.size() != 4)
+  {
+    vtkGenericWarningMacro(<< "InteractiveBox Matrix: expected exactly 4 lines, found "
+                           << lines.size() << ".");
+    return false;
+  }
+
+  int idx = 0;
+  // Parse each of the 4 lines.
+  for (int row = 0; row < 4; ++row)
+  {
+    QString line = lines[row];
+
+    // Allow commas as separators; convert them to spaces.
+    line.replace(QLatin1Char(','), QLatin1Char(' '));
+
+    // Collapse multiple spaces into a single space.
+    line = line.simplified();
+
+    // Split into tokens. Must have exactly 4 values.
+    const QStringList tokens = line.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+    if (tokens.size() != 4)
+    {
+      vtkGenericWarningMacro(<< "InteractiveBox Matrix: line " << (row + 1) << " has "
+                             << tokens.size() << " values; expected 4.");
+      return false;
+    }
+    // Parse each numeric value using the strict token parser.
+    for (int col = 0; col < 4; ++col)
+    {
+      double val = 0.0;
+      if (!parseStrictNumberToken(tokens[col], val))
+      {
+        vtkGenericWarningMacro(<< "InteractiveBox Matrix: line " << (row + 1) << ", column "
+                               << (col + 1) << ": invalid number token '"
+                               << tokens[col].toStdString() << "'.");
+        return false;
+      }
+      matrix[idx++] = val;
+    }
+  }
+  return (idx == 16);
+}
+
+//-----------------------------------------------------------------------------
+// Compose 4x4 from PRS (deg for rotation)
+void composeMatrixFromPRS(
+  const double pos[3], const double rotDeg[3], const double scale[3], double outMatrix[16])
+{
+  vtkNew<vtkTransform> transform;
+  transform->Identity();
+  transform->Translate(const_cast<double*>(pos));
+  transform->RotateZ(rotDeg[2]);
+  transform->RotateX(rotDeg[0]);
+  transform->RotateY(rotDeg[1]);
+  transform->Scale(const_cast<double*>(scale));
+
+  vtkMatrix4x4* matrix4x4 = transform->GetMatrix();
+  for (int row = 0; row < 4; ++row)
+  {
+    for (int col = 0; col < 4; ++col)
+    {
+      outMatrix[row * 4 + col] = matrix4x4->GetElement(row, col);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Decompose 4x4 to PRS (deg for rotation)
+void decomposeMatrixToPRS(
+  const double inMatrix[16], double pos[3], double rotDeg[3], double scale[3])
+{
+  vtkNew<vtkMatrix4x4> matrix4x4;
+  for (int row = 0; row < 4; ++row)
+  {
+    for (int col = 0; col < 4; ++col)
+    {
+      matrix4x4->SetElement(row, col, inMatrix[row * 4 + col]);
+    }
+  }
+
+  vtkNew<vtkTransform> transform;
+  transform->SetMatrix(matrix4x4);
+  transform->GetPosition(pos);
+  transform->GetOrientation(rotDeg);
+  transform->GetScale(scale);
+}
+
+//-----------------------------------------------------------------------------
+// Read Position, Rotation, Scale (each 3-tuple) from SM properties
+// into provided arrays using unchecked property helpers. Assumes
+// all three properties are non-null and have at least 3 components.
+void readPRSFromProperties(vtkSMProperty* positionProperty, vtkSMProperty* rotationProperty,
+  vtkSMProperty* scaleProperty, double pos[3], double rot[3], double scl[3])
+{
+  vtkSMUncheckedPropertyHelper positionHelper(positionProperty);
+  for (int index = 0; index < 3; ++index)
+  {
+    pos[index] = positionHelper.GetAsDouble(index);
+  }
+
+  vtkSMUncheckedPropertyHelper rotationHelper(rotationProperty);
+  for (int index = 0; index < 3; ++index)
+  {
+    rot[index] = rotationHelper.GetAsDouble(index);
+  }
+
+  vtkSMUncheckedPropertyHelper scaleHelper(scaleProperty);
+  for (int index = 0; index < 3; ++index)
+  {
+    scl[index] = scaleHelper.GetAsDouble(index);
+  }
+}
+} // end namespace
 
 //-----------------------------------------------------------------------------
 pqBoxPropertyWidget::pqBoxPropertyWidget(
@@ -26,6 +215,10 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
 {
   this->Ui->setupUi(this);
   pqWidgetUtilities::formatChildTooltips(this);
+
+  this->Position = smgroup->GetProperty("Position");
+  this->Rotation = smgroup->GetProperty("Rotation");
+  this->Scale = smgroup->GetProperty("Scale");
 
   vtkSMProxy* wdgProxy = this->widgetProxy();
 
@@ -40,7 +233,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
   this->WidgetLinks.addPropertyLink(this->Ui->enableMoveFaces, "checked", SIGNAL(toggled(bool)),
     wdgProxy, wdgProxy->GetProperty("MoveFacesEnabled"));
 
-  if (vtkSMProperty* position = smgroup->GetProperty("Position"))
+  if (vtkSMProperty* position = this->Position)
   {
     this->addPropertyLink(
       this->Ui->translateX, "text2", SIGNAL(textChangedAndEditingFinished()), position, 0);
@@ -68,7 +261,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     this->Ui->enableTranslation->hide();
   }
 
-  if (vtkSMProperty* rotation = smgroup->GetProperty("Rotation"))
+  if (vtkSMProperty* rotation = this->Rotation)
   {
     this->addPropertyLink(
       this->Ui->rotateX, "text2", SIGNAL(textChangedAndEditingFinished()), rotation, 0);
@@ -96,7 +289,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     this->Ui->enableRotation->hide();
   }
 
-  if (vtkSMProperty* scale = smgroup->GetProperty("Scale"))
+  if (vtkSMProperty* scale = this->Scale)
   {
     this->addPropertyLink(
       this->Ui->scaleX, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 0);
@@ -180,6 +373,9 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
   }
 
   this->connect(&this->WidgetLinks, SIGNAL(qtWidgetChanged()), SLOT(render()));
+  // When any SM property linked through pqPropertyWidget::links() changes,
+  // update the matrix text if currently on the Matrix tab.
+  this->connect(&this->links(), SIGNAL(smPropertyChanged()), SLOT(onSMPropertiesChanged()));
 
   // link show3DWidget checkbox
   this->connect(this->Ui->show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
@@ -235,10 +431,47 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
         &pqActiveObjects::dataUpdated, this, &pqBoxPropertyWidget::placeWidget);
       this->render();
     });
+
+  // Ensure fields page is selected by default
+  this->Ui->tabWidget->setCurrentWidget(this->Ui->fieldsPage);
+  this->connect(this->Ui->tabWidget, SIGNAL(currentChanged(int)), SLOT(onTabChanged(int)));
+  this->connect(this->Ui->matrixEdit, SIGNAL(textChanged()), SLOT(matrixTextEdited()));
+
+  // Disable matrix tab if required properties are missing (need Position, Rotation, Scale)
+  if (!this->Position || !this->Scale || !this->Rotation)
+  {
+    int idx = this->Ui->tabWidget->indexOf(this->Ui->matrixPage);
+    if (idx >= 0)
+    {
+      this->Ui->tabWidget->setTabEnabled(idx, false);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqBoxPropertyWidget::~pqBoxPropertyWidget() = default;
+
+//-----------------------------------------------------------------------------
+void pqBoxPropertyWidget::apply()
+{
+  // If currently in matrix tab, push current matrix text into unchecked properties first.
+  if (this->Ui->tabWidget->currentWidget() == this->Ui->matrixPage)
+  {
+    double matrixData[16];
+    if (this->Ui->matrixEdit && ::parseMatrixText(this->Ui->matrixEdit->toPlainText(), matrixData))
+    {
+      double pos[3] = { 0, 0, 0 };
+      double rot[3] = { 0, 0, 0 };
+      double scl[3] = { 1, 1, 1 };
+      ::decomposeMatrixToPRS(matrixData, pos, rot, scl);
+      vtkSMUncheckedPropertyHelper(this->Position).Set(pos, 3);
+      vtkSMUncheckedPropertyHelper(this->Rotation).Set(rot, 3);
+      vtkSMUncheckedPropertyHelper(this->Scale).Set(scl, 3);
+    }
+  }
+
+  this->Superclass::apply();
+}
 
 //-----------------------------------------------------------------------------
 void pqBoxPropertyWidget::placeWidget()
@@ -261,5 +494,116 @@ void pqBoxPropertyWidget::placeWidget()
     double bds[6] = { 0, 1, 0, 1, 0, 1 };
     vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bds, 6);
     wdgProxy->UpdateVTKObjects();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqBoxPropertyWidget::onTabChanged(int index)
+{
+  if (this->Ui->tabWidget->widget(index) == this->Ui->matrixPage)
+  {
+    // When switching to matrix mode, compose from current PRS values
+    double pos[3] = { 0, 0, 0 };
+    double rot[3] = { 0, 0, 0 };
+    double scl[3] = { 1, 1, 1 };
+    ::readPRSFromProperties(this->Position, this->Rotation, this->Scale, pos, rot, scl);
+    double matrixData[16];
+    ::composeMatrixFromPRS(pos, rot, scl, matrixData);
+    // show in text
+    QString txt;
+    for (int rId = 0; rId < 4; ++rId)
+    {
+      for (int cId = 0; cId < 4; ++cId)
+      {
+        txt += QString::number(matrixData[rId * 4 + cId], 'g', 16);
+        if (cId < 3)
+        {
+          txt += QLatin1String(" ");
+        }
+      }
+      if (rId < 3)
+      {
+        txt += QLatin1String("\n");
+      }
+    }
+    bool oldSignalState = this->Ui->matrixEdit->blockSignals(true);
+    this->Ui->matrixEdit->setPlainText(txt);
+    this->Ui->matrixEdit->blockSignals(oldSignalState);
+  }
+  else
+  {
+    // Map current matrix text back to properties at the unchecked level
+    double matrixData[16];
+    if (::parseMatrixText(this->Ui->matrixEdit->toPlainText(), matrixData))
+    {
+      bool changed = false;
+      double pos[3], rot[3], scl[3];
+      ::decomposeMatrixToPRS(matrixData, pos, rot, scl);
+      vtkSMUncheckedPropertyHelper(this->Position).Set(pos, 3);
+      vtkSMUncheckedPropertyHelper(this->Rotation).Set(rot, 3);
+      vtkSMUncheckedPropertyHelper(this->Scale).Set(scl, 3);
+      changed = true;
+      if (changed)
+      {
+        Q_EMIT this->changeAvailable();
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqBoxPropertyWidget::fillMatrixTextFromProperties()
+{
+  double matrixData[16] = { 0 };
+  bool haveMatrix = false;
+  double pos[3] = { 0, 0, 0 };
+  double rot[3] = { 0, 0, 0 };
+  double scl[3] = { 1, 1, 1 };
+  ::readPRSFromProperties(this->Position, this->Rotation, this->Scale, pos, rot, scl);
+  ::composeMatrixFromPRS(pos, rot, scl, matrixData);
+  haveMatrix = true;
+
+  if (haveMatrix)
+  {
+    QString txt;
+    for (int row = 0; row < 4; ++row)
+    {
+      for (int col = 0; col < 4; ++col)
+      {
+        txt += QString::number(matrixData[row * 4 + col], 'g', 16);
+        if (col < 3)
+        {
+          txt += QLatin1String(" ");
+        }
+      }
+      if (row < 3)
+      {
+        txt += QLatin1String("\n");
+      }
+    }
+    bool oldSignalState = this->Ui->matrixEdit->blockSignals(true);
+    this->Ui->matrixEdit->setPlainText(txt);
+    this->Ui->matrixEdit->blockSignals(oldSignalState);
+  }
+  else
+  {
+    vtkGenericWarningMacro(<< "InteractiveBox Matrix: cannot compose matrix because required"
+                           << " properties are missing for proxy "
+                           << (this->proxy() ? this->proxy()->GetXMLName() : "(null)"));
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqBoxPropertyWidget::matrixTextEdited()
+{
+  Q_EMIT this->changeAvailable();
+}
+
+//-----------------------------------------------------------------------------
+void pqBoxPropertyWidget::onSMPropertiesChanged()
+{
+  if (this->Ui->tabWidget->currentWidget() == this->Ui->matrixPage)
+  {
+    this->fillMatrixTextFromProperties();
   }
 }

@@ -1093,6 +1093,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   TemporalArrayOperator.xml
   TestOpenFOAMRestartFiles.xml
   TextSource.xml
+  TestTransformMatrixTab.xml
   ThresholdBackwardsCompatibility.xml
   TimeManagerPanel.xml
   TimeManagerSequence.xml
