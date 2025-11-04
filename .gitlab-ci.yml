@@ -1,3 +1,16 @@
+---
+spec:
+    inputs:
+        project-tag:
+            default: "paraview"
+            description: "The project tag to use for selecting runners"
+            options:
+                - "paraview"
+                # Use when deploying a new machine to test that it is working
+                # properly before adding it to the main pool.
+                - "__paraview"
+
+---
 include:
     # Metadata shared my many jobs
     - local: .gitlab/rules.yml

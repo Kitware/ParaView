@@ -49,7 +49,7 @@
 
 .windows_builder_tags:
     tags:
-        - paraview # Since this is a bare runner, pin to a project.
+        - $[[ inputs.project-tag ]]
         - msvc-19.35
         - nonconcurrent
         - shell
@@ -58,7 +58,7 @@
 
 .windows_test_tags:
     tags:
-        - paraview # Since this is a bare runner, pin to a project.
+        - $[[ inputs.project-tag ]]
         - msvc-19.35
         - nonconcurrent
         - shell

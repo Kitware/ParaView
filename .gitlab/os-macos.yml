@@ -38,7 +38,7 @@
 
 .macos_x86_64_builder_tags:
     tags:
-        - paraview
+        - $[[ inputs.project-tag ]]
         - macos-x86_64
         - shell
         - xcode-16.4
@@ -46,7 +46,7 @@
 
 .macos_arm64_builder_tags:
     tags:
-        - paraview
+        - $[[ inputs.project-tag ]]
         - macos-arm64
         - shell
         - xcode-16.4

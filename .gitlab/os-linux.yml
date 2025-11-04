@@ -152,12 +152,12 @@
         - build
         - docker
         - linux-x86_64
-        - paraview
+        - $[[ inputs.project-tag ]]
 
 .linux_tester_tags:
     tags:
         - docker
-        - paraview
+        - $[[ inputs.project-tag ]]
         - linux-x86_64
         - x11-gnome
 
