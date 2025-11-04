@@ -991,6 +991,50 @@ set(TraceMultiViews_TIMEOUT 150)
 set(TransferFunction2D_TIMEOUT 150)
 set(ZoomToData_TIMEOUT 150)
 
+# Test without baselines and could only run in built-in mode.
+list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
+  CellQualityForPixel.xml
+  ComputeArrayMagnitudeSetting.xml
+  DefaultReadersSetting.xml
+  DelimitedTextReader.xml
+  DynamicFieldDataDomain.xml
+  ExportFilteredColumnsSpreadsheet.xml
+  ExportSpreadsheetFormatting.xml
+  ExtractCellsByType.xml
+  ExtractParticlesOverTime.xml
+  FluentReaderZoneSelection.xml
+  FieldDataToAttribute.xml
+  HTGCellCentersBackwardCompat.xml
+  HTGFeatureEdgesBackwardCompat.xml
+  HTGGhostCellsGeneratorBackwardCompat.xml
+  HTGReflectionBackwardCompat.xml
+  HTGVisibleLeavesSizeBackwardCompat.xml
+  InformationPanel.xml
+  IntegrationStrategy.xml
+  OverrideProperty.xml
+  PartialArrayInLineChart.xml
+  ProxyCategoriesConfiguration.xml
+  ProxyCategoriesDialog.xml
+  ProxyCategoriesDialogSettings.xml
+  ProxyCategoriesMenusDefault.xml
+  ProxyCategoriesToolbar.xml
+  QuadricDecimation.xml
+  RawImageDataReaderBackwardCompat.xml
+  ReaderRegistrationName.xml
+  ReadIOHDFAMRMaxLevels.xml
+  RescaleVisibleRangeOption.xml
+  SpatioTemporalHarmonicsAttribute.xml
+  SpatioTemporalHarmonicsSource.xml
+  SpreadSheetSelectedCellConnectivity.xml
+  TensorPrincipalInvariants.xml
+  TestFileListPropertyWidget.xml
+  TestCompositePropertyWidgetDecorator.xml
+  ThresholdTable.xml
+  TimeKeeper.xml
+  WriteXMLTimeValue.xml
+  YieldCriteria.xml
+)
+
 list (APPEND TESTS_WITHOUT_BASELINES
   AbortExit.xml
   AboutDialog.xml
@@ -999,65 +1043,36 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ArrayBoundsScaleDomain.xml
   ArraySelectionWidget.xml
   AutoConvertSingleProperty.xml
-  ComputeArrayMagnitudeSetting.xml
   CSVPreview.xml
-  CellQualityForPixel.xml
   ChangeFileNameReaction.xml
   CustomOutputFormat.xml
-  DefaultReadersSetting.xml
-  DelimitedTextReader.xml
-  DynamicFieldDataDomain.xml
   ExplodeDataSet.xml
-  ExportFilteredColumnsSpreadsheet.xml
-  ExportSpreadsheetFormatting.xml
   ExpressionsDialog.xml
   ExpressionsExporter.xml
   ExpressionsSettings.xml
-  ExtractCellsByType.xml
-  ExtractParticlesOverTime.xml
-  FieldDataToAttribute.xml
+  FileDialogAllFavorites.xml
   FileDialogOpenInteractClose.xml
-  FluentReaderZoneSelection.xml
   ForceStaticMesh.xml
   GradientBackwardsCompatibility.xml
-  HTGCellCentersBackwardCompat.xml
-  HTGFeatureEdgesBackwardCompat.xml
-  HTGGhostCellsGeneratorBackwardCompat.xml
-  HTGReflectionBackwardCompat.xml
-  HTGVisibleLeavesSizeBackwardCompat.xml
   ImportCustomPresets.xml
-  InformationPanel.xml
-  IntegrationStrategy.xml
   LogViewer.xml
   MergeTime.xml
   ModifyGUIWindowTitle.xml
   OpacityWidgetRange.xml
   OpenHelp.xml
-  OverrideProperty.xml
-  PartialArrayInLineChart.xml
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
   PolarAxesBackwardsCompatibility.xml
   PreservePropertyValues.xml
   ProcessIdScalarsBackwardCompat.xml
-  ProxyCategoriesConfiguration.xml
-  ProxyCategoriesDialog.xml
   ProxyCategoriesDialogDefault.xml
-  ProxyCategoriesDialogSettings.xml
   ProxyCategoriesFavorites.xml
-  ProxyCategoriesMenusDefault.xml
-  ProxyCategoriesToolbar.xml
   QuadraturePointsDS.xml
-  QuadricDecimation.xml
   QuickLaunchCreateProxy.xml
   QuickLaunchNavigation.xml
   QuickLaunchRequest.xml
-  RawImageDataReaderBackwardCompat.xml
-  ReadIOHDFAMRMaxLevels.xml
-  ReaderRegistrationName.xml
   ReflectBackwardCompat.xml
   ReloadCGNSFile.xml
-  RescaleVisibleRangeOption.xml
   SearchBox.xml
   ServerConnectDialog.xml
   SettingsNoCustomDefault.xml
@@ -1066,26 +1081,16 @@ list (APPEND TESTS_WITHOUT_BASELINES
   SettingsRestoreProxyAppDefault.xml
   SettingsSubProxy.xml
   SliceBackwardsCompatibility.xml
-  SpatioTemporalHarmonicsAttribute.xml
-  SpatioTemporalHarmonicsSource.xml
   SpreadSheetFieldData.xml
-  SpreadSheetSelectedCellConnectivity.xml
   STLReaderMergePoints.xml
   StringInLineChartView.xml
   TableHistogram.xml
   TemporalArrayOperator.xml
-  TensorPrincipalInvariants.xml
-  TestCompositePropertyWidgetDecorator.xml
-  TestFileListPropertyWidget.xml
   TestOpenFOAMRestartFiles.xml
   TextSource.xml
   ThresholdBackwardsCompatibility.xml
-  ThresholdTable.xml
-  TimeKeeper.xml
   TimeManagerPanel.xml
   TimeManagerSequence.xml
-  WriteXMLTimeValue.xml
-  YieldCriteria.xml
 )
 
 if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)

@@ -240,8 +240,8 @@ QMap<QPointer<pqServer>, QString> pqFileDialog::pqImplementation::FilePaths;
 /////////////////////////////////////////////////////////////////////////////
 void pqFileDialog::addImplementation(vtkTypeUInt32 location)
 {
-  pqServer* server = location == vtkPVSession::DATA_SERVER ? this->Server : nullptr;
-  this->Implementations[location] = new pqImplementation(this, server);
+  pqServer* dataServer = location == vtkPVSession::DATA_SERVER ? this->Server : nullptr;
+  this->Implementations[location] = new pqImplementation(this, dataServer);
   this->Implementations[location]->setObjectName(
     QString("Filesystem_%1").arg(this->Implementations.size() - 1));
   // the selected location is temporarily set here,

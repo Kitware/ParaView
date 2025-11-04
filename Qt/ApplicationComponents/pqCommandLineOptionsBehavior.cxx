@@ -32,6 +32,7 @@
 #include "vtkSMPluginManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMStringVectorProperty.h"
 #include <vtksys/SystemTools.hxx>
 
@@ -144,7 +145,8 @@ void pqCommandLineOptionsBehavior::processServerConnection()
   // Connect to builtin, if none present.
   if (pqActiveObjects::instance().activeServer() == nullptr)
   {
-    pqServerConnectReaction::connectToServer(pqServerResource("builtin:"), false);
+    pqServerConnectReaction::connectToServer(
+      pqServerResource(vtkSMSession::GetBuiltinName()), false);
   }
 
   // Now we are assured that some default server connection has been made

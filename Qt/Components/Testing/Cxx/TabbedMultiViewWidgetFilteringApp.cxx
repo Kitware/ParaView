@@ -13,6 +13,7 @@
 #include <pqServer.h>
 #include <pqServerManagerModel.h>
 #include <pqTabbedMultiViewWidget.h>
+#include <vtkSMSession.h>
 #include <vtkSMViewLayoutProxy.h>
 
 namespace
@@ -61,7 +62,7 @@ public:
     pqObjectBuilder* ob = core->getObjectBuilder();
 
     // Create server only after a pipeline browser get created...
-    pqServer* server = ob->createServer(pqServerResource("builtin:"));
+    pqServer* server = ob->createServer(pqServerResource(vtkSMSession::GetBuiltinName()));
     pqActiveObjects::instance().setActiveServer(server);
 
     QString viewType = "SpreadSheetView";

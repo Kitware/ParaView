@@ -5,7 +5,6 @@ list(APPEND TESTS_WITHOUT_BASELINES
   FullNotation.xml
   IconBrowser.xml
   MacroEditor.xml
-  MultipleNumberOfComponents.xml
   ProgrammableSourcePythonEditorLink.xml
   PythonDefaultLoadState.xml
   PythonDefaultSaveState.xml
@@ -19,7 +18,7 @@ list(APPEND TESTS_WITHOUT_BASELINES
 
 # This test rely on copy being Ctrl-C
 if(NOT APPLE)
-  list(APPEND TESTS_WITHOUT_BASELINES
+  list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
     TooltipCopy.xml
     TestHTGHoverOnCell.xml
     )
@@ -106,20 +105,25 @@ if (numpy_found)
   # Selection non-functional on CRS mode
   set(SelectionSaveStatePVSM_DISABLE_CRS TRUE)
 
+  # Test without baselines and could only run in built-in mode.
+  list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
+    HyperTreeGridGenerateFields.xml
+    HTGPlotSelectionOverTime.xml
+    MultipleNumberOfComponents.xml
+    ProgrammableFilterFieldData.xml
+    PythonCalculatorInput.xml
+    )
+
   list(APPEND TESTS_WITHOUT_BASELINES
     ExpressionChooser.xml
     ExpressionClear.xml
     FieldDataDomainDefault.xml
-    HyperTreeGridGenerateFields.xml
-    HTGPlotSelectionOverTime.xml
     PlotOverLine_htg.xml # needs find data
-    ProgrammableFilterFieldData.xml
     PythonCalculator.xml
     PythonCalculatorArrayAssociation.xml
     PythonCalculatorAutocomplete.xml
     PythonCalculatorCrossComposite.xml
     PythonCalculatorFieldData.xml
-    PythonCalculatorInput.xml
     PythonCalculatorMultiline.xml
     SelectionAndAutoSaveState.xml
     )

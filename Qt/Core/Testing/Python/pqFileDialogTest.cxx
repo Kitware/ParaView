@@ -16,6 +16,7 @@
 #include <QWidget>
 
 #include "vtkObjectFactory.h"
+#include "vtkSMSession.h"
 #include "vtkSmartPointer.h"
 
 #include "pqApplicationCore.h"
@@ -126,7 +127,7 @@ pqFileDialogTestWidget::pqFileDialogTestWidget()
   // automatically make a server connection
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* ob = core->getObjectBuilder();
-  this->Server = ob->createServer(pqServerResource("builtin:"));
+  this->Server = ob->createServer(pqServerResource(vtkSMSession::GetBuiltinName()));
   QVBoxLayout* l = new QVBoxLayout(this);
 
   QPushButton* rec = new QPushButton(this);
