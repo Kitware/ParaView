@@ -1043,7 +1043,7 @@ void vtkPVXRInterfaceWidgets::HideBillboard()
 //----------------------------------------------------------------------------
 bool vtkPVXRInterfaceWidgets::HasCellImage(vtkStringArray* sa, vtkIdType currCell)
 {
-  std::string svalue = sa->GetValue(currCell);
+  const std::string& svalue = sa->GetValue(currCell);
   if (!strncmp(svalue.c_str(), "file://", 7))
   {
     return true;
@@ -1418,14 +1418,8 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
       double toEnd = toArray->GetTuple1(aid);
       double fromEnd2 = fromArray->GetTuple1(this->Internals->PreviousPickedCellId);
       double toEnd2 = toArray->GetTuple1(this->Internals->PreviousPickedCellId);
-      if (fromEnd2 < fromEnd)
-      {
-        fromEnd = fromEnd2;
-      }
-      if (toEnd2 > toEnd)
-      {
-        toEnd = toEnd2;
-      }
+      fromEnd = std::min(fromEnd, fromEnd2);
+      toEnd = std::max(toEnd, toEnd2);
       toString << " From: " << fromEnd << " To: " << toEnd << " \n";
 
       // OK for each cell that is between from and to
@@ -1488,7 +1482,7 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
 
   std::vector<std::string> cvals;
   cvals.push_back(toString.str());
-  cvals.push_back(updatePosition ? "true" : "false");
+  cvals.emplace_back(updatePosition ? "true" : "false");
   cvals.push_back(textureFile);
   this->Helper->GetCollaborationClient()->ShowBillboard(cvals);
   this->ShowBillboard(toString.str(), updatePosition, textureFile);

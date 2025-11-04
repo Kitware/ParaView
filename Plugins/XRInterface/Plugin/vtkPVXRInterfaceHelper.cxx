@@ -1115,8 +1115,7 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
           gchild->GetScalarAttribute("normal0", normal.data());
           gchild->GetScalarAttribute("normal1", normal.data() + 1);
           gchild->GetScalarAttribute("normal2", normal.data() + 2);
-          loc.CropPlaneStates.push_back(
-            std::pair<std::array<double, 3>, std::array<double, 3>>(origin, normal));
+          loc.CropPlaneStates.emplace_back(origin, normal);
         }
       }
 
@@ -1233,8 +1232,7 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
           child->GetScalarAttribute("normal0", normal.data());
           child->GetScalarAttribute("normal1", normal.data() + 1);
           child->GetScalarAttribute("normal2", normal.data() + 2);
-          loc.CropPlaneStates.push_back(
-            std::pair<std::array<double, 3>, std::array<double, 3>>(origin, normal));
+          loc.CropPlaneStates.emplace_back(origin, normal);
         }
       }
     }
