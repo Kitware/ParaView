@@ -5,7 +5,6 @@ list(APPEND TESTS_WITHOUT_BASELINES
   FullNotation.xml
   IconBrowser.xml
   MacroEditor.xml
-  MultipleNumberOfComponents.xml
   ProgrammableSourcePythonEditorLink.xml
   PythonDefaultLoadState.xml
   PythonDefaultSaveState.xml
@@ -106,14 +105,19 @@ if (numpy_found)
   # Selection non-functional on CRS mode
   set(SelectionSaveStatePVSM_DISABLE_CRS TRUE)
 
+  # Test without baselines and could only run in built-in mode.
+  list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
+    HyperTreeGridGenerateFields.xml
+    HTGPlotSelectionOverTime.xml
+    MultipleNumberOfComponents.xml
+    ProgrammableFilterFieldData.xml
+    )
+
   list(APPEND TESTS_WITHOUT_BASELINES
     ExpressionChooser.xml
     ExpressionClear.xml
     FieldDataDomainDefault.xml
-    HyperTreeGridGenerateFields.xml
-    HTGPlotSelectionOverTime.xml
     PlotOverLine_htg.xml # needs find data
-    ProgrammableFilterFieldData.xml
     PythonCalculator.xml
     PythonCalculatorArrayAssociation.xml
     PythonCalculatorAutocomplete.xml

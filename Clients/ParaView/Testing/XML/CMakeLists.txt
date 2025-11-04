@@ -1,9 +1,11 @@
 # Adding test should be mainly add XML under one of the following list:
+# * TEST_WITHOUT_BASELINES_CLIENT_ONLY
 # * TESTS_WITHOUT_BASELINES
 # * TESTS_WITH_INLINE_COMPARES
 # * TESTS_WITH_BASELINES
 # Please do that in an included CMake script, to keep this file small.
 
+set(TEST_WITHOUT_BASELINES_CLIENT_ONLY)
 set(TESTS_WITHOUT_BASELINES)
 set(TESTS_WITH_INLINE_COMPARES)
 set(TESTS_WITH_BASELINES)
@@ -34,6 +36,10 @@ endif(PARAVIEW_SSH_SERVERS_TESTING)
 # Finally create the tests from the XML lists
 list(APPEND TESTS_WITHOUT_BASELINES
   ${TESTS_WITH_INLINE_COMPARES})
+
+paraview_add_client_tests(
+  TEST_SCRIPTS ${TEST_WITHOUT_BASELINES_CLIENT_ONLY}
+)
 
 paraview_add_client_tests(
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
