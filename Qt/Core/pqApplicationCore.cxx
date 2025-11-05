@@ -9,7 +9,6 @@
 #include <vtksys/SystemTools.hxx>
 
 // Qt includes.
-#include <QApplication>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
@@ -119,8 +118,8 @@ pqApplicationCore::pqApplicationCore(int& argc, char** argv, vtkCLIOptions* opti
   }
 
   vtkPVView::SetUseGenericOpenGLRenderWindow(true);
-  vtkInitializationHelper::SetOrganizationName(QApplication::organizationName().toStdString());
-  vtkInitializationHelper::SetApplicationName(QApplication::applicationName().toStdString());
+  vtkInitializationHelper::SetOrganizationName(QCoreApplication::organizationName().toStdString());
+  vtkInitializationHelper::SetApplicationName(QCoreApplication::applicationName().toStdString());
   if (!vtkInitializationHelper::Initialize(
         argc, argv, vtkProcessModule::PROCESS_CLIENT, cliOptions, addStandardArgs))
   {
@@ -516,10 +515,11 @@ void pqApplicationCore::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
 {
-  if (!QApplication::applicationName().isEmpty())
+  if (!QCoreApplication::applicationName().isEmpty())
   {
     // Change root element to match the application name.
-    QString valid_name = QApplication::applicationName().replace(QRegularExpression("\\W"), "_");
+    QString valid_name =
+      QCoreApplication::applicationName().replace(QRegularExpression("\\W"), "_");
     root->SetName(valid_name.toUtf8().data());
   }
   Q_EMIT this->stateSaved(root);
@@ -550,11 +550,11 @@ pqServerConfigurationCollection& pqApplicationCore::serverConfigurations()
 //-----------------------------------------------------------------------------
 QString pqApplicationCore::getSettingFileBaseName()
 {
-  QString fileBaseName = QApplication::applicationName();
+  QString fileBaseName = QCoreApplication::applicationName();
 
   if (this->VersionedSettings)
   {
-    fileBaseName += QApplication::applicationVersion();
+    fileBaseName += QCoreApplication::applicationVersion();
   }
 
   const bool disableSettings = vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry();
@@ -581,7 +581,7 @@ pqSettings* pqApplicationCore::settings()
 
     // First look for site settings and set them as SystemScope,
     // for automatic fallback
-    const QString settingsOrg = QApplication::organizationName();
+    const QString settingsOrg = QCoreApplication::organizationName();
     const QString iniFileBaseName = this->getSettingFileBaseName();
     // QSettings enforce this directory hierarchy: ini file is under an "organization" subdir.
     // https://doc.qt.io/qt-5/qsettings.html#platform-specific-notes
@@ -773,7 +773,7 @@ QHelpEngine* pqApplicationCore::helpEngine()
     // :/${application_name}/Documentation/${qch-filename}.
     // Locate all such registered resources and register them with the help
     // engine.
-    QDir dir(QString(":/%1/Documentation").arg(QApplication::applicationName()));
+    QDir dir(QString(":/%1/Documentation").arg(QCoreApplication::applicationName()));
     QStringList help_files;
     if (dir.exists())
     {
@@ -784,7 +784,7 @@ QHelpEngine* pqApplicationCore::helpEngine()
     Q_FOREACH (const QString& filename, help_files)
     {
       QString qch_file =
-        QString(":/%1/Documentation/%2").arg(QApplication::applicationName()).arg(filename);
+        QString(":/%1/Documentation/%2").arg(QCoreApplication::applicationName()).arg(filename);
       this->registerDocumentation(qch_file);
     }
     bool success = this->HelpEngine->setupData();
