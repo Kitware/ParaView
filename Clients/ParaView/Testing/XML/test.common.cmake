@@ -1259,6 +1259,7 @@ list(APPEND TESTS_WITH_BASELINES
   AMRRectGridSurface.xml
   AMRUniformGridOutline.xml
   AMRUniformGridSurface.xml
+  AnnotateGlobalData.xml
   AnnulusWidget.xml
   AxisAlignedCutterAMR.xml
   AxisAlignedCutterHTG.xml
