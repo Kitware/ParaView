@@ -605,7 +605,8 @@ void pqProxyGroupMenuManager::populateMenu()
   {
     auto* rmenu = mainMenu->addMenu(tr("&Recent")) << pqSetName("Recent");
     this->Internal->RecentMenu = rmenu;
-    this->connect(rmenu, SIGNAL(aboutToShow()), SLOT(populateRecentlyUsedMenu()));
+
+    this->populateRecentlyUsedMenu();
   }
 
   if (this->EnableFavorites)
@@ -795,9 +796,6 @@ void pqProxyGroupMenuManager::triggered()
       this->Internal->RecentlyUsed.pop_back();
     }
     this->saveRecentlyUsedItems();
-
-    // while this is not necessary, this overcomes a limitation of our testing
-    // framework where it doesn't trigger "aboutToShow" signal.
     this->populateRecentlyUsedMenu();
   }
 }
