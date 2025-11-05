@@ -85,59 +85,15 @@ struct Printer
   {
   }
 
-  std::array<char, 4> StringTypeFormats = { { 'c', 'C', 's', 'S' } };
-  std::array<char, 8> FloatTypeFormats = { { 'a', 'A', 'e', 'E', 'f', 'F', 'g', 'G' } };
-  std::array<int, 2> FloatTypes = { { VTK_FLOAT, VTK_DOUBLE } };
-  std::array<char, 6> IntegralTypeFormats = { { 'd', 'i', 'o', 'u', 'x', 'X' } };
-  std::array<char, 12> IntegralTypes = { { VTK_CHAR, VTK_SIGNED_CHAR, VTK_UNSIGNED_CHAR, VTK_SHORT,
-    VTK_UNSIGNED_SHORT, VTK_INT, VTK_UNSIGNED_INT, VTK_LONG, VTK_UNSIGNED_LONG, VTK_ID_TYPE,
-    VTK_LONG_LONG, VTK_UNSIGNED_LONG_LONG } };
-
-  // Validate that a format string is valid for a given data type
-  bool IsFormatStringValid(const char* format, int typeID)
-  {
-    vtksys::RegularExpression regex(
-      "(%([-+0 #]?[-+0 #]?[-+0 #]?[-+0 #]?[-+0 "
-      "#]?)([0-9]+)?(\\.([0-9]+))?(h|l|ll|w|II32|I64)?([cCdiouxXeEfgGaAnpsS])|%%)");
-
-    regex.find(format);
-    std::string typeString = regex.match(7);
-
-    bool validType = false;
-    if (VTK_STRING == typeID)
-    {
-      validType = std::find(this->StringTypeFormats.begin(), this->StringTypeFormats.end(),
-                    typeString[0]) != this->StringTypeFormats.end();
-    }
-    else if (std::find(this->FloatTypes.begin(), this->FloatTypes.end(), typeID) !=
-      this->FloatTypes.end())
-    {
-      validType = std::find(this->FloatTypeFormats.begin(), this->FloatTypeFormats.end(),
-                    typeString[0]) != this->FloatTypeFormats.end();
-    }
-    else if (std::find(this->IntegralTypes.begin(), this->IntegralTypes.end(), typeID) !=
-      this->IntegralTypes.end())
-    {
-      validType = std::find(this->IntegralTypeFormats.begin(), this->IntegralTypeFormats.end(),
-                    typeString[0]) != this->IntegralTypeFormats.end();
-    }
-
-    return validType;
-  }
-
   template <typename ArrayT>
   void operator()(ArrayT* array)
   {
     assert(this->ChosenTuple >= 0 && this->ChosenTuple < array->GetNumberOfTuples());
-
     auto self = this->Self;
-    int dataType = array->GetDataType();
-    bool formatValid = this->IsFormatStringValid(self->GetFormat(), dataType);
 
     std::ostringstream stream;
     stream << (self->GetPrefix() ? self->GetPrefix() : "");
-
-    if (formatValid)
+    try
     {
       char buffer[256];
       vtkDataArrayAccessor<ArrayT> accessor(array);
@@ -163,11 +119,11 @@ struct Printer
         stream << " )";
       }
     }
-    else
+    catch (std::exception& e)
     {
-      vtkGenericWarningMacro("Format string '" << self->GetFormat()
-                                               << "' is not valid for data array type "
-                                               << array->GetDataTypeAsString());
+      vtkErrorWithObjectMacro(self, << e.what() << ": Format string '" << self->GetFormat()
+                                    << "' is not valid for data array type "
+                                    << array->GetDataTypeAsString());
       stream << "(error)";
     }
 
@@ -178,15 +134,11 @@ struct Printer
   void operator()(vtkStringArray* array)
   {
     assert(this->ChosenTuple >= 0 && this->ChosenTuple < array->GetNumberOfTuples());
-
     auto self = this->Self;
-    int dataType = array->GetDataType();
-    bool formatValid = this->IsFormatStringValid(self->GetFormat(), dataType);
 
     std::ostringstream stream;
     stream << (self->GetPrefix() ? self->GetPrefix() : "");
-
-    if (formatValid)
+    try
     {
       char buffer[256];
       const auto numComps = array->GetNumberOfComponents();
@@ -211,11 +163,11 @@ struct Printer
         stream << " )";
       }
     }
-    else
+    catch (std::exception& e)
     {
-      vtkGenericWarningMacro("Format string '" << self->GetFormat()
-                                               << "' is not valid for data array type "
-                                               << array->GetDataTypeAsString());
+      vtkErrorWithObjectMacro(self, << e.what() << ": Format string '" << self->GetFormat()
+                                    << "' is not valid for data array type "
+                                    << array->GetDataTypeAsString());
       stream << "(error)";
     }
 
@@ -352,16 +304,21 @@ int vtkAnnotateGlobalDataFilter::RequestData(vtkInformation* vtkNotUsed(request)
     return 1;
   }
 
-  using Dispatcher = vtkArrayDispatch::DispatchByValueType<vtkArrayDispatch::AllTypes>;
   Printer printer(chosenTuple, sarray, this);
-  auto da = vtkDataArray::SafeDownCast(array);
-  if (da && !Dispatcher::Execute(da, printer))
+  if (auto da = vtkDataArray::SafeDownCast(array))
   {
-    printer(da);
+    if (!vtkArrayDispatch::Dispatch::Execute(da, printer))
+    {
+      printer(da);
+    }
   }
   else if (auto sa = vtkStringArray::SafeDownCast(array))
   {
     printer(sa);
+  }
+  else
+  {
+    vtkErrorMacro("Array " << array->GetClassName() << " is not supported.");
   }
 
   return 1;
