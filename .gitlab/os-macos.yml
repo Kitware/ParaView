@@ -1,5 +1,12 @@
 # macOS-specific builder configurations and build commands
 
+---
+spec:
+    inputs:
+        project-tag:
+            description: "The project tag to use for selecting runners"
+
+---
 ## Base configurations
 
 .macos:

@@ -19,8 +19,14 @@ include:
 
     # OS builds.
     - local: .gitlab/os-linux.yml
+      inputs:
+          project-tag: $[[ inputs.project-tag ]]
     - local: .gitlab/os-macos.yml
+      inputs:
+          project-tag: $[[ inputs.project-tag ]]
     - local: .gitlab/os-windows.yml
+      inputs:
+          project-tag: $[[ inputs.project-tag ]]
 
 stages:
     - build
