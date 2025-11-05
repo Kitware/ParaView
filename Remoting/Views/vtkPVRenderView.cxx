@@ -746,8 +746,9 @@ void vtkPVRenderView::SetupInteractor(vtkRenderWindowInteractor* iren)
     {
       this->Interactor->SetRenderWindow(this->GetRenderWindow());
 
-      // Enable camera manipulator
-      this->CameraOrientationWidget->On();
+      // Enable camera manipulator if the widget's representation is visible.
+      bool visibility = this->CameraOrientationWidget->GetRepresentation()->GetVisibility();
+      this->CameraOrientationWidget->SetEnabled(visibility);
 
       // this will set the interactor style.
       int mode = this->InteractionMode;
@@ -2551,6 +2552,10 @@ void vtkPVRenderView::SetOrientationAxesZLabelText(const char* text)
 void vtkPVRenderView::SetCameraOrientationWidgetVisibility(bool visible)
 {
   this->CameraOrientationWidget->GetRepresentation()->SetVisibility(visible);
+  if (this->CameraOrientationWidget->GetInteractor())
+  {
+    this->CameraOrientationWidget->SetEnabled(visible);
+  }
 }
 
 //----------------------------------------------------------------------------
