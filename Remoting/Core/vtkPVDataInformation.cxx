@@ -1048,7 +1048,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
       &this->UniqueBlockTypes.front(), static_cast<int>(this->UniqueBlockTypes.size()));
   }
 
-  *css << static_cast<int>(this->UniqueBlockTypes.size());
+  *css << static_cast<int>(this->UniqueCellTypes.size());
   if (!this->UniqueCellTypes.empty())
   {
     std::vector<int> uniqueVector{ this->UniqueCellTypes.begin(), this->UniqueCellTypes.end() };
@@ -1156,6 +1156,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing stream");
     return;
   }
+  this->UniqueCellTypes.resize(uniqueCellTypesLength);
   if (uniqueCellTypesLength > 0 &&
     !css->GetArgument(0, argument++, this->UniqueCellTypes.data(), uniqueCellTypesLength))
   {
