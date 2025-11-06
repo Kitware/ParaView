@@ -81,6 +81,13 @@ pqCompositePropertyWidgetDecorator::pqCompositePropertyWidgetDecorator(
   {
     (void)(proxy);
     auto decorator = pqPropertyWidgetDecorator::create(xml, parentObject);
+    // Since this decorator is meant to be nested inside the composite
+    // expression, remove it from the parent's top-level decorators to avoid
+    // double-participation in pqProxyWidgetItem's top-level AND evaluation.
+    if (decorator)
+    {
+      parentObject->removeDecorator(decorator);
+    }
     auto vtkDecorator = vtkSmartPointer<vtkQtPropertyDecorator>::New();
     vtkDecorator->SetLogic(decorator);
     return vtkDecorator;
