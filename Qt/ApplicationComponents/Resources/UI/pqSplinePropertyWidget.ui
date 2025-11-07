@@ -103,9 +103,9 @@
         </spacer>
        </item>
        <item>
-        <widget class="QToolButton" name="DeleteAll">
+        <widget class="QToolButton" name="Reset">
          <property name="toolTip">
-          <string>Remove all points</string>
+          <string>Reset points</string>
          </property>
          <property name="text">
           <string>...</string>

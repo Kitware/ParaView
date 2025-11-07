@@ -211,6 +211,7 @@ public:
   Ui::SplinePropertyWidget Ui;
   SplineTableModel Model;
   pqPropertyLinks InternalLinks;
+  std::vector<vtkVector3d> DefaultHandlePositions;
 };
 
 //-----------------------------------------------------------------------------
@@ -232,6 +233,16 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
   if (vtkSMProperty* handlePositions = smgroup->GetProperty("HandlePositions"))
   {
     this->addPropertyLink(this, "points", SIGNAL(pointsChanged()), handlePositions);
+
+    vtkSMPropertyHelper helper(handlePositions);
+    const unsigned int numElems = helper.GetNumberOfElements();
+
+    internals.DefaultHandlePositions.reserve(numElems / 3);
+    for (unsigned int i = 0; i + 2 < numElems; i += 3)
+    {
+      internals.DefaultHandlePositions.emplace_back(
+        helper.GetAsDouble(i), helper.GetAsDouble(i + 1), helper.GetAsDouble(i + 2));
+    }
   }
   else
   {
@@ -287,7 +298,8 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
   QObject::connect(ui.PointsTable->selectionModel(), &QItemSelectionModel::selectionChanged,
     [&]() { ui.Remove->setEnabled(ui.PointsTable->selectionModel()->hasSelection()); });
 
-  this->connect(ui.DeleteAll, &QAbstractButton::clicked, [&]() { internals.Model.setPoints({}); });
+  this->connect(ui.Reset, &QAbstractButton::clicked,
+    [&]() { internals.Model.setPoints(internals.DefaultHandlePositions); });
 
   if (auto prop = this->widgetProxy()->GetProperty("CurrentHandleIndex"))
   {
