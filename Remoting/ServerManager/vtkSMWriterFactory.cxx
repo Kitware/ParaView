@@ -207,10 +207,9 @@ void vtkSMWriterFactory::GetGroups(vtkStringList* groups)
   if (groups)
   {
     groups->RemoveAllItems();
-    for (std::set<std::string>::iterator group = this->Internals->Groups.begin();
-         group != this->Internals->Groups.end(); group++)
+    for (const auto& group : this->Internals->Groups)
     {
-      groups->AddString(group->c_str());
+      groups->AddString(group.c_str());
     }
   }
 }
@@ -237,10 +236,9 @@ void vtkSMWriterFactory::UpdateAvailableWriters()
     vtkSMSessionProxyManager* sessionProxyManager = session->GetSessionProxyManager();
     vtkSMProxyDefinitionManager* pdm = sessionProxyManager->GetProxyDefinitionManager();
 
-    for (std::set<std::string>::iterator group = this->Internals->Groups.begin();
-         group != this->Internals->Groups.end(); group++)
+    for (const auto& group : this->Internals->Groups)
     {
-      vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator(group->c_str());
+      vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator(group.c_str());
       for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
         vtkPVXMLElement* hints =
@@ -303,23 +301,20 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
   // Make sure the source is in an expected state (BUG #13172)
   source->UpdatePipeline();
 
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
-       ++iter)
+  for (auto& [_, value] : this->Internals->Prototypes)
   {
-    iter->second.FillInformation(source->GetSession());
-    if (iter->second.CanCreatePrototype(source) &&
-      (proxybyname || iter->second.ExtensionTest(extension.c_str())) &&
-      iter->second.CanWrite(source, outputport))
+    value.FillInformation(source->GetSession());
+    if (value.CanCreatePrototype(source) &&
+      (proxybyname || value.ExtensionTest(extension.c_str())) && value.CanWrite(source, outputport))
     {
       if (proxybyname)
       {
-        if (strcmp(filename, iter->second.Name.c_str()) != 0)
+        if (strcmp(filename, value.Name.c_str()) != 0)
         {
           continue;
         }
       }
-      vtkSMProxy* proxy = pxm->NewProxy(iter->second.Group.c_str(), iter->second.Name.c_str());
+      vtkSMProxy* proxy = pxm->NewProxy(value.Group.c_str(), value.Name.c_str());
       vtkNew<vtkSMParaViewPipelineController> controller;
       controller->PreInitializeProxy(proxy);
       vtkSMPropertyHelper(proxy, "FileName").Set(filename);
@@ -353,32 +348,29 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
   { return vtksys::SystemTools::Strucmp(s1.c_str(), s2.c_str()) < 0; };
   std::set<std::string, decltype(case_insensitive_comp)> sorted_types(case_insensitive_comp);
 
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
-       ++iter)
+  for (auto& [_, value] : this->Internals->Prototypes)
   {
-    if (iter->second.CanCreatePrototype(source) && iter->second.CanWrite(source, outputport))
+    if (value.CanCreatePrototype(source) && value.CanWrite(source, outputport))
     {
-      iter->second.FillInformation(source->GetSession());
-      if (!iter->second.Extensions.empty())
+      value.FillInformation(source->GetSession());
+      if (!value.Extensions.empty())
       {
-        std::string ext_join = ::vtkJoin(iter->second.Extensions, "*.", " ");
+        std::string ext_join = ::vtkJoin(value.Extensions, "*.", " ");
         std::ostringstream stream;
-        stream << iter->second.Description << "(" << ext_join << ")";
+        stream << value.Description << "(" << ext_join << ")";
         sorted_types.insert(stream.str());
       }
     }
   }
 
   std::ostringstream all_types;
-  std::set<std::string>::iterator iter2;
-  for (iter2 = sorted_types.begin(); iter2 != sorted_types.end(); ++iter2)
+  for (const auto& type : sorted_types)
   {
-    if (iter2 != sorted_types.begin())
+    if (type != *sorted_types.begin())
     {
       all_types << ";;";
     }
-    all_types << (*iter2);
+    all_types << type;
   }
   this->Internals->SupportedFileTypes = all_types.str();
   return this->Internals->SupportedFileTypes.c_str();
@@ -390,31 +382,28 @@ const char* vtkSMWriterFactory::GetSupportedWriterProxies(
 {
   std::set<std::string> sorted_types;
 
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
-       ++iter)
+  for (auto& [_, value] : this->Internals->Prototypes)
   {
-    if (iter->second.CanCreatePrototype(source) && iter->second.CanWrite(source, outputport))
+    if (value.CanCreatePrototype(source) && value.CanWrite(source, outputport))
     {
-      iter->second.FillInformation(source->GetSession());
-      if (!iter->second.Extensions.empty())
+      value.FillInformation(source->GetSession());
+      if (!value.Extensions.empty())
       {
         std::ostringstream stream;
-        stream << iter->second.Name;
+        stream << value.Name;
         sorted_types.insert(stream.str());
       }
     }
   }
 
   std::ostringstream all_types;
-  std::set<std::string>::iterator iter2;
-  for (iter2 = sorted_types.begin(); iter2 != sorted_types.end(); ++iter2)
+  for (const auto& type : sorted_types)
   {
-    if (iter2 != sorted_types.begin())
+    if (type != *sorted_types.begin())
     {
       all_types << ";";
     }
-    all_types << (*iter2);
+    all_types << type;
   }
   this->Internals->SupportedWriterProxies = all_types.str();
   return this->Internals->SupportedWriterProxies.c_str();
@@ -428,11 +417,9 @@ bool vtkSMWriterFactory::CanWrite(vtkSMSourceProxy* source, unsigned int outputp
     return false;
   }
 
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
-       ++iter)
+  for (auto& [_, value] : this->Internals->Prototypes)
   {
-    if (iter->second.CanCreatePrototype(source) && iter->second.CanWrite(source, outputport))
+    if (value.CanCreatePrototype(source) && value.CanWrite(source, outputport))
     {
       return true;
     }
