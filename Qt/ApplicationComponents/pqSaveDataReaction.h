@@ -30,8 +30,9 @@ public:
    * successful, otherwise returns false.
    * Note that this method is static. Applications can simply use this without
    * having to create a reaction instance.
+   * if desired writer proxy name is known, it can be passed.
    */
-  static bool saveActiveData(const QString& files);
+  static bool saveActiveData(const QString& files, const QString& writerName = "");
   static bool saveActiveData();
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

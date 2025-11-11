@@ -14,12 +14,14 @@
 #include "pqSettings.h"
 #include "pqTestUtility.h"
 #include "pqUndoStack.h"
+
 #include "vtkPVDataInformation.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMWriterFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringList.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -69,7 +71,6 @@ void pqSaveDataReaction::dataUpdated(pqPipelineSource* source)
 bool pqSaveDataReaction::saveActiveData()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
-  // TODO: also is there's a pending accept.
   pqOutputPort* port = pqActiveObjects::instance().activePort();
   if (!server || !port)
   {
@@ -78,8 +79,10 @@ bool pqSaveDataReaction::saveActiveData()
   }
 
   vtkSMWriterFactory* writerFactory = vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
-  QString filters = writerFactory->GetSupportedFileTypes(
-    vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber());
+  auto sourceProxy = vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
+  QString filters = writerFactory->GetSupportedFileTypes(sourceProxy, port->getPortNumber());
+  auto possibleWriters =
+    vtk::TakeSmartPointer(writerFactory->GetPossibleWriters(sourceProxy, port->getPortNumber()));
   if (filters.isEmpty())
   {
     qCritical("Cannot determine writer to use.");
@@ -96,17 +99,22 @@ bool pqSaveDataReaction::saveActiveData()
   {
     QString fname = fileDialog.getSelectedFiles()[0];
     pqSaveDataReaction::setDefaultExtension(port->getDataInformation(), QFileInfo(fname).suffix());
-    return pqSaveDataReaction::saveActiveData(fname);
+    // Get the selected writer.
+    QString selectedWriterName = possibleWriters->GetString(fileDialog.getSelectedFilterIndex());
+    // make sure that it can be used or else get the correct one based on the extension.
+    QString writerName =
+      QString::fromStdString(writerFactory->GetCorrectWriterName(fname.toUtf8().data(), sourceProxy,
+        port->getPortNumber(), selectedWriterName.toUtf8().data()));
+    return pqSaveDataReaction::saveActiveData(fname, writerName);
   }
   return false;
 }
 
 //-----------------------------------------------------------------------------
-bool pqSaveDataReaction::saveActiveData(const QString& filename)
+bool pqSaveDataReaction::saveActiveData(const QString& filename, const QString& writerName)
 {
   SCOPED_UNDO_EXCLUDE();
   pqServer* server = pqActiveObjects::instance().activeServer();
-  // TODO: also is there's a pending accept.
   pqOutputPort* port = pqActiveObjects::instance().activePort();
   if (!server || !port)
   {
@@ -115,9 +123,19 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
   }
 
   vtkSMWriterFactory* writerFactory = vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
+  auto sourceProxy = vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
   vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(writerFactory->CreateWriter(filename.toUtf8().data(),
-    vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber()));
+  if (!writerName.isEmpty())
+  {
+    proxy.TakeReference(writerFactory->CreateWriter(
+      filename.toUtf8().data(), sourceProxy, port->getPortNumber(), writerName.toUtf8().data()));
+  }
+  else
+  {
+    proxy.TakeReference(
+      writerFactory->CreateWriter(filename.toUtf8().data(), sourceProxy, port->getPortNumber()));
+  }
+
   vtkSMSourceProxy* writer = vtkSMSourceProxy::SafeDownCast(proxy);
   if (!writer)
   {
