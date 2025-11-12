@@ -95,9 +95,9 @@ void pqTimeManagerWidget::setActiveScene(pqAnimationScene* scene)
   }
 
   auto sceneProxy = scene->getProxy();
-  this->Internals->SceneLinks.addPropertyLink(this->Internals->Ui.strideStep, "value",
+  this->Internals->SceneLinks.addTraceablePropertyLink(this->Internals->Ui.strideStep, "value",
     SIGNAL(valueChanged(int)), sceneProxy, sceneProxy->GetProperty("Stride"));
-  this->Internals->SceneLinks.addPropertyLink(this->Internals->Ui.nbOfFramesValue, "value",
+  this->Internals->SceneLinks.addTraceablePropertyLink(this->Internals->Ui.nbOfFramesValue, "value",
     SIGNAL(valueChanged(int)), sceneProxy, sceneProxy->GetProperty("NumberOfFrames"));
   this->Internals->Connector->Connect(sceneProxy->GetProperty("PlayMode"),
     vtkCommand::UncheckedPropertyModifiedEvent, this, SLOT(updateWidgetsVisibility()));
