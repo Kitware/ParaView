@@ -1,6 +1,12 @@
 # SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
+
+set(CMAKE_AUTOMOC 1)
+set(CMAKE_AUTORCC 1)
+set(CMAKE_AUTOUIC 1)
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
+
 set(classes
   pqAboutDialogReaction
   pqAddToFavoritesReaction
@@ -339,11 +345,6 @@ vtk_module_find_package(
 source_group("Resources" FILES
   ${ui_files}
   ${resource_files})
-
-set(CMAKE_AUTOMOC 1)
-set(CMAKE_AUTORCC 1)
-set(CMAKE_AUTOUIC 1)
-set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 
 set(translatable_files)
 if (PARAVIEW_BUILD_TRANSLATIONS)
