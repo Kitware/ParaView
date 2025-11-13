@@ -6,4 +6,5 @@ same across all processes. This caused `vtkSMSaveAnimationExtractsProxy` to not 
 `vtkSMFileListDomain`, `vtkSMFrameStrideQueryDomain` or `vtkSMAnimationFrameWindowDomain`, which are domains used
 by `vtkSMSaveAnimationExtractsProxy`, and allows using default values from those domains in symmetric mode. This is
 acceptable because those domains are guaranteed to return the same default values across all processes, because the
-information provided by those domains is guaranteed to be the same across all processes at the reader level.
+information provided by those domains is guaranteed to be the same across all processes at the reader level. Finally,
+thanks to this fix, the SaveAnimation test can be enabled for symmetric mode.
