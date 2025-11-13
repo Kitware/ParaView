@@ -124,6 +124,7 @@ set(PVBATCH_TESTS
   ParallelSerialWriter.py
   ParallelSerialWriterWithIOSS.py
   PotentialMismatchedDataDelivery.py,NO_VALID
+  SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   Simple.py
   TestFetchData.py,NO_VALID
@@ -139,12 +140,6 @@ if (PARAVIEW_PLUGIN_ENABLE_SurfaceLIC AND PARAVIEW_PLUGIN_ENABLE_Moments)
   list(APPEND PVBATCH_TESTS
     Plugins.py,NO_VALID)
 endif ()
-
-# Saving animation currently doesn't work in symmetric mode.
-# paraview/paraview#17329
-set(PVBATCH_NO_SYMMETRIC_TESTS
-  SaveAnimation.py
-  )
 
 # Test tests require symmetric mode
 set(PVBATCH_SYMMETRIC_TESTS
@@ -162,7 +157,6 @@ IF (MPIEXEC_EXECUTABLE)
   paraview_add_test_pvbatch_mpi(
     JUST_VALID
     ${PVBATCH_TESTS}
-    ${PVBATCH_NO_SYMMETRIC_TESTS}
     )
   set(vtkRemotingApplication_NUMPROCS 5)
   paraview_add_test_pvbatch_mpi(
@@ -194,7 +188,6 @@ else ()
   paraview_add_test_pvbatch(
     JUST_VALID
     ${PVBATCH_TESTS}
-    ${PVBATCH_NO_SYMMETRIC_TESTS}
     )
   set(paraview_pvbatch_args
     --symmetric)
