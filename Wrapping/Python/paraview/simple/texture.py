@@ -23,13 +23,13 @@ def GetMaterialLibrary():
 def CreateTexture(filename=None, trivial_producer_key=None, proxyname=None):
     """Creates and returns a new ImageTexture proxy.
     The texture is not attached to anything by default but it can be applied
-    to things, for example the view, like so::
+    to things, for example the view, like so:
 
         GetActiveView().UseTexturedBackground = 1
         GetActiveView().BackgroundTexture = CreateTexture("foo.png")
 
-    :param filename: The name of the image file to load as a texture. If can be
-        `None`, in which case the texture is read from a trivial producer indentified
+    :param filename: The name of the image file to load as a texture. It can be
+        `None`, in which case the texture is read from a trivial producer identified
         by the `trivial_producer_key`
     :type filename: str
     :param trivial_producer_key: Identifier of the texture image source on the
@@ -44,11 +44,11 @@ def CreateTexture(filename=None, trivial_producer_key=None, proxyname=None):
     textureproxy = pxm.NewProxy("textures", "ImageTexture")
     controller = servermanager.ParaViewPipelineController()
     if filename is not None:
-        controller.SMController.RegisterTextureProxy(textureproxy, filename)
-    elif trivial_producer_key is not None:
+        controller.SMController.RegisterTextureProxyFromFile(textureproxy, filename, proxyname)
+    else:
         controller.SMController.RegisterTextureProxy(
-            textureproxy, trivial_producer_key, proxyname
-        )
+            textureproxy, trivial_producer_key, proxyname)
+
     return servermanager._getPyProxy(textureproxy)
 
 

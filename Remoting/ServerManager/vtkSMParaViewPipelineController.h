@@ -29,6 +29,7 @@
 #ifndef vtkSMParaViewPipelineController_h
 #define vtkSMParaViewPipelineController_h
 
+#include "vtkParaViewDeprecation.h" // PARAVIEW_DEPRECATED_IN_6_1_0
 #include "vtkSMObject.h"
 
 #include <string> // for std::string
@@ -217,14 +218,19 @@ public:
     return this->RegisterLightProxy(proxy, view, nullptr);
   }
 
+  ///@{
   /**
    * Use this method after PreInitializeProxy() and PostInitializeProxy() to
    * register a texture proxy with the proxy manager. This will also perform
    * needed python tracing.
    */
+  virtual bool RegisterTextureProxyFromFile(
+    vtkSMProxy* proxy, const char* filename, const char* registrationName);
+  PARAVIEW_DEPRECATED_IN_6_1_0("Use RegisterTextureProxyFromFile instead.")
   virtual bool RegisterTextureProxy(vtkSMProxy* proxy, const char* filename);
   virtual bool RegisterTextureProxy(
-    vtkSMProxy* proxy, const char* trivialProducerKeyName, const char* proxyname);
+    vtkSMProxy* proxy, const char* trivialProducerKeyName, const char* registrationName);
+  ///@}
 
   //---------------------------------------------------------------------------
   // *******  Methods for Extractors  *********
