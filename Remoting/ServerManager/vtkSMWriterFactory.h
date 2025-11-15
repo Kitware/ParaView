@@ -63,11 +63,22 @@ public:
    * a filename.extension to lookup the right proxy.
    */
   vtkSMProxy* CreateWriter(
-    const char* filename, vtkSMSourceProxy*, unsigned int outputport, bool proxyname = false);
-  vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy* pxy)
-  {
-    return this->CreateWriter(filename, pxy, 0);
-  }
+    const char* filename, vtkSMSourceProxy*, unsigned int outputport = 0, bool proxyname = false);
+
+  /**
+   * After using GetCorrectWriterName, use this method to create the writer proxy.
+   */
+  vtkSMProxy* CreateWriter(
+    const char* filename, vtkSMSourceProxy*, unsigned int outputport, const char* writerProxyName);
+
+  /**
+   * Given a filename, source and output port, and a writer proxy name,
+   * return the correct writer proxy name to use. This is needed because a user
+   * may either select the writer specifically or expect the correct writer to be
+   * chosen based on the filename extension.
+   */
+  std::string GetCorrectWriterName(const char* filename, vtkSMSourceProxy* source,
+    unsigned int outputport, const char* writerProxyName);
 
   /**
    * Returns a formatted string with all supported file types.
@@ -81,10 +92,14 @@ public:
   {
     return this->GetSupportedFileTypes(source, 0);
   }
+
+  ///@{
   /**
    * A variation on GetSupportedFileTypes that obtains a list of prototype proxy names.
    */
+  vtkStringList* GetPossibleWriters(vtkSMSourceProxy* source, unsigned int outputport);
   const char* GetSupportedWriterProxies(vtkSMSourceProxy* source, unsigned int outputport);
+  ///@}
 
   // Returns the number of registered prototypes.
   unsigned int GetNumberOfRegisteredPrototypes();
