@@ -6,10 +6,13 @@
 #include "ui_pqQuickLaunchDialogExtended.h"
 
 #include "pqExtendedSortFilterProxyModel.h"
-#include "pqHelpReaction.h"
 #include "pqKeyEventFilter.h"
 #include "pqProxyActionListModel.h"
 #include "pqQtConfig.h"
+
+#ifdef PARAVIEW_USE_QTHELP
+#include "pqHelpReaction.h"
+#endif
 
 #include <QAction>
 #include <QItemSelectionModel>
