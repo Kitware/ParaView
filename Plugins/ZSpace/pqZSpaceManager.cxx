@@ -36,6 +36,18 @@ pqZSpaceManager::pqZSpaceManager(QObject* p)
 }
 
 //-----------------------------------------------------------------------------
+void pqZSpaceManager::onShutdown()
+{
+  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+  if (sdkManager)
+  {
+    // TODO fix crash due to `zccompatShutDown(this->ZSpaceContext)`
+    // Related issue: https://gitlab.kitware.com/paraview/paraview/-/issues/23141
+    sdkManager->ShutDown();
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqZSpaceManager::onRenderEnded()
 {
   pqView* view = dynamic_cast<pqView*>(sender());

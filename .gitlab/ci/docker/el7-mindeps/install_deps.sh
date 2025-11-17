@@ -23,12 +23,6 @@ sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/CentOS-*.repo
 sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/CentOS-*.repo
 sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/CentOS-*.repo
 
-# Python dependencies
-yum install -y --setopt=install_weak_deps=False \
-    rh-python38-python3 rh-python38-python-devel rh-python38-python3-numpy \
-    rh-python38-python3-pip rh-python38-python3-mpi4py-mpich \
-    rh-python38-python3-mpi4py-openmpi rh-python38-python3-matplotlib
-
 # Core build tools
 yum install -y --setopt=install_weak_deps=False \
     devtoolset-8

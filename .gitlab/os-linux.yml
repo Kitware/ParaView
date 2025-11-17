@@ -38,7 +38,7 @@ spec:
     image: "kitware/paraview:ci-el7-mindeps-20250116"
 
     variables:
-        LAUNCHER: "scl enable rh-python38 devtoolset-8 --"
+        LAUNCHER: "scl enable devtoolset-8 --"
 
 .el8_icc:
     extends: .linux
@@ -73,13 +73,13 @@ spec:
         # Disable shared memory; it doesn't work so well inside of containers.
         I_MPI_SHM: disable
 
-.el7_mindeps_shared_mpi_python_qt5:
+.el7_mindeps_shared_mpi_qt5:
     extends:
         - .el7_mindeps
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: el7_shared_mindeps_mpi_python_qt5
+        CMAKE_CONFIGURATION: el7_shared_mindeps_mpi_qt5
 
 .el8_shared_icc_mpi_python:
     extends:
