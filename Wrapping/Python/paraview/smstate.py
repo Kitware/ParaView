@@ -260,7 +260,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         sorted_selections = [x for x in sorted_proxies_of_interest \
                              if smtrace.Trace.get_registered_name(x, "selections")]
         selected_source_id = None
-        if sorted_selections:
+        if sorted_selections and len(sorted_selections) > 1:
             trace.append_separated([ \
                 "# ----------------------------------------------------------------",
                 "# setup the selections",
@@ -293,7 +293,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
 
         # --------------------------------------------------------------------------
         # Link selections to selected source
-        if sorted_selections:
+        if sorted_selections and len(sorted_selections) > 1:
             trace.append_separated([ \
                 f"appendSelections.SetSelectionId({selected_source_varname}.GetGlobalID())",
                 f"appendSelections.SetSelectionPort({selected_source_port})"])
