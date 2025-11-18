@@ -219,7 +219,9 @@ static bool convert_to_blueprint_mesh(
 
     vtkPartitionedDataSetCollection* pdc = convertToPDC->GetOutput();
     conduit_cpp::Node channel_data = node[name]["data"];
-    return vtkDataObjectToConduit::FillConduitNode(pdc, channel_data);
+    bool res = vtkDataObjectToConduit::FillConduitNode(pdc, channel_data);
+    vtkDataObjectToConduit::FillConduitNodeAssembly(pdc, channel);
+    return res;
   }
 
   node[name]["type"] = "mesh";
