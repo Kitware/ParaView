@@ -76,6 +76,7 @@ public:
    * \li \c InteractiveBox: pqBoxPropertyWidget
    * \li \c InteractiveHandle: pqHandlePropertyWidget
    * \li \c InteractiveLine: pqLinePropertyWidget
+   * \li \c InteractiveFourLines: pqFourLinesPropertyWidget
    * \li \c InteractiveSpline: pqSplinePropertyWidget
    * \li \c InteractiveSphere: pqSpherePropertyWidget
    * \li \c InteractivePolyLine: pqSplinePropertyWidget (with mode==POLYLINE)

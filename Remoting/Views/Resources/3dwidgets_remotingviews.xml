@@ -98,6 +98,38 @@
       </SubProxy>
     </NewWidgetRepresentationProxy>
     <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="FourLinesWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="FourLinesRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Point1WorldPositionsInfo" />
+          <Property name="Point1WorldPositions" />
+          <Property name="Point2WorldPositionsInfo" />
+          <Property name="Point2WorldPositions" />
+          <Property name="PlaceWidget" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="FourLinesWidget"></Proxy>
+        <ExposedProperties>
+          <Property name="ProcessEvents" />
+        </ExposedProperties>
+      </SubProxy>
+    </NewWidgetRepresentationProxy>
+    <!-- ================================================================== -->
     <NewWidgetRepresentationProxy base_proxygroup="representations"
                                   base_proxyname="LineWidgetRepresentation"
                                   class="vtk3DWidgetRepresentation"
@@ -2789,6 +2821,92 @@
       </DoubleVectorProperty>
     </Proxy>
     <!-- ================================================================== -->
+    <Proxy class="vtkMultiLineRepresentation"
+           name="FourLinesRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDirectionalLine"
+                         default_values="1"
+                         name="DirectionalLine"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPoint1WorldPosition"
+                            default_values="0 0 0 1 0 0 0 1 0 0 0 1"
+                            information_property="Point1WorldPositionsInfo"
+                            name="Point1WorldPositions"
+                            number_of_elements="12"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            use_index="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPoint1WorldPositions"
+                            information_only="1"
+                            name="Point1WorldPositionsInfo">
+        <DoubleArrayInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPoint2WorldPosition"
+                            default_values="1 1 1 2 1 1 1 2 1 1 1 2"
+                            information_property="Point2WorldPositionsInfo"
+                            name="Point2WorldPositions"
+                            number_of_elements="12"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            use_index="1">
+          <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPoint2WorldPositions"
+                            information_only="1"
+                            name="Point2WorldPositionsInfo">
+        <DoubleArrayInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLineColor"
+                            default_values="1.0 1.0 1.0"
+                            name="LineColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the widget</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- ================================================================== -->
     <Proxy class="vtkPointHandleRepresentation3D"
            name="HandleRepresentation">
       <IntVectorProperty animateable="1"
@@ -3368,6 +3486,17 @@
            base_proxyname="WidgetBase"
            class="vtkLineWidget2"
            name="LineWidget2">
+      <IntVectorProperty command="SetProcessEvents"
+                         default_values="1"
+                         name="ProcessEvents"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkMultiLineWidget"
+           name="FourLinesWidget">
       <IntVectorProperty command="SetProcessEvents"
                          default_values="1"
                          name="ProcessEvents"
