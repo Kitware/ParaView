@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Setup: create a simple source and add the example filter -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyPropertyWidgets" />
+
+  <!-- Case 1: ShrinkFactor = 0.0, button checked => should be visible -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ShrinkFactor/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidget/Checkbox" command="set_boolean" arguments="true" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidgetDecorator" property="visible" arguments="true" />
+
+  <!-- Case 2: ShrinkFactor = 0.2, button unchecked => should be visible -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ShrinkFactor/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidget/Checkbox" command="set_boolean" arguments="false" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidgetDecorator" property="visible" arguments="true" />
+
+  <!-- Case 3: ShrinkFactor = 0.0, button unchecked => should be hidden -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ShrinkFactor/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidget/Checkbox" command="set_boolean" arguments="false" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidgetDecorator" property="visible" arguments="false" />
+
+  <!-- Case 4: ShrinkFactor = 0.2, button checked => should be visible -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ShrinkFactor/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidget/Checkbox" command="set_boolean" arguments="true" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidgetDecorator" property="visible" arguments="true" />
+</pqevents>

@@ -26,12 +26,21 @@
                           number_of_elements="1"
                           default_values="0">
       <Documentation>
-        This property's widget is standard, but the decorator controls it's
-        logic. This property will be "available" only when
-        ShrinkFactor >= 0.1.
+        This property's widget is standard, but its visibility is controlled by
+        decorators: it is available when the DemonstratePropertyWidget is checked
+        OR when ShrinkFactor >= 0.1.
       </Documentation>
       <Hints>
-          <PropertyWidgetDecorator type="my_decorator" />
+        <!-- Show when DemonstratePropertyWidget==1 OR my_decorator allows -->
+        <PropertyWidgetDecorator type="CompositeDecorator">
+          <Expression type="or">
+            <PropertyWidgetDecorator type="GenericDecorator"
+                                     mode="visibility"
+                                     property="DemonstratePropertyWidget"
+                                     value="1"/>
+            <PropertyWidgetDecorator type="my_decorator" />
+          </Expression>
+        </PropertyWidgetDecorator>
       </Hints>
     </DoubleVectorProperty>
     <DoubleVectorProperty command="GetShrinkFactor"
