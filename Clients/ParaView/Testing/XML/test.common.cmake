@@ -1772,6 +1772,14 @@ if (TARGET VTK::IOOMF)
     )
 endif()
 
+if (TARGET VTK::IOPDAL)
+  ExternalData_Expand_Arguments(ParaViewData _
+    "DATA{${paraview_test_data_directory_input}/Data/ReadOffset.las}")
+  list(APPEND TESTS_WITHOUT_BASELINES
+    ReadOffset.xml
+  )
+endif ()
+
 if(VTK_USE_LARGE_DATA)
   ExternalData_Expand_Arguments(ParaViewData _
     "DATA{${paraview_test_data_directory_input}/Data/bake/bake.e}")

@@ -17,6 +17,47 @@
         <Documentation>This property specifies the file name for the
         PDAL reader.</Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty name="HasOffset"
+                         command="GetHasOffset"
+                         information_only="1"
+                         panel_visibility="never">
+      </IntVectorProperty>
+
+      <StringVectorProperty name="OffsetAsString"
+                            command="GetOffsetAsString"
+                            information_only="1"
+                            number_of_elements="1"
+                            panel_visibility="default"
+                            label="Offset Preview">
+        <Documentation>
+          String representation of the point cloud offset available in metadata.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="HasOffset"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ApplyOffset"
+                         command="SetApplyOffset"
+                         number_of_elements="1"
+                         default_values="0"
+                         label="Apply Offset">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, apply metadata offset to point coordinates.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="HasOffset"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+
       <Hints>
         <ReaderFactory extensions="bin bpf csd csv greyhound gpkg icebride las laz mat nitf nsf ntf pcd ply pts qi rxp sbet sqlite sid tindex txt h5"
                        file_description="PDAL Files" />
