@@ -77,32 +77,6 @@ vtkPVArrayCalculator::vtkPVArrayCalculator()
 vtkPVArrayCalculator::~vtkPVArrayCalculator() = default;
 
 // ----------------------------------------------------------------------------
-int vtkPVArrayCalculator::GetAttributeTypeFromInput(vtkDataObject* input)
-{
-  int attributeType = this->AttributeType;
-  if (attributeType == vtkArrayCalculator::DEFAULT_ATTRIBUTE_TYPE)
-  {
-    vtkGraph* graphInput = vtkGraph::SafeDownCast(input);
-    vtkDataSet* dsInput = vtkDataSet::SafeDownCast(input);
-    vtkTable* tableInput = vtkTable::SafeDownCast(input);
-    if (graphInput)
-    {
-      attributeType = vtkDataObject::VERTEX;
-    }
-    if (dsInput)
-    {
-      attributeType = vtkDataObject::POINT;
-    }
-    if (tableInput)
-    {
-      attributeType = vtkDataObject::ROW;
-    }
-  }
-
-  return attributeType;
-}
-
-// ----------------------------------------------------------------------------
 void vtkPVArrayCalculator::ResetArrayAndVariableNames()
 {
   // Look at the data-arrays available in the input and register them as

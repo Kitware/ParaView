@@ -53,11 +53,6 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
-   * Get the attribute type.
-   */
-  int GetAttributeTypeFromInput(vtkDataObject* input);
-
-  /**
    * Clears the array and variable names.
    */
   void ResetArrayAndVariableNames();
