@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVGhostCellsGenerator.h"
 
+#include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSetRange.h"
 #include "vtkConvertToPartitionedDataSetCollection.h"
@@ -11,6 +12,7 @@
 #include "vtkDataObjectTreeRange.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
+#include "vtkDoubleArray.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridGhostCellsGenerator.h"
 #include "vtkInformation.h"
@@ -66,15 +68,11 @@ int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
 int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingHyperTreeGrid(
   vtkDataObject* inputDO, vtkDataObject* outputDO)
 {
-  if (!outputDO)
-  {
-    return 0;
-  }
   vtkNew<vtkHyperTreeGridGhostCellsGenerator> instance;
   instance->SetController(this->GetController());
   instance->SetInputDataObject(inputDO);
   const int result = instance->GetExecutive()->Update();
-  if (result == 1)
+  if (outputDO && result == 1)
   {
     outputDO->ShallowCopy(instance->GetOutput());
   }
@@ -168,6 +166,7 @@ int vtkPVGhostCellsGenerator::ProcessComposite(
   for (auto inIt = inputRange.begin(), outIt = outputRange.begin(); inIt != inputRange.end();
        ++inIt, ++outIt)
   {
+    bool hasHTG = vtkPVGhostCellsGenerator::HasHTG(this->GetController(), *inIt);
     if (*inIt)
     {
       *outIt = vtkSmartPointer<vtkDataObject>::Take(inIt->NewInstance());
@@ -187,7 +186,7 @@ int vtkPVGhostCellsGenerator::ProcessComposite(
         }
         result &= this->ProcessComposite(inputComposite, outputComposite);
       }
-      else if (vtkPVGhostCellsGenerator::HasHTG(this->GetController(), *inIt))
+      else if (hasHTG)
       {
         // Not composite or PartitionedDS: process data either in HTG GCG or classic GCG
         result &= this->GhostCellsGeneratorUsingHyperTreeGrid(*inIt, *outIt);
@@ -199,6 +198,12 @@ int vtkPVGhostCellsGenerator::ProcessComposite(
     }
     else
     {
+      if (hasHTG)
+      {
+        vtkNew<vtkHyperTreeGrid> emptyHTG;
+        emptyHTG->Initialize();
+        this->GhostCellsGeneratorUsingHyperTreeGrid(emptyHTG, nullptr);
+      }
       *outIt = nullptr;
     }
   }
