@@ -93,7 +93,7 @@ void vtkPVArrayCalculator::AddCoordinateVariableNames()
   this->AddCoordinateScalarVariable("coordsX", 0);
   this->AddCoordinateScalarVariable("coordsY", 1);
   this->AddCoordinateScalarVariable("coordsZ", 2);
-  this->AddCoordinateVectorVariable("coords", 0, 1, 2);
+  this->AddCoordinateVectorVariable("coords");
 }
 
 // ----------------------------------------------------------------------------
@@ -165,7 +165,7 @@ void vtkPVArrayCalculator::AddArrayAndVariableNames(
           possibleNames.begin(), possibleNames.end(), add_scalar_variables(this, arrayName, i));
       }
 
-      if (numberComps == 3)
+      if (numberComps > 1)
       {
         std::string validVariableName = vtkArrayCalculator::CheckValidVariableName(arrayName);
         this->AddVectorVariable(validVariableName.c_str(), arrayName);
