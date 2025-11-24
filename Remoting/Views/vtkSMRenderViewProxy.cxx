@@ -34,7 +34,7 @@
 #include "vtkRenderer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataDeliveryManagerProxy.h"
-#include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
@@ -1159,8 +1159,47 @@ void vtkSMRenderViewProxy::UpdateVTKObjects()
       mlp->LoadDefaultMaterials();
     }
   }
-
+  this->UpdateAnariProperties();
   this->Superclass::UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::UpdateAnariProperties()
+{
+  bool updateANARIRendererNames = false;
+  bool updateANARIRendererParameters = false;
+  auto itEnableANARI = this->Internals->Properties.find("EnableANARI");
+  auto* propEnableANARI = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("EnableANARI"));
+  auto itANARILibrary = this->Internals->Properties.find("ANARILibrary");
+  if (itEnableANARI->second.ModifiedFlag && propEnableANARI->GetElement(0) ||
+    itANARILibrary->second.ModifiedFlag)
+  {
+    updateANARIRendererNames = true;
+  }
+  auto itANARIRenderer = this->Internals->Properties.find("ANARIRenderer");
+  if (itEnableANARI->second.ModifiedFlag && propEnableANARI->GetElement(0) ||
+    itANARILibrary->second.ModifiedFlag || itANARIRenderer->second.ModifiedFlag)
+  {
+    updateANARIRendererParameters = true;
+  }
+
+  // update ANARI properties in the correct order
+  this->UpdateProperty("EnableANARI");
+  this->UpdateProperty("ANARILibrary");
+  if (updateANARIRendererNames)
+  {
+    vtkSMStringVectorProperty* propRendererNames =
+      vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARIRendererNames"));
+    this->UpdatePropertyInformation(propRendererNames);
+  }
+  this->UpdateProperty("ANARIRenderer");
+  if (updateANARIRendererParameters)
+  {
+    vtkSMStringVectorProperty* propRendererParameters =
+      vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARIRendererParametersInfo"));
+    this->UpdatePropertyInformation(propRendererParameters);
+  }
+  this->UpdateProperty("ANARIRendererParameter");
 }
 
 //----------------------------------------------------------------------------
