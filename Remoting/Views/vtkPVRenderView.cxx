@@ -17,6 +17,7 @@
 #include "vtkCuller.h"
 #include "vtkDataRepresentation.h"
 #include "vtkDisplayConfiguration.h"
+#include "vtkDynamicProperties.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
@@ -31,6 +32,7 @@
 #include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkLegendScaleActor.h"
 #include "vtkLightKit.h"
+#include "vtkLogger.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
@@ -67,6 +69,7 @@
 #include "vtkPointData.h"
 #include "vtkPolarAxesActor2D.h"
 #include "vtkProcessModule.h"
+#include "vtkRange.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
@@ -74,8 +77,10 @@
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
+#include "vtkSetGet.h"
 #include "vtkSkybox.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 #include "vtkTextRepresentation.h"
@@ -84,10 +89,18 @@
 #include "vtkToneMappingPass.h"
 #include "vtkTrackballPan.h"
 #include "vtkTransform.h"
+#include "vtkType.h"
 #include "vtkValuePass.h"
 #include "vtkVector.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtk_jsoncpp.h"
+#include <anari/frontend/anari_enums.h>
+
+#include "vtk_scn.h"
+// clang-format off
+#include VTK_SCN(scn/scan.h)
+// clang-format on
 
 #if VTK_MODULE_ENABLE_ParaView_icet
 #include "vtkIceTSynchronizedRenderers.h"
@@ -133,6 +146,10 @@ public:
 #endif
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkSmartPointer<vtkAnariPass> AnariPass = nullptr;
+  /**
+   * Map between renderer parametr and anari type (such as int(ANARI_INT32)).
+   */
+  std::map<std::string, int> AnariRendererParameterToType;
 #endif
 
   vtkSmartPointer<vtkImageProcessingPass> SavedImageProcessingPass;
@@ -150,7 +167,8 @@ public:
   int OSPRayCount;
   bool Hide2DOverlays;
 
-  bool IsInAnari;
+  bool IsInAnari = false;
+  vtkNew<vtkStringArray> ANARIRendererNames;
 
   vtkNew<vtkFloatArray> ArrayHolder;
   vtkNew<vtkWindowToImageFilter> ZGrabber;
@@ -3661,9 +3679,9 @@ bool vtkPVRenderView::GetEnableANARI()
 void vtkPVRenderView::SetANARILibrary([[maybe_unused]] std::string l)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  vtkRenderer* ren = this->GetRenderer();
   if (this->Internals->AnariPass)
   {
+    vtkLog(INFO, "SetANARILibrary: " << l);
     this->Internals->AnariPass->GetAnariDevice()->SetupAnariDeviceFromLibrary(
       l.c_str(), "default", false);
   }
@@ -3674,8 +3692,7 @@ void vtkPVRenderView::SetANARILibrary([[maybe_unused]] std::string l)
 const char* vtkPVRenderView::GetANARILibrary()
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  vtkRenderer* ren = this->GetRenderer();
-  return "";
+  return this->Internals->AnariPass->GetAnariDevice()->GetAnariLibraryName().c_str();
 #else
   return nullptr;
 #endif
@@ -3687,6 +3704,7 @@ void vtkPVRenderView::SetANARIRenderer([[maybe_unused]] std::string r)
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   if (this->Internals->AnariPass)
   {
+    vtkLog(INFO, "SetANARIRenderer: " << r);
     this->Internals->AnariPass->GetAnariRenderer()->SetSubtype(r.c_str());
   }
 #endif
@@ -3703,6 +3721,175 @@ const char* vtkPVRenderView::GetANARIRenderer()
   return "";
 #else
   return nullptr;
+#endif
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkPVRenderView::GetANARIRendererNames()
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+  if (!this->Internals->AnariPass)
+  {
+    this->Internals->ANARIRendererNames->Resize(0);
+    return this->Internals->ANARIRendererNames;
+  }
+  std::vector<std::string> rendererNames =
+    this->Internals->AnariPass->GetAnariDevice()->GetAnariRendererSubTypes();
+  this->Internals->ANARIRendererNames->SetNumberOfValues(rendererNames.size());
+  for (int i = 0; i < rendererNames.size(); ++i)
+  {
+    this->Internals->ANARIRendererNames->SetValue(i, rendererNames[i]);
+  }
+#endif
+  return this->Internals->ANARIRendererNames;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetANARIRendererParameter(
+  const std::string& key, const std::string& stringValue)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+  if (this->Internals->AnariRendererParameterToType.count(key) == 0)
+  {
+    vtkErrorMacro("Cannot find ANARI parameter: " << key);
+    return;
+  }
+  int type = this->Internals->AnariRendererParameterToType[key];
+  switch (type)
+  {
+    case vtkDynamicProperties::INT32:
+      if (auto result = scn::scan<int>(stringValue, "{}"))
+      {
+        this->Internals->AnariPass->GetAnariRenderer()->SetParameteri(key.c_str(), result->value());
+      }
+      else
+      {
+        vtkErrorMacro("Error converting ANARI_INT32 parameter: " << result.error().msg());
+        return;
+      }
+      break;
+    case vtkDynamicProperties::BOOL:
+      if (auto result = scn::scan<bool>(stringValue, "{}"))
+      {
+        this->Internals->AnariPass->GetAnariRenderer()->SetParameterb(key.c_str(), result->value());
+      }
+      else
+      {
+        vtkErrorMacro("Error converting ANARI_BOOL parameter: " << result.error().msg());
+        return;
+      }
+      break;
+    case vtkDynamicProperties::FLOAT32:
+      if (auto result = scn::scan<float>(stringValue, "{}"))
+      {
+        this->Internals->AnariPass->GetAnariRenderer()->SetParameterf(key.c_str(), result->value());
+      }
+      else
+      {
+        vtkErrorMacro("Expecting ANARI_FLOAT32 parameter, got: " << result.error().msg());
+        return;
+      }
+      break;
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVRenderView::GetANARIRendererParameters()
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+  if (!this->Internals->AnariPass)
+  {
+    return "";
+  }
+  auto* ren = this->Internals->AnariPass->GetAnariRenderer();
+  const char* libraryName = this->GetANARILibrary();
+  Json::Value jsonAllParameters;
+  Json::Value jsonParameters(Json::arrayValue);
+  const std::string& rendererName = ren->GetSubtype();
+  std::map<int, int> anariToParameterType = {
+    { ANARI_BOOL, vtkDynamicProperties::BOOL },
+    { ANARI_INT32, vtkDynamicProperties::INT32 },
+    { ANARI_FLOAT32, vtkDynamicProperties::FLOAT32 },
+    { ANARI_STRING, vtkDynamicProperties::STRING },
+    { ANARI_FLOAT32_VEC3, vtkDynamicProperties::FLOAT32_VEC3 },
+    { ANARI_FLOAT32_VEC4, vtkDynamicProperties::FLOAT32_VEC4 },
+    { ANARI_ARRAY2D, vtkDynamicProperties::ARRAY2D },
+  };
+  if (auto* ren = this->Internals->AnariPass->GetAnariRenderer())
+  {
+    auto rendererParameters = ren->GetRendererParameters();
+    this->Internals->AnariRendererParameterToType.clear();
+    for (auto pIter = rendererParameters.cbegin(); pIter != rendererParameters.cend(); ++pIter)
+    {
+      Json::Value jsonRendererParameters;
+      std::string description = ren->GetRendererParameterDescription(*pIter);
+      std::string name = pIter->first;
+      int type = pIter->second;
+      if (anariToParameterType.count(type) > 0)
+      {
+        jsonRendererParameters[vtkDynamicProperties::TYPE_KEY] = anariToParameterType[type];
+      }
+      else
+      {
+        vtkWarningMacro("There is not vtkDynamicParamters::Type association with: " << type);
+      }
+      const void* pDefault = ren->GetRendererParameterDefault(*pIter);
+      const void* pMin = ren->GetRendererParameterMinimum(*pIter);
+      const void* pMax = ren->GetRendererParameterMaximum(*pIter);
+      const void* pValue = ren->GetRendererParameterDefault(*pIter);
+      jsonRendererParameters[vtkDynamicProperties::NAME_KEY] = name;
+      jsonRendererParameters[vtkDynamicProperties::DESCRIPTION_KEY] = description;
+      this->Internals->AnariRendererParameterToType[name] = anariToParameterType[type];
+      switch (type)
+      {
+        case ANARI_INT32:
+        {
+          int minVal = pMin != nullptr ? *(reinterpret_cast<const vtkTypeInt32*>(pMin)) : 0;
+          int maxVal = pMax != nullptr ? *(reinterpret_cast<const vtkTypeInt32*>(pMax)) : 100;
+          int defaultValue =
+            pDefault != nullptr ? *(reinterpret_cast<const vtkTypeInt32*>(pDefault)) : 1;
+          int value = pDefault != nullptr ? *(reinterpret_cast<const int*>(pValue)) : 1;
+          jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
+          jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
+          jsonRendererParameters[vtkDynamicProperties::MIN_KEY] = minVal;
+          jsonRendererParameters[vtkDynamicProperties::MAX_KEY] = maxVal;
+          break;
+        }
+        case ANARI_BOOL:
+        {
+          bool defaultValue =
+            pDefault != nullptr ? *(reinterpret_cast<const bool*>(pDefault)) : false;
+          int value = pDefault != nullptr ? *(reinterpret_cast<const bool*>(pValue)) : 1;
+          jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
+          jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
+          break;
+        }
+        case ANARI_FLOAT32:
+        {
+          double defaultValue =
+            pDefault != nullptr ? *(reinterpret_cast<const double*>(pDefault)) : 1;
+          int value = pDefault != nullptr ? *(reinterpret_cast<const vtkTypeFloat32*>(pValue)) : 1;
+          double minVal = pMin != nullptr ? *(reinterpret_cast<const vtkTypeFloat32*>(pMin)) : 0;
+          double maxVal = pMax != nullptr ? *(reinterpret_cast<const vtkTypeFloat32*>(pMax)) : 1;
+          jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
+          jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
+          jsonRendererParameters[vtkDynamicProperties::MIN_KEY] = minVal;
+          jsonRendererParameters[vtkDynamicProperties::MAX_KEY] = maxVal;
+          break;
+        }
+      }
+      jsonParameters.append(jsonRendererParameters);
+    }
+    jsonAllParameters[vtkDynamicProperties::LIBRARY_KEY] = libraryName;
+    jsonAllParameters[vtkDynamicProperties::RENDERER_KEY] = rendererName;
+    jsonAllParameters[vtkDynamicProperties::PROPERTIES_KEY] = jsonParameters;
+  }
+  Json::StreamWriterBuilder builder;
+  std::string jsonString = Json::writeString(builder, jsonAllParameters);
+  return jsonString;
+#else
+  return "";
 #endif
 }
 
