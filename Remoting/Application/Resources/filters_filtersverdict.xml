@@ -248,6 +248,8 @@
                  value="29" />
           <Entry text="Equivolume Skew"
                  value="30" />
+          <Entry text="Inradius"
+                 value="37"/>
           <Entry text="Jacobian"
                  value="25" />
           <Entry text="Mean Ratio"
