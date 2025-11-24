@@ -1506,7 +1506,7 @@
                                        property="ANARILibrary"
                                        values="visrtx" />
             </Expression>
-	        </PropertyWidgetDecorator>
+	  </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty name="OSPRayRendererType"
@@ -1557,7 +1557,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                                        property="EnableANARI"
                                        values="1" />
             </Expression>
-	        </PropertyWidgetDecorator>
+                </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -1589,7 +1589,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                                        property="EnableANARI"
                                        values="1" />
             </Expression>
-	        </PropertyWidgetDecorator>
+                </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -1650,7 +1650,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                                        property="EnableANARI"
                                        values="1" />
             </Expression>
-	        </PropertyWidgetDecorator>
+                </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
