@@ -292,7 +292,7 @@
   <Proxy group="filters" name="AppendPolyData" />
   <Proxy group="filters" name="AppendReductionFilter" />
   <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
-  <Proxy group="filters" name="AxisAlignedReflect"/>
+  <Proxy group="filters" name="AxisAlignedReflect" icon=":/pqWidgets/Icons/pqReflect.svg"/>
   <Proxy group="filters" name="AxisAlignedSlice" />
   <Proxy group="filters" name="AxisAlignedTransform"/>
   <Proxy group="filters" name="BlockIdScalars" />
