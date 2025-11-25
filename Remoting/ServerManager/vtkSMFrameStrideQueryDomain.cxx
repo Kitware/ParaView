@@ -62,19 +62,17 @@ void vtkSMFrameStrideQueryDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 //----------------------------------------------------------------------------
 int vtkSMFrameStrideQueryDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
-  auto frameStrideProp = vtkSMIntVectorProperty::SafeDownCast(prop);
-  if (!frameStrideProp)
+  if (auto frameStrideProp = vtkSMIntVectorProperty::SafeDownCast(prop))
   {
-    vtkErrorMacro("Property is not a vtkSMIntVectorProperty.");
-    return 0;
-  }
-  if (use_unchecked_values)
-  {
-    frameStrideProp->SetUncheckedElement(0, this->FrameStride);
-  }
-  else
-  {
-    frameStrideProp->SetElement(0, this->FrameStride);
+    if (use_unchecked_values)
+    {
+      frameStrideProp->SetUncheckedElement(0, this->FrameStride);
+    }
+    else
+    {
+      frameStrideProp->SetElement(0, this->FrameStride);
+    }
+    return 1;
   }
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
@@ -83,7 +81,7 @@ int vtkSMFrameStrideQueryDomain::SetDefaultValues(vtkSMProperty* prop, bool use_
 void vtkSMFrameStrideQueryDomain::OnDomainModified()
 {
   vtkSMProperty* prop = this->GetProperty();
-  this->SetDefaultValues(prop, true);
+  this->SetDefaultValues(prop, false);
   if (prop->GetParent())
   {
     prop->GetParent()->UpdateProperty(prop->GetXMLName());
