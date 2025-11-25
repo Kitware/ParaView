@@ -154,6 +154,7 @@ public:
 
   void SetFramesPerTimestep(int val);
   void SetStride(int val);
+  int GetStride();
   bool GetInPlay();
   ///@}
 

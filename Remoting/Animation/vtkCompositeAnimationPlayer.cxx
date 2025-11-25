@@ -7,6 +7,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkTimestepsAnimationPlayer.h"
 
+#include <cassert>
+
 vtkStandardNewMacro(vtkCompositeAnimationPlayer);
 //----------------------------------------------------------------------------
 vtkCompositeAnimationPlayer::vtkCompositeAnimationPlayer()
@@ -144,4 +146,11 @@ void vtkCompositeAnimationPlayer::SetStride(int _val)
 {
   this->TimestepsAnimationPlayer->SetStride(_val);
   this->SequenceAnimationPlayer->SetStride(_val);
+}
+
+//----------------------------------------------------------------------------
+int vtkCompositeAnimationPlayer::GetStride()
+{
+  assert(this->TimestepsAnimationPlayer->GetStride() == this->SequenceAnimationPlayer->GetStride());
+  return this->TimestepsAnimationPlayer->GetStride();
 }
