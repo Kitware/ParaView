@@ -198,9 +198,9 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   dialog.setSettingsKey("SaveScreenshotDialog");
   if (dialog.exec() == QDialog::Accepted)
   {
-    const bool embedParaViewState =
-      vtkSMPropertyHelper(shProxy, "EmbedParaViewState").GetAsInt() == 1;
-    if (embedParaViewState)
+    vtkSMProxy* formatProxy = vtkSMPropertyHelper(shProxy, "Format").GetAsProxy();
+    vtkSMProperty* embedStateProp = formatProxy->GetProperty("EmbedParaViewState");
+    if (embedStateProp && vtkSMPropertyHelper(embedStateProp).GetAsInt() == 1)
     {
       Q_EMIT pqApplicationCore::instance()->aboutToWriteState(filename);
     }

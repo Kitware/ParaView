@@ -3785,23 +3785,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="EmbedParaViewState"
-                         label="Embed ParaView State"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Set whether to embed the ParaView state in the image as metadata. This option is only available for PNG.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Format"
-                                   value="PNG">
-          </PropertyWidgetDecorator>
-        </Hints>
-      </IntVectorProperty>
-
       <PropertyGroup label="Size and Scaling">
         <Property name="SaveAllViews"/>
         <Property name="ImageResolution"/>
@@ -3821,10 +3804,6 @@
 
       <PropertyGroup label="Image Options">
         <Property name="Format"/>
-      </PropertyGroup>
-
-      <PropertyGroup label="Metadata">
-        <Property name="EmbedParaViewState"/>
       </PropertyGroup>
     </SaveScreenshotProxy>
 
@@ -3884,6 +3863,19 @@
           PNG file in the form of text key/value pairs.
         </Documentation>
       </StringVectorProperty>
+      <IntVectorProperty name="EmbedParaViewState"
+                         label="Embed ParaView State"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether to embed the ParaView state in the image as metadata. This option is only available for PNG.
+        </Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="Metadata">
+        <Property name="MetaData"/>
+        <Property name="EmbedParaViewState"/>
+      </PropertyGroup>
       <Hints>
         <FormatOptions extensions="png"
                        file_description="PNG images"/>
