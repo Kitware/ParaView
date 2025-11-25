@@ -66,19 +66,17 @@ void vtkSMDataTypeQueryDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 //----------------------------------------------------------------------------
 int vtkSMDataTypeQueryDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
-  auto placeHolderProp = vtkSMIntVectorProperty::SafeDownCast(prop);
-  if (!placeHolderProp)
+  if (auto placeHolderProp = vtkSMIntVectorProperty::SafeDownCast(prop))
   {
-    vtkErrorMacro("Property is not a vtkSMIntVectorProperty.");
-    return 0;
-  }
-  if (use_unchecked_values)
-  {
-    placeHolderProp->SetUncheckedElement(0, this->InputDataType);
-  }
-  else
-  {
-    placeHolderProp->SetElement(0, this->InputDataType);
+    if (use_unchecked_values)
+    {
+      placeHolderProp->SetUncheckedElement(0, this->InputDataType);
+    }
+    else
+    {
+      placeHolderProp->SetElement(0, this->InputDataType);
+    }
+    return 1;
   }
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
