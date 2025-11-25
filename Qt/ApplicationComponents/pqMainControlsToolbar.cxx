@@ -9,6 +9,7 @@
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
 #include "pqLoadDataReaction.h"
+#include "pqLoadStateReaction.h"
 #include "pqSaveDataReaction.h"
 #include "pqSaveExtractsReaction.h"
 #include "pqSaveStateReaction.h"
@@ -32,6 +33,7 @@ void pqMainControlsToolbar::constructor()
   new pqUndoRedoReaction(ui.actionRedo, false);
   new pqAutoApplyReaction(ui.actionAutoApply);
   new pqDataQueryReaction(ui.actionQuery);
+  new pqLoadStateReaction(ui.actionLoadState);
   new pqSaveStateReaction(ui.actionSaveState);
   new pqSaveExtractsReaction(ui.actionGenerateExtracts);
 #if VTK_MODULE_ENABLE_ParaView_pqPython
