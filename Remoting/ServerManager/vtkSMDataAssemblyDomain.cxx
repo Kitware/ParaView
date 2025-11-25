@@ -200,6 +200,7 @@ int vtkSMDataAssemblyDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unch
         if (!selector.empty())
         {
           helper.Set(0, selector.c_str());
+          return 1;
         }
       }
     }
@@ -218,7 +219,7 @@ int vtkSMDataAssemblyDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unch
           return 1;
         }
         // if it's element block, and we couldn't find it, then all blocks will be element blocks.
-        else if (this->EntityType == vtkIOSSReader::EntityType::ELEMENTBLOCK)
+        if (this->EntityType == vtkIOSSReader::EntityType::ELEMENTBLOCK)
         {
           helper.Set(0, "/");
           return 1;
