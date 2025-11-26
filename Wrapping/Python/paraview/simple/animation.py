@@ -79,7 +79,7 @@ def GetRepresentationAnimationHelper(sourceproxy):
 # -----------------------------------------------------------------------------
 
 
-def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
+def GetAnimationTrack(propertyname_or_property, index=None, proxy=None, registrationName=None):
     """Returns an animation cue for the property. If one doesn't exist then a
     new one will be created.
     Typical usage::
@@ -138,6 +138,9 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
     cue.AnimatedPropertyName = propertyname
     if index != None:
         cue.AnimatedElement = index
+    session = servermanager.ActiveConnection.Session
+    pxm = servermanager.ProxyManager(session)
+    pxm.RegisterProxy("animation", registrationName, cue)
     scene.Cues.append(cue)
     return cue
 
@@ -145,12 +148,13 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
 # -----------------------------------------------------------------------------
 
 
-def GetCameraTrack(view=None):
+def GetCameraTrack(view=None, registrationName=None):
     """Returns the camera animation track for the given view.
 
     :param view: The view whose camera animation track should be retrieved.
                  If no view is specified, the active view will be used. If no existing camera
                  animation track is found, a new one will be created.
+    :param registrationName: Optional name to register the camera animation cue with.
     :type view: View proxy
     :return: Camera animation cue
     :rtype: :class:`paraview.servermanager.CameraAnimationCue`
@@ -167,6 +171,9 @@ def GetCameraTrack(view=None):
     # no cue was found, create a new one.
     cue = servermanager.animation.CameraAnimationCue()
     cue.AnimatedProxy = view
+    session = servermanager.ActiveConnection.Session
+    pxm = servermanager.ProxyManager(session)
+    pxm.RegisterProxy("animation", registrationName, cue)
     scene.Cues.append(cue)
     return cue
 
