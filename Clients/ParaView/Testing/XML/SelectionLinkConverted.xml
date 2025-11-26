@@ -15,10 +15,10 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateX" command="key" arguments="16777236" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateX" command="key" arguments="16777219" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateX" command="set_string" arguments="3" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateX" command="set_string" arguments="30" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="key" arguments="16777236" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="set_string" arguments="30" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/show3DWidget" command="set_boolean" arguments="false" />
@@ -32,8 +32,8 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateZ" command="set_string" arguments="30" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateZ" command="set_string" arguments="30" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateZ" command="set_string" arguments="30" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateZ" command="set_string" arguments="30" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface" />

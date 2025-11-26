@@ -17,8 +17,8 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,66,5,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateY" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateY" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateY" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateY" command="set_string" arguments="20" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,72,9,/0:0/2:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,72,9,/0:0/2:0" />
@@ -29,9 +29,9 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,87,4,/0:0/2:0" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateY" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateY" command="set_string" arguments="20" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateY" command="key" arguments="16777221" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateY" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateY" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateY" command="key" arguments="16777221" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,10,12,/0:0/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,10,12,/0:0/0:0/0:1" />

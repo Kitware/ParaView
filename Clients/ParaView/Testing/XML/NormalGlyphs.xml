@@ -25,8 +25,8 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,50,8,/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,50,8,/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateX" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateY" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateY" command="set_string" arguments="2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Solid Color" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/show3DWidget" command="set_boolean" arguments="false" />

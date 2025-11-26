@@ -17,13 +17,13 @@
 
   <!-- Setup a specific translation to test plane position -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/UseCropping/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/translateX" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/translateY" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateY" command="set_string" arguments="2" />
 
   <!-- Test scaling behavior -->
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/scaleX" command="set_string" arguments="10" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/scaleY" command="set_string" arguments="0.5" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/scaleZ" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/scaleX" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/scaleY" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/scaleZ" command="set_string" arguments="0.5" />
 
   <!-- Hide the box widget for the baseline-->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/InteractiveBox/show3DWidget" command="set_boolean" arguments="false" />

@@ -47,9 +47,9 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Alphabetical" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateX" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateX" command="set_string" arguments="20" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/translateX" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Transform/ProxySelectionWidget/frame/ChosenProxyWidget/InteractiveBox/tabWidget/qt_tabwidget_stackedwidget/fieldsPage/translateX" command="key" arguments="16777248" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
