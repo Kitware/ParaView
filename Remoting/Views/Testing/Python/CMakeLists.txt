@@ -20,7 +20,6 @@ ExternalData_Expand_Arguments(ParaViewData _
 
   # baselines
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SurfaceLIC-OfficeContour.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SurfaceLIC-OfficeContour_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SurfaceLIC-OfficeHSlice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SurfaceLIC-OfficeVSlice.png}")
 
