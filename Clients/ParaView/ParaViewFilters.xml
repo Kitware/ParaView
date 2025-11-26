@@ -409,10 +409,12 @@
   <Proxy group="filters" name="HyperTreeGridToDualGrid" />
   <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
   <Proxy group="filters" name="HyperTreeGridVisibleLeavesSize" />
+  <Proxy group="filters" name="ImageClip"/>
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToPointSet" />
   <Proxy group="filters" name="ImageDataToUniformGrid" />
+  <Proxy group="filters" name="ImageShrink"/>
   <Proxy group="filters" name="IntegrateAttributes" icon=":/pqWidgets/Icons/pqIntegrateAttributes.svg" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
   <Proxy group="filters" name="IntersectFragments" />
