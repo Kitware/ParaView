@@ -3,14 +3,17 @@
 #include "vtkSMTransferFunctionProxy.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkCommunicator.h"
 #include "vtkDoubleArray.h"
 #include "vtkIntArray.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkProcessModule.h"
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMNamedPropertyIterator.h"
@@ -320,6 +323,18 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
   {
     rangeMin = std::min(rangeMin, preNormalizationRange[0]);
     rangeMax = std::max(rangeMax, preNormalizationRange[1]);
+  }
+
+  if (vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode())
+  {
+    double globalRangeMin, globalRangeMax;
+    // In symmetric mode, we need to get the global range
+    vtkMultiProcessController::GetGlobalController()->AllReduce(
+      &rangeMin, &globalRangeMin, 1, vtkCommunicator::MIN_OP);
+    vtkMultiProcessController::GetGlobalController()->AllReduce(
+      &rangeMax, &globalRangeMax, 1, vtkCommunicator::MAX_OP);
+    rangeMin = globalRangeMin;
+    rangeMax = globalRangeMax;
   }
 
   // Setting the "LastRange" here because, it should match the current range of the control points.
