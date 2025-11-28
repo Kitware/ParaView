@@ -122,8 +122,10 @@ int main(int argc, char* argv[])
         if (QGuiApplication::platformName().compare("wayland", Qt::CaseInsensitive) == 0)
         {
           vtkLogF(WARNING,
-            "ParaView is not fully tested on Wayland. You may experience issues. Please report "
-            "them to the issue tracker "
+            "ParaView is not fully tested on Wayland. You may experience issues. "
+            "To work around crashes, you may wish to 'export QT_QPA_PLATFORM=xcb' in "
+            "a shell and run the paraview executable from there. "
+            "Please report issues on the issue tracker: "
             "https://gitlab.kitware.com/paraview/paraview/-/issues/23124");
           if (vtksys::SystemTools::HasEnv("VTK_DEFAULT_OPENGL_WINDOW"))
           {
