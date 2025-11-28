@@ -825,24 +825,3 @@ Now you may delete your copies of the branch.
     The `branch -d` command works only when the topic branch has been
     correctly merged.  Use `-D` instead of `-d` to force the deletion
     of an unmerged topic branch (warning - you could lose commits).
-
-Contribute VTK Changes
-----------------------
-
-If you have any VTK changes, then you are required to get your changes
-incorporated into VTK using [VTK's development workflow][]. Once your VTK topic has
-been approved and merged into VTK, then:
-
-1. Create a [ParaView topic](#create-a-topic) if you haven't already.
-2. Add your VTK topic head (or the latest VTK
-   origin/master which includes your VTK topic head).
-
-        $ cd VTK
-        $ git checkout master
-        $ cd ..
-        $ git add VTK
-        $ git commit
-
-3. Follow the merge process documented earlier.
-
-[VTK's development workflow]: https://gitlab.kitware.com/vtk/vtk/-/tree/master/Documentation/dev/git
