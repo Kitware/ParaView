@@ -665,6 +665,18 @@ def setattr(proxy, pname, value):
                 newGlobalFieldValues.append(globalFields[i])
                 newGlobalFieldValues.append(str(value))
             return globalFields.SetData(newGlobalFieldValues)
+        else:
+            raise NotSupportedException("Since ParaView 6.1, IOSSReader no longer "
+                                        "supports 'ReadGlobalFields' and it has been replaced by "
+                                        "'GlobalFields'.")
+
+    if pname == "EmbedParaViewState" and proxy.SMProxy.GetXMLName() == "SaveScreenshot":
+        if compatibility_version <= (6, 0):
+            proxy.GetProperty("Format").GetProperty("EmbedParaViewState").SetData(value)
+        else:
+            raise NotSupportedException("Since ParaView 6.1, SaveScreenshot no longer "
+                                        "supports 'EmbedParaViewState' and it has been replaced by "
+                                        "'Format.EmbedParaViewState'.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -1357,6 +1369,14 @@ def getattr(proxy, pname):
         else:
             raise NotSupportedException("'ReadGlobalFields' property has been removed in ParaView 6.1. Please use the "
                                         "'GlobalFields' property to get/set the list of global fields to read instead.")
+
+    if pname == "EmbedParaViewState" and proxy.SMProxy.GetXMLName() == "SaveScreenshot":
+        if compatibility_version < (6, 1):
+            return proxy.GetProperty("Format").GetProperty("EmbedParaViewState").GetData()
+        else:
+            raise NotSupportedException(
+                "'EmbedParaViewState' property has been removed in ParaView 6.1. Please use the "
+                "'Format.EmbedParaViewState' property to get/set the EmbedParaViewState instead.")
 
     raise Continue()
 

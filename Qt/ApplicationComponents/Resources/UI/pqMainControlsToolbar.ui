@@ -16,7 +16,7 @@
    <string>Main Controls</string>
   </property>
   <property name="orientation">
-   <enum>Qt::Horizontal</enum>
+   <enum>Qt::Orientation::Horizontal</enum>
   </property>
   <action name="actionOpenData">
    <property name="icon">
@@ -147,6 +147,19 @@
     <string>Save Extracts</string>
    </property>
   </action>
+  <action name="actionLoadState">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqLoadState.svg</normaloff>:/pqWidgets/Icons/pqLoadState.svg
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Load State...</string>
+   </property>
+   <property name="toolTip">
+    <string>Load State</string>
+   </property>
+  </action>
   <action name="actionSaveState">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -173,6 +186,7 @@
   </action>
   <addaction name="actionOpenData"/>
   <addaction name="actionSaveData"/>
+  <addaction name="actionLoadState"/>
   <addaction name="actionSaveState"/>
   <addaction name="actionGenerateExtracts"/>
   <addaction name="actionSaveCatalystState"/>

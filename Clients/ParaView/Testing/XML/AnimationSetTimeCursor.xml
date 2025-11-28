@@ -40,7 +40,7 @@
 
   <!-- VCR controls are not in undo stack -->
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPlay" command="activate" arguments="" />
-  <pqcheck object="pqClientMainWindow/MainControlsToolbar/1QToolButton8" property="enabled" arguments="false" />
+  <pqcheck object="pqClientMainWindow/MainControlsToolbar/1QToolButton9" property="enabled" arguments="false" />
 
   <!-- set time -->
   <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0.5" />
@@ -53,5 +53,5 @@
   <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777235" />
 
   <!-- check empty undo stack -->
-  <pqcheck object="pqClientMainWindow/MainControlsToolbar/1QToolButton8" property="enabled" arguments="false" />
+  <pqcheck object="pqClientMainWindow/MainControlsToolbar/1QToolButton9" property="enabled" arguments="false" />
 </pqevents>

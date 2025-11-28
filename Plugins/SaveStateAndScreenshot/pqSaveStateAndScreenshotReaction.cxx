@@ -126,10 +126,10 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
     pqSaveStateReaction::saveState(stateFile, this->Location);
     QString screenshotFile = pathNoExt + ".png";
 
-    const bool embedParaViewState =
-      vtkSMPropertyHelper(shProxy, "EmbedParaViewState").GetAsInt() == 1;
+    vtkSMProxy* formatProxy = vtkSMPropertyHelper(shProxy, "Format").GetAsProxy();
+    vtkSMProperty* embedStateProp = formatProxy->GetProperty("EmbedParaViewState");
     vtkSmartPointer<vtkPVXMLElement> stateXMLRoot;
-    if (embedParaViewState)
+    if (embedStateProp && vtkSMPropertyHelper(embedStateProp).GetAsInt() == 1)
     {
       Q_EMIT pqApplicationCore::instance()->aboutToWriteState(screenshotFile);
       vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();

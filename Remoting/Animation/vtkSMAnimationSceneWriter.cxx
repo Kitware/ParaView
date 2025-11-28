@@ -137,12 +137,13 @@ bool vtkSMAnimationSceneWriter::Save()
   {
     this->Saving = true;
     this->SaveFailed = false;
-
+    double* currentTimeWindow = this->AnimationScene->GetPlaybackTimeWindow();
+    int currentStride = this->AnimationScene->GetStride();
     this->AnimationScene->SetPlaybackTimeWindow(this->GetPlaybackTimeWindow());
     this->AnimationScene->SetStride(this->GetStride());
     this->AnimationScene->Play();
-    this->AnimationScene->SetPlaybackTimeWindow(1.0, -1.0); // Reset to full range
-    this->AnimationScene->SetStride(1);                     // Reset to 1 Stride
+    this->AnimationScene->SetPlaybackTimeWindow(currentTimeWindow); // Restore previous range
+    this->AnimationScene->SetStride(currentStride);                 // Restore previous stride
     this->Saving = false;
   }
 
