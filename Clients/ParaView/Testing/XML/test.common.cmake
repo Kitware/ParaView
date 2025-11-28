@@ -916,7 +916,6 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeIsosurfaceBlendMode.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeNoMapScalars.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeSliceBlendMode.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VTKHDFWriter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/WaveNoFontScale.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/WaveFontScale.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/YoungsMaterialInterface.png}"
@@ -1799,11 +1798,10 @@ if (NOT PARAVIEW_USE_MPI)
   )
 endif()
 
-# VTKHDFWriter does not work with MPI yet
-# See issue https://gitlab.kitware.com/vtk/vtk/-/issues/19231
+# VTKHDFWriter does not support writing external partitions/compositte with MPI yet
+# See issue https://gitlab.kitware.com/vtk/vtk/-/issues/19857
 if (TARGET VTK::IOHDF)
   paraview_add_client_tests(
-    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS VTKHDFWriter.xml
   )
 endif()

@@ -45,14 +45,29 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty command="SetUseExternalComposite"
+      <IntVectorProperty command="SetUseExternalTimeSteps"
                         default_values="0"
-                        name="UseExternalComposite"
+                        name="UseExternalTimeSteps"
+                        label="Split By Time Steps"
                         number_of_elements="1">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Write composite leaf blocks in different files.
-          Only applies to vtkPartitionedDataSetCollection and vtkMultiBlockDataSet inputs.
+          Write each time step data in their own file,
+          referenced by the main file to form a time-varying dataset.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseExternalPartitions"
+                        default_values="0"
+                        name="UseExternalPartitions"
+                        label="Split By Partitions"
+                        number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Write each individual partitions and composite leaf blocks in their own file.
+          Each file can be opened independently and top level files points to lower level files.
+          Turning this on implies turning UseExternalComposite on.
+          Only applies to vtkPartitionedDataSet and its inheriting classes as well as composite data containing such data.
         </Documentation>
 
         <Hints>
@@ -62,31 +77,29 @@
         </Hints>
       </IntVectorProperty>
 
-      <IntVectorProperty command="SetUseExternalTimeSteps"
+      <IntVectorProperty command="SetUseExternalComposite"
                         default_values="0"
-                        name="UseExternalTimeSteps"
+                        name="UseExternalComposite"
+                        label="Split By Composite"
                         number_of_elements="1">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Write each time step data in a different file,
-          referrenced by the main file to form a time-varying dataset.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty command="SetUseExternalPartitions"
-                        default_values="0"
-                        name="UseExternalPartitions"
-                        number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Write each partition in a different file.
-          Only applies to vtkPartitionedDataSet and composite inputs.
+          Write each composite leaf blocks in their own file.
+          Each file can be opened independently and top level files points to lower level files.
+          Only applies to vtkPartitionedDataSetCollection and vtkMultiBlockDataSet inputs.
         </Documentation>
 
         <Hints>
-          <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                  name="vtkCompositeDataSet"
-                                  mode="visibility"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                      name="vtkCompositeDataSet"
+                                      mode="visibility"/>
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="UseExternalPartitions" function="boolean_invert"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
 
