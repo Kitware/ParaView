@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="VEL" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
+  <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ExportUSD.usd" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
+  <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ExportUSD.usda" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
+  <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ExportUSD.usdc" />
+
+</pqevents>
