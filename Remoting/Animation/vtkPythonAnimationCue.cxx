@@ -11,6 +11,8 @@
 #include "vtkPythonUtil.h"
 #include "vtkSmartPyObject.h"
 
+#include <iostream>
+
 namespace
 {
 bool CheckAndFlushPythonErrors()

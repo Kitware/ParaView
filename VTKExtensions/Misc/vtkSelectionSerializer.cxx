@@ -20,6 +20,8 @@
 #include "vtkSelectionNode.h"
 #include "vtkStringArray.h"
 
+#include <iostream>
+
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSelectionSerializer);
@@ -35,7 +37,7 @@ vtkSelectionSerializer::~vtkSelectionSerializer() = default;
 //----------------------------------------------------------------------------
 void vtkSelectionSerializer::PrintXML(int printData, vtkSelection* selection)
 {
-  vtkSelectionSerializer::PrintXML(cout, vtkIndent(), printData, selection);
+  vtkSelectionSerializer::PrintXML(std::cout, vtkIndent(), printData, selection);
 }
 
 //----------------------------------------------------------------------------

@@ -318,7 +318,7 @@ void vtkPVProgressHandler::OnProgressEvent(vtkObject* caller, unsigned long even
 
   // Try to clamp frequent progress events.
   this->Internals->ProgressTimer->StopTimer();
-  // cout <<"Elapsed: " << this->Internals->ProgressTimer->GetElapsedTime() <<
+  // std::cout <<"Elapsed: " << this->Internals->ProgressTimer->GetElapsedTime() <<
   //  endl;
   double progress = *reinterpret_cast<double*>(calldata);
   if (this->LastProgress == static_cast<int>(progress * 100.0))

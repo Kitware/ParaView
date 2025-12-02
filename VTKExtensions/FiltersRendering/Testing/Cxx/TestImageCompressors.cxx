@@ -14,6 +14,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkZlibImageCompressor.h"
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <vtksys/CommandLineArguments.hxx>
@@ -87,7 +88,7 @@ extern int TestImageCompressors(int argc, char* argv[])
   arg.StoreUnusedArguments(true);
   if (!arg.Parse())
   {
-    cerr << "Problem parsing arguments" << endl;
+    std::cerr << "Problem parsing arguments" << endl;
     return TEST_FAILED;
   }
 
@@ -186,16 +187,18 @@ extern int TestImageCompressors(int argc, char* argv[])
     }
   }
 
-  cout << "Input: " << image->GetDimensions()[0] << "x" << image->GetDimensions()[1] << "x"
-       << image->GetDimensions()[2] << " (uncompressed size: " << uncompressedSize << ") " << endl;
+  std::cout << "Input: " << image->GetDimensions()[0] << "x" << image->GetDimensions()[1] << "x"
+            << image->GetDimensions()[2] << " (uncompressed size: " << uncompressedSize << ") "
+            << endl;
 
   for (MapType::iterator iter = datas.begin(); iter != datas.end(); ++iter)
   {
-    cout << iter->first.c_str() << " :"
-         << " compress: " << (iter->second.CompressTime / max_count)
-         << " decompress: " << (iter->second.DecompressTime / max_count) << " compression ratio: "
-         << ((uncompressedSize - iter->second.CompressedSize) * 100.0 / uncompressedSize)
-         << "( compressed size: " << iter->second.CompressedSize << ")" << endl;
+    std::cout << iter->first.c_str() << " :"
+              << " compress: " << (iter->second.CompressTime / max_count)
+              << " decompress: " << (iter->second.DecompressTime / max_count)
+              << " compression ratio: "
+              << ((uncompressedSize - iter->second.CompressedSize) * 100.0 / uncompressedSize)
+              << "( compressed size: " << iter->second.CompressedSize << ")" << endl;
   }
   return TEST_SUCCESS;
 }

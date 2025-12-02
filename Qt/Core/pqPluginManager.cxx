@@ -76,7 +76,7 @@ public:
       }
     }
     stream << "</Plugins>\n";
-    // cout << stream.str().c_str() << endl;
+    // std::cout << stream.str().c_str() << endl;
     return QString(stream.str().c_str());
   }
 };

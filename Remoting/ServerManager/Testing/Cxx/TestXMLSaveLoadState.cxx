@@ -11,6 +11,8 @@
 
 #include "vtkPVXMLElement.h"
 
+#include <iostream>
+
 //----------------------------------------------------------------------------
 extern int TestXMLSaveLoadState(int argc, char* argv[])
 {
@@ -22,7 +24,7 @@ extern int TestXMLSaveLoadState(int argc, char* argv[])
   vtkSmartPointer<vtkPVXMLElement> xmlRootNodeLoaded;
   //---------------------------------------------------------------------------
   vtkSMSession* session = vtkSMSession::New();
-  cout << "==== Starting ====" << endl;
+  std::cout << "==== Starting ====" << endl;
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
 
@@ -38,7 +40,7 @@ extern int TestXMLSaveLoadState(int argc, char* argv[])
   shrink->UpdateVTKObjects();
   shrink->UpdatePipeline();
 
-  // shrink->GetDataInformation(0)->Print(cout);
+  // shrink->GetDataInformation(0)->Print(std::cout);
 
   pxm->RegisterProxy("sources", "sphere", proxy);
   pxm->RegisterProxy("filters", "shrink", shrink);
@@ -47,42 +49,42 @@ extern int TestXMLSaveLoadState(int argc, char* argv[])
   xmlRootNodeOrigin.TakeReference(pxm->SaveXMLState());
   xmlRootNodeOrigin->PrintXML();
 
-  cout << "==== End of State creation ===" << endl;
+  std::cout << "==== End of State creation ===" << endl;
 
-  cout << "==== Clear proxyManager state ===" << endl;
+  std::cout << "==== Clear proxyManager state ===" << endl;
   pxm->UnRegisterProxies();
   ;
   proxy->Delete();
   shrink->Delete();
 
-  cout << "==== Make sure that the state is empty ===" << endl;
+  std::cout << "==== Make sure that the state is empty ===" << endl;
   xmlRootNodeLoaded.TakeReference(pxm->SaveXMLState());
   // xmlRootNodeLoaded->PrintXML();
   if (pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink"))
   {
-    cout << " - Error in clearing" << endl;
+    std::cout << " - Error in clearing" << endl;
     return_value = EXIT_FAILURE;
   }
   else
   {
-    cout << " - Clearing done" << endl;
+    std::cout << " - Clearing done" << endl;
   }
 
-  cout << "==== Loading previous state ====" << endl;
+  std::cout << "==== Loading previous state ====" << endl;
   pxm->LoadXMLState(xmlRootNodeOrigin);
   xmlRootNodeLoaded.TakeReference(pxm->SaveXMLState());
   xmlRootNodeLoaded->PrintXML();
-  cout << "==== End of state loading ====" << endl;
+  std::cout << "==== End of state loading ====" << endl;
 
   //---------------------------------------------------------------------------
   if (pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink") &&
     return_value == EXIT_SUCCESS)
   {
-    cout << endl << " ### SUCCESS: States are equals ###" << endl;
+    std::cout << endl << " ### SUCCESS: States are equals ###" << endl;
   }
   else
   {
-    cout << endl << " ### FAILED: States are NOT equals ###" << endl;
+    std::cout << endl << " ### FAILED: States are NOT equals ###" << endl;
     return_value = EXIT_FAILURE;
   }
   session->Delete();

@@ -2,25 +2,22 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "vtkInitializationHelper.h"
-#include "vtkNew.h"
-#include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMTransferFunctionPresets.h"
-#include "vtkSmartPointer.h"
 #include "vtkTestUtilities.h"
 
 #include "vtk_jsoncpp.h"
 #include <cassert>
-#include <sstream>
+#include <iostream>
 
 #define myassert(condition, message)                                                               \
   if ((condition))                                                                                 \
   {                                                                                                \
-    cout << (message) << " -- SUCCESS" << endl;                                                    \
+    std::cout << (message) << " -- SUCCESS" << endl;                                               \
   }                                                                                                \
   else                                                                                             \
   {                                                                                                \
-    cout << (message) << " -- FAILED" << endl;                                                     \
+    std::cout << (message) << " -- FAILED" << endl;                                                \
     return EXIT_FAILURE;                                                                           \
   }
 
@@ -33,12 +30,12 @@ extern int TestTransferFunctionPresets(int argc, char* argv[])
   auto presets = vtkSMTransferFunctionPresets::GetInstance();
 
   myassert(presets->GetNumberOfPresets() > 0, "Load presets");
-  cout << "Number of presets: " << presets->GetNumberOfPresets() << endl;
+  std::cout << "Number of presets: " << presets->GetNumberOfPresets() << endl;
 
   unsigned int testPreset = 10;
 
   myassert(presets->GetPresetAsString(testPreset).empty() == false, "Has test preset");
-  cout << "Preset: " << endl << presets->GetPresetAsString(testPreset);
+  std::cout << "Preset: " << endl << presets->GetPresetAsString(testPreset);
 
   unsigned int old_size = presets->GetNumberOfPresets();
 
@@ -59,7 +56,7 @@ extern int TestTransferFunctionPresets(int argc, char* argv[])
   presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
   myassert(presets->GetPresetAsString(testPreset).empty() == false, "Has overridden preset on
   reload");
-  cout << "Preset: " << endl
+  std::cout << "Preset: " << endl
        << presets->GetPresetAsString(testPreset);
   myassert(presets->GetPreset(testPreset)["ColorSpace"].asString() == "Bogus", "Overridden preset is
   of right type");

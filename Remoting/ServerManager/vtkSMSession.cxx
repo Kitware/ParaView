@@ -360,11 +360,11 @@ void vtkSMSession::ProcessNotification(const vtkSMMessage* message)
   // Find the object for whom this message is meant.
   vtkSMRemoteObject* remoteObj = vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
 
-  // cout << "##########     Server notification    ##########" << endl;
-  // cout << id << " = " << remoteObj << "(" << (remoteObj?
+  // std::cout << "##########     Server notification    ##########" << endl;
+  // std::cout << id << " = " << remoteObj << "(" << (remoteObj?
   //    remoteObj->GetClassName() : "null") << ")" << endl;
   // state.PrintDebugString();
-  // cout << "###################################################" << endl;
+  // std::cout << "###################################################" << endl;
 
   // ProcessingRemoteNotification = true prevent
   // "ignore_synchronization" properties to be loaded...

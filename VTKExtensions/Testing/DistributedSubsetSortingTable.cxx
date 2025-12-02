@@ -25,6 +25,8 @@
 
 #include "vtkProcess.h"
 
+#include <iostream>
+
 class MyProcess : public vtkProcess
 {
 public:
@@ -85,7 +87,7 @@ void MyProcess::Execute()
   sortFilter->SetBlockSize(1024);
   sortFilter->UpdatePiece(me, nbProc, 0);
 
-  //  cout << "Full range ["
+  //  std::cout << "Full range ["
   //       << wavelet->GetOutput()->GetScalarRange()[0]
   //       << ", "
   //       << wavelet->GetOutput()->GetScalarRange()[1]
@@ -96,18 +98,18 @@ void MyProcess::Execute()
   {
     vtkFloatArray* data =
       vtkFloatArray::SafeDownCast(sortFilter->GetOutput()->GetColumnByName("RTData"));
-    //      cout << ">>> Print block " << i << " range: [" << data->GetRange()[0]
+    //      std::cout << ">>> Print block " << i << " range: [" << data->GetRange()[0]
     //           << ", " << data->GetRange()[1] << "] - size: "
     //           << data->GetNumberOfTuples() << endl;
     double goal = data->GetRange()[0];
     vtkIdType index = -1;
     while (goal == data->GetValue(++index))
       ;
-    cout << "the first " << index << " values are the same. The nb proc is " << nbProc << endl;
+    std::cout << "the first " << index << " values are the same. The nb proc is " << nbProc << endl;
     this->ReturnValue = ((index % nbProc) == 0);
     if (this->ReturnValue == 1)
     {
-      cout << "First block values are the same. OK" << endl;
+      std::cout << "First block values are the same. OK" << endl;
     }
   }
 
@@ -140,7 +142,7 @@ int main(int argc, char** argv)
   {
     if (me == 0)
     {
-      cout << "DistributedData test requires more than 1 processe" << endl;
+      std::cout << "DistributedData test requires more than 1 processe" << endl;
     }
     contr->Delete();
     return retVal;
@@ -150,7 +152,7 @@ int main(int argc, char** argv)
   {
     if (me == 0)
     {
-      cout << "DistributedData test requires MPI" << endl;
+      std::cout << "DistributedData test requires MPI" << endl;
     }
     contr->Delete();
     return retVal; // is this the right error val?   TODO

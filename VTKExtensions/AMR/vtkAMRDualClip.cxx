@@ -35,8 +35,7 @@
 #include "vtkUnstructuredGrid.h"
 
 #include <algorithm>
-#include <cmath>
-#include <ctime>
+#include <iostream>
 
 vtkStandardNewMacro(vtkAMRDualClip);
 
@@ -550,7 +549,7 @@ unsigned char vtkAMRDualClipLocator::GetLevelMaskValue(int x, int y, int z)
 
   if (ptr[x + (y * this->YIncrement) + (z * this->ZIncrement)] != 1)
   {
-    // cerr << "debug\n";
+    // std::cerr << "debug\n";
   }
 
   return ptr[x + (y * this->YIncrement) + (z * this->ZIncrement)];
@@ -1815,7 +1814,7 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
           *ptIdPtr = this->Points->InsertNextPoint(pt);
           if (pt[1] > 100000.0)
           {
-            cerr << "bug\n";
+            std::cerr << "bug\n";
           }
 
           // For internal points we do not need to interpolate attributes.
@@ -1853,7 +1852,7 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
           *ptIdPtr = this->Points->InsertNextPoint(pt);
           if (pt[1] > 100000.0)
           {
-            cerr << "bug\n";
+            std::cerr << "bug\n";
           }
 
           // Interpolate attributes

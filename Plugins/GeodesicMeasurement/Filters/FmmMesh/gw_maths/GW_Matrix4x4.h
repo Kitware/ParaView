@@ -720,14 +720,14 @@ public:
     static void TestClass(std::ostream &s = cout)
     {
         TestClassHeader("GW_Matrix4x4", s);
-        cout << "Test for matrix inversion : " << endl;
+        std::cout << "Test for matrix inversion : " << endl;
         GW_Matrix4x4 M;
         M.Randomize();
-        cout << "Matrix M = " << M << endl;
+        std::cout << "Matrix M = " << M << endl;
         GW_Matrix4x4 MM = M.Invert();
-        cout << "Matrix M^-1 = " << MM << endl;
+        std::cout << "Matrix M^-1 = " << MM << endl;
         GW_Float err = (M*MM - GW_Matrix4x4()).Norm2();
-        cout << "|| MM^-1 - ID ||_2 = " << err << endl;
+        std::cout << "|| MM^-1 - ID ||_2 = " << err << endl;
         GW_ASSERT( err<GW_EPSILON );
         TestClassFooter("GW_Matrix4x4", s);
     }

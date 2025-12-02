@@ -214,7 +214,7 @@ int vtkEquivalenceSet::ResolveEquivalences()
     }
   }
   this->Resolved = 1;
-  // cerr << "Final number of equivalent sets: " << count << endl;
+  // std::cerr << "Final number of equivalent sets: " << count << endl;
 
   this->NumberOfResolvedSets = count;
 

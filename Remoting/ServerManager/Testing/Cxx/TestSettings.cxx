@@ -15,6 +15,7 @@
 #include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
 
+#include <iostream>
 #include <vtk_jsoncpp.h>
 
 #include "vtksys/SystemTools.hxx"
@@ -64,32 +65,32 @@ bool TestPriority(vtkSMParaViewPipelineController* controller, vtkSMProxy* spher
   double lowerThanApp = vtkSMSettings::GetApplicationPriority() - 1;
   if (settings->HasSetting("sources.SphereSource.Radius", lowerThanApp))
   {
-    cerr << "Should not have settings with lower priority than ApplicationPriority\n";
+    std::cerr << "Should not have settings with lower priority than ApplicationPriority\n";
     return false;
   }
 
   if (settings->HasSetting(
         "sources.SphereSource.ThetaResolution", vtkSMSettings::GetApplicationPriority()))
   {
-    cerr << "Application priority should not have ThetaResolution\n";
+    std::cerr << "Application priority should not have ThetaResolution\n";
     return false;
   }
 
   if (!settings->HasSetting("sources.SphereSource.Center", vtkSMSettings::GetApplicationPriority()))
   {
-    cerr << "Application priority should have Center\n";
+    std::cerr << "Application priority should have Center\n";
     return false;
   }
 
   if (!settings->HasSetting("sources.SphereSource.ThetaResolution"))
   {
-    cerr << "User priority should have ThetaResolution\n";
+    std::cerr << "User priority should have ThetaResolution\n";
     return false;
   }
 
   if (!settings->HasSetting("sources.SphereSource.Radius"))
   {
-    cerr << "Default (User) priority should have Radius\n";
+    std::cerr << "Default (User) priority should have Radius\n";
     return false;
   }
 
@@ -100,7 +101,7 @@ bool TestPriority(vtkSMParaViewPipelineController* controller, vtkSMProxy* spher
   {
     if (radiusProperty->GetElement(0) != 1.0)
     {
-      cerr << "Failed at " << __LINE__ << endl;
+      std::cerr << "Failed at " << __LINE__ << endl;
       return false;
     }
 
@@ -110,13 +111,13 @@ bool TestPriority(vtkSMParaViewPipelineController* controller, vtkSMProxy* spher
     if (centerProperty->GetElement(0) != 1.0 || centerProperty->GetElement(1) != 2.0 ||
       centerProperty->GetElement(2) != 3.0)
     {
-      cerr << "Failed at " << __LINE__ << endl;
+      std::cerr << "Failed at " << __LINE__ << endl;
       return false;
     }
   }
   else
   {
-    cerr << "Could not get Radius property\n";
+    std::cerr << "Could not get Radius property\n";
   }
 
   return true;
@@ -194,7 +195,7 @@ bool TestJSONSerDes(vtkSMProxy* sphere)
   if (!vtkSMSettings::DeserializeFromJSON(sphere, state) ||
     vtkSMPropertyHelper(sphere, "Radius").GetAsInt() != 12)
   {
-    cerr << "Failed to DeserializeFromJSON." << endl;
+    std::cerr << "Failed to DeserializeFromJSON." << endl;
     return false;
   }
 
@@ -215,19 +216,19 @@ bool TestSaveLoadFile(vtkPVTestUtilities* utility)
   settings->ClearAllSettings();
   if (!settings->AddCollectionFromFile(filePath, vtkSMSettings::GetUserPriority()))
   {
-    cerr << "Failed to load collection from file\n";
+    std::cerr << "Failed to load collection from file\n";
     return false;
   }
 
   if (!settings->HasSetting("sources.SphereSource.Radius"))
   {
-    cerr << "Failed to load UserSettings: SphereSource.Radius not found!\n";
+    std::cerr << "Failed to load UserSettings: SphereSource.Radius not found!\n";
     return false;
   }
 
   if (settings->HasSetting("sources.SphereSource.Center"))
   {
-    cerr << "Wrong setting loaded: has SphereSource.Center but it should not.\n";
+    std::cerr << "Wrong setting loaded: has SphereSource.Center but it should not.\n";
     return false;
   }
 
@@ -242,7 +243,7 @@ int DoTests(vtkPVTestUtilities* utility)
   vtkNew<vtkSMParaViewPipelineController> controller;
   if (!controller->InitializeSession(session))
   {
-    cerr << "Failed to initialize ParaView session." << endl;
+    std::cerr << "Failed to initialize ParaView session." << endl;
     return EXIT_FAILURE;
   }
 

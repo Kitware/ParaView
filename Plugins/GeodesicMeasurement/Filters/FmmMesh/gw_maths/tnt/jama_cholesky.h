@@ -33,7 +33,7 @@ using TNT::Array1D;
         L = chol.getL();
 
       else
-        cout << "factorization was not complete.\n";
+        std::cout << "factorization was not complete.\n";
 
     </pre>
 

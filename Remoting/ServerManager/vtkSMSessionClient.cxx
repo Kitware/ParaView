@@ -37,6 +37,7 @@
 #include <vtksys/RegularExpression.hxx>
 
 #include <cassert>
+#include <iostream>
 #include <set>
 
 //****************************************************************************/
@@ -425,7 +426,7 @@ void vtkSMSessionClient::SetupDataServerRenderServerConnection()
   vtkMPIMToNSocketConnectionPortInformation* info =
     vtkMPIMToNSocketConnectionPortInformation::New();
   this->GatherInformation(RENDER_SERVER, info, mpiMToN->GetGlobalID());
-  // info->Print(cout);
+  // info->Print(std::cout);
 
   vtkSMPropertyHelper helper(mpiMToN, "Connections");
   for (int cc = 0; cc < info->GetNumberOfConnections(); cc++)
@@ -1056,7 +1057,7 @@ bool vtkSMSessionClient::OnWrongTagEvent(
   }
   else
   {
-    cout << "Wrong tag but don't know how to handle it... " << tag << endl;
+    std::cout << "Wrong tag but don't know how to handle it... " << tag << endl;
     abort();
     // We was not able to handle it localy
     // return this->Superclass::OnWrongTagEvent(obj, event, calldata);

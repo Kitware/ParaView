@@ -51,9 +51,9 @@ void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
 //---------------------------------------------------------------------------
 void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset, vtkSMProxyLocator*)
 {
-  // cout << ">>>>>>>>>>>>" << endl;
+  // std::cout << ">>>>>>>>>>>>" << endl;
   // msg->PrintDebugString();
-  // cout << "<<<<<<<<<<<<" << endl;
+  // std::cout << "<<<<<<<<<<<<" << endl;
 
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 

@@ -42,14 +42,14 @@ bool vtkSMServerStateLocator::FindState(
     // We only rely on XML definition to figure out the SM classname
     if (!newState.HasExtension(ProxyState::xml_group))
     {
-      //      cout << "--------- Skipped server State -------------" << endl;
+      //      std::cout << "--------- Skipped server State -------------" << endl;
       //      newState.PrintDebugString();
-      //      cout << "---------------------------------------------------" << endl;
+      //      std::cout << "---------------------------------------------------" << endl;
       return false;
     }
-    //    cout << "--------- State fetch from the server -------------" << endl;
+    //    std::cout << "--------- State fetch from the server -------------" << endl;
     //    stateToFill->PrintDebugString();
-    //    cout << "---------------------------------------------------" << endl;
+    //    std::cout << "---------------------------------------------------" << endl;
     // this->RegisterState(&newState);
     return true;
   }

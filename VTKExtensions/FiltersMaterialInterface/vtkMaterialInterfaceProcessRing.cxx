@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkMaterialInterfaceProcessRing.h"
 #include <iostream>
-using std::cerr;
+
 using std::endl;
 using std::ostream;
 //
@@ -59,7 +59,7 @@ void vtkMaterialInterfaceProcessRing::Initialize(int nProcs)
 //       && minimumLoading>upperLoadingBound)
 //     {
 //     upperLoadingBound=minimumLoading;
-//     cerr << "vtkMaterialInterfaceProcessRing "
+//     std::cerr << "vtkMaterialInterfaceProcessRing "
 //           << "[" << __LINE__ << "] "
 //           << "Error: Upper loading bound excludes all processes."
 //           << endl;
@@ -100,9 +100,9 @@ void vtkMaterialInterfaceProcessRing::Initialize(
   if (upperLoadingBound != -1 && minimumLoading > upperLoadingBound)
   {
     upperLoadingBound = minimumLoading;
-    cerr << "vtkMaterialInterfaceProcessRing "
-         << "[" << __LINE__ << "] "
-         << "Error: Upper loading bound excludes all processes." << endl;
+    std::cerr << "vtkMaterialInterfaceProcessRing "
+              << "[" << __LINE__ << "] "
+              << "Error: Upper loading bound excludes all processes." << endl;
   }
 
   // Build ring of process ids.
@@ -136,13 +136,13 @@ void vtkMaterialInterfaceProcessRing::Print()
   size_t n = this->Buffer->size();
   if (n == 0)
   {
-    cerr << "{}";
+    std::cerr << "{}";
     return;
   }
-  cerr << "{" << (*this->Buffer)[0];
+  std::cerr << "{" << (*this->Buffer)[0];
   for (size_t i = 1; i < n; ++i)
   {
-    cerr << ", " << (*this->Buffer)[i];
+    std::cerr << ", " << (*this->Buffer)[i];
   }
-  cerr << "}";
+  std::cerr << "}";
 }

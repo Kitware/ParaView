@@ -749,7 +749,7 @@ std::ostream& operator<<(std::ostream &s, GW_MatrixNxP& m)
     s << "GW_MatrixNxP : " << endl;
     for( GW_U32 i=0; i<m.GetNbrRows(); ++i )
     {
-        cout << "|";
+        std::cout << "|";
         for( GW_U32 j=0; j<m.GetNbrCols(); ++j )
         {
             s << m.GetData(i,j);

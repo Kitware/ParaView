@@ -26,6 +26,7 @@
 #include "vtkStringScanner.h"
 
 #include <cassert>
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
@@ -415,7 +416,7 @@ bool vtkPVSessionServer::Connect()
       return false;
   }
 
-  cout << "Connection URL: " << url.str() << endl;
+  std::cout << "Connection URL: " << url.str() << endl;
   return this->Connect(url.str().c_str());
 }
 
@@ -437,7 +438,7 @@ bool vtkPVSessionServer::Connect(const char* url)
   {
     this->Internal->GetActiveController()->RegisterController(ccontroller);
     ccontroller->FastDelete();
-    cout << "Client connected." << endl;
+    std::cout << "Client connected." << endl;
   }
 
   if (this->MultipleConnection && !this->DisableFurtherConnections &&
@@ -521,9 +522,9 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       vtkSMMessage msg;
       msg.ParseFromString(string);
 
-      //      cout << "=================================" << endl;
+      //      std::cout << "=================================" << endl;
       //      msg.PrintDebugString();
-      //      cout << "=================================" << endl;
+      //      std::cout << "=================================" << endl;
 
       // Do we skip the processing ?
       if (!this->Internal->StoreShareOnly(&msg))

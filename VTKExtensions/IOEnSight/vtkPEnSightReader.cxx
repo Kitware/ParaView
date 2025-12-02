@@ -29,6 +29,8 @@
 
 #include "vtksys/FStream.hxx"
 
+#include <iostream>
+
 typedef std::vector<vtkPEnSightReader::vtkPEnSightReaderCellIds*> vtkPEnSightReaderCellIdsTypeBase;
 class vtkPEnSightReaderCellIdsType : public vtkPEnSightReaderCellIdsTypeBase
 {
@@ -233,7 +235,7 @@ int vtkPEnSightReader::RequestData(vtkInformation* vtkNotUsed(request),
     this->ActualTimeValue = steps[cnt];
   }
 
-  cout << "Executing with: " << this->ActualTimeValue << endl;
+  std::cout << "Executing with: " << this->ActualTimeValue << endl;
 
   int i, timeSet, fileSet, timeStep, timeStepInFile, fileNum;
   vtkDataArray* times;

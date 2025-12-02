@@ -8,15 +8,14 @@
 #include "vtkErrorObserver.h"
 #include "vtkInformation.h"
 #include "vtkNew.h"
-#include "vtkTestUtilities.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <string>
+#include <iostream>
 
 #define vtk_assert(x)                                                                              \
   if (!(x))                                                                                        \
   {                                                                                                \
-    cerr << "On line " << __LINE__ << " ERROR: Condition FAILED!! : " << #x << endl;               \
+    std::cerr << "On line " << __LINE__ << " ERROR: Condition FAILED!! : " << #x << endl;          \
     return EXIT_FAILURE;                                                                           \
   }
 

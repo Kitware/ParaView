@@ -14,7 +14,7 @@
 #include "vtkTestUtilities.h"
 
 #include <cassert>
-#include <sstream>
+#include <iostream>
 
 static const char* testdefinition =
   "<ServerManagerConfiguration>"
@@ -58,7 +58,7 @@ extern int TestSelfGeneratingSourceProxy(int argc, char* argv[])
   controller->InitializeProxy(sgProxy);
   if (!sgProxy->ExtendDefinition(extension))
   {
-    cerr << "Failed to extend proxy definition!" << endl;
+    std::cerr << "Failed to extend proxy definition!" << endl;
     return EXIT_FAILURE;
   }
   sgProxy->UpdateVTKObjects();
@@ -73,7 +73,7 @@ extern int TestSelfGeneratingSourceProxy(int argc, char* argv[])
   if (sphere->GetCenter()[0] != center[0] || sphere->GetCenter()[1] != center[1] ||
     sphere->GetCenter()[2] != center[2])
   {
-    cerr << "Failed to update VTK object correctly!" << endl;
+    std::cerr << "Failed to update VTK object correctly!" << endl;
     return EXIT_FAILURE;
   }
 
@@ -82,7 +82,7 @@ extern int TestSelfGeneratingSourceProxy(int argc, char* argv[])
     vtkTestUtilities::GetArgOrEnvOrDefault("-T", argc, argv, "VTK_TEMP_DIR", "Testing/Temporary");
   if (!tempDir)
   {
-    cerr << "Could not determine temporary directory.\n";
+    std::cerr << "Could not determine temporary directory.\n";
     return EXIT_FAILURE;
   }
   std::string path = tempDir;
@@ -95,7 +95,7 @@ extern int TestSelfGeneratingSourceProxy(int argc, char* argv[])
 
   if (sphere != nullptr)
   {
-    cerr << "Cleanup has failed!" << endl;
+    std::cerr << "Cleanup has failed!" << endl;
     return EXIT_FAILURE;
   }
 
@@ -105,7 +105,7 @@ extern int TestSelfGeneratingSourceProxy(int argc, char* argv[])
     vtkSMSelfGeneratingSourceProxy::SafeDownCast(pxm->GetProxy("sources", "mysamplesource"));
   if (!sgProxy)
   {
-    cerr << "Failed to load proxy from state file!" << endl;
+    std::cerr << "Failed to load proxy from state file!" << endl;
     return EXIT_FAILURE;
   }
 
@@ -113,7 +113,7 @@ extern int TestSelfGeneratingSourceProxy(int argc, char* argv[])
   if (sphere->GetCenter()[0] != center[0] || sphere->GetCenter()[1] != center[1] ||
     sphere->GetCenter()[2] != center[2])
   {
-    cerr << "State didn't set VTK object ivars correctly. Load must have failed!" << endl;
+    std::cerr << "State didn't set VTK object ivars correctly. Load must have failed!" << endl;
     return EXIT_FAILURE;
   }
 
@@ -126,7 +126,7 @@ extern int TestSelfGeneratingSourceProxy(int argc, char* argv[])
   if (sphere->GetCenter()[0] != center[0] || sphere->GetCenter()[1] != center[1] ||
     sphere->GetCenter()[2] != center[2])
   {
-    cerr << "Failed to update VTK object correctly after loading state!" << endl;
+    std::cerr << "Failed to update VTK object correctly after loading state!" << endl;
     return EXIT_FAILURE;
   }
   sgProxy = nullptr;

@@ -57,9 +57,9 @@ void vtkSMPipelineState::ValidateState()
   {
     vtkSMMessage msg;
     msg.CopyFrom(*this->GetFullState());
-    //    cout << "~~~~~~~~~~~~~ PUSH pxm state to server ~~~~~~~~~~~~~~~~" << endl;
+    //    std::cout << "~~~~~~~~~~~~~ PUSH pxm state to server ~~~~~~~~~~~~~~~~" << endl;
     //    msg.PrintDebugString();
-    //    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    //    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     this->PushState(&msg);
   }
 }

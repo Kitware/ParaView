@@ -6,6 +6,8 @@
 #include "vtkStringArray.h"
 #include "vtkVariantArray.h"
 
+#include <iostream>
+
 static double dblIni[] = { 904., 906., 917. };
 static const char* strIni[] = { "901", "Turbo", "Targa" };
 
@@ -213,12 +215,12 @@ static bool do_check(vtkClientServerStream& css)
     vtkVariant varOut;
     if (!css.GetArgument(0, arg, &varOut) || varOut.ToString() != "911")
     {
-      cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of 911\n";
+      std::cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of 911\n";
       return false;
     }
     if (!css.GetArgument(0, arg, &varOut) || varOut.ToDouble() != 356.0)
     {
-      cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of 356.0\n";
+      std::cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of 356.0\n";
       return false;
     }
     vtkDoubleArray* dblArr;
@@ -228,8 +230,8 @@ static bool do_check(vtkClientServerStream& css)
       dblArr->GetValue(0) != dblIni[0] || dblArr->GetValue(1) != dblIni[1] ||
       dblArr->GetValue(2) != dblIni[2])
     {
-      cout << "Variant was \"" << varOut.ToString().c_str()
-           << "\" instead of (904.0, 906.0, 917.0)\n";
+      std::cout << "Variant was \"" << varOut.ToString().c_str()
+                << "\" instead of (904.0, 906.0, 917.0)\n";
       return false;
     }
     vtkStringArray* strArr;
@@ -239,8 +241,8 @@ static bool do_check(vtkClientServerStream& css)
       strArr->GetValue(0) != strIni[0] || strArr->GetValue(1) != strIni[1] ||
       strArr->GetValue(2) != strIni[2])
     {
-      cout << "Variant was \"" << varOut.ToString().c_str()
-           << "\" instead of (\"901\", \"Turbo\", \"Targa\")\n";
+      std::cout << "Variant was \"" << varOut.ToString().c_str()
+                << "\" instead of (\"901\", \"Turbo\", \"Targa\")\n";
       return false;
     }
     vtkVariantArray* varArr;
@@ -250,13 +252,13 @@ static bool do_check(vtkClientServerStream& css)
       varArr->GetValue(0) != vtkVariant(strIni[0]).ToDouble() || varArr->GetValue(1) != strIni[1] ||
       varArr->GetValue(2) != strIni[2])
     {
-      cout << "Variant was \"" << varOut.ToString().c_str()
-           << "\" instead of (901.0, \"Turbo\", \"Targa\")\n";
+      std::cout << "Variant was \"" << varOut.ToString().c_str()
+                << "\" instead of (901.0, \"Turbo\", \"Targa\")\n";
       return false;
     }
     if (!css.GetArgument(0, arg, &varOut) || varOut.IsValid())
     {
-      cout << "Variant that was supposed to be invalid is valid\n";
+      std::cout << "Variant that was supposed to be invalid is valid\n";
       return false;
     }
   }
@@ -289,9 +291,9 @@ static bool do_test()
   do_store(css1);
 
   // Cover stream print code.
-  cout << "-----------------------------------------------------------\n";
-  css1.Print(cout);
-  cout << "-----------------------------------------------------------\n";
+  std::cout << "-----------------------------------------------------------\n";
+  css1.Print(std::cout);
+  std::cout << "-----------------------------------------------------------\n";
 
   // Copy the stream in various ways.
   vtkClientServerStream css2(css1);
@@ -300,7 +302,7 @@ static bool do_test()
   vtkClientServerStream css4;
   if (!css4.StreamFromString(css3.StreamToString()))
   {
-    cerr << "FAILED: StreamToString or StreamFromString failed." << endl;
+    std::cerr << "FAILED: StreamToString or StreamFromString failed." << endl;
     return false;
   }
   vtkClientServerStream css5;
@@ -309,39 +311,39 @@ static bool do_test()
     size_t length;
     if (!css4.GetData(&data, &length))
     {
-      cerr << "FAILED: GetData failed." << endl;
+      std::cerr << "FAILED: GetData failed." << endl;
       return false;
     }
     if (!css5.SetData(data, length))
     {
-      cerr << "FAILED: SetData failed." << endl;
+      std::cerr << "FAILED: SetData failed." << endl;
       return false;
     }
   }
 
   if (!do_check(css1))
   {
-    cerr << "FAILED: Stream contents could not correctly be retrieved." << endl;
+    std::cerr << "FAILED: Stream contents could not correctly be retrieved." << endl;
     return false;
   }
   if (!do_check(css2))
   {
-    cerr << "FAILED: Copy constructor did not copy stream properly." << endl;
+    std::cerr << "FAILED: Copy constructor did not copy stream properly." << endl;
     return false;
   }
   if (!do_check(css3))
   {
-    cerr << "FAILED: Copy method did not copy stream properly." << endl;
+    std::cerr << "FAILED: Copy method did not copy stream properly." << endl;
     return false;
   }
   if (!do_check(css4))
   {
-    cerr << "FAILED: String(To/From)Stream did not copy stream properly." << endl;
+    std::cerr << "FAILED: String(To/From)Stream did not copy stream properly." << endl;
     return false;
   }
   if (!do_check(css5))
   {
-    cerr << "FAILED: (Get/Set)Data did not copy stream properly." << endl;
+    std::cerr << "FAILED: (Get/Set)Data did not copy stream properly." << endl;
     return false;
   }
   return true;

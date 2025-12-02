@@ -4,6 +4,7 @@
 #include "vtkMaterialInterfacePieceTransactionMatrix.h"
 #include "vtkCommunicator.h"
 #include <cassert>
+#include <iostream>
 using std::vector;
 
 namespace
@@ -262,14 +263,14 @@ void vtkMaterialInterfacePieceTransactionMatrix::Print()
 
       if (nTransactions > 0)
       {
-        cerr << "TM[f=" << i << ",p=" << j << "]=";
+        std::cerr << "TM[f=" << i << ",p=" << j << "]=";
 
         // put this i,j's transaction list
         for (int q = 0; q < nTransactions; ++q)
         {
-          cerr << this->Matrix[matIdx][q] << ",";
+          std::cerr << this->Matrix[matIdx][q] << ",";
         }
-        cerr << endl;
+        std::cerr << endl;
       }
     }
   }

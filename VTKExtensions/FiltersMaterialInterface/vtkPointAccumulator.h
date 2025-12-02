@@ -18,7 +18,10 @@
 #define vtkPointAccumulator_h
 
 #include "vtkPoints.h" // for vtkPoints
-#include <exception>   // for std::bad_alloc
+#ifdef NDEBUG
+#include <exception> // for std::bad_alloc
+#endif
+#include <iostream> // for std::cerr
 
 template <typename T_CPP, class T_VTK>
 class vtkPointAccumulator
@@ -156,12 +159,12 @@ public:
     T_CPP* pBuf = this->PtStore;
     for (int i = 0; i < this->NPts; ++i)
     {
-      cerr << i << " (" << pBuf[0];
+      std::cerr << i << " (" << pBuf[0];
       for (int q = 1; q < 3; ++q)
       {
-        cerr << ", " << pBuf[q];
+        std::cerr << ", " << pBuf[q];
       }
-      cerr << ")" << endl;
+      std::cerr << ")" << endl;
       pBuf += 3;
     }
   }

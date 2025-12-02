@@ -8,12 +8,12 @@
 
 #include "vtkNew.h"
 #include "vtkRenderWindow.h"
-#include "vtkSetGet.h"
 
 #if VTK_MODULE_ENABLE_VTK_Python
 #include "patchlevel.h"
 #endif
 
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vtksys/SystemInformation.hxx>
@@ -120,26 +120,26 @@ extern int TestSystemCaps(int argc, char* argv[])
   sysinfo.RunOSCheck();
 
   // make the report
-  cout << "CTEST_FULL_OUTPUT (Avoid ctest truncation of output)" << endl
-       << endl
-       << "Host System:" << endl
-       << "OS = " << sysinfo.GetOSDescription() << endl
-       << "CPU = " << sysinfo.GetCPUDescription() << endl
-       << "RAM = " << sysinfo.GetMemoryDescription() << endl
-       << endl
+  std::cout << "CTEST_FULL_OUTPUT (Avoid ctest truncation of output)" << endl
+            << endl
+            << "Host System:" << endl
+            << "OS = " << sysinfo.GetOSDescription() << endl
+            << "CPU = " << sysinfo.GetCPUDescription() << endl
+            << "RAM = " << sysinfo.GetMemoryDescription() << endl
+            << endl
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
-       << "MPI:" << endl
-       << "Version = " << GetMPIVersion() << endl
-       << "Library = " << GetMPILibraryVersion() << endl
-       << endl
+            << "MPI:" << endl
+            << "Version = " << GetMPIVersion() << endl
+            << "Library = " << GetMPILibraryVersion() << endl
+            << endl
 #endif
 #if VTK_MODULE_ENABLE_VTK_Python
-       << "Python:" << endl
-       << "Version = " << GetPythonVersion() << endl
-       << endl
+            << "Python:" << endl
+            << "Version = " << GetPythonVersion() << endl
+            << endl
 #endif
-       << "OpenGL:" << endl
-       << GetOpenGLInfo() << endl;
+            << "OpenGL:" << endl
+            << GetOpenGLInfo() << endl;
 
   // always pass
   return 0;

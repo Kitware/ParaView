@@ -68,6 +68,7 @@
 #include "vtksys/SystemTools.hxx"
 
 #include <cassert>
+#include <iostream>
 
 #ifdef QT_TESTING_WITH_PYTHON
 #include "pqPythonEventSourceImage.h"
@@ -302,7 +303,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
   {
     if (view && (view->widget() == widget))
     {
-      cout << "Using View API for capture" << endl;
+      std::cout << "Using View API for capture" << endl;
       return pqCoreTestUtility::CompareView(view, referenceImage, threshold, tempDirectory, size);
     }
   }
@@ -314,7 +315,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
     vtkRenderWindow* rw = glWidget->renderWindow();
     if (rw)
     {
-      cout << "Using QVTKOpenGLStereoWidget RenderWindow API for capture" << endl;
+      std::cout << "Using QVTKOpenGLStereoWidget RenderWindow API for capture" << endl;
       return pqCoreTestUtility::CompareImage(
         rw, referenceImage, threshold, std::cerr, tempDirectory, size);
     }
@@ -325,7 +326,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
     vtkRenderWindow* rw = nativeWidget->renderWindow();
     if (rw)
     {
-      cout << "Using QVTKOpenGLNativeWidget RenderWindow API for capture" << endl;
+      std::cout << "Using QVTKOpenGLNativeWidget RenderWindow API for capture" << endl;
       return pqCoreTestUtility::CompareImage(
         rw, referenceImage, threshold, std::cerr, tempDirectory, size);
     }
@@ -336,7 +337,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
     vtkRenderWindow* rw = qvtkWidget->renderWindow();
     if (rw)
     {
-      cout << "Using QVTKOpenGLNativeWidget RenderWindow API for capture" << endl;
+      std::cout << "Using QVTKOpenGLNativeWidget RenderWindow API for capture" << endl;
       return pqCoreTestUtility::CompareImage(
         rw, referenceImage, threshold, std::cerr, tempDirectory, size);
     }
@@ -399,8 +400,8 @@ bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceIma
     extents[cc] -= view_position[cc / 2];
   }
   test_image->SetExtent(extents);
-  bool ret =
-    pqCoreTestUtility::CompareImage(test_image, referenceImage, threshold, cout, tempDirectory);
+  bool ret = pqCoreTestUtility::CompareImage(
+    test_image, referenceImage, threshold, std::cout, tempDirectory);
   return ret;
 }
 

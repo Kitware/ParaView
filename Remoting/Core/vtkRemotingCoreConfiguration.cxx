@@ -11,6 +11,7 @@
 #include "vtkStringFormatter.h"
 #include "vtkStringScanner.h"
 
+#include <iostream>
 #include <vtk_cli11.h>
 #include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -646,5 +647,5 @@ void vtkRemotingCoreConfiguration::PrintSelf(ostream& os, vtkIndent indent)
   }
 
   os << indent << "DisplayConfiguration: " << endl;
-  this->DisplayConfiguration->PrintSelf(cout, indent.GetNextIndent());
+  this->DisplayConfiguration->PrintSelf(std::cout, indent.GetNextIndent());
 }

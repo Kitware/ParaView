@@ -12,7 +12,7 @@
 #include "vtkTable.h"
 #include "vtkTestUtilities.h"
 
-#include "vtkDataArraySelection.h"
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 extern int TestTemporalMultiplexing(int argc, char* argv[])

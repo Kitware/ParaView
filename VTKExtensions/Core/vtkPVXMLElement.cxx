@@ -10,6 +10,7 @@
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <cctype>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -259,7 +260,7 @@ const char* vtkPVXMLElement::GetCharacterData()
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::PrintXML()
 {
-  this->PrintXML(cout, vtkIndent());
+  this->PrintXML(std::cout, vtkIndent());
 }
 
 //----------------------------------------------------------------------------

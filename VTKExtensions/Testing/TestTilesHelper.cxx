@@ -3,24 +3,25 @@
 
 #include "assert.h"
 #include "vtkTilesHelper.h"
+#include <iostream>
 
 static void vtkTest(int rank, vtkTilesHelper* helper, int minx, int miny, int maxx, int maxy)
 {
   double viewport[] = { 0, 0, 1, 1 };
   double normalized_tile_viewport[4];
   helper->GetNormalizedTileViewport(viewport, rank, normalized_tile_viewport);
-  cout << "---------------------" << endl
-       << "Rank : " << rank << " in " << helper->GetTileDimensions()[0] << "x"
-       << helper->GetTileDimensions()[1] << endl;
-  cout << normalized_tile_viewport[0] << ", " << normalized_tile_viewport[1] << ", "
-       << normalized_tile_viewport[2] << ", " << normalized_tile_viewport[3] << endl;
+  std::cout << "---------------------" << endl
+            << "Rank : " << rank << " in " << helper->GetTileDimensions()[0] << "x"
+            << helper->GetTileDimensions()[1] << endl;
+  std::cout << normalized_tile_viewport[0] << ", " << normalized_tile_viewport[1] << ", "
+            << normalized_tile_viewport[2] << ", " << normalized_tile_viewport[3] << endl;
 
   int tile_viewport[4];
   helper->GetTileViewport(viewport, rank, tile_viewport);
 
-  cout << "Expected value: " << minx << ", " << miny << ", " << maxx << ", " << maxy << endl;
-  cout << "From vtkTilesHelper: " << tile_viewport[0] << ", " << tile_viewport[1] << ", "
-       << tile_viewport[2] << ", " << tile_viewport[3] << endl;
+  std::cout << "Expected value: " << minx << ", " << miny << ", " << maxx << ", " << maxy << endl;
+  std::cout << "From vtkTilesHelper: " << tile_viewport[0] << ", " << tile_viewport[1] << ", "
+            << tile_viewport[2] << ", " << tile_viewport[3] << endl;
   assert(tile_viewport[0] == minx);
   assert(tile_viewport[1] == miny);
   assert(tile_viewport[2] == maxx);

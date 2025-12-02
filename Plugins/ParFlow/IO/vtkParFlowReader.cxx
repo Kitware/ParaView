@@ -15,6 +15,7 @@
 #include "vtksys/FStream.hxx"
 
 #include <cctype>
+#include <iostream>
 #include <sstream>
 
 static constexpr std::streamoff headerSize = 6 * sizeof(double) + 4 * sizeof(int);

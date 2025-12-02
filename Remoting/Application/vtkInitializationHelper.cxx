@@ -30,6 +30,7 @@
 #include "vtksys/SystemTools.hxx"
 
 #include <cassert>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -528,7 +529,7 @@ bool vtkInitializationHelper::InitializeOthers()
   // smTestDriver
   if (vtksys::SystemTools::HasEnv("PARAVIEW_SMTESTDRIVER"))
   {
-    cout << "Process started" << endl;
+    std::cout << "Process started" << endl;
   }
 
   // This checks if the environment has VTK_DEFAULT_OPENGL_WINDOW set. If it is not set,

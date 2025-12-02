@@ -5,6 +5,7 @@
 #include "vtkVector.h"
 
 #include <cassert>
+#include <iostream>
 
 namespace
 {
@@ -14,10 +15,10 @@ void Test(const vtkVector2i& target, const vtkVector2i& maxsize, bool expect_app
   vtkVector2i size(maxsize);
   vtkVector2i mag = vtkSMSaveScreenshotProxy::GetScaleFactorsAndSize(target, size, &approx);
 
-  cout << "----------------------------------------------------" << endl;
-  cout << " Target: " << target << " Max size: " << maxsize << endl;
-  cout << " Achieved: " << (size * mag) << " Approx: " << approx << endl;
-  cout << " New size: " << size << " scale: " << mag << endl << endl;
+  std::cout << "----------------------------------------------------" << endl;
+  std::cout << " Target: " << target << " Max size: " << maxsize << endl;
+  std::cout << " Achieved: " << (size * mag) << " Approx: " << approx << endl;
+  std::cout << " New size: " << size << " scale: " << mag << endl << endl;
   if (size * mag != target && expect_approx == false)
   {
     throw false;

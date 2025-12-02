@@ -4,6 +4,7 @@
 
 #include "pqXMLEventSource.h"
 
+#include <iostream>
 #include <sstream>
 #include <string>
 

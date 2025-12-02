@@ -156,9 +156,9 @@ public:
 
         T_Vector2DList& R = PolyInt.PerformIntersection( P1,P2 );
         for( IT_Vector2DList it=R.begin(); it!=R.end(); ++it )
-            cout << *it << endl;
+            std::cout << *it << endl;
 
-        cout << "Area : " << PolyInt.GetAreaIntersection() << endl;
+        std::cout << "Area : " << PolyInt.GetAreaIntersection() << endl;
         TestClassFooter("GW_PolygonIntersector", s);
     }
 

@@ -19,7 +19,8 @@
 #include <fstream> // for file operations
 using std::ifstream;
 using std::ofstream;
-#include <sstream> // for std::ostringstream
+#include <iostream> // for std::cerr
+#include <sstream>  // for std::ostringstream
 using std::ostringstream;
 #include <vector> // for std::vector
 using std::vector;
@@ -313,7 +314,7 @@ int WritePidFile(vtkCommunicator* comm, string pidFileName)
     {
       for (int procId = 0; procId < nProcs; ++procId)
       {
-        cerr << thisHrp << endl;
+        std::cerr << thisHrp << endl;
         thisHrp += hrpSize;
       }
     }
@@ -357,7 +358,8 @@ string GetMemoryUsage(int pid, int line, int procId)
   }
   else
   {
-    cerr << "[" << line << "] " << procId << " could not open " << statusFileName << "." << endl;
+    std::cerr << "[" << line << "] " << procId << " could not open " << statusFileName << "."
+              << endl;
   }
 
   return memoryUsage.str();
@@ -491,7 +493,7 @@ ostream& operator<<(ostream& sout, vector<int>& vi)
 //   int nProcs=pla.size();
 //   for (int procId=0; procId<nProcs; ++procId)
 //     {
-//     cerr << "Fragment loading on process " << procId << ":" << endl;
+//     std::cerr << "Fragment loading on process " << procId << ":" << endl;
 //     int nLocalFragments=pla[procId].size();
 //     for (int fragmentIdx=0; fragmentIdx<nLocalFragments; ++fragmentIdx)
 //       {
@@ -528,12 +530,12 @@ void PrintHistogram(vector<TCnt>& bins, vector<TLabel>& binIds)
     }
     // clip at width of 40.
     int wid = maxBin < maxWidth ? bins[i] : bins[i] * maxWidth / maxBin;
-    cerr << "{" << setw(12) << std::left << binIds[i] << "}*";
+    std::cerr << "{" << setw(12) << std::left << binIds[i] << "}*";
     for (int j = 1; j < wid; ++j)
     {
-      cerr << "*";
+      std::cerr << "*";
     }
-    cerr << "(" << bins[i] << ")" << endl;
+    std::cerr << "(" << bins[i] << ")" << endl;
   }
 }
 //

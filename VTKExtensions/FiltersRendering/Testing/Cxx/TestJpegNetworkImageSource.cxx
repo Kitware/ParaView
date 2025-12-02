@@ -6,6 +6,8 @@
 #include "vtkProcessModule.h"
 #include "vtkTestUtilities.h"
 
+#include <iostream>
+
 extern int TestJpegNetworkImageSource(int argc, char* argv[])
 {
   auto fileName = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/clouds.jpeg");

@@ -45,6 +45,7 @@
 #include <QStringList>
 
 #include <cassert>
+#include <iostream>
 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #include "vtkPythonInterpreter.h"
@@ -82,7 +83,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   if (rcConfig->GetDisableRegistry())
   {
     // a cout for test playback.
-    cout << "Process started" << endl;
+    std::cout << "Process started" << endl;
   }
 
   // Process tests.
@@ -316,7 +317,7 @@ bool pqCommandLineOptionsBehavior::processTests()
 
     // Play the test script if specified.
     pqTestUtility* testUtility = pqApplicationCore::instance()->testUtility();
-    cout << "Playing: " << qPrintable(script) << endl;
+    std::cout << "Playing: " << qPrintable(script) << endl;
     bool success = testUtility->playTests(script);
     if (success && !baseline.isEmpty())
     {

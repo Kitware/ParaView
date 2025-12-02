@@ -23,6 +23,7 @@
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <algorithm>
+#include <iostream>
 #include <list>
 #include <vector>
 

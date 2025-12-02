@@ -7,6 +7,8 @@
 #include "vtkTestUtilities.h"
 #include "vtkUnstructuredGrid.h"
 
+#include <iostream>
+
 extern int TestPEnSightBinaryGoldReader(int argc, char* argv[])
 {
   char* fname =

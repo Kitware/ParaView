@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "vtkSMCoreUtilities.h"
-#include "vtkTestUtilities.h"
 
 #include <cassert>
+#if defined(_MSC_VER)
 #include <cfloat> //for msvc _nextafter
+#endif
 #include <cmath>
+#include <iostream>
 #include <limits>
-#include <sstream>
 
 namespace
 {
@@ -27,15 +28,15 @@ double next_value_after(double value, double direction)
 
 bool valid_range(double range[2])
 {
-  cout.precision(std::numeric_limits<long double>::digits10 + 1);
+  std::cout.precision(std::numeric_limits<long double>::digits10 + 1);
 
-  cout << "IN: " << std::fixed << range[0] << ", " << range[1] << endl;
+  std::cout << "IN: " << std::fixed << range[0] << ", " << range[1] << endl;
   const bool range_spans_pos_neg = (range[0] < 0 && range[1] > 0);
 
   if (range_spans_pos_neg)
   { // if the range spans both positive and negative the Adjustment will fail.
     bool adjusted = vtkSMCoreUtilities::AdjustRange(range);
-    cout << "OUT: " << range[0] << ", " << range[1] << endl;
+    std::cout << "OUT: " << range[0] << ", " << range[1] << endl;
     return (adjusted == false);
   }
 
@@ -57,7 +58,7 @@ bool valid_range(double range[2])
   // values between the min and max. It could be more if the input
   // range had more, or if we started as a denormal value
   const bool adjusted = vtkSMCoreUtilities::AdjustRange(range);
-  cout << "OUT: " << range[0] << ", " << range[1] << endl;
+  std::cout << "OUT: " << range[0] << ", " << range[1] << endl;
 
   return (adjusted == should_be_adjusted) && (original_range[0] == range[0]) &&
     (next_value <= range[1]);
@@ -89,67 +90,67 @@ extern int TestAdjustRange(int argc, char* argv[])
   int exit_code = EXIT_SUCCESS;
   if (!valid_range(zeros))
   {
-    cerr << "Failed testing zeros" << endl;
+    std::cerr << "Failed testing zeros" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(ones))
   {
-    cerr << "Failed at testing ones" << endl;
+    std::cerr << "Failed at testing ones" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(nones))
   {
-    cerr << "Failed at testing nones" << endl;
+    std::cerr << "Failed at testing nones" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(zero_one))
   {
-    cerr << "Failed at testing zero_one" << endl;
+    std::cerr << "Failed at testing zero_one" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(none_one))
   {
-    cerr << "Failed at testing none_one" << endl;
+    std::cerr << "Failed at testing none_one" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(small))
   {
-    cerr << "Failed at testing small" << endl;
+    std::cerr << "Failed at testing small" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(large))
   {
-    cerr << "Failed at testing large" << endl;
+    std::cerr << "Failed at testing large" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(large_exact))
   {
-    cerr << "Failed at testing large_exact" << endl;
+    std::cerr << "Failed at testing large_exact" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(real_small))
   {
-    cerr << "Failed at testing real_small" << endl;
+    std::cerr << "Failed at testing real_small" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(real_world_case1))
   {
-    cerr << "Failed at testing real_world_case1" << endl;
+    std::cerr << "Failed at testing real_world_case1" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(real_world_case2))
   {
-    cerr << "Failed at testing real_world_case2" << endl;
+    std::cerr << "Failed at testing real_world_case2" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(real_world_case3))
   {
-    cerr << "Failed at testing real_world_case3" << endl;
+    std::cerr << "Failed at testing real_world_case3" << endl;
     exit_code = EXIT_FAILURE;
   }
   if (!valid_range(real_world_case4))
   {
-    cerr << "Failed at testing real_world_case4" << endl;
+    std::cerr << "Failed at testing real_world_case4" << endl;
     exit_code = EXIT_FAILURE;
   }
   return exit_code;

@@ -11,8 +11,9 @@
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkRemotingCoreConfiguration.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
+
+#include <iostream>
 
 #if PARAVIEW_USE_PYTHON
 extern "C"
@@ -105,11 +106,11 @@ static int RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
     // Report status:
     if (config->GetReverseConnection())
     {
-      cout << "Connecting to client (reverse connection requested)..." << endl;
+      std::cout << "Connecting to client (reverse connection requested)..." << endl;
     }
     else
     {
-      cout << "Waiting for client..." << endl;
+      std::cout << "Waiting for client..." << endl;
     }
   }
   bool success = false;
@@ -130,7 +131,7 @@ static int RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
     pm->UnRegisterSession(session);
   }
 
-  cout << "Exiting..." << endl;
+  std::cout << "Exiting..." << endl;
   session->Delete();
   // Exit application
   vtkInitializationHelper::Finalize();

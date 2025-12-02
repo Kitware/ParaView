@@ -19,8 +19,8 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <algorithm>
 #include <cmath>
+#include <iostream>
 
 vtkStandardNewMacro(vtkMooseXfemClip);
 

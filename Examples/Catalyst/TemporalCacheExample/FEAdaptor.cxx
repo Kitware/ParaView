@@ -80,7 +80,7 @@ public:
       vtkTemporalDataSetCache::SafeDownCast(pcache->GetClientSideObject());
     if (!cache)
     {
-      cerr << "Something is wrong, pipeline should have a temporal cache." << endl;
+      std::cerr << "Something is wrong, pipeline should have a temporal cache." << endl;
       return 1;
     }
 
@@ -246,7 +246,7 @@ void Initialize(int argc, char* argv[])
   {
     // KEY POINT:
     // If you want to use memkind features, you have to tell VTK where you want to map from.
-    cout << "Extended memory is backed by " << home << endl;
+    std::cout << "Extended memory is backed by " << home << endl;
     vtkObjectBase::SetMemkindDirectory(home.c_str());
   }
 

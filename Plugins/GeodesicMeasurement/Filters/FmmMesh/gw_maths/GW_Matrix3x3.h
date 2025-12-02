@@ -13,6 +13,8 @@
 #include "GW_Maths.h"
 #include "GW_MatrixStatic.h"
 
+#include <iostream>
+
 namespace GW {
 
 /*------------------------------------------------------------------------------*/
@@ -414,17 +416,17 @@ public:
         x = M*b;
     }
 
-    static void TestClass(std::ostream &s = cout)
+    static void TestClass(std::ostream &s = std::cout)
     {
         TestClassHeader("GW_Matrix3x3", s);
-        cout << "Test for matrix inversion : " << endl;
+        std::cout << "Test for matrix inversion : " << endl;
         GW_Matrix3x3 M;
         M.Randomize();
-        cout << "Matrix M = " << M << endl;
+        std::cout << "Matrix M = " << M << endl;
         GW_Matrix3x3 MM = M.Invert();
-        cout << "Matrix M^-1 = " << MM << endl;
+        std::cout << "Matrix M^-1 = " << MM << endl;
         GW_Float err = (M*MM - GW_Matrix3x3()).Norm2();
-        cout << "|| MM^-1 - ID ||_2 = " << err << endl;
+        std::cout << "|| MM^-1 - ID ||_2 = " << err << endl;
         GW_ASSERT( err<GW_EPSILON );
         TestClassFooter("GW_Matrix3x3", s);
     }

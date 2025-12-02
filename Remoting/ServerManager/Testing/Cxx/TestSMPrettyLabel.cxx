@@ -3,14 +3,13 @@
 
 #include "vtkSMProperty.h"
 
-#include <cstring>
 #include <iostream>
 
 static bool CheckStringEquivalent(const std::string& tested, const std::string& reference)
 {
   if (tested != reference)
   {
-    cerr << "Expected '" << reference << "' but got '" << tested << "'" << std::endl;
+    std::cerr << "Expected '" << reference << "' but got '" << tested << "'" << std::endl;
     return false;
   }
   return true;

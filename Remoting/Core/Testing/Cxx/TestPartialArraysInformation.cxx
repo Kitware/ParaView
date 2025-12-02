@@ -11,6 +11,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
 
+#include <iostream>
+
 static vtkSmartPointer<vtkPolyData> GetPolyData(
   const char** parrays = nullptr, const char** carrays = nullptr)
 {
@@ -66,34 +68,34 @@ extern int TestPartialArraysInformation(int, char*[])
 
   if (info->GetArrayInformation("pd0", vtkDataObject::POINT) == nullptr)
   {
-    cerr << "ERROR: failed to find `pd0`." << endl;
+    std::cerr << "ERROR: failed to find `pd0`." << endl;
     return EXIT_FAILURE;
   }
   if (info->GetArrayInformation("pd0", vtkDataObject::POINT)->GetIsPartial())
   {
-    cerr << "ERROR: 'pd0' should not have been flagged as partial.";
+    std::cerr << "ERROR: 'pd0' should not have been flagged as partial.";
     return EXIT_FAILURE;
   }
 
   if (info->GetArrayInformation("cd0", vtkDataObject::CELL) == nullptr)
   {
-    cerr << "ERROR: failed to find `cd0`." << endl;
+    std::cerr << "ERROR: failed to find `cd0`." << endl;
     return EXIT_FAILURE;
   }
   if (!info->GetArrayInformation("cd0", vtkDataObject::CELL)->GetIsPartial())
   {
-    cerr << "ERROR: 'cd0' should have been flagged as partial.";
+    std::cerr << "ERROR: 'cd0' should have been flagged as partial.";
     return EXIT_FAILURE;
   }
 
   if (info->GetArrayInformation("cd1", vtkDataObject::CELL) == nullptr)
   {
-    cerr << "ERROR: failed to find `cd1`." << endl;
+    std::cerr << "ERROR: failed to find `cd1`." << endl;
     return EXIT_FAILURE;
   }
   if (!info->GetArrayInformation("cd1", vtkDataObject::CELL)->GetIsPartial())
   {
-    cerr << "ERROR: 'cd1' should have been flagged as partial.";
+    std::cerr << "ERROR: 'cd1' should have been flagged as partial.";
     return EXIT_FAILURE;
   }
 
@@ -105,23 +107,23 @@ extern int TestPartialArraysInformation(int, char*[])
 
   if (b1info->GetArrayInformation("cd0", vtkDataObject::CELL) == nullptr)
   {
-    cerr << "ERROR: failed to find `cd0` on block 1." << endl;
+    std::cerr << "ERROR: failed to find `cd0` on block 1." << endl;
     return EXIT_FAILURE;
   }
   if (b1info->GetArrayInformation("cd0", vtkDataObject::CELL)->GetIsPartial())
   {
-    cerr << "ERROR: 'cd0' should not have been flagged as partial on block 1";
+    std::cerr << "ERROR: 'cd0' should not have been flagged as partial on block 1";
     return EXIT_FAILURE;
   }
 
   if (b1info->GetArrayInformation("cd1", vtkDataObject::CELL) == nullptr)
   {
-    cerr << "ERROR: failed to find `cd1` on block 1." << endl;
+    std::cerr << "ERROR: failed to find `cd1` on block 1." << endl;
     return EXIT_FAILURE;
   }
   if (!b1info->GetArrayInformation("cd1", vtkDataObject::CELL)->GetIsPartial())
   {
-    cerr << "ERROR: 'cd1' should have been flagged as partial on block 1";
+    std::cerr << "ERROR: 'cd1' should have been flagged as partial on block 1";
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;

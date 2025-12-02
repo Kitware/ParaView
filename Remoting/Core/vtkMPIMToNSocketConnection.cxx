@@ -12,6 +12,7 @@
 #include "vtkSocketCommunicator.h"
 
 #include <cassert>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -100,7 +101,7 @@ void vtkMPIMToNSocketConnection::Initialize(int waiting_process_type)
 //------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::ConnectMtoN()
 {
-  cout << "ConnectMtoN" << endl;
+  std::cout << "ConnectMtoN" << endl;
   if (this->IsWaiting)
   {
     this->WaitForConnection();
@@ -136,7 +137,7 @@ void vtkMPIMToNSocketConnection::SetupWaitForConnection()
   {
     this->NumberOfConnections = this->Controller->GetNumberOfProcesses();
   }
-  cout.flush();
+  std::cout.flush();
 }
 
 //------------------------------------------------------------------------------
@@ -152,9 +153,9 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
     vtkErrorMacro("SetupWaitForConnection must be called before WaitForConnection");
     return;
   }
-  cout << "Waiting for connection:"
-       << " rank :" << myId << " host :" << this->Internals->SelfHostName.c_str()
-       << " port :" << this->PortNumber << "\n";
+  std::cout << "Waiting for connection:"
+            << " rank :" << myId << " host :" << this->Internals->SelfHostName.c_str()
+            << " port :" << this->PortNumber << "\n";
 
   vtkClientSocket* socket = this->ServerSocket->WaitForConnection();
   this->ServerSocket->Delete();
@@ -170,8 +171,8 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
 
   int data;
   this->SocketCommunicator->Receive(&data, 1, 1, 1238);
-  cout << "Received Hello from process " << data << "\n";
-  cout.flush();
+  std::cout << "Received Hello from process " << data << "\n";
+  std::cout.flush();
 }
 
 //------------------------------------------------------------------------------
@@ -193,9 +194,9 @@ void vtkMPIMToNSocketConnection::Connect()
   const vtkMPIMToNSocketConnectionInternals::NodeInformation& targetNode =
     this->Internals->ServerInformation[myId];
 
-  cout << "Connecting :"
-       << " rank :" << myId << " dest-host :" << targetNode.HostName.c_str()
-       << " dest-port :" << targetNode.PortNumber << endl;
+  std::cout << "Connecting :"
+            << " rank :" << myId << " dest-host :" << targetNode.HostName.c_str()
+            << " dest-port :" << targetNode.PortNumber << endl;
 
   this->SocketCommunicator->ConnectTo(
     const_cast<char*>(targetNode.HostName.c_str()), targetNode.PortNumber);

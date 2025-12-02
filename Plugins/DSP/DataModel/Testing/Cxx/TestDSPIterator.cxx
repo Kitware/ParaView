@@ -14,6 +14,8 @@
 #include "vtkTemporalMultiplexing.h"
 #include "vtkTestUtilities.h"
 
+#include <iostream>
+
 namespace
 {
 

@@ -12,6 +12,7 @@
 #endif
 
 #include <cassert>
+#include <iostream>
 #include <unistd.h>
 
 // typedef unsigned short MessageTagProtocol;
@@ -127,17 +128,17 @@ void vtkVRUIPipe::ReadLayout(vtkVRUIServerState* state)
   uint32_t value; /* Generic 4-byte "value" returned by VRUI VRDeviceDaemon */
   ssize_t bytes;  /* The number of bytes returned from a socket read */
 
-  cout << "Vrui Server: using protocol " << this->protocol << endl;
+  std::cout << "Vrui Server: using protocol " << this->protocol << endl;
   /* Read the protocol value */
   if (this->protocol > 0)
   {
-    cout << "Reading Vrui Protocol value" << endl;
+    std::cout << "Reading Vrui Protocol value" << endl;
     bytes = read(this->Socket, reinterpret_cast<char*>(&value), sizeof(value));
     if (bytes < 0)
     {
       qDebug() << "Socket readlayout protocol number error";
     }
-    cout << "Vrui Server: reporting protocol " << value << endl;
+    std::cout << "Vrui Server: reporting protocol " << value << endl;
   }
 
 /* Read the number of 6-DOF position trackers */
@@ -156,7 +157,7 @@ void vtkVRUIPipe::ReadLayout(vtkVRUIServerState* state)
     (*(state->GetTrackerStates()))[count] = vtkVRUITrackerState::New();
   }
 
-  cout << "Vrui Server: reporting " << value << " trackers" << endl;
+  std::cout << "Vrui Server: reporting " << value << " trackers" << endl;
 
 /* Read the number of buttons */
 #ifdef QTSOCK
@@ -170,7 +171,7 @@ void vtkVRUIPipe::ReadLayout(vtkVRUIServerState* state)
 #endif
   state->GetButtonStates()->resize(value);
 
-  cout << "Vrui Server: reporting " << value << " buttons" << endl;
+  std::cout << "Vrui Server: reporting " << value << " buttons" << endl;
 
 /* Read the number of valuators */
 #ifdef QTSOCK
@@ -184,7 +185,7 @@ void vtkVRUIPipe::ReadLayout(vtkVRUIServerState* state)
 #endif
   state->GetValuatorStates()->resize(value);
 
-  cout << "Vrui Server: reporting " << value << " valuators " << endl;
+  std::cout << "Vrui Server: reporting " << value << " valuators " << endl;
 }
 
 // ----------------------------------------------------------------------------

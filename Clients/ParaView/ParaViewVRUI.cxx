@@ -145,14 +145,14 @@ void ParaViewVRUI::Init()
   this->Internals->Pipe->Send(vruiPipe::CONNECT_REQUEST);
   if (!this->Internals->Pipe->WaitForServerReply(30000)) // 30s
   {
-    cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
+    std::cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
     delete this->Internals->Pipe;
     this->Internals->Pipe = 0;
     return;
   }
   if (this->Internals->Pipe->Receive() != vruiPipe::CONNECT_REPLY)
   {
-    cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
+    std::cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
     delete this->Internals->Pipe;
     this->Internals->Pipe = 0;
     return;
@@ -276,7 +276,7 @@ void ParaViewVRUI::GetNextPacket()
       {
         if (this->Internals->Pipe->Receive() != vruiPipe::PACKET_REPLY)
         {
-          cout << "PVRUI Mismatching message while waiting for PACKET_REPLY" << endl;
+          std::cout << "PVRUI Mismatching message while waiting for PACKET_REPLY" << endl;
         }
         else
         {
@@ -290,7 +290,7 @@ void ParaViewVRUI::GetNextPacket()
       }
       else
       {
-        cout << "timeout for PACKET_REPLY" << endl;
+        std::cout << "timeout for PACKET_REPLY" << endl;
       }
     }
   }
@@ -307,12 +307,12 @@ void ParaViewVRUI::PrintPositionOrientation()
   (*trackers)[0]->GetPosition(pos);
   (*trackers)[0]->GetUnitQuaternion(q);
 
-  // cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
-  // cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
+  // std::cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
+  // std::cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
   //      << endl;
 
   std::vector<bool>* buttons = this->Internals->State->GetButtonStates();
-  // cout << "button0=" << (*buttons)[0] << endl;
+  // std::cout << "button0=" << (*buttons)[0] << endl;
   pqView* view = 0;
   view = pqActiveObjects::instance().activeView();
   if (view)

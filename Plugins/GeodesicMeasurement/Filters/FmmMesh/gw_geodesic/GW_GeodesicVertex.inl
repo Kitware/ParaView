@@ -284,7 +284,7 @@ void GW_GeodesicVertex::ComputeFrontIntersection( GW_GeodesicVertex& v1, GW_Geod
     }
     else    // use classical extrapolation
     {
-//        cout << "missed" << endl;
+//        std::cout << "missed" << endl;
         GW_GeodesicVertex::ComputeFrontIntersection( v1, d1, v2, d2, pInter, pLambda );
     }
 }

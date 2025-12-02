@@ -19,6 +19,8 @@
     #include "GW_VoronoiMesh.inl"
 #endif
 
+#include <iostream>
+
 using namespace GW;
 
 T_VoronoiVertexList GW_VoronoiMesh::CurrentTargetVertex_;
@@ -236,7 +238,7 @@ GW_U32 GW_VoronoiMesh::AddFurthestPointsIterate( T_GeodesicVertexList& VertList,
     if( bUseProgressBar )
     {
         pb.End();
-        cout << endl;
+        std::cout << endl;
     }
     return nNbrPoints;
 }
@@ -745,7 +747,7 @@ void GW_VoronoiMesh::BuildGeodesicBoundaries( GW_GeodesicMesh& Mesh )
                 // GW_ASSERT( pFace1!=NULL || pFace2!=NULL )    // \todo FIX THIS BUG
                 if( pFace1!=NULL || pFace2!=NULL )
                 {
-//                    cout << "Gap in a geodesic boundary." << endl;
+//                    std::cout << "Gap in a geodesic boundary." << endl;
                 }
                 pPrevVert = pVert;
             }

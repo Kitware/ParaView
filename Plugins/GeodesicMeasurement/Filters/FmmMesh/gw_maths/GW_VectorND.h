@@ -434,7 +434,7 @@ inline
 std::ostream& operator<<(std::ostream &s, GW_VectorND& v)
 {
     s << "GW_VectorND, size=" << v.GetDim() << " : " << endl;
-    cout << "|";
+    std::cout << "|";
     for( GW_U32 j=0; j<v.GetDim(); ++j )
     {
         s << v.GetData(j);

@@ -258,10 +258,10 @@ public:
         {
             b.SetZero();
             b[i] = 1;
-            cout << M << endl;
-            cout << b << endl;
+            std::cout << M << endl;
+            std::cout << b << endl;
             M.LUSolve( x, b );
-            cout << x << endl;
+            std::cout << x << endl;
             GW_Maths::Convert(xstatic, x);
             r.SetColumn( xstatic, i );
         }
@@ -651,11 +651,11 @@ public:
 
         s << "The rows of the matrix : " << endl;
         for( GW_U32 i=0; i<3; ++i )
-            cout << M.GetRow(i) << endl;
+            std::cout << M.GetRow(i) << endl;
 
         s << "The columns of the matrix : " << endl;
         for( GW_U32 j=0; j<5; ++j )
-            cout << M.GetColumn(j) << endl;
+            std::cout << M.GetColumn(j) << endl;
 
         GW_MatrixStatic<5,5,GW_Float> TMM = (TM*M);
         GW_MatrixStatic<3,3,GW_Float> MTM = (M*TM);
@@ -711,7 +711,7 @@ public:
         b.Randomize();
         A.Solve(x,b);
         err = (A*x-b).Norm();
-        cout << "Error = " << err << endl;
+        std::cout << "Error = " << err << endl;
         GW_ASSERT( err<GW_EPSILON );
 
         s << "Test of matrix over complex field : a matrix M :" << endl;
@@ -720,8 +720,8 @@ public:
         GW_Complex<GW_Float> max;
         max.real(1); max.imag(1);
         CM.Randomize( min,max );
-        cout << CM << endl;
-        cout << "|M|_2=" << CM.Norm2() << ", |M|_1=" << CM.Norm1() << ", |M|_inf=" << CM.NormInf() << endl;
+        std::cout << CM << endl;
+        std::cout << "|M|_2=" << CM.Norm2() << ", |M|_1=" << CM.Norm1() << ", |M|_inf=" << CM.NormInf() << endl;
     }
 
 protected:
@@ -742,7 +742,7 @@ std::ostream& operator<<(std::ostream &s, GW_MatrixStatic<r_size, c_size, v_type
     s << " : " << endl;
     for( GW_U32 i=0; i<r_size; ++i )
     {
-        cout << "|";
+        std::cout << "|";
         for( GW_U32 j=0; j<c_size; ++j )
         {
             s << m.GetData(i,j);

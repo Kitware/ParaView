@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <cctype> // for isprint().
+#include <iostream>
 #include <map>
 #include <set>
 #include <string>
@@ -324,12 +325,12 @@ public:
   {
     if (this->Object && this->Object->GetMTime() != this->MTime)
     {
-      cerr << this->Object->GetClassName()
-           << "'s MTime was changed unexpectedly.\n"
-              "This can imply serious problem in the reader logic and cause\n"
-              "unexpected issues when running in parallel. \n"
-              "Please address the issues."
-           << endl;
+      std::cerr << this->Object->GetClassName()
+                << "'s MTime was changed unexpectedly.\n"
+                   "This can imply serious problem in the reader logic and cause\n"
+                   "unexpected issues when running in parallel. \n"
+                   "Please address the issues."
+                << endl;
       abort();
     }
   }

@@ -866,7 +866,7 @@ void GenericIO::write()
   if (Rank == 0)
   {
     double Rate = ((double)FileSize) / MaxTotalTime / (1024. * 1024.);
-    cout << "Wrote " << Vars.size() << " variables to " << FileName << " (" << FileSize
+    std::cout << "Wrote " << Vars.size() << " variables to " << FileName << " (" << FileSize
          << " bytes) in " << MaxTotalTime << "s: " << Rate << " MB/s" << endl;
   }
 
@@ -1512,7 +1512,7 @@ void GenericIO::readDataSection(
   if (Rank == 0 && PrintStats)
   {
     double Rate = ((double)AllTotalReadSize) / MaxTotalTime / (1024. * 1024.);
-    cout << "Read " << Vars.size() << " variables from " << FileName << " (" << AllTotalReadSize
+    std::cout << "Read " << Vars.size() << " variables from " << FileName << " (" << AllTotalReadSize
          << " bytes) in " << MaxTotalTime << "s: " << Rate << " MB/s [excluding header read]"
          << endl;
   }
@@ -1826,7 +1826,7 @@ void GenericIO::readData(int EffRank, bool PrintStats, bool CollStats)
   if (Rank == 0 && PrintStats)
   {
     double Rate = ((double)AllTotalReadSize) / MaxTotalTime / (1024. * 1024.);
-    cout << "Read " << Vars.size() << " variables from " << FileName << " (" << AllTotalReadSize
+    std::cout << "Read " << Vars.size() << " variables from " << FileName << " (" << AllTotalReadSize
          << " bytes) in " << MaxTotalTime << "s: " << Rate << " MB/s [excluding header read]"
          << endl;
   }

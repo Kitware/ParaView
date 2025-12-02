@@ -26,6 +26,7 @@
 #include "vtkUnsignedIntArray.h"
 
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -55,7 +56,7 @@ public:
   //  static void WaitForGDB()
   //    {
   //    bool debug = true;
-  //    cout << "Waiting GDB for process "
+  //    std::cout << "Waiting GDB for process "
   //         << vtkMultiProcessController::GetGlobalController()->GetLocalProcessId()
   //         << " launch: gdb --pid=" << getpid() << endl
   //         << " - Go up till you are in the while loop (sleep)." << endl
@@ -92,7 +93,7 @@ public:
       {
         if (dstArray->InsertNextTuple(idx, otherArray) == -1)
         {
-          cout << "ERROR MergeTable::InsertNextTuple is not working." << endl;
+          std::cout << "ERROR MergeTable::InsertNextTuple is not working." << endl;
         }
       }
 
@@ -265,8 +266,8 @@ public:
       }
       else
       {
-        cout << "Try to add value out of the histogran range: " << value << " Range: [" << this->Min
-             << ", " << (this->Min + this->Delta * this->Size) << "]" << endl;
+        std::cout << "Try to add value out of the histogran range: " << value << " Range: ["
+                  << this->Min << ", " << (this->Min + this->Delta * this->Size) << "]" << endl;
       }
     }
 
@@ -307,7 +308,7 @@ public:
       if (this->Min != other.Min || this->Delta != other.Delta || Size != other.Size)
       {
         // Throw exception because not compatible histogram
-        cout << "ERROR: Histogram::Merge not compatible histogram !" << endl;
+        std::cout << "ERROR: Histogram::Merge not compatible histogram !" << endl;
       }
       for (int i = 0; i < this->Size; i++)
       {
@@ -342,19 +343,19 @@ public:
 
     void Print()
     {
-      cout << "Histo: " << endl
-           << " - NbElements: " << this->TotalValues << endl
-           << " - Min: " << this->Min << endl
-           << " - Delta: " << this->Delta << endl
-           << " - Size: " << this->Size << endl;
+      std::cout << "Histo: " << endl
+                << " - NbElements: " << this->TotalValues << endl
+                << " - Min: " << this->Min << endl
+                << " - Delta: " << this->Delta << endl
+                << " - Size: " << this->Size << endl;
       double min = this->Min;
       for (int i = 0; i < this->Size; i++)
       {
         if (this->Values[i] > 0)
         {
-          cout << " - [" << min << ", ";
+          std::cout << " - [" << min << ", ";
           min += this->Delta;
-          cout << min << "]: " << this->Values[i] << endl;
+          std::cout << min << "]: " << this->Values[i] << endl;
         }
         else
         {
@@ -979,7 +980,7 @@ public:
       if (!this->DataToSort)
       {
         // This mean that no output can be provided
-        // cout << "ERROR the merge process have no DataArray." << endl;
+        // std::cout << "ERROR the merge process have no DataArray." << endl;
         return 1;
       }
       vtkDataArray* subsetArray =
@@ -1110,7 +1111,7 @@ public:
         {
           if (subArray->InsertNextTuple(sorter->Array[idx].OriginalIndex, srcArray) == -1)
           {
-            cout << "ERROR NewSubsetTable::InsertNextTuple is not working." << endl;
+            std::cout << "ERROR NewSubsetTable::InsertNextTuple is not working." << endl;
           }
         }
       }
@@ -1121,7 +1122,7 @@ public:
         {
           if (subArray->InsertNextTuple(idx, srcArray) == -1)
           {
-            cout << "ERROR NewSubsetTable::InsertNextTuple is not working." << endl;
+            std::cout << "ERROR NewSubsetTable::InsertNextTuple is not working." << endl;
           }
         }
       }
@@ -1185,9 +1186,8 @@ public:
 
           //          if(pid < 0 || pid >= this->NumProcs)
           //            {
-          //            cout << "Error invalid pid " << pid << " at idx " << idx << " mergePid " <<
-          //            mergePid << " me " << this->Me << endl;
-          //            WaitForGDB();
+          //            std::cout << "Error invalid pid " << pid << " at idx " << idx << " mergePid
+          //            " << mergePid << " me " << this->Me << endl; WaitForGDB();
           //            }
 
           structuredIndices->InsertNextTuple3((id % dimensions[3 * pid]),
@@ -1203,7 +1203,7 @@ public:
   // --------------------------------------------------------------------------
   bool TestInternalClasses() override
   {
-    cout << "vtkSortedTableStreamer::TestInternalClasses()" << endl;
+    std::cout << "vtkSortedTableStreamer::TestInternalClasses()" << endl;
 
     vtkSmartPointer<vtkTable> input = vtkSmartPointer<vtkTable>::New();
     vtkSmartPointer<vtkDoubleArray> dataA = vtkSmartPointer<vtkDoubleArray>::New();
@@ -1253,8 +1253,9 @@ public:
     // Make sure that no values have been skipped while adding them
     if (histPart1.TotalValues + histPart2.TotalValues != dataA->GetNumberOfTuples())
     {
-      cout << "Invalid number of elements in the histogram. Expected " << dataA->GetNumberOfTuples()
-           << " and got " << (histPart1.TotalValues + histPart2.TotalValues) << endl;
+      std::cout << "Invalid number of elements in the histogram. Expected "
+                << dataA->GetNumberOfTuples() << " and got "
+                << (histPart1.TotalValues + histPart2.TotalValues) << endl;
       return false;
     }
 
@@ -1263,12 +1264,12 @@ public:
     histMerge.Merge(histPart2);
     if (histMerge.TotalValues != dataA->GetNumberOfTuples())
     {
-      cout << "Invalid number of elements in the histogram. Expected " << dataA->GetNumberOfTuples()
-           << " and got " << (histMerge.TotalValues) << endl;
+      std::cout << "Invalid number of elements in the histogram. Expected "
+                << dataA->GetNumberOfTuples() << " and got " << (histMerge.TotalValues) << endl;
       return false;
     }
 
-    cout << "Histogram ok" << endl;
+    std::cout << "Histogram ok" << endl;
 
     // Try to sort array
     ArraySorter sortedArray;
@@ -1280,22 +1281,22 @@ public:
 
     if (sortedArray.ArraySize != dataA->GetNumberOfTuples())
     {
-      cout << "Invalid sorted array size. Expected " << dataA->GetNumberOfTuples() << " and got "
-           << sortedArray.ArraySize << endl;
+      std::cout << "Invalid sorted array size. Expected " << dataA->GetNumberOfTuples()
+                << " and got " << sortedArray.ArraySize << endl;
       return false;
     }
 
     if (sortedArray.Array[0].Value != min)
     {
-      cout << "The min is not the first element in the array. Expected: " << min << " and got "
-           << sortedArray.Array[0].Value << endl;
+      std::cout << "The min is not the first element in the array. Expected: " << min << " and got "
+                << sortedArray.Array[0].Value << endl;
       return false;
     }
 
     if (sortedArray.Array[sortedArray.ArraySize - 1].Value != max)
     {
-      cout << "The max is not the first element in the array. Expected: " << max << " and got "
-           << sortedArray.Array[sortedArray.ArraySize - 1].Value << endl;
+      std::cout << "The max is not the first element in the array. Expected: " << max << " and got "
+                << sortedArray.Array[sortedArray.ArraySize - 1].Value << endl;
       return false;
     }
 
@@ -1305,27 +1306,27 @@ public:
 
     if (sortedArray.ArraySize != dataA->GetNumberOfTuples())
     {
-      cout << "Invalid sorted array size. Expected " << dataA->GetNumberOfTuples() << " and got "
-           << sortedArray.ArraySize << endl;
+      std::cout << "Invalid sorted array size. Expected " << dataA->GetNumberOfTuples()
+                << " and got " << sortedArray.ArraySize << endl;
       return false;
     }
 
     if (sortedArray.Array[0].Value != max)
     {
-      cout << "The max is not the first element in the array. Expected: " << max << " and got "
-           << sortedArray.Array[0].Value << endl;
+      std::cout << "The max is not the first element in the array. Expected: " << max << " and got "
+                << sortedArray.Array[0].Value << endl;
       return false;
     }
 
     if (sortedArray.Array[sortedArray.ArraySize - 1].Value != min)
     {
-      cout << "The min is not the first element in the array. Expected: " << min << " and got "
-           << sortedArray.Array[sortedArray.ArraySize - 1].Value << endl;
+      std::cout << "The min is not the first element in the array. Expected: " << min << " and got "
+                << sortedArray.Array[sortedArray.ArraySize - 1].Value << endl;
       return false;
     }
 
-    cout << "ArraySorter ok [" << dataA->GetRange()[0] << ", " << dataA->GetRange()[1] << "]"
-         << endl;
+    std::cout << "ArraySorter ok [" << dataA->GetRange()[0] << ", " << dataA->GetRange()[1] << "]"
+              << endl;
 
     return true;
   }
@@ -1801,7 +1802,7 @@ void vtkSortedTableStreamer::PrintInfo(vtkTable* input)
   }
   stream << endl;
 
-  cout << stream.str().c_str();
+  std::cout << stream.str().c_str();
 }
 //----------------------------------------------------------------------------
 bool vtkSortedTableStreamer::TestInternalClasses()
