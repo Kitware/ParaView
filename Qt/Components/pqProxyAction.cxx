@@ -202,7 +202,7 @@ void pqProxyAction::updateActionsState(QList<QAction*> actions)
     }
   }
 
-  if (selModel->GetNumberOfSelectedProxies() == 0 || outputPorts.empty())
+  if ((selModel && selModel->GetNumberOfSelectedProxies() == 0) || outputPorts.empty())
   {
     enabled = false;
   }
