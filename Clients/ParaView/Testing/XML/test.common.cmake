@@ -1637,6 +1637,7 @@ list(APPEND TESTS_WITH_BASELINES
   PointGaussianNoScaleTransferFunction.xml
   PointGaussianScaleOpacityArray.xml
   PointInterpolator.xml
+  PointsMatchingTransform.xml
   PointVolumeInterpolator.xml
   PolarAxes.xml
   PolarAxesRasterizedText.xml

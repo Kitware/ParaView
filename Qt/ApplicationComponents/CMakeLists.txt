@@ -96,6 +96,7 @@ set(classes
   pqFiltersMenuReaction
   pqFindDataWidget
   pqFontPropertyWidget
+  pqFourLinesPropertyWidget
   pqFrustumPropertyWidget
   pqGenericPropertyWidgetDecorator
   pqGlyphScaleFactorPropertyWidget
@@ -256,6 +257,7 @@ set(ui_files
   Resources/UI/pqFileListPropertyWidget.ui
   Resources/UI/pqFindDataWidget.ui
   Resources/UI/pqFontPropertyWidget.ui
+  Resources/UI/pqFourLinesPropertyWidget.ui
   Resources/UI/pqFrustumPropertyWidget.ui
   Resources/UI/pqHandlePropertyWidget.ui
   Resources/UI/pqImageCompressorWidget.ui

@@ -32,6 +32,7 @@
 #include "pqFileListPropertyWidget.h"
 #include "pqFileNamePropertyWidget.h"
 #include "pqFontPropertyWidget.h"
+#include "pqFourLinesPropertyWidget.h"
 #include "pqFrustumPropertyWidget.h"
 #include "pqGenericPropertyWidgetDecorator.h"
 #include "pqGlyphScaleFactorPropertyWidget.h"
@@ -306,6 +307,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "InteractiveLine")
   {
     return new pqLinePropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractiveFourLines")
+  {
+    return new pqFourLinesPropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "InteractiveSpline")
   {

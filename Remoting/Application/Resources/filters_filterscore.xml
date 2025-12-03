@@ -868,6 +868,64 @@ found and the point will be rejected.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPointsMatchingTransformFilter"
+                 label="Points Matching Transform"
+                 name="PointsMatchingTransformFilter">
+      <Documentation long_help=""
+                     short_help="">
+                     Allow the user to specify 4 pairs of points in space, to compute the affine transform between the two defined coordinates systems and to perform the transform on the input.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input dataset to the
+        Points Matching Transform filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetSourcePoint"
+                            default_values="0 0 0 1 0 0 0 1 0 0 0 1"
+                            name="SourcePoints"
+                            label="Source Point n°"
+                            number_of_elements="12"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            use_index="1">
+        <Documentation>This property defines the source points of lines for transformation.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTargetPoint"
+                            default_values="1 1 1 2 1 1 1 2 1 1 1 2"
+                            name="TargetPoints"
+                            label="Target Point n°"
+                            number_of_elements="12"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            use_index="1">
+        <Documentation>This property defines the target points of lines for transformation.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetRigidTransform"
+                         default_values="1"
+                         name="RigidTransform"
+                         number_of_elements="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>If true, approximate the transform with the closest rigid + scale transform.</Documentation>
+      </IntVectorProperty>
+      <PropertyGroup panel_widget="InteractiveFourLines">
+        <Property function="Point1WorldPositions" name="SourcePoints" />
+        <Property function="Point2WorldPositions" name="TargetPoints" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+
+      <!-- End PointsMatchingTransformFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPVFeatureEdges"
                  label="Feature Edges"
                  name="FeatureEdges">

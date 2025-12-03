@@ -469,6 +469,7 @@
   <Proxy group="filters" name="PointPlaneInterpolator" />
   <Proxy group="filters" name="PointSetToMolecule" />
   <Proxy group="filters" name="PointSetToOctreeImage" />
+  <Proxy group="filters" name="PointsMatchingTransformFilter" />
   <Proxy group="filters" name="PointVolumeInterpolator" />
   <Proxy group="filters" name="PolyDataNormals" />
   <Proxy group="filters" name="PolyDataTangents" />

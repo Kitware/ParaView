@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: Copyright (c) Kitware Inc. -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<ui version="4.0">
+ <class>FourLinesPropertyWidget</class>
+ <widget class="QWidget" name="FourLinesPropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>379</width>
+    <height>189</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelPoint1">
+     <property name="text">
+      <string>Point 1</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="pqDoubleLineEdit" name="point1X"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="pqDoubleLineEdit" name="point1Y"/>
+   </item>
+   <item row="3" column="3">
+    <widget class="pqDoubleLineEdit" name="point1Z"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelPoint2">
+     <property name="text">
+      <string>Point 2</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="pqDoubleLineEdit" name="point2X"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="pqDoubleLineEdit" name="point2Y"/>
+   </item>
+   <item row="4" column="3">
+    <widget class="pqDoubleLineEdit" name="point2Z"/>
+   </item>
+   <item row="5" column="1" colspan="3">
+    <widget class="QPushButton" name="switchL1">
+      <property name="text">
+       <string>Switch points</string>
+      </property>
+     </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="labelPoint3">
+     <property name="text">
+      <string>Point 3</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="pqDoubleLineEdit" name="point3X"/>
+   </item>
+   <item row="7" column="2">
+    <widget class="pqDoubleLineEdit" name="point3Y"/>
+   </item>
+   <item row="7" column="3">
+    <widget class="pqDoubleLineEdit" name="point3Z"/>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="labelPoint4">
+     <property name="text">
+      <string>Point 4</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="pqDoubleLineEdit" name="point4X"/>
+   </item>
+   <item row="8" column="2">
+    <widget class="pqDoubleLineEdit" name="point4Y"/>
+   </item>
+   <item row="8" column="3">
+    <widget class="pqDoubleLineEdit" name="point4Z"/>
+   </item>
+   <item row="9" column="1" colspan="3">
+    <widget class="QPushButton" name="switchL2">
+      <property name="text">
+       <string>Switch points</string>
+      </property>
+     </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="labelPoint5">
+     <property name="text">
+      <string>Point 5</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="pqDoubleLineEdit" name="point5X"/>
+   </item>
+   <item row="11" column="2">
+    <widget class="pqDoubleLineEdit" name="point5Y"/>
+   </item>
+   <item row="11" column="3">
+    <widget class="pqDoubleLineEdit" name="point5Z"/>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="labelPoint6">
+     <property name="text">
+      <string>Point 6</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="pqDoubleLineEdit" name="point6X"/>
+   </item>
+   <item row="12" column="2">
+    <widget class="pqDoubleLineEdit" name="point6Y"/>
+   </item>
+   <item row="12" column="3">
+    <widget class="pqDoubleLineEdit" name="point6Z"/>
+   </item>
+   <item row="13" column="1" colspan="3">
+    <widget class="QPushButton" name="switchL3">
+      <property name="text">
+       <string>Switch points</string>
+      </property>
+     </widget>
+   </item>
+   <item row="15" column="0">
+    <widget class="QLabel" name="labelPoint7">
+     <property name="text">
+      <string>Point 7</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="1">
+    <widget class="pqDoubleLineEdit" name="point7X"/>
+   </item>
+   <item row="15" column="2">
+    <widget class="pqDoubleLineEdit" name="point7Y"/>
+   </item>
+   <item row="15" column="3">
+    <widget class="pqDoubleLineEdit" name="point7Z"/>
+   </item>
+   <item row="16" column="0">
+    <widget class="QLabel" name="labelPoint8">
+     <property name="text">
+      <string>Point 8</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="1">
+    <widget class="pqDoubleLineEdit" name="point8X"/>
+   </item>
+   <item row="16" column="2">
+    <widget class="pqDoubleLineEdit" name="point8Y"/>
+   </item>
+   <item row="16" column="3">
+    <widget class="pqDoubleLineEdit" name="point8Z"/>
+   </item>
+   <item row="17" column="1" colspan="3">
+    <widget class="QPushButton" name="switchL4">
+      <property name="text">
+       <string>Switch points</string>
+      </property>
+     </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="text">
+      <string>Show Lines</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="4">
+    <widget class="QLabel" name="labelLength1">
+     <property name="text">
+      <string>Length: </string>
+     </property>
+     <property name="font">
+      <font>
+       <weight>63</weight>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="4">
+    <widget class="QLabel" name="labelLength2">
+     <property name="text">
+      <string>Length: </string>
+     </property>
+     <property name="font">
+      <font>
+       <weight>63</weight>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="4">
+    <widget class="QLabel" name="labelLength3">
+     <property name="text">
+      <string>Length: </string>
+     </property>
+     <property name="font">
+      <font>
+       <weight>63</weight>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0" colspan="4">
+    <widget class="QLabel" name="labelLength4">
+     <property name="text">
+      <string>Length: </string>
+     </property>
+     <property name="font">
+      <font>
+       <weight>63</weight>
+      </font>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
