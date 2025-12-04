@@ -252,6 +252,8 @@ vtkCDIReader::vtkCDIReader()
 
   vtkDebugMacro("MAX_VARS:" << MAX_VARS);
   vtkDebugMacro("Created vtkCDIReader");
+
+  cdiDefGlobal("NETCDF_LAZY_GRID_LOAD", true);
 }
 
 //----------------------------------------------------------------------------
