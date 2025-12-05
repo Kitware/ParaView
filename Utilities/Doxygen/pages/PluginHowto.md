@@ -321,8 +321,8 @@ filter.
   <ProxyGroup name="filters">
     <SourceProxy name="MyCellDerivatives" class="vtkCellDerivatives" label="My Cell Derivatives">
       <Documentation
-          long_help="Create point attribute array by projecting points onto an elevation vector."
-          short_help="Create a point array representing elevation.">
+          long_help="Create derivatives of scalars and vectors at the center of cells."
+          short_help="Create derivatives of scalars and vectors at the center of cells.">
       </Documentation>
       <InputProperty
           name="Input"
