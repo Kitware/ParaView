@@ -8,6 +8,8 @@
 
 #include <vtksys/SystemInformation.hxx>
 
+#include <iostream>
+
 // #define vtkPVMemoryUseInformationDEBUG
 
 #define vtkVerifyParseMacro(_call, _field)                                                         \
@@ -116,8 +118,8 @@ void vtkPVMemoryUseInformation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVMemoryUseInformation::MemInfo::Print()
 {
-  cerr << "ProcessType=" << this->ProcessType << endl
-       << "Rank=" << this->Rank << endl
-       << "ProcMemUse=" << this->ProcMemUse << endl
-       << "HostMemUse=" << this->HostMemUse << endl;
+  std::cerr << "ProcessType=" << this->ProcessType << endl
+            << "Rank=" << this->Rank << endl
+            << "ProcMemUse=" << this->ProcMemUse << endl
+            << "HostMemUse=" << this->HostMemUse << endl;
 }

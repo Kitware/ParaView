@@ -11,7 +11,7 @@
 #include "vtkSMTransferFunctionManager.h"
 
 #include <cassert>
-#include <sstream>
+#include <iostream>
 
 extern int TestTransferFunctionManager(int argc, char* argv[])
 {
@@ -26,44 +26,44 @@ extern int TestTransferFunctionManager(int argc, char* argv[])
   vtkSMProxy* colorTF = mgr->GetColorTransferFunction("arrayOne", pxm);
   if (colorTF == nullptr)
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
   // colorTF must match on multiple calls.
   if (colorTF != mgr->GetColorTransferFunction("arrayOne", pxm))
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
   // colorTF must be different for different arrays.
   if (colorTF == mgr->GetColorTransferFunction("arrayTwo", pxm))
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
   vtkSMProxy* opacityTF = mgr->GetOpacityTransferFunction("arrayOne", pxm);
   if (!opacityTF)
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
   if (opacityTF != mgr->GetOpacityTransferFunction("arrayOne", pxm))
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
   if (opacityTF == mgr->GetOpacityTransferFunction("arrayTwo", pxm))
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
   if (vtkSMPropertyHelper(colorTF, "ScalarOpacityFunction").GetAsProxy() != opacityTF)
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
@@ -79,13 +79,13 @@ extern int TestTransferFunctionManager(int argc, char* argv[])
   sbProxy = mgr->GetScalarBarRepresentation(colorTF, view);
   if (sbProxy == nullptr)
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
   if (sbProxy != mgr->GetScalarBarRepresentation(colorTF, view))
   {
-    cerr << "ERROR: Failed at line " << __LINE__ << endl;
+    std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
   view->Delete();

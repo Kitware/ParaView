@@ -14,6 +14,7 @@
 #include "vtksys/FStream.hxx"
 #include "vtksys/RegularExpression.hxx"
 
+#include <iostream>
 #include <sstream>
 #include <vector>
 
@@ -492,20 +493,20 @@ int vtkSpyPlotUniReader::MakeCurrent()
 void vtkSpyPlotUniReader::PrintMemoryUsage()
 {
   int cc;
-  cout << "Global size: " << sizeof(this) << endl;
+  std::cout << "Global size: " << sizeof(this) << endl;
 
   long total = 0;
   for (cc = 0; cc < this->NumberOfPossibleCellFields; ++cc)
   {
     total += sizeof(this->CellFields[cc]);
   }
-  cout << "cell fields: " << total << endl;
+  std::cout << "cell fields: " << total << endl;
   total = 0;
   for (cc = 0; cc < this->NumberOfPossibleMaterialFields; ++cc)
   {
     total += sizeof(this->MaterialFields[cc]);
   }
-  cout << "material fields: " << total << endl;
+  std::cout << "material fields: " << total << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -524,7 +525,7 @@ void vtkSpyPlotUniReader::PrintInformation()
       break;
     }
   }
-  // cout.write(this->FileDescription, cc);
+  // std::cout.write(this->FileDescription, cc);
   vtkDebugMacro("\"");
 
   vtkDebugMacro("FileVersion:        " << this->FileVersion);
@@ -636,7 +637,7 @@ void vtkSpyPlotUniReader::PrintInformation()
           vtkDebugMacro("      DataBlock: " << dataBlock);
           if (currentVar->DataBlocks[dataBlock])
           {
-            currentVar->DataBlocks[dataBlock]->Print(cout);
+            currentVar->DataBlocks[dataBlock]->Print(std::cout);
           }
           vtkDebugMacro("      Ghost cells fixed: " << currentVar->GhostCellsFixed[dataBlock]);
         }
@@ -648,7 +649,7 @@ void vtkSpyPlotUniReader::PrintInformation()
     }
   }
 
-  this->CellArraySelection->Print(cout);
+  this->CellArraySelection->Print(std::cout);
 }
 
 //-----------------------------------------------------------------------------
@@ -1030,7 +1031,7 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream* spis)
     vtkErrorMacro("Cannot read file version");
     return 0;
   }
-  // cout << "File version: " << this->FileVersion << endl;
+  // std::cout << "File version: " << this->FileVersion << endl;
   if (this->FileVersion >= 102)
   {
     if (!spis->ReadInt32s(&(this->SizeOfFilePointer), 1))
@@ -1048,7 +1049,7 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream* spis)
                                                        << ". Only handle 32 and 64 bit sizes.");
         return 0;
     }
-    // cout << "File pointer size: " << this->SizeOfFilePointer << endl;
+    // std::cout << "File pointer size: " << this->SizeOfFilePointer << endl;
   }
   if (!spis->ReadInt32s(&(this->FileCompressionFlag), 1))
   {
@@ -1257,7 +1258,7 @@ int vtkSpyPlotUniReader::ReadGroupHeaderInformation(vtkSpyPlotIStream* spis)
     }
     if (this->FileVersion >= 102)
     {
-      // cout << "This is SPCTH " << this->FileVersion
+      // std::cout << "This is SPCTH " << this->FileVersion
       // << " so read DumpDT's" << endl;
       if (!spis->ReadDoubles(gh.DumpDT, MAX_DUMPS))
       {

@@ -65,6 +65,8 @@
 
 #include <vtksys/CommandLineArguments.hxx>
 
+#include <iostream>
+
 void ResetCameraClippingRange(
   vtkObject* caller, unsigned long vtkNotUsed(eid), void* clientdata, void* vtkNotUsed(calldata))
 {
@@ -535,7 +537,7 @@ int main(int argc, char** argv)
   {
     if (contr->GetLocalProcessId() == 0)
     {
-      cout << args.GetHelp() << endl;
+      std::cout << args.GetHelp() << endl;
     }
     contr->Finalize();
     return 1;
@@ -549,13 +551,13 @@ int main(int argc, char** argv)
   {
     if (numProcs != tile_dimensions[0] * tile_dimensions[1])
     {
-      cerr << "When running in tile-display mode, number of processes must "
-              "match number of tiles"
-           << endl;
+      std::cerr << "When running in tile-display mode, number of processes must "
+                   "match number of tiles"
+                << endl;
       return 1;
     }
-    cout << "Rendering as a " << tile_dimensions[0] << "x" << tile_dimensions[1] << " tile display"
-         << endl;
+    std::cout << "Rendering as a " << tile_dimensions[0] << "x" << tile_dimensions[1]
+              << " tile display" << endl;
   }
 
   vtkMultiProcessController::SetGlobalController(contr);
@@ -575,7 +577,7 @@ int main(int argc, char** argv)
   {
     vtkSmartPointer<vtkSocketController> socket_contr = vtkSmartPointer<vtkSocketController>::New();
     socket_contr->Initialize(&argc, &argv);
-    cout << "Waiting for client on 11111" << endl;
+    std::cout << "Waiting for client on 11111" << endl;
     socket_contr->WaitForConnection(11111);
     p->SetSocketController(socket_contr);
   }

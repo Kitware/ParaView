@@ -146,7 +146,7 @@ void pqSpreadSheetView::updateRepresentationVisibility(pqRepresentation* repr, b
 //-----------------------------------------------------------------------------
 void pqSpreadSheetView::onEndRender()
 {
-  // cout << "Render" << endl;
+  // std::cout << "Render" << endl;
   // this->Internal->Model.forceUpdate();
   // this->Internal->Model->update();
   this->Internal->Table->viewport()->update();

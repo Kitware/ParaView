@@ -33,6 +33,8 @@ PythonPipeline... //One or more Catalyst Python Pipelines
 #include <vtkStringScanner.h>
 #include <vtkTimerLog.h>
 
+#include <iostream>
+
 int main(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
@@ -96,7 +98,7 @@ int main(int argc, char* argv[])
   for (unsigned int timeStep = 0; timeStep < numberOfTimeSteps; timeStep++)
   {
     // use a time step length of 0.1
-    cout << "timeStep " << timeStep << endl;
+    std::cout << "timeStep " << timeStep << endl;
     double time = timeStep * 0.1;
     tlog->StartTimer();
     attributes.UpdateFields(time);
@@ -110,9 +112,9 @@ int main(int argc, char* argv[])
 #endif
   }
 
-  cout << "Elapsed Simulation time " << tsim << endl;
+  std::cout << "Elapsed Simulation time " << tsim << endl;
 #ifdef USE_CATALYST
-  cout << "Elapsed CoProcessing time " << tcop << endl;
+  std::cout << "Elapsed CoProcessing time " << tcop << endl;
   FEAdaptor::Finalize();
 #endif
   MPI_Finalize();

@@ -8,6 +8,7 @@
 
 #include "vtk_lz4.h"
 #include <cassert>
+#include <iostream>
 #include <sstream>
 
 vtkStandardNewMacro(vtkLZ4Compressor);
@@ -138,5 +139,5 @@ const char* vtkLZ4Compressor::RestoreConfiguration(const char* stream)
 void vtkLZ4Compressor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  cout << "Quality: " << this->Quality << endl;
+  std::cout << "Quality: " << this->Quality << endl;
 }

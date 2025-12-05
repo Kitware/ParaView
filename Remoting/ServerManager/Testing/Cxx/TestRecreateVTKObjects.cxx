@@ -12,6 +12,8 @@
 #include "vtkSphereSource.h"
 #include "vtkWeakPointer.h"
 
+#include <iostream>
+
 extern int TestRecreateVTKObjects(int argc, char* argv[])
 {
   (void)argc;
@@ -53,7 +55,7 @@ extern int TestRecreateVTKObjects(int argc, char* argv[])
   }
   catch (const char* msg)
   {
-    cerr << msg << endl;
+    std::cerr << msg << endl;
   }
   vtkInitializationHelper::Finalize();
   return exitCode;

@@ -5,6 +5,8 @@
 
 #include <vtkSMViewProxy.h>
 
+#include <iostream>
+
 //-----------------------------------------------------------------------------
 pqMyRenderView::pqMyRenderView(
   const QString& group, const QString& name, vtkSMProxy* viewModule, pqServer* server, QObject* p)

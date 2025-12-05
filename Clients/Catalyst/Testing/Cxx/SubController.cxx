@@ -8,6 +8,7 @@
 #include <vtkSmartPointer.h>
 
 #include <cassert>
+#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -29,7 +30,7 @@ extern int SubController(int argc, char* argv[])
 
   if (numprocs < 2)
   {
-    cout << "ERROR: Too few ranks. Needs at least 2!" << std::endl;
+    std::cout << "ERROR: Too few ranks. Needs at least 2!" << std::endl;
     MPI_Finalize();
     return EXIT_FAILURE;
   }

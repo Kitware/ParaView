@@ -19,6 +19,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <cassert>
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
@@ -130,7 +131,7 @@ void vtkTCPNetworkAccessManager::AbortPendingConnection()
 bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
 {
   // FIXME_COLLABORATION
-  cout << "Need to fix this to report real pending connections" << endl;
+  std::cout << "Need to fix this to report real pending connections" << endl;
   return false;
 }
 
@@ -456,8 +457,8 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(int por
   const char* sys_hostname = sys_info.GetHostname() ? sys_info.GetHostname() : "localhost";
 
   // print out a status message.
-  cout << "Accepting connection(s): " << sys_hostname << ":" << server_socket->GetServerPort()
-       << endl;
+  std::cout << "Accepting connection(s): " << sys_hostname << ":" << server_socket->GetServerPort()
+            << endl;
 
   this->AbortPendingConnectionFlag = false;
   vtkSocketController* controller = nullptr;

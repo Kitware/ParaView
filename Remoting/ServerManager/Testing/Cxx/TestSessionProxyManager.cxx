@@ -10,6 +10,8 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 
+#include <iostream>
+
 extern int TestSessionProxyManager(int argc, char* argv[])
 {
   (void)argc;
@@ -29,7 +31,8 @@ extern int TestSessionProxyManager(int argc, char* argv[])
   pxm->GetProxies("sources", sourceProxies.GetPointer());
   if (sourceProxies->GetNumberOfItems() != 1)
   {
-    cerr << "Expected to get 1 source object, got " << sourceProxies->GetNumberOfItems() << "\n";
+    std::cerr << "Expected to get 1 source object, got " << sourceProxies->GetNumberOfItems()
+              << "\n";
     vtkInitializationHelper::Finalize();
     return EXIT_FAILURE;
   }

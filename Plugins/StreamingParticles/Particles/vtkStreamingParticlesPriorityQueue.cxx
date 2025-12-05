@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <map>
 #include <queue>
 #include <set>
@@ -332,10 +333,10 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(const double view_plan
     this->Internals->BlocksRequested.insert(itr->second);
   }
 
-  cout << "Update information  : " << endl
-       << "  To request        : " << this->Internals->BlocksToRequest.size() << endl
-       << "  Already requested : " << this->Internals->BlocksRequested.size() << endl
-       << "  To purge          : " << this->Internals->BlocksToPurge.size() << endl;
+  std::cout << "Update information  : " << endl
+            << "  To request        : " << this->Internals->BlocksToRequest.size() << endl
+            << "  Already requested : " << this->Internals->BlocksRequested.size() << endl
+            << "  To purge          : " << this->Internals->BlocksToPurge.size() << endl;
 }
 
 //----------------------------------------------------------------------------

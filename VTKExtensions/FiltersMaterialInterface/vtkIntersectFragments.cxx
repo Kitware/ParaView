@@ -43,6 +43,7 @@
 #include "vtkImplicitFunction.h"
 #include "vtkPlane.h"
 // STL
+#include <iostream>
 #include <sstream>
 using std::ostringstream;
 #include <vector>
@@ -207,9 +208,9 @@ int vtkIntersectFragments::CopyInputStructureGeom(
       dest->SetBlock(blockId, destFragments);
       destFragments->Delete();
 #ifdef vtkIntersectFragmentsDEBUG
-      cerr << "[" << __LINE__ << "]"
-           << "[" << this->Controller->GetLocalProcessId() << "]"
-           << "Input block " << blockId << " has " << nSrcFragments << " fragments." << endl;
+      std::cerr << "[" << __LINE__ << "]"
+                << "[" << this->Controller->GetLocalProcessId() << "]"
+                << "Input block " << blockId << " has " << nSrcFragments << " fragments." << endl;
 #endif
     }
     else
@@ -258,10 +259,10 @@ int vtkIntersectFragments::IdentifyLocalFragments()
   }
 
 #ifdef vtkIntersectFragmentsDEBUG
-  cerr << "[" << __LINE__ << "]"
-       << "[" << this->Controller->GetLocalProcessId() << "]"
-       << "found local ids:" << endl
-       << this->FragmentIds << endl;
+  std::cerr << "[" << __LINE__ << "]"
+            << "[" << this->Controller->GetLocalProcessId() << "]"
+            << "found local ids:" << endl
+            << this->FragmentIds << endl;
 #endif
 
   return 1;
@@ -341,10 +342,10 @@ int vtkIntersectFragments::Intersect()
   }
 
 #ifdef vtkIntersectFragmentsDEBUG
-  cerr << "[" << __LINE__ << "]"
-       << "[" << this->Controller->GetLocalProcessId() << "]"
-       << "intersection produced:" << endl
-       << this->IntersectionIds;
+  std::cerr << "[" << __LINE__ << "]"
+            << "[" << this->Controller->GetLocalProcessId() << "]"
+            << "intersection produced:" << endl
+            << this->IntersectionIds;
 #endif
   return 1;
 }
@@ -555,7 +556,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
         ++thisMsgId;
         ++thisMsgId;
 #ifdef vtkIntersectFragmentsDEBUG
-        cerr << "[" << __LINE__ << "] " << controllingProcId << " loading histogram:" << endl;
+        std::cerr << "[" << __LINE__ << "] " << controllingProcId << " loading histogram:" << endl;
         PrintPieceLoadingHistogram(loadingArrays);
 #endif
         // Build fragment to proc map
@@ -626,14 +627,15 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
           }
         }
 #ifdef vtkIntersectFragmentsDEBUG
-        cerr << "[" << __LINE__ << "] " << controllingProcId << " splitting:" << endl;
+        std::cerr << "[" << __LINE__ << "] " << controllingProcId << " splitting:" << endl;
         PrintHistogram(splitting);
-        cerr << "[" << __LINE__ << "] " << myProcId << " total number of fragments " << nFragments
-             << endl;
-        cerr << "[" << __LINE__ << "] " << myProcId << " total number split " << nSplit << endl;
-        cerr << "[" << __LINE__ << "] " << myProcId
-             << " Number of fragments intersected: " << this->NFragmentsIntersected << endl;
-        cerr << "[" << __LINE__ << "] " << myProcId << " the transaction matrix is:" << endl;
+        std::cerr << "[" << __LINE__ << "] " << myProcId << " total number of fragments "
+                  << nFragments << endl;
+        std::cerr << "[" << __LINE__ << "] " << myProcId << " total number split " << nSplit
+                  << endl;
+        std::cerr << "[" << __LINE__ << "] " << myProcId
+                  << " Number of fragments intersected: " << this->NFragmentsIntersected << endl;
+        std::cerr << "[" << __LINE__ << "] " << myProcId << " the transaction matrix is:" << endl;
         TM.Print();
 #endif
       }
@@ -853,9 +855,9 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
   }
 
 #ifdef vtkIntersectFragmentsDEBUG
-  cerr << "[" << __LINE__ << "] " << myProcId << " intersect centers: " << this->IntersectionCenters
-       << endl
-       << "Computation of geometric attributes completed." << endl;
+  std::cerr << "[" << __LINE__ << "] " << myProcId
+            << " intersect centers: " << this->IntersectionCenters << endl
+            << "Computation of geometric attributes completed." << endl;
 #endif
 }
 
@@ -1136,8 +1138,8 @@ int vtkIntersectFragments::GatherGeometricAttributes(const int recipientProcId)
   }
 
 #ifdef vtkIntersectFragmentsDEBUG
-  cerr << "[" << __LINE__ << "] " << myProcId << " intersect centers: " << this->IntersectionCenters
-       << endl;
+  std::cerr << "[" << __LINE__ << "] " << myProcId
+            << " intersect centers: " << this->IntersectionCenters << endl;
 #endif
   return 1;
 }
@@ -1152,9 +1154,9 @@ int vtkIntersectFragments::CopyAttributesToStatsOutput(const int controllingProc
   }
 
 #ifdef vtkIntersectFragmentsDEBUG
-  cerr << "[" << __LINE__ << "]"
-       << "[" << myProcId << "]"
-       << "copying to stats output:" << this->IntersectionCenters << this->IntersectionIds;
+  std::cerr << "[" << __LINE__ << "]"
+            << "[" << myProcId << "]"
+            << "copying to stats output:" << this->IntersectionCenters << this->IntersectionIds;
 #endif
 
   for (int blockId = 0; blockId < this->NBlocks; ++blockId)

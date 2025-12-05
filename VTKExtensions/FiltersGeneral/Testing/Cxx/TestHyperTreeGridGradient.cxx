@@ -12,12 +12,13 @@
 #include "vtkPVGradientFilter.h"
 #include "vtkRandomHyperTreeGridSource.h"
 
+#include <iostream>
 #include <string>
 
 #define vtk_assert(x)                                                                              \
   if (!(x))                                                                                        \
   {                                                                                                \
-    cerr << "On line " << __LINE__ << " ERROR: Condition FAILED!! : " << #x << endl;               \
+    std::cerr << "On line " << __LINE__ << " ERROR: Condition FAILED!! : " << #x << endl;          \
     return EXIT_FAILURE;                                                                           \
   }
 

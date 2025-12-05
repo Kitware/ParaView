@@ -16,7 +16,7 @@
 #include <cassert>
 
 #define ERROR(msg)                                                                                 \
-  cerr << "ERROR: " msg << endl;                                                                   \
+  std::cerr << "ERROR: " msg << endl;                                                              \
   return 1;
 
 extern int TestComparativeAnimationCueProxy(int argc, char* argv[])

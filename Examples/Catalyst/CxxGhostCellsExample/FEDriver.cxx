@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
       VTK_FROM_CHARS_IF_ERROR_RETURN(argv[i + 1], numGhostLevels, EXIT_FAILURE);
       if (numGhostLevels <= 0)
       {
-        cerr << "Bad ghost level of " << numGhostLevels << endl;
+        std::cerr << "Bad ghost level of " << numGhostLevels << endl;
         PrintUsage();
         MPI_Finalize();
         return 1;
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      cerr << "Unknown option " << argv[i] << endl;
+      std::cerr << "Unknown option " << argv[i] << endl;
       PrintUsage();
       MPI_Finalize();
       return 1;
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
   }
   if (scripts.empty())
   {
-    cerr << "No Catalysts script to process\n";
+    std::cerr << "No Catalysts script to process\n";
     PrintUsage();
     MPI_Finalize();
     return 1;

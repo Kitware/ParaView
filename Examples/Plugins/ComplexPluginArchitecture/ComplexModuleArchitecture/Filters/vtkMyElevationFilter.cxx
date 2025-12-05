@@ -8,6 +8,8 @@
 
 #include <vtkObjectFactory.h>
 
+#include <iostream>
+
 vtkStandardNewMacro(vtkMyElevationFilter);
 
 int vtkMyElevationFilter::RequestData(

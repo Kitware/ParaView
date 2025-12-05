@@ -157,7 +157,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
 
   if (value.NeedsRender == false && value.Data != nullptr && view->GetNeedsUpdate() == false)
   {
-    // cout <<  "Reusing cache" << endl;
+    // std::cout <<  "Reusing cache" << endl;
     if (doThread)
     {
       bool latest = this->Internals->Encoder->GetLatestOutput(view->GetGlobalID(), value.Data);
@@ -170,7 +170,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
     return value.Data;
   }
 
-  // cout <<  "Regenerating " << endl;
+  // std::cout <<  "Regenerating " << endl;
   // vtkTimerLog::ResetLog();
   // vtkTimerLog::CleanupLog();
   // vtkTimerLog::MarkStartEvent("StillRenderToString");
@@ -194,9 +194,9 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
     if (value.Data == nullptr)
     {
       // we need to wait till output is processed.
-      // cout << "Flushing" << endl;
+      // std::cout << "Flushing" << endl;
       this->Internals->Encoder->Flush(view->GetGlobalID());
-      // cout << "Done Flushing" << endl;
+      // std::cout << "Done Flushing" << endl;
     }
 
     bool latest = this->Internals->Encoder->GetLatestOutput(view->GetGlobalID(), value.Data);
@@ -224,7 +224,7 @@ const char* vtkPVWebApplication::StillRenderToString(
   if (array && array->GetMTime() != time)
   {
     this->LastStillRenderToMTime = array->GetMTime();
-    // cout << "Image size: " << array->GetNumberOfTuples() << endl;
+    // std::cout << "Image size: " << array->GetNumberOfTuples() << endl;
     return reinterpret_cast<char*>(array->GetPointer(0));
   }
   return nullptr;

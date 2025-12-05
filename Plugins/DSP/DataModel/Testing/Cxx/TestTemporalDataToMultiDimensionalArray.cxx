@@ -4,7 +4,6 @@
 
 #include "vtkDSPDataModelTestingUtilities.h"
 #include "vtkDataSet.h"
-#include "vtkDoubleArray.h"
 #include "vtkIOSSReader.h"
 #include "vtkInformation.h"
 #include "vtkMultiDimensionalArray.h"
@@ -12,10 +11,10 @@
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
-#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTestUtilities.h"
 
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -37,7 +36,7 @@ extern int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
   vtkInformation* info = readerIOSS->GetOutputInformation(0);
   if (!info->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
   {
-    cerr << "Unable to retrieve time steps from test data." << endl;
+    std::cerr << "Unable to retrieve time steps from test data." << endl;
     return EXIT_FAILURE;
   }
 
@@ -57,21 +56,21 @@ extern int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
       vtkPartitionedDataSetCollection::SafeDownCast(readerIOSS->GetOutputDataObject(0));
     if (!outputData)
     {
-      cerr << "Unable to retrieve output data as vtkPartitionedDataSetCollection." << endl;
+      std::cerr << "Unable to retrieve output data as vtkPartitionedDataSetCollection." << endl;
       return nullptr;
     }
 
     auto* outputDS = outputData->GetPartition(0, 0);
     if (!outputDS)
     {
-      cerr << "Unable to retrieve first partition of output data." << endl;
+      std::cerr << "Unable to retrieve first partition of output data." << endl;
       return nullptr;
     }
 
     auto* pointData = outputDS->GetPointData();
     if (!pointData)
     {
-      cerr << "Unable to retrieve point data in partition." << endl;
+      std::cerr << "Unable to retrieve point data in partition." << endl;
       return nullptr;
     }
 
@@ -79,7 +78,7 @@ extern int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
       vtkAOSDataArrayTemplate<double>::SafeDownCast(pointData->GetAbstractArray(arrayName.c_str()));
     if (!outArray)
     {
-      cerr << "Unable to retrieve " << arrayName << " array as vtkDoubleArray." << endl;
+      std::cerr << "Unable to retrieve " << arrayName << " array as vtkDoubleArray." << endl;
       return nullptr;
     }
 
@@ -118,8 +117,8 @@ extern int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
     if (outArray->GetNumberOfTuples() != nbOfPoints ||
       outArray->GetNumberOfComponents() != nbOfComponents)
     {
-      cerr << "Number of tuples and components should be equal over all timesteps in the"
-           << outArrayName << " array." << endl;
+      std::cerr << "Number of tuples and components should be equal over all timesteps in the"
+                << outArrayName << " array." << endl;
       return EXIT_FAILURE;
     }
 

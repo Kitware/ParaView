@@ -22,6 +22,7 @@
 #include "vtkTimerLog.h"
 
 #include <cassert>
+#include <iostream>
 #include <map>
 #include <set>
 #include <sstream>
@@ -1338,8 +1339,8 @@ void vtkSIProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
     }
     else
     {
-      cerr << "No SIProperty for the following information helper: " << informationHelper->GetName()
-           << endl;
+      std::cerr << "No SIProperty for the following information helper: "
+                << informationHelper->GetName() << endl;
     }
 
     // Remove InformationHelper from XML

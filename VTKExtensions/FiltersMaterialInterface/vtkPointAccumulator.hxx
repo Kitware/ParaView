@@ -139,12 +139,12 @@ public:
     T_CPP* pBuf = this->PtStore;
     for (int i = 0; i < this->NPts; ++i)
     {
-      cerr << i << " (" << pBuf[0];
+      std::cerr << i << " (" << pBuf[0];
       for (int q = 1; q < 3; ++q)
       {
-        cerr << ", " << pBuf[q];
+        std::cerr << ", " << pBuf[q];
       }
-      cerr << ")" << endl;
+      std::cerr << ")" << endl;
       pBuf += 3;
     }
   }

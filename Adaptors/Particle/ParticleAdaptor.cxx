@@ -15,6 +15,8 @@
 #include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
 
+#include <iostream>
+
 namespace
 {
 vtkMPIController* controller = nullptr;
@@ -66,7 +68,7 @@ void coprocessorcreateimage(int timestep, double time, char* filename, int n, do
 {
   if (!coProcessor || !coProcessorData)
   {
-    cerr << "CoProcessor has not been properly initialized" << endl;
+    std::cerr << "CoProcessor has not been properly initialized" << endl;
     return;
   }
 

@@ -28,6 +28,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>
+#include <iostream>
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemInformation.hxx"

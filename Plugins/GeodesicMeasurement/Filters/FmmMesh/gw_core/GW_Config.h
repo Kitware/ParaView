@@ -211,7 +211,7 @@ enum GW_Coord_RVBA { R, V, B, A };
     #define GW_DEBUG_ONLY(expr) expr
 #else
     #ifndef GW_ASSERT
-    #define GW_ASSERT(expr)    if(!(expr)) cerr << "Error in file " << __FILE__ << " line " << __LINE__ << "." << endl
+    #define GW_ASSERT(expr)    if(!(expr)) std::cerr << "Error in file " << __FILE__ << " line " << __LINE__ << "." << endl
   #endif
     #define GW_DEBUG_ONLY(expr)
 #endif // GW_DEBUG
@@ -323,13 +323,13 @@ void TestMathBit()
     {
 //        GW_ASSERT(GW_False);
         if( (bit&_SW_UNDERFLOW)==_SW_UNDERFLOW )
-            cerr << "Math operation problem : underflow." << endl;
+            std::cerr << "Math operation problem : underflow." << endl;
         if( (bit&_SW_OVERFLOW)==_SW_OVERFLOW )
-            cerr << "Math operation problem : overflow." << endl;
+            std::cerr << "Math operation problem : overflow." << endl;
         if( (bit&_SW_ZERODIVIDE)==_SW_ZERODIVIDE )
-            cerr << "Math operation problem : zero divide." << endl;
+            std::cerr << "Math operation problem : zero divide." << endl;
         if( (bit&_SW_INVALID)==_SW_INVALID )
-            cerr << "Math operation problem : invalid." << endl;
+            std::cerr << "Math operation problem : invalid." << endl;
     }
 #endif
 }

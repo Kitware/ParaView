@@ -19,6 +19,7 @@
 #include "pqView.h"
 
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 
 // ----------------------------------------------------------------------------
@@ -50,8 +51,8 @@ bool vtkSMVRDebugStyleProxy::Update()
   // here, in the Update() method.
   if (this->EnableReport)
   {
-    cout << "Tracker matrix\n";
-    this->TrackerMatrix->PrintSelf(cout, vtkIndent(0));
+    std::cout << "Tracker matrix\n";
+    this->TrackerMatrix->PrintSelf(std::cout, vtkIndent(0));
   }
 
   return true;
@@ -64,14 +65,14 @@ void vtkSMVRDebugStyleProxy::HandleButton(const vtkVREvent& event)
 
   if (event.data.button.state == 1)
   {
-    cout << "Button " << event.data.button.button << "is pressed\n";
+    std::cout << "Button " << event.data.button.button << "is pressed\n";
   }
   if (role == "Report Self")
   {
     if (event.data.button.state == 1)
     {
-      cout << "Reporting on myself\n";
-      this->PrintSelf(cout, vtkIndent(0));
+      std::cout << "Reporting on myself\n";
+      this->PrintSelf(std::cout, vtkIndent(0));
     }
   }
   if (role == "Report Tracker")
@@ -84,7 +85,7 @@ void vtkSMVRDebugStyleProxy::HandleButton(const vtkVREvent& event)
 void vtkSMVRDebugStyleProxy::HandleValuator(const vtkVREvent& event)
 {
   unsigned int xIdx = this->GetChannelIndexForValuatorRole("X");
-  cout << "Got a value for 'X' of " << event.data.valuator.channel[xIdx] << std::endl;
+  std::cout << "Got a value for 'X' of " << event.data.valuator.channel[xIdx] << std::endl;
 }
 
 // ----------------------------------------------------------------------------

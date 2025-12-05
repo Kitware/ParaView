@@ -7,6 +7,7 @@
 
 // Standard library
 #include <cassert>
+#include <iostream>
 #include <map>
 #include <set>
 #include <sstream>
@@ -98,7 +99,7 @@ public:
       }
       if (!comm)
       {
-        cerr << "Adios needs a valid MPI communicator." << endl;
+        std::cerr << "Adios needs a valid MPI communicator." << endl;
         return;
       }
 
@@ -108,9 +109,10 @@ public:
       if (0 != adios_read_init_method(method, *comm, parameters))
       {
         // Error occurred
-        cerr << "Adios triggered an error while trying to initialize the method: " << method << endl
-             << adios_errmsg() << endl
-             << "--------------------------------" << endl;
+        std::cerr << "Adios triggered an error while trying to initialize the method: " << method
+                  << endl
+                  << adios_errmsg() << endl
+                  << "--------------------------------" << endl;
       }
     }
     else
@@ -454,7 +456,7 @@ bool AdiosStream::Open()
   // Create the Adios file object
   float timeout_msec = 0.0; // 0.0s
 
-  //  cout << "1: adios_read_open_stream(\"" << this->FileName.c_str() << "\", "
+  //  std::cout << "1: adios_read_open_stream(\"" << this->FileName.c_str() << "\", "
   //       << this->Method << ", "
   //       << AdiosGlobal::GetMethodMPIController(this->Method)
   //       << ", ADIOS_LOCKMODE_CURRENT, "
@@ -467,13 +469,13 @@ bool AdiosStream::Open()
   timeout_msec = 5.0; // Set timeout to 5 seconds
   for (int i = 0; (i < 12) && (adios_errno == err_file_not_found); ++i)
   {
-    //    cout << (i+2) <<": adios_read_open_stream(\""
+    //    std::cout << (i+2) <<": adios_read_open_stream(\""
     //         << this->FileName.c_str() << "\", "
     //         << this->Method << ", "
     //         << AdiosGlobal::GetMethodMPIController(this->Method)
     //         << ", ADIOS_LOCKMODE_CURRENT, "
     //         << timeout_msec << ")" << endl;
-    cerr << "Wait on stream " << adios_errmsg() << endl;
+    std::cerr << "Wait on stream " << adios_errmsg() << endl;
     sleep(1);
     this->File = adios_read_open_stream(this->FileName.c_str(), this->Method,
       *AdiosGlobal::GetMethodMPIController(this->Method), ADIOS_LOCKMODE_CURRENT, timeout_msec);
@@ -483,12 +485,12 @@ bool AdiosStream::Open()
   if (adios_errno == err_end_of_stream)
   {
     // stream has been gone before we tried to open
-    cerr << "The stream has terminated before open: " << adios_errmsg() << endl;
+    std::cerr << "The stream has terminated before open: " << adios_errmsg() << endl;
   }
   else if (this->File == nullptr)
   {
     // some other error happened
-    cerr << "Error while trying to open the stream: " << adios_errmsg() << endl;
+    std::cerr << "Error while trying to open the stream: " << adios_errmsg() << endl;
   }
 
   if (!this->File)
@@ -517,9 +519,9 @@ void AdiosStream::UpdateMetaData()
     ADIOS_VARINFO* varInfo = adios_inq_var_byid(this->File, varIdx);
     if (varInfo == nullptr)
     {
-      cerr << "Error opening variable " << this->File->var_namelist[varIdx] << " of bp file "
-           << this->FileName.c_str() << ":" << endl
-           << adios_errmsg() << endl;
+      std::cerr << "Error opening variable " << this->File->var_namelist[varIdx] << " of bp file "
+                << this->FileName.c_str() << ":" << endl
+                << adios_errmsg() << endl;
       continue;
     }
 
@@ -527,8 +529,8 @@ void AdiosStream::UpdateMetaData()
     AdiosVariable newVar(this->File->var_namelist[varIdx], varInfo);
     if (!newVar.IsValid())
     {
-      cerr << "Skip variable " << newVar.GetName() << " - Dimension: " << newVar.GetDimension()
-           << " - Type: " << newVar.GetTypeAsString() << endl;
+      std::cerr << "Skip variable " << newVar.GetName() << " - Dimension: " << newVar.GetDimension()
+                << " - Type: " << newVar.GetTypeAsString() << endl;
       free(varInfo);
       continue;
     }
@@ -544,7 +546,7 @@ void AdiosStream::UpdateMetaData()
       }
       else
       {
-        //        cerr << "The field " << newVar.GetName()
+        //        std::cerr << "The field " << newVar.GetName()
         //             << " has no value while its dimension is " << newVar.GetDimension()
         //             << endl;
       }
@@ -568,7 +570,7 @@ void AdiosStream::UpdateMetaData()
 
     if (adios_get_attr_byid(this->File, attrIdx, &attributeType, &size, &data))
     {
-      cerr << "Failed to get attribute " << name << endl;
+      std::cerr << "Failed to get attribute " << name << endl;
       continue;
     }
 
@@ -596,7 +598,7 @@ bool AdiosStream::Close()
 
   if (!success)
   {
-    cerr << "Error while trying to close the stream: " << adios_errmsg() << endl;
+    std::cerr << "Error while trying to close the stream: " << adios_errmsg() << endl;
   }
 
   return success;
@@ -698,7 +700,7 @@ vtkDataArray* AdiosStream::ReadDataArray(
     case adios_complex:        //  8 bytes
     case adios_double_complex: // 16 bytes
     default:
-      cerr << "ERROR: Invalid data type" << endl;
+      std::cerr << "ERROR: Invalid data type" << endl;
       return nullptr;
       break;
   }
@@ -722,23 +724,23 @@ void AdiosStream::PrintInfo()
     return;
   }
 
-  cout << "CurrentStep: " << this->CurrentStep << endl;
-  cout << "LastStep: " << this->LastAvailableStep << endl;
+  std::cout << "CurrentStep: " << this->CurrentStep << endl;
+  std::cout << "LastStep: " << this->LastAvailableStep << endl;
 
-  cout << "Attributes:" << endl;
+  std::cout << "Attributes:" << endl;
   AdiosDataMapIterator iter = this->Attributes.begin();
   for (; iter != this->Attributes.end(); iter++)
   {
-    cout << " - " << iter->first << endl;
+    std::cout << " - " << iter->first << endl;
   }
 
-  cout << "Variables:" << endl;
+  std::cout << "Variables:" << endl;
   AdiosVariableMapIterator iter2 = this->MetaData.begin();
   for (; iter2 != this->MetaData.end(); iter2++)
   {
-    cout << " - " << iter2->first << " - ndim: " << iter2->second.GetDimension()
-         << " - dims: " << iter2->second.GetSize()[0] << "x" << iter2->second.GetSize()[1] << "x"
-         << iter2->second.GetSize()[2] << endl;
+    std::cout << " - " << iter2->first << " - ndim: " << iter2->second.GetDimension()
+              << " - dims: " << iter2->second.GetSize()[0] << "x" << iter2->second.GetSize()[1]
+              << "x" << iter2->second.GetSize()[2] << endl;
   }
 }
 // ----------------------------------------------------------------------------
@@ -755,7 +757,7 @@ bool AdiosStream::NextStep()
   }
   else
   {
-    cerr << "Error while trying to move forward: " << adios_errmsg() << endl;
+    std::cerr << "Error while trying to move forward: " << adios_errmsg() << endl;
   }
 
   this->CurrentStep = this->File->current_step;
@@ -979,7 +981,7 @@ public:
     selectionPoints = adios_selection_boundingbox(3, offset, countPoints);
     selectionCells = adios_selection_boundingbox(3, offset, countCells);
 
-    //    cout << "Cell selection: " << endl
+    //    std::cout << "Cell selection: " << endl
     //         << " - Offset: [" <<  offset[0]
     //         << ", "<<  offset[0]
     //         << ", "<<  offset[0] << "]" << endl
@@ -1020,7 +1022,7 @@ public:
           varIter->second.Name.find(nodesFilter) == std::string::npos &&
           varIter->second.Name.find(cellsFilter) == std::string::npos)
         {
-          //          cout << "id: " << varIter->second.GetId()
+          //          std::cout << "id: " << varIter->second.GetId()
           //               << ", name: " << varIter->second.GetName()
           //               << ", size: " << varIter->second.GetSize()[0] << "x"
           //               << varIter->second.GetSize()[1] << "x"

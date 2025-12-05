@@ -30,6 +30,8 @@
 #include "vtkStringFormatter.h"
 #include "vtkType.h"
 
+#include <iostream>
+
 //-----------------------------------------------------------------------------
 class vtkPlotEdges::Segment : public vtkObject
 {

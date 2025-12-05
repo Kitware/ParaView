@@ -66,7 +66,7 @@ void Server::ProcessMessage(const unsigned char* msg, size_t length)
 {
   if (!this->ClientServerInterpreter->ProcessStream(msg, length))
   {
-    cerr << "error in process message\n";
+    std::cerr << "error in process message\n";
   }
 }
 
@@ -102,7 +102,7 @@ void ClientManager::RunTests()
   const char* name;
   if (this->GetResultMessage()->GetArgument(0, 0, &name))
   {
-    cerr << name << "\n";
+    std::cerr << name << "\n";
   }
   stream.Reset();
   stream << vtkClientServerStream::Invoke << instance_id << "GetReferenceCount"
@@ -112,7 +112,7 @@ void ClientManager::RunTests()
   int refcount;
   if (this->GetResultMessage()->GetArgument(0, 0, &refcount))
   {
-    cerr << refcount << "\n";
+    std::cerr << refcount << "\n";
   }
   stream.Reset();
   stream << vtkClientServerStream::Delete << instance_id << vtkClientServerStream::End;

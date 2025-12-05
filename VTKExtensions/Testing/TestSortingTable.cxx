@@ -14,6 +14,8 @@
 #include "vtkUnsignedCharArray.h"
 
 #include <cfloat>
+#include <iostream>
+
 // ----------------------------------------------------------------------------
 void fillArray(vtkDoubleArray* array, double* dataPointer, int dataSize, const char* name)
 {
@@ -41,7 +43,7 @@ bool compareArray(
   for (int i = 0; i < dataSize; i++)
   {
     if (print)
-      cout << "Sorted value: " << array->GetValue(i) << " expected " << dataPointer[i] << endl;
+      std::cout << "Sorted value: " << array->GetValue(i) << " expected " << dataPointer[i] << endl;
     if (array->GetValue(i) != dataPointer[i])
       return false;
   }
@@ -163,14 +165,14 @@ int TestSortingTable(int vtkNotUsed(argc), char** vtkNotUsed(argv))
   bool debug = false;
 
   // --------------------------------------------------------------------------
-  cout << "Testing sorting with similar values: "
-       << ((result += sortWithSimilarValues(debug)) ? "FAILED" : "SUCCESS") << endl;
+  std::cout << "Testing sorting with similar values: "
+            << ((result += sortWithSimilarValues(debug)) ? "FAILED" : "SUCCESS") << endl;
   // --------------------------------------------------------------------------
-  cout << "Testing sorting with epsilon values: "
-       << ((result += sortWithEpsilonValues(debug)) ? "FAILED" : "SUCCESS") << endl;
+  std::cout << "Testing sorting with epsilon values: "
+            << ((result += sortWithEpsilonValues(debug)) ? "FAILED" : "SUCCESS") << endl;
   // --------------------------------------------------------------------------
-  cout << "Testing sorting with magnitude on unsigned char: "
-       << ((result += sortMagnitudeOnUnsignedCharVector()) ? "FAILED" : "SUCCESS") << endl;
+  std::cout << "Testing sorting with magnitude on unsigned char: "
+            << ((result += sortMagnitudeOnUnsignedCharVector()) ? "FAILED" : "SUCCESS") << endl;
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 

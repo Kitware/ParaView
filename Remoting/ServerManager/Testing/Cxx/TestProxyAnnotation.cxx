@@ -13,6 +13,7 @@
 
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
+#include <iostream>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -27,49 +28,49 @@ extern int TestProxyAnnotation(int argc, char* argv[])
   }
 
   vtkSMSession* session = vtkSMSession::New();
-  cout << "Starting..." << endl;
+  std::cout << "Starting..." << endl;
 
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
 
   // *******************************************************************
   // Test specific code
   // *******************************************************************
-  cout << endl << endl;
-  cout << "********************************" << endl;
-  cout << "*** Testing Proxy annotation ***" << endl;
-  cout << "********************************" << endl << endl;
+  std::cout << endl << endl;
+  std::cout << "********************************" << endl;
+  std::cout << "*** Testing Proxy annotation ***" << endl;
+  std::cout << "********************************" << endl << endl;
 
   // Create a source proxy
   vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
   proxy->UpdateVTKObjects();
 
-  cout << "--- Add annotation: Color, Tooltip, Owner ---" << endl;
+  std::cout << "--- Add annotation: Color, Tooltip, Owner ---" << endl;
   proxy->SetAnnotation("Color", "#FFAA00");
   proxy->SetAnnotation("Tooltip", "Just a sphere");
   proxy->SetAnnotation("Owner", "Seb");
   if (proxy->GetNumberOfAnnotations() != 3)
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect 3 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
+    std::cout << "Error: Expect 3 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
   }
   else if (!proxy->HasAnnotation("Color"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Color to be present." << endl;
+    std::cout << "Error: Expect annotations Color to be present." << endl;
   }
   else if (!proxy->HasAnnotation("Tooltip"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Tooltip to be present." << endl;
+    std::cout << "Error: Expect annotations Tooltip to be present." << endl;
   }
   else if (!proxy->HasAnnotation("Owner"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Owner to be present." << endl;
+    std::cout << "Error: Expect annotations Owner to be present." << endl;
   }
   else
   {
-    cout << " -> OK" << endl;
+    std::cout << " -> OK" << endl;
   }
 
   // -----------------------------------------------------------------------
@@ -80,95 +81,95 @@ extern int TestProxyAnnotation(int argc, char* argv[])
   // -----------------------------------------------------------------------
 
   proxy->SetAnnotation("Owner", nullptr);
-  cout << "--- Remove Owner annotations ---" << endl;
+  std::cout << "--- Remove Owner annotations ---" << endl;
   if (proxy->GetNumberOfAnnotations() != 2)
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect 2 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
+    std::cout << "Error: Expect 2 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
   }
   else if (!proxy->HasAnnotation("Color"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Color to be present." << endl;
+    std::cout << "Error: Expect annotations Color to be present." << endl;
   }
   else if (!proxy->HasAnnotation("Tooltip"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Tooltip to be present." << endl;
+    std::cout << "Error: Expect annotations Tooltip to be present." << endl;
   }
   else
   {
-    cout << " -> OK" << endl;
+    std::cout << " -> OK" << endl;
   }
 
   proxy->RemoveAnnotation("Tooltip");
-  cout << "--- Remove Tooltip annotations ---" << endl;
+  std::cout << "--- Remove Tooltip annotations ---" << endl;
   if (proxy->GetNumberOfAnnotations() != 1)
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect 1 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
+    std::cout << "Error: Expect 1 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
   }
   else if (!proxy->HasAnnotation("Color"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Color to be present." << endl;
+    std::cout << "Error: Expect annotations Color to be present." << endl;
   }
   else
   {
-    cout << " -> OK" << endl;
+    std::cout << " -> OK" << endl;
   }
 
   proxy->RemoveAllAnnotations();
-  cout << "--- Remove all annotations ---" << endl;
+  std::cout << "--- Remove all annotations ---" << endl;
   if (proxy->GetNumberOfAnnotations() != 0)
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect 0 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
+    std::cout << "Error: Expect 0 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
   }
   else
   {
-    cout << " -> OK" << endl;
+    std::cout << " -> OK" << endl;
   }
 
-  cout << "--- Add annotation: Color, Tooltip, Owner ---" << endl;
+  std::cout << "--- Add annotation: Color, Tooltip, Owner ---" << endl;
   proxy->SetAnnotation("Color", "#FFAA00");
   proxy->SetAnnotation("Tooltip", "Just a sphere");
   proxy->SetAnnotation("Owner", "Seb");
   if (proxy->GetNumberOfAnnotations() != 3)
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect 3 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
+    std::cout << "Error: Expect 3 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
   }
   else if (!proxy->HasAnnotation("Color"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Color to be present." << endl;
+    std::cout << "Error: Expect annotations Color to be present." << endl;
   }
   else if (!proxy->HasAnnotation("Tooltip"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Tooltip to be present." << endl;
+    std::cout << "Error: Expect annotations Tooltip to be present." << endl;
   }
   else if (!proxy->HasAnnotation("Owner"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Owner to be present." << endl;
+    std::cout << "Error: Expect annotations Owner to be present." << endl;
   }
   else
   {
-    cout << " -> OK" << endl;
+    std::cout << " -> OK" << endl;
   }
 
   proxy->RemoveAllAnnotations();
-  cout << "--- Remove all annotations ---" << endl;
+  std::cout << "--- Remove all annotations ---" << endl;
   if (proxy->GetNumberOfAnnotations() != 0)
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect 0 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
+    std::cout << "Error: Expect 0 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
   }
   else
   {
-    cout << " -> OK" << endl;
+    std::cout << " -> OK" << endl;
   }
 
   // -----------------------------------------------------------------------
@@ -178,59 +179,59 @@ extern int TestProxyAnnotation(int argc, char* argv[])
   withoutAnnotationXML->PrintXML(withoutAnnotationStr, vtkIndent());
   // -----------------------------------------------------------------------
 
-  cout << "--- Compare XML state ---" << endl;
-  cout << withAnnotationStr.str().c_str() << endl;
+  std::cout << "--- Compare XML state ---" << endl;
+  std::cout << withAnnotationStr.str().c_str() << endl;
   if (withAnnotationStr.str() == withoutAnnotationStr.str())
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: The xml state should be different when annotation are present." << endl;
+    std::cout << "Error: The xml state should be different when annotation are present." << endl;
   }
   else
   {
-    cout << " -> OK" << endl;
+    std::cout << " -> OK" << endl;
   }
 
-  cout << "--- Load XML state with annotation ---" << endl;
+  std::cout << "--- Load XML state with annotation ---" << endl;
   if (proxy->GetNumberOfAnnotations() != 0)
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect 0 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
+    std::cout << "Error: Expect 0 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
   }
   else
   {
-    cout << " -> Before load OK no annotation" << endl;
+    std::cout << " -> Before load OK no annotation" << endl;
   }
   proxy->LoadXMLState(withAnnotationXML->GetNestedElement(0), nullptr);
   if (proxy->GetNumberOfAnnotations() != 3)
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect 3 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
+    std::cout << "Error: Expect 3 annotations and got " << proxy->GetNumberOfAnnotations() << endl;
   }
   else if (!proxy->HasAnnotation("Color"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Color to be present." << endl;
+    std::cout << "Error: Expect annotations Color to be present." << endl;
   }
   else if (!proxy->HasAnnotation("Tooltip"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Tooltip to be present." << endl;
+    std::cout << "Error: Expect annotations Tooltip to be present." << endl;
   }
   else if (!proxy->HasAnnotation("Owner"))
   {
     ret_val = EXIT_FAILURE;
-    cout << "Error: Expect annotations Owner to be present." << endl;
+    std::cout << "Error: Expect annotations Owner to be present." << endl;
   }
   else
   {
-    cout << " -> After load OK found the expected annotations" << endl;
+    std::cout << " -> After load OK found the expected annotations" << endl;
   }
 
   // *******************************************************************
 
   proxy->Delete();
   session->Delete();
-  cout << "Exiting..." << endl;
+  std::cout << "Exiting..." << endl;
 
   vtkInitializationHelper::Finalize();
   return ret_val;

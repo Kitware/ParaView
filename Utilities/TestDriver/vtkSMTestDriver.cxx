@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <iostream>
 #include <sstream>
 #include <thread>
 
@@ -393,7 +394,7 @@ int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name
   {
     return 1;
   }
-  cerr << "vtkSMTestDriver: starting process " << name << "\n";
+  std::cerr << "vtkSMTestDriver: starting process " << name << "\n";
   vtksysProcess_SetTimeout(server, this->TimeOut);
   vtksysProcess_Execute(server);
   int foundWaiting = 0;
@@ -409,12 +410,12 @@ int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name
   }
   if (foundWaiting)
   {
-    cerr << "vtkSMTestDriver: " << name << " successfully started.\n";
+    std::cerr << "vtkSMTestDriver: " << name << " successfully started.\n";
     return 1;
   }
   else
   {
-    cerr << "vtkSMTestDriver: " << name << " never started.\n";
+    std::cerr << "vtkSMTestDriver: " << name << " never started.\n";
     vtksysProcess_Kill(server);
     return 0;
   }
@@ -426,12 +427,12 @@ int vtkSMTestDriver::StartProcess(vtksysProcess* client, const char* name)
   {
     return 1;
   }
-  cerr << "vtkSMTestDriver: starting process " << name << "\n";
+  std::cerr << "vtkSMTestDriver: starting process " << name << "\n";
   vtksysProcess_SetTimeout(client, this->TimeOut);
   vtksysProcess_Execute(client);
   if (vtksysProcess_GetState(client) == vtksysProcess_State_Executing)
   {
-    cerr << "vtkSMTestDriver: " << name << " successfully started.\n";
+    std::cerr << "vtkSMTestDriver: " << name << " successfully started.\n";
     return 1;
   }
   else
@@ -446,7 +447,7 @@ void vtkSMTestDriver::Stop(vtksysProcess* p, const char* name)
 {
   if (p)
   {
-    cerr << "vtkSMTestDriver: killing process " << name << "\n";
+    std::cerr << "vtkSMTestDriver: killing process " << name << "\n";
     vtksysProcess_Kill(p);
     vtksysProcess_WaitForExit(p, nullptr);
   }
@@ -501,10 +502,10 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output
         }
         if (!found)
         {
-          cerr << "vtkSMTestDriver: ***** Test will fail, because the string: \""
-               << possibleMPIErrors[i]
-               << "\"\nvtkSMTestDriver: ***** was found in the following output from the " << pname
-               << ":\n\"" << it->c_str() << "\"\n";
+          std::cerr << "vtkSMTestDriver: ***** Test will fail, because the string: \""
+                    << possibleMPIErrors[i]
+                    << "\"\nvtkSMTestDriver: ***** was found in the following output from the "
+                    << pname << ":\n\"" << it->c_str() << "\"\n";
           return 1;
         }
       }
@@ -580,7 +581,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     if (!renderServer)
     {
       VTK_CLEAN_PROCESSES;
-      cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the render server.\n";
+      std::cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the render server.\n";
       return 1;
     }
     renderServers.push_back(renderServer);
@@ -591,7 +592,8 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     if (!server)
     {
       VTK_CLEAN_PROCESSES;
-      cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the server (or dataserver).\n";
+      std::cerr
+        << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the server (or dataserver).\n";
       return 1;
     }
     servers.push_back(server);
@@ -602,7 +604,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     if (!client)
     {
       VTK_CLEAN_PROCESSES;
-      cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the client.\n";
+      std::cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the client.\n";
       return 1;
     }
     clients.push_back(client);
@@ -613,7 +615,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     if (!script)
     {
       VTK_CLEAN_PROCESSES;
-      cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the script.\n";
+      std::cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the script.\n";
       return 1;
     }
   }
@@ -638,7 +640,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     if (!this->StartProcessAndWait(
           clients[0], "client", ClientStdOut, ClientStdErr, "Waiting", connection_info))
     {
-      cerr << "vtkSMTestDriver: Reverse connection client never started.\n";
+      std::cerr << "vtkSMTestDriver: Reverse connection client never started.\n";
       VTK_CLEAN_PROCESSES;
       return -1;
     }
@@ -686,7 +688,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       if (!this->StartProcessAndWait(renderServer, processName.str().c_str(), RenderServerStdOut,
             RenderServerStdErr, "Accepting connection(s):", rs_connection_info))
       {
-        cerr << "vtkSMTestDriver: Render server never started.\n";
+        std::cerr << "vtkSMTestDriver: Render server never started.\n";
         VTK_CLEAN_PROCESSES;
         return -1;
       }
@@ -716,7 +718,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
           this->Stop(*stopIter, "renderserver");
         }
 
-        cerr << "vtkSMTestDriver: Server never started.\n";
+        std::cerr << "vtkSMTestDriver: Server never started.\n";
         VTK_CLEAN_PROCESSES;
         return -1;
       }
@@ -805,7 +807,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     if (!this->StartProcessAndWait(
           script, processName.str().c_str(), ScriptStdOut, ScriptStdErr, "", output_to_ignore))
     {
-      cerr << "vtkSMTestDriver: Script never started.\n";
+      std::cerr << "vtkSMTestDriver: Script never started.\n";
       VTK_CLEAN_PROCESSES;
       return -1;
     }
@@ -967,8 +969,8 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   }
   if (mpiError)
   {
-    cerr << "vtkSMTestDriver: Error string found in output, vtkSMTestDriver returning " << mpiError
-         << "\n";
+    std::cerr << "vtkSMTestDriver: Error string found in output, vtkSMTestDriver returning "
+              << mpiError << "\n";
     return mpiError;
   }
   // if both servers are fine return the client result
@@ -978,12 +980,12 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
 //----------------------------------------------------------------------------
 void vtkSMTestDriver::ReportCommand(const char* const* command, const char* name)
 {
-  cerr << "vtkSMTestDriver: " << name << " command is:\n";
+  std::cerr << "vtkSMTestDriver: " << name << " command is:\n";
   for (const char* const* c = command; *c; ++c)
   {
-    cerr << " \"" << *c << "\"";
+    std::cerr << " \"" << *c << "\"";
   }
-  cerr << "\n";
+  std::cerr << "\n";
 }
 
 //----------------------------------------------------------------------------
@@ -994,73 +996,73 @@ int vtkSMTestDriver::ReportStatus(vtksysProcess* process, const char* name)
   {
     case vtksysProcess_State_Starting:
     {
-      cerr << "vtkSMTestDriver: Never started " << name << " process.\n";
+      std::cerr << "vtkSMTestDriver: Never started " << name << " process.\n";
     }
     break;
     case vtksysProcess_State_Error:
     {
-      cerr << "vtkSMTestDriver: Error executing " << name
-           << " process: " << vtksysProcess_GetErrorString(process) << "\n";
+      std::cerr << "vtkSMTestDriver: Error executing " << name
+                << " process: " << vtksysProcess_GetErrorString(process) << "\n";
     }
     break;
     case vtksysProcess_State_Exception:
     {
-      cerr << "vtkSMTestDriver: " << name << " process exited with an exception: ";
+      std::cerr << "vtkSMTestDriver: " << name << " process exited with an exception: ";
       switch (vtksysProcess_GetExitException(process))
       {
         case vtksysProcess_Exception_None:
         {
-          cerr << "None";
+          std::cerr << "None";
         }
         break;
         case vtksysProcess_Exception_Fault:
         {
-          cerr << "Segmentation fault";
+          std::cerr << "Segmentation fault";
         }
         break;
         case vtksysProcess_Exception_Illegal:
         {
-          cerr << "Illegal instruction";
+          std::cerr << "Illegal instruction";
         }
         break;
         case vtksysProcess_Exception_Interrupt:
         {
-          cerr << "Interrupted by user";
+          std::cerr << "Interrupted by user";
         }
         break;
         case vtksysProcess_Exception_Numerical:
         {
-          cerr << "Numerical exception";
+          std::cerr << "Numerical exception";
         }
         break;
         case vtksysProcess_Exception_Other:
         {
-          cerr << "Unknown";
+          std::cerr << "Unknown";
         }
         break;
       }
-      cerr << "\n";
+      std::cerr << "\n";
     }
     break;
     case vtksysProcess_State_Executing:
     {
-      cerr << "vtkSMTestDriver: Never terminated " << name << " process.\n";
+      std::cerr << "vtkSMTestDriver: Never terminated " << name << " process.\n";
     }
     break;
     case vtksysProcess_State_Exited:
     {
       result = vtksysProcess_GetExitValue(process);
-      cerr << "vtkSMTestDriver: " << name << " process exited with code " << result << "\n";
+      std::cerr << "vtkSMTestDriver: " << name << " process exited with code " << result << "\n";
     }
     break;
     case vtksysProcess_State_Expired:
     {
-      cerr << "vtkSMTestDriver: killed " << name << " process due to timeout.\n";
+      std::cerr << "vtkSMTestDriver: killed " << name << " process due to timeout.\n";
     }
     break;
     case vtksysProcess_State_Killed:
     {
-      cerr << "vtkSMTestDriver: killed " << name << " process.\n";
+      std::cerr << "vtkSMTestDriver: killed " << name << " process.\n";
     }
     break;
   }
@@ -1174,12 +1176,12 @@ void vtkSMTestDriver::PrintLine(const char* pname, const char* line)
   // if the name changed then the line is output from a different process
   if (this->CurrentPrintLineName != pname)
   {
-    cerr << "-------------- " << pname << " output --------------\n";
+    std::cerr << "-------------- " << pname << " output --------------\n";
     // save the current pname
     this->CurrentPrintLineName = pname;
   }
-  cerr << line << "\n";
-  cerr.flush();
+  std::cerr << line << "\n";
+  std::cerr.flush();
 }
 
 //----------------------------------------------------------------------------

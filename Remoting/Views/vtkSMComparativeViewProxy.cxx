@@ -103,7 +103,7 @@ void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   if (vtkSMViewProxy::SafeDownCast(modifiedProxy) == nullptr)
   {
-    // cout << "vtkSMComparativeViewProxy::MarkDirty == " << modifiedProxy << endl;
+    // std::cout << "vtkSMComparativeViewProxy::MarkDirty == " << modifiedProxy << endl;
     // The representation that gets added to this view is a consumer of it's
     // input. While this view is a consumer of the representation. So, when the
     // input source is modified, that call eventually leads to

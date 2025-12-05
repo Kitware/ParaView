@@ -9,6 +9,7 @@
 #include "vtkSmartPointer.h"
 
 #include <cstdlib>
+#include <iostream>
 
 static vtkSmartPointer<vtkFloatArray> GetPolyData()
 {
@@ -67,23 +68,23 @@ extern int TestPVArrayInformation(int, char*[])
   auto range = info->GetComponentRange(0);
   if (!vtkMathUtilities::FuzzyCompare(range[0], 0.0))
   {
-    cerr << "ERROR: failed to find range minimum: " << range[0] << " " << 0.0 << endl;
+    std::cerr << "ERROR: failed to find range minimum: " << range[0] << " " << 0.0 << endl;
     return EXIT_FAILURE;
   }
   if (!vtkMathUtilities::FuzzyCompare(range[1], 100.0))
   {
-    cerr << "ERROR: failed to find range maximum: " << range[1] << " " << 100.0 << endl;
+    std::cerr << "ERROR: failed to find range maximum: " << range[1] << " " << 100.0 << endl;
     return EXIT_FAILURE;
   }
   range = info->GetComponentFiniteRange(0);
   if (!vtkMathUtilities::FuzzyCompare(range[0], 0.0))
   {
-    cerr << "ERROR: failed to find finite range minimum: " << range[0] << " " << 0.0 << endl;
+    std::cerr << "ERROR: failed to find finite range minimum: " << range[0] << " " << 0.0 << endl;
     return EXIT_FAILURE;
   }
   if (!vtkMathUtilities::FuzzyCompare(range[1], 100.0))
   {
-    cerr << "ERROR: failed to find finite range maximum: " << range[1] << " " << 100.0 << endl;
+    std::cerr << "ERROR: failed to find finite range maximum: " << range[1] << " " << 100.0 << endl;
     return EXIT_FAILURE;
   }
 
@@ -91,23 +92,25 @@ extern int TestPVArrayInformation(int, char*[])
   info->GetComponentRange(0, rangeArray);
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[0], 0.0))
   {
-    cerr << "ERROR: failed to find range minimum: " << rangeArray[0] << " " << 0.0 << endl;
+    std::cerr << "ERROR: failed to find range minimum: " << rangeArray[0] << " " << 0.0 << endl;
     return EXIT_FAILURE;
   }
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[1], 100.0))
   {
-    cerr << "ERROR: failed to find range maximum: " << rangeArray[1] << " " << 100.0 << endl;
+    std::cerr << "ERROR: failed to find range maximum: " << rangeArray[1] << " " << 100.0 << endl;
     return EXIT_FAILURE;
   }
   info->GetComponentFiniteRange(0, rangeArray);
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[0], 0.0))
   {
-    cerr << "ERROR: failed to find finite range minimum: " << rangeArray[0] << " " << 0.0 << endl;
+    std::cerr << "ERROR: failed to find finite range minimum: " << rangeArray[0] << " " << 0.0
+              << endl;
     return EXIT_FAILURE;
   }
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[1], 100.0))
   {
-    cerr << "ERROR: failed to find finite range maximum: " << rangeArray[1] << " " << 100.0 << endl;
+    std::cerr << "ERROR: failed to find finite range maximum: " << rangeArray[1] << " " << 100.0
+              << endl;
     return EXIT_FAILURE;
   }
 
@@ -118,47 +121,50 @@ extern int TestPVArrayInformation(int, char*[])
   range = info->GetComponentRange(0);
   if (!vtkMathUtilities::FuzzyCompare(range[0], 0.0))
   {
-    cerr << "ERROR: failed to find range minimum: " << range[0] << " " << 0.0 << endl;
+    std::cerr << "ERROR: failed to find range minimum: " << range[0] << " " << 0.0 << endl;
     return EXIT_FAILURE;
   }
   if (range[1] != vtkMath::Inf())
   {
-    cerr << "ERROR: failed to find range maximum: " << range[1] << " " << vtkMath::Inf() << endl;
+    std::cerr << "ERROR: failed to find range maximum: " << range[1] << " " << vtkMath::Inf()
+              << endl;
     return EXIT_FAILURE;
   }
   range = info->GetComponentFiniteRange(0);
   if (!vtkMathUtilities::FuzzyCompare(range[0], 0.0))
   {
-    cerr << "ERROR: failed to find finite range minimum: " << range[0] << " " << 0.0 << endl;
+    std::cerr << "ERROR: failed to find finite range minimum: " << range[0] << " " << 0.0 << endl;
     return EXIT_FAILURE;
   }
   if (!vtkMathUtilities::FuzzyCompare(range[1], 100.0))
   {
-    cerr << "ERROR: failed to find finite range maximum: " << range[1] << " " << 100.0 << endl;
+    std::cerr << "ERROR: failed to find finite range maximum: " << range[1] << " " << 100.0 << endl;
     return EXIT_FAILURE;
   }
 
   info->GetComponentRange(0, rangeArray);
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[0], 0.0))
   {
-    cerr << "ERROR: failed to find range minimum: " << rangeArray[0] << " " << 0.0 << endl;
+    std::cerr << "ERROR: failed to find range minimum: " << rangeArray[0] << " " << 0.0 << endl;
     return EXIT_FAILURE;
   }
   if (rangeArray[1] != vtkMath::Inf())
   {
-    cerr << "ERROR: failed to find range maximum: " << rangeArray[1] << " " << vtkMath::Inf()
-         << endl;
+    std::cerr << "ERROR: failed to find range maximum: " << rangeArray[1] << " " << vtkMath::Inf()
+              << endl;
     return EXIT_FAILURE;
   }
   info->GetComponentFiniteRange(0, rangeArray);
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[0], 0.0))
   {
-    cerr << "ERROR: failed to find finite range minimum: " << rangeArray[0] << " " << 0.0 << endl;
+    std::cerr << "ERROR: failed to find finite range minimum: " << rangeArray[0] << " " << 0.0
+              << endl;
     return EXIT_FAILURE;
   }
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[1], 100.0))
   {
-    cerr << "ERROR: failed to find finite range maximum: " << rangeArray[1] << " " << 100.0 << endl;
+    std::cerr << "ERROR: failed to find finite range maximum: " << rangeArray[1] << " " << 100.0
+              << endl;
     return EXIT_FAILURE;
   }
 

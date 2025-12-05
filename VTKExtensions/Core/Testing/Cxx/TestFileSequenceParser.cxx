@@ -3,18 +3,20 @@
 #include <vtkFileSequenceParser.h>
 #include <vtkNew.h>
 
+#include <iostream>
+
 static bool check_group(vtkFileSequenceParser* parser, const char* fname, const char* seqname)
 {
   if (!parser->ParseFileSequence(fname))
   {
-    cout << "ERROR: group not detected for '" << fname << "'" << endl;
+    std::cout << "ERROR: group not detected for '" << fname << "'" << endl;
     return false;
   }
   if (strcmp(parser->GetSequenceName(), seqname) != 0)
   {
-    cout << "ERROR: sequence name mismatch for '" << fname << "' " << endl
-         << "  expected : '" << seqname << "'" << endl
-         << "      got  : '" << parser->GetSequenceName() << "'" << endl;
+    std::cout << "ERROR: sequence name mismatch for '" << fname << "' " << endl
+              << "  expected : '" << seqname << "'" << endl
+              << "      got  : '" << parser->GetSequenceName() << "'" << endl;
     return false;
   }
   return true;
@@ -24,7 +26,7 @@ static bool check_no_group(vtkFileSequenceParser* parser, const char* fname)
 {
   if (parser->ParseFileSequence(fname))
   {
-    cout << "ERROR: group detected erroneously for '" << fname << "'" << endl;
+    std::cout << "ERROR: group detected erroneously for '" << fname << "'" << endl;
     return false;
   }
   return true;

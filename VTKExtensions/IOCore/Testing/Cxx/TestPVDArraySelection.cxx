@@ -9,10 +9,12 @@
 #include "vtkPVDReader.h"
 #include "vtkTestUtilities.h"
 
+#include <iostream>
+
 #define TASSERT(x)                                                                                 \
   if (!(x))                                                                                        \
   {                                                                                                \
-    cerr << "ERROR: failed at " << __LINE__ << "!" << endl;                                        \
+    std::cerr << "ERROR: failed at " << __LINE__ << "!" << endl;                                   \
     return EXIT_FAILURE;                                                                           \
   }
 

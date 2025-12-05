@@ -129,7 +129,7 @@ vtkSpyPlotUniReader* vtkSpyPlotReaderMap::GetReader(
     it->second = vtkSpyPlotUniReader::New();
     it->second->SetCellArraySelection(parent->GetCellDataArraySelection());
     it->second->SetFileName(it->first.c_str());
-    // cout << parent->GetController()->GetLocalProcessId()
+    // std::cout << parent->GetController()->GetLocalProcessId()
     // << "Create reader: " << it->second << endl;
 
     // Set properties from parent class on the new reader. They can be overridden
@@ -154,7 +154,7 @@ void vtkSpyPlotReaderMap::TellReadersToCheck(vtkSpyPlotReader* parent)
 //-----------------------------------------------------------------------------
 bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
 {
-  // cerr << "spydatafile\n";
+  // std::cerr << "spydatafile\n";
   // See if this is part of a series
   int currentNum = 0;
   bool isASeries = HasNumericalExtension(filename, currentNum);
@@ -185,7 +185,7 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
     auto result =
       vtk::format_to_n(buffer, sizeof(buffer), "{:s}/{:s}.{:d}", filePath, fileNoExt, idx);
     *result.out = '\0';
-    // cerr << "buffer1 == " << buffer << endl;
+    // std::cerr << "buffer1 == " << buffer << endl;
     if (!vtksys::SystemTools::FileExists(buffer))
     {
       int next = idx;
@@ -246,7 +246,7 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
     this->Files[file] = nullptr;
   }
   // Okay now open just the first file to get meta data
-  // cerr << "updating meta... " << endl;
+  // std::cerr << "updating meta... " << endl;
   return true;
 }
 

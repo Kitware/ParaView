@@ -12,6 +12,7 @@
 #include "vtkSmartPointer.h"
 
 #include <cassert>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -44,7 +45,7 @@ public:
     vtkTypeUInt32 correctId = this->GetMappedId(globalid);
     if (correctId != 0)
     {
-      // cout << "RegisterDataInformation: " << correctId << " " << port << endl;
+      // std::cout << "RegisterDataInformation: " << correctId << " " << port << endl;
       std::string id = this->GenerateID(correctId, port, info);
       this->DataInformationMap[id] = info;
     }
@@ -74,7 +75,7 @@ public:
   //---------------------------------------------------------------------------
   bool GatherInformation(vtkTypeUInt32 globalid, unsigned int port, vtkPVInformation* info)
   {
-    // cout << "GatherInformation: " << globalid << " " << port << endl;
+    // std::cout << "GatherInformation: " << globalid << " " << port << endl;
     std::string id = this->GenerateID(globalid, port, info);
     vtkPVInformation* storedValue = this->DataInformationMap[id];
 
@@ -116,7 +117,7 @@ public:
     {
       this->IdMap[data[i]] = data[i + 1];
     }
-    cout << endl;
+    std::cout << endl;
   }
   //---------------------------------------------------------------------------
   vtkTypeUInt32 GetMappedId(vtkTypeUInt32 originalId)

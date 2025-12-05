@@ -15,6 +15,7 @@
 #include "vtkTemporalMultiplexing.h"
 
 #include <cstdlib>
+#include <iostream>
 
 namespace
 {

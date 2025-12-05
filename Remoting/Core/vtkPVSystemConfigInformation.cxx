@@ -10,6 +10,7 @@
 using std::ostringstream;
 #include <algorithm>
 using std::sort;
+#include <iostream>
 
 #include <vtksys/SystemInformation.hxx>
 
@@ -24,18 +25,18 @@ using std::sort;
 
 void vtkPVSystemConfigInformation::ConfigInfo::Print()
 {
-  cerr << "OSDescriptor=" << this->OSDescriptor << endl
-       << "CPUDescriptor=" << this->CPUDescriptor << endl
-       << "MemDescriptor=" << this->MemDescriptor << endl
-       << "HostName=" << this->HostName << endl
-       << "ProcessType=" << this->ProcessType << endl
-       << "SystemType=" << this->SystemType << endl
-       << "Rank=" << this->Rank << endl
-       << "Pid=" << this->Pid << endl
-       << "HostMemoryTotal=" << this->HostMemoryTotal << endl
-       << "HostMemoryAvailable=" << this->HostMemoryAvailable << endl
-       << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl
-       << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl;
+  std::cerr << "OSDescriptor=" << this->OSDescriptor << endl
+            << "CPUDescriptor=" << this->CPUDescriptor << endl
+            << "MemDescriptor=" << this->MemDescriptor << endl
+            << "HostName=" << this->HostName << endl
+            << "ProcessType=" << this->ProcessType << endl
+            << "SystemType=" << this->SystemType << endl
+            << "Rank=" << this->Rank << endl
+            << "Pid=" << this->Pid << endl
+            << "HostMemoryTotal=" << this->HostMemoryTotal << endl
+            << "HostMemoryAvailable=" << this->HostMemoryAvailable << endl
+            << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl
+            << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -45,7 +46,7 @@ vtkStandardNewMacro(vtkPVSystemConfigInformation);
 #ifdef vtkPVSystemConfigInformationDEBUG
 vtkPVSystemConfigInformation::vtkPVSystemConfigInformation()
 {
-  cerr << "=====vtkPVSystemConfigInformation::vtkPVSystemConfigInformation" << endl;
+  std::cerr << "=====vtkPVSystemConfigInformation::vtkPVSystemConfigInformation" << endl;
 }
 #else
 vtkPVSystemConfigInformation::vtkPVSystemConfigInformation() = default;
@@ -55,7 +56,7 @@ vtkPVSystemConfigInformation::vtkPVSystemConfigInformation() = default;
 #ifdef vtkPVSystemConfigInformationDEBUG
 vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation()
 {
-  cerr << "=====vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation" << endl;
+  std::cerr << "=====vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation" << endl;
 }
 #else
 vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation() = default;
@@ -65,7 +66,7 @@ vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation() = default;
 void vtkPVSystemConfigInformation::CopyFromObject(vtkObject* obj)
 {
 #ifdef vtkPVSystemConfigInformationDEBUG
-  cerr << "=====vtkPVSystemConfigInformation::CopyFromObject" << endl;
+  std::cerr << "=====vtkPVSystemConfigInformation::CopyFromObject" << endl;
 #endif
 
   (void)obj;
@@ -106,7 +107,7 @@ void vtkPVSystemConfigInformation::CopyFromObject(vtkObject* obj)
 void vtkPVSystemConfigInformation::AddInformation(vtkPVInformation* pvinfo)
 {
 #ifdef vtkPVSystemConfigInformationDEBUG
-  cerr << "=====vtkPVSystemConfigInformation::AddInformation" << endl;
+  std::cerr << "=====vtkPVSystemConfigInformation::AddInformation" << endl;
 #endif
   vtkPVSystemConfigInformation* info = dynamic_cast<vtkPVSystemConfigInformation*>(pvinfo);
 
@@ -122,7 +123,7 @@ void vtkPVSystemConfigInformation::AddInformation(vtkPVInformation* pvinfo)
 void vtkPVSystemConfigInformation::CopyToStream(vtkClientServerStream* css)
 {
 #ifdef vtkPVSystemConfigInformationDEBUG
-  cerr << "=====vtkPVSystemConfigInformation::CopyToStream" << endl;
+  std::cerr << "=====vtkPVSystemConfigInformation::CopyToStream" << endl;
 #endif
 
   css->Reset();
@@ -147,7 +148,7 @@ void vtkPVSystemConfigInformation::CopyToStream(vtkClientServerStream* css)
 void vtkPVSystemConfigInformation::CopyFromStream(const vtkClientServerStream* css)
 {
 #ifdef vtkPVSystemConfigInformationDEBUG
-  cerr << "=====vtkPVSystemConfigInformation::CopyFromStream" << endl;
+  std::cerr << "=====vtkPVSystemConfigInformation::CopyFromStream" << endl;
 #endif
 
   int offset = 0;
@@ -210,7 +211,7 @@ void vtkPVSystemConfigInformation::CopyFromStream(const vtkClientServerStream* c
 void vtkPVSystemConfigInformation::Sort()
 {
 #ifdef vtkPVSystemConfigInformationDEBUG
-  cerr << "=====vtkPVSystemConfigInformation::Sort" << endl;
+  std::cerr << "=====vtkPVSystemConfigInformation::Sort" << endl;
 #endif
 
   sort(this->Configs.begin(), this->Configs.end());

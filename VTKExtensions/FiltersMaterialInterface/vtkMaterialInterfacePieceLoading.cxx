@@ -5,7 +5,6 @@
 #include "vtkMaterialInterfaceUtilities.h"
 #include <algorithm>
 #include <vector>
-using std::cerr;
 using std::endl;
 using std::ostream;
 using std::vector;
@@ -20,8 +19,8 @@ ostream& operator<<(ostream& sout, const vtkMaterialInterfacePieceLoading& fp)
 //
 void PrintPieceLoadingHistogram(vector<vector<vtkIdType>>& pla)
 {
-  // cerr << "loading array:" <<endl;
-  // cerr << pla << endl;
+  // std::cerr << "loading array:" <<endl;
+  // std::cerr << pla << endl;
   size_t nProcs = pla.size();
   // get min and max loading
   vtkIdType minLoading = (vtkIdType)1 << ((sizeof(vtkIdType) * 8) - 2);
@@ -72,9 +71,9 @@ void PrintPieceLoadingHistogram(vector<vector<vtkIdType>>& pla)
     binIds[binId] = static_cast<int>(minLoading + (binId + 1) * binWidth);
   }
   // print
-  cerr << "minLoading: " << minLoading << endl;
-  cerr << "maxLoading: " << maxLoading << endl;
-  cerr << "binWidth:   " << binWidth << endl;
-  cerr << "nBins:      " << nBins << endl;
+  std::cerr << "minLoading: " << minLoading << endl;
+  std::cerr << "maxLoading: " << maxLoading << endl;
+  std::cerr << "binWidth:   " << binWidth << endl;
+  std::cerr << "nBins:      " << nBins << endl;
   PrintHistogram(hist, binIds);
 }

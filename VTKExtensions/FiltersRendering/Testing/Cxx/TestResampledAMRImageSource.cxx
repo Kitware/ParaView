@@ -21,7 +21,7 @@
 #define vtk_assert(x)                                                                              \
   if (!(x))                                                                                        \
   {                                                                                                \
-    cerr << "ERROR: Condition FAILED!! : " << #x << endl;                                          \
+    std::cerr << "ERROR: Condition FAILED!! : " << #x << endl;                                     \
     return TEST_FAILED;                                                                            \
   }
 
@@ -67,7 +67,7 @@ extern int TestResampledAMRImageSource(int argc, char* argv[])
 
   vtkDataArray* temp = output->GetPointData()->GetArray("temp");
   vtk_assert(temp != nullptr);
-  cout << "Tuple: 14544: " << temp->GetTuple1(14544) << endl;
+  std::cout << "Tuple: 14544: " << temp->GetTuple1(14544) << endl;
 
   // FIXME: Add more validation code.
   return TEST_SUCCESS;

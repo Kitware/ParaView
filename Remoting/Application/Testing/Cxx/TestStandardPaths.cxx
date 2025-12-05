@@ -4,6 +4,7 @@
 #include "vtkPVStandardPaths.h"
 #include "vtkProcessModule.h"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -25,10 +26,10 @@ static bool compareVectors(
 {
   if (expected.size() != retrieved.size())
   {
-    cerr << "Different number of paths! Has " << retrieved.size() << ":\n";
+    std::cerr << "Different number of paths! Has " << retrieved.size() << ":\n";
     for (const std::string& path : retrieved)
     {
-      cerr << path << "\n";
+      std::cerr << path << "\n";
     }
     return false;
   }
@@ -37,8 +38,8 @@ static bool compareVectors(
   {
     if (expected[idx] != retrieved[idx])
     {
-      cerr << "Paths do not match. At index " << idx << " Expect " << expected[idx] << " but has "
-           << retrieved[idx] << "\n";
+      std::cerr << "Paths do not match. At index " << idx << " Expect " << expected[idx]
+                << " but has " << retrieved[idx] << "\n";
       return false;
     }
   }
@@ -53,7 +54,7 @@ extern int TestStandardPaths(int argc, char* argv[])
 
   if (!results::compareVectors(results::systemDirs, retrievenSystemDirs))
   {
-    cerr << "System Directories failed\n";
+    std::cerr << "System Directories failed\n";
     return EXIT_FAILURE;
   }
 
@@ -63,8 +64,8 @@ extern int TestStandardPaths(int argc, char* argv[])
   std::string userDir = vtkPVStandardPaths::GetUserSettingsDirectory();
   if (userDir != results::userDir)
   {
-    cerr << "Wrong user directory found. Has " << userDir << " but expects " << results::userDir
-         << "\n";
+    std::cerr << "Wrong user directory found. Has " << userDir << " but expects "
+              << results::userDir << "\n";
     return EXIT_FAILURE;
   }
 

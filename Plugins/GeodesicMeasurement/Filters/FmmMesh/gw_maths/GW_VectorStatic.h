@@ -437,36 +437,36 @@ public:
     static void TestClass(std::ostream &s = cout)
     {
         TestClassHeader("GW_VectorStatic", s);
-        cout << "Float based vectors ********************" << endl;
-        cout << "Test for creation :" << endl;
+        std::cout << "Float based vectors ********************" << endl;
+        std::cout << "Test for creation :" << endl;
         GW_VectorStatic<v_size,GW_Float> v;
         v.SetData(0,1);
         v.SetData(1,1);
-        cout << v << endl;
-        cout << "Test for norm : " << endl;
-        cout << v.Norm() << endl;
-        cout << "Test for scale : " << endl;
-        cout << "v*2 : " << v*2 << " ... norm=" << (v*2).Norm() << "." << endl;
-        cout << "Test for rotation : " << endl;
+        std::cout << v << endl;
+        std::cout << "Test for norm : " << endl;
+        std::cout << v.Norm() << endl;
+        std::cout << "Test for scale : " << endl;
+        std::cout << "v*2 : " << v*2 << " ... norm=" << (v*2).Norm() << "." << endl;
+        std::cout << "Test for rotation : " << endl;
         GW_U32 n_rot = 8;
         for( GW_U32 i=0; i<=n_rot; ++i )
         {
             GW_Float a = GW_TWOPI/n_rot*i;
-            cout << "Angle " << a << " : " << v.Rotate(a, 0,1 ) << endl;
+            std::cout << "Angle " << a << " : " << v.Rotate(a, 0,1 ) << endl;
         }
-        cout << "Test for soustraction : v-2*v" << endl;
-        cout << (v-v*2) << endl;
-        cout << "Test for addition : v+2*v" << endl;
-        cout << (v+v*2) << endl;
-        cout << "done." << endl;
+        std::cout << "Test for soustraction : v-2*v" << endl;
+        std::cout << (v-v*2) << endl;
+        std::cout << "Test for addition : v+2*v" << endl;
+        std::cout << (v+v*2) << endl;
+        std::cout << "done." << endl;
 
-        cout << "Integer based vectors ********************" << endl;
-        cout << "Test for creation (entry in [0,4]) :" << endl;
+        std::cout << "Integer based vectors ********************" << endl;
+        std::cout << "Test for creation (entry in [0,4]) :" << endl;
         GW_VectorStatic<v_size,GW_I32> vi;
         vi.Randomize(0,5);
-        cout << vi << endl;
-        cout << "Square norm = " << vi.SquareNorm() << endl;
-        cout << "Addition v+2*v : " << (vi+vi*2) << endl;
+        std::cout << vi << endl;
+        std::cout << "Square norm = " << vi.SquareNorm() << endl;
+        std::cout << "Addition v+2*v : " << (vi+vi*2) << endl;
         TestClassFooter("GW_VectorStatic", s);
     }
 

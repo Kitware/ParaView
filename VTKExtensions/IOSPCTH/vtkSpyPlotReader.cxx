@@ -300,7 +300,7 @@ int vtkSpyPlotReader::UpdateFile(vtkInformation* request, vtkInformationVector* 
 
   const int procId = this->GlobalController ? this->GlobalController->GetLocalProcessId() : 0;
   const int numProcs = this->GlobalController ? this->GlobalController->GetNumberOfProcesses() : 1;
-  // cout << procId << " : " << __LINE__ << endl;
+  // std::cout << procId << " : " << __LINE__ << endl;
 
   // When running in parallel, we need to ensure that all testing and meta-data
   // loading only happens on the root node. (BUG #12720).
@@ -342,7 +342,7 @@ int vtkSpyPlotReader::UpdateMetaData(
   // processes (BUG #12720).
   const int procId = this->GlobalController ? this->GlobalController->GetLocalProcessId() : 0;
   const int numProcs = this->GlobalController ? this->GlobalController->GetNumberOfProcesses() : 1;
-  // cout << procId << " : " << __LINE__ << endl;
+  // std::cout << procId << " : " << __LINE__ << endl;
 
   vtkSpyPlotReader::VectorOfDoubles timesteps;
 
@@ -1744,20 +1744,22 @@ int vtkSpyPlotReader::PrepareAMRData(vtkNonOverlappingAMR* hb, vtkSpyPlotBlock* 
 
   //   double bds[6];
   //   this->Bounds->GetBounds(bds);
-  //   cerr << "{\n";
-  //   cerr << "level:       [" << *level << "]\n";
-  //   cerr << "Origin:      [" << origin[0] << "," << origin[1] << "," << origin[2] << "]\n";
-  //   cerr << "Spacing:     [" << spacing[0] << "," << spacing[1] << "," << spacing[2] << "]\n";
-  //   cerr << "extents:     [" << extents[0] << "," << extents[1] << "," << extents[2] << "|"
+  //   std::cerr << "{\n";
+  //   std::cerr << "level:       [" << *level << "]\n";
+  //   std::cerr << "Origin:      [" << origin[0] << "," << origin[1] << "," << origin[2] << "]\n";
+  //   std::cerr << "Spacing:     [" << spacing[0] << "," << spacing[1] << "," << spacing[2] <<
+  //   "]\n"; std::cerr << "extents:     [" << extents[0] << "," << extents[1] << "," << extents[2]
+  //   << "|"
   //                            << extents[3] << "," << extents[4] << "," << extents[5] << "]\n";
-  //   cerr << "realExtents: [" << realExtents[0] << "," << realExtents[1] << "," << realExtents[2]
+  //   std::cerr << "realExtents: [" << realExtents[0] << "," << realExtents[1] << "," <<
+  //   realExtents[2]
   //   << ","
   //                            << realExtents[3] << "," << realExtents[4] << "," << realExtents[5]
   //                            << "]\n";
-  //   cerr << "realDims:    [" << realDims[0] << "," << realDims[1] << "," << realDims[2] << "]\n";
-  //   cerr << "bounds:      [" << bds[0] << "," << bds[1] << "," << bds[2] << ","
+  //   std::cerr << "realDims:    [" << realDims[0] << "," << realDims[1] << "," << realDims[2] <<
+  //   "]\n"; std::cerr << "bounds:      [" << bds[0] << "," << bds[1] << "," << bds[2] << ","
   //                            << bds[3] << "," << bds[4] << "," << bds[5] << "]\n";
-  //   cerr << "}\n";
+  //   std::cerr << "}\n";
   //
 
   //  vtkAMRBox box(realExtents);

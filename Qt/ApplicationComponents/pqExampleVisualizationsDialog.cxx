@@ -17,6 +17,7 @@
 #include <QStatusBar>
 
 #include <cassert>
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 pqExampleVisualizationsDialog::pqExampleVisualizationsDialog(QWidget* parentObject)
@@ -123,7 +124,7 @@ void pqExampleVisualizationsDialog::onButtonPressed()
              "place them under the following path for examples to work:\n\n'%1'")
             .arg(fdataPath.absoluteFilePath());
         // dump to cout for easy copy/paste.
-        cout << msg.toUtf8().data() << endl;
+        std::cout << msg.toUtf8().data() << endl;
         QMessageBox::warning(this, tr("Missing data"), msg, QMessageBox::Ok);
         return;
       }

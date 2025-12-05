@@ -25,6 +25,8 @@
 
 #include <vtksys/SystemTools.hxx>
 
+#include <iostream>
+
 vtkStandardNewMacro(vtkNetworkImageSource);
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::vtkNetworkImageSource()

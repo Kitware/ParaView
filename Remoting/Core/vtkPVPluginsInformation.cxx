@@ -274,7 +274,7 @@ void vtkPVPluginsInformation::Update(vtkPVPluginsInformation* other)
     {
       if (self_iter->RefersToSamePlugin(*other_iter))
       {
-        // cout << "Other: " << endl
+        // std::cout << "Other: " << endl
         //      << "  Name: " << other_iter->Name.c_str() << endl
         //      << "  Filename: " << other_iter->FileName.c_str() <<endl
         //      << "Self: " << endl

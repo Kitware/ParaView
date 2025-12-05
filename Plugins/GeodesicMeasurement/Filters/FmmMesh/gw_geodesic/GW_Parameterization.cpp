@@ -19,6 +19,8 @@
     #include "GW_Parameterization.inl"
 #endif
 
+#include <iostream>
+
 using namespace GW;
 
 
@@ -244,7 +246,7 @@ void GW_Parameterization::SegmentAllRegions( GW_GeodesicMesh& Mesh, T_GeodesicVe
     /* recompute the whole distance map */
     GW_OutputComment("Recomputing the whole Voronoi tessellation.");
     this->PerformFastMarching( Mesh, VertList );
-    cout << "  * Segmenting each region ";
+    std::cout << "  * Segmenting each region ";
     GW_U32 num = 0;
     GW_ProgressBar pb;
     pb.Begin();
@@ -257,7 +259,7 @@ void GW_Parameterization::SegmentAllRegions( GW_GeodesicMesh& Mesh, T_GeodesicVe
         pb.Update( ((GW_Float)num)/((GW_Float)VertList.size()) );
     }
     pb.End();
-    cout << endl;
+    std::cout << endl;
     Mesh.BuildConnectivity();
 
     if( pTrissectorInfoMap!=NULL )
@@ -718,7 +720,7 @@ void GW_Parameterization::BuildConformalMatrix( GW_Mesh& Mesh, GW_SparseMatrix& 
                     if( rTan>0 )
                         rVal += (1-rTan)/( 2*sqrt(rTan) );
                     else
-                        cout << " .. One degenerate triangle ..." << endl;
+                        std::cout << " .. One degenerate triangle ..." << endl;
                 }
 #else
                 GW_Vector3D e1 = pVerti->GetPosition()-pVertL->GetPosition();    e1.Normalize();
@@ -745,7 +747,7 @@ void GW_Parameterization::BuildConformalMatrix( GW_Mesh& Mesh, GW_SparseMatrix& 
                     if( rTan>0 )
                         rVal += (1-rTan)/( 2*sqrt(rTan) );
                     else
-                        cout << " .. One degenerate triangle ..." << endl;
+                        std::cout << " .. One degenerate triangle ..." << endl;
                 }
 #else
                 GW_Vector3D e1 = pVerti->GetPosition()-pVertR->GetPosition();    e1.Normalize();
@@ -806,7 +808,7 @@ void GW_Parameterization::ResolutionSpectral( GW_MatrixNxP& K, GW_MatrixNxP& L, 
     GW_MatrixNxP V(p,p);
     GW_VectorND Vp(p);
     K.SVD( U, V, &Vp, NULL );
-//    cout << Vp;
+//    std::cout << Vp;
     GW_Float rScaleX = Vp[EIG1]; // sqrt(Vp[EIG1]);
     GW_Float rScaleY = Vp[EIG2]; // sqrt(Vp[EIG2]);
     for( GW_U32 i=0; i<p; ++i )
@@ -865,7 +867,7 @@ void GW_Parameterization::SolveSystem( GW_SparseMatrix& M, GW_VectorND& x, GW_Ve
         if( LASResult()!=LASOK )
         {
             GW_ASSERT(GW_False);
-            cout << "Error ";
+            std::cout << "Error ";
             WriteLASErrDescr(stdout);
         }
         /* r = b - A * x */
@@ -873,7 +875,7 @@ void GW_Parameterization::SolveSystem( GW_SparseMatrix& M, GW_VectorND& x, GW_Ve
         err = (b-M*x).Norm2();
     }
     pb.End();
-    cout << endl;
+    std::cout << endl;
 
 
     //    std::ofstream str("log.log");
@@ -1023,7 +1025,7 @@ void GW_Parameterization::ResolutionBoundaryFree( GW_Mesh& Mesh, GW_SparseMatrix
         b[i+p]    = arbitrary_pos[k][1];
     }
 
-    cout << "  * System resolution.";
+    std::cout << "  * System resolution.";
     // K1.LUSolve( x, b );    // for small system
     GW_Parameterization::SolveSystem( K1, x, b );
 
@@ -1203,7 +1205,7 @@ void GW_Parameterization::ResolutionBoundaryFixed( GW_Mesh& Mesh, GW_SparseMatri
         }
 
         /* solve system */
-        cout << "  * System resolution.";
+        std::cout << "  * System resolution.";
         GW_Parameterization::SolveSystem( K, x, b );
 
         for( GW_U32 j=0; j<p; ++j )
@@ -1235,7 +1237,7 @@ void GW_Parameterization::ParameterizeMesh( GW_GeodesicMesh& Mesh, GW_VoronoiMes
 
     /* Gather distance information between base vertex and the rest **********************************************/
     GW_U32 i = 0;
-    cout << "  * Computing distance information ";
+    std::cout << "  * Computing distance information ";
     GW_ProgressBar pb;
     pb.Begin();
     for( IT_GeodesicVertexList it = BaseVertex.begin(); it!=BaseVertex.end(); ++it )
@@ -1253,7 +1255,7 @@ void GW_Parameterization::ParameterizeMesh( GW_GeodesicMesh& Mesh, GW_VoronoiMes
         pb.Update(((GW_Float)i)/((GW_Float)BaseVertex.size()));
     }
     pb.End();
-    cout << endl;
+    std::cout << endl;
     /* flatten the base points *************************************************************************************/
     /* build the distance matrix */
     GW_MatrixNxP M(p,p,0.0);
@@ -1498,7 +1500,7 @@ void GW_Parameterization::PerformPseudoLloydIteration( GW_GeodesicMesh& Mesh, T_
     Mesh.RegisterVertexInsersionCallbackFunction( PerformPseudoLloydIteration_Insertion );
     Mesh.RegisterNewDeadVertexCallbackFunction( PerformPseudoLloydIteration_NeswDead );
     GW_U32 num = 0;
-    cout << "  * Centering vertices ";
+    std::cout << "  * Centering vertices ";
     GW_ProgressBar pb;
     pb.Begin();
     for( IT_GeodesicVertexList it = VertList.begin(); it!=VertList.end(); ++it )
@@ -1525,7 +1527,7 @@ void GW_Parameterization::PerformPseudoLloydIteration( GW_GeodesicMesh& Mesh, T_
             NewVertList.push_back( pCenterVert );
     }
     pb.End();
-    cout << endl;
+    std::cout << endl;
     pCurVoronoiDiagram_ = NULL;
     Mesh.RegisterVertexInsersionCallbackFunction( NULL );
     Mesh.RegisterNewDeadVertexCallbackFunction( NULL );

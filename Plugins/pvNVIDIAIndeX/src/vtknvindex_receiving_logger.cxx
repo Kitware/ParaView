@@ -30,6 +30,7 @@
 #include "vtknvindex_receiving_logger.h"
 
 #include <atomic>
+#include <iostream>
 
 #include "vtkOutputWindow.h"
 #include "vtkSetGet.h"

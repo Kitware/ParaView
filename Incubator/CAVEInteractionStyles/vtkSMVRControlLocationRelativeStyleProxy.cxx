@@ -17,6 +17,7 @@
 #include "pqRenderView.h"
 
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 
 // -----------------------------------------------------------------------------

@@ -366,7 +366,7 @@ public:
     while (iter2 != controllersToNotify.end())
     {
       vtkMultiProcessController* ctrl = (*iter2);
-      // cout << "Notify: " << ctrl->GetCommunicator() << endl;
+      // std::cout << "Notify: " << ctrl->GetCommunicator() << endl;
       ctrl->TriggerRMI(remoteProcessId, data, argLength, tag);
       iter2++;
     }

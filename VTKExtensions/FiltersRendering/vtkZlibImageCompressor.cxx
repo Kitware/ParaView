@@ -94,7 +94,7 @@ void vtkZlibCompressorImageConditioner::SetMaskId(int maskId)
   }
   this->MaskId = maskId;
   // const unsigned char m=this->Mask[this->MaskId];
-  // cerr << "Mask=" << hex << (int)m << endl;
+  // std::cerr << "Mask=" << hex << (int)m << endl;
 }
 
 //-----------------------------------------------------------------------------

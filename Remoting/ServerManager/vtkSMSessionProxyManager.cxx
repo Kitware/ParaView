@@ -56,7 +56,7 @@ public:
     {
       vtkSMProxyManager::RegisteredProxyInformation* info =
         (vtkSMProxyManager::RegisteredProxyInformation*)data;
-      cout << info->Proxy
+      std::cout << info->Proxy
            << " " << vtkCommand::GetStringFromEventId(event)
            << " " << info->GroupName
            << " " << info->ProxyName

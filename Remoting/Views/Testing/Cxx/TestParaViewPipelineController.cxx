@@ -13,7 +13,7 @@
 #include "vtkTestUtilities.h"
 
 #include <cassert>
-#include <sstream>
+#include <iostream>
 
 extern int TestParaViewPipelineController(int argc, char* argv[])
 {
@@ -27,25 +27,25 @@ extern int TestParaViewPipelineController(int argc, char* argv[])
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   if (!controller->InitializeSession(session))
   {
-    cerr << "Failed to initialize ParaView session." << endl;
+    std::cerr << "Failed to initialize ParaView session." << endl;
     return EXIT_FAILURE;
   }
 
   if (controller->FindTimeKeeper(session) == nullptr)
   {
-    cerr << "Failed at line " << __LINE__ << endl;
+    std::cerr << "Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
   if (controller->FindAnimationScene(session) == nullptr)
   {
-    cerr << "Failed at line " << __LINE__ << endl;
+    std::cerr << "Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
   if (controller->GetTimeAnimationTrack(controller->GetAnimationScene(session)) == nullptr)
   {
-    cerr << "Failed at line " << __LINE__ << endl;
+    std::cerr << "Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
@@ -90,7 +90,7 @@ extern int TestParaViewPipelineController(int argc, char* argv[])
     vtkTestUtilities::GetArgOrEnvOrDefault("-T", argc, argv, "VTK_TEMP_DIR", "Testing/Temporary");
   if (!tempDir)
   {
-    cerr << "Could not determine temporary directory.\n";
+    std::cerr << "Could not determine temporary directory.\n";
     return EXIT_FAILURE;
   }
   std::string path = tempDir;

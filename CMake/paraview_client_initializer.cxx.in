@@ -27,6 +27,8 @@
 #include "vtkPVPluginTracker.h"
 #include "vtksys/SystemTools.hxx"
 
+#include <iostream>
+
 #cmakedefine01 _paraview_client_APPLICATION_XMLS
 #cmakedefine01 _paraview_client_SPLASH_IMAGE
 #cmakedefine01 _paraview_client_TITLE

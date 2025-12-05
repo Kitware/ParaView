@@ -5,17 +5,19 @@
 #include "vtkNew.h"
 #include "vtkPVMergeTablesComposite.h"
 #include "vtkPointData.h"
-#include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkTestUtilities.h"
 #include "vtkVariant.h"
 #include "vtkXMLTableReader.h"
 
+#include <algorithm>
+#include <iostream>
+
 #define expect(x, msg)                                                                             \
   if (!(x))                                                                                        \
   {                                                                                                \
-    cerr << __LINE__ << ": " msg << endl;                                                          \
+    std::cerr << __LINE__ << ": " msg << endl;                                                     \
     return EXIT_FAILURE;                                                                           \
   }
 

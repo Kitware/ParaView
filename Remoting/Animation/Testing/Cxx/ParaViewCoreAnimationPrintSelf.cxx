@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #define PRINT_SELF(classname)                                                                      \
   c = classname::New();                                                                            \
-  c->Print(cout);                                                                                  \
+  c->Print(std::cout);                                                                             \
   c->Delete();
 
 #include "vtkCompositeAnimationPlayer.h"
@@ -25,6 +25,8 @@
 #include "vtkSequenceAnimationPlayer.h"
 #include "vtkTimestepsAnimationPlayer.h"
 #include "vtkXMLPVAnimationWriter.h"
+
+#include <iostream>
 
 extern int ParaViewCoreAnimationPrintSelf(int, char*[])
 {

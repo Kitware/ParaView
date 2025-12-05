@@ -13,6 +13,7 @@
 #include <vtkTable.h>
 #include <vtkTesting.h>
 
+#include <iostream>
 #include <string>
 
 namespace

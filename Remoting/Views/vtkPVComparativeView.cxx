@@ -852,7 +852,7 @@ void vtkPVComparativeView::Update()
 {
   if (!this->Outdated)
   {
-    // cout << "Not Outdated" << endl;
+    // std::cout << "Not Outdated" << endl;
     return;
   }
 

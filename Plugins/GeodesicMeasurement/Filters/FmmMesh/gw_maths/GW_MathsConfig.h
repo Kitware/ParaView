@@ -252,7 +252,7 @@ namespace GW {
     #endif
 #else
     #ifndef GW_ASSERT
-        #define GW_ASSERT(expr)    if(!(expr)) cerr << "Error in file " << __FILE__ << " line " << __LINE__ << "." << endl
+        #define GW_ASSERT(expr)    if(!(expr)) std::cerr << "Error in file " << __FILE__ << " line " << __LINE__ << "." << endl
     #endif
     #ifndef GW_DEBUG_ONLY
         #define GW_DEBUG_ONLY(expr)

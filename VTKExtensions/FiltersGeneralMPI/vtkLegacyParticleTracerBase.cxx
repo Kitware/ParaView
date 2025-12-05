@@ -34,11 +34,11 @@
 
 #include <algorithm>
 #include <atomic>
-#include <functional>
+#include <iostream>
 #include <mutex>
 #ifdef DEBUGPARTICLETRACE
 #define Assert(x) assert(x)
-#define PRINT(x) cout << __LINE__ << ": " << x << endl;
+#define PRINT(x) std::cout << __LINE__ << ": " << x << endl;
 #else
 #define PRINT(x)
 #define Assert(x)
@@ -1899,13 +1899,13 @@ vtkFloatArray* vtkLegacyParticleTracerBase::GetParticleAngularVel(vtkPointData* 
 //------------------------------------------------------------------------------
 void vtkLegacyParticleTracerBase::PrintParticleHistories()
 {
-  cout << "Particle id, ages: " << endl;
+  std::cout << "Particle id, ages: " << endl;
   for (ParticleListIterator itr = this->ParticleHistories.begin();
        itr != this->ParticleHistories.end(); itr++)
   {
     ParticleInformation& info(*itr);
-    cout << info.InjectedPointId << " " << info.age << " " << endl;
+    std::cout << info.InjectedPointId << " " << info.age << " " << endl;
   }
-  cout << endl;
+  std::cout << endl;
 }
 VTK_ABI_NAMESPACE_END

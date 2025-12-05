@@ -13,6 +13,8 @@
 #include "../gw_core/GW_Config.h"
 #include "../gw_core/GW_Vertex.h"
 
+#include <iostream>
+
 namespace GW {
 
 class GW_VoronoiVertex;
@@ -45,12 +47,12 @@ public:
 
     void Begin()
     {
-        cout << char_begin_;
+        std::cout << char_begin_;
         for( GW_U32 i=0; i<nLength_; ++i )
-            cout << char_empty_;
-        cout << char_begin_;
+            std::cout << char_empty_;
+        std::cout << char_begin_;
         for( GW_U32 i=0; i<nLength_+1; ++i )
-            cout << "\b";
+            std::cout << "\b";
     }
 
     void Update(GW_Float rNewPos)
@@ -62,7 +64,7 @@ public:
             if( nToPrint>0 )
             {
                 for( GW_U32 i=0; i<nToPrint; ++i )
-                    cout << char_progress_;
+                    std::cout << char_progress_;
                 rLastPrint_ = rLastPrint_+nToPrint*rDelta_;
             }
             rCurPos_ = rNewPos;
@@ -73,7 +75,7 @@ public:
     {
         /* flush resting time */
         this->Update(1.0+rDelta_/10);
-        cout << char_begin_;
+        std::cout << char_begin_;
     }
 
 private:

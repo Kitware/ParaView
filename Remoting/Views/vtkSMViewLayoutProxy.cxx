@@ -167,7 +167,7 @@ public:
         vtkSMPropertyHelper(cell.ViewProxy, "ViewPosition").Set(pos, 2);
         cell.ViewProxy->UpdateProperty("ViewPosition");
       }
-      // cout << "View Position: " << cell.ViewProxy  << " = "
+      // std::cout << "View Position: " << cell.ViewProxy  << " = "
       //  << posx << "," << posy << endl;
     }
     else

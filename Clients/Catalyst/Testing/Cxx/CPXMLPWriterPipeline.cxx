@@ -20,6 +20,8 @@
 #include "vtkXMLStructuredGridReader.h"
 #include <vtksys/SystemTools.hxx>
 
+#include <iostream>
+
 extern int CPXMLPWriterPipeline(int argc, char* argv[])
 {
   vtkNew<vtkCPDataDescription> dd;
@@ -95,7 +97,7 @@ extern int CPXMLPWriterPipeline(int argc, char* argv[])
     vtkTestUtilities::GetArgOrEnvOrDefault("-T", argc, argv, "VTK_TEMP_DIR", "Testing/Temporary");
   if (!temp)
   {
-    cerr << "Could not determine temporary directory." << endl;
+    std::cerr << "Could not determine temporary directory." << endl;
     return 1;
   }
   std::string tempDir = temp;

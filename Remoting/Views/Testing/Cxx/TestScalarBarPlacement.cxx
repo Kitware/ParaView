@@ -21,7 +21,7 @@
 #include "vtkScalarBarRepresentation.h"
 
 #include <cassert>
-#include <sstream>
+#include <iostream>
 #include <vector>
 
 namespace
@@ -148,7 +148,7 @@ extern int TestScalarBarPlacement(int argc, char* argv[])
       const int& location = waveletSbClientSideRepObj->GetWindowLocation();
       if (location != static_cast<int>(vtkScalarBarRepresentation::AnyLocation))
       {
-        cerr << "ERROR: Failed at line " << __LINE__ << endl;
+        std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
         return EXIT_FAILURE;
       }
     }
@@ -177,7 +177,7 @@ extern int TestScalarBarPlacement(int argc, char* argv[])
       if (location !=
         static_cast<int>(vtkScalarBarRepresentation::AnyLocation)) // should be AnyLocation
       {
-        cerr << "ERROR: Failed at line " << __LINE__ << endl;
+        std::cerr << "ERROR: Failed at line " << __LINE__ << endl;
         return EXIT_FAILURE;
       }
     }

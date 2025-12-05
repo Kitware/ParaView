@@ -194,7 +194,7 @@ unsigned int vtkPVDataRepresentation::Initialize(
 int vtkPVDataRepresentation::RequestData(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*)
 {
-  // cout << "Updated: " << this->LogName << endl;
+  // std::cout << "Updated: " << this->LogName << endl;
   bool is_temporal = false;
   for (int cc = 0; cc < this->GetNumberOfInputPorts(); cc++)
   {

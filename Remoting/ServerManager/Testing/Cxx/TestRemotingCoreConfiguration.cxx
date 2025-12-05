@@ -6,6 +6,8 @@
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkRemotingCoreConfiguration.h"
 
+#include <iostream>
+
 extern int TestRemotingCoreConfiguration(int argc, char* argv[])
 {
   vtkNew<vtkCLIOptions> options;
@@ -19,6 +21,6 @@ extern int TestRemotingCoreConfiguration(int argc, char* argv[])
   vtkLogF(INFO, "%s", options->GetHelp());
 
   options->Parse(argc, argv);
-  vtkRemotingCoreConfiguration::GetInstance()->Print(cout);
+  vtkRemotingCoreConfiguration::GetInstance()->Print(std::cout);
   return EXIT_SUCCESS;
 }

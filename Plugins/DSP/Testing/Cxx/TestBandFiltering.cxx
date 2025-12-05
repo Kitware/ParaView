@@ -11,6 +11,7 @@
 #include <vtkTableFFT.h>
 
 #include <array>
+#include <iostream>
 
 namespace
 {
