@@ -90,6 +90,12 @@ protected:
   void Resize();
   ///@}
 
+  /**
+   * Forward to the render view proxy whether or not the window is being currently resized.
+   * If the proxy is not a render view proxy, it does nothing.
+   */
+  void SetResizingWindow(bool resizingWindow);
+
   vtkCommand* Observer;
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;
   vtkWeakPointer<vtkRenderWindowInteractor> Interactor;

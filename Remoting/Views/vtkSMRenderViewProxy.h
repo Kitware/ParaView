@@ -367,6 +367,11 @@ public:
    */
   vtkTuple<double, 3> GetUpperRight(int index);
 
+  /**
+   * Set whether the window is currently resizing.
+   */
+  vtkSetMacro(ResizingWindow, bool);
+
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy() override;
@@ -441,6 +446,8 @@ private:
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internal;
+
+  bool ResizingWindow = false;
 };
 
 #endif
