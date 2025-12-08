@@ -27,6 +27,7 @@
 // C/C++ includes
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <iterator>
 #include <sstream>
 #include <stdexcept>

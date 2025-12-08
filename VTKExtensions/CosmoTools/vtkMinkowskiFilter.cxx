@@ -2,10 +2,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkMinkowskiFilter.h"
 
-#include <cmath>
-#include <cstdio>
-#include <map>
-
 #include <vtkCell.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
@@ -18,11 +14,16 @@
 #include <vtkPoints.h>
 #include <vtkPolygon.h>
 #include <vtkPolyhedron.h>
+#include <vtkSmartPointer.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkStringFormatter.h>
 #include <vtkUnstructuredGrid.h>
 
-#include <vtkSmartPointer.h>
+#include <cmath>
+#include <cstdio>
+#include <iostream>
+#include <map>
+
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 #define VTK_NEW(type, name) name = vtkSmartPointer<type>::New()
 
