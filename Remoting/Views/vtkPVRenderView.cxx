@@ -3800,7 +3800,7 @@ std::string vtkPVRenderView::GetANARIRendererParameters()
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   if (!this->Internals->AnariPass)
   {
-    return "";
+    return "{}";
   }
   auto* ren = this->Internals->AnariPass->GetAnariRenderer();
   const char* libraryName = this->GetANARILibrary();
@@ -3849,7 +3849,7 @@ std::string vtkPVRenderView::GetANARIRendererParameters()
           int maxVal = pMax != nullptr ? *(reinterpret_cast<const vtkTypeInt32*>(pMax)) : 100;
           int defaultValue =
             pDefault != nullptr ? *(reinterpret_cast<const vtkTypeInt32*>(pDefault)) : 1;
-          int value = pDefault != nullptr ? *(reinterpret_cast<const int*>(pValue)) : 1;
+          int value = pDefault != nullptr ? *(reinterpret_cast<const vtkTypeInt32*>(pValue)) : 1;
           jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
           jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
           jsonRendererParameters[vtkDynamicProperties::MIN_KEY] = minVal;
@@ -3868,7 +3868,7 @@ std::string vtkPVRenderView::GetANARIRendererParameters()
         case ANARI_FLOAT32:
         {
           double defaultValue =
-            pDefault != nullptr ? *(reinterpret_cast<const double*>(pDefault)) : 1;
+            pDefault != nullptr ? *(reinterpret_cast<const vtkTypeFloat32*>(pDefault)) : 1;
           int value = pDefault != nullptr ? *(reinterpret_cast<const vtkTypeFloat32*>(pValue)) : 1;
           double minVal = pMin != nullptr ? *(reinterpret_cast<const vtkTypeFloat32*>(pMin)) : 0;
           double maxVal = pMax != nullptr ? *(reinterpret_cast<const vtkTypeFloat32*>(pMax)) : 1;
@@ -3889,7 +3889,7 @@ std::string vtkPVRenderView::GetANARIRendererParameters()
   std::string jsonString = Json::writeString(builder, jsonAllParameters);
   return jsonString;
 #else
-  return "";
+  return "{}";
 #endif
 }
 

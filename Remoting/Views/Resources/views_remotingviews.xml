@@ -1510,7 +1510,7 @@
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty command="GetANARIRendererParameters"
-                            default_values=""
+                            default_values="{}"
                             information_only = "1"
                             name="ANARIRendererParametersInfo"
                             panel_visibility="never"

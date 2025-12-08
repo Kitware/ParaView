@@ -440,6 +440,12 @@ void pqDynamicPropertiesWidget::propertyChanged()
     qWarning() << Q_FUNC_INFO << "Invalid property list length.";
     return;
   }
+  QString key = prop.at(0).toString();
+  QString value = prop.at(1).toString();
+  if (this->Internals->widgetMap.empty() && key == "" && value == "")
+  {
+    return;
+  }
 
   bool ok;
   for (int i = 0; i < prop.size(); i += 2)
@@ -525,10 +531,6 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
   }
 
   std::string stringProperties{ svp->GetElement(0) };
-  if (stringProperties.empty())
-  {
-    return;
-  }
   vtkLog(INFO, "ANARIRendererParametersInfo \n" << stringProperties);
   Json::Value root;
   Json::CharReaderBuilder readerBuilder;
@@ -539,7 +541,7 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
   if (!reader->parse(stringProperties.c_str(), stringProperties.c_str() + stringProperties.length(),
         &root, &errs))
   {
-    qWarning() << "Error parsing parameterss: " << errs;
+    qWarning() << "Error parsing parameters: " << errs;
     return;
   }
   if (root.isObject() && root.isMember(vtkDynamicProperties::PROPERTIES_KEY) &&
