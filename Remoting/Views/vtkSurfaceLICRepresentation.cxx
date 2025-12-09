@@ -192,7 +192,4 @@ void vtkSurfaceLICRepresentation::WriteTimerLog(const char* fileName)
 void vtkSurfaceLICRepresentation::UpdateColoringParameters()
 {
   this->Superclass::UpdateColoringParameters(); // check if this is still relevant.
-  // never interpolate scalars for surface LIC
-  // because geometry shader is not expecting it.
-  this->Superclass::SetInterpolateScalarsBeforeMapping(0);
 }
