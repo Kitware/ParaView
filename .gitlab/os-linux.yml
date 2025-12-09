@@ -166,7 +166,7 @@ spec:
         - docker
         - $[[ inputs.project-tag ]]
         - linux-x86_64
-        - x11-gnome
+        - x11
 
 ## Linux-specific scripts
 
