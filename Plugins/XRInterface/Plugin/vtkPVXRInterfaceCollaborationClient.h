@@ -74,6 +74,9 @@ public:
   void AddPointToSource(std::string const& name, double const* pt);
   void ClearPointSource();
 
+  void GetAvatarInitialUpVector(double* outVector);
+  void SendAvatarUpVector(const double* up);
+
 protected:
   vtkPVXRInterfaceCollaborationClient();
   ~vtkPVXRInterfaceCollaborationClient() override;

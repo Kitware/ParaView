@@ -303,6 +303,18 @@ void vtkPVXRInterfaceCollaborationClient::Render()
 #endif
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVXRInterfaceCollaborationClient::GetAvatarInitialUpVector(double* outVector)
+{
+#if XRINTERFACE_HAS_COLLABORATION
+  this->Internal->GetAvatarInitialUpVector(outVector);
+#else
+  outVector[0] = 0.0;
+  outVector[1] = 1.0;
+  outVector[2] = 0.0;
+#endif
+}
+
 #if XRINTERFACE_HAS_COLLABORATION
 //-----------------------------------------------------------------------------
 void vtkPVXRInterfaceCollaborationClient::SetCollabHost(std::string const& val)
@@ -485,6 +497,18 @@ void vtkPVXRInterfaceCollaborationClient::ClearPointSource()
   }
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVXRInterfaceCollaborationClient::SendAvatarUpVector(const double* up)
+{
+  if (this->Internal->GetConnected())
+  {
+    std::vector<vtkVRCollaborationClient::Argument> args;
+    args.resize(1);
+    args[0].SetDoubleVector(&up[0], 3);
+    this->Internal->SendAMessage("AUV", args);
+  }
+}
+
 #else
 void vtkPVXRInterfaceCollaborationClient::GoToPose(vtkVRCamera::Pose const&, double*, double*) {}
 void vtkPVXRInterfaceCollaborationClient::SetCollabHost(std::string const&) {}
@@ -505,5 +529,6 @@ void vtkPVXRInterfaceCollaborationClient::UpdateRay(vtkVRModel*, vtkEventDataDev
 void vtkPVXRInterfaceCollaborationClient::ShowBillboard(std::vector<std::string> const&) {}
 void vtkPVXRInterfaceCollaborationClient::HideBillboard() {}
 void vtkPVXRInterfaceCollaborationClient::AddPointToSource(std::string const&, double const*) {}
+void vtkPVXRInterfaceCollaborationClient::SendAvatarUpVector(const double*) {}
 void vtkPVXRInterfaceCollaborationClient::ClearPointSource() {}
 #endif
