@@ -497,8 +497,10 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
     def _load_array(self, var, chunk_offset, chunk_extent):
         arrays = []
+        in_grid_offsets = []
         for name, scalar in var.items():
             shp = scalar.shape
+            in_grid_offsets.append(scalar.position)
             comp = scalar.load_chunk(chunk_offset, chunk_extent)
             self._series.flush()
             if not math.isclose(1.0, scalar.unit_SI):
@@ -513,9 +515,9 @@ class openPMDReader(VTKPythonAlgorithmBase):
         ncomp = len(var)
         if ncomp > 1:
             flt = np.ravel(arrays, order="F")
-            return flt.reshape((flt.shape[0] // ncomp, ncomp))
+            return flt.reshape((flt.shape[0] // ncomp, ncomp)), in_grid_offsets
         else:
-            return arrays[0].flatten(order="F")
+            return arrays[0].flatten(order="F"), in_grid_offsets
 
     def _find_array(self, itr, name):
         var = itr.meshes[name]
@@ -560,7 +562,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
         # Use the configured coordinate mapping, filtering out coordinates that don't exist
         mapping = [coord for coord in [self._x_coord, self._y_coord, self._z_coord]
                    if coord and coord in var]
-        print("*coords mapping : ", mapping)
+        # print("*coords mapping : ", mapping)
         position_arrays = []
 
         for name in mapping:
@@ -692,7 +694,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
             chunk_cyl_shape = (chunk_extent[1], chunk_extent[2], nthetas)  # z, r, theta
             for name, var in arrays:
                 cyl_values = np.zeros(chunk_cyl_shape)
-                values = self._load_array(var[0], chunk_offset, chunk_extent)
+                values, in_grid_offsets = self._load_array(var[0], chunk_offset, chunk_extent)
                 self._series.flush()
 
                 for ntheta in range(nthetas):
@@ -779,7 +781,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
             data = []
             for name, var in arrays:
-                values = self._load_array(var[0], chunk_offset, chunk_extent)
+                values, in_grid_offsets = self._load_array(var[0], chunk_offset, chunk_extent)
                 self._series.flush()
                 data.append((name, values))
 
@@ -789,6 +791,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
             spacing = [next(i, 1) for _ in range(3)]
             i = iter(grid_offset)
             grid_offset = [next(i, 0) for _ in range(3)]
+            i = iter(in_grid_offsets[0])
+            in_grid_offsets_first_component = [next(i, 0) for _ in range(3)]
 
             ext = np.array(ext).reshape(3, 2)
 
@@ -803,12 +807,17 @@ class openPMDReader(VTKPythonAlgorithmBase):
                 ext         = ext[layout].flatten().tolist()
                 spacing     = np.array(spacing)[layout].flatten().tolist()
                 grid_offset = np.array(grid_offset)[layout].flatten().tolist()
+                in_grid_offsets_first_component = np.array(in_grid_offsets_first_component)[layout].flatten().tolist()
             else:
                 ext = ext.flatten().tolist()
 
+            # FIXME: every component has its own openPMD position (in_grid_offsets). Here we take the first component's offset.
+            #        an improved approach could interpolate vector/tensor components to the same point first, e.g., the voxel center.
+            in_grid_offset = np.array(in_grid_offsets_first_component) * np.array(spacing)
+
             img.SetExtent(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5])
             img.SetSpacing(spacing)
-            img.SetOrigin(grid_offset)
+            img.SetOrigin(grid_offset + in_grid_offset)
 
             img.GenerateGhostArray(ext)
             imgw = dsa.WrapDataObject(img)
