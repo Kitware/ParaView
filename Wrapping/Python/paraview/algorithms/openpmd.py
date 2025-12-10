@@ -791,6 +791,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
             spacing = [next(i, 1) for _ in range(3)]
             i = iter(grid_offset)
             grid_offset = [next(i, 0) for _ in range(3)]
+            i = iter(in_grid_offsets[0])
+            in_grid_offsets_first_component = [next(i, 0) for _ in range(3)]
 
             ext = np.array(ext).reshape(3, 2)
 
@@ -805,12 +807,13 @@ class openPMDReader(VTKPythonAlgorithmBase):
                 ext         = ext[layout].flatten().tolist()
                 spacing     = np.array(spacing)[layout].flatten().tolist()
                 grid_offset = np.array(grid_offset)[layout].flatten().tolist()
+                in_grid_offsets_first_component = np.array(in_grid_offsets_first_component)[layout].flatten().tolist()
             else:
                 ext = ext.flatten().tolist()
 
             # FIXME: every component has its own openPMD position (in_grid_offsets). Here we take the first component's offset.
             #        an improved approach could interpolate vector/tensor components to the same point first, e.g., the voxel center.
-            in_grid_offset = np.array(in_grid_offsets[0]) * np.array(spacing)
+            in_grid_offset = np.array(in_grid_offsets_first_component) * np.array(spacing)
 
             img.SetExtent(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5])
             img.SetSpacing(spacing)
