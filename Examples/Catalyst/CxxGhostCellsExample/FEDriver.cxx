@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 #include "FEDataStructures.h"
+#include <iostream>
 #include <mpi.h>
 #include <vector>
 
