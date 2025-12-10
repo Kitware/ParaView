@@ -215,6 +215,9 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
 
   this->EyeSeparation = process.child("EyeSeparation").attribute("Value").as_double(0.0);
 
+  this->UseOffAxisProjection =
+    process.child("UseOffAxisProjection").attribute("Value").as_bool(true);
+
   auto& internals = (*this->Internals);
   internals.Displays.clear();
   for (auto display : process.children("Machine"))

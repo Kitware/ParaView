@@ -149,6 +149,15 @@ public:
     return info->GetEyeSeparation();
   }
 
+  bool GetUseOffAxisProjection(vtkSMSession* session)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+
+    return info->GetUseOffAxisProjection();
+  }
+
   bool GetShowBorders(vtkSMSession* session)
   {
     vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
@@ -1701,6 +1710,12 @@ int vtkSMRenderViewProxy::GetNumberOfDisplays()
 double vtkSMRenderViewProxy::GetEyeSeparation()
 {
   return this->Internal->GetEyeSeparation(this->GetSession());
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetUseOffAxisProjection()
+{
+  return this->Internal->GetUseOffAxisProjection(this->GetSession());
 }
 
 //----------------------------------------------------------------------------

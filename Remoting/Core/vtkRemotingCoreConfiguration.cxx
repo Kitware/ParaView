@@ -219,6 +219,17 @@ double vtkRemotingCoreConfiguration::GetEyeSeparation() const
 }
 
 //----------------------------------------------------------------------------
+bool vtkRemotingCoreConfiguration::GetUseOffAxisProjection() const
+{
+  if (this->DisplayConfiguration)
+  {
+    return this->DisplayConfiguration->GetUseOffAxisProjection();
+  }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkRemotingCoreConfiguration::HandleDisplayEnvironment()
 {
   auto display = this->GetDisplay();
