@@ -46,3 +46,8 @@ paraview_add_plugin(PropertyWidgets
   UI_INTERFACES ${interfaces}
   SOURCES ${sources}
   SERVER_MANAGER_XML PropertyWidgetsFilter.xml)
+
+option(BUILD_TESTING "Build Plugin Testing" OFF)
+if (BUILD_TESTING AND BUILD_SHARED_LIBS)
+  add_subdirectory(Testing)
+endif()
