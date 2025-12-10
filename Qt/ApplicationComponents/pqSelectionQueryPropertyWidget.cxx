@@ -549,7 +549,7 @@ void pqSelectionQueryPropertyWidget::pqQueryWidget::populateOperators(int termTy
       this->addOperator(
         "is in range", ValueWidget::RANGE_PAIR, "({term} > {value_min}) & ({term} < {value_max})");
       this->addOperator(
-        "is one of", ValueWidget::COMMA_SEPARATED_VALUES, "in1d({term}, [{value}])");
+        "is one of", ValueWidget::COMMA_SEPARATED_VALUES, "isin({term}, [{value}])");
       this->addOperator("is >=", ValueWidget::SINGLE_VALUE, "{term} >= {value}");
       this->addOperator("is <=", ValueWidget::SINGLE_VALUE, "{term} <= {value}");
       this->addOperator("is min", ValueWidget::NO_VALUE, "{term} == min({term})");
