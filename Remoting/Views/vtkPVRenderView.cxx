@@ -3648,6 +3648,11 @@ void vtkPVRenderView::SetEnableANARI(bool v)
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->SynchronizedRenderers->SetRenderPass(this->Internals->AnariPass);
     this->SynchronizedRenderers->SetEnableRayTracing(true);
+    // Proxy properties defaults
+    // These defaults are set before ANARI is enabled and then they are not
+    // set again, so we need to set them here.
+    this->SetANARILibrary("visrtx");
+    this->SetANARIRenderer("default");
   }
   else
   {
@@ -3675,14 +3680,12 @@ bool vtkPVRenderView::GetEnableANARI()
 void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  if (!this->Internals->AnariPass)
+  if (this->Internals->AnariPass)
   {
-    vtkErrorMacro("Error: ANARI not initialized when SetANARILibrary " << l);
-    return;
+    vtkLog(INFO, "SetANARILibrary: " << l);
+    this->Internals->AnariPass->GetAnariDevice()->SetupAnariDeviceFromLibrary(
+      l.c_str(), "default", false);
   }
-  vtkLog(INFO, "SetANARILibrary: " << l);
-  this->Internals->AnariPass->GetAnariDevice()->SetupAnariDeviceFromLibrary(
-    l.c_str(), "default", false);
 #endif
 }
 
@@ -3700,13 +3703,11 @@ const char* vtkPVRenderView::GetANARILibrary()
 void vtkPVRenderView::SetANARIRenderer(std::string r [[maybe_unused]])
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  if (!this->Internals->AnariPass)
+  if (this->Internals->AnariPass)
   {
-    vtkErrorMacro("Error: ANARI not initialized when SetANARIRenderer " << r);
-    return;
+    vtkLog(INFO, "SetANARIRenderer: " << r);
+    this->Internals->AnariPass->GetAnariRenderer()->SetSubtype(r.c_str());
   }
-  vtkLog(INFO, "SetANARIRenderer: " << r);
-  this->Internals->AnariPass->GetAnariRenderer()->SetSubtype(r.c_str());
 #endif
 }
 
@@ -3749,48 +3750,49 @@ void vtkPVRenderView::SetANARIRendererParameter(
   const std::string& key, int type, const std::string& stringValue)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  if (!this->Internals->AnariPass)
+  if (this->Internals->AnariPass)
   {
-    vtkErrorMacro("Error: ANARI not initialized when SetANARIRendererParameter " << key);
-    return;
-  }
-  switch (type)
-  {
-    case vtkDynamicProperties::INT32:
-      if (auto result = scn::scan<int>(stringValue, "{}"))
-      {
-        this->Internals->AnariPass->GetAnariRenderer()->SetParameteri(key.c_str(), result->value());
-      }
-      else
-      {
-        vtkErrorMacro("Error converting ANARI_INT32 parameter: " << result.error().msg());
-        return;
-      }
-      break;
-    case vtkDynamicProperties::BOOL:
-      if (auto result = scn::scan<bool>(stringValue, "{}"))
-      {
-        this->Internals->AnariPass->GetAnariRenderer()->SetParameterb(key.c_str(), result->value());
-      }
-      else
-      {
-        vtkErrorMacro("Error converting ANARI_BOOL parameter: " << result.error().msg());
-        return;
-      }
-      break;
-    case vtkDynamicProperties::FLOAT32:
-      if (auto result = scn::scan<float>(stringValue, "{}"))
-      {
-        this->Internals->AnariPass->GetAnariRenderer()->SetParameterf(key.c_str(), result->value());
-      }
-      else
-      {
-        vtkErrorMacro("Expecting ANARI_FLOAT32 parameter, got: " << result.error().msg());
-        return;
-      }
-      break;
-    default:
-      vtkWarningMacro("vtkDynamicProperties::Type not handled: " << type);
+    switch (type)
+    {
+      case vtkDynamicProperties::INT32:
+        if (auto result = scn::scan<int>(stringValue, "{}"))
+        {
+          this->Internals->AnariPass->GetAnariRenderer()->SetParameteri(
+            key.c_str(), result->value());
+        }
+        else
+        {
+          vtkErrorMacro("Error converting ANARI_INT32 parameter: " << result.error().msg());
+          return;
+        }
+        break;
+      case vtkDynamicProperties::BOOL:
+        if (auto result = scn::scan<bool>(stringValue, "{}"))
+        {
+          this->Internals->AnariPass->GetAnariRenderer()->SetParameterb(
+            key.c_str(), result->value());
+        }
+        else
+        {
+          vtkErrorMacro("Error converting ANARI_BOOL parameter: " << result.error().msg());
+          return;
+        }
+        break;
+      case vtkDynamicProperties::FLOAT32:
+        if (auto result = scn::scan<float>(stringValue, "{}"))
+        {
+          this->Internals->AnariPass->GetAnariRenderer()->SetParameterf(
+            key.c_str(), result->value());
+        }
+        else
+        {
+          vtkErrorMacro("Expecting ANARI_FLOAT32 parameter, got: " << result.error().msg());
+          return;
+        }
+        break;
+      default:
+        vtkWarningMacro("vtkDynamicProperties::Type not handled: " << type);
+    }
   }
 #endif
 }
