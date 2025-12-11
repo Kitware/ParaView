@@ -95,7 +95,6 @@
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtk_jsoncpp.h"
-#include <anari/frontend/anari_enums.h>
 
 #include "vtk_scn.h"
 // clang-format off
@@ -118,6 +117,7 @@
 #include "vtkAnariPass.h"
 #include "vtkAnariRenderer.h"
 #include "vtkAnariSceneGraph.h"
+#include <anari/frontend/anari_enums.h>
 #endif
 
 #include <cassert>
@@ -3652,7 +3652,6 @@ void vtkPVRenderView::SetEnableANARI(bool v)
     // These defaults are set before ANARI is enabled and then they are not
     // set again, so we need to set them here.
     this->SetANARILibrary("visrtx");
-    this->SetANARIRenderer("default");
   }
   else
   {
@@ -3685,6 +3684,10 @@ void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
     vtkLog(INFO, "SetANARILibrary: " << l);
     this->Internals->AnariPass->GetAnariDevice()->SetupAnariDeviceFromLibrary(
       l.c_str(), "default", false);
+    // Proxy properties defaults
+    // These defaults are set before ANARI is enabled and then they are not
+    // set again, so we need to set them here.
+    this->SetANARIRenderer("default");
   }
 #endif
 }
@@ -3746,8 +3749,8 @@ vtkStringArray* vtkPVRenderView::GetANARIRendererNames()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetANARIRendererParameter(
-  const std::string& key, int type, const std::string& stringValue)
+void vtkPVRenderView::SetANARIRendererParameter(const std::string& key [[maybe_unused]],
+  int type [[maybe_unused]], const std::string& stringValue [[maybe_unused]])
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   if (this->Internals->AnariPass)
