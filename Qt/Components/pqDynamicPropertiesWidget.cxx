@@ -48,7 +48,7 @@ const char keyPropertyName[] = "DynamicPropertiesKey";
 class RowWidget
 {
 public:
-  RowWidget(pqDynamicPropertiesWidget* parent, const QString& key);
+  RowWidget(pqDynamicPropertiesWidget* parent, const QString& key, vtkDynamicProperties::Type type);
   virtual ~RowWidget();
   virtual void deleteLater();
   virtual QVariant value() = 0;
@@ -56,12 +56,15 @@ public:
 
   QHBoxLayout* layout;
   QLabel* label;
+  vtkDynamicProperties::Type type;
 };
 
 //------------------------------------------------------------------------------
-RowWidget::RowWidget(pqDynamicPropertiesWidget* parent, const QString& key)
+RowWidget::RowWidget(
+  pqDynamicPropertiesWidget* parent, const QString& key, vtkDynamicProperties::Type t)
   : layout(new QHBoxLayout)
   , label(new QLabel(key, parent))
+  , type(t)
 {
   this->label->setProperty(keyPropertyName, key);
   this->layout->setContentsMargins(0, 0, 0, 0);
@@ -89,8 +92,8 @@ void RowWidget::deleteLater()
 class RowWidgetBool : public RowWidget
 {
 public:
-  RowWidgetBool(
-    pqDynamicPropertiesWidget* parent, const QString& name, const QString& description, bool state);
+  RowWidgetBool(pqDynamicPropertiesWidget* parent, const QString& name,
+    vtkDynamicProperties::Type type, const QString& description, bool state);
   void deleteLater() override;
   QVariant value() override;
   bool setValue(const QVariant& value) override;
@@ -102,9 +105,9 @@ private:
 };
 
 //------------------------------------------------------------------------------
-RowWidgetBool::RowWidgetBool(
-  pqDynamicPropertiesWidget* parent, const QString& name, const QString& description, bool state)
-  : RowWidget(parent, name)
+RowWidgetBool::RowWidgetBool(pqDynamicPropertiesWidget* parent, const QString& name,
+  vtkDynamicProperties::Type type, const QString& description, bool state)
+  : RowWidget(parent, name, type)
   , checkbox(new QCheckBox(QString(), parent))
 {
   this->setCheckState(state);
@@ -150,8 +153,9 @@ void RowWidgetBool::setCheckState(bool state)
 class RowWidgetInt : public RowWidget
 {
 public:
-  RowWidgetInt(pqDynamicPropertiesWidget* parent, const QString& key, const QString& description,
-    int minValue, int maxValue, int defaultValue);
+  RowWidgetInt(pqDynamicPropertiesWidget* parent, const QString& key,
+    vtkDynamicProperties::Type type, const QString& description, int minValue, int maxValue,
+    int defaultValue);
   void deleteLater() override;
   QVariant value() override;
   bool setValue(const QVariant& value) override;
@@ -163,8 +167,9 @@ private:
 
 //------------------------------------------------------------------------------
 RowWidgetInt::RowWidgetInt(pqDynamicPropertiesWidget* parent, const QString& key,
-  const QString& description, int minValue, int maxValue, int defaultValue)
-  : RowWidget(parent, key)
+  vtkDynamicProperties::Type type, const QString& description, int minValue, int maxValue,
+  int defaultValue)
+  : RowWidget(parent, key, type)
   , intRangeWidget(new pqIntRangeWidget(parent))
 {
   this->intRangeWidget->setMinimum(minValue);
@@ -211,8 +216,9 @@ void RowWidgetInt::setValue(int value)
 class RowWidgetDouble : public RowWidget
 {
 public:
-  RowWidgetDouble(pqDynamicPropertiesWidget* parent, const QString& key, const QString& description,
-    double minValue, double maxValue, double defaultValue);
+  RowWidgetDouble(pqDynamicPropertiesWidget* parent, const QString& key,
+    vtkDynamicProperties::Type type, const QString& description, double minValue, double maxValue,
+    double defaultValue);
   void deleteLater() override;
   QVariant value() override;
   bool setValue(const QVariant& value) override;
@@ -224,8 +230,9 @@ private:
 
 //------------------------------------------------------------------------------
 RowWidgetDouble::RowWidgetDouble(pqDynamicPropertiesWidget* parent, const QString& key,
-  const QString& description, double minValue, double maxValue, double defaultValue)
-  : RowWidget(parent, key)
+  vtkDynamicProperties::Type type, const QString& description, double minValue, double maxValue,
+  double defaultValue)
+  : RowWidget(parent, key, type)
   , doubleRangeWidget(new pqDoubleRangeWidget(parent))
 {
   this->doubleRangeWidget->setMinimum(minValue);
@@ -435,20 +442,20 @@ void pqDynamicPropertiesWidget::propertyChanged()
 {
   QVariant propVar = this->property(this->PushPropertyName.data());
   QList<QVariant> prop = propVar.toList();
-  if (prop.size() % 2 != 0)
+  if (prop.size() % 3 != 0)
   {
     qWarning() << Q_FUNC_INFO << "Invalid property list length.";
     return;
   }
   QString key = prop.at(0).toString();
-  QString value = prop.at(1).toString();
+  QString value = prop.at(2).toString();
   if (this->Internals->widgetMap.empty() && key == "" && value == "")
   {
     return;
   }
 
   bool ok;
-  for (int i = 0; i < prop.size(); i += 2)
+  for (int i = 0; i < prop.size(); i += 3)
   {
     QString key = prop.at(i).toString();
     RowWidget* w = this->Internals->widgetMap.value(key, nullptr);
@@ -457,8 +464,8 @@ void pqDynamicPropertiesWidget::propertyChanged()
       qWarning() << Q_FUNC_INFO << "No widgets found for key" << key;
       continue;
     }
-
-    ok = w->setValue(prop.at(i + 1));
+    w->type = static_cast<vtkDynamicProperties::Type>(prop.at(i + 1).toInt());
+    ok = w->setValue(prop.at(i + 2));
     if (!ok)
     {
       qWarning() << Q_FUNC_INFO << "Cannot convert variant to index:" << prop.at(i + 1);
@@ -490,8 +497,10 @@ void pqDynamicPropertiesWidget::updatePropertyImpl()
   const pqInternals::WidgetMap& map = this->Internals->widgetMap;
   for (Iter it = map.begin(), itEnd = map.end(); it != itEnd; ++it)
   {
+    auto* w = it.value();
     newProp.append(QVariant(it.key()));
-    newProp.append(it.value()->value());
+    newProp.append(QVariant(w->type));
+    newProp.append(w->value());
   }
 
   this->IgnorePushPropertyUpdates = true;
@@ -554,7 +563,8 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
       QString description =
         QString::fromStdString(property[vtkDynamicProperties::DESCRIPTION_KEY].asString());
       QString name = QString::fromStdString(property[vtkDynamicProperties::NAME_KEY].asString());
-      int type = property[vtkDynamicProperties::TYPE_KEY].asInt();
+      vtkDynamicProperties::Type type =
+        static_cast<vtkDynamicProperties::Type>(property[vtkDynamicProperties::TYPE_KEY].asInt());
       QLabel* pLabel = new QLabel(name);
       pLabel->setToolTip(description);
       RowWidget* rowWidget = nullptr;
@@ -562,16 +572,20 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
       {
         case vtkDynamicProperties::INT32:
         {
-          int minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
-            ? property[vtkDynamicProperties::MIN_KEY].asInt()
-            : 0;
-          int maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
-            ? property[vtkDynamicProperties::MAX_KEY].asInt()
-            : 100;
+          if (!property.isMember(vtkDynamicProperties::DEFAULT_KEY))
+          {
+            qWarning() << name << " does not have a default value";
+          }
           int defaultValue = property.isMember(vtkDynamicProperties::DEFAULT_KEY)
             ? property[vtkDynamicProperties::DEFAULT_KEY].asInt()
             : 1;
-          rowWidget = new RowWidgetInt(this, name, description, minVal, maxVal, defaultValue);
+          int minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
+            ? property[vtkDynamicProperties::MIN_KEY].asInt()
+            : defaultValue;
+          int maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
+            ? property[vtkDynamicProperties::MAX_KEY].asInt()
+            : defaultValue;
+          rowWidget = new RowWidgetInt(this, name, type, description, minVal, maxVal, defaultValue);
           break;
         }
         case vtkDynamicProperties::BOOL:
@@ -579,23 +593,30 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
           bool defaultValue = property.isMember(vtkDynamicProperties::DEFAULT_KEY)
             ? property[vtkDynamicProperties::DEFAULT_KEY].asBool()
             : false;
-          rowWidget = new RowWidgetBool(this, name, description, defaultValue);
+          rowWidget = new RowWidgetBool(this, name, type, description, defaultValue);
           break;
         }
         case vtkDynamicProperties::FLOAT32:
         {
-          double minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
-            ? property[vtkDynamicProperties::MIN_KEY].asFloat()
-            : 0;
-          double maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
-            ? property[vtkDynamicProperties::MAX_KEY].asFloat()
-            : 1;
+          if (!property.isMember(vtkDynamicProperties::DEFAULT_KEY))
+          {
+            qWarning() << name << " does not have a default value";
+          }
           double defaultValue = property.isMember(vtkDynamicProperties::DEFAULT_KEY)
             ? property[vtkDynamicProperties::DEFAULT_KEY].asFloat()
             : 1;
-          rowWidget = new RowWidgetDouble(this, name, description, minVal, maxVal, defaultValue);
+          double minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
+            ? property[vtkDynamicProperties::MIN_KEY].asFloat()
+            : defaultValue;
+          double maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
+            ? property[vtkDynamicProperties::MAX_KEY].asFloat()
+            : defaultValue;
+          rowWidget =
+            new RowWidgetDouble(this, name, type, description, minVal, maxVal, defaultValue);
           break;
         }
+        default:
+          break;
       }
       if (rowWidget)
       {

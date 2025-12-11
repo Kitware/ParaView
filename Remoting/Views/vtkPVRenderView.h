@@ -1068,7 +1068,7 @@ public:
    * Sets a parameter 'name' to a 'value'. The value can be a bool,
    * int32 or float32 encoded as a string.
    */
-  void SetANARIRendererParameter(const std::string& name, const std::string& value);
+  void SetANARIRendererParameter(const std::string& name, int type, const std::string& value);
   ///@}
 
   ///@{
