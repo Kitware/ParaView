@@ -64,6 +64,8 @@ def runTest():
     assert upper_right_d1[1] == 1
     assert upper_right_d1[2] == -2
 
+    assert(renderView.GetUseOffAxisProjection() is True)
+
     assert renderView.GetShow2DOverlays(0) is False
     assert renderView.GetShow2DOverlays(1) is True
 
