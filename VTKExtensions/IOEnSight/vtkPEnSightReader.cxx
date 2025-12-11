@@ -2495,9 +2495,9 @@ void vtkPEnSightReader::InsertNextCellAndId(vtkUnstructuredGrid* output, int vtk
       assert(faces != nullptr && faces->IsStorage64Bit());
       vtkNew<vtkCellArray> newFaces;
       newFaces->DeepCopy(faces);
-      const auto inOffsets = faces->GetOffsetsArray64();
-      const auto inCon = faces->GetConnectivityArray64();
-      auto outCon = newFaces->GetConnectivityArray64();
+      const auto inOffsets = faces->GetOffsetsAOSArray64();
+      const auto inCon = faces->GetConnectivityAOSArray64();
+      auto outCon = newFaces->GetConnectivityAOSArray64();
       // faces is sizeOfFace0, pt0, ... ptn, sizeOfFace1, pts...
       for (vtkIdType i = 0; i < faces->GetNumberOfCells(); ++i)
       {

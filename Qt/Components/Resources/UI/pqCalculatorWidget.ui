@@ -23,8 +23,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="pqExpressionsWidget" name="Function">
-    </widget>
+    <widget class="pqExpressionsWidget" name="Function"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -39,7 +38,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Clear function</string>
          </property>
          <property name="text">
           <string>Clear</string>
@@ -55,7 +57,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Sine trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>sin</string>
@@ -71,7 +76,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Arcsine trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>asin</string>
@@ -87,7 +95,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Hyperbolic sine trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>sinh</string>
@@ -103,7 +114,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Vector dot product</string>
          </property>
          <property name="text">
           <string>dot</string>
@@ -126,7 +140,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Left parenthesis</string>
          </property>
          <property name="text">
           <string>(</string>
@@ -142,7 +159,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Cosine trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>cos</string>
@@ -158,7 +178,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Arccosine trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>acos</string>
@@ -174,7 +197,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Hyperbolic cosine trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>cosh</string>
@@ -190,7 +216,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Vector magnitude</string>
          </property>
          <property name="text">
           <string>mag</string>
@@ -210,7 +239,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Right parenthesis</string>
          </property>
          <property name="text">
           <string>)</string>
@@ -226,7 +258,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Tangent trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>tan</string>
@@ -242,7 +277,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Arctangent trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>atan</string>
@@ -258,7 +296,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Hyperbolic tangent trigonometric function: Units are in radians and not in degrees</string>
          </property>
          <property name="text">
           <string>tanh</string>
@@ -274,7 +315,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Vector norm</string>
          </property>
          <property name="text">
           <string>norm</string>
@@ -294,7 +338,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Unit vector in X direction. Consider using {x,y,z} syntax to define vectors instead.</string>
          </property>
          <property name="text">
           <string>iHat</string>
@@ -310,7 +357,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Absolute value function</string>
          </property>
          <property name="text">
           <string>abs</string>
@@ -326,7 +376,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Ceiling function</string>
          </property>
          <property name="text">
           <string>ceil</string>
@@ -342,7 +395,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Power function: x raised to the y</string>
          </property>
          <property name="text">
           <string>x^y</string>
@@ -358,7 +414,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Natural logarithm function</string>
          </property>
          <property name="text">
           <string>ln</string>
@@ -378,7 +437,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Unit vector in Y direction. Consider using {x,y,z} syntax to define vectors instead.</string>
          </property>
          <property name="text">
           <string>jHat</string>
@@ -394,7 +456,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Square root function</string>
          </property>
          <property name="text">
           <string>sqrt</string>
@@ -410,7 +475,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Floor function</string>
          </property>
          <property name="text">
           <string>floor</string>
@@ -426,7 +494,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Exponential function</string>
          </property>
          <property name="text">
           <string>exp</string>
@@ -442,7 +513,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Base-10 logarithm function</string>
          </property>
          <property name="text">
           <string>log10</string>
@@ -462,7 +536,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Unit vector in Z direction. Consider using {x,y,z} syntax to define vectors instead.</string>
          </property>
          <property name="text">
           <string>kHat</string>
@@ -478,7 +555,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Addition operator</string>
          </property>
          <property name="text">
           <string>+</string>
@@ -494,7 +574,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Subtraction operator</string>
          </property>
          <property name="text">
           <string>-</string>
@@ -510,7 +593,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Multiplication operator</string>
          </property>
          <property name="text">
           <string>*</string>
@@ -526,7 +612,10 @@
           </sizepolicy>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Division operator</string>
          </property>
          <property name="text">
           <string>/</string>
@@ -542,7 +631,10 @@
      <item>
       <widget class="QPushButton" name="Scalars">
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>List of scalar variables</string>
        </property>
        <property name="text">
         <string>Scalars</string>
@@ -552,7 +644,10 @@
      <item>
       <widget class="QPushButton" name="Vectors">
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>List of vector variables</string>
        </property>
        <property name="text">
         <string>Vectors</string>

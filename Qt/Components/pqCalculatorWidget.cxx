@@ -229,7 +229,7 @@ void pqCalculatorWidget::updateVariables(const QString& mode)
       }
     }
 
-    if (numComponents == 3)
+    if (numComponents > 1)
     {
       QString name = arrayNameSanitized
         ? arrayInfo->GetName()

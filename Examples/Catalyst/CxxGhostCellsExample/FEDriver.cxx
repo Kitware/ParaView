@@ -13,6 +13,8 @@
 #include <vtkNew.h>
 #include <vtkStringScanner.h>
 
+#include <iostream>
+
 // Sample C++ simulation code that provides different levels of ghost cells
 // for either a vtkUnstructuredGrid of vtkImageData. This example is
 // intended to show how to deal with ghost cells when using Catalyst.

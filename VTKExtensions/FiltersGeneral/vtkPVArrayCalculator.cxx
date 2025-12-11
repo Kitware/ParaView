@@ -77,32 +77,6 @@ vtkPVArrayCalculator::vtkPVArrayCalculator()
 vtkPVArrayCalculator::~vtkPVArrayCalculator() = default;
 
 // ----------------------------------------------------------------------------
-int vtkPVArrayCalculator::GetAttributeTypeFromInput(vtkDataObject* input)
-{
-  int attributeType = this->AttributeType;
-  if (attributeType == vtkArrayCalculator::DEFAULT_ATTRIBUTE_TYPE)
-  {
-    vtkGraph* graphInput = vtkGraph::SafeDownCast(input);
-    vtkDataSet* dsInput = vtkDataSet::SafeDownCast(input);
-    vtkTable* tableInput = vtkTable::SafeDownCast(input);
-    if (graphInput)
-    {
-      attributeType = vtkDataObject::VERTEX;
-    }
-    if (dsInput)
-    {
-      attributeType = vtkDataObject::POINT;
-    }
-    if (tableInput)
-    {
-      attributeType = vtkDataObject::ROW;
-    }
-  }
-
-  return attributeType;
-}
-
-// ----------------------------------------------------------------------------
 void vtkPVArrayCalculator::ResetArrayAndVariableNames()
 {
   // Look at the data-arrays available in the input and register them as
@@ -119,7 +93,7 @@ void vtkPVArrayCalculator::AddCoordinateVariableNames()
   this->AddCoordinateScalarVariable("coordsX", 0);
   this->AddCoordinateScalarVariable("coordsY", 1);
   this->AddCoordinateScalarVariable("coordsZ", 2);
-  this->AddCoordinateVectorVariable("coords", 0, 1, 2);
+  this->AddCoordinateVectorVariable("coords");
 }
 
 // ----------------------------------------------------------------------------
@@ -191,7 +165,7 @@ void vtkPVArrayCalculator::AddArrayAndVariableNames(
           possibleNames.begin(), possibleNames.end(), add_scalar_variables(this, arrayName, i));
       }
 
-      if (numberComps == 3)
+      if (numberComps > 1)
       {
         std::string validVariableName = vtkArrayCalculator::CheckValidVariableName(arrayName);
         this->AddVectorVariable(validVariableName.c_str(), arrayName);
