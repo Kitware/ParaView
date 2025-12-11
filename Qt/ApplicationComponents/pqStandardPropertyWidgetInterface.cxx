@@ -27,6 +27,7 @@
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDisplaySizedImplicitPlanePropertyWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
+#include "pqDynamicPropertiesWidget.h"
 #include "pqEnableWidgetDecorator.h"
 #include "pqEqualizerPropertyWidget.h"
 #include "pqFileListPropertyWidget.h"
@@ -159,6 +160,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "index_selection")
   {
     return new pqIndexSelectionWidget(smProxy, smProperty, parentWidget);
+  }
+  else if (name == "dynamic_properties_widget")
+  {
+    return new pqDynamicPropertiesWidget(smProxy, smProperty, parentWidget);
   }
   else if (name == "input_selector")
   {
