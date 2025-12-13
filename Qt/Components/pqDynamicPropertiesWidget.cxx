@@ -52,7 +52,8 @@ const char keyPropertyName[] = "DynamicPropertiesKey";
 class RowWidget
 {
 public:
-  RowWidget(pqDynamicPropertiesWidget* parent, const QString& key, vtkDynamicProperties::Type type);
+  RowWidget(pqDynamicPropertiesWidget* parent, const QString& key, vtkDynamicProperties::Type type,
+    const QString& description);
   virtual ~RowWidget();
   virtual void deleteLater();
   virtual QVariant value() = 0;
@@ -60,16 +61,31 @@ public:
 
   QHBoxLayout* layout;
   QLabel* label;
+  QString key;
+  QString description;
   vtkDynamicProperties::Type type;
 };
 
 //------------------------------------------------------------------------------
-RowWidget::RowWidget(
-  pqDynamicPropertiesWidget* parent, const QString& key, vtkDynamicProperties::Type t)
+RowWidget::RowWidget(pqDynamicPropertiesWidget* parent, const QString& k,
+  vtkDynamicProperties::Type t, const QString& d)
   : layout(new QHBoxLayout)
-  , label(new QLabel(key, parent))
+  , label(new QLabel(k, parent))
+  , key(k)
+  , description(d)
   , type(t)
 {
+  if (!description.isEmpty())
+  {
+    description[0] = description[0].toUpper();
+  }
+  QString labelKey = key;
+  if (!labelKey.isEmpty())
+  {
+    labelKey[0] = labelKey[0].toUpper();
+  }
+  this->label->setText(labelKey);
+  this->label->setToolTip(description);
   this->label->setProperty(keyPropertyName, key);
   this->layout->setContentsMargins(0, 0, 0, 0);
 }
@@ -110,17 +126,14 @@ private:
 
 //------------------------------------------------------------------------------
 RowWidgetBool::RowWidgetBool(pqDynamicPropertiesWidget* parent, const QString& name,
-  vtkDynamicProperties::Type type, const QString& description, bool state)
-  : RowWidget(parent, name, type)
+  vtkDynamicProperties::Type type, const QString& d, bool state)
+  : RowWidget(parent, name, type, d)
   , checkbox(new QCheckBox(QString(), parent))
 {
   this->setCheckState(state);
   this->checkbox->setProperty(keyPropertyName, name);
   this->checkbox->setToolTip(description);
   this->layout->addWidget(this->checkbox);
-
-  this->label->setToolTip(description);
-
   parent->connect(
     this->checkbox, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(updateProperty()));
 }
@@ -173,9 +186,9 @@ private:
 //------------------------------------------------------------------------------
 template <typename NumberWidgetType, typename NumberType>
 RowWidgetNumber<NumberWidgetType, NumberType>::RowWidgetNumber(pqDynamicPropertiesWidget* parent,
-  const QString& key, vtkDynamicProperties::Type type, const QString& description,
-  NumberType minValue, NumberType maxValue, NumberType defaultValue)
-  : RowWidget(parent, key, type)
+  const QString& key, vtkDynamicProperties::Type type, const QString& d, NumberType minValue,
+  NumberType maxValue, NumberType defaultValue)
+  : RowWidget(parent, key, type, d)
   , numberWidget(new NumberWidgetType(parent))
 {
   this->numberWidget->setMinimum(minValue);
@@ -646,6 +659,11 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
 int pqDynamicPropertiesWidget::findRow(const QString& key)
 {
   int row = 0;
+  QString labelKey(key);
+  if (!labelKey.isEmpty())
+  {
+    labelKey[0] = labelKey[0].toUpper();
+  }
   for (; row < this->Form->rowCount(); ++row)
   {
     QLayoutItem* layoutItem = this->Form->itemAt(row, QFormLayout::LabelRole);
@@ -654,7 +672,7 @@ int pqDynamicPropertiesWidget::findRow(const QString& key)
       QLabel* label = qobject_cast<QLabel*>(layoutItem->widget());
       if (label)
       {
-        if (key.compare(label->text(), Qt::CaseSensitive) < 0)
+        if (labelKey.compare(label->text(), Qt::CaseSensitive) < 0)
         {
           break;
         }
