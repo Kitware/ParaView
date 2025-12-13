@@ -19,10 +19,16 @@
 
 #include "vtkRemotingServerManagerModule.h" // For export macro
 
+#define VTK_DYNAMIC_PROPERTIES_MAJOR_VERSION 1
+#define VTK_DYNAMIC_PROPERTIES_MINOR_VERSION 0
+#define VTK_DYNAMIC_PROPERTIES_VERSION_CHECK(major, minor) (100000000 * major + minor)
+#define VTK_DYNAMIC_PROPERTIES_VERSION_NUMBER_QUICK                                                \
+  (VTK_DYNAMIC_PROPERTIES_VERSION_CHECK(                                                           \
+    VTK_DYNAMIC_PROPERTIES_MAJOR_VERSION, VTK_DYNAMIC_PROPERTIES_MINOR_VERSION))
+
 struct VTKREMOTINGSERVERMANAGER_EXPORT vtkDynamicProperties
 {
-  static const char* LIBRARY_KEY;
-  static const char* RENDERER_KEY;
+  static const char* VERSION_KEY;
   static const char* PROPERTIES_KEY;
   static const char* NAME_KEY;
   static const char* TYPE_KEY;
@@ -35,12 +41,9 @@ struct VTKREMOTINGSERVERMANAGER_EXPORT vtkDynamicProperties
   enum Type
   {
     BOOL,
-    INT32,
-    FLOAT32,
-    FLOAT32_VEC3,
-    FLOAT32_VEC4,
-    ARRAY2D,
-    STRING,
+    INT,
+    DOUBLE,
+    INVALID_TYPE,
   };
 };
 

@@ -134,6 +134,8 @@ struct ValuePassStateT
   bool AnnotationVisibility;
   bool CenterAxesVisibility;
 };
+const char* LIBRARY_KEY = "library";
+const char* RENDERER_KEY = "renderer";
 }
 
 class vtkPVRenderView::vtkInternals
@@ -3757,7 +3759,7 @@ void vtkPVRenderView::SetANARIRendererParameter(const std::string& key [[maybe_u
   {
     switch (type)
     {
-      case vtkDynamicProperties::INT32:
+      case vtkDynamicProperties::INT:
         if (auto result = scn::scan<int>(stringValue, "{}"))
         {
           this->Internals->AnariPass->GetAnariRenderer()->SetParameteri(
@@ -3781,8 +3783,8 @@ void vtkPVRenderView::SetANARIRendererParameter(const std::string& key [[maybe_u
           return;
         }
         break;
-      case vtkDynamicProperties::FLOAT32:
-        if (auto result = scn::scan<float>(stringValue, "{}"))
+      case vtkDynamicProperties::DOUBLE:
+        if (auto result = scn::scan<double>(stringValue, "{}"))
         {
           this->Internals->AnariPass->GetAnariRenderer()->SetParameterf(
             key.c_str(), result->value());
@@ -3815,12 +3817,12 @@ std::string vtkPVRenderView::GetANARIRendererParameters()
   const std::string& rendererName = ren->GetSubtype();
   std::map<int, int> anariToParameterType = {
     { ANARI_BOOL, vtkDynamicProperties::BOOL },
-    { ANARI_INT32, vtkDynamicProperties::INT32 },
-    { ANARI_FLOAT32, vtkDynamicProperties::FLOAT32 },
-    { ANARI_STRING, vtkDynamicProperties::STRING },
-    { ANARI_FLOAT32_VEC3, vtkDynamicProperties::FLOAT32_VEC3 },
-    { ANARI_FLOAT32_VEC4, vtkDynamicProperties::FLOAT32_VEC4 },
-    { ANARI_ARRAY2D, vtkDynamicProperties::ARRAY2D },
+    { ANARI_INT32, vtkDynamicProperties::INT },
+    { ANARI_FLOAT32, vtkDynamicProperties::DOUBLE },
+    { ANARI_STRING, vtkDynamicProperties::INVALID_TYPE },
+    { ANARI_FLOAT32_VEC3, vtkDynamicProperties::INVALID_TYPE },
+    { ANARI_FLOAT32_VEC4, vtkDynamicProperties::INVALID_TYPE },
+    { ANARI_ARRAY2D, vtkDynamicProperties::INVALID_TYPE },
   };
   if (auto* ren = this->Internals->AnariPass->GetAnariRenderer())
   {
@@ -3912,8 +3914,10 @@ std::string vtkPVRenderView::GetANARIRendererParameters()
       }
       jsonParameters.append(jsonRendererParameters);
     }
-    jsonAllParameters[vtkDynamicProperties::LIBRARY_KEY] = libraryName;
-    jsonAllParameters[vtkDynamicProperties::RENDERER_KEY] = rendererName;
+    jsonAllParameters[LIBRARY_KEY] = libraryName;
+    jsonAllParameters[RENDERER_KEY] = rendererName;
+    jsonAllParameters[vtkDynamicProperties::VERSION_KEY] =
+      VTK_DYNAMIC_PROPERTIES_VERSION_NUMBER_QUICK;
     jsonAllParameters[vtkDynamicProperties::PROPERTIES_KEY] = jsonParameters;
   }
   Json::StreamWriterBuilder builder;

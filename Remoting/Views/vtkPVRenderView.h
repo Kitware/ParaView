@@ -1042,10 +1042,13 @@ public:
    *   each parameter has a name, type, description, default, min, max
    *     the type is an int given by the ANARI type (such as int(ANARI_INT32))
    *     default, min and max have the type given by the ANARI type.
+   * Note that the library and renderer is not part of the vtkDynamicProperties
+   * specification.
    * Example:
    * {
    *   "library": "environment"
    *   "renderer": "ao",
+   *   "version": "1.0"
    *   "parameters":
    *   [
    *   {

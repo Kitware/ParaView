@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkDynamicProperties.h"
 
-const char* vtkDynamicProperties::LIBRARY_KEY = "library";
-const char* vtkDynamicProperties::RENDERER_KEY = "renderer";
+const char* vtkDynamicProperties::VERSION_KEY = "version";
 const char* vtkDynamicProperties::PROPERTIES_KEY = "properties";
 const char* vtkDynamicProperties::NAME_KEY = "name";
 const char* vtkDynamicProperties::TYPE_KEY = "type";

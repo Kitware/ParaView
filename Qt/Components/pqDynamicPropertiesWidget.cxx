@@ -529,6 +529,21 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
   if (root.isObject() && root.isMember(vtkDynamicProperties::PROPERTIES_KEY) &&
     root[vtkDynamicProperties::PROPERTIES_KEY].isArray())
   {
+    if (!root.isMember(vtkDynamicProperties::VERSION_KEY))
+    {
+      qWarning() << "Error: No version provided with the properties "
+                    "json specification";
+      return;
+    }
+    if (root[vtkDynamicProperties::VERSION_KEY].asInt() <
+      VTK_DYNAMIC_PROPERTIES_VERSION_NUMBER_QUICK)
+    {
+      qWarning() << "Error: json properties specification version "
+                    "is not supported: "
+                 << root[vtkDynamicProperties::VERSION_KEY].asInt()
+                 << " expecting: " << VTK_DYNAMIC_PROPERTIES_VERSION_NUMBER_QUICK;
+      return;
+    }
     Json::Value properties = root[vtkDynamicProperties::PROPERTIES_KEY];
     for (const auto& property : properties)
     {
@@ -542,7 +557,7 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
       RowWidget* rowWidget = nullptr;
       switch (type)
       {
-        case vtkDynamicProperties::INT32:
+        case vtkDynamicProperties::INT:
         {
           if (!property.isMember(vtkDynamicProperties::DEFAULT_KEY))
           {
@@ -580,30 +595,30 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
           rowWidget = new RowWidgetBool(this, name, type, description, defaultValue);
           break;
         }
-        case vtkDynamicProperties::FLOAT32:
+        case vtkDynamicProperties::DOUBLE:
         {
           if (!property.isMember(vtkDynamicProperties::DEFAULT_KEY))
           {
             qWarning() << name << " does not have a default value";
           }
           double defaultValue = property.isMember(vtkDynamicProperties::DEFAULT_KEY)
-            ? property[vtkDynamicProperties::DEFAULT_KEY].asFloat()
+            ? property[vtkDynamicProperties::DEFAULT_KEY].asDouble()
             : 1;
           if (property.isMember(vtkDynamicProperties::MIN_KEY) &&
             property.isMember(vtkDynamicProperties::MAX_KEY))
           {
-            double minVal = property[vtkDynamicProperties::MIN_KEY].asFloat();
-            double maxVal = property[vtkDynamicProperties::MAX_KEY].asFloat();
+            double minVal = property[vtkDynamicProperties::MIN_KEY].asDouble();
+            double maxVal = property[vtkDynamicProperties::MAX_KEY].asDouble();
             rowWidget = new RowWidgetNumber<pqDoubleRangeWidget, double>(
               this, name, type, description, minVal, maxVal, defaultValue);
           }
           else
           {
             double minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
-              ? property[vtkDynamicProperties::MIN_KEY].asFloat()
+              ? property[vtkDynamicProperties::MIN_KEY].asDouble()
               : std::numeric_limits<double>::lowest();
             double maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
-              ? property[vtkDynamicProperties::MAX_KEY].asFloat()
+              ? property[vtkDynamicProperties::MAX_KEY].asDouble()
               : std::numeric_limits<double>::max();
             rowWidget = new RowWidgetNumber<QDoubleSpinBox, double>(
               this, name, type, description, minVal, maxVal, defaultValue);
