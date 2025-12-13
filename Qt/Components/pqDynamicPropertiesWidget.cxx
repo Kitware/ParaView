@@ -7,8 +7,6 @@
 #include "pqIntRangeWidget.h"
 #include "pqPropertiesPanel.h"
 #include "vtkDynamicProperties.h"
-#include "vtkLogger.h"
-
 #include "vtkSMDynamicPropertiesDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
@@ -20,6 +18,7 @@
 #include <QByteArray>
 #include <QCheckBox>
 #include <QDebug>
+#include <QDoubleSpinBox>
 #include <QDynamicPropertyChangeEvent>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -27,14 +26,19 @@
 #include <QIntValidator>
 #include <QLabel>
 #include <QSlider>
+#include <QSpinBox>
 #include <QString>
 #include <QTimer>
 #include <QVBoxLayout>
 
 #include <QCoreApplication>
 #include <algorithm>
+#include <iostream>
+#include <limits>
 #include <qcontainerfwd.h>
+#include <qlogging.h>
 #include <qnamespace.h>
+#include <qspinbox.h>
 
 namespace
 {
@@ -150,129 +154,94 @@ void RowWidgetBool::setCheckState(bool state)
 }
 
 //------------------------------------------------------------------------------
-class RowWidgetInt : public RowWidget
+template <typename NumberWidgetType, typename NumberType>
+class RowWidgetNumber : public RowWidget
 {
 public:
-  RowWidgetInt(pqDynamicPropertiesWidget* parent, const QString& key,
-    vtkDynamicProperties::Type type, const QString& description, int minValue, int maxValue,
-    int defaultValue);
+  RowWidgetNumber(pqDynamicPropertiesWidget* parent, const QString& key,
+    vtkDynamicProperties::Type type, const QString& description, NumberType minValue,
+    NumberType maxValue, NumberType defaultValue);
   void deleteLater() override;
   QVariant value() override;
   bool setValue(const QVariant& value) override;
-  void setValue(int);
+  void setValue(NumberType value);
 
 private:
-  pqIntRangeWidget* intRangeWidget;
+  NumberWidgetType* numberWidget;
 };
 
 //------------------------------------------------------------------------------
-RowWidgetInt::RowWidgetInt(pqDynamicPropertiesWidget* parent, const QString& key,
-  vtkDynamicProperties::Type type, const QString& description, int minValue, int maxValue,
-  int defaultValue)
+template <typename NumberWidgetType, typename NumberType>
+RowWidgetNumber<NumberWidgetType, NumberType>::RowWidgetNumber(pqDynamicPropertiesWidget* parent,
+  const QString& key, vtkDynamicProperties::Type type, const QString& description,
+  NumberType minValue, NumberType maxValue, NumberType defaultValue)
   : RowWidget(parent, key, type)
-  , intRangeWidget(new pqIntRangeWidget(parent))
+  , numberWidget(new NumberWidgetType(parent))
 {
-  this->intRangeWidget->setMinimum(minValue);
-  this->intRangeWidget->setMaximum(maxValue);
+  this->numberWidget->setMinimum(minValue);
+  this->numberWidget->setMaximum(maxValue);
+  QString tooltip = description;
+  if (minValue != std::numeric_limits<NumberType>::lowest())
+  {
+    tooltip += (". min=" + QString::number(minValue));
+  }
+  if (maxValue != std::numeric_limits<NumberType>::max())
+  {
+    tooltip += (", max=" + QString::number(maxValue));
+  }
   this->setValue(defaultValue);
-  this->intRangeWidget->setToolTip(description);
-  this->intRangeWidget->setProperty(keyPropertyName, key);
+  this->numberWidget->setToolTip(tooltip);
+  this->numberWidget->setProperty(keyPropertyName, key);
 
-  this->layout->addWidget(this->intRangeWidget);
-
-  parent->connect(this->intRangeWidget, SIGNAL(valueChanged(int)), SLOT(updateProperty()));
+  this->layout->addWidget(this->numberWidget);
+  if constexpr (std::is_same_v<NumberType, int>)
+  {
+    parent->connect(this->numberWidget, SIGNAL(valueChanged(int)), SLOT(updateProperty()));
+  }
+  else if constexpr (std::is_same_v<NumberType, double>)
+  {
+    parent->connect(this->numberWidget, SIGNAL(valueChanged(double)), SLOT(updateProperty()));
+  }
 }
 
 //------------------------------------------------------------------------------
-QVariant RowWidgetInt::value()
+template <typename NumberWidgetType, typename NumberType>
+QVariant RowWidgetNumber<NumberWidgetType, NumberType>::value()
 {
-  return QVariant(this->intRangeWidget->value());
+  return QVariant(this->numberWidget->value());
 }
 
 //------------------------------------------------------------------------------
-bool RowWidgetInt::setValue(const QVariant& value)
+template <typename NumberWidgetType, typename NumberType>
+bool RowWidgetNumber<NumberWidgetType, NumberType>::setValue(const QVariant& value)
 {
   bool ok;
-  this->intRangeWidget->setValue(value.toInt(&ok));
+  if constexpr (std::is_same_v<NumberType, int>)
+  {
+    this->numberWidget->setValue(value.toInt(&ok));
+  }
+  else if constexpr (std::is_same_v<NumberType, double>)
+  {
+    this->numberWidget->setValue(value.toDouble(&ok));
+  }
   return ok;
 }
 
 //------------------------------------------------------------------------------
-void RowWidgetInt::deleteLater()
+template <typename NumberWidgetType, typename NumberType>
+void RowWidgetNumber<NumberWidgetType, NumberType>::deleteLater()
 {
   this->RowWidget::deleteLater();
-  this->intRangeWidget->deleteLater();
+  this->numberWidget->deleteLater();
 }
 
 //------------------------------------------------------------------------------
-void RowWidgetInt::setValue(int value)
+template <typename NumberWidgetType, typename NumberType>
+void RowWidgetNumber<NumberWidgetType, NumberType>::setValue(NumberType value)
 {
-  bool oldBlock = this->intRangeWidget->blockSignals(true);
-  this->intRangeWidget->setValue(value);
-  this->intRangeWidget->blockSignals(oldBlock);
-}
-
-//------------------------------------------------------------------------------
-class RowWidgetDouble : public RowWidget
-{
-public:
-  RowWidgetDouble(pqDynamicPropertiesWidget* parent, const QString& key,
-    vtkDynamicProperties::Type type, const QString& description, double minValue, double maxValue,
-    double defaultValue);
-  void deleteLater() override;
-  QVariant value() override;
-  bool setValue(const QVariant& value) override;
-  void setValue(double);
-
-private:
-  pqDoubleRangeWidget* doubleRangeWidget;
-};
-
-//------------------------------------------------------------------------------
-RowWidgetDouble::RowWidgetDouble(pqDynamicPropertiesWidget* parent, const QString& key,
-  vtkDynamicProperties::Type type, const QString& description, double minValue, double maxValue,
-  double defaultValue)
-  : RowWidget(parent, key, type)
-  , doubleRangeWidget(new pqDoubleRangeWidget(parent))
-{
-  this->doubleRangeWidget->setMinimum(minValue);
-  this->doubleRangeWidget->setMaximum(maxValue);
-  this->setValue(defaultValue);
-  this->doubleRangeWidget->setToolTip(description);
-  this->doubleRangeWidget->setProperty(keyPropertyName, key);
-
-  this->layout->addWidget(this->doubleRangeWidget);
-
-  parent->connect(this->doubleRangeWidget, SIGNAL(valueChanged(double)), SLOT(updateProperty()));
-}
-
-//------------------------------------------------------------------------------
-QVariant RowWidgetDouble::value()
-{
-  return QVariant(this->doubleRangeWidget->value());
-}
-
-//------------------------------------------------------------------------------
-bool RowWidgetDouble::setValue(const QVariant& value)
-{
-  bool ok;
-  this->doubleRangeWidget->setValue(value.toDouble(&ok));
-  return ok;
-}
-
-//------------------------------------------------------------------------------
-void RowWidgetDouble::deleteLater()
-{
-  this->RowWidget::deleteLater();
-  this->doubleRangeWidget->deleteLater();
-}
-
-//------------------------------------------------------------------------------
-void RowWidgetDouble::setValue(double value)
-{
-  bool oldBlock = this->doubleRangeWidget->blockSignals(true);
-  this->doubleRangeWidget->setValue(value);
-  this->doubleRangeWidget->blockSignals(oldBlock);
+  bool oldBlock = this->numberWidget->blockSignals(true);
+  this->numberWidget->setValue(value);
+  this->numberWidget->blockSignals(oldBlock);
 }
 
 } // end anon namespace
@@ -303,6 +272,7 @@ public:
     this->Widget->buildWidget(pullProp);
   }
   pqDynamicPropertiesWidget* Widget = nullptr;
+  vtkSMDomain* Domain = nullptr;
 };
 
 class pqDynamicPropertiesWidget::pqInternals
@@ -339,6 +309,7 @@ public:
   }
 
   WidgetMap widgetMap;
+  vtkNew<DomainModifiedObserver> observer;
 };
 
 //------------------------------------------------------------------------------
@@ -394,14 +365,15 @@ pqDynamicPropertiesWidget::pqDynamicPropertiesWidget(
     this->hide();
   }
 
-  vtkNew<DomainModifiedObserver> observer;
-  observer->Widget = this;
-  domain->AddObserver(vtkCommand::DomainModifiedEvent, observer);
+  this->Internals->observer->Widget = this;
+  this->Internals->observer->Domain = domain;
+  domain->AddObserver(vtkCommand::DomainModifiedEvent, this->Internals->observer);
 }
 
 //------------------------------------------------------------------------------
 pqDynamicPropertiesWidget::~pqDynamicPropertiesWidget()
 {
+  this->Internals->observer->Domain->RemoveObserver(this->Internals->observer);
   delete this->Internals;
   this->Internals = nullptr;
 }
@@ -447,9 +419,9 @@ void pqDynamicPropertiesWidget::propertyChanged()
     qWarning() << Q_FUNC_INFO << "Invalid property list length.";
     return;
   }
-  QString key = prop.at(0).toString();
-  QString value = prop.at(2).toString();
-  if (this->Internals->widgetMap.empty() && key == "" && value == "")
+  QString key0 = prop.at(0).toString();
+  QString value0 = prop.at(2).toString();
+  if (this->Internals->widgetMap.empty() && key0 == "" && value0 == "")
   {
     return;
   }
@@ -512,10 +484,11 @@ void pqDynamicPropertiesWidget::updatePropertyImpl()
 //------------------------------------------------------------------------------
 void pqDynamicPropertiesWidget::clearProperties()
 {
-  for (int i = 0; i < this->Form->rowCount(); ++i)
+  for (int i = this->Form->rowCount() - 1; i >= 0; --i)
   {
     this->Form->takeRow(i);
   }
+  assert(this->Form->rowCount() == 0);
   auto& map = this->Internals->widgetMap;
   for (auto it = map.begin(); it != map.end(); ++it)
   {
@@ -524,6 +497,7 @@ void pqDynamicPropertiesWidget::clearProperties()
     delete widget;
   }
   map.clear();
+  assert(this->Internals->widgetMap.empty());
 }
 
 //------------------------------------------------------------------------------
@@ -540,7 +514,6 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
   }
 
   std::string stringProperties{ svp->GetElement(0) };
-  vtkLog(INFO, "ANARIRendererParametersInfo \n" << stringProperties);
   Json::Value root;
   Json::CharReaderBuilder readerBuilder;
   std::string errs;
@@ -557,7 +530,6 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
     root[vtkDynamicProperties::PROPERTIES_KEY].isArray())
   {
     Json::Value properties = root[vtkDynamicProperties::PROPERTIES_KEY];
-    int row = 0;
     for (const auto& property : properties)
     {
       QString description =
@@ -579,13 +551,25 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
           int defaultValue = property.isMember(vtkDynamicProperties::DEFAULT_KEY)
             ? property[vtkDynamicProperties::DEFAULT_KEY].asInt()
             : 1;
-          int minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
-            ? property[vtkDynamicProperties::MIN_KEY].asInt()
-            : defaultValue;
-          int maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
-            ? property[vtkDynamicProperties::MAX_KEY].asInt()
-            : defaultValue;
-          rowWidget = new RowWidgetInt(this, name, type, description, minVal, maxVal, defaultValue);
+          if (property.isMember(vtkDynamicProperties::MAX_KEY) &&
+            property.isMember(vtkDynamicProperties::MIN_KEY))
+          {
+            int minVal = property[vtkDynamicProperties::MIN_KEY].asInt();
+            int maxVal = property[vtkDynamicProperties::MAX_KEY].asInt();
+            rowWidget = new RowWidgetNumber<pqIntRangeWidget, int>(
+              this, name, type, description, minVal, maxVal, defaultValue);
+          }
+          else
+          {
+            int minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
+              ? property[vtkDynamicProperties::MIN_KEY].asInt()
+              : std::numeric_limits<int>::lowest();
+            int maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
+              ? property[vtkDynamicProperties::MAX_KEY].asInt()
+              : std::numeric_limits<int>::max();
+            rowWidget = new RowWidgetNumber<QSpinBox, int>(
+              this, name, type, description, minVal, maxVal, defaultValue);
+          }
           break;
         }
         case vtkDynamicProperties::BOOL:
@@ -605,14 +589,25 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
           double defaultValue = property.isMember(vtkDynamicProperties::DEFAULT_KEY)
             ? property[vtkDynamicProperties::DEFAULT_KEY].asFloat()
             : 1;
-          double minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
-            ? property[vtkDynamicProperties::MIN_KEY].asFloat()
-            : defaultValue;
-          double maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
-            ? property[vtkDynamicProperties::MAX_KEY].asFloat()
-            : defaultValue;
-          rowWidget =
-            new RowWidgetDouble(this, name, type, description, minVal, maxVal, defaultValue);
+          if (property.isMember(vtkDynamicProperties::MIN_KEY) &&
+            property.isMember(vtkDynamicProperties::MAX_KEY))
+          {
+            double minVal = property[vtkDynamicProperties::MIN_KEY].asFloat();
+            double maxVal = property[vtkDynamicProperties::MAX_KEY].asFloat();
+            rowWidget = new RowWidgetNumber<pqDoubleRangeWidget, double>(
+              this, name, type, description, minVal, maxVal, defaultValue);
+          }
+          else
+          {
+            double minVal = property.isMember(vtkDynamicProperties::MIN_KEY)
+              ? property[vtkDynamicProperties::MIN_KEY].asFloat()
+              : std::numeric_limits<double>::lowest();
+            double maxVal = property.isMember(vtkDynamicProperties::MAX_KEY)
+              ? property[vtkDynamicProperties::MAX_KEY].asFloat()
+              : std::numeric_limits<double>::max();
+            rowWidget = new RowWidgetNumber<QDoubleSpinBox, double>(
+              this, name, type, description, minVal, maxVal, defaultValue);
+          }
           break;
         }
         default:

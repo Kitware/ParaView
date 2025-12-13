@@ -16,8 +16,26 @@ class QGroupBox;
 class QVBoxLayout;
 
 /**
- * pqDynamicPropertiesWidget displays a list of labels and slider widgets,
- * intended to be used for selecting an index into a zero-based enumeration.
+ *
+ *
+ * @class   pqDynamicPropertiesWidget
+ * @brief   Creates a panel_widget for setting dynamically generated properties
+ *
+ * The properties have a name, a type, a default value and optionally
+ * a min and a max value. We can have bool, int and double properties.
+ *
+ * See:
+ * - vtkPVRenderView::GetANARIRendererParameters for the json
+ * description of properties associated with an ANARI renderer
+ *
+ * - vtkDynamicProperties for the keys and types that can be used in
+ * the json file.
+ *
+ * - ANARIRenderParameter XML property definiton for the RenderViewProxy
+ * in view_removingviews.xml
+ *
+ * - pqIndexSelectionWidget for a similar dynamic widget that works only for
+ * int properties.
  */
 class PQCOMPONENTS_EXPORT pqDynamicPropertiesWidget : public pqPropertyWidget
 {
