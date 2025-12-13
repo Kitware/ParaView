@@ -4,8 +4,8 @@
 #include "vtkSMDynamicPropertiesDomain.h"
 
 #include "vtkDynamicProperties.h"
-#include "vtkLogger.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkStringFormatter.h"
 #include "json/json.h"
 
 #include "vtkObjectFactory.h"
@@ -41,7 +41,6 @@ int vtkSMDynamicPropertiesDomain::SetDefaultValues(vtkSMProperty* outProperty, b
   if (svpOut && svpInfo && svpInfo->GetNumberOfElements() == 1)
   {
     std::string stringProperties{ svpInfo->GetElement(0) };
-    vtkLog(INFO, "ANARIRendererParametersInfo \n" << stringProperties);
     Json::Value root;
     Json::CharReaderBuilder readerBuilder;
     std::string errs;
@@ -65,9 +64,8 @@ int vtkSMDynamicPropertiesDomain::SetDefaultValues(vtkSMProperty* outProperty, b
         std::string name = property[vtkDynamicProperties::NAME_KEY].asString();
         svpOut->SetElement(outIdx++, name.c_str());
 
-        vtkDynamicProperties::Type type =
-          static_cast<vtkDynamicProperties::Type>(property[vtkDynamicProperties::TYPE_KEY].asInt());
-        svpOut->SetElement(outIdx++, std::to_string(type).c_str());
+        int type = property[vtkDynamicProperties::TYPE_KEY].asInt();
+        svpOut->SetElement(outIdx++, vtk::to_string(type).c_str());
         if (!property.isMember(vtkDynamicProperties::DEFAULT_KEY))
         {
           vtkWarningMacro("Warning: " << name << " does not have a default value");

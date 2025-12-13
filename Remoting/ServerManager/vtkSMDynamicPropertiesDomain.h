@@ -2,11 +2,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class   vtkSMDynamicPropertiesDomain
- * @brief   Select names from an indexed string list.
+ * @brief   A domain (json description) for dynamic properties
  *
- *
- * See the vtkMPASReader proxy in readers.xml for how the properties should be
- * set up for this domain.
+ * See:
+ * - vtkPVRenderView::GetANARIRendererParameters for the json
+ * description of properties associated with an ANARI renderer
+ * - pqDynamicPropertiesWidget for the panel_widget for these
+ * properties and
+ * - ANARIRenderParameter XML property definiton for the RenderViewProxy
+ * in view_removingviews.xml
  */
 
 #ifndef vtkSMDynamicPropertiesDomain_h
