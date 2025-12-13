@@ -42,6 +42,7 @@
 #include <QListWidgetItem>
 #include <QMap>
 #include <QPointer>
+#include <QScrollArea>
 
 #include <vtksys/FStream.hxx>
 
@@ -67,7 +68,7 @@ public:
 void pqVRDockPanel::constructor()
 {
   this->setWindowTitle("CAVE Interaction Manager");
-  QWidget* container = new QWidget(this);
+  QScrollArea* container = new QScrollArea(this);
   this->Internals = new pqInternals();
   this->Internals->setupUi(container);
   pqWidgetUtilities::formatChildTooltips(container);

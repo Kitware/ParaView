@@ -3,263 +3,263 @@
 <!-- SPDX-License-Identifier: BSD-3-Clause -->
 <ui version="4.0">
  <class>VRDockPanel</class>
- <widget class="QWidget" name="VRDockPanel">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>479</width>
-    <height>613</height>
-   </rect>
+ <widget class="QScrollArea" name="scrollArea">
+  <property name="frameShape">
+   <enum>QFrame::NoFrame</enum>
   </property>
-  <property name="windowTitle">
-   <string/>
+  <property name="widgetResizable">
+   <bool>true</bool>
   </property>
-  <layout class="QGridLayout" name="gridLayout2">
-   <item row="1" column="0">
-    <widget class="QListWidget" name="connectionsTable"/>
-   </item>
-   <item row="12" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QPushButton" name="saveState">
-       <property name="text">
-        <string>Save VR State</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="restoreState">
-       <property name="text">
-        <string>Restore VR State</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="startButton">
-       <property name="toolTip">
-        <string>Start listening for VR events on the configured connections.</string>
-       </property>
-       <property name="text">
-        <string>Start</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="stopButton">
-       <property name="toolTip">
-        <string>Stop listening for VR events.</string>
-       </property>
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="6" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1">
-     <item>
-      <widget class="QComboBox" name="stylesCombo">
-       <property name="toolTip">
-        <string>Select the type of interaction.</string>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContents</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="pqAnimatableProxyComboBox" name="proxyCombo">
-       <property name="toolTip">
-        <string>Select an object for interaction.</string>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContents</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="pqAnimatablePropertiesComboBox" name="propertyCombo">
-       <property name="toolTip">
-        <string>Select the object's property for interaction.</string>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContents</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="5" column="0">
-    <widget class="QListWidget" name="stylesTable"/>
-   </item>
-   <item row="8" column="0">
-    <widget class="Line" name="line_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0">
-     <item>
-      <widget class="QPushButton" name="addConnection">
-       <property name="toolTip">
-        <string>Add a new VR connection.</string>
-       </property>
-       <property name="text">
-        <string>Add...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="editConnection">
-       <property name="toolTip">
-        <string>Edit the selected VR connection.</string>
-       </property>
-       <property name="text">
-        <string>Edit...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="removeConnection">
-       <property name="toolTip">
-        <string>Remove the selected VR connection.</string>
-       </property>
-       <property name="text">
-        <string>Remove</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>VR Connections:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Interactions:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <layout class="QVBoxLayout" name="stylePropertiesLayout">
+  <widget class="QWidget" name="VRDockPanel">
+   <property name="windowTitle">
+    <string/>
+   </property>
+   <layout class="QGridLayout" name="gridLayout2">
+    <item row="1" column="0">
+     <widget class="QListWidget" name="connectionsTable"/>
+    </item>
+    <item row="12" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-        <widget class="QLabel" name="stylePropertiesLabel">
-          <property name="text">
-            <string>TextLabel</string>
-          </property>
-        </widget>
+       <widget class="QPushButton" name="saveState">
+        <property name="text">
+         <string>Save VR State</string>
+        </property>
+       </widget>
       </item>
-    </layout>
-   </item>
-   <item row="7" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QPushButton" name="addStyle">
-       <property name="toolTip">
-        <string>Add a new interaction.</string>
-       </property>
-       <property name="text">
-        <string>Add...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="editStyle">
-       <property name="toolTip">
-        <string>Customize role bindings.</string>
-       </property>
-       <property name="text">
-        <string>Edit...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="removeStyle">
-       <property name="toolTip">
-        <string>Remove the selected interaction.</string>
-       </property>
-       <property name="text">
-        <string>Remove</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="11" column="0">
-    <layout class="QVBoxLayout" name="collaborationContainer"/>
-   </item>
-  </layout>
+      <item>
+       <widget class="QPushButton" name="restoreState">
+        <property name="text">
+         <string>Restore VR State</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="startButton">
+        <property name="toolTip">
+         <string>Start listening for VR events on the configured connections.</string>
+        </property>
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="stopButton">
+        <property name="toolTip">
+         <string>Stop listening for VR events.</string>
+        </property>
+        <property name="text">
+         <string>Stop</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="6" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1">
+      <item>
+       <widget class="QComboBox" name="stylesCombo">
+        <property name="toolTip">
+         <string>Select the type of interaction.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="pqAnimatableProxyComboBox" name="proxyCombo">
+        <property name="toolTip">
+         <string>Select an object for interaction.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="pqAnimatablePropertiesComboBox" name="propertyCombo">
+        <property name="toolTip">
+         <string>Select the object's property for interaction.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="5" column="0">
+     <widget class="QListWidget" name="stylesTable"/>
+    </item>
+    <item row="8" column="0">
+     <widget class="Line" name="line_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0">
+      <item>
+       <widget class="QPushButton" name="addConnection">
+        <property name="toolTip">
+         <string>Add a new VR connection.</string>
+        </property>
+        <property name="text">
+         <string>Add...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
+          <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="editConnection">
+        <property name="toolTip">
+         <string>Edit the selected VR connection.</string>
+        </property>
+        <property name="text">
+         <string>Edit...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="removeConnection">
+        <property name="toolTip">
+         <string>Remove the selected VR connection.</string>
+        </property>
+        <property name="text">
+         <string>Remove</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
+          <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>VR Connections:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Interactions:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="0">
+     <layout class="QVBoxLayout" name="stylePropertiesLayout">
+       <item>
+         <widget class="QLabel" name="stylePropertiesLabel">
+           <property name="text">
+             <string>TextLabel</string>
+           </property>
+         </widget>
+       </item>
+     </layout>
+    </item>
+    <item row="7" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QPushButton" name="addStyle">
+        <property name="toolTip">
+         <string>Add a new interaction.</string>
+        </property>
+        <property name="text">
+         <string>Add...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
+          <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="editStyle">
+        <property name="toolTip">
+         <string>Customize role bindings.</string>
+        </property>
+        <property name="text">
+         <string>Edit...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="removeStyle">
+        <property name="toolTip">
+         <string>Remove the selected interaction.</string>
+        </property>
+        <property name="text">
+         <string>Remove</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
+          <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="11" column="0">
+     <layout class="QVBoxLayout" name="collaborationContainer"/>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
