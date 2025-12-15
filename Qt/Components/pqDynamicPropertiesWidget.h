@@ -21,8 +21,35 @@ class QVBoxLayout;
  * @class   pqDynamicPropertiesWidget
  * @brief   Creates a panel_widget for setting dynamically generated properties
  *
- * The properties have a name, a type, a default value and optionally
- * a min and a max value. We can have bool, int and double properties.
+ * The properties are specified using a json file.
+ * The json contains a version and an array of parameters, and possible
+ * additional key: value parameters which are ignored.
+ *   each parameter has a name, type, description, default, min, max
+ *     the type is an int given vtkDynamicProperties::Type (such as vtkDynamicProperties::Type)
+ *     default, min and max have the specified type.
+ * Example:
+ * {
+ *   "library": "environment"
+ *   "renderer": "ao",
+ *   "version": "1.0"
+ *   "parameters":
+ *   [
+ *   {
+ *     "name" : "sampleLimit",
+ *     "type" :  <vtkDynamicProperties::Type>
+ *     "default" : 128,
+ *     "value": 0,
+ *     "description" : "stop refining the frame after this number of samples",
+ *     "max" : 100,
+ *     "min" : 0,
+ *   },
+ *   ...
+ *   ]
+ * }
+ * The key names and types are defined in vtkDynamicProperties class.
+ * @see vtkDynamicProperties
+ * The "library" and "renderer" key,values are for debugging and are
+ * ignored by the dynamic properties panel.
  *
  * See:
  * - vtkPVRenderView::GetANARIRendererParameters for the json

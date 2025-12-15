@@ -1037,34 +1037,11 @@ public:
 
   ///@{
   /**
-   * Return ANARI parameters specification for the current renderer as a string encoding a:
-   * Json containing a renderer name, library name and an array of parameters,
-   *   each parameter has a name, type, description, default, min, max
-   *     the type is an int given by the ANARI type (such as int(ANARI_INT32))
-   *     default, min and max have the type given by the ANARI type.
-   * Note that the library and renderer is not part of the vtkDynamicProperties
-   * specification.
-   * Example:
-   * {
-   *   "library": "environment"
-   *   "renderer": "ao",
-   *   "version": "1.0"
-   *   "parameters":
-   *   [
-   *   {
-   *     "name" : "sampleLimit",
-   *     "type" :  <vtkDynamicProperties::Type>
-   *     "default" : 128,
-   *     "value": 0,
-   *     "description" : "stop refining the frame after this number of samples",
-   *     "max" : 100,
-   *     "min" : 0,
-   *   },
-   *   ...
-   *   ]
-   * }
-   * The key names and types are defined in vtkDynamicProperties class.
-   * @see vtkDynamicProperties
+   * Return ANARI parameters specification for the current renderer as
+   * a string encoding a json which contains the version and an array of
+   * parameters. See pqDynamicPropertiesWidget for the description of these
+   * parameters
+   * @see pqDynamicPropertiesWidget
    */
   std::string GetANARIRendererParameters();
   /**

@@ -5,9 +5,10 @@
  * @brief   A domain (json description) for dynamic properties
  *
  * See:
- * - vtkPVRenderView::GetANARIRendererParameters for the json
+ * - vtkPVRenderView::GetANARIRendererParameters for code that generates json
  * description of properties associated with an ANARI renderer
- * - pqDynamicPropertiesWidget for the panel_widget for these
+ * - pqDynamicPropertiesWidget for json
+ * description of properties and the panel_widget for these
  * properties and
  * - ANARIRenderParameter XML property definiton for the RenderViewProxy
  * in view_removingviews.xml
