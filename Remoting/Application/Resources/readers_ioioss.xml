@@ -808,6 +808,22 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetIncludeGhostNodes"
+                         default_values="1"
+                         name="IncludeGhostData"
+                         label="Include Ghost Data"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether the reader should include ghost-node markings.
+
+          If the data is distributed across multiple partitions, ghost-node
+          markings are required to precisely compute statistics that take
+          duplicated nodes into account.
+        </Documentation>
+      </IntVectorProperty>
+
+
       <PropertyGroup name="DatabaseProperties"
                      label="Database Properties"
                      panel_widget="MetaDataPropertyWidget">
@@ -901,6 +917,7 @@
         <Property name="GenerateFileId"/>
         <Property name="ReadIds"/>
         <Property name="ReadQAAndInformationRecords"/>
+        <Property name="IncludeGhostData"/>
       </PropertyGroup>
 
       <Hints>
