@@ -1077,6 +1077,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   QuickLaunchRequest.xml
   ReflectBackwardCompat.xml
   ReloadCGNSFile.xml
+  RenderViewUpdateLOD.xml
   SearchBox.xml
   ServerConnectDialog.xml
   SettingsNoCustomDefault.xml

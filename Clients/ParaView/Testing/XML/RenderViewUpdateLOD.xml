@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- This is a smoke test to make sure the LOD computation does not cause a problem in the rendering process. -->
+
+  <!-- Set the LOD threshold to 0 -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Render View" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/LODThreshold/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Load can.ex2 file -->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.426307,0.387755,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.43159,0.700371,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.43159,0.700371,1,0,0)" />
+</pqevents>
