@@ -48,7 +48,7 @@ for x in range(1, len(sys.argv)):
         testing.AddArgument("-V")
         testing.AddArgument(join(sys.argv[x+1], "SaveTransparentImages.png"))
 
-result = testing.RegressionTest(testimage, 10)
+result = testing.RegressionTest(testimage, 0.05)
 if result == testing.DO_INTERACTOR:
     sys.exit(0)
 elif result == testing.NOT_RUN:

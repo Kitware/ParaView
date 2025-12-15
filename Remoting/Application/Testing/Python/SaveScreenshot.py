@@ -21,7 +21,7 @@ def RegressionTest(imageName):
     testing.AddArgument(tempdir)
     testing.AddArgument("-V")
     testing.AddArgument(smtesting.DataDir + "/Remoting/Application/Testing/Data/Baseline/" + imageName)
-    return testing.RegressionTest(tempdir + "/" + imageName, 10) == vtkTesting.PASSED
+    return testing.RegressionTest(tempdir + "/" + imageName, 0.05) == vtkTesting.PASSED
 
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [200, 200]

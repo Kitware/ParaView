@@ -132,7 +132,7 @@ def main():
                 t.AddArgument(os.path.join(args.baseline_dir, baseline_name))
                 t.AddArgument("-T")
                 t.AddArgument(args.temp_dir)
-                if t.RegressionTest(os.path.join(dirpath, image), 15) != t.PASSED:
+                if t.RegressionTest(os.path.join(dirpath, image), 0.05) != t.PASSED:
                     regressions_failure_count += 1
                     print("\n")
     if regressions_failure_count:

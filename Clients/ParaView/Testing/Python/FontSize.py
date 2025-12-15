@@ -82,7 +82,7 @@ for x in range(1, len(sys.argv)):
 testimage = join(testing.GetTempDirectory(), "FontSize.png")
 SaveScreenshot(testimage, layout=layout1, ImageResolution=[1280,800])
 
-result = testing.RegressionTest(testimage, 10)
+result = testing.RegressionTest(testimage, 0.05)
 if result == testing.DO_INTERACTOR:
     sys.exit(0)
 elif result == testing.NOT_RUN:

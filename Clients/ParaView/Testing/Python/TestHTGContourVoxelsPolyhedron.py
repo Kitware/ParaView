@@ -118,8 +118,8 @@ for x in range(1, len(sys.argv)):
         testing.AddArgument("-V")
         testing.AddArgument(join(sys.argv[x+1], "TestHTGContourVoxelsPolyhedron.png"))
 
-resultVoxels = testing.RegressionTest(testimageVoxels, 10)
-resultPolyhedron = testing.RegressionTest(testImagePolyhedron, 10)
+resultVoxels = testing.RegressionTest(testimageVoxels, 0.05)
+resultPolyhedron = testing.RegressionTest(testImagePolyhedron, 0.05)
 
 if resultVoxels == testing.DO_INTERACTOR and resultPolyhedron == testing.DO_INTERACTOR:
     sys.exit(0)

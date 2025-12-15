@@ -81,7 +81,7 @@ for x in range(1, len(sys.argv)):
 testimage = join(testing.GetTempDirectory(), "TestXYChartOpacity.png")
 SaveScreenshot(testimage, view=lineChartView1)
 
-result = testing.RegressionTest(testimage, 10)
+result = testing.RegressionTest(testimage, 0.05)
 if result == testing.DO_INTERACTOR:
     sys.exit(0)
 elif result == testing.NOT_RUN:
