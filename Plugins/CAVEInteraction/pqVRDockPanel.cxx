@@ -139,6 +139,15 @@ void pqVRDockPanel::constructor()
   this->updateConnectionButtons(this->Internals->connectionsTable->currentRow());
   this->updateStyleButtons(this->Internals->stylesTable->currentRow());
 
+  // Using size metrics about the font and margins, try to set the
+  // height of the list widget to accomodate 2.5 entries. If more
+  // are added, scrollbar will allow access.
+  QFontMetrics metrics(this->Internals->connectionsTable->font());
+  QMargins margins = this->Internals->connectionsTable->contentsMargins();
+  int rowHeight = metrics.height();
+  int totalHeight = static_cast<int>((2.5 * rowHeight) + margins.top() + margins.bottom());
+  this->Internals->connectionsTable->setFixedHeight(totalHeight);
+
   // Add the render view to the proxy combo
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
