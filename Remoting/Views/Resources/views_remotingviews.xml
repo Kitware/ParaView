@@ -1450,13 +1450,13 @@
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty name="EnableANARI"
-          label="Enable Ray Tracing with ANARI"
+          label="Enable Rendering with ANARI"
           command="SetEnableANARI"
           default_values="0"
           animateable="0"
           number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Enables ray tracing with ANARI.</Documentation>
+        <Documentation>Enables rendering with ANARI.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2086,7 +2086,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="MaxClipBounds"/>
         <Property name="LockBounds"/>
       </PropertyGroup>
-      <PropertyGroup label="Ray Traced Rendering"
+      <PropertyGroup label="Third Party Rendering"
                      panel_visibility="advanced">
         <Property name="EnableANARI"/>
         <Property name="EnableOSPRay"/>
