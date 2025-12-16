@@ -14,7 +14,7 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkDoubleArray;
-class vtkMultiBlockDataSet;
+class vtkStatisticalModel;
 
 class PVExtractBagPlotsInternal;
 
@@ -132,9 +132,9 @@ protected:
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  void GetEigenvalues(vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvalues);
+  void GetEigenvalues(vtkStatisticalModel* model, vtkDoubleArray* eigenvalues);
   void GetEigenvectors(
-    vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues);
+    vtkStatisticalModel* model, vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues);
 
   bool UseCustomGridBounds = false;
   double CustomGridBounds[4] = { -1, -1, -1, -1 };
