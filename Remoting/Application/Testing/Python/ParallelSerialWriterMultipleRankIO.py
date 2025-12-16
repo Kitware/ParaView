@@ -4,6 +4,8 @@ from paraview import smtesting
 from os.path import join
 import os, shutil
 
+LoadPalette("BlueGrayBackground")
+
 def Barrier():
     # ensure all ranks wait till root has created the directory to write into.
     pm = servermanager.vtkProcessModule.GetProcessModule()

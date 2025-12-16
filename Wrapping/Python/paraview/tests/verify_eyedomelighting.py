@@ -6,6 +6,8 @@ from .. import print_info as log
 
 
 def Execute(opts):
+    LoadPalette("BlueGrayBackground")
+
     log("initialize pipeline")
     view = CreateView('RenderViewWithEDL')
     view.ViewSize = [400, 400]

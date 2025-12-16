@@ -1,6 +1,9 @@
 from __future__ import print_function
 from paraview.simple import *
 from paraview import smtesting
+
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 tempdir = smtesting.GetUniqueTempDirectory("SaveAnimation-")

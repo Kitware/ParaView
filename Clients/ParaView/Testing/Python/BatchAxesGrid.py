@@ -3,6 +3,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 # create a new 'Sphere'
 sphere1 = Sphere()
 
@@ -51,6 +53,7 @@ sphere1Display.SetScalarBarVisibility(renderView1, False)
 
 # get color transfer function/color map for 'Normals'
 normalsLUT = GetColorTransferFunction('Normals')
+normalsLUT.ApplyPreset('Cool to Warm', True)
 
 # Properties modified on renderView1.AxesGrid
 renderView1.AxesGrid.Visibility = 1

@@ -4,6 +4,9 @@ from paraview import smtesting
 smtesting.ProcessCommandLineArguments()
 
 from paraview.simple import *
+
+LoadPalette("BlueGrayBackground")
+
 v1 = CreateRenderView()
 Sphere()
 Show()

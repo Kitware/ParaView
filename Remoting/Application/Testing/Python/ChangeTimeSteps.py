@@ -8,6 +8,9 @@
 #### import the simple module from the paraview
 from paraview.simple import *
 from paraview import smtesting
+
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 # create a new 'ExodusIIReader'

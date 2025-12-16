@@ -9,6 +9,8 @@ This rendering test ensures that the HTG contour using the "Voxels" strategy
 is the same as the decomposed polyhedra contour for a 2D slice.
 """
 
+LoadPalette("BlueGrayBackground")
+
 # Create the first renderview
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [678, 932]

@@ -12,6 +12,8 @@ from paraview import smtrace
 from paraview import smtesting
 import sys
 
+LoadPalette("BlueGrayBackground")
+
 settings = servermanager.vtkPVGeneralSettings()
 settings.SetScalarBarMode(settings.MANUAL_SCALAR_BARS)
 

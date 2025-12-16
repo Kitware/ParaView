@@ -2,6 +2,8 @@ from paraview import smtesting
 from paraview.simple import *
 import sys
 
+LoadPalette("BlueGrayBackground")
+
 Sphere()
 Show()
 Render()
@@ -15,7 +17,7 @@ def start_cue(self):
   print("Start Cue")
 
 def tick(self):
-  GetActiveSource().StartTheta = 180 * self.GetAnimationTime()
+  GetActiveSource().StartTheta = 45 * self.GetAnimationTime()
   Render()
 
 def end_cue(self):

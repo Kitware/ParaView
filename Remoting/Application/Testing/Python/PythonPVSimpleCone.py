@@ -2,6 +2,8 @@ from paraview.simple import *
 import sys
 from paraview import smtesting
 
+LoadPalette("BlueGrayBackground")
+
 resolution = 15
 cone = Cone(Resolution=resolution)
 if cone.Resolution != resolution:

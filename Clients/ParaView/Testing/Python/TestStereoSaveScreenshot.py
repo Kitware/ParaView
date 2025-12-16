@@ -5,6 +5,8 @@ from paraview.vtk.vtkTestingRendering import vtkTesting
 from os.path import join
 import sys
 
+LoadPalette("BlueGrayBackground")
+
 testing = vtkTesting()
 for arg in sys.argv:
     testing.AddArgument(arg)

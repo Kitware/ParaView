@@ -3,6 +3,9 @@
 from paraview.simple import *
 
 from paraview import smtesting
+
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 filename = smtesting.DataDir + '/Testing/Data/can.ex2'

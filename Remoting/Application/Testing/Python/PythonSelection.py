@@ -3,6 +3,8 @@ from paraview.selection import *
 
 from paraview import smtesting
 
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 s = Sphere()

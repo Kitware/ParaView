@@ -4,6 +4,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 # Create a new 'Render View'
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [1280, 800]

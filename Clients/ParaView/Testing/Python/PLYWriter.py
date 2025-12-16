@@ -5,6 +5,8 @@ from paraview.simple import *
 from paraview import smtesting
 import os.path
 
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 # create a new 'Wavelet'
@@ -27,14 +29,14 @@ contour1.Isosurfaces = [97.222075, 157.09105, 216.96002500000003, 276.829]
 contour1.ComputeScalars = 1
 contour1.PointMergeMethod = 'Uniform Binning'
 
-# get color transfer function/color map for 'RTData'
-rTDataLUT = GetColorTransferFunction('RTData')
-
 # show data in view
 contour1Display = Show(contour1, renderView1)
 # trace defaults for the display properties.
 contour1Display.ColorArrayName = ['POINTS', 'RTData']
-contour1Display.LookupTable = rTDataLUT
+
+# get color transfer function/color map for 'RTData'
+rTDataLUT = GetColorTransferFunction('RTData')
+rTDataLUT.ApplyPreset('Cool to Warm', True)
 
 # save data
 plyfilename = os.path.join(smtesting.TempDir, "PLYWriterData.ply")
@@ -82,8 +84,7 @@ ResetCamera()
 if not smtesting.DoRegressionTesting(renderView1.SMProxy):
     raise smtesting.TestError ('Test failed.')
 
-splitname = plyfilenamewithpadding.split('.')
-newfilename = splitname[0]+'_000.'+splitname[1]
+newfilename = os.path.join(smtesting.TempDir, "PLYWriterDataWithPadding_000.ply")
 fooply.FileNames=[newfilename]
 fooply.UpdatePipeline()
 

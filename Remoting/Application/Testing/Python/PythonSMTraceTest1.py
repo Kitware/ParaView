@@ -15,6 +15,8 @@ from paraview import smtrace
 from paraview import smtesting
 import sys
 
+LoadPalette("BlueGrayBackground")
+
 settings = servermanager.vtkPVGeneralSettings()
 settings.SetScalarBarMode(settings.MANUAL_SCALAR_BARS)
 
@@ -43,6 +45,8 @@ def create_pipeline():
     Render()
     ColorBy(value=("POINTS", "RTData"))
     GetDisplayProperties().SetScalarBarVisibility(ren, True)
+    rtDataLUT = GetColorTransferFunction("RTData")
+    rtDataLUT.ApplyPreset('Cool to Warm', True)
     Render()
 
     clip = Clip()

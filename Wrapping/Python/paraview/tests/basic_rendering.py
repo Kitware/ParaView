@@ -6,6 +6,8 @@ from .. import print_info as log
 
 
 def Execute(opts):
+    LoadPalette("BlueGrayBackground")
+
     log("initialize pipeline")
     view = CreateView('RenderView')
     view.ViewSize = [400, 400]
@@ -23,6 +25,7 @@ def Execute(opts):
     elevationLUT = GetColorTransferFunction('Elevation')
     elevationLUT.RescaleTransferFunction(0.0, 1.0)
     ColorBy(disp, ('POINTS', 'Elevation'))
+    elevationLUT.ApplyPreset('Cool to Warm', True)
 
     # reset camera
     view.ResetCamera(-0.5, 0.5, -0.5, 0.5, -0.5, 0.5)

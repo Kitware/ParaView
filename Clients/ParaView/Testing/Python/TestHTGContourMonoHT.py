@@ -9,6 +9,8 @@ This file is a rendering test of HTG Contour using polyhedron,
 in the case of a one cell grid (see issue Gitlab issue #22324)
 """
 
+LoadPalette("BlueGrayBackground")
+
 # Create first new 'Render View'
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [672, 679]
@@ -42,6 +44,7 @@ contourPolyhedraConcave.PointMergeMethod = 'Uniform Binning'
 contourPolyhedraConcaveDisplay = Show(contourPolyhedraConcave, renderView1, 'GeometryRepresentation')
 depthTF2D = GetTransferFunction2D('Depth')
 depthLUT = GetColorTransferFunction('Depth')
+depthLUT.ApplyPreset('Cool to Warm', True)
 depthLUT.TransferFunction2D = depthTF2D
 depthLUT.RGBPoints = [0.0, 0.231373, 0.298039, 0.752941, 2.5, 0.865003, 0.865003, 0.865003, 5.0, 0.705882, 0.0156863, 0.14902]
 depthLUT.ScalarRangeInitialized = 1.0

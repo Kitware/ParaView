@@ -5,6 +5,8 @@ import sys
 import os
 import os.path
 
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 xmf_file = os.path.join(smtesting.DataDir, "Testing/Data/poisson_3dall_2.xmf")
@@ -12,6 +14,9 @@ XDMFReader(FileNames=xmf_file)
 MergeBlocks()
 Show()
 view = Render()
+
+typesLUT = GetColorTransferFunction('nodeMaterialTypes')
+typesLUT.ApplyPreset('Cool to Warm', True)
 
 view.CameraViewUp = [0.40869219753099151, 0.77141145522009946, -0.48774486612623352]
 view.CameraPosition = [-1.1388262528701965, 2.72641269058122, 2.6480590031133158]

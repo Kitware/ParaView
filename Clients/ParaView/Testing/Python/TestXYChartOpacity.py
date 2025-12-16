@@ -1,5 +1,7 @@
 from paraview.simple import *
 
+LoadPalette("BlueGrayBackground")
+
 # disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 

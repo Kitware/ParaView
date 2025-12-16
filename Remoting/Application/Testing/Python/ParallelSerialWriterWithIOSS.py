@@ -2,6 +2,8 @@ from paraview import smtesting
 from paraview.simple import *
 from paraview import print_info
 
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 fnames = ["can.e.4.0", "can.e.4.1", "can.e.4.2", "can.e.4.3"]
 fnames = [ "%s/Testing/Data/can.e.4/%s" % (smtesting.DataDir, x) for x in fnames]
