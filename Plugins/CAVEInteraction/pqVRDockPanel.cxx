@@ -547,6 +547,14 @@ void pqVRDockPanel::styleComboChanged(const QString& name)
     style->Delete();
   }
   this->Internals->propertyCombo->setVectorSizeFilter(size);
+  if (size == 0)
+  {
+    this->Internals->propertyCombo->setVisible(false);
+  }
+  else
+  {
+    this->Internals->propertyCombo->setVisible(true);
+  }
 }
 
 //-----------------------------------------------------------------------------
