@@ -492,7 +492,7 @@ pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::Wind
   this->Internals->StartRenderObserver = nullptr;
   this->Internals->CollabStyleProxy = nullptr;
   this->Internals->CollabEnabled = false;
-  this->Internals->NavigationSharingEnabled = false;
+  this->Internals->NavigationSharingEnabled = true;
   this->updateCollabWidgetState();
 
   this->Internals->outputWindow->setReadOnly(true);
