@@ -2,7 +2,6 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
-  vtkDynamicProperties
   vtkLoadStateOptions
   vtkRemoteWriterHelper
   vtkPVCatalystChannelInformation
@@ -161,6 +160,7 @@ set(classes
   vtkSMWriterProxy)
 
 set(headers
+  vtkDynamicProperties.h
   vtkSMMessageMinimal.h)
 
 set(private_headers
