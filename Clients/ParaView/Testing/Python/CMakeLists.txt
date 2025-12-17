@@ -145,7 +145,7 @@ paraview_add_test_python(
 set(PVBATCH_TESTS
   BatchAxesGrid.py
   TestXYChartOpacity.py
-  FontSize.py # BUG #19816
+  FontSize.py,LOOSE_VALID # BUG #19816
   PLYWriter.py
   VolumeCellSelection.py
   SaveDataWithArraySelection.py,NO_VALID

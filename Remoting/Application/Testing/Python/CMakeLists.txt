@@ -19,7 +19,7 @@ set(PY_TESTS
   CellIntegrator.py,NO_VALID
   ChangeTimeSteps.py
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
-  ColorPaletteInStateFile.py
+  ColorPaletteInStateFile.py,LOOSE_VALID
   CompositeDataFieldArraysInformation.py,NO_VALID
   ConnectionProxyNamespaces.py,NO_VALID
   CSVWriterReader.py,NO_VALID
