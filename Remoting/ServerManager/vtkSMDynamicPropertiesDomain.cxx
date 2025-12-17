@@ -50,7 +50,7 @@ int vtkSMDynamicPropertiesDomain::SetDefaultValues(vtkSMProperty* outProperty, b
     if (!reader->parse(stringProperties.c_str(),
           stringProperties.c_str() + stringProperties.length(), &root, &errs))
     {
-      vtkWarningMacro("Error parsing parameters: " << errs);
+      vtkErrorMacro("Error parsing JSON: " << errs);
       return 0;
     }
     if (root.isObject() && root.isMember(vtkDynamicProperties::PROPERTIES_KEY) &&
