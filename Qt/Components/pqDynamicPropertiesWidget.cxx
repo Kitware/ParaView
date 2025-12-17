@@ -530,7 +530,7 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
   if (!reader->parse(stringProperties.c_str(), stringProperties.c_str() + stringProperties.length(),
         &root, &errs))
   {
-    qWarning() << "Error parsing parameters: " << errs;
+    qWarning() << "Error parsing parameters: " << errs.c_str();
     return;
   }
   if (root.isObject() && root.isMember(vtkDynamicProperties::PROPERTIES_KEY) &&
