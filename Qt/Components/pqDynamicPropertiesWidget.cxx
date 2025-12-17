@@ -16,13 +16,13 @@
 
 #include <QByteArray>
 #include <QCheckBox>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDoubleSpinBox>
 #include <QDynamicPropertyChangeEvent>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
-#include <QIntValidator>
 #include <QLabel>
 #include <QSlider>
 #include <QSpinBox>
@@ -30,14 +30,9 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include <QCoreApplication>
 #include <algorithm>
 #include <iostream>
 #include <limits>
-#include <qcontainerfwd.h>
-#include <qlogging.h>
-#include <qnamespace.h>
-#include <qspinbox.h>
 
 namespace
 {
@@ -58,35 +53,35 @@ public:
   virtual QVariant value() = 0;
   virtual bool setValue(const QVariant& v) = 0;
 
-  QHBoxLayout* layout;
-  QLabel* label;
-  QString key;
-  QString description;
-  vtkDynamicProperties::Type type;
+  QHBoxLayout* Layout;
+  QLabel* Label;
+  QString Key;
+  QString Description;
+  vtkDynamicProperties::Type Type;
 };
 
 //------------------------------------------------------------------------------
 RowWidget::RowWidget(pqDynamicPropertiesWidget* parent, const QString& k,
   vtkDynamicProperties::Type t, const QString& d)
-  : layout(new QHBoxLayout)
-  , label(new QLabel(k, parent))
-  , key(k)
-  , description(d)
-  , type(t)
+  : Layout(new QHBoxLayout)
+  , Label(new QLabel(k, parent))
+  , Key(k)
+  , Description(d)
+  , Type(t)
 {
-  if (!description.isEmpty())
+  if (!Description.isEmpty())
   {
-    description[0] = description[0].toUpper();
+    Description[0] = Description[0].toUpper();
   }
-  QString labelKey = key;
+  QString labelKey = Key;
   if (!labelKey.isEmpty())
   {
     labelKey[0] = labelKey[0].toUpper();
   }
-  this->label->setText(labelKey);
-  this->label->setToolTip(description);
-  this->label->setProperty(keyPropertyName, key);
-  this->layout->setContentsMargins(0, 0, 0, 0);
+  this->Label->setText(labelKey);
+  this->Label->setToolTip(Description);
+  this->Label->setProperty(keyPropertyName, Key);
+  this->Layout->setContentsMargins(0, 0, 0, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -94,17 +89,17 @@ RowWidget::~RowWidget()
 {
   // It's possible for this to not have a parent set if the widget was not
   // added to an external layout, so ensure that it gets cleaned up.
-  if (this->layout)
+  if (this->Layout)
   {
-    this->layout->deleteLater();
-    this->layout = nullptr;
+    this->Layout->deleteLater();
+    this->Layout = nullptr;
   }
 }
 
 //------------------------------------------------------------------------------
 void RowWidget::deleteLater()
 {
-  this->label->deleteLater();
+  this->Label->deleteLater();
 }
 
 //------------------------------------------------------------------------------
@@ -120,33 +115,33 @@ public:
   void setCheckState(bool state);
 
 private:
-  QCheckBox* checkbox;
+  QCheckBox* Checkbox;
 };
 
 //------------------------------------------------------------------------------
 RowWidgetBool::RowWidgetBool(pqDynamicPropertiesWidget* parent, const QString& name,
   vtkDynamicProperties::Type type, const QString& d, bool state)
   : RowWidget(parent, name, type, d)
-  , checkbox(new QCheckBox(QString(), parent))
+  , Checkbox(new QCheckBox(QString(), parent))
 {
   this->setCheckState(state);
-  this->checkbox->setProperty(keyPropertyName, name);
-  this->checkbox->setToolTip(description);
-  this->layout->addWidget(this->checkbox);
+  this->Checkbox->setProperty(keyPropertyName, name);
+  this->Checkbox->setToolTip(Description);
+  this->Layout->addWidget(this->Checkbox);
   parent->connect(
-    this->checkbox, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(updateProperty()));
+    this->Checkbox, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(updateProperty()));
 }
 
 //------------------------------------------------------------------------------
 QVariant RowWidgetBool::value()
 {
-  return QVariant(this->checkbox->checkState() == Qt::Checked);
+  return QVariant(this->Checkbox->checkState() == Qt::Checked);
 }
 
 //------------------------------------------------------------------------------
 bool RowWidgetBool::setValue(const QVariant& value)
 {
-  this->checkbox->setCheckState(value.toBool() ? Qt::Checked : Qt::Unchecked);
+  this->Checkbox->setCheckState(value.toBool() ? Qt::Checked : Qt::Unchecked);
   return true;
 }
 
@@ -154,15 +149,15 @@ bool RowWidgetBool::setValue(const QVariant& value)
 void RowWidgetBool::deleteLater()
 {
   this->RowWidget::deleteLater();
-  this->checkbox->deleteLater();
+  this->Checkbox->deleteLater();
 }
 
 //------------------------------------------------------------------------------
 void RowWidgetBool::setCheckState(bool state)
 {
-  bool oldBlock = this->checkbox->blockSignals(true);
-  this->checkbox->setCheckState(state ? Qt::Checked : Qt::Unchecked);
-  this->checkbox->blockSignals(oldBlock);
+  bool oldBlock = this->Checkbox->blockSignals(true);
+  this->Checkbox->setCheckState(state ? Qt::Checked : Qt::Unchecked);
+  this->Checkbox->blockSignals(oldBlock);
 }
 
 //------------------------------------------------------------------------------
@@ -179,7 +174,7 @@ public:
   void setValue(NumberType value);
 
 private:
-  NumberWidgetType* numberWidget;
+  NumberWidgetType* NumberWidget;
 };
 
 //------------------------------------------------------------------------------
@@ -188,11 +183,11 @@ RowWidgetNumber<NumberWidgetType, NumberType>::RowWidgetNumber(pqDynamicProperti
   const QString& key, vtkDynamicProperties::Type type, const QString& d, NumberType minValue,
   NumberType maxValue, NumberType defaultValue)
   : RowWidget(parent, key, type, d)
-  , numberWidget(new NumberWidgetType(parent))
+  , NumberWidget(new NumberWidgetType(parent))
 {
-  this->numberWidget->setMinimum(minValue);
-  this->numberWidget->setMaximum(maxValue);
-  QString tooltip = description;
+  this->NumberWidget->setMinimum(minValue);
+  this->NumberWidget->setMaximum(maxValue);
+  QString tooltip = Description;
   if (minValue != std::numeric_limits<NumberType>::lowest())
   {
     tooltip += (". min=" + QString::number(minValue));
@@ -202,17 +197,17 @@ RowWidgetNumber<NumberWidgetType, NumberType>::RowWidgetNumber(pqDynamicProperti
     tooltip += (", max=" + QString::number(maxValue));
   }
   this->setValue(defaultValue);
-  this->numberWidget->setToolTip(tooltip);
-  this->numberWidget->setProperty(keyPropertyName, key);
+  this->NumberWidget->setToolTip(tooltip);
+  this->NumberWidget->setProperty(keyPropertyName, key);
 
-  this->layout->addWidget(this->numberWidget);
+  this->Layout->addWidget(this->NumberWidget);
   if constexpr (std::is_same_v<NumberType, int>)
   {
-    parent->connect(this->numberWidget, SIGNAL(valueChanged(int)), SLOT(updateProperty()));
+    parent->connect(this->NumberWidget, SIGNAL(valueChanged(int)), SLOT(updateProperty()));
   }
   else if constexpr (std::is_same_v<NumberType, double>)
   {
-    parent->connect(this->numberWidget, SIGNAL(valueChanged(double)), SLOT(updateProperty()));
+    parent->connect(this->NumberWidget, SIGNAL(valueChanged(double)), SLOT(updateProperty()));
   }
 }
 
@@ -220,7 +215,7 @@ RowWidgetNumber<NumberWidgetType, NumberType>::RowWidgetNumber(pqDynamicProperti
 template <typename NumberWidgetType, typename NumberType>
 QVariant RowWidgetNumber<NumberWidgetType, NumberType>::value()
 {
-  return QVariant(this->numberWidget->value());
+  return QVariant(this->NumberWidget->value());
 }
 
 //------------------------------------------------------------------------------
@@ -230,11 +225,11 @@ bool RowWidgetNumber<NumberWidgetType, NumberType>::setValue(const QVariant& val
   bool ok;
   if constexpr (std::is_same_v<NumberType, int>)
   {
-    this->numberWidget->setValue(value.toInt(&ok));
+    this->NumberWidget->setValue(value.toInt(&ok));
   }
   else if constexpr (std::is_same_v<NumberType, double>)
   {
-    this->numberWidget->setValue(value.toDouble(&ok));
+    this->NumberWidget->setValue(value.toDouble(&ok));
   }
   return ok;
 }
@@ -244,16 +239,16 @@ template <typename NumberWidgetType, typename NumberType>
 void RowWidgetNumber<NumberWidgetType, NumberType>::deleteLater()
 {
   this->RowWidget::deleteLater();
-  this->numberWidget->deleteLater();
+  this->NumberWidget->deleteLater();
 }
 
 //------------------------------------------------------------------------------
 template <typename NumberWidgetType, typename NumberType>
 void RowWidgetNumber<NumberWidgetType, NumberType>::setValue(NumberType value)
 {
-  bool oldBlock = this->numberWidget->blockSignals(true);
-  this->numberWidget->setValue(value);
-  this->numberWidget->blockSignals(oldBlock);
+  bool oldBlock = this->NumberWidget->blockSignals(true);
+  this->NumberWidget->setValue(value);
+  this->NumberWidget->blockSignals(oldBlock);
 }
 
 } // end anon namespace
@@ -448,7 +443,7 @@ void pqDynamicPropertiesWidget::propertyChanged()
       qWarning() << Q_FUNC_INFO << "No widgets found for key" << key;
       continue;
     }
-    w->type = static_cast<vtkDynamicProperties::Type>(prop.at(i + 1).toInt());
+    w->Type = static_cast<vtkDynamicProperties::Type>(prop.at(i + 1).toInt());
     ok = w->setValue(prop.at(i + 2));
     if (!ok)
     {
@@ -483,7 +478,7 @@ void pqDynamicPropertiesWidget::updatePropertyImpl()
   {
     auto* w = it.value();
     newProp.append(QVariant(it.key()));
-    newProp.append(QVariant(w->type));
+    newProp.append(QVariant(w->Type));
     newProp.append(w->value());
   }
 
@@ -645,7 +640,7 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
         this->Internals->widgetMap.insert(name, rowWidget);
         // Keep the list alphabetic:
         int row = this->findRow(name);
-        this->Form->insertRow(row, rowWidget->label, rowWidget->layout);
+        this->Form->insertRow(row, rowWidget->Label, rowWidget->Layout);
       }
     }
   }
