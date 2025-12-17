@@ -2086,7 +2086,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="MaxClipBounds"/>
         <Property name="LockBounds"/>
       </PropertyGroup>
-      <PropertyGroup label="Third Party Rendering"
+      <PropertyGroup label="Rendering Backend"
                      panel_visibility="advanced">
         <Property name="EnableANARI"/>
         <Property name="EnableOSPRay"/>
