@@ -5,7 +5,7 @@
  * @brief   Key names and types for dynamic properties
  *
  * See:
- * - vtkPVRenderView::GetANARIRendererParameters for the json
+ * - vtkPVRenderView::GetANARIRendererParameters for the JSON
  * description of properties associated with an ANARI renderer
  * - pqDynamicPropertiesWidget for the panel_widget for these
  * properties and

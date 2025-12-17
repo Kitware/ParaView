@@ -1038,7 +1038,7 @@ public:
   ///@{
   /**
    * Return ANARI parameters specification for the current renderer as
-   * a string encoding a json which contains the version and an array of
+   * a string encoding a JSON which contains the version and an array of
    * parameters. See pqDynamicPropertiesWidget for the description of these
    * parameters
    * @see pqDynamicPropertiesWidget

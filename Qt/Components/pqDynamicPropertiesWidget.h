@@ -20,8 +20,8 @@ class QVBoxLayout;
  * @class   pqDynamicPropertiesWidget
  * @brief   Creates a panel_widget for setting dynamically generated properties
  *
- * The properties are specified using a json file.
- * The json contains a version and an array of parameters, and possible
+ * The properties are specified using a JSON file.
+ * The JSON contains a version and an array of parameters, and possible
  * additional key: value parameters which are ignored.
  *   each parameter has a name, type, description, default, min, max
  *     the type is an int given vtkDynamicProperties::Type (such as vtkDynamicProperties::Type)
@@ -51,11 +51,11 @@ class QVBoxLayout;
  * ignored by the dynamic properties panel.
  *
  * See:
- * - vtkPVRenderView::GetANARIRendererParameters for the json
+ * - vtkPVRenderView::GetANARIRendererParameters for the JSON
  * description of properties associated with an ANARI renderer
  *
  * - vtkDynamicProperties for the keys and types that can be used in
- * the json file.
+ * the JSON file.
  *
  * - ANARIRenderParameter XML property definiton for the RenderViewProxy
  * in view_removingviews.xml

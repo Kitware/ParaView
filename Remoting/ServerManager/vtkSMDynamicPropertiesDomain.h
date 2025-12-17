@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class   vtkSMDynamicPropertiesDomain
- * @brief   A domain (json description) for dynamic properties
+ * @brief   A domain (JSON description) for dynamic properties
  *
  * See:
- * - vtkPVRenderView::GetANARIRendererParameters for code that generates json
+ * - vtkPVRenderView::GetANARIRendererParameters for code that generates JSON
  * description of properties associated with an ANARI renderer
- * - pqDynamicPropertiesWidget for json
+ * - pqDynamicPropertiesWidget for JSON
  * description of properties and the panel_widget for these
  * properties and
  * - ANARIRenderParameter XML property definiton for the RenderViewProxy
