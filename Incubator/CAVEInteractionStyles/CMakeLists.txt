@@ -10,6 +10,7 @@ set(classes
   vtkSMVRDebugStyleProxy
   vtkSMVRTravelTrackballExoSplitStyleProxy
   vtkSMVRTrackStyleProxy
+  vtkSMVRFirstPersonCameraStyleProxy
   vtkVRQueue)
 
 vtk_module_add_module(ParaViewIncubator::CAVEInteractionStyles

@@ -125,5 +125,73 @@
         and a tracker.
       </Documentation>
     </VRDebugStyleProxy>
+    <VRFirstPersonCameraStyleProxy name="First Person Camera"
+                          processes="client|renderserver|dataserver">
+      <IntVectorProperty name="UpAxis"
+                        default_values="1"
+                        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="X Axis"
+                 value="0" />
+          <Entry text="Y Axis"
+                 value="1" />
+          <Entry text="Z Axis"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies the up axis of the scene.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="MouseSensitivityX"
+                         default_values="6.28"
+                         number_of_elements="1">
+        <Documentation>
+          Modify the speed of the camera when we move the cursor at the horizontal.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MouseSensitivityY"
+                         default_values="3.14"
+                         number_of_elements="1">
+        <Documentation>
+          Modify the speed of the camera when we move the cursor at the vertical.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="InvertXAxis"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Invert the X axis of the camera rotation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="InvertYAxis"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Invert the Y axis of the camera rotation.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="MoveSpeedForward"
+                         default_values="1.0"
+                         number_of_elements="1">
+        <Documentation>
+          Modify the move speed of the camera when we move forward or backward.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MoveSpeedRight"
+                         default_values="0.5"
+                         number_of_elements="1">
+        <Documentation>
+          Modify the move speed of the camera when we move left or right.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Documentation>
+        This interaction style uses the keyboard to control the position of the camera (can move forward, backward, right and left)
+        and the mouse to move the focal point of the camera. It acts like a "first person flight".
+        In the CAVE, this interaction style has no effect unless the off axis projection is turned off.
+        Please note that this interactor works only with a device that returns absolute position of the mouse on the screen (vrpn_Mouse for instance).
+      </Documentation>
+    </VRFirstPersonCameraStyleProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
