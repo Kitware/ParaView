@@ -174,15 +174,16 @@ void pqVRDockPanel::initStyles()
   std::vector<std::string> styleDescs = styleFactory->GetInteractorStyleDescriptions();
   std::vector<std::string> styleDocs = styleFactory->GetInteractorStyleDocStrings();
   this->Internals->stylesCombo->clear();
+
+  QObject::connect(this->Internals->stylesCombo, &QComboBox::currentTextChanged, this,
+    &pqVRDockPanel::styleComboChanged, Qt::UniqueConnection);
+
   for (size_t i = 0; i < styleDescs.size(); ++i)
   {
     this->Internals->stylesCombo->addItem(QString::fromStdString(styleDescs[i]));
     this->Internals->stylesCombo->setItemData(
       i, QString::fromStdString(styleDocs[i]), Qt::ToolTipRole);
   }
-
-  QObject::connect(this->Internals->stylesCombo, &QComboBox::currentTextChanged, this,
-    &pqVRDockPanel::styleComboChanged, Qt::UniqueConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -547,6 +548,14 @@ void pqVRDockPanel::styleComboChanged(const QString& name)
     style->Delete();
   }
   this->Internals->propertyCombo->setVectorSizeFilter(size);
+  if (size == 0)
+  {
+    this->Internals->propertyCombo->setVisible(false);
+  }
+  else
+  {
+    this->Internals->propertyCombo->setVisible(true);
+  }
 }
 
 //-----------------------------------------------------------------------------
