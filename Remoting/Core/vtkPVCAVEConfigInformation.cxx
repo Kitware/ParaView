@@ -19,6 +19,7 @@ public:
   bool IsInCAVE;
   int NumberOfDisplays;
   double EyeSeparation;
+  bool UseOffAxisProjection;
   bool ShowBorders;
   bool FullScreen;
   std::vector<int> Geometries;
@@ -53,6 +54,7 @@ void vtkPVCAVEConfigInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   this->Internal->IsInCAVE = config->GetIsInCave();
   this->Internal->NumberOfDisplays = numberOfDisplays;
   this->Internal->EyeSeparation = caveConfig->GetEyeSeparation();
+  this->Internal->UseOffAxisProjection = caveConfig->GetUseOffAxisProjection();
   this->Internal->ShowBorders = caveConfig->GetShowBorders();
   this->Internal->FullScreen = caveConfig->GetFullScreen();
 
@@ -109,6 +111,7 @@ void vtkPVCAVEConfigInformation::AddInformation(vtkPVInformation* pvinfo)
   this->Internal->IsInCAVE = info->GetIsInCAVE();
   this->Internal->NumberOfDisplays = numberOfDisplays;
   this->Internal->EyeSeparation = info->GetEyeSeparation();
+  this->Internal->UseOffAxisProjection = info->GetUseOffAxisProjection();
   this->Internal->ShowBorders = info->GetShowBorders();
   this->Internal->FullScreen = info->GetFullScreen();
 
@@ -157,8 +160,8 @@ void vtkPVCAVEConfigInformation::CopyToStream(vtkClientServerStream* css)
 
   *css << vtkClientServerStream::Reply;
   *css << this->Internal->IsInCAVE << this->Internal->NumberOfDisplays
-       << this->Internal->EyeSeparation << this->Internal->ShowBorders
-       << this->Internal->FullScreen;
+       << this->Internal->EyeSeparation << this->Internal->UseOffAxisProjection
+       << this->Internal->ShowBorders << this->Internal->FullScreen;
 
   for (std::size_t i = 0; i < this->Internal->Show2DOverlays.size(); ++i)
   {
@@ -210,6 +213,11 @@ void vtkPVCAVEConfigInformation::CopyFromStream(const vtkClientServerStream* css
   if (!css->GetArgument(0, idx++, &this->Internal->EyeSeparation))
   {
     vtkErrorMacro("Error parsing EyeSeparation from message.");
+    return;
+  }
+  if (!css->GetArgument(0, idx++, &this->Internal->UseOffAxisProjection))
+  {
+    vtkErrorMacro("Error parsing UseOffAxisProjection from message.");
     return;
   }
   if (!css->GetArgument(0, idx++, &this->Internal->ShowBorders))
@@ -325,6 +333,12 @@ bool vtkPVCAVEConfigInformation::GetIsInCAVE()
 double vtkPVCAVEConfigInformation::GetEyeSeparation()
 {
   return this->Internal->EyeSeparation;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVCAVEConfigInformation::GetUseOffAxisProjection()
+{
+  return this->Internal->UseOffAxisProjection;
 }
 
 //----------------------------------------------------------------------------

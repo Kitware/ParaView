@@ -59,6 +59,11 @@ public:
   virtual double GetEyeSeparation();
   ///@}
 
+  /**
+   * Return the use of off axis projection.
+   */
+  virtual bool GetUseOffAxisProjection();
+
   ///@{
   /**
    * Return the number of displays.

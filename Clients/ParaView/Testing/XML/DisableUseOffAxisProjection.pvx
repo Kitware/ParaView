@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<pvx>
+  <!--
+    A trivial configuration that shows
+    a small 300x300 window
+  -->
+  <Machine Name="localhost" />
+  <UseOffAxisProjection Value="false" />
+</pvx>

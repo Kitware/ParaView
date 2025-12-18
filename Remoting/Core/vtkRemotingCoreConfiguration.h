@@ -222,6 +222,11 @@ public:
   double GetEyeSeparation() const;
 
   /**
+   * Whether we enable UseOffAxisProjection or not.
+   */
+  bool GetUseOffAxisProjection() const;
+
+  /**
    * Get the gap in pixel between tiles in a tile display./
    */
   vtkGetVector2Macro(TileMullions, int);

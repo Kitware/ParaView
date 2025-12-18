@@ -300,6 +300,13 @@ public:
   double GetEyeSeparation();
 
   /**
+   * @brief Get the remotely configured use of off axis projection.
+   *
+   * @return bool
+   */
+  bool GetUseOffAxisProjection();
+
+  /**
    * @brief Get whether or not remote displays show borders.
    *
    * @return bool

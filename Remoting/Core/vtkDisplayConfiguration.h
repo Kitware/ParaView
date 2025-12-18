@@ -41,6 +41,11 @@ public:
   vtkGetMacro(EyeSeparation, double);
 
   /**
+   * Get use of off axis projection
+   */
+  vtkGetMacro(UseOffAxisProjection, bool);
+
+  /**
    * Returns the count for display specified.
    */
   int GetNumberOfDisplays() const;
@@ -113,6 +118,7 @@ private:
   bool Coverable = false;
   bool FullScreen = false;
   double EyeSeparation = 0.0;
+  bool UseOffAxisProjection = true;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

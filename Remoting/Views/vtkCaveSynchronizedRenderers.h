@@ -62,6 +62,12 @@ protected:
   vtkSetMacro(EyeSeparation, double);
 
   /**
+   * Set the use of off axis projection which will be used when defined displays, set to true by
+   * default.
+   */
+  vtkSetMacro(UseOffAxisProjection, bool);
+
+  /**
    * Define a display origin, x and y coordinates at index idx.
    * If idx is the local process id, also set Origin, DisplayX and DisplayY
    * Call SetNumberOfDisplays before calling this method.
@@ -94,6 +100,7 @@ private:
   void operator=(const vtkCaveSynchronizedRenderers&) = delete;
 
   double EyeSeparation = 0.065;
+  bool UseOffAxisProjection = true;
   int NumberOfDisplays = 0;
   std::vector<std::array<double, 12>> Displays;
   std::array<double, 3> DisplayOrigin = { -0.5, -0.5, -0.5 };

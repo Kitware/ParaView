@@ -57,6 +57,7 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
       }
     }
     this->SetEyeSeparation(config->GetEyeSeparation());
+    this->SetUseOffAxisProjection(config->GetUseOffAxisProjection());
   }
 }
 
@@ -119,9 +120,9 @@ void vtkCaveSynchronizedRenderers::InitializeCamera(vtkCamera* camera)
     camera->SetScreenBottomLeft(this->DisplayOrigin.data());
     camera->SetScreenBottomRight(this->DisplayX.data());
     camera->SetScreenTopRight(this->DisplayY.data());
-    camera->SetUseOffAxisProjection(true);
     camera->SetEyePosition(eyePosition);
     camera->SetEyeSeparation(this->EyeSeparation);
+    camera->SetUseOffAxisProjection(this->UseOffAxisProjection);
     this->CameraInitialized = true;
   }
 }
