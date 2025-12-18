@@ -39,6 +39,7 @@
 #include "vtkWeakPointer.h"
 
 #include <QDebug>
+#include <QDoubleValidator>
 #include <QListWidgetItem>
 #include <QMap>
 #include <QPointer>
@@ -47,9 +48,40 @@
 #include <vtksys/FStream.hxx>
 
 #include <cmath>
+#include <iostream>
 
 typedef std::map<std::string, std::string> StringMap;
 typedef std::map<std::string, StringMap> StringMapMap;
+
+namespace
+{
+class vtkNavigationObserver : public vtkCommand
+{
+public:
+  static vtkNavigationObserver* New() { return new vtkNavigationObserver; }
+
+  void Execute(
+    vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(event), void* calldata) override
+  {
+    vtkMatrix4x4* mat = static_cast<vtkMatrix4x4*>(calldata);
+    if (mat && this->scaleEdit)
+    {
+      // Update the scale text box
+      std::vector<double> currentScale = vtkSMVRInteractorStyleProxy::GetNavigationScale();
+      this->scaleEdit->setText(QString::number(currentScale[0]));
+    }
+  }
+
+  void SetScaleEdit(QLineEdit* edit) { this->scaleEdit = edit; }
+
+protected:
+  vtkNavigationObserver() {}
+  ~vtkNavigationObserver() override {}
+
+private:
+  QLineEdit* scaleEdit;
+};
+}
 
 class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
@@ -58,6 +90,7 @@ public:
 
   bool IsRunning;
 
+  vtkNew<vtkNavigationObserver> NavigationObserver;
   pqVRCollaborationWidget* CollaborationWidget;
   vtkWeakPointer<vtkCamera> Camera;
   QMap<QString, vtkSMVRInteractorStyleProxy*> StyleNameMap;
@@ -125,6 +158,12 @@ void pqVRDockPanel::constructor()
   connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(setActiveView(pqView*)));
 
+  connect(pqApplicationCore::instance(), SIGNAL(stateSaved(vtkPVXMLElement*)), this,
+    SLOT(saveConfigPanelState(vtkPVXMLElement*)));
+
+  connect(pqApplicationCore::instance(), SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+    this, SLOT(restoreConfigPanelState(vtkPVXMLElement*, vtkSMProxyLocator*)));
+
   connect(this->Internals->proxyCombo, SIGNAL(currentProxyChanged(vtkSMProxy*)), this,
     SLOT(proxyChanged(vtkSMProxy*)));
 
@@ -138,6 +177,10 @@ void pqVRDockPanel::constructor()
 
   this->updateConnectionButtons(this->Internals->connectionsTable->currentRow());
   this->updateStyleButtons(this->Internals->stylesTable->currentRow());
+
+  this->Internals->scaleValue->setValidator(new QDoubleValidator(this));
+  connect(this->Internals->scaleValue, SIGNAL(editingFinished()), this, SLOT(scaleEdited()));
+  this->Internals->NavigationObserver->SetScaleEdit(this->Internals->scaleValue);
 
   // Using size metrics about the font and margins, try to set the height
   // of the VR Connections list widget to accomodate 2.5 entries. If more
@@ -474,6 +517,42 @@ void pqVRDockPanel::updateStyles()
 }
 
 //-----------------------------------------------------------------------------
+void pqVRDockPanel::scaleEdited()
+{
+  vtkSMRenderViewProxy* viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+
+  // unobserve the INTERACTOR_STYLE_NAVIGATION events
+  viewProxy->RemoveObserver(this->Internals->NavigationObserver);
+
+  // get the navigation matrix, update it to reflect the edited scale value
+  // emit the INTERACTOR_STYLE_NAVIGATION event
+  QString scaleStr = this->Internals->scaleValue->text();
+  bool converted;
+  double scale = scaleStr.toDouble(&converted);
+
+  if (!converted)
+  {
+    vtkErrorWithObjectMacro(
+      nullptr, << scaleStr.data() << " cannot be converted to a numeric value");
+    return;
+  }
+
+  std::vector<double> newScale{ scale, scale, scale };
+  vtkSMVRInteractorStyleProxy::SetNavigationScale(newScale);
+
+  if (!this->Internals->IsRunning)
+  {
+    // If the event loop isn't running, do a manual render, since it
+    // won't automatically be done for us.
+    viewProxy->StillRender();
+  }
+
+  // re-observe the INTERACTOR_STYLE_NAVIGATION events
+  viewProxy->AddObserver(
+    vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_NAVIGATION, this->Internals->NavigationObserver);
+}
+
+//-----------------------------------------------------------------------------
 void pqVRDockPanel::editStyle(QListWidgetItem* item)
 {
   if (!item)
@@ -597,16 +676,25 @@ void pqVRDockPanel::setActiveView(pqView* view)
     this->Internals->proxyCombo->addProxy(0, rview->getSMName(), rview->getProxy());
   }
 
-#if CAVEINTERACTION_HAS_COLLABORATION
   if (view)
   {
     vtkSMRenderViewProxy* proxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
     if (proxy)
     {
+      // observe the INTERACTOR_STYLE_NAVIGATION events on the active render
+      // view proxy, so we can extract the scale and put that value in the
+      // scaleValue edit box
+      if (!proxy->HasObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_NAVIGATION,
+            this->Internals->NavigationObserver))
+      {
+        proxy->AddObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_NAVIGATION,
+          this->Internals->NavigationObserver);
+      }
+#if CAVEINTERACTION_HAS_COLLABORATION
       proxy->SetEnableSynchronizableActors(true);
+#endif
     }
   }
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -642,6 +730,8 @@ void pqVRDockPanel::saveState()
   {
     this->Internals->CollaborationWidget->saveCollaborationState(root.GetPointer());
   }
+
+  this->saveConfigPanelState(root.GetPointer());
 
   vtksys::ofstream os(filename.toUtf8().data(), ios::out);
   root->PrintXML(os, vtkIndent());
@@ -689,6 +779,46 @@ void pqVRDockPanel::restoreState()
   if (this->Internals->CollaborationWidget)
   {
     this->Internals->CollaborationWidget->restoreCollaborationState(root, nullptr);
+  }
+
+  this->restoreConfigPanelState(root, nullptr);
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::saveConfigPanelState(vtkPVXMLElement* root)
+{
+  if (!root)
+  {
+    return;
+  }
+
+  vtkNew<vtkPVXMLElement> sectionParent;
+  sectionParent->SetName("CAVEConfigPanel");
+  root->AddNestedElement(sectionParent);
+
+  vtkNew<vtkPVXMLElement> scaleChild;
+  scaleChild->SetName("ScaleFactor");
+  scaleChild->AddAttribute("value", this->Internals->scaleValue->text().toUtf8().constData());
+  sectionParent->AddNestedElement(scaleChild);
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::restoreConfigPanelState(vtkPVXMLElement* root, vtkSMProxyLocator* locator)
+{
+  if (!root)
+  {
+    return;
+  }
+
+  vtkPVXMLElement* sectionParent = root->FindNestedElementByName("CAVEConfigPanel");
+  if (sectionParent)
+  {
+    vtkPVXMLElement* scaleChild = sectionParent->FindNestedElementByName("ScaleFactor");
+    if (scaleChild)
+    {
+      const char* attr = scaleChild->GetAttributeOrEmpty("value");
+      this->Internals->scaleValue->setText(QString(attr));
+    }
   }
 }
 

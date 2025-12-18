@@ -134,7 +134,14 @@ public:
   // Get/Set the matrix used to navigate the scene. If no proxy argument
   // is provided, the active view proxy will be used.
   vtkMatrix4x4* GetNavigationMatrix(vtkSMRenderViewProxy* proxy = nullptr);
-  void SetNavigationMatrix(vtkMatrix4x4*, vtkSMRenderViewProxy* proxy = nullptr);
+  static void SetNavigationMatrix(vtkMatrix4x4*, vtkSMRenderViewProxy* proxy = nullptr);
+
+  // Description:
+  // Get/Set the scale of the navigation matrix, as an array of 3 doubles.
+  // If no proxy argument is provided, the active view proxy will be used.
+  static std::vector<double> GetNavigationScale(vtkSMRenderViewProxy* proxy = nullptr);
+  static void SetNavigationScale(
+    const std::vector<double>& scale, vtkSMRenderViewProxy* proxy = nullptr);
 
   // Description:
   // Update a matrix property on a proxy. If the proxy is a render view

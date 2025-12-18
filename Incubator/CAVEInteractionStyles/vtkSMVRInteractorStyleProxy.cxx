@@ -570,7 +570,8 @@ void vtkSMVRInteractorStyleProxy::SetNavigationMatrix(
 
   if (viewProxy == nullptr)
   {
-    vtkWarningMacro("Setting the navigation matrix requires an active render view proxy");
+    vtkWarningWithObjectMacro(
+      nullptr, "Setting the navigation matrix requires an active render view proxy");
     return;
   }
 
@@ -583,6 +584,84 @@ void vtkSMVRInteractorStyleProxy::SetNavigationMatrix(
   vtkSMPropertyHelper(viewProxy, "PhysicalToWorldMatrix").Set(physicalToWorld->Element[0], 16);
 
   viewProxy->InvokeEvent(INTERACTOR_STYLE_NAVIGATION, physicalToWorld);
+}
+
+// ----------------------------------------------------------------------------
+std::vector<double> vtkSMVRInteractorStyleProxy::GetNavigationScale(vtkSMRenderViewProxy* proxy)
+{
+  vtkSMRenderViewProxy* viewProxy = proxy;
+  if (viewProxy == nullptr)
+  {
+    viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+  }
+
+  std::vector<double> result;
+  result.resize(3);
+
+  if (viewProxy == nullptr)
+  {
+    vtkErrorWithObjectMacro(
+      nullptr, "Getting the navigation matrix scale requires an active render view proxy");
+    return result;
+  }
+
+  vtkNew<vtkMatrix4x4> tempMatrix;
+  vtkSMPropertyHelper(viewProxy, "ModelTransformMatrix").Get(*tempMatrix->Element, 16);
+
+  vtkVector3d columns[3];
+
+  for (int dim = 0; dim < 3; ++dim)
+  {
+    columns[dim].Set(tempMatrix->GetElement(0, dim), tempMatrix->GetElement(1, dim),
+      tempMatrix->GetElement(2, dim));
+    result[dim] = columns[dim].Norm();
+  }
+
+  return result;
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRInteractorStyleProxy::SetNavigationScale(
+  const std::vector<double>& scale, vtkSMRenderViewProxy* proxy)
+{
+  vtkSMRenderViewProxy* viewProxy = proxy;
+  if (viewProxy == nullptr)
+  {
+    viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+  }
+
+  if (viewProxy == nullptr)
+  {
+    vtkWarningWithObjectMacro(
+      nullptr, "Setting the navigation matrix scale requires an active render view proxy");
+    return;
+  }
+
+  vtkNew<vtkMatrix4x4> tempMatrix;
+  vtkSMPropertyHelper(viewProxy, "ModelTransformMatrix").Get(*tempMatrix->Element, 16);
+
+  vtkVector3d columns[3];
+
+  for (int dim = 0; dim < 3; ++dim)
+  {
+    // Initialize vectors from the rotation vectors of the matrix
+    columns[dim].Set(tempMatrix->GetElement(0, dim), tempMatrix->GetElement(1, dim),
+      tempMatrix->GetElement(2, dim));
+
+    // Make them unit length
+    columns[dim].Normalize();
+
+    // Rescale the rotation vectors by the provided scale values
+    columns[dim].Set(columns[dim].GetX() * scale[dim], columns[dim].GetY() * scale[dim],
+      columns[dim].GetZ() * scale[dim]);
+
+    // Update the temp matrix
+    tempMatrix->SetElement(0, dim, columns[dim].GetX());
+    tempMatrix->SetElement(1, dim, columns[dim].GetY());
+    tempMatrix->SetElement(2, dim, columns[dim].GetZ());
+  }
+
+  vtkSMVRInteractorStyleProxy::SetNavigationMatrix(tempMatrix, viewProxy);
 }
 
 // ----------------------------------------------------------------------------
