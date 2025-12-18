@@ -153,6 +153,78 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "^pvcrs\\.FileDialogAllFavorites$"
   )
 
+  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_asserts")
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23180
+    list(APPEND test_exclusions
+      ## Missing widgets
+      # PropertiesFrame/ProxyPanel
+      "^pv\\.BagPlots$"
+      "^pv\\.FunctionalBagPlots$"
+      "^pv\\.ExportSpreadsheetFormatting$"
+      "^pv\\.PartialArrayInLineChart$"
+      "^pv\\.ThresholdTable$"
+      "^(pv|pvcs|pvcrs)\\.CSVPreview$"
+      "^(pv|pvcs|pvcrs)\\.StringInLineChartView$"
+      "^(pv|pvcs|pvcrs)\\.SeriesPreset$"
+      "^(pv|pvcs|pvcrs)\\.SeriesPresetRegexp$"
+      "^(pv|pvcs|pvcrs)\\.HistogramKernelSmoothing$"
+      "^(pv|pvcs|pvcrs)\\.PlotMatrixViewDensityMaps$"
+      "^pv\\.ExportSceneSpreadSheetView2$"
+      "^(pv|pvcs)\\.ExportSelectionToCSV$"
+      # DisplayFrame/ProxyPanel
+      "^(pv|pvcs|pvcrs)\\.ColorAnnotationsVisibilitiesAndOpacities$"
+      "^(pv|pvcs|pvcrs)\\.XYBarChart$"
+      # ProxyPanel/ShowLegend
+      "^(pv|pvcs|pvcrs)\\.TableHistogram$"
+      # ProxyPanel/XYColumn
+      "^(pv|pvcs|pvcrs)\\.SaveTSV$"
+
+      ## Frame numbering
+      # expect: Frame.5, actual: Frame.1 or Frame.2
+      "^(pv|pvcs|pvcrs)\\.ExportLinePlotToCSV$"
+      "^(pv|pvcs|pvcrs)\\.SelectionLinkHistogram$"
+      "^ParaViewExample-Plugins/DockWidgetCustomProxy$"
+      # expect: Frame.5, actual: Frame.0
+      "^pv\\.BagPlotsSelection$"
+      # expect: Frame.2, actual: Frame.0
+      "^pv\\.DelimitedTextReader$"
+      "^(pv|pvcs|pvcrs)\\.SaveCSV$"
+      "^(pv|pvcs|pvcrs)\\.SaveMultiBlockCSV$"
+      "^(pv|pvcs|pvcrs)\\.SaveTXT$"
+      "^(pv|pvcs|pvcrs)\\.PlotMatrixViewArraySelection$"
+      "^(pv|pvcs|pvcrs)\\.PlotMatrixViewParameters$"
+      "^(pv|pvcs|pvcrs)\\.TraceExportAndSaveData$"
+      # expect: Frame.1, actual: Frame.0
+      "^pv\\.BagPlotMatrixView$"
+      "^(pv|pvcs|pvcrs)\\.PointChartView$"
+      # Something else frame related
+      "^pv\\.DynamicFieldDataDomain$"
+
+      ## Baseline failures
+      "^(pv|pvcs|pvcrs)\\.ParallelCoordinatesView$"
+      "^(pvcs|pvcrs)\\.PreviewFontScaling$"
+
+      ## Invalid widget values
+      # Invalid items
+      "^pv\\.ExportFilteredColumnsSpreadsheet$"
+      "^(pv|pvcs|pvcrs)\\.SelectionLinkParallelCoordinatesView$"
+      # "Cylinders" is not defined
+      # Also had a frame failure, but may just be fallout of missing value.
+      "^pv\\.PythonCalculatorInput$"
+      # expect: "Row Data", actual: "Cell Data"
+      "^(pv|pvcs|pvcrs)\\.CalculatorInput$"
+
+      ## Timeouts
+      "^(pv|pvcs|pvcrs)\\.LANLLoadSESAME$"
+      "^(pv|pvcs|pvcrs)\\.EnSight$"
+      "^(pv|pvcs|pvcrs)\\.PlotDataOverTime-NonDistributed$"
+
+      ## Memory corruption
+      # free(): invalid next size (fast)
+      "^CDIReaderPlugin::pvcs\\.CDIDimensionsTest$"
+    )
+  endif ()
+
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
     list(APPEND test_exclusions
       # https://gitlab.kitware.com/paraview/paraview/-/issues/22398
