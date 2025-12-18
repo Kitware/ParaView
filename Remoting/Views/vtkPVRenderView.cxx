@@ -4031,14 +4031,9 @@ bool vtkPVRenderView::GetShadows()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
-  vtkRenderer* ren = this->GetRenderer();
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetAmbientSamples(v, ren);
-#endif
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  // vtkAnariRendererNode::SetAmbientSamples((v < 1 ? -1 : v), ren);
-#endif
 #else
   (void)v;
 #endif
@@ -4080,14 +4075,9 @@ int vtkPVRenderView::GetRouletteDepth()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetSamplesPerPixel(int v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
-  vtkRenderer* ren = this->GetRenderer();
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetSamplesPerPixel(v, ren);
-#endif
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  // vtkAnariRendererNode::SetSamplesPerPixel(v, ren);
-#endif
 #else
   (void)v;
 #endif
@@ -4144,18 +4134,10 @@ int vtkPVRenderView::GetMaxFrames()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetDenoise(bool v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   this->Internals->OSPRayDenoise = v;
   vtkRenderer* ren = this->GetRenderer();
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayRendererNode::SetEnableDenoiser(v, ren);
-#endif
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  if (this->Internals->AnariPass)
-  {
-    this->Internals->AnariPass->GetAnariRenderer()->SetParameterb("denoise", v);
-  }
-#endif
 #else
   (void)v;
 #endif
@@ -4167,12 +4149,6 @@ bool vtkPVRenderView::GetDenoise()
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   return (vtkOSPRayRendererNode::GetEnableDenoiser(ren) == 1);
-#elif VTK_MODULE_ENABLE_VTK_RenderingAnari
-  if (this->Internals->AnariPass)
-  {
-    return this->Internals->AnariPass->GetAnariRenderer()->GetParameterb("denoise");
-  }
-  return false;
 #else
   return false;
 #endif
