@@ -1,5 +1,232 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="statistics">
+    <!--
+      This group is the set of classes that can be added to the "vtkGenerateStatistics"
+      as its "StatisticsAlgorithm" property. They should not be used directly
+      for the most part (since they only work on a single vtkTable as input).
+    -->
+
+    <!-- Descriptive statistics -->
+    <SourceProxy class="vtkPDescriptiveStatistics"
+      base_class="vtkStatisticsAlgorithm"
+      label="Descriptive Statistics"
+      name="DescriptiveStatistics">
+      <Documentation
+        long_help="Fit a Gaussian (i.e., normal) distribution to data."
+        short_help="Fit a Gaussian (i.e., normal) distribution to data.">
+        This filter fits a univariate Gaussian distribution to the underlying data.
+        To do this, it computes the min, max, mean, raw moments M2 through M4,
+        standard deviation, skewness, and kurtosis for each array you
+        select.
+      </Documentation>
+      <IntVectorProperty name="SampleEstimate" label="Sample Estimate"
+        command="SetSampleEstimate"
+        default_values="0"
+        number_of_elements="1">
+        <EnumerationDomain name="sample_estimate_list">
+          <Entry text="population" value="0" />
+          <Entry text="sample" value="1" />
+        </EnumerationDomain>
+        <Documentation
+          short_help="Is the input data the entire population or sample of it?"
+          long_help="Is the input data the entire population or sample of it?">
+          When set to "sample", descriptive statistics computed by this filter assume that
+          the input data only holds a sample of the whole population of study.
+          In effect, the sample variance, the sample standard deviation, the sample
+          skewness and the sample kurtosis are computed. When set to "population",
+          the population variance, the population standard deviation, the population
+          skewness and the population kurtosis are estimated instead.
+
+          Put another way, if the input data is a full description of the population being
+          studied, set this to "population." If the input data is a sample of the
+          population being studied, then set this to "sample."
+
+          For large data, the difference between the population estimate and the sample
+          estimate becomes small, so this parameter becomes of less worry.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- Order statistics -->
+    <SourceProxy class="vtkPOrderStatistics"
+      base_class="vtkStatisticsAlgorithm"
+      label="Order Statistics"
+      name="OrderStatistics">
+      <Documentation
+        long_help="Model data as a histogram of encountered values."
+        short_help="Model data as a histogram of encountered values.">
+        This filter fits a univariate probability density function (PDF) to the
+        underlying data. The cumulative distribution function (CDF) is related
+        to the PDF (it is the integral of the PDF) and is easy to obtain from
+        this model.
+
+        For small floating-point or integer data, modeling can be done by counting
+        the number of times each individual value is encountered. For larger data,
+        since individual values may be unique or infrequently-repeated, it is best
+        to quantize values to avoid a "model" of the data that is as large as the
+        data itself.
+      </Documentation>
+
+      <IntVectorProperty name="NumberOfIntervals" label="Number of Intervals"
+        command="SetNumberOfIntervals"
+        default_values="32"
+        number_of_elements="1">
+        <IntRangeDomain min="1" name="num_intervals" />
+        <Documentation
+          short_help="How many intervals should be output PDF contain?"
+          long_help="How many intervals should be output PDF contain?">
+          The number of intervals (between the minimum and maximum values taken on
+          by the sample) is an upper bound on the fidelity of the PDF as the
+          sample size increases.
+
+          The PDF is obtained by sorting all the samples and dividing the sorted
+          list into the given number of intervals. Each interval (to within a
+          single sample) has the same probability of occurring in the sample –
+          and thus presumably will have the same probability in other samples
+          taken from the same distribution.
+
+          A low number here, produces a small but coarse model of the input data
+          while a high number produces a large but <i>potentially</i> more faithful
+          model of the data.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="QuantileType" label="Quantile Type"
+        command="SetQuantileDefinition"
+        default_values="0"
+        number_of_elements="1">
+        <EnumerationDomain name="sample_estimate_list">
+          <Entry text="inverse CDF" value="0" />
+          <Entry text="inverse CDF, averaged steps" value="1" />
+          <Entry text="nearest observation" value="2" />
+        </EnumerationDomain>
+        <Documentation
+          short_help="How should quantile boundaries be defined?"
+          long_help="How should quantile boundaries be defined?">
+          Inter-quantile boundaries may defined in several ways.
+          Our implementation matches the techniques used by
+          [the R statistical package](https://search.r-project.org/R/refmans/stats/html/quantile.html").
+
+          When set to "inverse CDF," inter-quantile boundaries are computed identical to
+          "Type 1" of R: values are the inverse of the empirical distribution function
+          from the sample.
+
+          When set to "inverse CDF, averaged steps," inter-quantile boundaries are
+          computed identical to "Type 2" of R: the same as Type 1 but with averaging
+          at discontinuities. If the samples are non-numeric, then this devolves to
+          "inverse CDF" above.
+
+          When set to "nearest observation," inter-quantile boundaries are computed
+          identical to "Type 3" of R: the nearest even order statistic is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Quantize" label="Quantize"
+        command="SetQuantize"
+        default_values="1"
+        number_of_elements="1">
+        <EnumerationDomain name="quantize_list">
+          <Entry text="disabled" value="0" />
+          <Entry text="enabled" value="1" />
+        </EnumerationDomain>
+        <Documentation
+          short_help="Should the model be quantized to a fixed size?"
+          long_help="Should the model be quantized to a fixed size?">
+          If quantization is enabled and the resulting histogram is larger
+          than the "Maximum Histogram Size" parameter below, the histogram
+          will be simplified so that the maximum number of histogram entries
+          is produced.
+
+          This is enabled by default and should not be disabled for
+          samples taken from a continuous distribution unless you are prepared
+          to accept models the same size as the input dataset.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaximumHistogramSize" label="Maximum Histogram Size"
+        command="SetMaximumHistogramSize"
+        default_values="1024"
+        number_of_elements="1">
+        <IntRangeDomain min="2" name="max_histogram_size" />
+        <Documentation
+          short_help="Should the model be quantized to a fixed size?"
+          long_help="Should the model be quantized to a fixed size?">
+          If quantization is enabled and the resulting histogram is larger
+          than this parameter, the histogram will be simplified so that the
+          given maximum number of histogram entries is produced.
+        </Documentation>
+      </IntVectorProperty>
+
+    </SourceProxy>
+
+  </ProxyGroup>
   <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenerateStatistics" label="Generate Statistics" name="GenerateStatistics">
+      <Documentation
+        long_help="Compute a statistical model of a dataset."
+        short_help="Compute a statistical model of a dataset.">
+      Compute a statistical model of some field on an input dataset.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPartitionedDataSetCollection" />
+          <DataType value="vtkPartitionedDataSet" />
+          <DataType value="vtkUniformGridAMR" />
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCellGrid" />
+          <DataType value="vtkTable" />
+          <DataType value="vtkGraph" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1"
+                          auto_convert_association="1"/>
+        <Documentation>
+          The input to the filter. Arrays from this dataset will be used
+          for computing statistics and/or assessed by a statistical model.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="int int int int str" clean_command="ResetInputArraySpecifications"
+                            __command="EnableAttributeArray"
+                            label="Variables of Interest"
+                            name="SelectArrays"
+                            number_of_elements_per_command="5"
+                            repeat_command="1">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Choose arrays whose entries will be used to form
+        observations for statistical analysis.</Documentation>
+      </StringVectorProperty>
+
+      <ProxyProperty command="SetStatisticsAlgorithm"
+                     label="Statistics Algorithm"
+                     name="StatisticsAlgorithm">
+        <ProxyGroupDomain name="groups">
+          <Group name="statistics" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Group name="statistics" default="DescriptiveStatistics" />
+        </ProxyListDomain>
+        <Documentation>
+          This property specifies the parameters of the statistics algorithm
+          used to model the input data.
+        </Documentation>
+      </ProxyProperty>
+
+    </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPSciVizContingencyStats"
                  label="Contingency Statistics"
@@ -11,12 +238,14 @@
       obtained) may optionally be used to assess the input dataset. This filter
       computes contingency tables between pairs of attributes. This result is a
       tabular bivariate probability distribution which serves as a
-      Bayesian-style prior model. Data is assessed by computing &lt;ul&gt;
-      &lt;li&gt; the probability of observing both variables simultaneously;
-      &lt;li&gt; the probability of each variable conditioned on the other (the
-      two values need not be identical); and &lt;li&gt; the pointwise mutual
-      information (PMI). &lt;/ul&gt; Finally, the summary statistics include
-      the information entropy of the observations.</Documentation>
+      Bayesian-style prior model. Data is assessed by computing
+
+      + the probability of observing both variables simultaneously;
+      + the probability of each variable conditioned on the other (the
+        two values need not be identical); and
+      + the pointwise mutual information (PMI).
+
+      Finally, the summary statistics include the information entropy of the observations.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input"
                      port_index="0">
@@ -103,23 +332,26 @@
                  value="3" />
         </EnumerationDomain>
         <Documentation>Specify the task to be performed: modeling and/or
-        assessment. &lt;ol&gt; &lt;li&gt; "Detailed model of input data,"
-        creates a set of output tables containing a calculated statistical
-        model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
-        &lt;li&gt; "Model a subset of the data," creates an output table (or
-        tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the
-        input dataset;&lt;/li&gt; &lt;li&gt; "Assess the data with a model,"
-        adds attributes to the first input dataset using a model provided on
-        the second input port; and&lt;/li&gt; &lt;li&gt; "Model and assess the
-        same data," is really just operations 2 and 3 above applied to the same
-        input dataset. The model is first trained using a fraction of the input
-        data and then the entire dataset is assessed using that
-        model.&lt;/li&gt; &lt;/ol&gt; When the task includes creating a model
-        (i.e., tasks 2, and 4), you may adjust the fraction of the input
-        dataset used for training. You should avoid using a large fraction of
-        the input data for training as you will then not be able to detect
-        overfitting. The &lt;i&gt;Training fraction&lt;/i&gt; setting will be
-        ignored for tasks 1 and 3.</Documentation>
+        assessment.
+
+        + "Detailed model of input data," creates a set of output tables
+          containing a calculated statistical model of the **entire**
+          input dataset;
+        + "Model a subset of the data," creates an output table (or
+          tables) summarizing a **randomly-chosen subset** of the
+          input dataset;
+        + "Assess the data with a model," adds attributes to the first input
+          dataset using a model provided on the second input port; and
+        + "Model and assess the same data," is really just operations 2 and 3
+          above applied to the same input dataset. The model is first trained
+          using a fraction of the input data and then the entire dataset is
+          assessed using that model.
+
+        When the task includes creating a model (i.e., tasks 2, and 4), you may adjust
+        the fraction of the input dataset used for training. You should avoid using a large
+        fraction of the input data for training as you will then not be able to detect
+        overfitting. The *Training fraction* setting will be ignored for tasks 1 and 3.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetTrainingFraction"
@@ -153,10 +385,13 @@
                      short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model.">
       This filter either computes a statistical model of a dataset or takes
       such a model as its second input. Then, the model (however it is
-      obtained) may optionally be used to assess the input dataset.&lt;p&gt;
+      obtained) may optionally be used to assess the input dataset.
+
       This filter computes the min, max, mean, raw moments M2 through M4,
       standard deviation, skewness, and kurtosis for each array you
-      select.&lt;p&gt; The model is simply a univariate Gaussian distribution
+      select.
+
+      The model is simply a univariate Gaussian distribution
       with the mean and standard deviation provided. Data is assessed using
       this model by detrending the data (i.e., subtracting the mean) and then
       dividing by the standard deviation. Thus the assessment is an array whose
@@ -248,23 +483,24 @@
                  value="3" />
         </EnumerationDomain>
         <Documentation>Specify the task to be performed: modeling and/or
-        assessment. &lt;ol&gt; &lt;li&gt; "Detailed model of input data,"
-        creates a set of output tables containing a calculated statistical
-        model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
-        &lt;li&gt; "Model a subset of the data," creates an output table (or
-        tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the
-        input dataset;&lt;/li&gt; &lt;li&gt; "Assess the data with a model,"
-        adds attributes to the first input dataset using a model provided on
-        the second input port; and&lt;/li&gt; &lt;li&gt; "Model and assess the
-        same data," is really just operations 2 and 3 above applied to the same
-        input dataset. The model is first trained using a fraction of the input
-        data and then the entire dataset is assessed using that
-        model.&lt;/li&gt; &lt;/ol&gt; When the task includes creating a model
+        assessment.
+
+        + "Detailed model of input data," creates a set of output tables containing
+          a calculated statistical model of the **entire** input dataset;
+        + "Model a subset of the data," creates an output table (or tables) summarizing
+          a **randomly-chosen subset** of the input dataset;
+        + "Assess the data with a model," adds attributes to the first input dataset
+          using a model provided on the second input port; and
+        + "Model and assess the same data," is really just operations 2 and 3 above
+          applied to the same input dataset. The model is first trained using a fraction
+          of the input data and then the entire dataset is assessed using that model.
+
+        When the task includes creating a model
         (i.e., tasks 2, and 4), you may adjust the fraction of the input
         dataset used for training. You should avoid using a large fraction of
         the input data for training as you will then not be able to detect
-        overfitting. The &lt;i&gt;Training fraction&lt;/i&gt; setting will be
-        ignored for tasks 1 and 3.</Documentation>
+        overfitting. The *Training fraction* setting will be ignored for tasks 1 and 3.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetTrainingFraction"
@@ -318,7 +554,8 @@
                      short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model.">
       This filter either computes a statistical model of a dataset or takes
       such a model as its second input. Then, the model (however it is
-      obtained) may optionally be used to assess the input dataset.&lt;p&gt;
+      obtained) may optionally be used to assess the input dataset.
+
       This filter iteratively computes the center of k clusters in a space
       whose coordinates are specified by the arrays you select. The clusters
       are chosen as local minima of the sum of square Euclidean distances from
@@ -412,23 +649,24 @@
                  value="3" />
         </EnumerationDomain>
         <Documentation>Specify the task to be performed: modeling and/or
-        assessment. &lt;ol&gt; &lt;li&gt; "Detailed model of input data,"
-        creates a set of output tables containing a calculated statistical
-        model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
-        &lt;li&gt; "Model a subset of the data," creates an output table (or
-        tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the
-        input dataset;&lt;/li&gt; &lt;li&gt; "Assess the data with a model,"
-        adds attributes to the first input dataset using a model provided on
-        the second input port; and&lt;/li&gt; &lt;li&gt; "Model and assess the
-        same data," is really just operations 2 and 3 above applied to the same
-        input dataset. The model is first trained using a fraction of the input
-        data and then the entire dataset is assessed using that
-        model.&lt;/li&gt; &lt;/ol&gt; When the task includes creating a model
+        assessment.
+
+        + "Detailed model of input data," creates a set of output tables containing
+          a calculated statistical model of the **entire** input dataset;
+        + "Model a subset of the data," creates an output table (or
+          tables) summarizing a **randomly-chosen subset** of the input dataset;
+        + "Assess the data with a model," adds attributes to the first input dataset
+          using a model provided on the second input port; and
+        + "Model and assess the same data," is really just operations 2 and 3 above
+          applied to the same input dataset. The model is first trained using a fraction of
+          the input data and then the entire dataset is assessed using that model.
+
+        When the task includes creating a model
         (i.e., tasks 2, and 4), you may adjust the fraction of the input
         dataset used for training. You should avoid using a large fraction of
         the input data for training as you will then not be able to detect
-        overfitting. The &lt;i&gt;Training fraction&lt;/i&gt; setting will be
-        ignored for tasks 1 and 3.</Documentation>
+        overfitting. The *Training fraction* setting will be ignored for tasks 1 and 3.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetTrainingFraction"
@@ -495,36 +733,44 @@
                      short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model.">
       This filter either computes a statistical model of a dataset or takes
       such a model as its second input. Then, the model (however it is
-      obtained) may optionally be used to assess the input dataset.&lt;p&gt;
+      obtained) may optionally be used to assess the input dataset.
+
       This filter computes the covariance matrix for all the arrays you select
       plus the mean of each array. The model is thus a multivariate Gaussian
       distribution with the mean vector and variances provided. Data is
       assessed using this model by computing the Mahalanobis distance for each
-      input point. This distance will always be positive.&lt;p&gt; The learned
-      model output format is rather dense and can be confusing, so it is
+      input point. This distance will always be positive.
+
+      The learned model output format is rather dense and can be confusing, so it is
       discussed here. The first filter output is a multiblock dataset
-      consisting of 2 tables: &lt;ol&gt; &lt;li&gt; Raw covariance data.
-      &lt;li&gt; Covariance matrix and its Cholesky decomposition. &lt;/ol&gt;
+      consisting of 2 tables:
+
+      + Raw covariance data.
+      + Covariance matrix and its Cholesky decomposition.
+
       The raw covariance table has 3 meaningful columns: 2 titled "Column1" and
       "Column2" whose entries generally refer to the N arrays you selected when
       preparing the filter and 1 column titled "Entries" that contains numeric
       values. The first row will always contain the number of observations in
       the statistical analysis. The next N rows contain the mean for each of
       the N arrays you selected. The remaining rows contain covariances of
-      pairs of arrays.&lt;p&gt; The second table (covariance matrix and
-      Cholesky decomposition) contains information derived from the raw
-      covariance data of the first table. The first N rows of the first column
+      pairs of arrays.
+
+      The second table (covariance matrix and Cholesky decomposition) contains
+      information derived from the raw covariance data of the first table.
+      The first N rows of the first column
       contain the name of one array you selected for analysis. These rows are
       followed by a single entry labeled "Cholesky" for a total of N+1 rows.
       The second column, Mean contains the mean of each variable in the first N
-      entries and the number of observations processed in the final (N+1)
-      row.&lt;p&gt; The remaining columns (there are N, one for each array)
+      entries and the number of observations processed in the final (N+1) row.
+
+      The remaining columns (there are N, one for each array)
       contain 2 matrices in triangular format. The upper right triangle
       contains the covariance matrix (which is symmetric, so its lower triangle
       may be inferred). The lower left triangle contains the Cholesky
       decomposition of the covariance matrix (which is triangular, so its upper
       triangle is zero). Because the diagonal must be stored for both matrices,
-      an additional row is required &#226;&#8364;&#8221; hence the N+1 rows and
+      an additional row is required – hence the N+1 rows and
       the final entry of the column named "Column".</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input"
@@ -612,23 +858,24 @@
                  value="3" />
         </EnumerationDomain>
         <Documentation>Specify the task to be performed: modeling and/or
-        assessment. &lt;ol&gt; &lt;li&gt; "Detailed model of input data,"
-        creates a set of output tables containing a calculated statistical
-        model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
-        &lt;li&gt; "Model a subset of the data," creates an output table (or
-        tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the
-        input dataset;&lt;/li&gt; &lt;li&gt; "Assess the data with a model,"
-        adds attributes to the first input dataset using a model provided on
-        the second input port; and&lt;/li&gt; &lt;li&gt; "Model and assess the
-        same data," is really just operations 2 and 3 above applied to the same
-        input dataset. The model is first trained using a fraction of the input
-        data and then the entire dataset is assessed using that
-        model.&lt;/li&gt; &lt;/ol&gt; When the task includes creating a model
+        assessment.
+
+        + "Detailed model of input data," creates a set of output tables containing a calculated statistical
+          model of the **entire** input dataset;
+        + "Model a subset of the data," creates an output table (or tables) summarizing
+          a **randomly-chosen subset** of the input dataset;
+        + "Assess the data with a model," adds attributes to the first input dataset using a model
+          provided on the second input port; and
+        + "Model and assess the same data," is really just operations 2 and 3 above applied to the same
+          input dataset. The model is first trained using a fraction of the input
+          data and then the entire dataset is assessed using that model.
+
+        When the task includes creating a model
         (i.e., tasks 2, and 4), you may adjust the fraction of the input
         dataset used for training. You should avoid using a large fraction of
         the input data for training as you will then not be able to detect
-        overfitting. The &lt;i&gt;Training fraction&lt;/i&gt; setting will be
-        ignored for tasks 1 and 3.</Documentation>
+        overfitting. The *Training fraction* setting will be ignored for tasks 1 and 3.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetTrainingFraction"
@@ -662,17 +909,20 @@
                      short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model.">
       This filter either computes a statistical model of a dataset or takes
       such a model as its second input. Then, the model (however it is
-      obtained) may optionally be used to assess the input dataset. &lt;p&gt;
+      obtained) may optionally be used to assess the input dataset.
+
       This filter performs additional analysis above and beyond the
       multicorrelative filter. It computes the eigenvalues and eigenvectors of
       the covariance matrix from the multicorrelative filter. Data is then
       assessed by projecting the original tuples into a possibly
-      lower-dimensional space. &lt;p&gt; Since the PCA filter uses the
-      multicorrelative filter's analysis, it shares the same raw covariance
-      table specified in the multicorrelative documentation. The second table
-      in the multiblock dataset comprising the model output is an expanded
-      version of the multicorrelative version. &lt;p&gt; As with the
-      multicorrelative filter, the second model table contains the mean values,
+      lower-dimensional space.
+
+      Since the PCA filter uses the multicorrelative filter's analysis, it shares
+      the same raw covariance table specified in the multicorrelative documentation.
+      The second table in the multiblock dataset comprising the model output is an
+      expanded version of the multicorrelative version.
+
+      As with the multicorrelative filter, the second model table contains the mean values,
       the upper-triangular portion of the symmetric covariance matrix, and the
       non-zero lower-triangular portion of the Cholesky decomposition of the
       covariance matrix. Below these entries are the eigenvalues of the
@@ -765,23 +1015,23 @@
                  value="3" />
         </EnumerationDomain>
         <Documentation>Specify the task to be performed: modeling and/or
-        assessment. &lt;ol&gt; &lt;li&gt; "Detailed model of input data,"
-        creates a set of output tables containing a calculated statistical
-        model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
-        &lt;li&gt; "Model a subset of the data," creates an output table (or
-        tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the
-        input dataset;&lt;/li&gt; &lt;li&gt; "Assess the data with a model,"
-        adds attributes to the first input dataset using a model provided on
-        the second input port; and&lt;/li&gt; &lt;li&gt; "Model and assess the
-        same data," is really just operations 2 and 3 above applied to the same
-        input dataset. The model is first trained using a fraction of the input
-        data and then the entire dataset is assessed using that
-        model.&lt;/li&gt; &lt;/ol&gt; When the task includes creating a model
-        (i.e., tasks 2, and 4), you may adjust the fraction of the input
-        dataset used for training. You should avoid using a large fraction of
-        the input data for training as you will then not be able to detect
-        overfitting. The &lt;i&gt;Training fraction&lt;/i&gt; setting will be
-        ignored for tasks 1 and 3.</Documentation>
+        assessment.
+
+        + "Detailed model of input data," creates a set of output tables containing
+          a calculated statistical model of the **entire** input dataset;
+        + "Model a subset of the data," creates an output table (or tables) summarizing
+          a **randomly-chosen subset** of the input dataset;
+        + "Assess the data with a model," adds attributes to the first input dataset
+          using a model provided on the second input port; and
+        + "Model and assess the same data," is really just operations 2 and 3 above
+          applied to the same input dataset. The model is first trained using a fraction
+          of the input data and then the entire dataset is assessed using that model.
+
+        When the task includes creating a model (i.e., tasks 2, and 4), you may adjust
+        the fraction of the input dataset used for training. You should avoid using a large
+        fraction of the input data for training as you will then not be able to detect
+        overfitting. The *Training fraction* setting will be ignored for tasks 1 and 3.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetTrainingFraction"
@@ -830,23 +1080,26 @@
         decomposition be used to project the original vector into the new space
         (Full basis), or should a fixed subset of the decomposition be used
         (Fixed-size basis), or should the projection be clipped to preserve at
-        least some fixed "energy" (Fixed-energy basis)?&lt;p&gt; As an example,
+        least some fixed "energy" (Fixed-energy basis)?
+
+        As an example,
         suppose the variables of interest were {A,B,C,D,E} and that the
         eigenvalues of the covariance matrix for these were {5,2,1.5,1,.5}. If
         the "Full basis" scheme is used, then all 5 components of the
         eigenvectors will be used to project each {A,B,C,D,E}-tuple in the
-        original data into a new 5-components space.&lt;p&gt; If the
-        "Fixed-size" scheme is used and the "Basis Size" property is set to 4,
+        original data into a new 5-components space.
+
+        If the "Fixed-size" scheme is used and the "Basis Size" property is set to 4,
         then only the first 4 eigenvector components will be used to project
         each {A,B,C,D,E}-tuple into the new space and that space will be of
-        dimension 4, not 5.&lt;p&gt; If the "Fixed-energy basis" scheme is used
-        and the "Basis Energy" property is set to 0.8, then only the first 3
-        eigenvector components will be used to project each {A,B,C,D,E}-tuple
-        into the new space, which will be of dimension 3. The number 3 is
-        chosen because 3 is the lowest N for which the sum of the first N
-        eigenvalues divided by the sum of all eigenvalues is larger than the
-        specified "Basis Energy" (i.e., (5+2+1.5)/10 = 0.85 &gt;
-        0.8).</Documentation>
+        dimension 4, not 5.
+
+        If the "Fixed-energy basis" scheme is used and the "Basis Energy" property
+        is set to 0.8, then only the first 3 eigenvector components will be used to
+        project each {A,B,C,D,E}-tuple into the new space, which will be of dimension 3.
+        The number 3 is chosen because 3 is the lowest N for which the sum of the first N
+        eigenvalues divided by the sum of all eigenvalues is larger than the specified
+        "Basis Energy" (i.e., (5+2+1.5)/10 = 0.85 &gt; 0.8).</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="1"
                          command="SetFixedBasisSize"
@@ -891,5 +1144,30 @@
       </Hints>
     </SourceProxy>
     <!-- PCAStatistics -->
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractStatisticalModelTables" name="ExtractStatisticalModelTables">
+      <Documentation
+        long_help="Extract statistical model tables."
+        short_help="Extract statistical model tables.">
+      Extract statistical model tables from a model object or a collection of them.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPartitionedDataSetCollection" />
+          <DataType value="vtkStatisticalModel" />
+        </DataTypeDomain>
+        <Documentation>
+          The statistical model(s) from which to extract tables.
+        </Documentation>
+      </InputProperty>
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

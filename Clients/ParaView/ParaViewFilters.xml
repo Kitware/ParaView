@@ -374,6 +374,7 @@
   <Proxy group="filters" name="ExtractParticlesOverTime" />
   <Proxy group="filters" name="ExtractSelection" icon=":/pqWidgets/Icons/pqExtractSelection.svg" />
   <Proxy group="filters" name="ExtractSelectionOverTime" icon=":/pqWidgets/Icons/pqPlotSelectionOverTime.svg" />
+  <Proxy group="filters" name="ExtractStatisticalModelTables" />
   <Proxy group="filters" name="ExtractSubsetWithSeed" />
   <Proxy group="filters" name="ExtractTimeSteps" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
@@ -437,6 +438,7 @@
   <Proxy group="filters" name="MergeVectorComponents" />
   <Proxy group="filters" name="MeshQuality" />
   <Proxy group="filters" name="MinkowskiFilter" />
+  <Proxy group="filters" name="GenerateStatistics" />
   <Proxy group="filters" name="MoleculeToLines" />
   <Proxy group="filters" name="MomentInvariants" />
   <Proxy group="filters" name="MulticorrelativeStatistics" />
