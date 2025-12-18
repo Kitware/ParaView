@@ -135,7 +135,7 @@ spec:
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora42_shared_mpi_python_qt
+        CMAKE_CONFIGURATION: fedora42_shared_asserts_mpi_python_qt
         CMAKE_BUILD_TYPE: RelWithDebInfo
 
 .fedora42_shared_mpi_python_qt_viskoresoverride:
