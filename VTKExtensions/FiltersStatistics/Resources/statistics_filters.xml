@@ -274,6 +274,11 @@
         <DoubleRangeDomain max="1"
                            min="0"
                            name="training_range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="Task" function="equals" value="Model a subset of the data"/>
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Specify the fraction of values from the input dataset to
         be used for model fitting. The exact set of values is chosen at random
         from the dataset.</Documentation>

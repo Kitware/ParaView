@@ -34,9 +34,7 @@ protected:
   vtkPSciVizDescriptiveStats();
   ~vtkPSciVizDescriptiveStats() override;
 
-  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) override;
-  int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) override;
+  bool PrepareAlgorithm(vtkGenerateStatistics* filter) override;
 
   int SignedDeviations;
 

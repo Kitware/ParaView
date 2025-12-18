@@ -22,21 +22,23 @@
 #define vtkSciVizStatistics_h
 
 #include "vtkPVVTKExtensionsFiltersStatisticsModule.h" //needed for exports
-#include "vtkTableAlgorithm.h"
+#include "vtkPassInputTypeAlgorithm.h"
 
 class vtkCompositeDataSet;
 class vtkDataObjectToTable;
 class vtkFieldData;
+class vtkGenerateStatistics;
 class vtkInformationIntegerKey;
-class vtkMultiBlockDataSet;
+class vtkPartitionedDataSetCollection;
 class vtkMultiProcessController;
 class vtkSciVizStatisticsP;
 class vtkStatisticsAlgorithm;
 
-class VTKPVVTKEXTENSIONSFILTERSSTATISTICS_EXPORT vtkSciVizStatistics : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSFILTERSSTATISTICS_EXPORT vtkSciVizStatistics
+  : public vtkPassInputTypeAlgorithm
 {
 public:
-  vtkTypeMacro(vtkSciVizStatistics, vtkTableAlgorithm);
+  vtkTypeMacro(vtkSciVizStatistics, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
@@ -127,9 +129,9 @@ public:
   ///@}
 
   /**
-   * A key used to mark the output model data object (output port 0) when it is a multiblock
-   * of models (any of which may be multiblock dataset themselves) as opposed to a multiblock
-   * dataset containing a single model.
+   * A key used to mark the output model data object (output port 0) when it is a partitioned
+   * dataset collection holding multiple models as opposed to a partitationed dataset collection
+   * containing a single model.
    */
   vtkInformationIntegerKey* MULTIPLE_MODELS();
 
@@ -137,65 +139,31 @@ protected:
   vtkSciVizStatistics();
   ~vtkSciVizStatistics() override;
 
+  /**
+   * Configure the vtkGenerateStatistics instance on each rank with
+   * identical model requests.
+   *
+   * This requires communication to ensure that:
+   * + arrays present on only a subset of ranks are not the subject of a request
+   *   (vtkGhostArray is one example, as rank 0 typically will not have this array).
+   * + arrays with multiple components only have components present on all ranks
+   *   in the request.
+   * + ranks with no data have a valid request (that will produce an empty model
+   *   rather than an early exit).
+   */
+  virtual bool PrepareInputArrays(vtkDataObject* inData, vtkGenerateStatistics* filter);
+
+  /**
+   * Subclasses must override this method and configure \a filter
+   * by calling filter->SetStatisticsAlgorithm().
+   */
+  virtual bool PrepareAlgorithm(vtkGenerateStatistics* filter) = 0;
+
   int FillInputPortInformation(int port, vtkInformation* info) override;
   int FillOutputPortInformation(int port, vtkInformation* info) override;
 
-  int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output) override;
-  virtual int RequestDataObject(
-    vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output);
   int RequestData(
     vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output) override;
-  virtual int RequestData(vtkCompositeDataSet* compDataOu, vtkCompositeDataSet* compModelOu,
-    vtkCompositeDataSet* compDataIn, vtkCompositeDataSet* compModelIn, vtkDataObject* singleModel);
-  virtual int RequestData(vtkDataObject* observationsOut, vtkDataObject* modelOut,
-    vtkDataObject* observationsIn, vtkDataObject* modelIn);
-
-  virtual int PrepareFullDataTable(vtkTable* table, vtkFieldData* dataAttrIn);
-  virtual int PrepareTrainingTable(
-    vtkTable* trainingTable, vtkTable* fullDataTable, vtkIdType numObservations);
-
-  /**
-   * Method subclasses <b>must</b> override to calculate a full model from the given input data.
-   * The model should be placed on the first output port of the passed vtkInformationVector
-   * as well as returned in the \a model parameter.
-   */
-  virtual int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) = 0;
-
-  /**
-   * Method subclasses <b>must</b> override to assess an input table given a model of the proper
-   type.
-   * The \a dataset parameter contains a shallow copy of input port 0 and should be modified to
-   include the assessment.
-
-   * Adding new arrays to point/cell/vertex/edge data should not pose a problem, but any alterations
-   * to the dataset itself will probably require that you create a deep copy before modification.
-
-   * @param observations - a table containing the field data of the \a dataset converted to a table
-   * @param dataset - a shallow copy of the input dataset that should be altered to include an
-   assessment of the output.
-   * @param model - the statistical model with which to assess the \a observations.
-   */
-  virtual int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) = 0;
-
-  /**
-   * Subclasses <b>may</b> (but need not) override this function to guarantee that
-   * some minimum number of observations are included in the training data.
-   * By default, it returns the maximum of:
-   * observations->GetNumberOfRows() * this->TrainingFraction and
-   * min( observations->GetNumberOfRows(), 100 ).
-   * Thus, it will require the entire set of observations unless there are more than 100.
-   * Parameter N is the number of non-ghost observations.
-   */
-  virtual vtkIdType GetNumberOfObservationsForTraining(vtkIdType N);
-
-  /**
-   * A variant of shallow copy that calls vtkDataObject::ShallowCopy() and then
-   * for composite datasets, creates clones for each leaf node that then shallow
-   * copies the fields and geometry.
-   */
-  void ShallowCopy(vtkDataObject* out, vtkDataObject* in);
 
   int AttributeMode;
   int Task;

@@ -20,7 +20,8 @@
  *
  * The learned model output format is rather dense and can be confusing,
  * so it is discussed here.
- * The first filter output is a multiblock dataset consisting of 2 tables:
+ * The first filter output is a partitioned dataset collection consisting
+ * of 2 tables:
  *
  * \li Raw covariance data.
  * \li Covariance matrix and its Cholesky decomposition.
@@ -72,9 +73,7 @@ protected:
   vtkPSciVizMultiCorrelativeStats();
   ~vtkPSciVizMultiCorrelativeStats() override;
 
-  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) override;
-  int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) override;
+  bool PrepareAlgorithm(vtkGenerateStatistics* filter) override;
 
 private:
   vtkPSciVizMultiCorrelativeStats(const vtkPSciVizMultiCorrelativeStats&) = delete;

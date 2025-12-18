@@ -19,8 +19,8 @@
  * Since the PCA filter uses the multicorrelative filter's analysis,
  * it shares the same raw covariance table specified in the
  * multicorrelative documentation.
- * The second table in the multiblock dataset comprising the model output
- * is an expanded version of the multicorrelative version.
+ * The second table in the partitioned dataset collection comprising
+ * the model output is an expanded version of the multicorrelative version.
  *
  * As with the multicorrlative filter, the second model table contains the
  * mean values, the upper-triangular portion of the symmetric covariance
@@ -64,9 +64,7 @@ protected:
   vtkPSciVizPCAStats();
   ~vtkPSciVizPCAStats() override;
 
-  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) override;
-  int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) override;
+  bool PrepareAlgorithm(vtkGenerateStatistics* filter) override;
 
   int NormalizationScheme;
   int BasisScheme;
