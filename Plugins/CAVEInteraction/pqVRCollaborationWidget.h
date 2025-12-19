@@ -37,9 +37,6 @@ private Q_SLOTS:
   void collabServerChanged();
   void collabSessionChanged();
   void collabNameChanged();
-  void collabAvatarUpXChanged();
-  void collabAvatarUpYChanged();
-  void collabAvatarUpZChanged();
 
 private:
   Q_DISABLE_COPY(pqVRCollaborationWidget)

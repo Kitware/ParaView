@@ -160,8 +160,6 @@ public:
     this->CollaborationClient->SetCollabPort(this->CollabPort);
     this->CollaborationClient->SetCollabSession(this->CollabSession.toUtf8().constData());
     this->CollaborationClient->SetCollabName(this->CollabName.toUtf8().constData());
-    this->CollaborationClient->SetAvatarInitialUpVector(
-      this->CollabAvatarUpX, this->CollabAvatarUpY, this->CollabAvatarUpZ);
 
     // This interactor style proxy enables "outgoing" collaboration
     if (!this->CollabStyleProxy)
@@ -295,9 +293,6 @@ public:
         <Port value="5555"/>
         <Session value="pv"/>
         <Name value="Anonymous"/>
-        <AvatarUpX value="0"/>
-        <AvatarUpY value="1"/>
-        <AvatarUpZ value="0"/>
         <AvatarEvents>
           <Head value="vrconn.head"/>
           <LeftHand value="vrconn.wandl"/>
@@ -356,36 +351,6 @@ public:
     if (child)
     {
       this->CollabName = child->GetAttributeOrEmpty("value");
-    }
-
-    child = sectionParent->FindNestedElementByName("AvatarUpX");
-    if (child)
-    {
-      const char* upxstr = child->GetAttributeOrEmpty("value");
-      if (strcmp(upxstr, "") != 0)
-      {
-        VTK_FROM_CHARS_IF_ERROR_BREAK(upxstr, this->CollabAvatarUpX);
-      }
-    }
-
-    child = sectionParent->FindNestedElementByName("AvatarUpY");
-    if (child)
-    {
-      const char* upystr = child->GetAttributeOrEmpty("value");
-      if (strcmp(upystr, "") != 0)
-      {
-        VTK_FROM_CHARS_IF_ERROR_BREAK(upystr, this->CollabAvatarUpY);
-      }
-    }
-
-    child = sectionParent->FindNestedElementByName("AvatarUpZ");
-    if (child)
-    {
-      const char* upzstr = child->GetAttributeOrEmpty("value");
-      if (strcmp(upzstr, "") != 0)
-      {
-        VTK_FROM_CHARS_IF_ERROR_BREAK(upzstr, this->CollabAvatarUpZ);
-      }
     }
 
     child = sectionParent->FindNestedElementByName("AvatarEvents");
@@ -463,24 +428,6 @@ public:
     child->Delete();
 
     child = vtkPVXMLElement::New();
-    child->SetName("AvatarUpX");
-    child->AddAttribute("value", this->CollabAvatarUpX);
-    sectionParent->AddNestedElement(child);
-    child->Delete();
-
-    child = vtkPVXMLElement::New();
-    child->SetName("AvatarUpY");
-    child->AddAttribute("value", this->CollabAvatarUpY);
-    sectionParent->AddNestedElement(child);
-    child->Delete();
-
-    child = vtkPVXMLElement::New();
-    child->SetName("AvatarUpZ");
-    child->AddAttribute("value", this->CollabAvatarUpZ);
-    sectionParent->AddNestedElement(child);
-    child->Delete();
-
-    child = vtkPVXMLElement::New();
     child->SetName("AvatarEvents");
 
     vtkPVXMLElement* grandChild = vtkPVXMLElement::New();
@@ -524,9 +471,6 @@ public:
   QString CollabSession;
   QString CollabName;
   int CollabPort;
-  double CollabAvatarUpX;
-  double CollabAvatarUpY;
-  double CollabAvatarUpZ;
   QString HeadEventName;
   QString LeftHandEventName;
   QString RightHandEventName;
@@ -548,7 +492,7 @@ pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::Wind
   this->Internals->StartRenderObserver = nullptr;
   this->Internals->CollabStyleProxy = nullptr;
   this->Internals->CollabEnabled = false;
-  this->Internals->NavigationSharingEnabled = false;
+  this->Internals->NavigationSharingEnabled = true;
   this->updateCollabWidgetState();
 
   this->Internals->outputWindow->setReadOnly(true);
@@ -568,15 +512,6 @@ pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::Wind
 
   connect(this->Internals->cNameValue, SIGNAL(editingFinished()), this, SLOT(collabNameChanged()));
 
-  connect(
-    this->Internals->cAvatarUpX, SIGNAL(editingFinished()), this, SLOT(collabAvatarUpXChanged()));
-
-  connect(
-    this->Internals->cAvatarUpY, SIGNAL(editingFinished()), this, SLOT(collabAvatarUpYChanged()));
-
-  connect(
-    this->Internals->cAvatarUpZ, SIGNAL(editingFinished()), this, SLOT(collabAvatarUpZChanged()));
-
   connect(pqApplicationCore::instance(), SIGNAL(stateSaved(vtkPVXMLElement*)), this,
     SLOT(saveCollaborationState(vtkPVXMLElement*)));
 
@@ -588,9 +523,6 @@ pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::Wind
   this->collabServerChanged();
   this->collabSessionChanged();
   this->collabNameChanged();
-  this->collabAvatarUpXChanged();
-  this->collabAvatarUpYChanged();
-  this->collabAvatarUpZChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -640,9 +572,6 @@ void pqVRCollaborationWidget::updateCollabWidgetState()
   this->Internals->cSessionValue->setEnabled(enabled);
   this->Internals->cNameValue->setEnabled(enabled);
   this->Internals->cPortValue->setEnabled(enabled);
-  this->Internals->cAvatarUpX->setEnabled(enabled);
-  this->Internals->cAvatarUpY->setEnabled(enabled);
-  this->Internals->cAvatarUpZ->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -678,27 +607,6 @@ void pqVRCollaborationWidget::collabPortChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqVRCollaborationWidget::collabAvatarUpXChanged()
-{
-  double avUpX = this->Internals->cAvatarUpX->text().toDouble();
-  this->Internals->CollabAvatarUpX = avUpX;
-}
-
-//-----------------------------------------------------------------------------
-void pqVRCollaborationWidget::collabAvatarUpYChanged()
-{
-  double avUpY = this->Internals->cAvatarUpY->text().toDouble();
-  this->Internals->CollabAvatarUpY = avUpY;
-}
-
-//-----------------------------------------------------------------------------
-void pqVRCollaborationWidget::collabAvatarUpZChanged()
-{
-  double avUpZ = this->Internals->cAvatarUpZ->text().toDouble();
-  this->Internals->CollabAvatarUpZ = avUpZ;
-}
-
-//-----------------------------------------------------------------------------
 void pqVRCollaborationWidget::saveCollaborationState(vtkPVXMLElement* root)
 {
   this->Internals->saveCollaborationState(root);
@@ -715,9 +623,6 @@ void pqVRCollaborationWidget::restoreCollaborationState(
   this->Internals->cPortValue->setText(QString::number(this->Internals->CollabPort));
   this->Internals->cSessionValue->setText(this->Internals->CollabSession);
   this->Internals->cNameValue->setText(this->Internals->CollabName);
-  this->Internals->cAvatarUpX->setText(QString::number(this->Internals->CollabAvatarUpX));
-  this->Internals->cAvatarUpY->setText(QString::number(this->Internals->CollabAvatarUpY));
-  this->Internals->cAvatarUpZ->setText(QString::number(this->Internals->CollabAvatarUpZ));
 
   pqVRAvatarEvents* dialog = this->Internals->AvatarConfigDialog;
   dialog->setEventName(pqVRAvatarEvents::Head, this->Internals->HeadEventName);
@@ -740,9 +645,6 @@ void pqVRCollaborationWidget::collabServerChanged() {}
 void pqVRCollaborationWidget::collabSessionChanged() {}
 void pqVRCollaborationWidget::collabNameChanged() {}
 void pqVRCollaborationWidget::collabPortChanged() {}
-void pqVRCollaborationWidget::collabAvatarUpXChanged() {}
-void pqVRCollaborationWidget::collabAvatarUpYChanged() {}
-void pqVRCollaborationWidget::collabAvatarUpZChanged() {}
 void pqVRCollaborationWidget::saveCollaborationState([[maybe_unused]] vtkPVXMLElement* root) {}
 void pqVRCollaborationWidget::restoreCollaborationState(
   [[maybe_unused]] vtkPVXMLElement* root, [[maybe_unused]] vtkSMProxyLocator* locator)

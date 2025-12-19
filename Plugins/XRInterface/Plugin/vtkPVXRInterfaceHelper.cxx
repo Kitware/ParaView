@@ -90,6 +90,46 @@
 
 struct vtkPVXRInterfaceHelper::vtkInternals
 {
+  /*
+   * Event handler which responds to navigation events by sending updated
+   * avatar torso up vector message to collaborators.
+   */
+  class vtkNavigationObserver : public vtkCommand
+  {
+  public:
+    static vtkNavigationObserver* New() { return new vtkNavigationObserver; }
+
+    void Execute(
+      vtkObject* caller, unsigned long vtkNotUsed(event), void* vtkNotUsed(calldata)) override
+    {
+      vtkRenderWindow* renwin = vtkRenderWindow::SafeDownCast(caller);
+      if (renwin)
+      {
+        if (this->CollabClient != nullptr)
+        {
+          renwin->GetPhysicalToWorldMatrix(this->NavigationMatrix.Get());
+          this->CollabClient->GetAvatarInitialUpVector(this->avatarUp);
+          this->NavigationMatrix->MultiplyPoint(this->avatarUp, this->avatarUp);
+          this->CollabClient->SendAvatarUpVector(this->avatarUp);
+        }
+      }
+    }
+
+    vtkPVXRInterfaceCollaborationClient* CollabClient;
+
+  protected:
+    vtkNavigationObserver()
+      : CollabClient(nullptr)
+    {
+    }
+    ~vtkNavigationObserver() override = default;
+
+  private:
+    vtkNew<vtkMatrix4x4> NavigationMatrix;
+    double avatarUp[4];
+  };
+
+  vtkNew<vtkNavigationObserver> NavigationObserver;
   vtkNew<vtkQWidgetWidget> QWidgetWidget;
   vtkPVRenderView* View = nullptr;
   vtkSmartPointer<vtkOpenGLRenderWindow> RenderWindow;
@@ -118,6 +158,7 @@ vtkPVXRInterfaceHelper::vtkPVXRInterfaceHelper()
 {
   this->CollaborationClient->SetHelper(this);
   this->Widgets->SetHelper(this);
+  this->Internals->NavigationObserver->CollabClient = this->CollaborationClient.Get();
 }
 
 //----------------------------------------------------------------------------
@@ -335,6 +376,10 @@ bool vtkPVXRInterfaceHelper::CollaborationConnect()
     }
   }
 
+  // Observer all navigation events (PhysicalToWorld matrix updated)
+  this->Internals->RenderWindow->AddObserver(
+    vtkRenderWindow::PhysicalToWorldMatrixModified, this->Internals->NavigationObserver);
+
   return this->CollaborationClient->Connect(this->Renderer);
 }
 
@@ -355,6 +400,9 @@ bool vtkPVXRInterfaceHelper::CollaborationDisconnect()
       cmodel->GetRay()->RemoveObservers(vtkCommand::ModifiedEvent);
     }
   }
+
+  this->Internals->RenderWindow->RemoveObserver(this->Internals->NavigationObserver);
+
   return this->CollaborationClient->Disconnect();
 }
 

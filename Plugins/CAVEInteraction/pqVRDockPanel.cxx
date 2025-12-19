@@ -42,6 +42,7 @@
 #include <QListWidgetItem>
 #include <QMap>
 #include <QPointer>
+#include <QScrollArea>
 
 #include <vtksys/FStream.hxx>
 
@@ -67,7 +68,7 @@ public:
 void pqVRDockPanel::constructor()
 {
   this->setWindowTitle("CAVE Interaction Manager");
-  QWidget* container = new QWidget(this);
+  QScrollArea* container = new QScrollArea(this);
   this->Internals = new pqInternals();
   this->Internals->setupUi(container);
   pqWidgetUtilities::formatChildTooltips(container);
@@ -137,6 +138,22 @@ void pqVRDockPanel::constructor()
 
   this->updateConnectionButtons(this->Internals->connectionsTable->currentRow());
   this->updateStyleButtons(this->Internals->stylesTable->currentRow());
+
+  // Using size metrics about the font and margins, try to set the height
+  // of the VR Connections list widget to accomodate 2.5 entries. If more
+  // are added, scrollbar will allow access.
+  QFontMetrics connMetrics(this->Internals->connectionsTable->font());
+  QMargins connMargins = this->Internals->connectionsTable->contentsMargins();
+  int rowHeight = connMetrics.height();
+  int totalHeight = static_cast<int>((2.5 * rowHeight) + connMargins.top() + connMargins.bottom());
+  this->Internals->connectionsTable->setFixedHeight(totalHeight);
+
+  // Same for the Interactions list widget
+  QFontMetrics interMetrics(this->Internals->stylesTable->font());
+  QMargins interMargins = this->Internals->stylesTable->contentsMargins();
+  rowHeight = interMetrics.height();
+  totalHeight = static_cast<int>((4.5 * rowHeight) + interMargins.top() + interMargins.bottom());
+  this->Internals->stylesTable->setFixedHeight(totalHeight);
 
   // Add the render view to the proxy combo
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -491,8 +508,10 @@ void pqVRDockPanel::updateStyleButtons(int row)
   this->Internals->editStyle->setEnabled(enabled);
   this->Internals->removeStyle->setEnabled(enabled);
 
+  QWidget* dockPanel = this->findChild<QWidget*>("VRDockPanel");
+
   // Remove the existing proxy widget
-  pqProxyWidget* proxyWidget = this->widget()->findChild<pqProxyWidget*>();
+  pqProxyWidget* proxyWidget = dockPanel->findChild<pqProxyWidget*>();
   if (proxyWidget)
   {
     proxyWidget->parentWidget()->layout()->removeWidget(proxyWidget);
@@ -519,9 +538,9 @@ void pqVRDockPanel::updateStyleButtons(int row)
       return;
     }
 
-    proxyWidget = new pqProxyWidget(style, this);
+    proxyWidget = new pqProxyWidget(style, dockPanel);
     proxyWidget->setApplyChangesImmediately(true);
-    QGridLayout* layout = qobject_cast<QGridLayout*>(this->widget()->layout());
+    QGridLayout* layout = qobject_cast<QGridLayout*>(dockPanel->layout());
     QVBoxLayout* propertiesLayout = layout->findChild<QVBoxLayout*>("stylePropertiesLayout");
     if (propertiesLayout)
     {
