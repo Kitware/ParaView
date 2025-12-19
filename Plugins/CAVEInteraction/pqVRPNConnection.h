@@ -64,6 +64,7 @@ public:
   // Description:
   // Adding a transformation matrix
   void setTransformation(vtkMatrix4x4* matrix);
+  vtkMatrix4x4* getTransformation() { return this->Transformation; }
 
   // Description:
   // Initialize the device with the name.
