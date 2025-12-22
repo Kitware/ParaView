@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVRenderView.h"
 
-#include "vtk3DWidgetRepresentation.h"
 #include "vtkAbstractMapper.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
@@ -45,7 +44,6 @@
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCameraCollection.h"
 #include "vtkPVCenterAxesActor.h"
-#include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVGridAxes3DActor.h"
@@ -69,7 +67,6 @@
 #include "vtkPointData.h"
 #include "vtkPolarAxesActor2D.h"
 #include "vtkProcessModule.h"
-#include "vtkRange.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
@@ -3653,7 +3650,10 @@ void vtkPVRenderView::SetEnableANARI(bool v)
     // Proxy properties defaults
     // These defaults are set before ANARI is enabled and then they are not
     // set again, so we need to set them here.
-    this->SetANARILibrary("visrtx");
+    if (std::string(this->GetANARILibrary()).empty())
+    {
+      this->SetANARILibrary("visrtx");
+    }
   }
   else
   {
@@ -3683,13 +3683,16 @@ void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   if (this->Internals->AnariPass)
   {
-    vtkLog(INFO, "SetANARILibrary: " << l);
+    vtkDebugMacro("SetANARILibrary: " << l);
     this->Internals->AnariPass->GetAnariDevice()->SetupAnariDeviceFromLibrary(
       l.c_str(), "default", false);
     // Proxy properties defaults
     // These defaults are set before ANARI is enabled and then they are not
     // set again, so we need to set them here.
-    this->SetANARIRenderer("default");
+    if (std::string(this->GetANARIRenderer()).empty())
+    {
+      this->SetANARIRenderer("default");
+    }
   }
 #endif
 }
@@ -3710,7 +3713,7 @@ void vtkPVRenderView::SetANARIRenderer(std::string r [[maybe_unused]])
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   if (this->Internals->AnariPass)
   {
-    vtkLog(INFO, "SetANARIRenderer: " << r);
+    vtkDebugMacro("SetANARIRenderer: " << r);
     this->Internals->AnariPass->GetAnariRenderer()->SetSubtype(r.c_str());
   }
 #endif
