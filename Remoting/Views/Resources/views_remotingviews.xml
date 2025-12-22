@@ -1585,22 +1585,16 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
-              <Expression type="and">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         mode="visibility"
-                                         property="EnableOSPRay"
-                                         values="1" />
-                <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                   <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
-                </PropertyWidgetDecorator>
-              </Expression>
+            <Expression type="and">
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
-                                       property="EnableANARI"
+                                       property="EnableOSPRay"
                                        values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
+              </PropertyWidgetDecorator>
             </Expression>
-                </PropertyWidgetDecorator>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty

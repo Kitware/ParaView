@@ -4014,7 +4014,7 @@ void vtkPVRenderView::SetShadows(bool v)
 {
   this->Internals->OSPRayShadows = v;
   vtkRenderer* ren = this->GetRenderer();
-  if (this->Internals->IsInOSPRay || this->Internals->IsInAnari)
+  if (this->Internals->IsInOSPRay)
   {
     ren->SetUseShadows(v);
   }
