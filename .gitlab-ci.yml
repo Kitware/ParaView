@@ -110,9 +110,9 @@ el8-shared-icc-mpi-python:test:
     needs:
         - el8-shared-icc-mpi-python:build
 
-fedora42-shared-debug-mpi-python-qt:build:
+fedora42-shared-asserts-mpi-python-qt:build:
     extends:
-        - .fedora42_shared_debug_mpi_python_qt
+        - .fedora42_shared_asserts_mpi_python_qt
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
@@ -121,15 +121,15 @@ fedora42-shared-debug-mpi-python-qt:build:
         PV_CI_RUN_MANUALLY: "true"
     timeout: 90 minutes
 
-fedora42-shared-debug-mpi-python-qt:test:
+fedora42-shared-asserts-mpi-python-qt:test:
     extends:
-        - .fedora42_shared_debug_mpi_python_qt
+        - .fedora42_shared_asserts_mpi_python_qt
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .rules
     needs:
-        - fedora42-shared-debug-mpi-python-qt:build
+        - fedora42-shared-asserts-mpi-python-qt:build
     timeout: 240 minutes
 
 fedora42-shared-mpi-python-qt-viskoresoverride:build:
@@ -168,7 +168,7 @@ fedora42-shared-mpi-offscreen-osmesa-python-qt-viskoresoverride:test:
 
 translations:test:
     extends:
-        - .fedora42_shared_debug_mpi_python_qt
+        - .fedora42_shared_asserts_mpi_python_qt
         - .cmake_translations_linux
         - .linux_tester_tags
         - .cmake_translations_artifacts
@@ -176,7 +176,7 @@ translations:test:
     variables:
         PV_CI_MERGED_ONLY: "true"
     needs:
-        - fedora42-shared-debug-mpi-python-qt:build
+        - fedora42-shared-asserts-mpi-python-qt:build
     timeout: 15 minutes
 
 ## Catalyst editions

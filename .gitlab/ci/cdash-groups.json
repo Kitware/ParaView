@@ -5,7 +5,7 @@
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_documentation_mpi_python]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_doxygen]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride]" },
-        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_python_qt]" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_asserts_shared_mpi_python_qt]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_python_qt_tidy]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[fedora42_shared_mpi_python_qt_viskoresoverride]" },
         { "group": "master", "site": "gitlab-ci", "buildname": "paraview-branch-master-[macos_arm64_python_qt]" },
