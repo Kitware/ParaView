@@ -52,7 +52,6 @@ canex2.ModeShape = 3
 Render()
 
 animationScene1.GoToFirst()
-animationScene1.GoToNext()
 
 if not smtesting.DoRegressionTesting(renderView1.SMProxy):
   # This will lead to VTK object leaks.
