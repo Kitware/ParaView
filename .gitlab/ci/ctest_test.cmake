@@ -56,6 +56,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
     "pvcs\\.LagrangianParticleTrackerParallel$"
     "pvcrs\\.LagrangianParticleTrackerParallel$"
     "ParaViewExample-Plugins/LagrangianIntegrationModel$"
+
+    # see https://gitlab.kitware.com/paraview/paraview/-/issues/23183
+    "^paraviewPython-MPI-Batch-VolumeCellSelection$"
   )
 endif()
 
