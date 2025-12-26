@@ -234,13 +234,16 @@ spec:
       name: translations
 
     script:
+        # Download Qt
+        - cmake -P .gitlab/ci/download_qt6.cmake
+        - export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$PWD/.gitlab/qt6
         - echo "Pushing translation artifacts"
         - git config --global user.email "kwrobot+paraview-ci@kitware.com"
         - git config --global user.name "gitlab-ci"
         - git clone https://gitlab.kitware.com/paraview/paraview-translations.git
         - cmake -DNEW_TRANSLATIONS_DIR=./translations -DTRANSLATIONS_DIR=./paraview-translations/en/ -P .gitlab/ci/update_translations.cmake
         - cd paraview-translations
-        - cmake -B build -DQt5_DIR=/lib64/cmake/Qt5
+        - cmake -B build
         - cmake --build ./build/ --target files_update
         - if [ -n "$( git status -s )" ]; then git add -A; git commit -m "New strings from $CI_COMMIT_SHORT_SHA"; git push https://token:$PARAVIEW_TRANSLATIONS_TOKEN@gitlab.kitware.com/paraview/paraview-translations.git; else echo "No new string to push to paraview-translations for $CI_COMMIT_SHORT_SHA"; fi
 
