@@ -193,5 +193,62 @@
         Please note that this interactor works only with a device that returns absolute position of the mouse on the screen (vrpn_Mouse for instance).
       </Documentation>
     </VRFirstPersonCameraStyleProxy>
+    <VRJoystickCameraStyleProxy name="Controller"
+                          processes="client|renderserver|dataserver">
+      <IntVectorProperty name="UpAxis"
+      default_values="1"
+      number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="X Axis"
+                 value="0" />
+          <Entry text="Y Axis"
+                 value="1" />
+          <Entry text="Z Axis"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies the up axis of the scene.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInvertXAxis"
+                         name="InvertXAxis"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Invert the X axis of the camera rotation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInvertXAxis"
+                         name="InvertYAxis"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Invert the Y axis of the camera rotation.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="LookRotationSensitivity"
+                         default_values="0.01"
+                         number_of_elements="1">
+        <Documentation>
+          Modify the speed of the rotation of the camera when we move the joystick.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MoveCameraSensitivity"
+                         default_values="0.1"
+                         number_of_elements="1">
+        <Documentation>
+          Modify the move speed of the camera when we move the joystick.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Documentation>
+        This interaction style uses a controller with two joysticks to control the position of the camera
+        and its orientation.
+        In the CAVE, this interaction style has no effect unless the off axis projection is turned off.
+        The input device must contains 2 joysticks with valuators going from -1 to 1 in X and Y to function correctly (a
+        vrpn_Joylin or a vrpn_Joywin32 for instance)
+      </Documentation>
+    </VRJoystickCameraStyleProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
