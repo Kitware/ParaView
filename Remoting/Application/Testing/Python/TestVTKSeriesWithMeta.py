@@ -7,6 +7,8 @@ from paraview import smtesting
 
 import os.path
 
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 meta_file = os.path.join(smtesting.DataDir, "Testing/Data/FileSeries/blow.vtk.series")

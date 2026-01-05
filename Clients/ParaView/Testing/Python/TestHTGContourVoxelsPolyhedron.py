@@ -9,6 +9,8 @@ This rendering test ensures that the HTG contour using the "Voxels" strategy
 is the same as the decomposed polyhedra contour for a 2D slice.
 """
 
+LoadPalette("BlueGrayBackground")
+
 # Create the first renderview
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [678, 932]
@@ -118,8 +120,8 @@ for x in range(1, len(sys.argv)):
         testing.AddArgument("-V")
         testing.AddArgument(join(sys.argv[x+1], "TestHTGContourVoxelsPolyhedron.png"))
 
-resultVoxels = testing.RegressionTest(testimageVoxels, 10)
-resultPolyhedron = testing.RegressionTest(testImagePolyhedron, 10)
+resultVoxels = testing.RegressionTest(testimageVoxels, 0.05)
+resultPolyhedron = testing.RegressionTest(testImagePolyhedron, 0.05)
 
 if resultVoxels == testing.DO_INTERACTOR and resultPolyhedron == testing.DO_INTERACTOR:
     sys.exit(0)

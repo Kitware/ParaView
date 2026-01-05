@@ -3,6 +3,8 @@ from paraview.modules.vtkRemotingViews import *
 from vtk import *
 from paraview import smtesting
 
+simple.LoadPalette("BlueGrayBackground")
+
 NUM_POINTS = 5
 
 ### Create the geometry

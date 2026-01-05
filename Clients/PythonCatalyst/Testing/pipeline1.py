@@ -6,6 +6,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+LoadPalette("BlueGrayBackground")
+
 # ----------------------------------------------------------------
 # setup views used in the visualization
 # ----------------------------------------------------------------
@@ -57,6 +59,9 @@ slice1.SliceType.Normal = [0.0, 0.0, 1.0]
 
 # show data from wavelet1
 wavelet1Display = Show(wavelet1, renderView1, 'UniformGridRepresentation')
+
+rtDataLUT = GetColorTransferFunction("RTData")
+rtDataLUT.ApplyPreset('Cool to Warm', True)
 
 # trace defaults for the display properties.
 wavelet1Display.Representation = 'Outline'

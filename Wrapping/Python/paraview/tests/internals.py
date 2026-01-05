@@ -6,6 +6,6 @@ def compare(test_image, baseline_image):
     testing = vtkTesting()
     testing.AddArgument("-V")
     testing.AddArgument(baseline_image)
-    if testing.RegressionTest(test_image, 10) == vtkTesting.FAILED:
+    if testing.RegressionTest(test_image, 0.05) == vtkTesting.FAILED:
         raise RuntimeError("Regression test failed!")
     return True

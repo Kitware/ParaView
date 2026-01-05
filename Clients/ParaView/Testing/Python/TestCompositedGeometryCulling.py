@@ -2,6 +2,8 @@ from paraview import servermanager
 from paraview import simple as smp
 from paraview import smtesting
 
+smp.LoadPalette("BlueGrayBackground")
+
 # Make sure the test driver know that process has properly started
 print ("Process started")
 

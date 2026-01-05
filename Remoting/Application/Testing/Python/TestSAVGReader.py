@@ -1,6 +1,8 @@
 from paraview import simple
 from paraview import smtesting
 
+simple.LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 savg_file_path = smtesting.DataDir + '/Testing/Data/test.savg'

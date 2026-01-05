@@ -4,6 +4,8 @@ from paraview.vtk.vtkTestingRendering import vtkTesting
 from os.path import join
 import sys
 
+LoadPalette("BlueGrayBackground")
+
 # create a new 'Wavelet'
 wavelet1 = Wavelet(registrationName='Wavelet1')
 
@@ -18,6 +20,9 @@ ColorBy(wavelet1Display, ('POINTS', 'RTData'))
 
 # change representation type
 wavelet1Display.SetRepresentationType('Surface')
+
+rTDataLUT = GetColorTransferFunction('RTData')
+rTDataLUT.ApplyPreset('Cool to Warm', True)
 
 # hide color bar/color legend
 wavelet1Display.SetScalarBarVisibility(renderView1, False)
@@ -48,7 +53,7 @@ for x in range(1, len(sys.argv)):
         testing.AddArgument("-V")
         testing.AddArgument(join(sys.argv[x+1], "SaveTransparentImages.png"))
 
-result = testing.RegressionTest(testimage, 10)
+result = testing.RegressionTest(testimage, 0.05)
 if result == testing.DO_INTERACTOR:
     sys.exit(0)
 elif result == testing.NOT_RUN:

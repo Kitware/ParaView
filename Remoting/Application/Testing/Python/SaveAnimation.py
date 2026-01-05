@@ -1,6 +1,9 @@
 from __future__ import print_function
 from paraview.simple import *
 from paraview import smtesting
+
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 
 tempdir = smtesting.GetUniqueTempDirectory("SaveAnimation-")
@@ -13,7 +16,7 @@ def RegressionTest(imageName, baselineName):
     testing.AddArgument(tempdir)
     testing.AddArgument("-V")
     testing.AddArgument(smtesting.DataDir + "/Remoting/Application/Testing/Data/Baseline/" + baselineName)
-    return testing.RegressionTest(tempdir + "/" + imageName, 10) == vtkTesting.PASSED
+    return testing.RegressionTest(tempdir + "/" + imageName, 0.05) == vtkTesting.PASSED
 
 
 # Create a new 'Render View'

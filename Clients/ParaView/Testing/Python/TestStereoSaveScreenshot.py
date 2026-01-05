@@ -5,6 +5,8 @@ from paraview.vtk.vtkTestingRendering import vtkTesting
 from os.path import join
 import sys
 
+LoadPalette("BlueGrayBackground")
+
 testing = vtkTesting()
 for arg in sys.argv:
     testing.AddArgument(arg)
@@ -22,7 +24,7 @@ fname = join(testing.GetTempDirectory(), "TestStereoSaveScreenshot.png")
 SaveScreenshot(fname, ImageResolution=[800, 800], saveInBackground = True)
 servermanager.vtkRemoteWriterHelper.Wait(fname)
 
-result = testing.RegressionTest(fname, 10)
+result = testing.RegressionTest(fname, 0.05)
 if result == testing.DO_INTERACTOR:
     sys.exit(0)
 elif result == testing.NOT_RUN:

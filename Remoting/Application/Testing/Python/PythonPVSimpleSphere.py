@@ -1,6 +1,8 @@
 from paraview.simple import *
 from paraview import smtesting
 
+LoadPalette("BlueGrayBackground")
+
 sphere = Sphere()
 sphere.PhiResolution = 20
 sphere.ThetaResolution = 20

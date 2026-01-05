@@ -7,6 +7,8 @@
 from paraview import smtesting
 from paraview.simple import *
 
+LoadPalette("BlueGrayBackground")
+
 smtesting.ProcessCommandLineArguments()
 view = CreateRenderView()
 

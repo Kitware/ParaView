@@ -5,6 +5,8 @@ from paraview.vtk.vtkCommonCore import vtkCollection;
 import vtk.vtkRenderingVolume
 import os
 
+LoadPalette("BlueGrayBackground")
+
 paraview.simple._DisableFirstRenderCameraReset()
 
 smtesting.ProcessCommandLineArguments()

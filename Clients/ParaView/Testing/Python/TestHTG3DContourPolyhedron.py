@@ -9,6 +9,7 @@ This file tests that the HTG contour using decomposed polyhedra, shows the right
 being more precise than the voxel contour algorithm, which should give a different output.
 """
 
+LoadPalette("BlueGrayBackground")
 
 # Create the first renderview
 renderView1 = CreateView('RenderView')
@@ -55,6 +56,7 @@ contourPolyhedraConcave.PointMergeMethod = 'Uniform Binning'
 contourPolyhedraConcaveDisplay = Show(contourPolyhedraConcave, renderView1, 'GeometryRepresentation')
 depthTF2D = GetTransferFunction2D('Depth')
 depthLUT = GetColorTransferFunction('Depth')
+depthLUT.ApplyPreset('Cool to Warm', True)
 depthLUT.TransferFunction2D = depthTF2D
 depthLUT.RGBPoints = [0.0, 0.231373, 0.298039, 0.752941, 2.5, 0.865003, 0.865003, 0.865003, 5.0, 0.705882, 0.0156863, 0.14902]
 depthLUT.ScalarRangeInitialized = 1.0
@@ -81,7 +83,7 @@ for x in range(1, len(sys.argv)):
         testing.AddArgument("-V")
         testing.AddArgument(join(sys.argv[x+1], "TestHTG3DContourPolyhedron.png"))
 
-resultPolyhedron = testing.RegressionTest(testImagePolyhedron, 10)
+resultPolyhedron = testing.RegressionTest(testImagePolyhedron, 0.05)
 
 
 if resultPolyhedron == testing.DO_INTERACTOR:
