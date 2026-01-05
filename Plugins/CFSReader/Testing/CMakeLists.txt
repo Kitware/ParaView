@@ -31,5 +31,5 @@ paraview_add_client_server_render_tests(
   LOAD_PLUGIN   "CFSReader"
   BASELINE_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
   TEST_DATA_TARGET ParaViewData
-  PREFIX CFSReaderPlugin::pvcsr
+  PREFIX CFSReaderPlugin::pvcrs
   TEST_SCRIPTS  ${module_tests})
