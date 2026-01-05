@@ -304,7 +304,7 @@ function (_paraview_add_tests function)
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20697
     set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
       PROPERTY
-        TIMEOUT_AFTER_MATCH "5" "Couldn't find object")
+        TIMEOUT_AFTER_MATCH "5" "Couldn't find object\;Endian handshake failed")
   endforeach ()
 endfunction ()
 
