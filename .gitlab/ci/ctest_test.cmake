@@ -326,6 +326,16 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "^pvcs\\.FeatureEdgesRepresentationHTG$"
     "^pv\\.MultipleColorOnSelection$"
     "^pvcs\\.MultipleColorOnSelection$"
+
+    # macOS 15+ local network permission requests. New macOS requires
+    # applications to get user permission to access localhost network
+    # resources. There is no good way to automate answering these dialogs in CI
+    # jobs. Until there is a resolution, skip network-based tests.
+    "^pvcs\\."
+    "^pvcrs\\."
+    # Plugin tests.
+    "::pvcs\\."
+    "::pvcrs\\."
     )
 endif ()
 
