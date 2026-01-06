@@ -2,6 +2,7 @@ set(python_files
   paraview/__init__.py.in
   paraview/_backwardscompatibilityhelper.py
   paraview/algorithms/__init__.py
+  paraview/algorithms/atmosphere.py
   paraview/algorithms/openpmd.py
   paraview/algorithms/savgreader.py
   paraview/apps/__init__.py

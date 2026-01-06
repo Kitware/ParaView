@@ -1,0 +1,118 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- =================================================================== -->
+    <SourceProxy name="AtmosphereVolumize"
+                 label="Atmosphere Volumize"
+                 class="paraview.algorithms.atmosphere.AtmosphereVolumize"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Convert stacked 2D quad layers into 3D hexahedral cells.
+
+        This filter takes the 3D output from AtmosphereReader3D (Port 1 or Port 2) which
+        consists of stacked 2D quad layers at each vertical level, and converts
+        them into true 3D hexahedral (brick) cells. This enables proper volume
+        rendering and 3D visualization of atmospheric data.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>Input must be vtkUnstructuredGrid from AtmosphereReader3D 3D output.</Documentation>
+      </InputProperty>
+
+      <!-- end of AtmosphereVolumize -->
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="AtmosphereExtractSlices"
+                 label="Atmosphere Extract Slices"
+                 class="paraview.algorithms.atmosphere.AtmosphereExtractSlices"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Extract a contiguous range of vertical slices from 3D atmosphere data.
+
+        This filter extracts a subset of vertical levels from 3D atmosphere output,
+        useful for focusing on specific atmospheric regions such as the troposphere,
+        stratosphere, or boundary layer without processing the entire vertical column.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>Input must be vtkUnstructuredGrid from AtmosphereReader3D 3D output.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="MinMaxPlanes"
+                         label="Planes (Min - Max)"
+                         command="SetMaxPlane"
+                         number_of_elements="2"
+                         default_values="0 0">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>Select the range of vertical planes to extract (inclusive).</Documentation>
+      </IntVectorProperty>
+
+      <!-- end of AtmosphereExtractSlices -->
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="AtmosphereSphere"
+                 label="Atmosphere Sphere"
+                 class="paraview.algorithms.atmosphere.AtmosphereSphere"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Project lat/lon data onto a 3D sphere for globe visualization.
+
+        This filter transforms points from geographic coordinates (longitude as X,
+        latitude as Y, vertical level as Z) into spherical coordinates for
+        rendering data on a 3D globe. It supports vertical exaggeration through
+        a scale factor to make atmospheric layers visible.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>Input mesh with points in geographic coordinates.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="Data Layer"
+                         command="SetDataLayer"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>If enabled, adds a small offset to prevent z-fighting when overlaying data.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+                            command="SetScalingFactor"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <Documentation>Vertical exaggeration factor. Higher values make vertical structure more visible.</Documentation>
+      </DoubleVectorProperty>
+
+      <!-- end of AtmosphereSphere -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

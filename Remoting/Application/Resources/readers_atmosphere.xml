@@ -1,0 +1,257 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- =================================================================== -->
+    <SourceProxy name="AtmosphereReader3D"
+                 label="Atmosphere 3D Data Reader"
+                 class="paraview.algorithms.atmosphere.AtmosphereReader3D"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Multi-output NetCDF reader for E3SM/EAM atmospheric model data.
+
+        This reader produces three separate outputs for different variable types:
+        - Port 0 (2D): Surface variables with 2 dimensions (time, ncol)
+        - Port 1 (3D-lev): Variables on middle levels with 3 dimensions (time, lev, ncol)
+        - Port 2 (3D-ilev): Variables on interface levels with 3 dimensions (time, ilev, ncol)
+      </Documentation>
+
+      <OutputPort index="0" name="2D" />
+      <OutputPort index="1" name="3D middle layer" />
+      <OutputPort index="2" name="3D interface layer" />
+
+      <StringVectorProperty command="SetDataFileName"
+                            name="FileName1"
+                            label="Data File"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify the NetCDF data file name.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetConnFileName"
+                            name="FileName2"
+                            label="Connectivity File"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify the NetCDF connectivity file name.</Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1"
+                            si_class="vtkSITimeStepsProperty">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="2DVariablesInfo"
+                            command="Get2DDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="2D Variables"
+                            command="Get2DDataArrays"
+                            information_property="2DVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="2DVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the 2D surface variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="3DMiddleLayerVariablesInfo"
+                            command="Get3DmDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="3D Middle Layer Variables"
+                            command="Get3DmDataArrays"
+                            information_property="3DMiddleLayerVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="3DMiddleLayerVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the 3D middle layer (lev) variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="3DInterfaceLayerVariablesInfo"
+                            command="Get3DiDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="3D Interface Layer Variables"
+                            command="Get3DiDataArrays"
+                            information_property="3DInterfaceLayerVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="3DInterfaceLayerVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the 3D interface layer (ilev) variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="nc" file_description="Atmosphere NetCDF files" />
+      </Hints>
+
+      <!-- end of AtmosphereReader3D -->
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="AtmosphereReader2D"
+                 label="Atmosphere 2D Data Reader"
+                 class="paraview.algorithms.atmosphere.AtmosphereReader2D"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Single-output NetCDF reader with vertical level slicing for 3D data.
+
+        This reader produces a single 2D mesh output, projecting 3D atmospheric data
+        onto a 2D surface by selecting specific vertical level indices. This is useful
+        for creating lightweight 2D visualizations of atmospheric layers.
+      </Documentation>
+
+      <OutputPort index="0" name="Mesh" />
+
+      <StringVectorProperty command="SetDataFileName"
+                            name="FileName1"
+                            label="Data File"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify the NetCDF data file name.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetConnFileName"
+                            name="FileName2"
+                            label="Connectivity File"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify the NetCDF connectivity file name.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="Middle Layer"
+                         command="SetMiddleLayer"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>Select which middle layer (lev) index to slice.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Interface Layer"
+                         command="SetInterfaceLayer"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>Select which interface layer (ilev) index to slice.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1"
+                            si_class="vtkSITimeStepsProperty">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="2DVariablesInfo"
+                            command="Get2DDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="2D Variables"
+                            command="Get2DDataArrays"
+                            information_property="2DVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="2DVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the 2D surface variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="3DMiddleLayerVariablesInfo"
+                            command="Get3DmDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="3D Middle Layer Variables"
+                            command="Get3DmDataArrays"
+                            information_property="3DMiddleLayerVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="3DMiddleLayerVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the 3D middle layer (lev) variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="3DInterfaceLayerVariablesInfo"
+                            command="Get3DiDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="3D Interface Layer Variables"
+                            command="Get3DiDataArrays"
+                            information_property="3DInterfaceLayerVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="3DInterfaceLayerVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the 3D interface layer (ilev) variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="nc" file_description="Atmosphere NetCDF files" />
+      </Hints>
+
+      <!-- end of AtmosphereReader2D -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
