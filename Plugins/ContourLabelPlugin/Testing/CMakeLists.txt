@@ -25,5 +25,5 @@ paraview_add_client_server_render_tests(
   LOAD_PLUGIN   "ContourLabelPlugin"
   BASELINE_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
   TEST_DATA_TARGET ParaViewData
-  PREFIX ContourLabelPlugin::pvcsr
+  PREFIX ContourLabelPlugin::pvcrs
   TEST_SCRIPTS  ${module_tests})
