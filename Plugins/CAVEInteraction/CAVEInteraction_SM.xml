@@ -193,7 +193,7 @@
         Please note that this interactor works only with a device that returns absolute position of the mouse on the screen (vrpn_Mouse for instance).
       </Documentation>
     </VRFirstPersonCameraStyleProxy>
-    <VRJoystickCameraStyleProxy name="Controller"
+    <VRJoystickCameraStyleProxy name="Joystick Camera"
                           processes="client|renderserver|dataserver">
       <IntVectorProperty name="UpAxis"
       default_values="1"
