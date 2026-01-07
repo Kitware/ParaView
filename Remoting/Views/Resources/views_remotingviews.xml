@@ -1468,7 +1468,8 @@
       <StringVectorProperty command="SetANARILibrary"
                             default_values="visrtx"
                             name="ANARILibrary"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <StringListDomain name="list">
           <String value="visrtx" />
           <String value="helide" />

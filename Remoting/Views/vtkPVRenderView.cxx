@@ -3652,7 +3652,18 @@ void vtkPVRenderView::SetEnableANARI(bool v)
     // set again, so we need to set them here.
     if (std::string(this->GetANARILibrary()).empty())
     {
-      this->SetANARILibrary("visrtx");
+      // TODO: When switching ANARI libraries works, we should set visrtx as
+      // the default.
+      auto* envLibraryName = std::getenv("ANARI_LIBRARY");
+      if (envLibraryName)
+      {
+        this->SetANARILibrary("environment");
+      }
+      else
+      {
+        // this library is installed with paraview so it is always available
+        this->SetANARILibrary("visrtx");
+      }
     }
   }
   else
