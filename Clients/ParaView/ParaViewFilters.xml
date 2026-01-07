@@ -282,6 +282,7 @@
   <Proxy group="filters" name="AggregateDataSet" />
   <Proxy group="filters" name="AlignImageOrigin" />
   <Proxy group="filters" name="AngularPeriodicFilter" />
+  <Proxy group="filters" name="AtmosphereSphere" />
   <Proxy group="filters" name="AnnotateAttributeData" />
   <Proxy group="filters" name="AnnotateGlobalData" />
   <Proxy group="filters" name="Append" />
