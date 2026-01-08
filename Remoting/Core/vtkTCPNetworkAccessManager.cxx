@@ -454,7 +454,16 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(int por
 
   vtksys::SystemInformation sys_info;
   sys_info.RunOSCheck();
-  const char* sys_hostname = sys_info.GetHostname() ? sys_info.GetHostname() : "localhost";
+  std::string const& boundAddress = server_socket->GetBoundAddress();
+  const char* sys_hostname;
+  if (boundAddress.empty() || boundAddress == "0.0.0.0")
+  {
+    sys_hostname = sys_info.GetHostname() ? sys_info.GetHostname() : "localhost";
+  }
+  else
+  {
+    sys_hostname = boundAddress.c_str();
+  }
 
   // print out a status message.
   std::cout << "Accepting connection(s): " << sys_hostname << ":" << server_socket->GetServerPort()
