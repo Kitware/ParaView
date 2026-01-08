@@ -1,0 +1,96 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="settings">
+        <SettingsProxy name="ZSpaceSettings"
+                       label="zSpace Settings"
+                       processes="client|dataserver|renderserver"
+                       class="vtkPVZSpaceSettings">
+
+            <!-- Left button -->
+            <IntVectorProperty name="LeftButtonUseCustomMacro"
+                               label="Use custom macro"
+                               command="SetLeftButtonUseCustomMacro"
+                               number_of_elements="1"
+                               default_values="0" >
+                <Documentation>
+                    If enabled, the macro name will be triggered for the left button.
+                </Documentation>
+                <BooleanDomain name="bool" />
+            </IntVectorProperty>
+            <StringVectorProperty name="LeftButtonMacroName"
+                                  label="Macro name"
+                                  command="SetLeftButtonMacro"
+                                  number_of_elements="1"
+                                  panel_visibility="default">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="enabled_state"
+                                             property="LeftButtonUseCustomMacro"
+                                             value="1" />
+                </Hints>
+            </StringVectorProperty>
+
+            <!-- Left button -->
+            <IntVectorProperty name="MiddleButtonUseCustomMacro"
+                               label="Use custom macro"
+                               command="SetMiddleButtonUseCustomMacro"
+                               number_of_elements="1"
+                               default_values="0" >
+                <Documentation>
+                    If enabled, the macro name will be triggered for the middle button.
+                </Documentation>
+                <BooleanDomain name="bool" />
+            </IntVectorProperty>
+            <StringVectorProperty name="MiddleButtonMacroName"
+                                  label="Macro name"
+                                  command="SetMiddleButtonMacro"
+                                  number_of_elements="1"
+                                  panel_visibility="default">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="enabled_state"
+                                             property="MiddleButtonUseCustomMacro"
+                                             value="1" />
+                </Hints>
+            </StringVectorProperty>
+
+            <!-- Right button -->
+            <IntVectorProperty name="RightButtonUseCustomMacro"
+                               label="Use custom macro"
+                               command="SetRightButtonUseCustomMacro"
+                               number_of_elements="1"
+                               default_values="0" >
+                <Documentation>
+                    If enabled, the macro name will be triggered for the right button.
+                </Documentation>
+                <BooleanDomain name="bool" />
+            </IntVectorProperty>
+            <StringVectorProperty name="RightButtonMacroName"
+                                  label="Macro name"
+                                  command="SetRightButtonMacro"
+                                  number_of_elements="1"
+                                  panel_visibility="default">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="enabled_state"
+                                             property="RightButtonUseCustomMacro"
+                                             value="1" />
+                </Hints>
+            </StringVectorProperty>
+
+            <PropertyGroup label="Left button control">
+                <Property name="LeftButtonUseCustomMacro" />
+                <Property name="LeftButtonMacroName" />
+            </PropertyGroup>
+
+            <PropertyGroup label="Middle button control">
+                <Property name="MiddleButtonUseCustomMacro" />
+                <Property name="MiddleButtonMacroName" />
+            </PropertyGroup>
+
+            <PropertyGroup label="Right button control">
+                <Property name="RightButtonUseCustomMacro" />
+                <Property name="RightButtonMacroName" />
+            </PropertyGroup>
+        </SettingsProxy>
+    </ProxyGroup>
+</ServerManagerConfiguration>
