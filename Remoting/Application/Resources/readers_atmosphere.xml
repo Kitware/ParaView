@@ -10,17 +10,17 @@
         Multi-output NetCDF reader for E3SM/EAM atmospheric model data.
 
         This reader produces three separate outputs for different variable types:
-        - Port 0 (2D): Surface variables with 2 dimensions (time, ncol) as quad mesh
-        - Port 1 (3D-lev): Variables on middle levels as hexahedral volume mesh
-        - Port 2 (3D-ilev): Variables on interface levels as hexahedral volume mesh
+        - Port 0 (Surface): Surface variables with 2 dimensions (time, ncol) as quad mesh
+        - Port 1 (Middle Layer): Variables on middle levels as hexahedral volume mesh
+        - Port 2 (Interface Layer): Variables on interface levels as hexahedral volume mesh
 
-        The 3D outputs are volumized directly, producing hexahedral cells that span
+        The 3D outputs are converted to volumetric data, producing hexahedral cells that span
         between adjacent vertical levels for immediate volume rendering support.
       </Documentation>
 
-      <OutputPort index="0" name="2D" />
-      <OutputPort index="1" name="3D middle layer" />
-      <OutputPort index="2" name="3D interface layer" />
+      <OutputPort index="0" name="Surface" />
+      <OutputPort index="1" name="Middle Layer" />
+      <OutputPort index="2" name="Interface Layer" />
 
       <StringVectorProperty command="SetDataFileName"
                             name="FileName1"
@@ -30,7 +30,7 @@
         <Documentation>Specify the NetCDF data file name.</Documentation>
       </StringVectorProperty>
 
-      <StringVectorProperty command="SetConnFileName"
+      <StringVectorProperty command="SetConnectivityFileName"
                             name="FileName2"
                             label="Connectivity File"
                             number_of_elements="1">
@@ -45,73 +45,76 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
 
-      <StringVectorProperty name="2DVariablesInfo"
-                            command="Get2DDataArrays"
+      <StringVectorProperty name="SurfaceVariablesInfo"
+                            command="GetSurfaceDataArrays"
                             number_of_elements_per_command="2"
                             information_only="1"
                             si_class="vtkSIDataArraySelectionProperty" />
 
-      <StringVectorProperty name="2D Variables"
-                            command="Get2DDataArrays"
-                            information_property="2DVariablesInfo"
+      <StringVectorProperty name="SurfaceVariables"
+                            label="Surface Variables"
+                            command="GetSurfaceDataArrays"
+                            information_property="SurfaceVariablesInfo"
                             number_of_elements_per_command="2"
                             element_types="2 0"
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
         <ArraySelectionDomain name="array_list">
           <RequiredProperties>
-            <Property function="ArrayList" name="2DVariablesInfo" />
+            <Property function="ArrayList" name="SurfaceVariablesInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>Select the 2D surface variables to read.</Documentation>
+        <Documentation>Select the surface variables to read.</Documentation>
         <Hints>
           <ArraySelectionWidget icon_type="cell" />
         </Hints>
       </StringVectorProperty>
 
-      <StringVectorProperty name="3DMiddleLayerVariablesInfo"
-                            command="Get3DmDataArrays"
+      <StringVectorProperty name="MiddleLayerVariablesInfo"
+                            command="GetMiddleLayerDataArrays"
                             number_of_elements_per_command="2"
                             information_only="1"
                             si_class="vtkSIDataArraySelectionProperty" />
 
-      <StringVectorProperty name="3D Middle Layer Variables"
-                            command="Get3DmDataArrays"
-                            information_property="3DMiddleLayerVariablesInfo"
+      <StringVectorProperty name="MiddleLayerVariables"
+                            label="Middle Layer Variables"
+                            command="GetMiddleLayerDataArrays"
+                            information_property="MiddleLayerVariablesInfo"
                             number_of_elements_per_command="2"
                             element_types="2 0"
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
         <ArraySelectionDomain name="array_list">
           <RequiredProperties>
-            <Property function="ArrayList" name="3DMiddleLayerVariablesInfo" />
+            <Property function="ArrayList" name="MiddleLayerVariablesInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>Select the 3D middle layer (lev) variables to read.</Documentation>
+        <Documentation>Select the middle layer (lev) variables to read.</Documentation>
         <Hints>
           <ArraySelectionWidget icon_type="cell" />
         </Hints>
       </StringVectorProperty>
 
-      <StringVectorProperty name="3DInterfaceLayerVariablesInfo"
-                            command="Get3DiDataArrays"
+      <StringVectorProperty name="InterfaceLayerVariablesInfo"
+                            command="GetInterfaceLayerDataArrays"
                             number_of_elements_per_command="2"
                             information_only="1"
                             si_class="vtkSIDataArraySelectionProperty" />
 
-      <StringVectorProperty name="3D Interface Layer Variables"
-                            command="Get3DiDataArrays"
-                            information_property="3DInterfaceLayerVariablesInfo"
+      <StringVectorProperty name="InterfaceLayerVariables"
+                            label="Interface Layer Variables"
+                            command="GetInterfaceLayerDataArrays"
+                            information_property="InterfaceLayerVariablesInfo"
                             number_of_elements_per_command="2"
                             element_types="2 0"
                             repeat_command="1"
                             si_class="vtkSIDataArraySelectionProperty">
         <ArraySelectionDomain name="array_list">
           <RequiredProperties>
-            <Property function="ArrayList" name="3DInterfaceLayerVariablesInfo" />
+            <Property function="ArrayList" name="InterfaceLayerVariablesInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>Select the 3D interface layer (ilev) variables to read.</Documentation>
+        <Documentation>Select the interface layer (ilev) variables to read.</Documentation>
         <Hints>
           <ArraySelectionWidget icon_type="cell" />
         </Hints>

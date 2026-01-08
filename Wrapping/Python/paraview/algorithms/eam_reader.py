@@ -17,9 +17,9 @@ Readers
 -------
 EAMDataReader
     Multi-output reader that produces three separate outputs:
-    - Port 0: 2D surface variables (e.g., surface temperature, precipitation)
-    - Port 1: 3D variables on middle levels (lev) as hexahedral volume mesh
-    - Port 2: 3D variables on interface levels (ilev) as hexahedral volume mesh
+    - Port 0: Surface variables (e.g., surface temperature, precipitation)
+    - Port 1: Middle layer variables on lev levels as hexahedral volume mesh
+    - Port 2: Interface layer variables on ilev levels as hexahedral volume mesh
 
 Filters
 -------
@@ -453,13 +453,13 @@ class EAMDataReader(VTKPythonAlgorithmBase):
     Multi-output NetCDF reader for E3SM/EAM atmospheric model data.
 
     This reader produces three separate outputs for different variable types:
-    - Port 0 (2D): Surface variables with 2 dimensions (time, ncol) as quad mesh
-    - Port 1 (3D-lev): Variables on middle levels as hexahedral volume mesh
-    - Port 2 (3D-ilev): Variables on interface levels as hexahedral volume mesh
+    - Port 0 (Surface): Surface variables with 2 dimensions (time, ncol) as quad mesh
+    - Port 1 (Middle Layer): Variables on middle levels as hexahedral volume mesh
+    - Port 2 (Interface Layer): Variables on interface levels as hexahedral volume mesh
 
-    The 3D outputs are volumized directly in the reader, producing hexahedral cells
-    that span between adjacent vertical levels. This enables immediate volume
-    rendering without requiring additional filters.
+    The 3D outputs are converted to volumetric data directly in the reader,
+    producing hexahedral cells that span between adjacent vertical levels.
+    This enables immediate volume rendering without requiring additional filters.
 
     The reader automatically detects horizontal dimensions by matching the connectivity
     file's cell count with dimensions in the data file. It handles fill values
@@ -467,23 +467,23 @@ class EAMDataReader(VTKPythonAlgorithmBase):
 
     Parameters
     ----------
-    FileName1 : str
+    DataFile : str
         Path to the NetCDF data file containing atmospheric variables.
-    FileName2 : str
+    ConnectivityFile : str
         Path to the NetCDF connectivity file containing mesh topology
         (corner_lat, corner_lon arrays defining cell vertices).
 
     Outputs
     -------
     Port 0 : vtkUnstructuredGrid
-        2D surface mesh with quad cells. Each cell corresponds to one
-        horizontal grid column. Contains selected 2D variables as cell data.
+        Surface mesh with quad cells. Each cell corresponds to one
+        horizontal grid column. Contains selected surface variables as cell data.
     Port 1 : vtkUnstructuredGrid
-        3D volumetric mesh for middle-level (lev) variables with hexahedral cells.
+        Volumetric mesh for middle layer (lev) variables with hexahedral cells.
         Cell data is averaged between adjacent levels. Contains 'lev' and 'numlev'
         in field data.
     Port 2 : vtkUnstructuredGrid
-        3D volumetric mesh for interface-level (ilev) variables with hexahedral cells.
+        Volumetric mesh for interface layer (ilev) variables with hexahedral cells.
         Cell data is averaged between adjacent levels. Contains 'ilev' and 'numilev'
         in field data.
 
@@ -501,13 +501,12 @@ class EAMDataReader(VTKPythonAlgorithmBase):
     -------
     In ParaView Python shell::
 
-        from paraview.simple import *
+        from paraview.simple import EAMDataReader
         reader = EAMDataReader()
-        reader.FileName1 = '/path/to/data.nc'
-        reader.FileName2 = '/path/to/connectivity.nc'
-        reader.UpdatePipelineInformation()
-        reader.Get2DDataArrays().EnableArray('TREFHT')
-        reader.Update()
+        reader.DataFile = '/path/to/data.nc'
+        reader.ConnectivityFile = '/path/to/connectivity.nc'
+        reader.SurfaceVariables = ['TREFHT']
+        reader.UpdatePipeline()
     """
 
     def __init__(self):
@@ -523,11 +522,11 @@ class EAMDataReader(VTKPythonAlgorithmBase):
         self._dimensions = {}
         self._variables = {}
 
-        self._vars2D_selection = vtkDataArraySelection()
-        self._vars3Dm_selection = vtkDataArraySelection()
-        self._vars3Di_selection = vtkDataArraySelection()
+        self._surface_selection = vtkDataArraySelection()
+        self._middle_layer_selection = vtkDataArraySelection()
+        self._interface_layer_selection = vtkDataArraySelection()
 
-        for sel in [self._vars2D_selection, self._vars3Dm_selection, self._vars3Di_selection]:
+        for sel in [self._surface_selection, self._middle_layer_selection, self._interface_layer_selection]:
             sel.AddObserver("ModifiedEvent", createModifiedCallback(self))
 
         self._mesh_dataset = None
@@ -591,9 +590,9 @@ class EAMDataReader(VTKPythonAlgorithmBase):
             print_warning("Could not match horizontal dimension in data file")
             return
 
-        self._vars2D_selection.RemoveAllArrays()
-        self._vars3Dm_selection.RemoveAllArrays()
-        self._vars3Di_selection.RemoveAllArrays()
+        self._surface_selection.RemoveAllArrays()
+        self._middle_layer_selection.RemoveAllArrays()
+        self._interface_layer_selection.RemoveAllArrays()
 
         for dim_name, dim_obj in vardata.dimensions.items():
             dim_meta = DimMeta(dim_name, dim_obj.size)
@@ -618,16 +617,16 @@ class EAMDataReader(VTKPythonAlgorithmBase):
 
             ndims = len(info.dimensions)
             if ndims == 2:
-                self._vars2D_selection.AddArray(name)
+                self._surface_selection.AddArray(name)
             elif ndims == 3:
                 if AtmosphereConstants.LEV in info.dimensions:
-                    self._vars3Dm_selection.AddArray(name)
+                    self._middle_layer_selection.AddArray(name)
                 elif AtmosphereConstants.ILEV in info.dimensions:
-                    self._vars3Di_selection.AddArray(name)
+                    self._interface_layer_selection.AddArray(name)
 
-        self._vars2D_selection.DisableAllArrays()
-        self._vars3Dm_selection.DisableAllArrays()
-        self._vars3Di_selection.DisableAllArrays()
+        self._surface_selection.DisableAllArrays()
+        self._middle_layer_selection.DisableAllArrays()
+        self._interface_layer_selection.DisableAllArrays()
 
         if 'time' in vardata.variables:
             self._time_steps = list(vardata['time'][:].data.flatten())
@@ -639,7 +638,7 @@ class EAMDataReader(VTKPythonAlgorithmBase):
             self._populate_metadata()
             self.Modified()
 
-    def SetConnFileName(self, fname):
+    def SetConnectivityFileName(self, fname):
         if fname != self._conn_filename:
             self._conn_filename = fname
             self._clear()
@@ -650,14 +649,14 @@ class EAMDataReader(VTKPythonAlgorithmBase):
     def GetTimestepValues(self):
         return self._time_steps
 
-    def Get2DDataArrays(self):
-        return self._vars2D_selection
+    def GetSurfaceDataArrays(self):
+        return self._surface_selection
 
-    def Get3DmDataArrays(self):
-        return self._vars3Dm_selection
+    def GetMiddleLayerDataArrays(self):
+        return self._middle_layer_selection
 
-    def Get3DiDataArrays(self):
-        return self._vars3Di_selection
+    def GetInterfaceLayerDataArrays(self):
+        return self._interface_layer_selection
 
     def RequestInformation(self, request, inInfo, outInfo):
         executive = self.GetExecutive()
@@ -711,60 +710,56 @@ class EAMDataReader(VTKPythonAlgorithmBase):
         from_port = request.Get(executive.FROM_OUTPUT_PORT())
         time_idx = self._get_time_index(outInfo, from_port)
 
-        # Output 0: 2D surface data
-        output2D = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 0))
+        # Output 0: Surface data
+        outputSurface = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 0))
         vtk_coords, cell_types, cell_array = build_2d_geometry(lat, lon, ncells2D)
-        output2D.SetPoints(vtk_coords)
-        output2D.VTKObject.SetCells(cell_types, cell_array)
+        outputSurface.SetPoints(vtk_coords)
+        outputSurface.VTKObject.SetCells(cell_types, cell_array)
 
         for name, varmeta in self._variables.items():
-            if self._vars2D_selection.ArrayIsEnabled(name):
+            if self._surface_selection.ArrayIsEnabled(name):
                 data = load_variable_data(vardata, varmeta, time_idx)
-                output2D.CellData.append(data, name)
+                outputSurface.CellData.append(data, name)
 
-        # Output 1: 3D middle layer (lev) - volumized hexahedral mesh
+        # Output 1: Middle layer (lev) - volumetric hexahedral mesh
         try:
             lev = FindSpecialVariable(vardata, AtmosphereConstants.LEV, AtmosphereConstants.HYAM, AtmosphereConstants.HYBM)
             if lev is not None:
                 nlev = len(lev)
-                output3Dm = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 1))
+                outputMiddle = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 1))
                 vtk_coords, cell_types, cell_array = build_3d_volume_geometry(lat, lon, lev, ncells2D)
-                output3Dm.SetPoints(vtk_coords)
-                output3Dm.VTKObject.SetCells(cell_types, cell_array)
+                outputMiddle.SetPoints(vtk_coords)
+                outputMiddle.VTKObject.SetCells(cell_types, cell_array)
 
                 for name, varmeta in self._variables.items():
-                    if self._vars3Dm_selection.ArrayIsEnabled(name):
+                    if self._middle_layer_selection.ArrayIsEnabled(name):
                         data = load_variable_data_averaged(vardata, varmeta, time_idx, ncells2D, nlev)
-                        output3Dm.CellData.append(data, name)
+                        outputMiddle.CellData.append(data, name)
 
-                output3Dm.FieldData.append(nlev - 1, "numlev")
-                output3Dm.FieldData.append(lev, "lev")
+                outputMiddle.FieldData.append(nlev - 1, "numlev")
+                outputMiddle.FieldData.append(lev, "lev")
         except Exception as e:
             print_error(f"Error processing middle layer variables: {e}")
 
-        print(output3Dm.VTKObject)
-
-        # Output 2: 3D interface layer (ilev) - volumized hexahedral mesh
+        # Output 2: Interface layer (ilev) - volumetric hexahedral mesh
         try:
             ilev = FindSpecialVariable(vardata, AtmosphereConstants.ILEV, AtmosphereConstants.HYAI, AtmosphereConstants.HYBI)
             if ilev is not None:
                 nilev = len(ilev)
-                output3Di = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 2))
+                outputInterface = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 2))
                 vtk_coords, cell_types, cell_array = build_3d_volume_geometry(lat, lon, ilev, ncells2D)
-                output3Di.SetPoints(vtk_coords)
-                output3Di.VTKObject.SetCells(cell_types, cell_array)
+                outputInterface.SetPoints(vtk_coords)
+                outputInterface.VTKObject.SetCells(cell_types, cell_array)
 
                 for name, varmeta in self._variables.items():
-                    if self._vars3Di_selection.ArrayIsEnabled(name):
+                    if self._interface_layer_selection.ArrayIsEnabled(name):
                         data = load_variable_data_averaged(vardata, varmeta, time_idx, ncells2D, nilev)
-                        output3Di.CellData.append(data, name)
+                        outputInterface.CellData.append(data, name)
 
-                output3Di.FieldData.append(nilev - 1, "numilev")
-                output3Di.FieldData.append(ilev, "ilev")
+                outputInterface.FieldData.append(nilev - 1, "numilev")
+                outputInterface.FieldData.append(ilev, "ilev")
         except Exception as e:
             print_error(f"Error processing interface layer variables: {e}")
-
-        print(output3Di.VTKObject)
 
         return 1
 
@@ -827,19 +822,19 @@ class EAMProjectToSphere(VTKPythonAlgorithmBase):
 
         from paraview.simple import *
         reader = EAMDataReader()
-        reader.FileName1 = '/path/to/data.nc'
-        reader.FileName2 = '/path/to/connectivity.nc'
-        reader.Get2DDataArrays().EnableArray('TREFHT')
+        reader.DataFile = '/path/to/data.nc'
+        reader.ConnectivityFile = '/path/to/connectivity.nc'
+        reader.SurfaceVariables = ['TREFHT']
         reader.Update()
 
-        # Project 2D output onto sphere
+        # Project surface output onto sphere
         sphere = EAMProjectToSphere(Input=OutputPort(reader, 0))
-        sphere.SetDataLayer(True)  # Slight offset for layering
+        sphere.DataLayer = True  # Slight offset for layering
         sphere.Update()
 
-        # For 3D data with vertical exaggeration
+        # For middle layer data with vertical exaggeration
         sphere3d = EAMProjectToSphere(Input=OutputPort(reader, 1))
-        sphere3d.SetScalingFactor(10.0)  # Exaggerate vertical structure
+        sphere3d.Scale = 10.0  # Exaggerate vertical structure
         sphere3d.Update()
     """
 

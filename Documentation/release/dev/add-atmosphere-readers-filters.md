@@ -11,8 +11,8 @@ stored in NetCDF format.
   - 3D middle layer (lev) variables as hexahedral volume mesh
   - 3D interface layer (ilev) variables as hexahedral volume mesh
 
-  The 3D outputs are volumized directly in the reader, producing hexahedral cells
-  that span between adjacent vertical levels. This enables immediate volume
+  The 3D outputs are converted to volumetric data directly in the reader,
+  producing hexahedral cells that span between adjacent vertical levels. This enables immediate volume
   rendering without requiring additional filters. Supports time animation and
   automatic detection of hybrid sigma-pressure coordinates.
 
