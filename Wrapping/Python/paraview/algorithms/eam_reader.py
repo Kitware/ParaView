@@ -15,7 +15,7 @@ No external dependencies like pyproj or pandas are required.
 
 Readers
 -------
-AtmosphereReader
+EAMDataReader
     Multi-output reader that produces three separate outputs:
     - Port 0: 2D surface variables (e.g., surface temperature, precipitation)
     - Port 1: 3D variables on middle levels (lev) as hexahedral volume mesh
@@ -23,7 +23,7 @@ AtmosphereReader
 
 Filters
 -------
-AtmosphereSphere
+EAMProjectToSphere
     Projects lat/lon data onto a 3D sphere for globe visualization.
     Supports scaling for vertical exaggeration of atmospheric layers.
 
@@ -50,14 +50,14 @@ Usage Example
 -------------
 In ParaView:
 1. Use File -> Open to select a NetCDF data file
-2. Choose "Atmosphere Data Reader"
+2. Choose "EAM Data Reader"
 3. Set the connectivity file path in the Properties panel
 4. Select variables to load from the array selection widgets
 5. Apply to visualize
 
 For spherical projection:
-1. Apply AtmosphereReader reader
-2. Apply AtmosphereSphere filter
+1. Apply EAMDataReader reader
+2. Apply EAMProjectToSphere filter
 3. Adjust scale factor for vertical exaggeration if needed
 """
 
@@ -445,10 +445,10 @@ def process_point_to_sphere(point, max_z, radius, scale):
 
 
 # ==============================================================================
-# AtmosphereReader - Multi-output reader for 2D and 3D volumetric data
+# EAMDataReader - Multi-output reader for 2D and 3D volumetric data
 # ==============================================================================
 
-class AtmosphereReader(VTKPythonAlgorithmBase):
+class EAMDataReader(VTKPythonAlgorithmBase):
     """
     Multi-output NetCDF reader for E3SM/EAM atmospheric model data.
 
@@ -502,7 +502,7 @@ class AtmosphereReader(VTKPythonAlgorithmBase):
     In ParaView Python shell::
 
         from paraview.simple import *
-        reader = AtmosphereReader()
+        reader = EAMDataReader()
         reader.FileName1 = '/path/to/data.nc'
         reader.FileName2 = '/path/to/connectivity.nc'
         reader.UpdatePipelineInformation()
@@ -766,10 +766,10 @@ class AtmosphereReader(VTKPythonAlgorithmBase):
 
 
 # ==============================================================================
-# AtmosphereSphere - Project data onto spherical coordinates
+# EAMProjectToSphere - Project data onto spherical coordinates
 # ==============================================================================
 
-class AtmosphereSphere(VTKPythonAlgorithmBase):
+class EAMProjectToSphere(VTKPythonAlgorithmBase):
     """
     Project lat/lon data onto a 3D sphere for globe visualization.
 
@@ -822,19 +822,19 @@ class AtmosphereSphere(VTKPythonAlgorithmBase):
     In ParaView Python shell::
 
         from paraview.simple import *
-        reader = AtmosphereReader()
+        reader = EAMDataReader()
         reader.FileName1 = '/path/to/data.nc'
         reader.FileName2 = '/path/to/connectivity.nc'
         reader.Get2DDataArrays().EnableArray('TREFHT')
         reader.Update()
 
         # Project 2D output onto sphere
-        sphere = AtmosphereSphere(Input=OutputPort(reader, 0))
+        sphere = EAMProjectToSphere(Input=OutputPort(reader, 0))
         sphere.SetDataLayer(True)  # Slight offset for layering
         sphere.Update()
 
         # For 3D data with vertical exaggeration
-        sphere3d = AtmosphereSphere(Input=OutputPort(reader, 1))
+        sphere3d = EAMProjectToSphere(Input=OutputPort(reader, 1))
         sphere3d.SetScalingFactor(10.0)  # Exaggerate vertical structure
         sphere3d.Update()
     """

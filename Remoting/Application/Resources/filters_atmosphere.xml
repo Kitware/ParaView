@@ -1,9 +1,9 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
     <!-- =================================================================== -->
-    <SourceProxy name="AtmosphereSphere"
-                 label="Atmosphere Sphere"
-                 class="paraview.algorithms.atmosphere.AtmosphereSphere"
+    <SourceProxy name="EAMProjectToSphere"
+                 label="EAM Project To Sphere"
+                 class="paraview.algorithms.eam_reader.EAMProjectToSphere"
                  si_class="vtkSIPythonSourceProxy">
 
       <Documentation>
@@ -43,7 +43,7 @@
         <Documentation>Vertical exaggeration factor. Higher values make vertical structure more visible.</Documentation>
       </DoubleVectorProperty>
 
-      <!-- end of AtmosphereSphere -->
+      <!-- end of EAMProjectToSphere -->
     </SourceProxy>
 
   </ProxyGroup>

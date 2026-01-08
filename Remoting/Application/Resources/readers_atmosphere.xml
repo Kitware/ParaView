@@ -1,9 +1,9 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
     <!-- =================================================================== -->
-    <SourceProxy name="AtmosphereReader"
-                 label="Atmosphere Data Reader"
-                 class="paraview.algorithms.atmosphere.AtmosphereReader"
+    <SourceProxy name="EAMDataReader"
+                 label="EAM Data Reader"
+                 class="paraview.algorithms.eam_reader.EAMDataReader"
                  si_class="vtkSIPythonSourceProxy">
 
       <Documentation>
@@ -118,10 +118,10 @@
       </StringVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="nc" file_description="Atmosphere NetCDF files" />
+        <ReaderFactory extensions="nc" file_description="EAM NetCDF files" />
       </Hints>
 
-      <!-- end of AtmosphereReader -->
+      <!-- end of EAMDataReader -->
     </SourceProxy>
 
   </ProxyGroup>

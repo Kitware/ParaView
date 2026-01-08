@@ -1,4 +1,4 @@
-## Add Atmosphere reader and filter for EAM/E3SM data
+## Add EAM reader and filter for E3SM data
 
 ParaView now includes a Python-based reader and filter for visualizing E3SM/EAM
 (Energy Exascale Earth System Model / E3SM Atmosphere Model) atmospheric data
@@ -6,7 +6,7 @@ stored in NetCDF format.
 
 ### Reader
 
-- **Atmosphere Data Reader**: Multi-output reader producing separate outputs for:
+- **EAM Data Reader**: Multi-output reader producing separate outputs for:
   - 2D surface variables as quad mesh
   - 3D middle layer (lev) variables as hexahedral volume mesh
   - 3D interface layer (ilev) variables as hexahedral volume mesh
@@ -18,7 +18,7 @@ stored in NetCDF format.
 
 ### Filter
 
-- **Atmosphere Sphere**: Projects lat/lon data onto a 3D sphere for globe
+- **EAM Project To Sphere**: Projects lat/lon data onto a 3D sphere for globe
   visualization with optional vertical exaggeration.
 
 ### Requirements
