@@ -742,6 +742,8 @@ class EAMDataReader(VTKPythonAlgorithmBase):
         except Exception as e:
             print_error(f"Error processing middle layer variables: {e}")
 
+        print(output3Dm.VTKObject)
+
         # Output 2: 3D interface layer (ilev) - volumized hexahedral mesh
         try:
             ilev = FindSpecialVariable(vardata, AtmosphereConstants.ILEV, AtmosphereConstants.HYAI, AtmosphereConstants.HYBI)
@@ -761,6 +763,8 @@ class EAMDataReader(VTKPythonAlgorithmBase):
                 output3Di.FieldData.append(ilev, "ilev")
         except Exception as e:
             print_error(f"Error processing interface layer variables: {e}")
+
+        print(output3Di.VTKObject)
 
         return 1
 
