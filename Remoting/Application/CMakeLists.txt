@@ -207,6 +207,10 @@ _paraview_remoting_application_optional_xml(
   FILES   Resources/proxies_alembic.xml)
 
 _paraview_remoting_application_optional_xml(
+  TARGETS VTK::IOUSD
+  FILES   Resources/proxies_usd.xml)
+
+_paraview_remoting_application_optional_xml(
   TARGETS VTK::IONetCDF
   FILES   Resources/readers_ionetcdf.xml)
 

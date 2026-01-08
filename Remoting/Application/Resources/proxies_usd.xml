@@ -1,0 +1,19 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="exporters">
+    <RenderViewExporterProxy class="vtkUSDExporter"
+                             name="USDExporter">
+      <Documentation>Exporter to export a single render view to an OpenUSD scene format.
+      </Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="usd usda usdc" />
+      </Hints>
+    </RenderViewExporterProxy>
+  </ProxyGroup>
+
+</ServerManagerConfiguration>
