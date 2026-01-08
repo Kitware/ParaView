@@ -9,7 +9,9 @@
 class pqView;
 class QListWidgetItem;
 class vtkObject;
+class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMProxyLocator;
 
 class pqVRDockPanel : public QDockWidget
 {
@@ -50,6 +52,8 @@ private Q_SLOTS:
 
   void saveState();
   void restoreState();
+  void saveConfigPanelState(vtkPVXMLElement* root);
+  void restoreConfigPanelState(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
 
   void disableConnectionButtons();
   void enableConnectionButtons();
@@ -57,6 +61,8 @@ private Q_SLOTS:
   void updateStartStopButtonStates();
   void start();
   void stop();
+
+  void scaleEdited();
 
 private:
   Q_DISABLE_COPY(pqVRDockPanel)
