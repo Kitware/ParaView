@@ -16,12 +16,17 @@
 #ifndef pqZSpaceManager_h
 #define pqZSpaceManager_h
 
+#include "vtkZSpaceSDKManager.h"
+
+#include <QAction>
 #include <QObject>
 
 #include <set>
 
 class pqView;
 class pqPipelineSource;
+class vtkCommand;
+class vtkObject;
 
 class pqZSpaceManager : public QObject
 {
@@ -38,22 +43,53 @@ public:
   void onStartup() {}
 
   /**
-   * Called when the application shuts down. Currently calls `Shutdown` on the zSpaceSDKManager.
+   * Called when the application shuts down. Currently calls `Shutdown` on the
+   * `vtkZSpaceSDKManager`.
    */
   void onShutdown();
 
-public Q_SLOTS:
+private Q_SLOTS:
+  /**
+   * Called when a view is added, before the call to onViewAdded.
+   * Internally fills the `ZSPaceViews` set if the given is a zSpace view.
+   */
+  void onPreViewAdded(pqView*);
+
+  /**
+   * Called after onPreViewAdded signal. Setup the event callback for stylus custom events.
+   */
   void onViewAdded(pqView*);
+
+  /**
+   * Called to remove the view from the `ZSpaceViews` set if the given view is a zSpace view.
+   */
   void onViewRemoved(pqView*);
+
+  /**
+   * Called when full screen option is toggled On or Off.
+   */
   void onActiveFullScreenEnabled(bool);
 
-protected Q_SLOTS:
+  /**
+   * Called from the added views when their corresponding render are ended.
+   */
   void onRenderEnded();
 
-protected:
-  std::set<pqView*> ZSpaceViews;
-
 private:
+  /**
+   * Event callback from the `vtkZSpaceSDKManager` class.
+   */
+  void onEvent(vtkObject* caller, unsigned long event, void* data);
+
+  /**
+   * Find the macro action specified by the settings.
+   * If there there is no macro found, it returns a nullptr.
+   */
+  QAction* findMacro(vtkZSpaceSDKManager::ButtonIds buttonId);
+
+  std::set<pqView*> ZSpaceViews;
+  vtkCommand* Observer;
+
   Q_DISABLE_COPY(pqZSpaceManager)
 };
 
