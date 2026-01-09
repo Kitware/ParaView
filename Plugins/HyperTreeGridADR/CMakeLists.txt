@@ -5,3 +5,7 @@ paraview_add_plugin(HyperTreeGridADR
   MODULES HyperTreeGridFilters
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridFilters/vtk.module"
   )
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()
