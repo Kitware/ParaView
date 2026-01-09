@@ -30,11 +30,13 @@ EAMProjectToSphere
 Data Format
 -----------
 EAM/E3SM data consists of:
+
 - Data files (.nc): NetCDF files containing time-varying atmospheric variables
 - Connectivity files (.nc): NetCDF files defining the unstructured mesh topology
   with corner lat/lon coordinates for each grid cell
 
 The readers automatically detect:
+
 - Horizontal dimensions by matching sizes between connectivity and data files
 - Vertical dimensions (lev for mid-levels, ilev for interface levels)
 - Time dimensions for animation support
@@ -49,6 +51,7 @@ coordinates are not provided.
 Usage Example
 -------------
 In ParaView:
+
 1. Use File -> Open to select a NetCDF data file
 2. Choose "EAM Data Reader"
 3. Set the connectivity file path in the Properties panel
@@ -56,6 +59,7 @@ In ParaView:
 5. Apply to visualize
 
 For spherical projection:
+
 1. Apply EAMDataReader reader
 2. Apply EAMProjectToSphere filter
 3. Adjust scale factor for vertical exaggeration if needed
@@ -778,6 +782,7 @@ class EAMProjectToSphere(VTKPythonAlgorithmBase):
     a scale factor to make atmospheric layers visible.
 
     The transformation maps:
+
     - Longitude -> azimuthal angle (theta)
     - Latitude -> polar angle (phi), measured from north pole
     - Z-coordinate -> radial distance from sphere center
@@ -796,7 +801,8 @@ class EAMProjectToSphere(VTKPythonAlgorithmBase):
     Input
     -----
     vtkUnstructuredGrid or vtkPolyData
-        Mesh with points in geographic coordinates:
+        Mesh with points in geographic coordinates.
+
         - X: Longitude in degrees (-180 to 180 or 0 to 360)
         - Y: Latitude in degrees (-90 to 90)
         - Z: Vertical level (e.g., pressure in hPa, or index)
