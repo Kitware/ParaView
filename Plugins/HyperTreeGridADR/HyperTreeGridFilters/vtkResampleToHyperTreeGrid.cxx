@@ -1804,11 +1804,9 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
   if (cursor->IsLeaf())
   {
     // If we match the criterion, we subdivide
-    // Also: if the subtrees have only one element, it is useless to subdivide, we already are at
-    // the finest possible resolution given input data
     if (level < this->MaxDepth && it != multiResolutionGrid[level].end() &&
       ((!this->ArrayMeasurement && !this->ArrayMeasurementDisplay) || !std::isnan(values[0])) &&
-      it->second.NumberOfLeavesInSubtree > 1 && it->second.CanSubdivide &&
+      it->second.CanSubdivide &&
       (!this->ArrayMeasurement ||
         (this->InRange && values[0] > this->Min && values[0] < this->Max) ||
         (!this->InRange && !(values[0] > this->Min && values[0] < this->Max))))
