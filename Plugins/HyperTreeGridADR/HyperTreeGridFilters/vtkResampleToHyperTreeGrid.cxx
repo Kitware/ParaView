@@ -155,7 +155,8 @@ int vtkResampleToHyperTreeGrid::RequestData(
     return 0;
   }
 
-  int numberOfProcesses = this->Controller ? this->Controller->GetNumberOfProcesses() : 1;
+  assert(this->Controller != nullptr);
+  int numberOfProcesses = this->Controller->GetNumberOfProcesses();
 
   vtkInformationVector* inArrayVec = this->Information->Get(INPUT_ARRAYS_TO_PROCESS());
   vtkInformation* inArrayInfo = inArrayVec->GetInformationObject(0);
