@@ -1201,20 +1201,20 @@ int vtkCDIReader::BuildVarArrays()
 
     for (int var = 0; var < this->NumberOfPointVars; var++)
     {
-      this->PointDataArraySelection->EnableArray(this->Internals->PointVars[var].Name);
       vtkDebugMacro("Adding Point var: " << this->Internals->PointVars[var].Name);
+      this->PointDataArraySelection->AddArray(this->Internals->PointVars[var].Name);
     }
 
     for (int var = 0; var < this->NumberOfCellVars; var++)
     {
       vtkDebugMacro("Adding cell var: " << this->Internals->CellVars[var].Name);
-      this->CellDataArraySelection->EnableArray(this->Internals->CellVars[var].Name);
+      this->CellDataArraySelection->AddArray(this->Internals->CellVars[var].Name);
     }
 
     for (int var = 0; var < this->NumberOfDomainVars; var++)
     {
       vtkDebugMacro("Adding domain var: " << this->Internals->DomainVars[var].c_str());
-      this->DomainDataArraySelection->EnableArray(this->Internals->DomainVars[var].c_str());
+      this->DomainDataArraySelection->AddArray(this->Internals->DomainVars[var].c_str());
     }
   }
   else
