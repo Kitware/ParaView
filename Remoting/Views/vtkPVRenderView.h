@@ -56,6 +56,7 @@ class vtkRenderViewBase;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkSkybox;
+class vtkStringArray;
 class vtkTextRepresentation;
 class vtkTexture;
 class vtkTimerLog;
@@ -1028,6 +1029,26 @@ public:
    */
   void SetANARIRenderer(std::string);
   const char* GetANARIRenderer();
+  /**
+   * Returns the renderer names for the current ANARILibrary
+   */
+  vtkStringArray* GetANARIRendererNames();
+  ///@}
+
+  ///@{
+  /**
+   * Return ANARI parameters specification for the current renderer as
+   * a string encoding a JSON which contains the version and an array of
+   * parameters. See pqDynamicPropertiesWidget for the description of these
+   * parameters
+   * @see pqDynamicPropertiesWidget
+   */
+  std::string GetANARIRendererParameters();
+  /**
+   * Sets a parameter 'name' to a 'value'. The value can be a bool,
+   * int32 or float32 encoded as a string.
+   */
+  void SetANARIRendererParameter(const std::string& name, int type, const std::string& value);
   ///@}
 
   ///@{

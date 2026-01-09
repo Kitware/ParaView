@@ -72,6 +72,7 @@ set(classes
   vtkSMDoubleMapPropertyIterator
   vtkSMDoubleRangeDomain
   vtkSMDoubleVectorProperty
+  vtkSMDynamicPropertiesDomain
   vtkSMEnumerationDomain
   vtkSMExtentDomain
   vtkSMExtractsController
@@ -159,6 +160,7 @@ set(classes
   vtkSMWriterProxy)
 
 set(headers
+  vtkDynamicProperties.h
   vtkSMMessageMinimal.h)
 
 set(private_headers
@@ -166,7 +168,6 @@ set(private_headers
   vtkSMProxyInternals.h
   vtkSMProxyPropertyInternals.h
   vtkSMSessionProxyManagerInternals.h)
-
 
 set(template_classes
   vtkSIVectorPropertyTemplate

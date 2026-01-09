@@ -1450,13 +1450,13 @@
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty name="EnableANARI"
-          label="Enable Ray Tracing with ANARI"
+          label="Enable Rendering with ANARI"
           command="SetEnableANARI"
           default_values="0"
           animateable="0"
           number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Enables ray tracing with ANARI.</Documentation>
+        <Documentation>Enables rendering with ANARI.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -1468,7 +1468,8 @@
       <StringVectorProperty command="SetANARILibrary"
                             default_values="visrtx"
                             name="ANARILibrary"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <StringListDomain name="list">
           <String value="visrtx" />
           <String value="helide" />
@@ -1483,30 +1484,73 @@
                                    values="1" />
         </Hints>
       </StringVectorProperty>
+      <StringVectorProperty
+          command="GetANARIRendererNames"
+          information_only="1"
+          name="ANARIRendererNames">
+        <StringArrayHelper />
+      </StringVectorProperty>
       <StringVectorProperty command="SetANARIRenderer"
                             default_values="default"
                             name="ANARIRenderer"
                             number_of_elements="1">
         <StringListDomain name="list">
-          <String value="default" />
-          <String value="ao" />
-          <String value="dpt" />
+          <RequiredProperties>
+            <Property
+                function="ANARIRendererNames"
+                name="ANARIRendererNames" />
+          </RequiredProperties>
         </StringListDomain>
         <Documentation>Set the ANARI renderer.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableANARI"
-                                       values="1" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="ANARILibrary"
-                                       values="visrtx" />
-            </Expression>
-	        </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableANARI"
+                                   values="1" />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetANARIRendererParameters"
+                            default_values="{}"
+                            information_only = "1"
+                            name="ANARIRendererParametersInfo"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Json containing a array of maps
+        renderer sub-type (a string) to an array of properties,
+        each property has a name, type, description, default, min, max
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableANARI"
+                                   values="1" />
+        </Hints>
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetANARIRendererParameter"
+                            name="ANARIRendererParameter"
+                            label="ANARI Renderer Parameters"
+                            panel_widget="dynamic_properties_widget"
+                            element_types="2 0 2"
+                            number_of_elements="3"
+                            number_of_elements_per_command="3"
+                            repeat_command="1">
+        <Documentation>Set a ANARI renderer parameter.</Documentation>
+        <DynamicPropertiesDomain name="json_list">
+          <RequiredProperties>
+            <Property
+                function="Info"
+                name="ANARIRendererParametersInfo" />
+          </RequiredProperties>
+        </DynamicPropertiesDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableANARI"
+                                   values="1" />
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty name="OSPRayRendererType"
@@ -1542,22 +1586,16 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
-              <Expression type="and">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         mode="visibility"
-                                         property="EnableOSPRay"
-                                         values="1" />
-                <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                   <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
-                </PropertyWidgetDecorator>
-              </Expression>
+            <Expression type="and">
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
-                                       property="EnableANARI"
+                                       property="EnableOSPRay"
                                        values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
+              </PropertyWidgetDecorator>
             </Expression>
-	        </PropertyWidgetDecorator>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -1574,22 +1612,16 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
-              <Expression type="and">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         mode="visibility"
-                                         property="EnableOSPRay"
-                                         values="1" />
-                <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                   <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
-                </PropertyWidgetDecorator>
-              </Expression>
+            <Expression type="and">
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
-                                       property="EnableANARI"
+                                       property="EnableOSPRay"
                                        values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
+              </PropertyWidgetDecorator>
             </Expression>
-	        </PropertyWidgetDecorator>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -1605,18 +1637,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         shoot per pixel.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableOSPRay"
-                                       values="1" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableANARI"
-                                       values="1" />
-            </Expression>
-          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -1650,7 +1675,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                                        property="EnableANARI"
                                        values="1" />
             </Expression>
-	        </PropertyWidgetDecorator>
+                </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -1697,33 +1722,17 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Documentation>Controls whether to denoise images. This option will have no effect without a denoiser library and until progressive passes or samples per pixel exceeds four.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="or">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableOSPRay"
-                                       values="1" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableANARI"
-                                       values="1" />
-            </Expression>
-          </PropertyWidgetDecorator>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableANARI"
-                                       values="1" />
-              <PropertyWidgetDecorator type="CompositeDecorator">
-                <Expression type="or">
-                  <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                    <Property name="MaxFrames" function="greaterthan" value="3"/>
-                  </PropertyWidgetDecorator>
-                  <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                    <Property name="SamplesPerPixel" function="greaterthan" value="3" />
-                  </PropertyWidgetDecorator>
-                </Expression>
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="MaxFrames" function="greaterthan" value="3"/>
+              </PropertyWidgetDecorator>
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="SamplesPerPixel" function="greaterthan" value="3" />
               </PropertyWidgetDecorator>
             </Expression>
           </PropertyWidgetDecorator>
@@ -1741,18 +1750,10 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Documentation>Diminish or amplify all lights in the scene.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableOSPRay"
-                                       values="1" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableANARI"
-                                       values="1" />
-            </Expression>
-          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty
@@ -2043,7 +2044,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="MaxClipBounds"/>
         <Property name="LockBounds"/>
       </PropertyGroup>
-      <PropertyGroup label="Ray Traced Rendering"
+      <PropertyGroup label="Rendering Backend"
                      panel_visibility="advanced">
         <Property name="EnableANARI"/>
         <Property name="EnableOSPRay"/>

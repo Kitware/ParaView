@@ -427,6 +427,8 @@ protected:
   // the cache of selection when the current user became master
   unsigned long NewMasterObserverId;
   void NewMasterCallback(vtkObject* src, unsigned long event, void* data);
+  // Update ANARI properties in the correct order
+  void UpdateAnariProperties();
 
   bool NeedsUpdateLOD;
 
