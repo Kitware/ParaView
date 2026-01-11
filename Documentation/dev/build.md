@@ -232,7 +232,7 @@ Optional dependencies:
   * [Python][python]
     - At least 3.3 is required
   * [Qt5][qt]
-    - Version 5.12 or newer. Qt6 support is experimental and not tested yet.
+    - Version 5.15 or newer when using Qt 5, Qt 6.9 when using Qt 6.
 
 ##### Installing CMake
 
