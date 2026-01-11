@@ -249,11 +249,6 @@ ParaView uses Qt to provide its graphical user interface. Precompiled binaries a
 Note that on Windows, the compiler used for building ParaView must match the
 compiler version used to build Qt.
 
-The Linux packages for Qt 5.9 use a version of protobuf that may conflict with
-that used by ParaView. If, when running ParaView, error messages about a
-mismatch in protobuf versions appears, moving the `libqgtk3.so` plugin out of
-the `plugins/platformthemes` directory has been sufficient in the past.
-
 #### Optional Additions
 
 ##### Download And Install ffmpeg (`.avi`) movie libraries
