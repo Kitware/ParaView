@@ -232,7 +232,7 @@ Optional dependencies:
   * [Python][python]
     - At least 3.3 is required
   * [Qt5][qt]
-    - Version 5.12 or newer. Qt6 support is experimental and not tested yet.
+    - Version 5.15 or newer when using Qt 5, Qt 6.9 when using Qt 6.
 
 ##### Installing CMake
 
@@ -248,11 +248,6 @@ ParaView uses Qt to provide its graphical user interface. Precompiled binaries a
 
 Note that on Windows, the compiler used for building ParaView must match the
 compiler version used to build Qt.
-
-The Linux packages for Qt 5.9 use a version of protobuf that may conflict with
-that used by ParaView. If, when running ParaView, error messages about a
-mismatch in protobuf versions appears, moving the `libqgtk3.so` plugin out of
-the `plugins/platformthemes` directory has been sufficient in the past.
 
 #### Optional Additions
 
