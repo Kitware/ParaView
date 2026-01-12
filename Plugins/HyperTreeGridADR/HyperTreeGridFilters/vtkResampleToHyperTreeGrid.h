@@ -567,7 +567,7 @@ protected:
    * Collection of input point data arrays to resample, deducted from
    * InputDataArrayNames.
    */
-  std::vector<std::vector<vtkDataArray*>> InputPointDataArrays;
+  std::vector<std::vector<vtkDataArray*>> InputArrays;
 
   /**
    * Collection of input scalar field names to resample.

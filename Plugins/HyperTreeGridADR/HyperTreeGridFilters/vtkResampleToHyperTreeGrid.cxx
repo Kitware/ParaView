@@ -254,39 +254,58 @@ int vtkResampleToHyperTreeGrid::RequestData(
   this->Mask = vtkBitArray::New();
 
   // Linking input scalar fields
-  const char* dataName = this->GetInputArrayInformation(0)->Get(vtkDataObject::FIELD_NAME());
+  const char* scalarName = this->GetInputArrayInformation(0)->Get(vtkDataObject::FIELD_NAME());
 
-  this->InputPointDataArrays.resize(inputs.size());
+  this->InputArrays.resize(inputs.size());
 
   for (int inputId = 0; inputId < static_cast<int>(inputs.size()); ++inputId)
   {
     vtkDataSet* input = inputs[inputId];
-    vtkDataArray* data;
+    vtkDataArray* scalarData;
+    vtkDataSetAttributes* dataSetAttributes;
 
     switch (fieldAssociation)
     {
-
       case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-        data = input->GetPointData()->GetArray(dataName);
+        dataSetAttributes = input->GetPointData();
+        scalarData = dataSetAttributes->GetArray(scalarName);
         break;
       case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-        data = input->GetCellData()->GetArray(dataName);
-        vtkErrorMacro("Cell data is currently disabled, aborting");
-        return 0;
-      default:
-        data = nullptr;
+        dataSetAttributes = input->GetCellData();
+        scalarData = dataSetAttributes->GetArray(scalarName);
         break;
+      default:
+        scalarData = nullptr;
+        break;
+    }
+
+    if (this->ArrayMeasurement)
+    {
+      this->InputArrays[inputId].emplace_back(scalarData);
+
+      if (inputId == 0)
+      {
+        vtkNew<vtkDoubleArray> scalarField;
+        scalarField->SetName((std::string(scalarName) + std::string("_measure")).c_str());
+        output->GetCellData()->AddArray(scalarField);
+        this->ScalarFields.emplace_back(scalarField);
+
+        vtkAbstractArrayMeasurement* tmp = this->ArrayMeasurement->NewInstance();
+        tmp->DeepCopy(this->ArrayMeasurement);
+
+        this->ArrayMeasurements.emplace_back(
+          vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(tmp));
+      }
     }
 
     if (this->ArrayMeasurementDisplay)
     {
       for (const std::string& name : this->InputDataArrayNames)
       {
-        vtkPointData* pointData = input->GetPointData();
-        vtkDataArray* array;
-        if ((array = pointData->GetArray(name.c_str())))
+        vtkDataArray* array = dataSetAttributes->GetArray(name.c_str());
+        if (array)
         {
-          this->InputPointDataArrays[inputId].emplace_back(array);
+          this->InputArrays[inputId].emplace_back(array);
 
           if (inputId == 0)
           {
@@ -302,25 +321,6 @@ int vtkResampleToHyperTreeGrid::RequestData(
               vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(tmp));
           }
         }
-      }
-    }
-
-    if (this->ArrayMeasurement)
-    {
-      this->InputPointDataArrays[inputId].emplace_back(data);
-
-      if (inputId == 0)
-      {
-        vtkNew<vtkDoubleArray> scalarField;
-        scalarField->SetName((std::string(dataName) + std::string("_measure")).c_str());
-        output->GetCellData()->AddArray(scalarField);
-        this->ScalarFields.emplace_back(scalarField);
-
-        vtkAbstractArrayMeasurement* tmp = this->ArrayMeasurement->NewInstance();
-        tmp->DeepCopy(this->ArrayMeasurement);
-
-        this->ArrayMeasurements.emplace_back(
-          vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(tmp));
       }
     }
   }
@@ -349,7 +349,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
   this->ScalarFields.clear();
   this->ArrayMeasurements.clear();
   this->GridOfMultiResolutionGrids.clear();
-  this->InputPointDataArrays.clear();
+  this->InputArrays.clear();
 
   this->LocalHyperTreeBoundingBox.clear();
   this->UpdateProgress(1.0);
@@ -988,7 +988,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
   for (int inputId = 0; inputId < static_cast<int>(dataSets.size()); ++inputId)
   {
     vtkDataSet* dataSet = dataSets[inputId];
-    std::vector<vtkDataArray*>& dataList = this->InputPointDataArrays[inputId];
+    std::vector<vtkDataArray*>& dataList = this->InputArrays[inputId];
 
     // First pass, we fill the highest resolution grid with input values
     if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
@@ -1108,161 +1108,133 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
 
       // We allocate those variables to avoid unnecessary allocation inside the recursive function.
       // Those are used to check the distance between a point and the cell.
-      double* weights = new double[maxNumberOfPoints];
+      std::vector<double> weights(maxNumberOfPoints);
 
       double volumeUnit = 1.0;
       for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
       {
         vtkCell* cell = dataSet->GetCell(cellId);
         double* cellBounds = cell->GetBounds();
-        std::size_t depth = static_cast<std::size_t>(~0);
-        vtkIdType imin, imax, jmin, jmax, kmin, kmax;
-        do
-        {
-          ++depth;
-          imin = std::floor<vtkIdType>(
-            std::min<double>((cellBounds[0] - this->Bounds[0]) * this->ResolutionPerTree[depth] *
-                this->CellDims[0] / (this->Bounds[1] - this->Bounds[0]),
-              this->MaxResolutionPerTree * this->CellDims[0] - 1));
-          imax = std::floor<vtkIdType>(
-            std::min<double>((cellBounds[1] - this->Bounds[0]) * this->ResolutionPerTree[depth] *
-                this->CellDims[0] / (this->Bounds[1] - this->Bounds[0]),
-              this->MaxResolutionPerTree * this->CellDims[0] - 1));
-          jmin = std::floor<vtkIdType>(
-            std::min<double>((cellBounds[2] - this->Bounds[2]) * this->ResolutionPerTree[depth] *
-                this->CellDims[0] / (this->Bounds[3] - this->Bounds[2]),
-              this->MaxResolutionPerTree * this->CellDims[0] - 1));
-          jmax = std::floor<vtkIdType>(
-            std::min<double>((cellBounds[3] - this->Bounds[2]) * this->ResolutionPerTree[depth] *
-                this->CellDims[0] / (this->Bounds[3] - this->Bounds[2]),
-              this->MaxResolutionPerTree * this->CellDims[0] - 1));
-          kmin = std::floor<vtkIdType>(
-            std::min<double>((cellBounds[4] - this->Bounds[4]) * this->ResolutionPerTree[depth] *
-                this->CellDims[0] / (this->Bounds[5] - this->Bounds[4]),
-              this->MaxResolutionPerTree * this->CellDims[0] - 1));
-          kmax = std::floor<vtkIdType>(
-            std::min<double>((cellBounds[5] - this->Bounds[4]) * this->ResolutionPerTree[depth] *
-                this->CellDims[0] / (this->Bounds[5] - this->Bounds[4]),
-              this->MaxResolutionPerTree * this->CellDims[0] - 1));
-        } while ((imin == imax || jmin == jmax || kmin == kmax) && depth != this->MaxDepth);
+        vtkIdType minHigherResIdxX, maxHigherResIdxX, minHigherResIdxY, maxHigherResIdxY,
+          minHigherResIdxZ, maxHigherResIdxZ;
 
-        vtkIdType igridmin = imin / this->ResolutionPerTree[depth],
-                  igridmax = imax / this->ResolutionPerTree[depth],
-                  jgridmin = jmin / this->ResolutionPerTree[depth],
-                  jgridmax = jmax / this->ResolutionPerTree[depth],
-                  kgridmin = kmin / this->ResolutionPerTree[depth],
-                  kgridmax = kmax / this->ResolutionPerTree[depth];
+        // We retrieve the index range of the higher resolution in the HTG between which the cell
+        // we are computing is located
+        minHigherResIdxX =
+          std::floor<vtkIdType>(std::min<double>((cellBounds[0] - this->Bounds[0]) *
+              this->MaxResolutionPerTree * this->CellDims[0] / (this->Bounds[1] - this->Bounds[0]),
+            this->MaxResolutionPerTree * this->CellDims[0] - 1));
+        maxHigherResIdxX =
+          std::floor<vtkIdType>(std::min<double>((cellBounds[1] - this->Bounds[0]) *
+              this->MaxResolutionPerTree * this->CellDims[0] / (this->Bounds[1] - this->Bounds[0]),
+            this->MaxResolutionPerTree * this->CellDims[0] - 1));
+        minHigherResIdxY =
+          std::floor<vtkIdType>(std::min<double>((cellBounds[2] - this->Bounds[2]) *
+              this->MaxResolutionPerTree * this->CellDims[1] / (this->Bounds[3] - this->Bounds[2]),
+            this->MaxResolutionPerTree * this->CellDims[1] - 1));
+        maxHigherResIdxY =
+          std::floor<vtkIdType>(std::min<double>((cellBounds[3] - this->Bounds[2]) *
+              this->MaxResolutionPerTree * this->CellDims[1] / (this->Bounds[3] - this->Bounds[2]),
+            this->MaxResolutionPerTree * this->CellDims[1] - 1));
+        minHigherResIdxZ =
+          std::floor<vtkIdType>(std::min<double>((cellBounds[4] - this->Bounds[4]) *
+              this->MaxResolutionPerTree * this->CellDims[2] / (this->Bounds[5] - this->Bounds[4]),
+            this->MaxResolutionPerTree * this->CellDims[2] - 1));
+        maxHigherResIdxZ =
+          std::floor<vtkIdType>(std::min<double>((cellBounds[5] - this->Bounds[4]) *
+              this->MaxResolutionPerTree * this->CellDims[2] / (this->Bounds[5] - this->Bounds[4]),
+            this->MaxResolutionPerTree * this->CellDims[2] - 1));
 
-        for (vtkIdType igrid = igridmin; igrid <= igridmax; ++igrid)
+        for (vtkIdType xIdxGrid = minHigherResIdxX; xIdxGrid <= maxHigherResIdxX; ++xIdxGrid)
         {
-          for (vtkIdType jgrid = jgridmin; jgrid <= jgridmax; ++jgrid)
+          for (vtkIdType yIdxGrid = minHigherResIdxY; yIdxGrid <= maxHigherResIdxY; ++yIdxGrid)
           {
-            for (vtkIdType kgrid = kgridmin; kgrid <= kgridmax; ++kgrid)
+            for (vtkIdType zIdxGrid = minHigherResIdxZ; zIdxGrid <= maxHigherResIdxZ; ++zIdxGrid)
             {
-              auto& grid = this->GridOfMultiResolutionGrids[this->GridCoordinatesToIndex(
-                igrid, jgrid, kgrid)][depth];
+              double boxBounds[6] = { this->Bounds[0] +
+                  (0.0 + xIdxGrid) / (this->CellDims[0] * this->MaxResolutionPerTree) *
+                    (this->Bounds[1] - this->Bounds[0]),
+                this->Bounds[0] +
+                  (1.0 + xIdxGrid) / (this->CellDims[0] * this->MaxResolutionPerTree) *
+                    (this->Bounds[1] - this->Bounds[0]),
+                this->Bounds[2] +
+                  (0.0 + yIdxGrid) / (this->CellDims[1] * this->MaxResolutionPerTree) *
+                    (this->Bounds[3] - this->Bounds[2]),
+                this->Bounds[2] +
+                  (1.0 + yIdxGrid) / (this->CellDims[1] * this->MaxResolutionPerTree) *
+                    (this->Bounds[3] - this->Bounds[2]),
+                this->Bounds[4] +
+                  (0.0 + zIdxGrid) / (this->CellDims[2] * this->MaxResolutionPerTree) *
+                    (this->Bounds[5] - this->Bounds[4]),
+                this->Bounds[4] +
+                  (1.0 + zIdxGrid) / (this->CellDims[2] * this->MaxResolutionPerTree) *
+                    (this->Bounds[5] - this->Bounds[4]) };
 
-              for (vtkIdType ii = (igrid == igridmin ? imin % this->ResolutionPerTree[depth] : 0);
-                   ii <= (igrid == igridmax ? imax % this->ResolutionPerTree[depth]
-                                            : this->ResolutionPerTree[depth] - 1);
-                   ++ii)
+              double volume = 0.0;
+              bool nonZeroVolume = false;
+
+              vtkCell3D* cell3D = vtkCell3D::SafeDownCast(cell);
+              vtkVoxel* voxel = vtkVoxel::SafeDownCast(cell);
+
+              if (voxel)
               {
-                for (vtkIdType jj = (jgrid == jgridmin ? jmin % this->ResolutionPerTree[depth] : 0);
-                     jj <= (jgrid == jgridmax ? jmax % this->ResolutionPerTree[depth]
-                                              : this->ResolutionPerTree[depth] - 1);
-                     ++jj)
+                nonZeroVolume = this->IntersectedVolume(boxBounds, voxel, volumeUnit, volume);
+              }
+              else if (cell3D)
+              {
+                nonZeroVolume =
+                  this->IntersectedVolume(boxBounds, cell3D, volumeUnit, volume, weights.data());
+              }
+              else
+              {
+                vtkErrorMacro(<< "cell type " << cell->GetClassName() << " not supported");
+              }
+
+              if (nonZeroVolume)
+              {
+                std::size_t gridIdx =
+                  this->GridCoordinatesToIndex(xIdxGrid / this->MaxResolutionPerTree,
+                    yIdxGrid / this->MaxResolutionPerTree, zIdxGrid / this->MaxResolutionPerTree);
+                auto& grid = this->GridOfMultiResolutionGrids[gridIdx][this->MaxDepth];
+
+                vtkIdType childIdx = this->MultiResGridCoordinatesToIndex(
+                  xIdxGrid % this->MaxResolutionPerTree, yIdxGrid % this->MaxResolutionPerTree,
+                  zIdxGrid % this->MaxResolutionPerTree, this->MaxDepth);
+                auto it = grid.find(childIdx);
+                if (it == grid.end())
                 {
-                  for (vtkIdType kk =
-                         (kgrid == kgridmin ? kmin % this->ResolutionPerTree[depth] : 0);
-                       kk <= (kgrid == kgridmax ? kmax % this->ResolutionPerTree[depth]
-                                                : this->ResolutionPerTree[depth] - 1);
-                       ++kk)
+                  GridElement& element = grid[childIdx];
+                  element.NumberOfLeavesInSubtree = 1;
+                  element.NumberOfPointsInSubtree = 1;
+                  element.UnmaskedChildrenHaveNoMaskedLeaves = true;
+                  element.AccumulatedWeight = volume;
+                  for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
                   {
-                    vtkIdType ires = ii + igrid * this->ResolutionPerTree[depth];
-                    vtkIdType jres = jj + jgrid * this->ResolutionPerTree[depth];
-                    vtkIdType kres = kk + kgrid * this->ResolutionPerTree[depth];
-
-                    double boxBounds[6] = { this->Bounds[0] +
-                        (0.0 + ires) / (this->CellDims[0] * this->ResolutionPerTree[depth]) *
-                          (this->Bounds[1] - this->Bounds[0]),
-                      this->Bounds[0] +
-                        (1.0 + ires) / (this->CellDims[0] * this->ResolutionPerTree[depth]) *
-                          (this->Bounds[1] - this->Bounds[0]),
-                      this->Bounds[2] +
-                        (0.0 + jres) / (this->CellDims[1] * this->ResolutionPerTree[depth]) *
-                          (this->Bounds[3] - this->Bounds[2]),
-                      this->Bounds[2] +
-                        (1.0 + jres) / (this->CellDims[1] * this->ResolutionPerTree[depth]) *
-                          (this->Bounds[3] - this->Bounds[2]),
-                      this->Bounds[4] +
-                        (0.0 + kres) / (this->CellDims[2] * this->ResolutionPerTree[depth]) *
-                          (this->Bounds[5] - this->Bounds[4]),
-                      this->Bounds[4] +
-                        (1.0 + kres) / (this->CellDims[2] * this->ResolutionPerTree[depth]) *
-                          (this->Bounds[5] - this->Bounds[4]) };
-
-                    double volume = 0.0;
-                    bool nonZeroVolume = false;
-
-                    vtkCell3D* cell3D = vtkCell3D::SafeDownCast(cell);
-                    vtkVoxel* voxel = vtkVoxel::SafeDownCast(cell);
-
-                    if (voxel)
-                    {
-                      nonZeroVolume = this->IntersectedVolume(boxBounds, voxel, volumeUnit, volume);
-                    }
-                    else if (cell3D)
-                    {
-                      nonZeroVolume =
-                        this->IntersectedVolume(boxBounds, cell3D, volumeUnit, volume, weights);
-                    }
-                    else
-                    {
-                      vtkErrorMacro(<< "cell type " << cell->GetClassName() << " not supported");
-                    }
-
-                    if (nonZeroVolume)
-                    {
-                      vtkIdType gridIdx = this->MultiResGridCoordinatesToIndex(ii, jj, kk, depth);
-                      auto it = grid.find(gridIdx);
-                      if (it == grid.end())
-                      {
-                        GridElement& element = grid[gridIdx];
-                        element.NumberOfLeavesInSubtree = 1;
-                        element.NumberOfPointsInSubtree = 1;
-                        element.UnmaskedChildrenHaveNoMaskedLeaves = true;
-                        element.AccumulatedWeight = volume;
-                        for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
-                        {
-                          element.ArrayMeasurements.emplace_back(
-                            vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
-                              this->ArrayMeasurements[l]->NewInstance()));
-                          element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
-                          element.ArrayMeasurements[l]->Add(dataList[l]->GetTuple(cellId),
-                            dataList[l]->GetNumberOfComponents(), volume);
-                        }
-                      }
-                      // if not, then the grid location is already created, just need to add the
-                      // element into it
-                      else
-                      {
-                        for (std::size_t l = 0; l < dataList.size(); ++l)
-                        {
-                          it->second.ArrayMeasurements[l]->Add(dataList[l]->GetTuple(cellId),
-                            dataList[l]->GetNumberOfComponents(), volume);
-                        }
-                        ++(it->second.NumberOfPointsInSubtree);
-                        it->second.AccumulatedWeight += volume;
-                      }
-                    }
+                    element.ArrayMeasurements.emplace_back(
+                      vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
+                        this->ArrayMeasurements[l]->NewInstance()));
+                    element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
+                    element.ArrayMeasurements[l]->Add(
+                      dataList[l]->GetTuple(cellId), dataList[l]->GetNumberOfComponents(), volume);
                   }
+                }
+                // if not, then the grid location is already created, just need to add the
+                // element into it
+                else
+                {
+                  for (std::size_t l = 0; l < dataList.size(); ++l)
+                  {
+                    it->second.ArrayMeasurements[l]->Add(
+                      dataList[l]->GetTuple(cellId), dataList[l]->GetNumberOfComponents(), volume);
+                  }
+                  ++(it->second.NumberOfPointsInSubtree);
+                  it->second.AccumulatedWeight += volume;
                 }
               }
             }
           }
         }
       }
-      delete[] weights;
     }
     else
     {
@@ -1774,17 +1746,11 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
 
   std::vector<double> values(this->ArrayMeasurements.size(), 0.0);
 
-  std::size_t offset = this->ArrayMeasurement != nullptr;
-
   if (!values.empty() && it != multiResolutionGrid[level].end())
   {
     if (!it->second.ArrayMeasurements.empty())
     {
-      if (this->ArrayMeasurement)
-      {
-        it->second.ArrayMeasurements[0]->Measure(values[0]);
-      }
-      for (std::size_t l = offset; l < this->ArrayMeasurements.size(); ++l)
+      for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
       {
         it->second.ArrayMeasurements[l]->Measure(values[l]);
       }
@@ -1801,16 +1767,18 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
   }
 
   this->Mask->InsertValue(idx, it == multiResolutionGrid[level].end());
+  double& subdivisionValue = values[0];
 
   if (cursor->IsLeaf())
   {
     // If we match the criterion, we subdivide
     if (level < this->MaxDepth && it != multiResolutionGrid[level].end() &&
-      ((!this->ArrayMeasurement && !this->ArrayMeasurementDisplay) || !std::isnan(values[0])) &&
+      ((!this->ArrayMeasurement && !this->ArrayMeasurementDisplay) ||
+        !std::isnan(subdivisionValue)) &&
       it->second.CanSubdivide &&
       (!this->ArrayMeasurement ||
-        (this->InRange && values[0] > this->Min && values[0] < this->Max) ||
-        (!this->InRange && !(values[0] > this->Min && values[0] < this->Max))))
+        (this->InRange && subdivisionValue > this->Min && subdivisionValue < this->Max) ||
+        (!this->InRange && !(subdivisionValue > this->Min && subdivisionValue < this->Max))))
     {
       cursor->SubdivideLeaf();
     }
