@@ -422,10 +422,7 @@ void pqVRDockPanel::removeConnection()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::addStyle()
 {
-  vtkSMProxy* proxy = this->Internals->propertyCombo->getCurrentProxy();
-  QByteArray property = this->Internals->propertyCombo->getCurrentPropertyName().toUtf8();
   QString styleString = this->Internals->stylesCombo->currentText();
-
   vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
   vtkSMVRInteractorStyleProxy* style =
     styleFactory->NewInteractorStyleFromDescription(styleString.toStdString());
@@ -436,8 +433,20 @@ void pqVRDockPanel::addStyle()
     return;
   }
 
+  // Some proxies can only be correctly retrieved with the property combobox
+  vtkSMProxy* proxy = this->Internals->propertyCombo->getCurrentProxy();
+  QByteArray property = this->Internals->propertyCombo->getCurrentPropertyName().toUtf8();
+
+  if (style->GetControlledPropertySize() != 0)
+  {
+    style->SetControlledPropertyName(property.data());
+  }
+  else
+  {
+    // When there isn't property, we must retieve the proxy directly from the proxy combobox
+    proxy = this->Internals->proxyCombo->getCurrentProxy();
+  }
   style->SetControlledProxy(proxy);
-  style->SetControlledPropertyName(property.data());
 
   style->AddObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_REQUEST_CONFIGURE, this,
     &pqVRDockPanel::configureStyle);
@@ -926,10 +935,17 @@ QString pqVRDockPanel::pqInternals::createName(vtkSMVRInteractorStyleProxy* styl
   objectName =
     (pqControlledProxy ? pqControlledProxy->getSMName()
                        : (smControlledProxy ? smControlledProxy->GetXMLLabel() : "<error>"));
-  propertyName =
-    (strlen(style->GetControlledPropertyName()) ? style->GetControlledPropertyName() : "--");
 
-  description = QString("%1 on %2's %3").arg(styleName).arg(objectName).arg(propertyName);
+  if (style->GetControlledPropertySize() == 0)
+  {
+    description = QString("%1 on %2's").arg(styleName).arg(objectName);
+  }
+  else
+  {
+    propertyName =
+      (strlen(style->GetControlledPropertyName()) ? style->GetControlledPropertyName() : "--");
+    description = QString("%1 on %2's %3").arg(styleName).arg(objectName).arg(propertyName);
+  }
 
   return description;
 }

@@ -102,11 +102,6 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
     return false;
   }
 
-  if (child->GetAttribute("property") == nullptr)
-  {
-    return false;
-  }
-
   bool result = true;
   for (unsigned int neCount = 0; neCount < child->GetNumberOfNestedElements(); neCount++)
   {
@@ -202,17 +197,25 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
   }
 
   // Set property
-  this->SetControlledPropertyName(child->GetAttribute("property"));
+  if (child->GetAttribute("property"))
+  {
+    this->SetControlledPropertyName(child->GetAttribute("property"));
+  }
+
+  if (this->GetControlledPropertySize() != 0 &&
+    (this->ControlledPropertyName == nullptr || this->ControlledPropertyName[0] == '\0'))
+  {
+    vtkWarningMacro("PropertyName is missing.");
+    result = false;
+  }
 
   // Verify settings
-  if (this->ControlledProxy == nullptr || this->ControlledPropertyName == nullptr ||
-    this->ControlledPropertyName[0] == '\0')
+  if (this->ControlledProxy == nullptr)
   {
-    vtkWarningMacro(<< "Invalid Controlled Proxy or PropertyName. "
+    vtkWarningMacro(<< "Invalid Controlled Proxy. "
                     << "this->ControlledProxy: " << this->ControlledProxy << " "
                     << "Proxy id, locator: " << id << ", " << locator << " "
-                    << "Proxy name: " << child->GetAttribute("proxyName") << " "
-                    << "PropertyName: " << this->ControlledPropertyName);
+                    << "Proxy name: " << child->GetAttribute("proxyName"));
     result = false;
   }
 
