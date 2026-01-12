@@ -78,6 +78,9 @@
       <Proxy group="filters" name="MaterialInterfaceFilter" />
       <Proxy group="filters" name="NonOverlappingLevelIdScalars" />
     </Category>
+    <Category name="EAM" menu_label="&amp;EAM">
+      <Proxy group="filters" name="EAMProjectToSphere" />
+    </Category>
   </Category>
 
   <Category name="Display" menu_label="Display">
@@ -347,6 +350,7 @@
   <Proxy group="filters" name="Delaunay3D" />
   <Proxy group="filters" name="DescriptiveStatistics" />
   <Proxy group="filters" name="DistributePoints" />
+  <Proxy group="filters" name="EAMProjectToSphere" />
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="EnvironmentAnnotation" />
   <Proxy group="filters" name="EqualizerFilter"/>

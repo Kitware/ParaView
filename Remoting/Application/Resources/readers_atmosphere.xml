@@ -1,0 +1,131 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- =================================================================== -->
+    <SourceProxy name="EAMDataReader"
+                 label="EAM Data Reader"
+                 class="paraview.algorithms.eam_reader.EAMDataReader"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Multi-output NetCDF reader for E3SM/EAM atmospheric model data.
+
+        This reader produces three separate outputs for different variable types:
+        - Port 0 (Surface): Surface variables with 2 dimensions (time, ncol) as quad mesh
+        - Port 1 (Middle Layer): Variables on middle levels as hexahedral volume mesh
+        - Port 2 (Interface Layer): Variables on interface levels as hexahedral volume mesh
+
+        The 3D outputs are converted to volumetric data, producing hexahedral cells that span
+        between adjacent vertical levels for immediate volume rendering support.
+      </Documentation>
+
+      <OutputPort index="0" name="Surface" />
+      <OutputPort index="1" name="Middle Layer" />
+      <OutputPort index="2" name="Interface Layer" />
+
+      <StringVectorProperty command="SetDataFileName"
+                            name="FileName1"
+                            label="Data File"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify the NetCDF data file name.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetConnectivityFileName"
+                            name="FileName2"
+                            label="Connectivity File"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify the NetCDF connectivity file name.</Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1"
+                            si_class="vtkSITimeStepsProperty">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="SurfaceVariablesInfo"
+                            command="GetSurfaceDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="SurfaceVariables"
+                            label="Surface Variables"
+                            command="GetSurfaceDataArrays"
+                            information_property="SurfaceVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="SurfaceVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the surface variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="MiddleLayerVariablesInfo"
+                            command="GetMiddleLayerDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="MiddleLayerVariables"
+                            label="Middle Layer Variables"
+                            command="GetMiddleLayerDataArrays"
+                            information_property="MiddleLayerVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="MiddleLayerVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the middle layer (lev) variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="InterfaceLayerVariablesInfo"
+                            command="GetInterfaceLayerDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="InterfaceLayerVariables"
+                            label="Interface Layer Variables"
+                            command="GetInterfaceLayerDataArrays"
+                            information_property="InterfaceLayerVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="InterfaceLayerVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the interface layer (ilev) variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="nc" file_description="EAM NetCDF files" />
+      </Hints>
+
+      <!-- end of EAMDataReader -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -413,6 +413,13 @@ if (PARAVIEW_USE_PYTHON)
     list(APPEND xml_files
       Resources/readers_openpmd.xml)
   endif()
+  find_python_module(netCDF4 netCDF4_found)
+  if (netCDF4_found)
+    list(APPEND xml_files
+      Resources/readers_atmosphere.xml)
+    list(APPEND xml_files
+      Resources/filters_atmosphere.xml)
+  endif()
   list(APPEND xml_files
     Resources/readers_savg.xml)
   list(APPEND xml_files

@@ -1,0 +1,50 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- =================================================================== -->
+    <SourceProxy name="EAMProjectToSphere"
+                 label="EAM Project To Sphere"
+                 class="paraview.algorithms.eam_reader.EAMProjectToSphere"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Project lat/lon data onto a 3D sphere for globe visualization.
+
+        This filter transforms points from geographic coordinates (longitude as X,
+        latitude as Y, vertical level as Z) into spherical coordinates for
+        rendering data on a 3D globe. It supports vertical exaggeration through
+        a scale factor to make atmospheric layers visible.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>Input mesh with points in geographic coordinates.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="Data Layer"
+                         command="SetDataLayer"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>If enabled, adds a small offset to prevent z-fighting when overlaying data.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+                            command="SetScalingFactor"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <Documentation>Vertical exaggeration factor. Higher values make vertical structure more visible.</Documentation>
+      </DoubleVectorProperty>
+
+      <!-- end of EAMProjectToSphere -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
