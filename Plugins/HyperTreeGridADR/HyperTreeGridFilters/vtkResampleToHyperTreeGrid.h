@@ -13,8 +13,8 @@
  * Set a pointer to an instance derived from vtkAbstractArrayMeasurement
  * with the ArrayMeasurement method to set up the subdividing strategy.
  * By default, leaves in the vtkHyperTreeGrid are divided if the measured data
- * is between GetMin() and GetMax(). If GetInRange() == false, the subdivide
- * outside of the range instead.
+ * is between GetLowerThreshold() and GetUpperThreshold().
+ * If GetInvertRange() == true, the subdivide outside of the range instead.
  *
  * Similarly use ArrayMeasurementDisplay to create a secondary criterion.
  * For example, set ArrayMeasurement to vtkStandardDeviationArrayMeasurement*
@@ -128,15 +128,8 @@ public:
    * Upper bound used to decide whether hyper tree grid should be refined or not
    * Default value is std::numeric_limits<double>infinity().
    */
-  vtkGetMacro(Max, double);
-  vtkSetMacro(Max, double);
-  ///@}
-
-  ///@{
-  /**
-   * Sets Max to infinity. Call this method to annihilate the upper bound.
-   */
-  void SetMaxToInfinity();
+  vtkGetMacro(UpperThreshold, double);
+  vtkSetMacro(UpperThreshold, double);
   ///@}
 
   ///@{
@@ -144,21 +137,38 @@ public:
    * Lower bound used to decide whether hyper tree grid should be refined or not
    * Default value is -std::numeric_limits<double>::infinity().
    */
-  vtkGetMacro(Min, double);
-  vtkSetMacro(Min, double);
+  vtkGetMacro(LowerThreshold, double);
+  vtkSetMacro(LowerThreshold, double);
   ///@}
 
   ///@{
   /**
-   * Sets Min to minus infinity. Call this method to annihilate the lower bound.
+   * Possible values for the threshold function:
+   * - THRESHOLD_BETWEEN - Keep values between the lower and upper thresholds.
+   * - THRESHOLD_BELOW_LOWER - Keep values below the lower threshold.
+   * - THRESHOLD_ABOVE_UPPER - Keep values above the upper threshold.
    */
-  void SetMinToInfinity();
+  enum ThresholdType
+  {
+    THRESHOLD_BETWEEN = 0,
+    THRESHOLD_BELOW_LOWER,
+    THRESHOLD_ABOVE_UPPER
+  };
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the threshold method, defining which threshold bounds to use. The default method is
+   * THRESHOLD_BETWEEN.
+   */
+  vtkGetMacro(ThresholdFunction, ThresholdType);
+  void SetThresholdFunction(int function);
   ///@}
 
   ///@{
   /**
    * Accessors for NoEmptyCells. If this flag is turned off, there can be masked leaves
-   * although the input has geometry in them, just because there is no point inside the leaf.
+   * although the input has geometry in them, just because therga e is no point inside the leaf.
    * If turned on, any empty leaf that has geometry will be display, i.e. the concerned leaves
    * parent
    * won't subdivide and create them, resuling in a "hole free" hyper tree grid, at the cost of a
@@ -175,8 +185,8 @@ public:
    * within
    * the range. Otherwise, we subdivide for values outside of the range.
    */
-  vtkGetMacro(InRange, bool);
-  vtkSetMacro(InRange, bool);
+  vtkGetMacro(InvertRange, bool);
+  vtkSetMacro(InvertRange, bool);
   ///@}
 
   ///@{
@@ -195,15 +205,6 @@ public:
     vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
   virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-
-  ///@{
-  /**
-   * If state == false, sets Max / Min to infinity / -infinity. Else, sets Max / Min to the last non
-   * infinite value.
-   */
-  void SetMaxState(bool state);
-  void SetMinState(bool state);
-  ///@}
 
   ///@{
   /**
@@ -237,12 +238,18 @@ protected:
   /**
    * Range values used to decide whether to subdivide a leaf or not
    */
-  double Min, Max;
+  double LowerThreshold, UpperThreshold;
 
   /**
-   * Decides whether the criteria should be inside [this->Min, this->Max] or outside.
+   * Threshold method to use when computing subdivision
    */
-  bool InRange;
+  ThresholdType ThresholdFunction;
+
+  /**
+   * Decides whether the criteria should be inside [this->LowerThreshold, this->UpperThreshold] or
+   * outside.
+   */
+  bool InvertRange;
 
   double Progress;
 
@@ -427,6 +434,12 @@ protected:
    */
   void CreateGridOfMultiResolutionGrids(std::vector<vtkDataSet*>& dataSet, int fieldAssociation);
 
+  /**
+   * Given a value, return true if the value is within the threshold range, based on the threshold
+   * function, the lower and the upper values.
+   */
+  bool IsValueInRange(double value);
+
   ///@{
   /**
    * This method computes the intersection volume between a box and a vtkCell3D.
@@ -548,11 +561,6 @@ protected:
    */
   vtkSmartPointer<vtkDataObject> BroadcastHyperTreeOwnership(
     vtkDataObject* input, vtkIdType processId);
-
-  /**
-   * Cache used to handle SetMaxState(bool) and SetMinState(bool)
-   */
-  double MaxCache, MinCache;
 
   /**
    * Flag to say whether we accept empty cell with geometry in it or not.

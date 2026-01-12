@@ -65,12 +65,10 @@ vtkResampleToHyperTreeGrid::vtkResampleToHyperTreeGrid()
   this->ArrayMeasurementDisplay = nullptr;
   this->BranchFactor = 2;
   this->MaxDepth = 1;
-  this->Min = -std::numeric_limits<double>::infinity();
-  this->Max = std::numeric_limits<double>::infinity();
-  this->MaxCache = this->Max;
-  this->MinCache = this->Min;
+  this->LowerThreshold = -std::numeric_limits<double>::infinity();
+  this->UpperThreshold = std::numeric_limits<double>::infinity();
   this->MinimumNumberOfPointsInSubtree = 1;
-  this->InRange = true;
+  this->InvertRange = false;
   this->NoEmptyCells = false;
   this->Extrapolate = true;
 
@@ -89,11 +87,24 @@ void vtkResampleToHyperTreeGrid::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "InRange (boolean): " << this->InRange << std::endl;
-  os << indent << "Min: " << this->Min << std::endl;
-  os << indent << "MinCache: " << this->MinCache << std::endl;
-  os << indent << "Max: " << this->Max << std::endl;
-  os << indent << "MaxCache: " << this->MaxCache << std::endl;
+  os << indent << "Threshold function: ";
+  switch (this->ThresholdFunction)
+  {
+    case vtkResampleToHyperTreeGrid::THRESHOLD_ABOVE_UPPER:
+      os << "Above upper" << std::endl;
+      os << indent << "Upper: " << this->UpperThreshold << std::endl;
+      break;
+    case vtkResampleToHyperTreeGrid::THRESHOLD_BELOW_LOWER:
+      os << "Below lower" << std::endl;
+      os << indent << "Lower: " << this->LowerThreshold << std::endl;
+      break;
+    case vtkResampleToHyperTreeGrid::THRESHOLD_BETWEEN:
+      os << "Between" << std::endl;
+      os << indent << "Lower: " << this->LowerThreshold << std::endl;
+      os << indent << "Upper: " << this->UpperThreshold << std::endl;
+      break;
+  }
+  os << indent << "InvertRange (boolean): " << this->InvertRange << std::endl;
   os << indent << "MinimumNumberOfPointsInSubtree: " << this->MinimumNumberOfPointsInSubtree
      << std::endl;
   os << indent << "MaxDepth: " << this->MaxDepth << std::endl;
@@ -1748,18 +1759,16 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
   }
 
   this->Mask->InsertValue(idx, it == multiResolutionGrid[level].end());
-  double& subdivisionValue = values[0];
 
   if (cursor->IsLeaf())
   {
+    double& subdivisionValue = values[0];
+
     // If we match the criterion, we subdivide
     if (level < this->MaxDepth && it != multiResolutionGrid[level].end() &&
       ((!this->ArrayMeasurement && !this->ArrayMeasurementDisplay) ||
         !std::isnan(subdivisionValue)) &&
-      it->second.CanSubdivide &&
-      (!this->ArrayMeasurement ||
-        (this->InRange && subdivisionValue > this->Min && subdivisionValue < this->Max) ||
-        (!this->InRange && !(subdivisionValue > this->Min && subdivisionValue < this->Max))))
+      it->second.CanSubdivide && (!this->ArrayMeasurement || (IsValueInRange(subdivisionValue))))
     {
       cursor->SubdivideLeaf();
     }
@@ -1799,6 +1808,28 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
       }
     }
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkResampleToHyperTreeGrid::IsValueInRange(double value)
+{
+  bool isInRange = false;
+  switch (this->ThresholdFunction)
+  {
+    case vtkResampleToHyperTreeGrid::THRESHOLD_BETWEEN:
+      isInRange = value > this->LowerThreshold && value < this->UpperThreshold;
+      break;
+    case vtkResampleToHyperTreeGrid::THRESHOLD_ABOVE_UPPER:
+      isInRange = value > this->UpperThreshold;
+      break;
+    case vtkResampleToHyperTreeGrid::THRESHOLD_BELOW_LOWER:
+      isInRange = value < this->LowerThreshold;
+  }
+  if (this->InvertRange)
+  {
+    isInRange = !isInRange;
+  }
+  return isInRange;
 }
 
 //----------------------------------------------------------------------------
@@ -1877,18 +1908,6 @@ int vtkResampleToHyperTreeGrid::RequestUpdateExtent(
 }
 
 //----------------------------------------------------------------------------
-void vtkResampleToHyperTreeGrid::SetMaxToInfinity()
-{
-  this->SetMax(std::numeric_limits<double>::infinity());
-}
-
-//----------------------------------------------------------------------------
-void vtkResampleToHyperTreeGrid::SetMinToInfinity()
-{
-  this->SetMin(-std::numeric_limits<double>::infinity());
-}
-
-//----------------------------------------------------------------------------
 vtkTuple<vtkIdType, 3> vtkResampleToHyperTreeGrid::IndexToMultiResGridCoordinates(
   vtkIdType idx, std::size_t depth) const
 {
@@ -1925,37 +1944,15 @@ std::size_t vtkResampleToHyperTreeGrid::GridCoordinatesToIndex(
 }
 
 //----------------------------------------------------------------------------
-void vtkResampleToHyperTreeGrid::SetMaxState(bool state)
+void vtkResampleToHyperTreeGrid::SetThresholdFunction(int function)
 {
-  if (!state)
+  ThresholdType threshold_function = static_cast<ThresholdType>(function);
+  if (this->GetThresholdFunction() == threshold_function)
   {
-    if (this->Max == std::numeric_limits<double>::infinity())
-    {
-      return;
-    }
-    this->MaxCache = this->Max;
-    this->SetMaxToInfinity();
+    return;
   }
-  else
-  {
-    this->SetMax(std::min(this->MaxCache, this->Max));
-  }
-}
 
-//----------------------------------------------------------------------------
-void vtkResampleToHyperTreeGrid::SetMinState(bool state)
-{
-  if (!state)
-  {
-    if (this->Min == -std::numeric_limits<double>::infinity())
-    {
-      return;
-    }
-    this->MinCache = this->Min;
-    this->SetMinToInfinity();
-  }
-  else
-  {
-    this->SetMin(std::max(this->MinCache, this->Min));
-  }
+  this->ThresholdFunction = threshold_function;
+
+  this->Modified();
 }

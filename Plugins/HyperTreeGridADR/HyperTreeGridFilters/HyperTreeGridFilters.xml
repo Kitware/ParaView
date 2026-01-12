@@ -78,10 +78,11 @@
     <SourceProxy name="ResampleToHyperTreeGrid" class="vtkResampleToHyperTreeGrid" label="Resample To Hyper Tree Grid" >
       <Documentation long_help="Warning: this plugin is a beta. Adaptive Mesh Refinement using a Hyper Tree Grid. The output is a Hyper Tree grid such that its leaves store a value measuring some property of the set of points inside them. Leaves are subdivided given some user defined heuristic."
                      short_help="Adaptive Mesh Refinement using a Hyper Tree Grid." >
-          This Filter generates a Hyper Tree Grid from any input data set which has point data.
+          This Filter generates a Hyper Tree Grid from any input data set which has point data or cell data.
           Leaves of the Hyper Tree Grid are subdivided if the subset of points inside that leave
-          match a crietrion set by the user on the input point data. The criterion is displayed, as
-          well as an other way to represent the set of data in the subset.
+          match a crietrion set by the user on the input point data or cell data. The criterion is displayed, as
+          well as an other way to represent the set of data in the subset. This filter works better with volumetric
+          data rather than surfaces.
       </Documentation>
       <InputProperty name="Input"
                      command="SetInputConnection" >
@@ -121,9 +122,18 @@
                          command="SetMaxDepth"
                          number_of_elements="1"
                          animateable="0"
-                         default_values="1" >
+                         default_values="2" >
         <Documentation>
           Maximum tree depth of output Hyper Tree Grid.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="MinimumNumberOfPointsInSubtree"
+                         command="SetMinimumNumberOfPointsInSubtree"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced" >
+        <Documentation>
+          Nodes are subdivided if an only if their non-empty children have at least this amount of points.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty name="SelectInputScalars"
@@ -141,76 +151,109 @@
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>
-          Input point data used as a subdividing criterion to build the hypertree grid.
+          Input data used as a subdividing criterion to build the hypertree grid.
         </Documentation>
       </StringVectorProperty>
-      <IntVectorProperty name="UseMax"
-                         command="SetMaxState"
-                         label="Use Max"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If not checked, Max is set to infinity.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty name="Max"
-                            command="SetMax"
-                            number_of_elements="1"
-                            default_values="1">
+      <ProxyProperty command="SetArrayMeasurement"
+                     label="Subdividing Criterion Method"
+                     name="ArrayMeasurement">
+        <ProxyListDomain name="proxy_list">
+          <Group name="array_measurement" default="Arithmetic Mean" />
+        </ProxyListDomain>
+        <Documentation>This property sets the array measurement method on the input data
+          used for subdividing leaves in the hyper tree grid. While we didn't reach max
+          depth and a cell value is in the threshold range, we refine the tree.</Documentation>
+      </ProxyProperty>
+      <ProxyProperty command="SetArrayMeasurementDisplay"
+                     label="Interpolating Method"
+                     panel_visibility="advanced"
+                     name="ArrayMeasurementDisplay">
+        <ProxyListDomain name="proxy_list">
+          <Group name="array_measurement" default="None" />
+        </ProxyListDomain>
+        <Documentation>This property sets an extra array measurement method only for visualization
+          purposes. It is applied only to the other arrays of the same type as the subdivision criterion.</Documentation>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetLowerThreshold"
+                            default_values="0"
+                            name="LowerThreshold"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="min">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
         <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="UseMax" function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdFunction" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdFunction" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>
-          Leaves are subdivided if the Subdividing Criterion is lower than Max.
+          The value of this property specifies the lower bound for the
+          subdivision operation.
         </Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty name="UseMin"
-                         command="SetMinState"
-                         label="Use Min"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          If not checked, Min is set to minus infinity.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty name="Min"
-                            command="SetMin"
-                            number_of_elements="1"
-                            default_values="0" >
+      <DoubleVectorProperty command="SetUpperThreshold"
+                            default_values="0"
+                            name="UpperThreshold"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="max">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
         <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="UseMin" function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdFunction" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdFunction" value="2" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>
-          Leaves are subdivided if the Subdividing Criterion is greater than Min.
+          The value of this property specifies the upper bound for the
+          subdivision operation.
         </Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty name="MinimumNumberOfPointsInSubtree"
-                         command="SetMinimumNumberOfPointsInSubtree"
+      <IntVectorProperty command="SetThresholdFunction"
+                         default_values="0"
+                         name="ThresholdFunction"
                          number_of_elements="1"
-                         default_values="1" >
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry text="Between" value="0"/>
+          <Entry text="Below Lower Threshold" value="1"/>
+          <Entry text="Above Upper Threshold" value="2"/>
+        </EnumerationDomain>
         <Documentation>
-          Nodes are subdivided if an only if their non-empty children have at least this amount of points.
+          This property indicates the threshold method.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty name="InsideRange"
-                         command="SetInRange"
+      <IntVectorProperty name="InvertRange"
+                         command="SetInvertRange"
                          number_of_elements="1"
-                         default_values="1" >
+                         default_values="0" >
         <BooleanDomain name="bool" />
         <Documentation>
-          Inverts the criterion. Leafs are subdivided if the Subdividing Criterion is outside of [Min, Max]
+          Inverts the criterion. Leafs are subdivided if the Subdividing Criterion is outside of [LowerThreshold, UpperThreshold]
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="NoEmptyCells"
                          command="SetNoEmptyCells"
                          number_of_elements="1"
-                         default_values="0" >
+                         default_values="0"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Forces the output hyper tree grid to not produce empty cells by limiting subdivisions.
@@ -223,7 +266,8 @@
       <IntVectorProperty name="ExtrapolatePointData"
                          command="SetExtrapolate"
                          number_of_elements="1"
-                         default_values="0" >
+                         default_values="0"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Forces the output hyper tree grid to not produce empty cells by extrapolation.
@@ -232,24 +276,24 @@
           that would be produced if this parameter was off, using Von Neumann super cursors.
         </Documentation>
       </IntVectorProperty>
-      <ProxyProperty command="SetArrayMeasurement"
-                     label="Subdividing Criterion"
-                     name="ArrayMeasurement">
-        <ProxyListDomain name="proxy_list">
-          <Group name="array_measurement" default="Arithmetic Mean" />
-        </ProxyListDomain>
-        <Documentation>This property sets the array measurement method used for
-          subdividing leaves in the hyper tree grid.</Documentation>
-      </ProxyProperty>
-      <ProxyProperty command="SetArrayMeasurementDisplay"
-                     label="Averaging method"
-                     name="ArrayMeasurementDisplay">
-        <ProxyListDomain name="proxy_list">
-          <Group name="array_measurement" default="None" />
-        </ProxyListDomain>
-        <Documentation>This property sets an extra array measurement method only for visualization
-          purposes. This measurement is applied to the list of inputs.</Documentation>
-      </ProxyProperty>
+
+      <PropertyGroup
+         name="Subdivision">
+
+        <Property name="MinimumNumberOfPointsInSubtree"/>
+        <Property name="SelectInputScalars"/>
+        <Property name="ArrayMeasurement"/>
+        <Property name="ArrayMeasurementDisplay"/>
+      </PropertyGroup>
+
+      <PropertyGroup
+         name="Threshold values">
+
+        <Property name="LowerThreshold"/>
+        <Property name="UpperThreshold"/>
+        <Property name="ThresholdFunction"/>
+        <Property name="InvertRange"/>
+      </PropertyGroup>
       <!-- End ResampleToHyperTreeGrid -->
     </SourceProxy>
   </ProxyGroup>
