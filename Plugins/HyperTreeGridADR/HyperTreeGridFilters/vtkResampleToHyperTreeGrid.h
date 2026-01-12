@@ -217,9 +217,6 @@ public:
   vtkBooleanMacro(Extrapolate, bool);
   ///@}
 
-  void AddDataArray(const char* name);
-  void ClearDataArrays();
-
 protected:
   vtkResampleToHyperTreeGrid();
   ~vtkResampleToHyperTreeGrid() override;
@@ -564,15 +561,9 @@ protected:
   bool NoEmptyCells;
 
   /**
-   * Collection of input point data arrays to resample, deducted from
-   * InputDataArrayNames.
+   * Collection of input data arrays to resample
    */
   std::vector<std::vector<vtkDataArray*>> InputArrays;
-
-  /**
-   * Collection of input scalar field names to resample.
-   */
-  std::vector<std::string> InputDataArrayNames;
 
   /**
    *  Multi-controller pointer for multi-process handling.

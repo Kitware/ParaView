@@ -300,9 +300,9 @@ int vtkResampleToHyperTreeGrid::RequestData(
 
     if (this->ArrayMeasurementDisplay)
     {
-      for (const std::string& name : this->InputDataArrayNames)
+      for (int i = 0; i < dataSetAttributes->GetNumberOfArrays(); i++)
       {
-        vtkDataArray* array = dataSetAttributes->GetArray(name.c_str());
+        vtkDataArray* array = dataSetAttributes->GetArray(i);
         if (array)
         {
           this->InputArrays[inputId].emplace_back(array);
@@ -310,7 +310,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
           if (inputId == 0)
           {
             vtkNew<vtkDoubleArray> scalarFieldDisplay;
-            scalarFieldDisplay->SetName(name.c_str());
+            scalarFieldDisplay->SetName(array->GetName());
             output->GetCellData()->AddArray(scalarFieldDisplay);
             this->ScalarFields.emplace_back(scalarFieldDisplay);
 
@@ -355,25 +355,6 @@ int vtkResampleToHyperTreeGrid::RequestData(
   this->UpdateProgress(1.0);
 
   return 1;
-}
-
-//------------------------------------------------------------------------------
-void vtkResampleToHyperTreeGrid::AddDataArray(const char* name)
-{
-  if (!name)
-  {
-    vtkErrorMacro("name cannot be null.");
-    return;
-  }
-
-  this->InputDataArrayNames.emplace_back(name);
-  this->Modified();
-}
-
-//------------------------------------------------------------------------------
-void vtkResampleToHyperTreeGrid::ClearDataArrays()
-{
-  this->InputDataArrayNames.clear();
 }
 
 //----------------------------------------------------------------------------

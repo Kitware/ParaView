@@ -126,19 +126,6 @@
           Maximum tree depth of output Hyper Tree Grid.
         </Documentation>
       </IntVectorProperty>
-      <StringVectorProperty clean_command="ClearDataArrays"
-                            command="AddDataArray"
-                            name="PointDataArrays"
-                            label="Point Data Array to process"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Add a point array by name to be resampled.</Documentation>
-        <ArrayListDomain input_domain_name="input_array" name="array_list">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
       <StringVectorProperty name="SelectInputScalars"
                             label="Subdividing Criterion Array"
                             command="SetInputArrayToProcess"
