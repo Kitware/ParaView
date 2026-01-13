@@ -61,8 +61,8 @@ vtkResampleToHyperTreeGrid::vtkResampleToHyperTreeGrid()
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
 
-  this->ArrayMeasurement = nullptr;
-  this->ArrayMeasurementDisplay = nullptr;
+  this->SubdivisionMethod = nullptr;
+  this->InterpolationMethod = nullptr;
   this->BranchFactor = 2;
   this->MaxDepth = 1;
   this->LowerThreshold = -std::numeric_limits<double>::infinity();
@@ -117,22 +117,22 @@ void vtkResampleToHyperTreeGrid::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "ResolutionPerTree[" << i << "]: " << this->ResolutionPerTree[i] << std::endl;
   }
 
-  if (this->ArrayMeasurement)
+  if (this->SubdivisionMethod)
   {
-    os << indent << *(this->ArrayMeasurement) << std::endl;
+    os << indent << *(this->SubdivisionMethod) << std::endl;
   }
   else
   {
-    os << indent << "No ArrayMeasurement" << std::endl;
+    os << indent << "No SubdivisionMethod" << std::endl;
   }
 
-  if (this->ArrayMeasurementDisplay)
+  if (this->InterpolationMethod)
   {
-    os << indent << *(this->ArrayMeasurementDisplay) << std::endl;
+    os << indent << *(this->InterpolationMethod) << std::endl;
   }
   else
   {
-    os << indent << "No ArrayMeasurementDisplay" << std::endl;
+    os << indent << "No InterpolationMethod" << std::endl;
   }
 }
 
@@ -275,6 +275,8 @@ int vtkResampleToHyperTreeGrid::RequestData(
     vtkDataArray* scalarData;
     vtkDataSetAttributes* dataSetAttributes;
 
+    // If the array used to subdivide the input comes from PointData, the filter interpolates only
+    // point data arrays. Otherwise it interpolates cell data arrays
     switch (fieldAssociation)
     {
       case vtkDataObject::FIELD_ASSOCIATION_POINTS:
@@ -287,10 +289,14 @@ int vtkResampleToHyperTreeGrid::RequestData(
         break;
       default:
         scalarData = nullptr;
+        dataSetAttributes = nullptr;
         break;
     }
 
-    if (this->ArrayMeasurement)
+    // We create an instance of SubdivisionMethods in ArrayValuesAccumulators to store values
+    // The values will then be retrieved for subdivision because it is located at the first index of
+    // ArrayValuesAccumulators
+    if (this->SubdivisionMethod)
     {
       this->InputArrays[inputId].emplace_back(scalarData);
 
@@ -301,15 +307,17 @@ int vtkResampleToHyperTreeGrid::RequestData(
         output->GetCellData()->AddArray(scalarField);
         this->ScalarFields.emplace_back(scalarField);
 
-        vtkAbstractArrayMeasurement* tmp = this->ArrayMeasurement->NewInstance();
-        tmp->DeepCopy(this->ArrayMeasurement);
+        vtkAbstractArrayMeasurement* tmp = this->SubdivisionMethod->NewInstance();
+        tmp->DeepCopy(this->SubdivisionMethod);
 
-        this->ArrayMeasurements.emplace_back(
+        this->ArrayValuesAccumulators.emplace_back(
           vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(tmp));
       }
     }
 
-    if (this->ArrayMeasurementDisplay)
+    // If an interpolation method is set, we create an instance of this method to store values
+    // for each array in the input dataSetAttributes (PointData or CellData)
+    if (this->InterpolationMethod && dataSetAttributes)
     {
       for (int i = 0; i < dataSetAttributes->GetNumberOfArrays(); i++)
       {
@@ -325,10 +333,10 @@ int vtkResampleToHyperTreeGrid::RequestData(
             output->GetCellData()->AddArray(scalarFieldDisplay);
             this->ScalarFields.emplace_back(scalarFieldDisplay);
 
-            vtkAbstractArrayMeasurement* tmp = this->ArrayMeasurementDisplay->NewInstance();
-            tmp->DeepCopy(this->ArrayMeasurementDisplay);
+            vtkAbstractArrayMeasurement* tmp = this->InterpolationMethod->NewInstance();
+            tmp->DeepCopy(this->InterpolationMethod);
 
-            this->ArrayMeasurements.emplace_back(
+            this->ArrayValuesAccumulators.emplace_back(
               vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(tmp));
           }
         }
@@ -350,7 +358,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
   output->SetMask(this->Mask);
   this->Mask->FastDelete();
 
-  if (this->Extrapolate && !this->ArrayMeasurements.empty() &&
+  if (this->Extrapolate && !this->ArrayValuesAccumulators.empty() &&
     fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
   {
     vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(output);
@@ -358,7 +366,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
   }
 
   this->ScalarFields.clear();
-  this->ArrayMeasurements.clear();
+  this->ArrayValuesAccumulators.clear();
   this->GridOfMultiResolutionGrids.clear();
   this->InputArrays.clear();
 
@@ -371,7 +379,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
 //----------------------------------------------------------------------------
 vtkResampleToHyperTreeGrid::GridElement::~GridElement()
 {
-  this->ArrayMeasurements.clear();
+  this->ArrayValuesAccumulators.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -1052,9 +1060,9 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
         auto& grid = this->GridOfMultiResolutionGrids[gridIdx][this->MaxDepth];
 
         auto it = grid.find(childIndex);
-        // if this is the first time we pass by this grid location, we create a new ArrayMeasurement
-        // instance
-        // NOTE: GridElement::CanSubdivide does not need to be set at the highest resolution
+        // if this is the first time we pass by this grid location, we create a new
+        // vtkArrayMeasurement instance NOTE: GridElement::CanSubdivide does not need to be set at
+        // the highest resolution
         if (it == grid.end())
         {
           GridElement& element = grid[childIndex];
@@ -1062,13 +1070,13 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
           element.NumberOfPointsInSubtree = 1;
           element.AccumulatedWeight = 1.0;
           element.UnmaskedChildrenHaveNoMaskedLeaves = true;
-          for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
+          for (std::size_t l = 0; l < this->ArrayValuesAccumulators.size(); ++l)
           {
-            element.ArrayMeasurements.emplace_back(
+            element.ArrayValuesAccumulators.emplace_back(
               vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
-                this->ArrayMeasurements[l]->NewInstance()));
-            element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
-            element.ArrayMeasurements[l]->Add(
+                this->ArrayValuesAccumulators[l]->NewInstance()));
+            element.ArrayValuesAccumulators[l]->DeepCopy(this->ArrayValuesAccumulators[l]);
+            element.ArrayValuesAccumulators[l]->Add(
               dataList[l]->GetTuple(pointId), dataList[l]->GetNumberOfComponents());
           }
         }
@@ -1078,7 +1086,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
         {
           for (std::size_t l = 0; l < dataList.size(); ++l)
           {
-            it->second.ArrayMeasurements[l]->Add(
+            it->second.ArrayValuesAccumulators[l]->Add(
               dataList[l]->GetTuple(pointId), dataList[l]->GetNumberOfComponents());
           }
           ++(it->second.NumberOfPointsInSubtree);
@@ -1200,13 +1208,13 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
                   element.NumberOfPointsInSubtree = 1;
                   element.UnmaskedChildrenHaveNoMaskedLeaves = true;
                   element.AccumulatedWeight = volume;
-                  for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
+                  for (std::size_t l = 0; l < this->ArrayValuesAccumulators.size(); ++l)
                   {
-                    element.ArrayMeasurements.emplace_back(
+                    element.ArrayValuesAccumulators.emplace_back(
                       vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
-                        this->ArrayMeasurements[l]->NewInstance()));
-                    element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
-                    element.ArrayMeasurements[l]->Add(
+                        this->ArrayValuesAccumulators[l]->NewInstance()));
+                    element.ArrayValuesAccumulators[l]->DeepCopy(this->ArrayValuesAccumulators[l]);
+                    element.ArrayValuesAccumulators[l]->Add(
                       dataList[l]->GetTuple(cellId), dataList[l]->GetNumberOfComponents(), volume);
                   }
                 }
@@ -1216,7 +1224,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
                 {
                   for (std::size_t l = 0; l < dataList.size(); ++l)
                   {
-                    it->second.ArrayMeasurements[l]->Add(
+                    it->second.ArrayValuesAccumulators[l]->Add(
                       dataList[l]->GetTuple(cellId), dataList[l]->GetNumberOfComponents(), volume);
                   }
                   ++(it->second.NumberOfPointsInSubtree);
@@ -1283,20 +1291,20 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
           // Here we check with the first child.
           element.CanSubdivide =
             mapElement.second.NumberOfPointsInSubtree >= this->MinimumNumberOfPointsInSubtree &&
-            (!this->ArrayMeasurement ||
-              this->ArrayMeasurement->CanMeasure(
+            (!this->SubdivisionMethod ||
+              this->SubdivisionMethod->CanMeasure(
                 mapElement.second.NumberOfPointsInSubtree, mapElement.second.AccumulatedWeight)) &&
-            (!this->ArrayMeasurementDisplay ||
-              this->ArrayMeasurementDisplay->CanMeasure(
+            (!this->InterpolationMethod ||
+              this->InterpolationMethod->CanMeasure(
                 mapElement.second.NumberOfPointsInSubtree, mapElement.second.AccumulatedWeight));
 
-          for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
+          for (std::size_t l = 0; l < this->ArrayValuesAccumulators.size(); ++l)
           {
-            element.ArrayMeasurements.emplace_back(
+            element.ArrayValuesAccumulators.emplace_back(
               vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
-                this->ArrayMeasurements[l]->NewInstance()));
-            element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
-            element.ArrayMeasurements[l]->Add(mapElement.second.ArrayMeasurements[l]);
+                this->ArrayValuesAccumulators[l]->NewInstance()));
+            element.ArrayValuesAccumulators[l]->DeepCopy(this->ArrayValuesAccumulators[l]);
+            element.ArrayValuesAccumulators[l]->Add(mapElement.second.ArrayValuesAccumulators[l]);
           }
         }
         // else, the grid element is already created, we add data to it
@@ -1320,17 +1328,18 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
           // Here we accumulate for each child
           it->second.CanSubdivide &=
             it->second.NumberOfPointsInSubtree >= this->MinimumNumberOfPointsInSubtree &&
-            (!this->ArrayMeasurement ||
-              this->ArrayMeasurement->CanMeasure(
+            (!this->SubdivisionMethod ||
+              this->SubdivisionMethod->CanMeasure(
                 mapElement.second.NumberOfPointsInSubtree, mapElement.second.AccumulatedWeight)) &&
-            (!this->ArrayMeasurementDisplay ||
-              this->ArrayMeasurementDisplay->CanMeasure(
+            (!this->InterpolationMethod ||
+              this->InterpolationMethod->CanMeasure(
                 mapElement.second.NumberOfPointsInSubtree, mapElement.second.AccumulatedWeight));
 
           // We add the accumulators from the child
-          for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
+          for (std::size_t l = 0; l < this->ArrayValuesAccumulators.size(); ++l)
           {
-            it->second.ArrayMeasurements[l]->Add(mapElement.second.ArrayMeasurements[l]);
+            it->second.ArrayValuesAccumulators[l]->Add(
+              mapElement.second.ArrayValuesAccumulators[l]);
           }
         }
       }
@@ -1338,7 +1347,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
   }
 
   if (this->NoEmptyCells ||
-    (this->Extrapolate && !this->ArrayMeasurements.empty() &&
+    (this->Extrapolate && !this->ArrayValuesAccumulators.empty() &&
       fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS))
   {
     for (int inputId = 0; inputId < static_cast<int>(dataSets.size()); ++inputId)
@@ -1736,15 +1745,15 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
 
   auto it = multiResolutionGrid[level].find(this->MultiResGridCoordinatesToIndex(i, j, k, level));
 
-  std::vector<double> values(this->ArrayMeasurements.size(), 0.0);
+  std::vector<double> values(this->ArrayValuesAccumulators.size(), 0.0);
 
   if (!values.empty() && it != multiResolutionGrid[level].end())
   {
-    if (!it->second.ArrayMeasurements.empty())
+    if (!it->second.ArrayValuesAccumulators.empty())
     {
-      for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
+      for (std::size_t l = 0; l < this->ArrayValuesAccumulators.size(); ++l)
       {
-        it->second.ArrayMeasurements[l]->Measure(values[l]);
+        it->second.ArrayValuesAccumulators[l]->Measure(values[l]);
       }
     }
     else
@@ -1753,7 +1762,7 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
     }
   }
 
-  for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
+  for (std::size_t l = 0; l < this->ArrayValuesAccumulators.size(); ++l)
   {
     this->ScalarFields[l]->InsertValue(idx, values[l]);
   }
@@ -1766,9 +1775,8 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
 
     // If we match the criterion, we subdivide
     if (level < this->MaxDepth && it != multiResolutionGrid[level].end() &&
-      ((!this->ArrayMeasurement && !this->ArrayMeasurementDisplay) ||
-        !std::isnan(subdivisionValue)) &&
-      it->second.CanSubdivide && (!this->ArrayMeasurement || (IsValueInRange(subdivisionValue))))
+      ((!this->SubdivisionMethod && !this->InterpolationMethod) || !std::isnan(subdivisionValue)) &&
+      it->second.CanSubdivide && (!this->SubdivisionMethod || IsValueInRange(subdivisionValue)))
     {
       cursor->SubdivideLeaf();
     }

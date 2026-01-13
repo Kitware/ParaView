@@ -11,15 +11,15 @@
  * the stragegy applied over the field.
  *
  * Set a pointer to an instance derived from vtkAbstractArrayMeasurement
- * with the ArrayMeasurement method to set up the subdividing strategy.
+ * with the SubdivisionMethod method to set up the subdividing strategy.
  * By default, leaves in the vtkHyperTreeGrid are divided if the measured data
  * is between GetLowerThreshold() and GetUpperThreshold().
  * If GetInvertRange() == true, the subdivide outside of the range instead.
  *
- * Similarly use ArrayMeasurementDisplay to create a secondary criterion.
- * For example, set ArrayMeasurement to vtkStandardDeviationArrayMeasurement*
+ * Similarly use InterpolationMethod to create a secondary criterion.
+ * For example, set SubdivisionMethod to vtkStandardDeviationArrayMeasurement*
  * to produce a vtkHyperTreeGrid.
- * Set ArrayMeasurementDisplay to vtkMedianMeasurement to produce an extra
+ * Set InterpolationMethod to vtkMedianMeasurement to produce an extra
  * scalar field that is closer to the input, ie the the median of the subtree.
  *
  */
@@ -80,18 +80,18 @@ public:
 
   ///@{
   /**
-   * Set/Get for ArrayMeasurement. Use it to feed a pointer of any subclass of
+   * Set/Get for SubdivisionMethod. Use it to feed a pointer of any subclass of
    * vtkAbstractArrayMeasurement,
    * which will be used to accumulate scalars from the input data set in order to produce the hyper
    * tree grid.
    */
-  vtkGetMacro(ArrayMeasurement, vtkAbstractArrayMeasurement*);
-  vtkSetMacro(ArrayMeasurement, vtkAbstractArrayMeasurement*);
+  vtkGetMacro(SubdivisionMethod, vtkAbstractArrayMeasurement*);
+  vtkSetMacro(SubdivisionMethod, vtkAbstractArrayMeasurement*);
   ///@}
 
   ///@{
   /**
-   * Set/Get for ArrayMeasurement. Use it to feed a pointer of any subclass of
+   * Set/Get for InterpolationMethod. Use it to feed a pointer of any subclass of
    * vtkAbstractArrayMeasurement,
    * which will be used to accumulate scalars from the input data. This measurement is not used for
    * subdivision,
@@ -101,8 +101,8 @@ public:
    * for example.
    * Default value is nullptr.
    */
-  vtkGetMacro(ArrayMeasurementDisplay, vtkAbstractArrayMeasurement*);
-  vtkSetMacro(ArrayMeasurementDisplay, vtkAbstractArrayMeasurement*);
+  vtkGetMacro(InterpolationMethod, vtkAbstractArrayMeasurement*);
+  vtkSetMacro(InterpolationMethod, vtkAbstractArrayMeasurement*);
   ///@}
 
   ///@{
@@ -277,7 +277,7 @@ protected:
     /**
      * Accumulators used for measuring quantities on subtrees
      */
-    std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayMeasurements;
+    std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayValuesAccumulators;
 
     vtkIdType NumberOfLeavesInSubtree;
     vtkIdType NumberOfPointsInSubtree;
@@ -299,12 +299,12 @@ protected:
   /**
    * Pointers used to determine what resampling metric is used for the subdivision criterion.
    */
-  vtkAbstractArrayMeasurement* ArrayMeasurement;
+  vtkAbstractArrayMeasurement* SubdivisionMethod;
 
   /**
    * Pointers used to determine what resampling metric is used for the list of input scalar fields.
    */
-  vtkAbstractArrayMeasurement* ArrayMeasurementDisplay;
+  vtkAbstractArrayMeasurement* InterpolationMethod;
 
   /**
    * Only needed internally. This draws a multi resolution grid that should have this->MaxDepth+1
@@ -485,10 +485,10 @@ protected:
   std::vector<double> Diagonal;
 
   /**
-   * Dummy pointer for creating at run-time the proper type of ArrayMeasurement or
-   * ArrayMeasurementDisplay.
+   * Dummy pointer for creating at run-time the proper type of SubdivisionMethod or
+   * InterpolationMethod.
    */
-  std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayMeasurements;
+  std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayValuesAccumulators;
 
   /**
    * Converts indexing at given resolution to a tuple (i,j,k) to navigate in a MultiResolutionGrid.

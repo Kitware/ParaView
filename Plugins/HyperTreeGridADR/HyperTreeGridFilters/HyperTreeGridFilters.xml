@@ -154,9 +154,9 @@
           Input data used as a subdividing criterion to build the hypertree grid.
         </Documentation>
       </StringVectorProperty>
-      <ProxyProperty command="SetArrayMeasurement"
+      <ProxyProperty command="SetSubdivisionMethod"
                      label="Subdividing Criterion Method"
-                     name="ArrayMeasurement">
+                     name="SubdivisionMethod">
         <ProxyListDomain name="proxy_list">
           <Group name="array_measurement" default="Arithmetic Mean" />
         </ProxyListDomain>
@@ -164,10 +164,10 @@
           used for subdividing leaves in the hyper tree grid. While we didn't reach max
           depth and a cell value is in the threshold range, we refine the tree.</Documentation>
       </ProxyProperty>
-      <ProxyProperty command="SetArrayMeasurementDisplay"
+      <ProxyProperty command="SetInterpolationMethod"
                      label="Interpolating Method"
                      panel_visibility="advanced"
-                     name="ArrayMeasurementDisplay">
+                     name="InterpolationMethod">
         <ProxyListDomain name="proxy_list">
           <Group name="array_measurement" default="None" />
         </ProxyListDomain>
@@ -282,8 +282,8 @@
 
         <Property name="MinimumNumberOfPointsInSubtree"/>
         <Property name="SelectInputScalars"/>
-        <Property name="ArrayMeasurement"/>
-        <Property name="ArrayMeasurementDisplay"/>
+        <Property name="SubdivisionMethod"/>
+        <Property name="InterpolationMethod"/>
       </PropertyGroup>
 
       <PropertyGroup
