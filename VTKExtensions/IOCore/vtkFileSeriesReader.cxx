@@ -395,6 +395,20 @@ vtkFileSeriesReader::~vtkFileSeriesReader()
 }
 
 //----------------------------------------------------------------------------
+void vtkFileSeriesReader::SetReader(vtkAlgorithm* reader)
+{
+  this->Superclass::SetReader(reader);
+  if (reader)
+  {
+    int numPorts = reader->GetNumberOfOutputPorts();
+    if (numPorts != this->GetNumberOfOutputPorts())
+    {
+      this->SetNumberOfOutputPorts(numPorts);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkFileSeriesReader::AddFileName(const char* name)
 {
   this->AddFileNameInternal(name);

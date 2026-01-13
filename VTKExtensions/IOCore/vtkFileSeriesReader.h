@@ -79,6 +79,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
+   * Set the internal reader. This method also automatically configures
+   * the number of output ports to match the reader's output port count,
+   * enabling support for readers with multiple output ports.
+   */
+  void SetReader(vtkAlgorithm* reader) override;
+
+  /**
    * All pipeline passes are forwarded to the internal reader. The
    * vtkFileSeriesReader reports time steps in RequestInformation. It
    * updated the file name of the internal in RequestUpdateExtent based
