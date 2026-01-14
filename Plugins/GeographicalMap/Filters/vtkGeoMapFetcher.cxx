@@ -29,6 +29,18 @@ constexpr const char* MapQuestStaticBaseURL = "https://www.mapquestapi.com/stati
 constexpr const char* OSMBaseURL = "https://tile.openstreetmap.org/";
 
 //-----------------------------------------------------------------------------
+// Return whether the libcurl in use has SSL/TLS support enabled.
+bool HasCurlSSLSupport()
+{
+  const curl_version_info_data* vi = curl_version_info(CURLVERSION_NOW);
+  if (!vi)
+  {
+    return false;
+  }
+  return (vi->features & CURL_VERSION_SSL) != 0;
+}
+
+//-----------------------------------------------------------------------------
 // Ref: https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames (Lon./lat. to tile numbers)
 long OSMLonToTileX(double lonDeg, int zoom)
 {
@@ -326,6 +338,16 @@ int vtkGeoMapFetcher::RequestData(
   if (this->Provider != OpenStreetMap && this->APIKey.empty())
   {
     vtkErrorMacro("An API key must be provided.");
+    return 0;
+  }
+
+  // If OpenStreetMap is selected, ensure HTTPS capability via libcurl SSL support.
+  // Warn once and abort early to avoid spamming per-tile messages.
+  if (this->Provider == OpenStreetMap && !::HasCurlSSLSupport())
+  {
+    vtkWarningMacro(
+      "OpenStreetMap requires HTTPS, but libcurl on this build lacks SSL/TLS support. "
+      "Please rebuild curl with SSL enabled or select another provider.");
     return 0;
   }
 
