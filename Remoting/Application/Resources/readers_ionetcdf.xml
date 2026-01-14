@@ -845,6 +845,27 @@
           </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
+      <IntVectorProperty command="SetUsePrimaryGrid"
+                         default_values="0"
+                         name="UsePrimaryGrid"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property indicates whether to load the primary grid or the dual
+          grid. The primary MPAS grid is defined as a Voronoi diagram of points
+          on a sphere, and the simulation data are defined in those cell regions
+          of that Voronoi diagram. MPAS also defines the dual grid, which is
+          naturally a Delaunay tesselation of the points. When this option is
+          true, the primary Voronoi diagram is loaded, and the field data are
+          the cells of these regions. When this option is false (the default),
+          the dual Delaunay tesselation is loaded and the field data is on the
+          points.
+
+          Note that switching between the dual and primary grid switches the
+          point/cell semantics. Thus, when UsePrimaryGrid is turned on, the
+          selection of point arrays actually affects cell arrays and vice versa.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetProjectLatLon"
                          default_values="0"
                          name="ProjectLatLon"
