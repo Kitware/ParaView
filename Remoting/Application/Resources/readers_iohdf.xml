@@ -110,6 +110,20 @@
           time step if possible.
         </Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetPieceDistribution"
+                         default_values="0"
+                         name="PieceDistribution"
+                         number_of_elements="1">
+        <Documentation>Control how partitioned datasets are loaded in distributed mode.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Block"
+                 value="0" />
+          <Entry text="Interleave"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <!-- End HDFReaderCore -->
     </Proxy>
 
@@ -144,6 +158,7 @@
             <Property name="FieldArrayStatus" />
           </PropertyGroup>
           <Property name="MaximumLevelsToReadByDefaultForAMR" />
+          <Property name="PieceDistribution" />
           <Property name="UseCache" />
         </ExposedProperties>
       </SubProxy>
