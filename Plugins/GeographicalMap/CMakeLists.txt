@@ -4,3 +4,7 @@ paraview_add_plugin(GeographicalMap
   VERSION "1.0"
   MODULES GeographicalMap::vtkGeographicalMap
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module")
+
+if (BUILD_TESTING AND BUILD_SHARED_LIBS)
+  add_subdirectory(Testing)
+endif()
