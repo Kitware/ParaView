@@ -86,6 +86,18 @@ cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENT
 ninja
 ```
 
+ParaView also ships CMake presets:
+ - default
+ - dev
+ - mini
+
+They can be used directly like this:
+
+```
+cmake -GNinja --preset presetName ../paraview
+ninja
+```
+
 #### Run
 Double click on the paraview executable in the `/bin` directory or run in the previous terminal
 

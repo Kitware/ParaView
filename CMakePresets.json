@@ -1,0 +1,118 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default config",
+      "description": "Default release build of ParaView with no other variables set",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Release"
+        }
+      }
+    },
+    {
+      "name": "dev",
+      "displayName": "Developer config",
+      "description": "Full feature developer build in debug mode and with testing activated",
+      "cacheVariables" : {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Debug"
+        },
+        "PARAVIEW_USE_PYTHON": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "VTK_DEBUG_LEAKS": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "PARAVIEW_BUILD_TESTING": {
+          "type": "STRING",
+          "value": "WANT"
+        },
+        "PARAVIEW_BUILD_VTK_TESTING": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "PARAVIEW_USE_MPI": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "VTK_SMP_IMPLEMENTATION_TYPE": {
+          "type": "STRING",
+          "value": "TBB"
+        },
+        "PARAVIEW_EXTRA_COMPILER_WARNINGS": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "PARAVIEW_ENABLE_EXAMPLES": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "PARAVIEW_BUILD_LEGACY_REMOVE": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "PARAVIEW_ENABLE_EXTRA_BUILD_WARNINGS": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "PARAVIEW_GENERATE_SPDX": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "PARAVIEW_LINKER_FATAL_WARNINGS": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      }
+    },
+    {
+      "name": "mini",
+      "displayName": "Minimalist",
+      "description": "Minimalist (Qt) release build for a fast build of ParaView",
+      "cacheVariables" : {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Release"
+        },
+        "PARAVIEW_PLUGINS_DEFAULT": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "PARAVIEW_USE_VISKORES": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "PARAVIEW_ENABLE_XDMF2": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "PARAVIEW_USE_FORTRAN": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "PARAVIEW_USE_QTHELP": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "VTK_OPENGL_HAS_EGL": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "VTK_SMP_ENABLE_STDTHREAD": {
+          "type": "BOOL",
+          "value": "OFF"
+        }
+      }
+    }
+  ]
+}
