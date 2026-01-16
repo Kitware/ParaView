@@ -104,8 +104,8 @@ public:
   /**
    * Update that sets the update piece first.
    */
-  void Update(int port) override;
-  void Update() override { this->Superclass::Update(); }
+  bool Update(int port) override;
+  bool Update() override { return this->Superclass::Update(); }
   int Update(int port, vtkInformationVector* requests) override
   {
     return this->Superclass::Update(port, requests);

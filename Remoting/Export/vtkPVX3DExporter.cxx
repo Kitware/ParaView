@@ -83,9 +83,9 @@ void vtkPVX3DExporter::WriteColorLegends(vtkX3DExporterWriter* writer)
   typedef std::set<vtkContext2DScalarBarActor*> VisibleActorType;
   VisibleActorType visibleActors;
 
-  vtkActor2DCollection* actors2D = annotationRenderer->GetActors2D();
+  vtkPropCollection* actors2D = annotationRenderer->GetViewProps();
   actors2D->InitTraversal();
-  while (vtkActor2D* currentActor = actors2D->GetNextItem())
+  while (vtkProp* currentActor = actors2D->GetNextProp())
   {
     if (currentActor->IsA("vtkContext2DScalarBarActor"))
     {

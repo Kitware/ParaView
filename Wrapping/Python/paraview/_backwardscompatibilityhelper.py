@@ -1508,6 +1508,10 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("Reflect", "AxisAlignedReflect")]
         proxies[proxiesNS.filters] += [("HyperTreeGridVisibleLeavesSize", "HyperTreeGridGenerateFields")]
 
+    if compatibility_version <= (6, 2):
+        proxies[proxiesNS.filters] += [("XMLHierarchicalBoxDataReader", "XMLUniformGridAMRReader")]
+        proxies[proxiesNS.filters] += [("XMLHierarchicalBoxDataReaderCore", "XMLUniformGridAMRReaderCore")]
+
     return proxies
 
 
