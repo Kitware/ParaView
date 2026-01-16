@@ -56,30 +56,20 @@
 vtkStandardNewMacro(vtkResampleToHyperTreeGrid);
 
 //----------------------------------------------------------------------------
+vtkCxxSetSmartPointerMacro(vtkResampleToHyperTreeGrid, Controller, vtkMultiProcessController);
+
+//----------------------------------------------------------------------------
 vtkResampleToHyperTreeGrid::vtkResampleToHyperTreeGrid()
 {
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
-
-  this->SubdivisionMethod = nullptr;
-  this->InterpolationMethod = nullptr;
-  this->BranchFactor = 2;
-  this->MaxDepth = 1;
-  this->LowerThreshold = -std::numeric_limits<double>::infinity();
-  this->UpperThreshold = std::numeric_limits<double>::infinity();
-  this->MinimumNumberOfPointsInSubtree = 1;
-  this->InvertRange = false;
-  this->NoEmptyCells = false;
-  this->Extrapolate = true;
-
-  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
-//----------------------------------------------------------------------------
-vtkResampleToHyperTreeGrid::~vtkResampleToHyperTreeGrid()
+//------------------------------------------------------------------------------
+vtkMultiProcessController* vtkResampleToHyperTreeGrid::GetController()
 {
-  this->SetController(nullptr);
+  return this->Controller;
 }
 
 //----------------------------------------------------------------------------
@@ -1949,18 +1939,4 @@ std::size_t vtkResampleToHyperTreeGrid::GridCoordinatesToIndex(
   vtkIdType i, vtkIdType j, vtkIdType k) const
 {
   return k + j * this->CellDims[2] + i * this->CellDims[2] * this->CellDims[1];
-}
-
-//----------------------------------------------------------------------------
-void vtkResampleToHyperTreeGrid::SetThresholdFunction(int function)
-{
-  ThresholdType threshold_function = static_cast<ThresholdType>(function);
-  if (this->GetThresholdFunction() == threshold_function)
-  {
-    return;
-  }
-
-  this->ThresholdFunction = threshold_function;
-
-  this->Modified();
 }
