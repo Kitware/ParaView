@@ -392,7 +392,7 @@ private:
    * resolution grids
    * matching the subdivision scheme of the output hyper tree grid.
    */
-  void CreateGridOfMultiResolutionGrids(std::vector<vtkDataSet*>& dataSet, int fieldAssociation);
+  void CreateGridOfMultiResolutionGrids(vtkDataSet* dataSet, int fieldAssociation);
 
   /**
    * Given a value, return true if the value is within the threshold range, based on the threshold
@@ -458,6 +458,8 @@ private:
     vtkIdType i, vtkIdType j, vtkIdType k, double x[3], double closestPoint[3], double pcoords[3],
     double* weights, bool markEmpty, vtkIdType ii = 0, vtkIdType jj = 0, vtkIdType kk = 0,
     std::size_t depth = 0);
+
+  bool BuildHtgFromDataSet(vtkDataSet* dataSet, int fieldAssociation, vtkHyperTreeGrid* htg);
 
   unsigned int BranchFactor = 2;
   int Dimensions[3] = { 4, 4, 4 };
@@ -576,7 +578,7 @@ private:
   /**
    * Collection of input data arrays to resample
    */
-  std::vector<std::vector<vtkDataArray*>> InputArrays;
+  std::vector<vtkDataArray*> InputArrays;
 
   /**
    *  Multi-controller pointer for multi-process handling.
