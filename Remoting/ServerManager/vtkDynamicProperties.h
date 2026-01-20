@@ -28,15 +28,15 @@
 
 struct VTKREMOTINGSERVERMANAGER_EXPORT vtkDynamicProperties
 {
-  static inline const char* VERSION_KEY = "version";
-  static inline const char* PROPERTIES_KEY = "properties";
-  static inline const char* NAME_KEY = "name";
-  static inline const char* TYPE_KEY = "type";
-  static inline const char* DESCRIPTION_KEY = "description";
-  static inline const char* DEFAULT_KEY = "default";
-  static inline const char* VALUE_KEY = "value";
-  static inline const char* MIN_KEY = "min";
-  static inline const char* MAX_KEY = "max";
+  static constexpr const char* VERSION_KEY = "version";
+  static constexpr const char* PROPERTIES_KEY = "properties";
+  static constexpr const char* NAME_KEY = "name";
+  static constexpr const char* TYPE_KEY = "type";
+  static constexpr const char* DESCRIPTION_KEY = "description";
+  static constexpr const char* DEFAULT_KEY = "default";
+  static constexpr const char* VALUE_KEY = "value";
+  static constexpr const char* MIN_KEY = "min";
+  static constexpr const char* MAX_KEY = "max";
 
   enum Type
   {
