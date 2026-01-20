@@ -194,6 +194,7 @@ vtkSMProxyClipboard::~vtkSMProxyClipboard()
 bool vtkSMProxyClipboard::Copy(vtkSMProxy* source)
 {
   this->Internals->Clear();
+  this->CopiedProxy = source;
   if (!source)
   {
     return false;
