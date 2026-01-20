@@ -263,6 +263,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/waveletElevation.vti}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletMaterial.vti}"
   "DATA{${paraview_test_data_directory_input}/Data/WaveletThresholdLegacy.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/WorldWithTexture.png}"
   "DATA{${paraview_test_data_directory_input}/Data/x_ray_copy_1.json}"
   "DATA{${paraview_test_data_directory_input}/Data/x_ray_copy_2.json}"
   "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs.vtm}"
@@ -1295,10 +1296,11 @@ list(APPEND TESTS_WITH_BASELINES
   NOAMRUniformGridSurface.xml
   PartialFieldDataMultiBlock.xml
   ParticleTracerGlyph.xml
-  PointDataSetInterpolator.xml
   PassArrays.xml
   PerlinNoise.xml
+  PNGReaderDataOrigin.xml
   PointAndCellIdsHTG.xml
+  PointDataSetInterpolator.xml
   Protractor.xml
   PVCellCentersHyperTreeGrid.xml
   RegionIds.xml
