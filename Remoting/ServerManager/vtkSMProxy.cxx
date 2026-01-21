@@ -2015,6 +2015,7 @@ void vtkSMProxy::Copy(vtkSMProxy* src, const char* exceptionClass, int proxyProp
   }
 
   iter->Delete();
+  this->UpdateVTKObjects();
 }
 
 //---------------------------------------------------------------------------
