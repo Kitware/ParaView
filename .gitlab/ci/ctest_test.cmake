@@ -58,6 +58,8 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
     "ParaViewExample-Plugins/LagrangianIntegrationModel$"
 
     # see https://gitlab.kitware.com/paraview/paraview/-/issues/23183
+    # See also, the "^paraviewPython-Batch-VolumeCellSelection$" exclusion below
+    # in the "macos" exclusions.
     "^paraviewPython-MPI-Batch-VolumeCellSelection$"
   )
 endif()
@@ -339,6 +341,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # Plugin tests.
     "::pvcs\\."
     "::pvcrs\\."
+
+    # see https://gitlab.kitware.com/paraview/paraview/-/issues/23183
+    # See also the "^paraviewPython-MPI-Batch-VolumeCellSelection$" exclusion
+    # in the "_mpi" list above.
+    "^paraviewPython-Batch-VolumeCellSelection$"
     )
 endif ()
 

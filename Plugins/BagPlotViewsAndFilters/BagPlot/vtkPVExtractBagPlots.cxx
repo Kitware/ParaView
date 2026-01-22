@@ -13,9 +13,10 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPCAStatistics.h"
-#include "vtkPSciVizPCAStats.h"
+#include "vtkPPCAStatistics.h"
+// #include "vtkPSciVizPCAStats.h"
 #include "vtkPointData.h"
+#include "vtkStatisticalModel.h"
 #include "vtkStringArray.h"
 #include "vtkStringFormatter.h"
 #include "vtkTable.h"
@@ -127,10 +128,15 @@ void vtkPVExtractBagPlots::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 // ----------------------------------------------------------------------
-void vtkPVExtractBagPlots::GetEigenvalues(
-  vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvalues)
+void vtkPVExtractBagPlots::GetEigenvalues(vtkStatisticalModel* model, vtkDoubleArray* eigenvalues)
 {
-  vtkTable* outputMeta = vtkTable::SafeDownCast(outputMetaDS->GetBlock(1));
+  if (!model)
+  {
+    vtkErrorMacro(<< "NULL model pointer!");
+    return;
+  }
+
+  auto* outputMeta = vtkTable::SafeDownCast(model->GetTable(vtkStatisticalModel::Derived, 0));
 
   if (!outputMeta)
   {
@@ -160,18 +166,18 @@ void vtkPVExtractBagPlots::GetEigenvalues(
 
 // ----------------------------------------------------------------------
 void vtkPVExtractBagPlots::GetEigenvectors(
-  vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues)
+  vtkStatisticalModel* model, vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues)
 {
   // Count eigenvalues
-  this->GetEigenvalues(outputMetaDS, eigenvalues);
+  this->GetEigenvalues(model, eigenvalues);
   vtkIdType numberOfEigenvalues = eigenvalues->GetNumberOfTuples();
 
-  if (!outputMetaDS)
+  if (!model)
   {
     vtkErrorMacro(<< "NULL dataset pointer!");
   }
 
-  vtkTable* outputMeta = vtkTable::SafeDownCast(outputMetaDS->GetBlock(1));
+  auto* outputMeta = vtkTable::SafeDownCast(model->GetTable(vtkStatisticalModel::Derived, 0));
 
   if (!outputMeta)
   {
@@ -253,32 +259,35 @@ int vtkPVExtractBagPlots::RequestData(
   vtkTable* outTable2 = inputTable;
 
   // Compute the PCA on the provided input functions
-  vtkNew<vtkPSciVizPCAStats> pca;
-  pca->SetInputData(inputTable);
-  pca->SetAttributeMode(vtkDataObject::ROW);
+  vtkNew<vtkPPCAStatistics> pca;
+  pca->SetInputDataObject(vtkStatisticsAlgorithm::INPUT_DATA, inputTable);
   for (vtkIdType i = 0; i < inputTable->GetNumberOfColumns(); i++)
   {
     vtkAbstractArray* arr = inputTable->GetColumn(i);
     if (strcmp(arr->GetName(), "ColName") != 0)
     {
-      pca->EnableAttributeArray(arr->GetName());
+      pca->SetColumnStatus(arr->GetName(), 1);
     }
   }
+  pca->RequestSelectedColumns();
 
   pca->SetBasisScheme(vtkPCAStatistics::FIXED_BASIS_SIZE);
   pca->SetFixedBasisSize(
     this->NumberOfProjectionAxes); // Number of PCA projection axis - 10 is the max we will allow
-  pca->SetTrainingFraction(1.0);
-  pca->SetRobustPCA(this->RobustPCA);
+  pca->SetMedianAbsoluteDeviation(this->RobustPCA);
+  pca->SetLearnOption(true);
+  pca->SetDeriveOption(true);
+  pca->SetAssessOption(true);
   pca->Update();
 
+  // Fetch assessed data
   vtkTable* outputPCATable =
-    vtkTable::SafeDownCast(pca->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL));
+    vtkTable::SafeDownCast(pca->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_DATA));
 
   outTable2 = outputPCATable;
 
-  vtkMultiBlockDataSet* outputMetaDS = vtkMultiBlockDataSet::SafeDownCast(
-    pca->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_DATA));
+  auto* outputMetaDS = vtkStatisticalModel::SafeDownCast(
+    pca->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL));
 
   // Compute the explained variance
   vtkNew<vtkDoubleArray> eigenVectors;
@@ -470,9 +479,9 @@ int vtkPVExtractBagPlots::RequestData(
   thresholdTable->AddColumn(tValues.Get());
 
   // Bag plot
-  vtkMultiBlockDataSet* outputHDR = vtkMultiBlockDataSet::SafeDownCast(
+  auto* outputHDR = vtkStatisticalModel::SafeDownCast(
     hdr->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL));
-  vtkTable* outputHDRTable = vtkTable::SafeDownCast(outputHDR->GetBlock(0));
+  vtkTable* outputHDRTable = outputHDR->GetTable(vtkStatisticalModel::Learned, 0);
   outTable2 = outputHDRTable;
 
   for (auto* arr : cArrays)

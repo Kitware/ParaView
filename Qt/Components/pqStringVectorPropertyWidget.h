@@ -21,7 +21,7 @@ public:
 
   /**
    * Factory method to instantiate a hard-coded type of pqPropertyWidget
-   * subclass for t he vtkSMStringVectorProperty.
+   * subclass for the vtkSMStringVectorProperty.
    */
   static pqPropertyWidget* createWidget(
     vtkSMStringVectorProperty* smproperty, vtkSMProxy* smproxy, QWidget* parent = nullptr);

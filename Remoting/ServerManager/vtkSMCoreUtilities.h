@@ -73,7 +73,7 @@ public:
    *    and keeps the range unchanged.
    * 2. If the range[0] == range[1] (using logic to handle nearly similar
    *    floating points numbers), then the range[1] is adjusted to be such that
-   *    range[1] > range[0p].
+   *    range[1] > range[0].
    * 3. If range[0] < range[1] (beyond the margin of error checked for in (2),
    *    then range is left unchanged.
    *

@@ -823,6 +823,8 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString(int dataType)
       return "Partitioned Dataset Collection";
     case VTK_CELL_GRID:
       return "Cell Grid";
+    case VTK_STATISTICAL_MODEL:
+      return "Statistical Model";
     default:
       break;
   }
@@ -1264,6 +1266,7 @@ int vtkPVDataInformation::GetExtentType(int type)
     case VTK_PARTITIONED_DATA_SET_COLLECTION:
     case VTK_UNIFORM_HYPER_TREE_GRID:
     case VTK_CELL_GRID:
+    case VTK_STATISTICAL_MODEL:
       return VTK_PIECES_EXTENT;
 
     case VTK_HIERARCHICAL_BOX_DATA_SET:

@@ -4,22 +4,27 @@
 #include "vtkSciVizStatisticsPrivate.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkCellAttribute.h"
 #include "vtkCellData.h"
+#include "vtkCellGrid.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTreeIterator.h"
+#include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDemandDrivenPipeline.h"
+#include "vtkExtractStatisticalModelTables.h"
+#include "vtkGenerateStatistics.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMinimalStandardRandomSequence.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
 #include "vtkStatisticsAlgorithm.h"
 #include "vtkStringArray.h"
@@ -29,6 +34,88 @@
 
 #include <set>
 #include <sstream>
+
+namespace
+{
+
+/// Return the number of components the given array name has (or 0 if not found).
+int NumberOfArrayComponents(vtkDataObject* data, int fieldAssoc, const char* arrayName)
+{
+  int nc = 0;
+  if (auto* compData = vtkCompositeDataSet::SafeDownCast(data))
+  {
+    bool foundOne = false;
+    vtkSmartPointer<vtkCompositeDataIterator> iter;
+    iter.TakeReference(compData->NewIterator());
+    iter->SkipEmptyNodesOn();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      auto* leafObj = iter->GetCurrentDataObject();
+      if (!vtkCompositeDataSet::SafeDownCast(leafObj))
+      {
+        int leafNC = NumberOfArrayComponents(leafObj, fieldAssoc, arrayName);
+        if (leafNC > 0)
+        {
+          foundOne = true;
+        }
+        nc = std::max(nc, leafNC);
+      }
+    }
+    if (!foundOne && nc == 0)
+    {
+      nc = VTK_INT_MAX;
+    }
+  }
+  else if (auto* dataSet = vtkDataSet::SafeDownCast(data))
+  {
+    if (auto* dsa = dataSet->GetAttributes(fieldAssoc))
+    {
+      if (auto* array = dsa->GetArray(arrayName))
+      {
+        nc = array->GetNumberOfComponents();
+      }
+    }
+  }
+  else if (auto* table = vtkTable::SafeDownCast(data))
+  {
+    if (fieldAssoc != vtkDataObject::FIELD_ASSOCIATION_ROWS)
+    {
+      vtkGenericWarningMacro(<< "Tables have only row attributes but you asked for an attribute "
+                             << " of type " << fieldAssoc << ".");
+    }
+    if (auto* dsa = table->GetAttributes(fieldAssoc))
+    {
+      if (auto* array = dsa->GetArray(arrayName))
+      {
+        nc = array->GetNumberOfComponents();
+      }
+    }
+  }
+  else if (auto* cellGrid = vtkCellGrid::SafeDownCast(data))
+  {
+    if (fieldAssoc != vtkDataObject::FIELD_ASSOCIATION_CELLS)
+    {
+      vtkGenericWarningMacro(
+        << "Cell grids have only cell attributes but you asked for an attribute "
+        << " of type " << fieldAssoc << ".");
+    }
+    else
+    {
+      if (auto* cellAtt = cellGrid->GetCellAttributeByName(arrayName))
+      {
+        nc = cellAtt->GetNumberOfComponents();
+      }
+    }
+  }
+  else
+  {
+    // Data is not present on this rank; report a large value.
+    nc = VTK_INT_MAX;
+  }
+  return nc;
+}
+
+}
 
 vtkCxxSetObjectMacro(vtkSciVizStatistics, Controller, vtkMultiProcessController);
 
@@ -124,10 +211,92 @@ void vtkSciVizStatistics::EnableAttributeArray(const char* arrName)
 
 void vtkSciVizStatistics::ClearAttributeArrays()
 {
-  if (this->P->ResetBuffer())
+  bool hadRequests = this->P->GetNumberOfRequests() > 0;
+  if (this->P->ResetBuffer() || hadRequests)
   {
+    this->P->ResetRequests();
     this->Modified();
   }
+}
+
+bool vtkSciVizStatistics::PrepareInputArrays(
+  vtkDataObject* inData, vtkGenerateStatistics* modelData)
+{
+  // I. Generate a map of array names to numbers of components locally.
+  std::map<vtkStringToken::Hash, int> arrayNameToNumberOfComponents;
+  this->P->AddBufferToRequests();
+  for (const auto& req : this->P->Requests)
+  {
+    for (const auto& arrayName : req)
+    {
+      if (arrayName.empty())
+      {
+        continue;
+      }
+      vtkStringToken arrayToken(arrayName);
+      int localNumComps = NumberOfArrayComponents(inData, this->AttributeMode, arrayName.c_str());
+      arrayNameToNumberOfComponents[arrayToken.GetId()] = localNumComps;
+    }
+  }
+  // II. Flatten the map to an array of numbers of components. Because all ranks have
+  //     identical requests, the vectors will all be sized and ordered identically.
+  std::vector<int> numComps;
+  numComps.reserve(arrayNameToNumberOfComponents.size());
+  for (auto [key, value] : arrayNameToNumberOfComponents)
+  {
+    (void)key;
+    numComps.push_back(value);
+  }
+
+  // II. Take the minimum number of components globally for each array. (Reduce with MIN_OP.)
+  //     Then update the map to reflect the global number of components.
+  //     For single-process runs, the map does not need to be updated.
+  if (this->Controller)
+  {
+    std::vector<int> globalNumComps;
+    globalNumComps.resize(numComps.size());
+    this->Controller->AllReduce(numComps.data(), globalNumComps.data(),
+      static_cast<vtkIdType>(numComps.size()), vtkCommunicator::StandardOperations::MIN_OP);
+    int idx = 0;
+    for (auto& entry : arrayNameToNumberOfComponents)
+    {
+      entry.second = globalNumComps[idx++];
+      if (entry.second == VTK_INT_MAX)
+      {
+        // No ranks reported any data. Discard this array.
+        entry.second = 0;
+      }
+    }
+  }
+  // III. Build requests using globally available numbers of components, not those available
+  // locally.
+  int arrayIdx = 0;
+  for (const auto& req : this->P->Requests)
+  {
+    for (const auto& arrayName : req)
+    {
+      if (arrayName.empty())
+      {
+        continue;
+      }
+      vtkStringToken arrayToken(arrayName);
+      int numCompsForArray = arrayNameToNumberOfComponents[arrayToken.GetId()];
+      if (numCompsForArray <= 0)
+      {
+        continue;
+      }
+      for (int cc = (numCompsForArray > 1 ? -2 : 0); cc < numCompsForArray; ++cc)
+      {
+        modelData->SetInputArrayToProcess(
+          arrayIdx++, 0, 0, this->AttributeMode, arrayName.c_str(), cc);
+        if (cc == -2)
+        {
+          ++cc; /* skip the L₁ norm for now */
+        }
+      }
+    }
+  }
+  return true;
 }
 
 int vtkSciVizStatistics::FillInputPortInformation(int port, vtkInformation* info)
@@ -149,607 +318,73 @@ int vtkSciVizStatistics::FillOutputPortInformation(int port, vtkInformation* inf
 {
   if (port == 0)
   {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPartitionedDataSetCollection");
     return 1;
   }
-  else if (port == 1)
-  {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
-    return 1;
-  }
-  return 0;
+  return this->Superclass::FillOutputPortInformation(port, info);
 }
 
-int vtkSciVizStatistics::ProcessRequest(
-  vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output)
-{
-  if (request && request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
-  {
-    return this->RequestDataObject(request, input, output);
-  }
-  return this->Superclass::ProcessRequest(request, input, output);
-}
-
-int vtkSciVizStatistics::RequestDataObject(
+int vtkSciVizStatistics::RequestData(
   vtkInformation* vtkNotUsed(request), vtkInformationVector** input, vtkInformationVector* output)
 {
+  double trainingFraction = 1.;
+  switch (this->Task)
+  {
+    case Tasks::MODEL_INPUT:
+      break;
+    case Tasks::CREATE_MODEL:
+      trainingFraction = this->TrainingFraction;
+      break;
+    default:
+    case Tasks::ASSESS_INPUT:
+    case Tasks::MODEL_AND_ASSESS:
+      vtkErrorMacro("Tasks that involve assessing data are no longer supported.");
+      return 0;
+      break;
+  }
+
   // Input 0: Data for learning/assessment.
   // If this is composite data, both outputs must be composite datasets with the same structure.
   vtkInformation* iinfo = input[0]->GetInformationObject(0);
   vtkDataObject* inData = iinfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkCompositeDataSet* inDataComp = vtkCompositeDataSet::SafeDownCast(inData);
 
   // Output 0: Model
-  // The output model type must be a multiblock dataset
+  // The output model type must be a partitioned dataset collection
   vtkInformation* oinfom = output->GetInformationObject(0);
-  vtkDataObject* ouModel = oinfom->Get(vtkDataObject::DATA_OBJECT());
+  auto* ouModel = vtkPartitionedDataSetCollection::GetData(oinfom);
 
-  if (inDataComp)
-  {
-    vtkMultiBlockDataSet* mbModel = vtkMultiBlockDataSet::SafeDownCast(ouModel);
-    if (!mbModel)
-    {
-      mbModel = vtkMultiBlockDataSet::New();
-      oinfom->Set(vtkDataObject::DATA_OBJECT(), mbModel);
-      oinfom->Set(vtkDataObject::DATA_EXTENT_TYPE(), mbModel->GetExtentType());
-      mbModel->FastDelete();
-    }
-  }
-  else
-  {
-    if (!ouModel || !ouModel->IsA("vtkMultiBlockDataSet"))
-    {
-      vtkMultiBlockDataSet* modelObj = vtkMultiBlockDataSet::New();
-      oinfom->Set(vtkDataObject::DATA_OBJECT(), modelObj);
-      oinfom->Set(vtkDataObject::DATA_EXTENT_TYPE(), modelObj->GetExtentType());
-      modelObj->FastDelete();
-    }
-  }
+  vtkNew<vtkGenerateStatistics> modelData;
+  modelData->SetController(this->Controller);
+  modelData->SetInputDataObject(0, inData);
+  modelData->SetTrainingFraction(this->Task == Tasks::MODEL_INPUT ? 1.0 : this->TrainingFraction);
 
-  // Output 1: Assessed data
-  // The assessed data output will always be a shallow copy of the input data.
-  vtkInformation* oinfod = output->GetInformationObject(1);
-  vtkDataObject* ouData = oinfod->Get(vtkDataObject::DATA_OBJECT());
+  // Ensure the same arrays+components are requested across all ranks, even
+  // those with no data.
+  this->PrepareInputArrays(inData, modelData);
 
-  if (!ouData || !ouData->IsA(inData->GetClassName()))
-  {
-    ouData = inData->NewInstance();
-    oinfod->Set(vtkDataObject::DATA_OBJECT(), ouData);
-    // oinfod->Set( vtkDataObject::DATA_EXTENT_TYPE(), ouData->GetExtentType() );
-    ouData->FastDelete();
-    this->GetOutputPortInformation(1)->Set(
-      vtkDataObject::DATA_EXTENT_TYPE(), ouData->GetExtentType());
-  }
-  return 1;
-}
+  // Subclasses override this method and call modelData->SetStatisticsAlgorithm()
+  // inside it with a properly-configured algorithm.
+  this->PrepareAlgorithm(modelData);
 
-int vtkSciVizStatistics::RequestData(
-  vtkInformation* vtkNotUsed(request), vtkInformationVector** input, vtkInformationVector* output)
-{
-  vtkDataObject* modelObjIn = vtkDataObject::GetData(input[1], 0);
-  vtkDataObject* dataObjIn = vtkDataObject::GetData(input[0], 0);
-  if (!dataObjIn)
-  {
-    // Silently ignore missing data.
-    return 1;
-  }
-
-  if (this->P->Buffer.empty())
-  {
-    // Silently ignore empty requests.
-    return 1;
-  }
-
-  // Get output model data and sci-viz data.
-  vtkDataObject* modelObjOu = vtkDataObject::GetData(output, 0);
-  vtkDataObject* dataObjOu = vtkDataObject::GetData(output, 1);
-  if (!dataObjOu || !modelObjOu)
-  {
-    // Silently ignore missing data.
-    return 1;
-  }
-
-  // Either we have a multiblock input dataset or a single data object of interest.
-  int stat = 1;
-  vtkCompositeDataSet* compDataObjIn = vtkCompositeDataSet::SafeDownCast(dataObjIn);
-  if (compDataObjIn)
-  {
-    // I. Prepare output model containers
-    vtkMultiBlockDataSet* ouModelRoot = vtkMultiBlockDataSet::SafeDownCast(modelObjOu);
-    if (!ouModelRoot)
-    {
-      vtkErrorMacro(
-        "Output model data object of incorrect type \"" << modelObjOu->GetClassName() << "\"");
-      return 0;
-    }
-    // Copy the structure of the input dataset to the model output.
-    // If we have input models in the proper structure, then we'll copy them into this structure
-    // later.
-    ouModelRoot->CopyStructure(compDataObjIn);
-    ouModelRoot->GetInformation()->Set(MULTIPLE_MODELS(), 1);
-  }
-  else
-  {
-    modelObjOu->GetInformation()->Remove(MULTIPLE_MODELS());
-  }
-
-  // FIXME Temporary workaround.
-  // Currently the stats filters output a vtkMultiBlockDataSet on the model output port.
-  // If we copy the structure of an input vtkPartitionedDataSetCollection, it currently translates
-  // into a multiblock of partitioned data sets. Since later on, we compute the stats for each leaf,
-  // a multiblock (the output model) is injected in this partitioned data set, which is not allowed.
-  // You CANNOT have a partitioned data sets of multiblocks.
-  // To avoid this problem, we're converting partitioned data sets back to multi blocks when this
-  // happens.
-  //
-  // Ideally, we should make the statistic filters correctly handle partitioned data set inputs,
-  // and not output a multiblock.
-  if (auto ouModel = vtkMultiBlockDataSet::SafeDownCast(modelObjOu))
-  {
-    for (unsigned int blockId = 0; blockId < ouModel->GetNumberOfBlocks(); ++blockId)
-    {
-      if (auto pds = vtkPartitionedDataSet::SafeDownCast(ouModel->GetBlock(blockId)))
-      {
-        vtkNew<vtkMultiBlockDataSet> mbds;
-        mbds->SetNumberOfBlocks(pds->GetNumberOfPartitions());
-        ouModel->SetBlock(blockId, mbds);
-      }
-    }
-  }
+  vtkNew<vtkExtractStatisticalModelTables> modelToTables;
+  modelToTables->SetInputConnection(0, modelData->GetOutputPort());
+  modelToTables->UpdatePiece(this->Controller ? this->Controller->GetLocalProcessId() : 0,
+    this->Controller ? this->Controller->GetNumberOfProcesses() : 1,
+    /* ghost levels */ 0);
+  ouModel->CompositeShallowCopy(
+    vtkCompositeDataSet::SafeDownCast(modelToTables->GetOutputDataObject(0)));
 
   // II. Create/update the output sci-viz data
-  this->ShallowCopy(dataObjOu, dataObjIn);
-
-  if (compDataObjIn)
+  vtkDataObject* dataObjOu = vtkDataObject::GetData(output, 1);
+  vtkDataObject* dataObjIn = vtkDataObject::GetData(input[0], 0);
+  if (auto* cdou = vtkCompositeDataSet::SafeDownCast(dataObjIn))
   {
-    // Loop over each data object of interest, calculating a model from and/or assessing it.
-    vtkCompositeDataSet* compModelObjIn = vtkCompositeDataSet::SafeDownCast(modelObjIn);
-    vtkCompositeDataSet* compModelObjOu = vtkCompositeDataSet::SafeDownCast(modelObjOu);
-    vtkCompositeDataSet* compDataObjOu = vtkCompositeDataSet::SafeDownCast(dataObjOu);
-
-    // We may have a single model for all blocks or one per block
-    // This is too tricky to detect automagically (because a single model may be a composite
-    // dataset),
-    // so we'll only treat an input composite dataset as a collection of models if it is marked
-    // as such. Otherwise, it is treated as a single model that is applied to each block.
-    vtkDataObject* preModel =
-      (compModelObjIn && compModelObjIn->GetInformation()->Has(MULTIPLE_MODELS()))
-      ? nullptr
-      : modelObjIn; // Pre-existing model. Initialize as if we have a single model.
-    // Iterate over all blocks at the given hierarchy level looking for leaf nodes
-    this->RequestData(compDataObjOu, compModelObjOu, compDataObjIn, compModelObjIn, preModel);
+    cdou->CompositeShallowCopy(vtkCompositeDataSet::SafeDownCast(dataObjIn));
   }
   else
   {
-    stat = this->RequestData(dataObjOu, modelObjOu, dataObjIn, modelObjIn);
-  }
-
-  if (this->Controller->GetLocalProcessId() != 0)
-  {
-    modelObjOu->Initialize();
-  }
-
-  return stat;
-}
-
-int vtkSciVizStatistics::RequestData(vtkCompositeDataSet* compDataOu,
-  vtkCompositeDataSet* compModelOu, vtkCompositeDataSet* compDataIn,
-  vtkCompositeDataSet* compModelIn, vtkDataObject* singleModel)
-{
-  if (!compDataOu || !compModelOu || !compDataIn)
-  {
-    vtkErrorMacro(<< "Mismatch between inputs and/or outputs."
-                  << " Data in: " << compDataIn << " Model in: " << compModelIn
-                  << " Data out: " << compDataOu << " Model out: " << compModelOu
-                  << " Pre-existing model: " << singleModel);
-    return 0;
-  }
-
-  int stat = 1;
-  vtkCompositeDataIterator* inDataIter = compDataIn->NewIterator();
-  vtkCompositeDataIterator* ouDataIter = compDataOu->NewIterator();
-  vtkCompositeDataIterator* ouModelIter = compModelOu->NewIterator();
-
-  // We may have a single model for all blocks or one per block
-  vtkCompositeDataIterator* inModelIter = compModelIn ? compModelIn->NewIterator() : nullptr;
-  vtkDataObject* currentModel = singleModel;
-
-  if (vtkDataObjectTreeIterator::SafeDownCast(inDataIter))
-  {
-    vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(inDataIter);
-    treeIter->VisitOnlyLeavesOff();
-    treeIter->TraverseSubTreeOff();
-  }
-  // inDataIter->SkipEmptyNodesOff();
-
-  if (vtkDataObjectTreeIterator::SafeDownCast(ouDataIter))
-  {
-    vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(ouDataIter);
-    treeIter->VisitOnlyLeavesOff();
-    treeIter->TraverseSubTreeOff();
-  }
-  // ouDataIter->SkipEmptyNodesOff();
-
-  if (vtkDataObjectTreeIterator::SafeDownCast(ouModelIter))
-  {
-    vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(ouModelIter);
-    treeIter->VisitOnlyLeavesOff();
-    treeIter->TraverseSubTreeOff();
-  }
-  ouModelIter
-    ->SkipEmptyNodesOff(); // Cannot skip since we may need to copy or create models as we go.
-
-  if (inModelIter)
-  {
-    if (vtkDataObjectTreeIterator::SafeDownCast(inModelIter))
-    {
-      vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(inModelIter);
-      treeIter->VisitOnlyLeavesOff();
-      treeIter->TraverseSubTreeOff();
-    }
-    // inModelIter->SkipEmptyNodesOff();
-
-    inModelIter->InitTraversal();
-    currentModel = inModelIter->GetCurrentDataObject();
-  }
-
-  for (inDataIter->InitTraversal(), ouDataIter->InitTraversal(), ouModelIter->InitTraversal();
-       !inDataIter->IsDoneWithTraversal();
-       inDataIter->GoToNextItem(), ouDataIter->GoToNextItem(), ouModelIter->GoToNextItem())
-  {
-    vtkDataObject* inDataCur = inDataIter->GetCurrentDataObject();
-    if (inDataCur && !inDataCur->IsA("vtkCompositeDataSet"))
-    { // We have a leaf node
-      vtkDataObject* ouModelCur = ouModelIter->GetCurrentDataObject();
-      if (!ouModelCur)
-      {
-        vtkMultiBlockDataSet* mbModel = vtkMultiBlockDataSet::New();
-        ouModelIter->GetDataSet()->SetDataSet(ouModelIter, mbModel);
-        mbModel->Delete();
-        ouModelCur = mbModel;
-      }
-      stat = this->RequestData(ouDataIter->GetCurrentDataObject(), ouModelCur,
-        inDataIter->GetCurrentDataObject(), currentModel);
-      if (!stat)
-      {
-        break;
-      }
-    }
-    else if (inDataCur)
-    { // Iterate over children
-      stat =
-        this->RequestData(vtkCompositeDataSet::SafeDownCast(ouDataIter->GetCurrentDataObject()),
-          vtkCompositeDataSet::SafeDownCast(ouModelIter->GetCurrentDataObject()),
-          vtkCompositeDataSet::SafeDownCast(inDataIter->GetCurrentDataObject()),
-          inModelIter ? vtkCompositeDataSet::SafeDownCast(inModelIter->GetCurrentDataObject())
-                      : nullptr,
-          currentModel);
-      if (!stat)
-      {
-        break;
-      }
-    }
-    if (inModelIter)
-    { // Update currentModel to point to the next input model in the tree
-      inModelIter->GoToNextItem();
-      currentModel = inModelIter->GetCurrentDataObject();
-    }
-  }
-  inDataIter->Delete();
-  ouDataIter->Delete();
-  ouModelIter->Delete();
-  if (inModelIter)
-    inModelIter->Delete();
-
-  return stat;
-}
-
-int vtkSciVizStatistics::RequestData(
-  vtkDataObject* outData, vtkDataObject* outModel, vtkDataObject* inData, vtkDataObject* inModel)
-{
-  vtkFieldData* dataAttrIn = inData->GetAttributesAsFieldData(this->AttributeMode);
-  if (!dataAttrIn)
-  {
-    // Silently ignore missing attributes.
-    return 1;
-  }
-
-  // Create a table with all the data
-  vtkNew<vtkTable> inTable;
-  int stat = this->PrepareFullDataTable(inTable, dataAttrIn);
-  if (stat < 1)
-  { // return an error (stat=0) or success (stat=-1)
-    return -stat;
-  }
-
-  // Either create or retrieve the model, depending on the task at hand
-  if (this->Task != ASSESS_INPUT)
-  {
-    // We are creating a model by executing Learn and Derive operations on the input data
-    // Create a table to hold the input data (unless the TrainingFraction is exactly 1.0)
-    vtkSmartPointer<vtkTable> train = nullptr;
-    vtkIdType N = inTable->GetNumberOfRows();
-
-    vtkUnsignedCharArray* ghosts = inTable->GetRowData()->GetGhostArray();
-    if (ghosts)
-    {
-      for (vtkIdType id = 0; id < ghosts->GetNumberOfValues(); ++id)
-      {
-        if (ghosts->GetValue(id))
-        {
-          --N;
-        }
-      }
-    }
-
-    vtkIdType M = this->Task == MODEL_INPUT ? N : this->GetNumberOfObservationsForTraining(N);
-    if (M == N)
-    {
-      train = inTable;
-      if (this->Task != MODEL_INPUT && this->TrainingFraction < 1.)
-      {
-        vtkWarningMacro(<< "Either TrainingFraction (" << this->TrainingFraction
-                        << ") is high enough to include all observations after rounding"
-                        << " or the minimum number of observations required for training is at "
-                           "least the size of the entire input."
-                        << " Any assessment will not be able to detect overfitting.");
-      }
-    }
-    else
-    {
-      train = vtkSmartPointer<vtkTable>::New();
-      this->PrepareTrainingTable(train, inTable, M);
-    }
-
-    // Calculate detailed statistical model from the input data set
-    vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast(outModel);
-    if (!outModelDS)
-    {
-      vtkErrorMacro("No model output dataset or incorrect type");
-      stat = 0;
-    }
-    else
-    {
-      outModel->Initialize();
-      stat = this->LearnAndDerive(outModelDS, train);
-    }
-  }
-  else
-  {
-    // We are using an input model specified by the user
-    // stat = this->FetchModel( outModel, input[1] ); // retrieves outModel from input[1]
-    if (!inModel)
-    {
-      vtkErrorMacro("No input model");
-      stat = 0;
-    }
-    outModel->ShallowCopy(inModel);
-  }
-
-  if (stat < 1)
-  { // Exit on failure (0) or early success (-1)
-    return -stat;
-  }
-
-  if (outData)
-  {
-    outData->ShallowCopy(inData);
-  }
-  vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast(outModel);
-  if (!outModelDS)
-  {
-    vtkErrorMacro("No model output dataset or incorrect type");
-    return 0;
-  }
-  if (this->Task != CREATE_MODEL && this->Task != MODEL_INPUT)
-  {
-    // Assess the data using the input or the just-created model
-    stat = this->AssessData(inTable, outData, outModelDS);
-  }
-  // We remove the output model in ranks other than the root
-  if (this->Controller && this->Controller->GetLocalProcessId() != 0)
-  {
-    vtkMultiBlockDataSet::SafeDownCast(outModelDS)->Initialize();
-  }
-  return stat ? 1 : 0;
-}
-
-int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* dataAttrIn)
-{
-  for (auto colIt = this->P->Buffer.begin(); colIt != this->P->Buffer.end(); ++colIt)
-  {
-    vtkAbstractArray* arr = dataAttrIn->GetAbstractArray(colIt->c_str());
-    if (arr)
-    {
-      vtkIdType ntup = arr->GetNumberOfTuples();
-      int ncomp = arr->GetNumberOfComponents();
-      if (ncomp > 1)
-      {
-        // Create a column in the table for each component of non-scalar arrays requested.
-        // FIXME: Should we add a "norm" column when arr is a vtkDataArray? It would make sense.
-        std::vector<vtkAbstractArray*> comps;
-        const char* compName;
-
-        // Check component names can be used
-        std::set<std::string> compCheckSet;
-        bool useCompNames = true;
-        for (int i = 0; i < ncomp; ++i)
-        {
-          compName = arr->GetComponentName(i);
-          if (!compName || compCheckSet.count(compName) > 0)
-          {
-            useCompNames = false;
-            break;
-          }
-          compCheckSet.emplace(compName);
-        }
-
-        for (int i = 0; i < ncomp; ++i)
-        {
-          std::ostringstream os;
-          compName = arr->GetComponentName(i);
-          os << arr->GetName() << "_";
-          useCompNames ? os << compName : os << i;
-
-          vtkAbstractArray* arrCol = vtkAbstractArray::CreateArray(arr->GetDataType());
-          arrCol->SetName(os.str().c_str());
-          arrCol->SetNumberOfComponents(1);
-          arrCol->SetNumberOfTuples(ntup);
-          comps.push_back(arrCol);
-          inTable->AddColumn(arrCol);
-          arrCol->FastDelete();
-        }
-        vtkIdType vidx = 0;
-        vtkDataArray* darr = vtkDataArray::SafeDownCast(arr);
-        vtkStringArray* sarr = vtkStringArray::SafeDownCast(arr);
-        if (darr)
-        {
-          for (int i = 0; i < ncomp; ++i)
-          {
-            vtkDataArray::SafeDownCast(comps[i])->CopyComponent(0, darr, i);
-          }
-        }
-        else if (sarr)
-        {
-          std::vector<vtkStringArray*> scomps;
-          for (int i = 0; i < ncomp; ++i, ++vidx)
-          {
-            scomps[i] = vtkStringArray::SafeDownCast(comps[i]);
-          }
-          for (vtkIdType j = 0; j < ntup; ++j)
-          {
-            for (int i = 0; i < ncomp; ++i, ++vidx)
-            {
-              scomps[i]->SetValue(j, sarr->GetValue(vidx));
-            }
-          }
-        }
-        else
-        {
-          // Inefficient, but works for any array type.
-          for (vtkIdType j = 0; j < ntup; ++j)
-          {
-            for (int i = 0; i < ncomp; ++i, ++vidx)
-            {
-              comps[i]->InsertVariantValue(j, arr->GetVariantValue(vidx));
-            }
-          }
-        }
-      }
-      else
-      {
-        inTable->AddColumn(arr);
-      }
-    }
-  }
-
-  // If there's a ghost array in the input, we want it in the table.
-  if (vtkUnsignedCharArray* ghosts = dataAttrIn->GetGhostArray())
-  {
-    inTable->AddColumn(ghosts);
-  }
-
-  vtkIdType ncols = inTable->GetNumberOfColumns();
-  if (ncols < 1)
-  {
-    vtkWarningMacro("Every requested array wasn't a scalar or wasn't present.");
-    return -1;
+    dataObjOu->ShallowCopy(dataObjIn);
   }
 
   return 1;
-}
-
-int vtkSciVizStatistics::PrepareTrainingTable(
-  vtkTable* trainingTable, vtkTable* fullDataTable, vtkIdType M)
-{
-  // FIXME: this should eventually eliminate duplicate points as well as subsample...
-  //        but will require the original ugrid/polydata/graph.
-
-  vtkUnsignedCharArray* ghosts = fullDataTable->GetRowData()->GetGhostArray();
-
-  std::set<vtkIdType> trainRows;
-  vtkIdType N = fullDataTable->GetNumberOfRows();
-  double frac = static_cast<double>(M) / static_cast<double>(N);
-  vtkNew<vtkMinimalStandardRandomSequence> rand;
-  for (vtkIdType i = 0; i < N; ++i)
-  {
-    if (ghosts && ghosts->GetValue(i))
-    {
-      continue;
-    }
-    rand->Next();
-    if (rand->GetValue() < frac)
-    {
-      trainRows.insert(i);
-    }
-  }
-  // Now add or subtract entries as required.
-  N = N - 1;
-  while (static_cast<vtkIdType>(trainRows.size()) > M)
-  {
-    rand->Next();
-    vtkIdType rec = static_cast<vtkIdType>(rand->GetRangeValue(0, N));
-    trainRows.erase(rec);
-  }
-  while (static_cast<vtkIdType>(trainRows.size()) < M)
-  {
-    rand->Next();
-    vtkIdType rec = static_cast<vtkIdType>(rand->GetRangeValue(0, N));
-    if (!ghosts || !ghosts->GetValue(rec))
-    {
-      trainRows.insert(rec);
-    }
-  }
-  // Finally, copy the subset into the training table
-  trainingTable->Initialize();
-  for (int i = 0; i < fullDataTable->GetNumberOfColumns(); ++i)
-  {
-    vtkAbstractArray* srcCol = fullDataTable->GetColumn(i);
-    vtkAbstractArray* dstCol = vtkAbstractArray::CreateArray(srcCol->GetDataType());
-    dstCol->SetName(srcCol->GetName());
-    trainingTable->AddColumn(dstCol);
-    dstCol->FastDelete();
-  }
-  trainingTable->SetNumberOfRows(M);
-  vtkNew<vtkVariantArray> row;
-  vtkIdType dstRow = 0;
-  for (std::set<vtkIdType>::iterator it = trainRows.begin(); it != trainRows.end(); ++it, ++dstRow)
-  {
-    fullDataTable->GetRow(*it, row);
-    trainingTable->SetRow(dstRow, row);
-  }
-  return 1;
-}
-
-vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining(vtkIdType N)
-{
-  vtkIdType M = static_cast<vtkIdType>(N * this->TrainingFraction);
-  return M < 100 ? (N < 100 ? N : 100) : M;
-}
-
-void vtkSciVizStatistics::ShallowCopy(vtkDataObject* out, vtkDataObject* in)
-{
-  out->ShallowCopy(in);
-  vtkCompositeDataSet* cdIn = vtkCompositeDataSet::SafeDownCast(in);
-  vtkCompositeDataSet* cdOut = vtkCompositeDataSet::SafeDownCast(out);
-  if (cdIn == nullptr || cdOut == nullptr)
-  {
-    return;
-  }
-
-  // this is needed since vtkCompositeDataSet::ShallowCopy() doesn't clone
-  // leaf nodes, but simply passes them through.
-  vtkSmartPointer<vtkCompositeDataIterator> iterOut;
-  iterOut.TakeReference(cdOut->NewIterator());
-  for (iterOut->InitTraversal(); !iterOut->IsDoneWithTraversal(); iterOut->GoToNextItem())
-  {
-    vtkSmartPointer<vtkDataObject> curDO = iterOut->GetCurrentDataObject();
-    if (vtkCompositeDataSet::SafeDownCast(curDO) == nullptr && curDO != nullptr)
-    {
-      vtkDataObject* clone = curDO->NewInstance();
-      clone->ShallowCopy(curDO);
-      cdOut->SetDataSet(iterOut, clone);
-      clone->FastDelete();
-    }
-  }
 }
