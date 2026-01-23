@@ -823,6 +823,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <StringVectorProperty command="SetCatalystConduitChannelName"
+                            name="CatalystConduitChannelName"
+                            number_of_elements="1"
+                            default_values="input"
+                            panel_visibility="advanced">
+        <Documentation>
+          The IOSS Catalyst Conduit channel name when reading from IOSS Catalyst Conduit.
+          If not specified (default), the reader will use the default Catalyst Conduit channel name.
+        </Documentation>
+      </StringVectorProperty>
 
       <PropertyGroup name="DatabaseProperties"
                      label="Database Properties"
@@ -918,6 +928,7 @@
         <Property name="ReadIds"/>
         <Property name="ReadQAAndInformationRecords"/>
         <Property name="IncludeGhostData"/>
+        <Property name="CatalystConduitChannelName"/>
       </PropertyGroup>
 
       <Hints>
