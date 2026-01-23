@@ -11,15 +11,15 @@
  * the stragegy applied over the field.
  *
  * Set a pointer to an instance derived from vtkAbstractArrayMeasurement
- * with the ArrayMeasurement method to set up the subdividing strategy.
+ * with the SubdivisionMethod method to set up the subdividing strategy.
  * By default, leaves in the vtkHyperTreeGrid are divided if the measured data
- * is between GetMin() and GetMax(). If GetInRange() == false, the subdivide
- * outside of the range instead.
+ * is between GetLowerThreshold() and GetUpperThreshold().
+ * If GetInvertRange() == true, the subdivide outside of the range instead.
  *
- * Similarly use ArrayMeasurementDisplay to create a secondary criterion.
- * For example, set ArrayMeasurement to vtkStandardDeviationArrayMeasurement*
+ * Similarly use InterpolationMethod to create a secondary criterion.
+ * For example, set SubdivisionMethod to vtkStandardDeviationArrayMeasurement*
  * to produce a vtkHyperTreeGrid.
- * Set ArrayMeasurementDisplay to vtkMedianMeasurement to produce an extra
+ * Set InterpolationMethod to vtkMedianMeasurement to produce an extra
  * scalar field that is closer to the input, ie the the median of the subtree.
  *
  */
@@ -64,15 +64,16 @@ public:
 
   ///@{
   /**
-   * Set/Get the multi-process controller.
+   * Get/Set the controller in an MPI environment.
    */
-  vtkSetMacro(Controller, vtkMultiProcessController*);
-  vtkGetMacro(Controller, vtkMultiProcessController*);
+  void SetController(vtkMultiProcessController*);
+  vtkMultiProcessController* GetController();
   ///@}
 
   ///@{
   /**
-   * Set/Get the subdivision factor in the grid refinement scheme.
+   * Set/Get the subdivision factor in the grid refinement scheme between 2 and 3. The default value
+   * is 2.
    */
   vtkSetClampMacro(BranchFactor, unsigned int, 2, 3);
   vtkGetMacro(BranchFactor, unsigned int);
@@ -80,18 +81,18 @@ public:
 
   ///@{
   /**
-   * Set/Get for ArrayMeasurement. Use it to feed a pointer of any subclass of
+   * Set/Get for SubdivisionMethod. Use it to feed a pointer of any subclass of
    * vtkAbstractArrayMeasurement,
    * which will be used to accumulate scalars from the input data set in order to produce the hyper
-   * tree grid.
+   * tree grid. Default value is nullptr.
    */
-  vtkGetMacro(ArrayMeasurement, vtkAbstractArrayMeasurement*);
-  vtkSetMacro(ArrayMeasurement, vtkAbstractArrayMeasurement*);
+  vtkGetMacro(SubdivisionMethod, vtkAbstractArrayMeasurement*);
+  vtkSetMacro(SubdivisionMethod, vtkAbstractArrayMeasurement*);
   ///@}
 
   ///@{
   /**
-   * Set/Get for ArrayMeasurement. Use it to feed a pointer of any subclass of
+   * Set/Get for InterpolationMethod. Use it to feed a pointer of any subclass of
    * vtkAbstractArrayMeasurement,
    * which will be used to accumulate scalars from the input data. This measurement is not used for
    * subdivision,
@@ -101,13 +102,13 @@ public:
    * for example.
    * Default value is nullptr.
    */
-  vtkGetMacro(ArrayMeasurementDisplay, vtkAbstractArrayMeasurement*);
-  vtkSetMacro(ArrayMeasurementDisplay, vtkAbstractArrayMeasurement*);
+  vtkGetMacro(InterpolationMethod, vtkAbstractArrayMeasurement*);
+  vtkSetMacro(InterpolationMethod, vtkAbstractArrayMeasurement*);
   ///@}
 
   ///@{
   /**
-   * Set/Get the maximum tree depth.
+   * Set/Get the maximum tree depth, 2 by default.
    */
   vtkSetMacro(MaxDepth, unsigned int);
   vtkGetMacro(MaxDepth, unsigned int);
@@ -128,15 +129,8 @@ public:
    * Upper bound used to decide whether hyper tree grid should be refined or not
    * Default value is std::numeric_limits<double>infinity().
    */
-  vtkGetMacro(Max, double);
-  vtkSetMacro(Max, double);
-  ///@}
-
-  ///@{
-  /**
-   * Sets Max to infinity. Call this method to annihilate the upper bound.
-   */
-  void SetMaxToInfinity();
+  vtkGetMacro(UpperThreshold, double);
+  vtkSetMacro(UpperThreshold, double);
   ///@}
 
   ///@{
@@ -144,15 +138,30 @@ public:
    * Lower bound used to decide whether hyper tree grid should be refined or not
    * Default value is -std::numeric_limits<double>::infinity().
    */
-  vtkGetMacro(Min, double);
-  vtkSetMacro(Min, double);
+  vtkGetMacro(LowerThreshold, double);
+  vtkSetMacro(LowerThreshold, double);
   ///@}
+
+  /**
+   * Possible values for the threshold function:
+   * - THRESHOLD_BETWEEN - Keep values between the lower and upper thresholds.
+   * - THRESHOLD_BELOW_LOWER - Keep values below the lower threshold.
+   * - THRESHOLD_ABOVE_UPPER - Keep values above the upper threshold.
+   */
+  enum ThresholdType
+  {
+    THRESHOLD_BETWEEN = 0,
+    THRESHOLD_BELOW_LOWER,
+    THRESHOLD_ABOVE_UPPER
+  };
 
   ///@{
   /**
-   * Sets Min to minus infinity. Call this method to annihilate the lower bound.
+   * Get/Set the threshold method, defining which threshold bounds to use. The default method is
+   * THRESHOLD_BETWEEN.
    */
-  void SetMinToInfinity();
+  vtkGetMacro(ThresholdFunction, int);
+  vtkSetMacro(ThresholdFunction, int);
   ///@}
 
   ///@{
@@ -160,10 +169,8 @@ public:
    * Accessors for NoEmptyCells. If this flag is turned off, there can be masked leaves
    * although the input has geometry in them, just because there is no point inside the leaf.
    * If turned on, any empty leaf that has geometry will be display, i.e. the concerned leaves
-   * parent
-   * won't subdivide and create them, resuling in a "hole free" hyper tree grid, at the cost of a
-   * coarser
-   * result.
+   * parent won't subdivide and create them, resuling in a "hole free" hyper tree grid, at the
+   * cost of a coarser result. False by default.
    */
   vtkGetMacro(NoEmptyCells, bool);
   vtkSetMacro(NoEmptyCells, bool);
@@ -172,18 +179,18 @@ public:
   ///@{
   /**
    * Accessor for InRange. If set to true, the criterion for subdividing is true if the value is
-   * within
-   * the range. Otherwise, we subdivide for values outside of the range.
+   * within the range. Otherwise, we subdivide for values outside of the range. False by default.
    */
-  vtkGetMacro(InRange, bool);
-  vtkSetMacro(InRange, bool);
+  vtkGetMacro(InvertRange, bool);
+  vtkSetMacro(InvertRange, bool);
   ///@}
 
   ///@{
   /**
    * Accessor for MinimumNumberOfPointsInSubtree, which sets a minimum number of points per leaf.
+   * The default value is 1.
    * Note that the minimum number of points per subtree can be greater depending of the minimum
-   * number of points required vtkAbstractArrayMeasurement*
+   * number of points required by vtkAbstractArrayMeasurement.
    */
   vtkGetMacro(MinimumNumberOfPointsInSubtree, vtkIdType);
   vtkSetMacro(MinimumNumberOfPointsInSubtree, vtkIdType);
@@ -198,15 +205,6 @@ public:
 
   ///@{
   /**
-   * If state == false, sets Max / Min to infinity / -infinity. Else, sets Max / Min to the last non
-   * infinite value.
-   */
-  void SetMaxState(bool state);
-  void SetMinState(bool state);
-  ///@}
-
-  ///@{
-  /**
    * Getter / Setter on the boolean flag Extrapolate.
    * It is set to true by default. If set to true, on point-based scalar input, cells of the
    * output hyper tree grid intersecting the geometry of the input data set, but not including
@@ -217,12 +215,9 @@ public:
   vtkBooleanMacro(Extrapolate, bool);
   ///@}
 
-  void AddDataArray(const char* name);
-  void ClearDataArrays();
-
 protected:
   vtkResampleToHyperTreeGrid();
-  ~vtkResampleToHyperTreeGrid() override;
+  ~vtkResampleToHyperTreeGrid() override = default;
 
   int FillInputPortInformation(int, vtkInformation*) override;
 
@@ -230,26 +225,12 @@ protected:
 
   int RequestData(vtkInformation* request, vtkInformationVector**, vtkInformationVector*);
 
+private:
+  vtkResampleToHyperTreeGrid(const vtkResampleToHyperTreeGrid&) = delete;
+  void operator=(const vtkResampleToHyperTreeGrid&) = delete;
+
   int ProcessTrees(vtkHyperTreeGrid*, vtkDataObject*);
   int GenerateTrees(vtkHyperTreeGrid*);
-
-  unsigned int BranchFactor;
-  int Dimensions[3];
-  unsigned int MaxDepth;
-
-  /**
-   * Range values used to decide whether to subdivide a leaf or not
-   */
-  double Min, Max;
-
-  /**
-   * Decides whether the criteria should be inside [this->Min, this->Max] or outside.
-   */
-  bool InRange;
-
-  double Progress;
-
-  vtkBitArray* Mask;
 
   /**
    * Only needed internally. Each element for each position in the multi resolution grid
@@ -273,34 +254,24 @@ protected:
     /**
      * Accumulators used for measuring quantities on subtrees
      */
-    std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayMeasurements;
+    std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayValuesAccumulators;
 
-    vtkIdType NumberOfLeavesInSubtree;
-    vtkIdType NumberOfPointsInSubtree;
-    vtkIdType NumberOfNonMaskedChildren;
-    double AccumulatedWeight;
+    vtkIdType NumberOfLeavesInSubtree = 0;
+    vtkIdType NumberOfPointsInSubtree = 0;
+    vtkIdType NumberOfNonMaskedChildren = 0;
+    double AccumulatedWeight = 0.0;
 
     /**
      * Boolean used to avoid searching for masked children in a full subtree
      */
-    bool UnmaskedChildrenHaveNoMaskedLeaves;
+    bool UnmaskedChildrenHaveNoMaskedLeaves = true;
 
     /**
      * Flag to tell whether it is legit to subdivide the corresponding leaf in the hyper tree.
      * A leaf cannot be subdivided if there is not enough data in the induced leaves.
      */
-    bool CanSubdivide;
+    bool CanSubdivide = false;
   };
-
-  /**
-   * Pointers used to determine what resampling metric is used for the subdivision criterion.
-   */
-  vtkAbstractArrayMeasurement* ArrayMeasurement;
-
-  /**
-   * Pointers used to determine what resampling metric is used for the list of input scalar fields.
-   */
-  vtkAbstractArrayMeasurement* ArrayMeasurementDisplay;
 
   /**
    * Only needed internally. This draws a multi resolution grid that should have this->MaxDepth+1
@@ -349,12 +320,12 @@ protected:
      * Key used to sort elements in priority queue. It should be the number of valid neighbors
      * of a htg cell.
      */
-    vtkIdType Key;
+    vtkIdType Key = 0;
 
     /**
      * Id of corresponding htg cell
      */
-    vtkIdType Id;
+    vtkIdType Id = 0;
 
     /**
      * Accumulated means for each scalar field (not normalized until the end of the algorithm)
@@ -408,13 +379,6 @@ protected:
     vtkHyperTreeGridNonOrientedVonNeumannSuperCursor* superCursor, PriorityQueue& queue);
 
   /**
-   * Flag to tell wether data should be extrapolated on cells intersecting geometry but not having
-   * any data.
-   * This flag is only effective on point-based input scalar.
-   */
-  bool Extrapolate;
-
-  /**
    * Method that divides recursively leafs of the output hyper tree grid depending of the
    * subdivision criterion
    * The cursor should correspond with the multiResolutionGrid and (i,j,k) should match the position
@@ -430,6 +394,12 @@ protected:
    */
   void CreateGridOfMultiResolutionGrids(std::vector<vtkDataSet*>& dataSet, int fieldAssociation);
 
+  /**
+   * Given a value, return true if the value is within the threshold range, based on the threshold
+   * function, the lower and the upper values.
+   */
+  bool IsValueInRange(double value);
+
   ///@{
   /**
    * This method computes the intersection volume between a box and a vtkCell3D.
@@ -439,46 +409,6 @@ protected:
   bool IntersectedVolume(const double boxBounds[6], vtkCell3D* cell3D, double volumeUnit,
     double& volume, double* weights) const;
   ///@}
-
-  /**
-   * Helper for easy access to the cells dimensions of the hyper tree grid.
-   */
-  unsigned int CellDims[3];
-
-  /**
-   * Stores the number of children given input dimensions and branch factor
-   */
-  vtkIdType NumberOfChildren;
-
-  ///@{
-  /**
-   * Output scalar/vector field
-   */
-  std::vector<vtkDoubleArray*> ScalarFields;
-  vtkLongArray *NumberOfLeavesInSubtreeField, *NumberOfPointsInSubtreeField;
-  ///@}
-
-  /**
-   * Minimum number of points in a leaf for it to be subdivided.
-   */
-  vtkIdType MinimumNumberOfPointsInSubtree;
-
-  /**
-   * Helper to the maximum resolution in one direction in a hyper tree.
-   */
-  vtkIdType MaxResolutionPerTree;
-
-  /**
-   * Helper to the resolution at a certain depth in one direction of a hyper tree.
-   */
-  std::vector<vtkIdType> ResolutionPerTree;
-  std::vector<double> Diagonal;
-
-  /**
-   * Dummy pointer for creating at run-time the proper type of ArrayMeasurement or
-   * ArrayMeasurementDisplay.
-   */
-  std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayMeasurements;
 
   /**
    * Converts indexing at given resolution to a tuple (i,j,k) to navigate in a MultiResolutionGrid.
@@ -503,18 +433,12 @@ protected:
    */
   std::size_t GridCoordinatesToIndex(vtkIdType i, vtkIdType j, vtkIdType k) const;
 
-  ///@{
   /**
-   * 3D grid of multi-resolution grids.
-   * this->GridOfMultiResolutionGrids[this->GridCoordinatesToIndex(i,j,k)][depth][this->MultiResGridCoordinatesToIndex(ii,
-   * jj, kk)] is a
-   * GridElement in the MultiResGrid mapped to tree of coordinates (i,j,k) in the hyper tree grid,
-   * and of
-   * coordinates (ii, jj, kk) relative to the latter tree at depth depth.
+   * Method retristributing points and cells of the input so hyper trees are not split
+   * between processes.
    */
-  typedef std::vector<MultiResGridType> GridOfMultiResGridsType;
-  GridOfMultiResGridsType GridOfMultiResolutionGrids;
-  ///@}
+  vtkSmartPointer<vtkDataObject> BroadcastHyperTreeOwnership(
+    vtkDataObject* input, vtkIdType processId);
 
   /**
    * Method which will forbid subdividing cells if they have an empty children intersecting
@@ -535,6 +459,104 @@ protected:
     double* weights, bool markEmpty, vtkIdType ii = 0, vtkIdType jj = 0, vtkIdType kk = 0,
     std::size_t depth = 0);
 
+  unsigned int BranchFactor = 2;
+  int Dimensions[3] = { 4, 4, 4 };
+  unsigned int MaxDepth = 2;
+
+  ///@{
+  /**
+   * Range values used to decide whether to subdivide a leaf or not
+   */
+  double LowerThreshold = -std::numeric_limits<double>::infinity();
+  double UpperThreshold = std::numeric_limits<double>::infinity();
+  ///@}
+
+  /**
+   * Threshold method to use when computing subdivision
+   */
+  int ThresholdFunction = ThresholdType::THRESHOLD_BETWEEN;
+
+  /**
+   * Decides whether the criteria should be inside [this->LowerThreshold, this->UpperThreshold] or
+   * outside.
+   */
+  bool InvertRange = false;
+
+  double Progress = 0.0;
+
+  vtkBitArray* Mask = nullptr;
+
+  /**
+   * Helper for easy access to the cells dimensions of the hyper tree grid.
+   */
+  unsigned int CellDims[3] = { 3, 3, 3 };
+
+  /**
+   * Stores the number of children given input dimensions and branch factor
+   */
+  vtkIdType NumberOfChildren = 0;
+
+  ///@{
+  /**
+   * Output scalar/vector field
+   */
+  std::vector<vtkDoubleArray*> ScalarFields;
+  vtkLongArray* NumberOfLeavesInSubtreeField = nullptr;
+  vtkLongArray* NumberOfPointsInSubtreeField = nullptr;
+  ///@}
+
+  /**
+   * Minimum number of points in a leaf for it to be subdivided.
+   */
+  vtkIdType MinimumNumberOfPointsInSubtree = 1;
+
+  /**
+   * Helper to the maximum resolution in one direction in a hyper tree.
+   */
+  vtkIdType MaxResolutionPerTree = 1;
+
+  /**
+   * Helper to the resolution at a certain depth in one direction of a hyper tree.
+   */
+  std::vector<vtkIdType> ResolutionPerTree;
+  std::vector<double> Diagonal;
+
+  /**
+   * Flag to tell wether data should be extrapolated on cells intersecting geometry but not having
+   * any data.
+   * This flag is only effective on point-based input scalar.
+   */
+  bool Extrapolate = true;
+
+  /**
+   * Pointers used to determine what resampling metric is used for the subdivision criterion.
+   */
+  vtkAbstractArrayMeasurement* SubdivisionMethod = nullptr;
+
+  /**
+   * Pointers used to determine what resampling metric is used for the list of input scalar fields.
+   */
+  vtkAbstractArrayMeasurement* InterpolationMethod = nullptr;
+
+  /**
+   * Dummy pointer for creating at run-time the proper type of SubdivisionMethod or
+   * InterpolationMethod.
+   */
+  std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayValuesAccumulators;
+
+  ///@{
+  /**
+   * 3D grid of multi-resolution grids.
+   * this->GridOfMultiResolutionGrids[this->GridCoordinatesToIndex(i,j,k)][depth][this->MultiResGridCoordinatesToIndex(ii,
+   * jj, kk)] is a
+   * GridElement in the MultiResGrid mapped to tree of coordinates (i,j,k) in the hyper tree grid,
+   * and of
+   * coordinates (ii, jj, kk) relative to the latter tree at depth depth.
+   */
+  typedef std::vector<MultiResGridType> GridOfMultiResGridsType;
+  GridOfMultiResGridsType GridOfMultiResolutionGrids;
+  ///@}
+
   /**
    * Bounds of the input, all processes included
    */
@@ -546,42 +568,20 @@ protected:
   std::vector<vtkBoundingBox> LocalHyperTreeBoundingBox;
 
   /**
-   * Method retristributing points and cells of the input so hyper trees are not split
-   * between processes.
-   */
-  vtkSmartPointer<vtkDataObject> BroadcastHyperTreeOwnership(
-    vtkDataObject* input, vtkIdType processId);
-
-  /**
-   * Cache used to handle SetMaxState(bool) and SetMinState(bool)
-   */
-  double MaxCache, MinCache;
-
-  /**
    * Flag to say whether we accept empty cell with geometry in it or not.
    * Setting it on will make the filter slightly slower.
    */
-  bool NoEmptyCells;
+  bool NoEmptyCells = false;
 
   /**
-   * Collection of input point data arrays to resample, deducted from
-   * InputDataArrayNames.
+   * Collection of input data arrays to resample
    */
-  std::vector<std::vector<vtkDataArray*>> InputPointDataArrays;
-
-  /**
-   * Collection of input scalar field names to resample.
-   */
-  std::vector<std::string> InputDataArrayNames;
+  std::vector<std::vector<vtkDataArray*>> InputArrays;
 
   /**
    *  Multi-controller pointer for multi-process handling.
    */
-  vtkMultiProcessController* Controller;
-
-private:
-  vtkResampleToHyperTreeGrid(const vtkResampleToHyperTreeGrid&) = delete;
-  void operator=(const vtkResampleToHyperTreeGrid&) = delete;
+  vtkSmartPointer<vtkMultiProcessController> Controller;
 };
 
 #endif

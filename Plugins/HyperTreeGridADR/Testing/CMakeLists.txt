@@ -1,5 +1,6 @@
 set(test_xmls
   TestResampleToHyperTreeGridPointArray.xml
+  TestResampleToHyperTreeGridCellArray.xml
 )
 
 paraview_add_client_tests(
