@@ -1055,7 +1055,6 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ExpressionsDialog.xml
   ExpressionsExporter.xml
   ExpressionsSettings.xml
-  FileDialogAllFavorites.xml
   FileDialogOpenInteractClose.xml
   ForceStaticMesh.xml
   GradientBackwardsCompatibility.xml
