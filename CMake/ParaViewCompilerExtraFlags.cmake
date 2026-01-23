@@ -6,7 +6,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   set(paraview_extra_warning_flags
     -Wnon-virtual-dtor
     -Wno-long-long
-    -ansi
     -Wcast-align
     -Wchar-subscripts
     -Wall
