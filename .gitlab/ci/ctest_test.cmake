@@ -152,10 +152,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "^pvcrs\\.TestGroupDataFromTimeSeries$"
     "^pvcrs\\.TestOpacityRendering$"
     "^pvcrs\\.UnstructuredVolumeRenderingVectorComponent$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/23165
-    "^pv\\.FileDialogAllFavorites$"
-    "^pvcrs\\.FileDialogAllFavorites$"
   )
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_asserts")
