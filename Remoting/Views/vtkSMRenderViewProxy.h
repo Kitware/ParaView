@@ -58,6 +58,20 @@ public:
 
   ///@{
   /**
+   * Makes a new selection source proxy using a value of a vtkIdTypeArray with fast selection.
+   */
+  bool SelectPointsByArrayValue(vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, vtkSMRepresentationProxy* source, const char* arrayName,
+    vtkIdType idValue, bool multiple_selections = false, int modifier = 0,
+    bool selectBlocks = false);
+  bool SelectCellsByArrayValue(vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, vtkSMRepresentationProxy* source, const char* arrayName,
+    vtkIdType idValue, bool multiple_selections = false, int modifier = 0,
+    bool selectBlocks = false);
+  ///@}
+
+  ///@{
+  /**
    * Returns the range for visible elements in the current view.
    */
   bool ComputeVisibleScalarRange(const int region[4], int fieldAssociation, const char* scalarName,
@@ -490,6 +504,14 @@ private:
    * Internal method to update stereo properties
    */
   void UpdateStereoProperties();
+
+  /**
+   * Internal method to execute `cmd` on the rendering processes to do rendering
+   * for selection with a specified id.
+   */
+  bool SelectByArrayValue(vtkCollection* selectedRepresentations, vtkCollection* selectionSources,
+    vtkSMRepresentationProxy* repr, int fieldAssociation, const char* arrayName, vtkIdType idValue,
+    bool multiple_selections, int modifier = 0, bool select_blocks = false);
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
 

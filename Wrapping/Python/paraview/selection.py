@@ -562,3 +562,80 @@ def ShrinkSelection(Source=None, Layers=1):
     :type Layers: int
     :rtype: None"""
     GrowSelection(Source, -Layers)
+
+def _selectDataByArrayValueHelper(ArrayName, IdValue, Source, Modifier, FieldType):
+    """Helper function to select points/cells by a value of a vtkIdTypeArray using fast selection.
+    WARNING: This work only for vtkIdTypeArray
+
+    :param ArrayName: The name of the vtkIdType array on which to make the selection.
+    :type ArrayName: str
+    :param IdValue: The value of the id to select in the array.
+    :type IdValue: int
+    :param Source: The source whose selection should be modified.
+    :type Source: Source proxy
+    :param Modifier: 'ADD', 'SUBTRACT', 'TOGGLE', or None to define whether and how the selection
+        should modify the existing selection.
+    :type Modifier: str
+    :param FieldType: 'CELL' or 'POINT' : whether to make a selection of points or cells
+    :type FieldType: str
+    """
+    from paraview.vtk import vtkCollection
+    from vtkmodules.vtkCommonCore import vtkIdTypeArray
+    from vtkmodules.vtkCommonDataModel import vtkDataObject
+
+    view = paraview.simple.GetActiveView()
+
+    if Source == None:
+        Source = paraview.simple.GetActiveSource()
+
+    FieldTypeDO = vtkDataObject.POINT
+    if(FieldType == "CELL"):
+        FieldTypeDO = vtkDataObject.CELL
+
+    if not Source.GetDataInformation().GetArrayInformation(ArrayName, FieldTypeDO).GetDataTypeAsString() == "idtype":
+        raise ValueError("'%s' is not a vtkIdTypeArray" % ArrayName)
+
+    repr = paraview.simple.GetRepresentation(Source)
+
+    selectedReps = vtkCollection()
+    selectionSources = vtkCollection()
+    if(FieldType == "POINT"):
+        view.SelectPointsByArrayValue(selectedReps, selectionSources, repr, ArrayName, IdValue)
+    else:
+        view.SelectCellsByArrayValue(selectedReps, selectionSources, repr, ArrayName, IdValue)
+
+    _collectSelectionPorts(selectedReps, selectionSources, False, Modifier=Modifier)
+
+    paraview.simple.Render(view)
+
+def SelectPointsDataByArrayValue(ArrayName, IdValue, Source=None, Modifier=None):
+    """Select points by a value of a vtkIdTypeArray using fast selection.
+    WARNING: This work only for vtkIdTypeArray
+
+    :param ArrayName: The name of the vtkIdType array on which to make the selection.
+    :type ArrayName: str
+    :param IdValue: The value of the id to select in the array.
+    :type IdValue: int
+    :param Source: If provided, the source whose selection should be modified. Defaults to the active source.
+    :type Source: Source proxy
+    :param Modifier: 'ADD', 'SUBTRACT', 'TOGGLE', or None to define whether and how the selection
+        should modify the existing selection. None by default.
+    :type Modifier: str
+    """
+    _selectDataByArrayValueHelper(ArrayName, IdValue, Source, Modifier, "POINT")
+
+def SelectCellsDataByArrayValue(ArrayName, IdValue, Source=None, Modifier=None):
+    """Select cells by a value of a vtkIdTypeArray using fast selection.
+    WARNING: This work only for vtkIdTypeArray
+
+    :param ArrayName: The name of the vtkIdType array on which to make the selection.
+    :type ArrayName: str
+    :param IdValue: The value of the id to select in the array.
+    :type IdValue: int
+    :param Source: If provided, the source whose selection should be modified. Defaults to the active source.
+    :type Source: Source proxy
+    :param Modifier: 'ADD', 'SUBTRACT', 'TOGGLE', or None to define whether and how the selection
+        should modify the existing selection. None by default.
+    :type Modifier: str
+    """
+    _selectDataByArrayValueHelper(ArrayName, IdValue, Source, Modifier, "CELL")
