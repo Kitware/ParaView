@@ -35,6 +35,8 @@ foreach (index_test IN LISTS index_tests)
   if (TEST "${index_test}")
     set_property(TEST ${index_test} APPEND
       PROPERTY
-        SKIP_REGULAR_EXPRESSION "The (CUDA version supported by this system|version of your CUDA driver) is .*, but .* is the required minimum")
+        SKIP_REGULAR_EXPRESSION
+          "The (CUDA version supported by this system|version of your CUDA driver) is .*, but .* is the required minimum"
+          "The NVIDIA IndeX plugin does not support local rendering on macOS")
   endif ()
 endforeach ()
