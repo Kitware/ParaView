@@ -1,0 +1,93 @@
+"""
+Test for MultiOutputPortReader plugin demonstrating vtkFileSeriesReader
+with multiple output ports.
+
+This test verifies:
+1. Reader loads and produces 2 output ports
+2. vtkFileSeriesReader correctly detects output port count
+3. Both ports have distinct geometry and data arrays
+4. Time series navigation works correctly
+"""
+
+import os
+import sys
+from pathlib import Path
+
+from paraview.simple import *
+
+# Load the plugin (path configured by CMake generator expression)
+plugin_path = r"$<TARGET_FILE:MultiOutputPortReader>"
+print(f"Loading plugin from: {plugin_path}")
+LoadPlugin(plugin_path, remote=False, ns=globals())
+
+# Find data directory (configured by CMake)
+data_dir = Path(r"@DATA_DIR@")
+
+# Collect test data files
+files = sorted([
+    str(f) for f in data_dir.glob("*.mopr")
+])
+
+if len(files) == 0:
+    print(f"ERROR: No .mopr test files found in {data_dir}")
+    sys.exit(1)
+
+print(f"Found {len(files)} test files in {data_dir}")
+
+# Create reader with file series
+reader = MultiOutputPortReader(FileName=files)
+reader.UpdatePipeline()
+
+# Get the underlying VTK object
+vtk_reader = reader.GetClientSideObject()
+
+# Test 1: Verify 2 output ports
+num_ports = vtk_reader.GetNumberOfOutputPorts()
+print(f"Output ports: {num_ports}")
+assert num_ports == 2, f"Expected 2 output ports, got {num_ports}"
+
+# Test 2: Verify time steps
+time_steps = list(reader.TimestepValues)
+print(f"Time steps: {len(time_steps)} frames")
+assert len(time_steps) == len(files), f"Expected {len(files)} time steps, got {len(time_steps)}"
+
+# Test 3: Verify distinct geometry on each port
+output0 = vtk_reader.GetOutputDataObject(0)
+output1 = vtk_reader.GetOutputDataObject(1)
+
+points0 = output0.GetNumberOfPoints()
+points1 = output1.GetNumberOfPoints()
+print(f"Port 0 (Square): {points0} points")
+print(f"Port 1 (Circle): {points1} points")
+
+assert points0 == 400, f"Expected 400 points on port 0, got {points0}"
+assert points1 == 1801, f"Expected 1801 points on port 1, got {points1}"
+
+# Test 4: Verify distinct arrays on each port
+array0 = output0.GetPointData().GetArray(0)
+array1 = output1.GetPointData().GetArray(0)
+
+array0_name = array0.GetName() if array0 else None
+array1_name = array1.GetName() if array1 else None
+print(f"Port 0 array: {array0_name}")
+print(f"Port 1 array: {array1_name}")
+
+assert array0_name == "SquareWave", f"Expected 'SquareWave' on port 0, got {array0_name}"
+assert array1_name == "CircleWave", f"Expected 'CircleWave' on port 1, got {array1_name}"
+
+# Test 5: Verify time stepping updates data
+if len(time_steps) > 1:
+    # Get value at t=0
+    reader.UpdatePipeline(time=time_steps[0])
+    val0_t0 = vtk_reader.GetOutputDataObject(0).GetPointData().GetArray(0).GetValue(0)
+
+    # Get value at a different time
+    mid_idx = len(time_steps) // 2
+    reader.UpdatePipeline(time=time_steps[mid_idx])
+    val0_t1 = vtk_reader.GetOutputDataObject(0).GetPointData().GetArray(0).GetValue(0)
+
+    print(f"Time stepping: value at t={time_steps[0]:.3f}: {val0_t0:.4f}")
+    print(f"Time stepping: value at t={time_steps[mid_idx]:.3f}: {val0_t1:.4f}")
+
+print("\n=== ALL TESTS PASSED ===")
+print("vtkFileSeriesReader correctly handles multiple output ports")

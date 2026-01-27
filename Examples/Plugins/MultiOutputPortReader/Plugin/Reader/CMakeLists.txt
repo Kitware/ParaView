@@ -1,0 +1,5 @@
+vtk_module_add_module(MultiOutputPortReaderCore
+  FORCE_STATIC
+  CLASSES vtkMultiOutputPortReader)
+
+paraview_add_server_manager_xmls(XMLS MultiOutputPortReader.xml)

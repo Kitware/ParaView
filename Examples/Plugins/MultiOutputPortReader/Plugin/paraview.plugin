@@ -1,0 +1,9 @@
+NAME
+  MultiOutputPortReader
+DESCRIPTION
+  Example reader with multiple output ports demonstrating vtkFileSeriesReader support
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersCore
