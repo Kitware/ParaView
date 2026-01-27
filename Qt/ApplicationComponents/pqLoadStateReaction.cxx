@@ -115,6 +115,33 @@ void pqLoadStateReaction::loadState(
   }
 }
 
+bool pqLoadStateReaction::pngStatefileValidityCallback(
+  QStringList group, vtkTypeUInt32 location, QString& reason)
+{
+  if (group.size() == 1)
+  {
+    const auto& file = group[0];
+    const auto info = QFileInfo(file);
+    if (info.suffix() != "png")
+    {
+      return true;
+    }
+
+    std::string contents;
+    const bool hasStateFile =
+      vtkSMLoadStateOptionsProxy::PNGHasStateFile(file.toUtf8().data(), contents, location);
+
+    if (!hasStateFile)
+    {
+      reason = tr("%1 does not contain state data.").arg(info.fileName());
+    }
+
+    return hasStateFile;
+  }
+
+  return true;
+}
+
 //-----------------------------------------------------------------------------
 void pqLoadStateReaction::loadState()
 {
@@ -131,6 +158,7 @@ void pqLoadStateReaction::loadState()
     server, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(), fileExt, false, false);
   fileDialog.setObjectName("FileLoadServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
+  fileDialog.setFileValidityCallback(pngStatefileValidityCallback);
   if (fileDialog.exec() == QDialog::Accepted)
   {
     const QString selectedFile = fileDialog.getSelectedFiles()[0];
