@@ -14,7 +14,6 @@
 #include "vtkSmartPyObject.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <regex>
 #include <string>
 
 namespace
@@ -273,8 +272,53 @@ void vtkPythonCalculator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "Expression: " << this->Expression << endl;
-  os << indent << "MultilineExpression: " << this->MultilineExpression << endl;
-  os << indent << "UseMultilineExpression: " << this->UseMultilineExpression << endl;
-  os << indent << "ArrayName: " << this->ArrayName << endl;
+  os << indent << "Expression: " << this->Expression << std::endl;
+  os << indent << "MultilineExpression: " << this->MultilineExpression << std::endl;
+  os << indent << "UseMultilineExpression: " << this->UseMultilineExpression << std::endl;
+  os << indent << "ArrayName: " << this->ArrayName << std::endl;
+  os << indent << "Input names: " << std::endl;
+  for (std::size_t i = 0; i < this->InputsName.size(); i++)
+  {
+    os << indent << indent << i << " : " << this->InputsName[i] << std::endl;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonCalculator::SetInputName(int index, const std::string& inputName)
+{
+  if (this->InputsName.empty())
+  {
+    this->InputsName.resize(this->GetTotalNumberOfInputConnections());
+  }
+  if (index < 0 || index >= this->InputsName.size())
+  {
+    vtkErrorMacro("Invalid index specified '" << index << "'.");
+    return;
+  }
+  if (this->InputsName[index] != inputName)
+  {
+    this->InputsName[index] = inputName;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonCalculator::ClearInputNames()
+{
+  if (!this->InputsName.empty())
+  {
+    this->InputsName.clear();
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPythonCalculator::GetInputName(int index)
+{
+  if (index >= 0 && index < this->InputsName.size())
+  {
+    return this->InputsName[index];
+  }
+  vtkWarningMacro("The index is out of range, returning empty string");
+  return "";
 }

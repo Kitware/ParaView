@@ -36,7 +36,22 @@
         </DataTypeDomain>
         <Documentation>Set the input of the filter.</Documentation>
       </InputProperty>
-
+      <StringVectorProperty name="InputName"
+                            command="SetInputName"
+                            panel_visibility="never"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            clean_command="ClearInputNames">
+        <Documentation>
+          Specify names that can be used for each input.
+        </Documentation>
+        <RegistrationNamesDomain name="names_list" registration_group="sources">
+          <RequiredProperties>
+            <Property name="Input" function="Proxies" />
+          </RequiredProperties>
+        </RegistrationNamesDomain>
+      </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetUseMultilineExpression"
                          default_values="0"
