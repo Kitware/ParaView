@@ -639,3 +639,56 @@ def SelectCellsDataByArrayValue(ArrayName, IdValue, Source=None, Modifier=None):
     :type Modifier: str
     """
     _selectDataByArrayValueHelper(ArrayName, IdValue, Source, Modifier, "CELL")
+
+def SelectBlocks(BlockSelector, Source=None, FieldType='POINT', Modifier=None):
+    """Select all the points or cells from a block of a Composite DataSet
+
+    :param BlockSelector: The block(s) we want to select (example: "/Root/Block1").
+    :type BlockSelector: str
+    :param Source: If provided, the source whose selection should be modified. Defaults to the active source.
+    :type Source: Source proxy
+    :param FieldType: attribute to select, 'POINT' or 'CELL'
+    :type FieldType: str
+    :param Modifier: 'ADD', 'SUBTRACT', 'TOGGLE', or None to define whether and how the selection
+        should modify the existing selection. None by default.
+    :type Modifier: str
+    """
+    from paraview.vtk import vtkCollection
+
+    view = paraview.simple.GetActiveView()
+
+    if Source == None:
+        Source = paraview.simple.GetActiveSource()
+
+    reprProxy = paraview.simple.GetRepresentation(Source).SMProxy
+
+    from vtkmodules.vtkFiltersSources import vtkSelectionSource
+    from paraview.vtk import vtkSelectionNode
+    from paraview.modules.vtkRemotingViews import vtkSMSelectionHelper
+
+    selectionSource = vtkSelectionSource()
+    if FieldType.upper() == 'CELL':
+        selectionSource.SetFieldType(vtkSelectionNode.CELL)
+    elif FieldType.upper() == 'POINT':
+        selectionSource.SetFieldType(vtkSelectionNode.POINT)
+    else:
+        raise RuntimeError("Invalid type %s" % FieldType)
+    selectionSource.SetContentType(vtkSelectionNode.BLOCK_SELECTORS)
+    if reprProxy.GetProperty("Assembly") != 0:
+        selectionSource.SetArrayName(sm.vtkSMPropertyHelper(reprProxy, "Assembly").GetAsString())
+    else:
+        selectionSource.SetArrayName("Hierarchy")
+    selectionSource.AddBlockSelector(BlockSelector)
+    selectionSource.Update()
+    selectionSourceProxy = vtkSMSelectionHelper.NewSelectionSourceFromSelection(Source.GetSession(), selectionSource.GetOutput())
+
+    selectedReps = vtkCollection()
+    selectionSources = vtkCollection()
+
+    selectionSources.AddItem(selectionSourceProxy)
+    selectedReps.AddItem(reprProxy)
+
+    _collectSelectionPorts(selectedReps, selectionSources, False, Modifier=Modifier)
+    selectionSourceProxy.UnRegister(None)
+
+    paraview.simple.Render(view)
