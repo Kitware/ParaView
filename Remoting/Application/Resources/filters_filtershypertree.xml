@@ -195,7 +195,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy name="HyperTreeGridVisibleLeavesSize"
-                 class="vtkHyperTreeGridVisibleLeavesSize"
+                 class="vtkHyperTreeGridGenerateFields"
                  label="HyperTreeGrid Visible Leaves Size">
       <Deprecated deprecated_in="6.0" to_remove_in="6.2">
         This filter has been replaced by 'HyperTreeGrid Generate Fields'.

@@ -7,7 +7,6 @@
 #include "vtkCommand.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
-#include "vtkLegacy.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVStringFormatter.h"
 #include "vtkRenderWindow.h"

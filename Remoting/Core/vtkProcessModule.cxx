@@ -10,7 +10,6 @@
 #include "vtkDummyController.h"
 #include "vtkFloatingPointExceptions.h"
 #include "vtkInformation.h"
-#include "vtkLegacy.h"
 #include "vtkLogger.h"
 #include "vtkMultiThreader.h"
 #include "vtkNew.h"

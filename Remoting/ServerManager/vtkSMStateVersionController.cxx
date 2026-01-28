@@ -2605,6 +2605,36 @@ private:
   }
 };
 
+//===========================================================================
+struct Process_6_1_to_6_2
+{
+  bool operator()(xml_document& document) { return HandleRenamedProxies(document); }
+
+  bool HandleRenamedProxies(xml_document& document)
+  {
+    std::map<std::string, std::string> renamedProxies = {
+      { "XMLHierarchicalBoxDataReader", "XMLUniformGridAMRReader" },
+      { "XMLHierarchicalBoxDataReaderCore", "XMLUniformGridAMRReaderCore" },
+    };
+
+    for (const auto& proxy : renamedProxies)
+    {
+      std::string request =
+        "//ServerManagerState/Proxy[@group='filters' and @type='" + proxy.first + "']";
+      pugi::xpath_node_set xpath_set = document.select_nodes(request.c_str());
+
+      for (auto xpath_node : xpath_set)
+      {
+        auto node = xpath_node.node();
+        // Change filter type
+        node.attribute("type").set_value(proxy.second.c_str());
+      }
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -2745,6 +2775,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_6_0_to_6_1 converter;
     status = converter(document);
     version = vtkSMVersion(6, 1, 0);
+  }
+
+  if (status && (version < vtkSMVersion(6, 2, 0)))
+  {
+    Process_6_1_to_6_2 converter;
+    status = converter(document);
+    version = vtkSMVersion(6, 2, 0);
   }
 
   if (status)

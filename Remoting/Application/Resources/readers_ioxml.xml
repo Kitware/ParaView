@@ -1019,9 +1019,13 @@
     </Proxy>
 
     <!-- ================================================================== -->
-    <Proxy class="vtkXMLHierarchicalBoxDataReader"
+    <Proxy class="vtkXMLUniformGridAMRReader"
                  label="XML Hierarchical Box Data reader"
                  name="XMLHierarchicalBoxDataReaderCore">
+      <Deprecated deprecated_in="6.2" to_remove_in="6.4">
+        This reader has been replaced by 'XML UniformGrid AMR reader'.
+        Please consider using that instead.
+      </Deprecated>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
@@ -2333,12 +2337,17 @@
                  label="XML Hierarchical Box Data reader"
                  name="XMLHierarchicalBoxDataReader"
                  si_class="vtkSIMetaReaderProxy">
+      <Deprecated deprecated_in="6.2" to_remove_in="6.4">
+        This reader has been replaced by 'XML UniformGrid AMR Reader'.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation long_help="Reads a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids."
                      short_help="Read a VTK data file containing a hierarchical box dataset.">
                      The XML Hierarchical Box Data reader reads VTK's XML-based
                      file format containing a vtkHierarchicalBoxDataSet. The
                      expected file extensions is either .vthb or
-                     .vth.</Documentation>
+                     .vth.
+      </Documentation>
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="internal_sources"

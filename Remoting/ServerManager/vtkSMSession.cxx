@@ -5,7 +5,6 @@
 
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
-#include "vtkLegacy.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCatalystSessionCore.h"
 #include "vtkPVServerInformation.h"
