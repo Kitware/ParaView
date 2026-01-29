@@ -10,14 +10,12 @@
 #include "vtkPVPluginTracker.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConfiguration.h"
+#include "vtkResourceFileLocator.h"
 #include "vtkSMObject.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
-
-// for PARAVIEW_INSTALL_DIR and PARAVIEW_BINARY_DIR variables
-#include "vtkCPConfig.h"
 
 #include "ParaView_paraview_plugins.h"
 
@@ -83,14 +81,20 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
   {
     vtkCPCxxHelper::ParaViewExternallyInitialized = false;
 
-// Since when coprocessing, we have no information about the executable, we
-// make one up using the current working directory.
-// std::string self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
-#if defined(_WIN32) && defined(CMAKE_INTDIR)
-    std::string programname = PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR "/unknown_exe";
-#else
-    std::string programname = PARAVIEW_BINARY_DIR "/bin/unknown_exe";
-#endif
+    // Provide a stable argv[0] for Catalyst initialization.
+    // Use the actual process executable when available (standalone modes),
+    // otherwise fall back to a Catalyst-specific placeholder.
+    std::string programname;
+
+    const std::string exe = vtkResourceFileLocator::GetCurrentExecutablePath();
+    if (!exe.empty())
+    {
+      programname = exe; // standalone cases (pvbatch, pvserver, etc.)
+    }
+    else
+    {
+      programname = "pv_catalyst"; // embedded Catalyst (in-situ) case
+    }
 
     int argc = 1;
     char** argv = new char*[2];
