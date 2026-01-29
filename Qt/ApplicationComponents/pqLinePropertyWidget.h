@@ -63,6 +63,12 @@ protected Q_SLOTS:
   void pickNormal(double x, double y, double z, double nx, double ny, double nz);
 
   /**
+   * Called when the button "Reposition to view" is clicked.
+   * This will set the position of both points relative to the camera of the active view.
+   */
+  void onRepositionToViewClicked();
+
+  /**
    * Updates the length label.
    */
   void updateLengthLabel();

@@ -482,3 +482,24 @@ Hide the mouse cursor when hovering a render view.
   </Hints>
 </RenderViewProxy>
 ```
+
+RepositionToView
+--------------------------
+Add an action to reposition the source towards the camera view. Note that this hint only works for proxies containing the panel widget property `InteractiveLine`.
+
+This action will manipulate the 2 point coordinates of the line to place them relative to the camera orientation.
+
+This action recovers the `CameraFocalPoint` property from the current active view, if it exists, then converts it into display space in order to compute the depth of the new coordinate (i.e. the Z coordinate in display space).
+Then the X and Y coordinates of the points are computed in display space depending on the current viewport width and height. X, Y and Z coordinates of both points are then converted back to world space and set both `Point1WorldPosition` or `Point2WorldPosition` properties repespectively.
+
+```xml
+<SourceProxy ...>
+  ...
+  <PropertyGroup ... panel_widget="InteractiveLine">
+    ...
+  </PropertyGroup>
+  <Hints>
+    <RepositionToView />
+  </Hints>
+</SourceProxy>
+```
