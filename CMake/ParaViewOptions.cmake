@@ -234,6 +234,8 @@ option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 
 option(PARAVIEW_ENABLE_OCCT "Enable OCCT Support." OFF)
 
+option(PARAVIEW_ENABLE_IFC "Enable IFC Support." OFF)
+
 option(PARAVIEW_BUILD_TRANSLATIONS "Generate translation files" OFF)
 if (PARAVIEW_BUILD_TRANSLATIONS)
   set(PARAVIEW_TRANSLATIONS_DIRECTORY "${CMAKE_BINARY_DIR}/Translations" CACHE STRING
@@ -523,6 +525,11 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_OCCT
   MODULES   VTK::IOOCCT
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_IFC
+  MODULES   VTK::IOIFC
   EXCLUSIVE)
 
 paraview_require_module(

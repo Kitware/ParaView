@@ -1,0 +1,31 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkIFCReader"
+                 label="IFC Reader"
+                 name="IFC Reader">
+      <Documentation short_help="Reads IFC files.">
+
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify file name of the IFC file to read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetNumberOfThreads"
+                         default_values="8"
+                         name="NumberOfThreads"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" max="32"
+                        name="range" />
+        <Documentation>Specify the number of threads used to process the IFC file</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ifc"
+                       file_description="IFC files" />
+      </Hints>
+    </SourceProxy>
+    <!-- End IFCReader -->
+  </ProxyGroup>
+</ServerManagerConfiguration>
