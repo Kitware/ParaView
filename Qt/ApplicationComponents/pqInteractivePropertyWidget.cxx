@@ -3,17 +3,22 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqInteractivePropertyWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqLiveInsituVisualizationManager.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "vtkRenderer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
+#include "vtkVector.h"
 
 #include <QtDebug>
 
@@ -75,4 +80,71 @@ pqInteractivePropertyWidget::~pqInteractivePropertyWidget()
 
     this->pqPropertyWidget::setView(nullptr);
   }
+}
+
+//-----------------------------------------------------------------------------
+std::vector<vtkVector3d> pqInteractivePropertyWidget::displayToWorldCoordinates(
+  const std::vector<vtkVector3d>& displayCoordPoints)
+{
+  vtkRenderer* renderer = this->getRenderer();
+  if (!renderer)
+  {
+    return {};
+  }
+
+  std::vector<vtkVector3d> worldCoordPoints(displayCoordPoints.size());
+  // Compute all points from display coord to world coord.
+  for (std::size_t i = 0; i < displayCoordPoints.size(); i++)
+  {
+    worldCoordPoints[i] = renderer->DisplayToWorld(displayCoordPoints[i]);
+  }
+
+  return worldCoordPoints;
+}
+
+//-----------------------------------------------------------------------------
+double pqInteractivePropertyWidget::getFocalPointDepth()
+{
+  vtkSMRenderViewProxy* renderViewProxy = this->getActiveRenderViewProxy();
+  vtkRenderer* renderer = this->getRenderer();
+  if (!renderViewProxy || !renderer)
+  {
+    return -1.0;
+  }
+
+  // Recover focal point in display coordinates to get the Z coordinate for the new depth position
+  // of the ruler.
+  double cameraFocalPointWorldCoord[3] = { 0.0, 0.0, 0.0 };
+  vtkSMPropertyHelper(renderViewProxy, "CameraFocalPoint").Get(cameraFocalPointWorldCoord, 3);
+  double cameraFocalPointDisplayCoord[3] = { 0.0, 0.0, 0.0 };
+  renderer->SetWorldPoint(cameraFocalPointWorldCoord[0], cameraFocalPointWorldCoord[1],
+    cameraFocalPointWorldCoord[2], 1.0);
+  renderer->WorldToDisplay(cameraFocalPointDisplayCoord[0], cameraFocalPointDisplayCoord[1],
+    cameraFocalPointDisplayCoord[2]);
+
+  return cameraFocalPointDisplayCoord[2];
+}
+
+//-----------------------------------------------------------------------------
+vtkSMRenderViewProxy* pqInteractivePropertyWidget::getActiveRenderViewProxy()
+{
+  pqRenderView* activeView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (!activeView)
+  {
+    return nullptr;
+  }
+
+  return vtkSMRenderViewProxy::SafeDownCast(activeView->getProxy());
+}
+
+//-----------------------------------------------------------------------------
+vtkRenderer* pqInteractivePropertyWidget::getRenderer()
+{
+  vtkSMRenderViewProxy* renderViewProxy = this->getActiveRenderViewProxy();
+  if (!renderViewProxy)
+  {
+    return nullptr;
+  }
+
+  return renderViewProxy->GetRenderer();
 }
