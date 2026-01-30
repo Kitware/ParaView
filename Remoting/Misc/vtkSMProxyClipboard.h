@@ -39,6 +39,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
+   * Get the currently copied proxy in the clipboard. If none have been copied,
+   * it is set to nullptr. The default value is nullptr.
+   */
+  vtkGetMacro(CopiedProxy, vtkSMProxy*);
+
+  /**
    * Put a proxy's state on the clipboard. Return true if the operation was
    * successful.
    */
@@ -70,6 +76,8 @@ private:
   void operator=(const vtkSMProxyClipboard&) = delete;
 
   vtkSMProxyClipboardInternals* Internals;
+
+  vtkSMProxy* CopiedProxy = nullptr;
 };
 
 #endif

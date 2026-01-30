@@ -36,6 +36,7 @@ endif ()
 list(APPEND TESTS_WITH_BASELINES
   AutoSaveState.xml
   ColorByComponentNames.xml # needs programmable filter
+  CopyPasteTrace.xml
   LiveProgrammableSource.xml
   LinkRenderViews.xml
   LinkViews.xml

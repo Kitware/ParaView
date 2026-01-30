@@ -26,6 +26,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxyClipboard.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTrace.h"
 #include "vtkSMViewProxy.h"
 #include "vtkTimerLog.h"
 
@@ -942,6 +943,11 @@ void pqPropertiesPanel::copyProperties()
 void pqPropertiesPanel::pasteProperties()
 {
   this->Internals->SourceClipboard->Paste(this->Internals->Source->getProxy());
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this->Internals->Source->getProxy())
+    .arg("Copy")
+    .arg(this->Internals->SourceClipboard->GetCopiedProxy())
+    .arg("comment", qPrintable(tr("paste properties of the input")));
   this->renderActiveView();
 }
 
