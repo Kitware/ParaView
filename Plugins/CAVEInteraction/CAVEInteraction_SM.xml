@@ -2,10 +2,27 @@
   <ProxyGroup name="cave_interaction">
     <VRTrackStyleProxy name="Track"
                        processes="client|renderserver|dataserver">
+
+      <DoubleVectorProperty command="SetEyeSeparation"
+                            name="EyeSeparation"
+                            default_values="0.065"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>
+          Set the distance between the eyes in off-axis projection (CAVE) mode. The
+          number of elements is updated automatically based on detected number of
+          independent viewers. Viewers are given role names based on their index,
+          and elements are applied to the viewers in index order.
+        </Documentation>
+      </DoubleVectorProperty>
       <Documentation>
-        Implements head tracking if used on the render view proxy and the
-        "EyeTransformMatrix". If you have more than one RenderView, be sure to
-        select the one connected to the CAVE displays.
+        Implements head tracking for any number of simultaneous viewers. Tracker
+        roles are added dynamically based on the detected remote display configuration
+        ( .pvx file), and are named "Viewer0", "Viewer1", ..., "ViewerM" etc., where
+        M is the number of detected independent viewers minus one. If you have more than
+        one RenderView, be sure to associate this interactor style with the RenderView
+        proxy connected to the CAVE displays.
       </Documentation>
     </VRTrackStyleProxy>
     <VRTravelGrabEgoStyleProxy name="TravelGrabEgo"

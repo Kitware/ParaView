@@ -6,10 +6,8 @@
  * @brief   interactor style for head tracking
  *
  * vtkSMVRTrackStyleProxy is the simplest interface style, it simply maps
- * head tracking data to the eye location.
- *
- * It is expected that the RenderView EyeTransformMatrix is the property
- * that will be connected to the head tracker.
+ * head tracking data from one or more trackers to the eye position and
+ * orientation of one or more viewers.
  */
 #ifndef vtkSMVRTrackStyleProxy_h
 #define vtkSMVRTrackStyleProxy_h
@@ -18,12 +16,7 @@
 #include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRInteractorStyleProxy.h"
 
-class vtkMatrix4x4;
-class vtkSMDoubleVectorProperty;
-class vtkSMIntVectorProperty;
-class vtkSMProxy;
-class vtkSMRenderViewProxy;
-class vtkTransform;
+#include <memory>
 
 struct vtkVREvent;
 
@@ -34,21 +27,30 @@ public:
   static vtkSMVRTrackStyleProxy* New();
   vtkTypeMacro(vtkSMVRTrackStyleProxy, vtkSMVRInteractorStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  int GetControlledPropertySize() override { return 16; }
+  int GetControlledPropertySize() override { return 0; }
+  void SetControlledProxy(vtkSMProxy*) override;
 
   // Overridden to defer expensive calculations and update vtk objects
   bool Update() override;
+
+  // Overridden to query EyeSeparation property value and apply it to the
+  // currently controlled proxy.
+  void UpdateVTKObjects() override;
 
 protected:
   vtkSMVRTrackStyleProxy();
   ~vtkSMVRTrackStyleProxy() override = default;
   void HandleTracker(const vtkVREvent& event) override;
 
+  vtkPVXMLElement* SaveConfiguration() override;
+  bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator) override;
+
 private:
   vtkSMVRTrackStyleProxy(const vtkSMVRTrackStyleProxy&) = delete; // Not implemented.
   void operator=(const vtkSMVRTrackStyleProxy&) = delete;         // Not implemented.
 
-  vtkNew<vtkMatrix4x4> TrackerMatrix;
+  class Internal;
+  std::unique_ptr<Internal> Internals;
 };
 
 #endif // vtkSMVRTrackStyleProxy_h

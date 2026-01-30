@@ -14,16 +14,16 @@
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
-#include "vtkSMVRTrackStyleProxy.h"
+#include "vtkSMVRInteractorStyleProxy.h"
 
 struct vtkVREvent;
 
 class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRControlLocationRelativeStyleProxy
-  : public vtkSMVRTrackStyleProxy
+  : public vtkSMVRInteractorStyleProxy
 {
 public:
   static vtkSMVRControlLocationRelativeStyleProxy* New();
-  vtkTypeMacro(vtkSMVRControlLocationRelativeStyleProxy, vtkSMVRTrackStyleProxy);
+  vtkTypeMacro(vtkSMVRControlLocationRelativeStyleProxy, vtkSMVRInteractorStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
   int GetControlledPropertySize() override { return 3; }
 

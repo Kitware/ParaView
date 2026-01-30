@@ -107,6 +107,14 @@
         <DoubleRangeDomain min="0"
                            name="range" />
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEyeSeparation"
+                            default_values="0.065"
+                            ignore_synchronization="1"
+                            name="EyeSeparation"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetUseOffAxisProjection"
                          default_values="0"
                          name="EnableTracking"
@@ -818,5 +826,34 @@
     </MaterialLibraryProxy>
   </ProxyGroup>
 
+  <ProxyGroup name="viewers">
+    <Proxy class="vtkIndependentViewerCollection"
+           name="IndependentViewerCollection"
+           processes="client">
+      <DoubleVectorProperty command="SetEyeTransform"
+                            argument_is_array="1"
+                            default_values="none"
+                            label="EyeTransforms"
+                            name="EyeTransforms"
+                            number_of_elements_per_command="16"
+                            repeat_command="1"
+                            immediate_update="1"
+                            is_internal="1"
+                            set_number_command="SetNumberOfEyeTransforms"
+                            use_index="1">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEyeSeparation"
+                            default_values="none"
+                            label="EyeSeparations"
+                            name="EyeSeparations"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            immediate_update="1"
+                            is_internal="1"
+                            set_number_command="SetNumberOfEyeSeparations"
+                            use_index="1">
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
 
 </ServerManagerConfiguration>

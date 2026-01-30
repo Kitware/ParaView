@@ -1220,6 +1220,7 @@
           <Property name="CameraParallelScale" panel_visibility="never"/>
           <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
           <Property name="EyeAngle" panel_visibility="never"/>
+          <Property name="EyeSeparation" panel_visibility="never"/>
           <Property name="EyeTransformMatrix" />
           <Property name="ModelTransformMatrix" />
         </ExposedProperties>
@@ -1245,6 +1246,15 @@
         <BooleanDomain name="bool" />
         <Documentation>Enables/disables synchronizable actors (e.g. OpenGLAvatars).</Documentation>
       </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="IndependentViewers"
+               proxygroup="viewers"
+               proxyname="IndependentViewerCollection"></Proxy>
+        <ExposedProperties>
+          <Property name="EyeTransforms" panel_visibility="never"/>
+          <Property name="EyeSeparations" panel_visibility="never"/>
+        </ExposedProperties>
+      </SubProxy>
       <IntVectorProperty command="SetParallelProjection"
                          default_values="0"
                          ignore_synchronization="1"

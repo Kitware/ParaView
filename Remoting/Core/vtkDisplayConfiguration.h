@@ -52,7 +52,16 @@ public:
 
   ///@{
   /**
-   * Returns environment string for the given display index.
+   * Returns optional name string for the given display index, or nullptr if
+   * the Machine element has no Name attribute.
+   */
+  const char* GetName(int index) const;
+  ///@}
+
+  ///@{
+  /**
+   * Returns environment string for the given display index, or nullptr if
+   * the Machine element has no Environment attribute.
    */
   const char* GetEnvironment(int index) const;
   ///@}
@@ -99,6 +108,41 @@ public:
    * annotation, etc.
    */
   bool GetShow2DOverlays(int index) const;
+  ///@}
+
+  ///@{
+  /**
+   * Returns the configured viewer id for the given display index. If not
+   * configured, all displays are associated with a viewer id of 0 by default.
+   */
+  int GetViewerId(int index) const;
+  ///@}
+
+  ///@{
+  /**
+   * Returns the number of child elements under the optional IndependentViewers
+   * element.  If provided, these are used to set default EyeSeparation for each
+   * of the independent viewers listed in the Machine elements.
+   */
+  int GetNumberOfViewers() const;
+  ///@}
+
+  ///@{
+  /**
+   * Returns the Id attribute of the given independent viewer index. In order to
+   * be used, this should match the ViewerId attribute of one or more Machine
+   * elements.
+   */
+  int GetId(int viewerIndex) const;
+  ///@}
+
+  ///@{
+  /**
+   * Returns the EyeSeparation attribute of the given independent viewer index.
+   * In order to be used, there should be a sibling "Id" element that matches
+   * the ViewerId attribute of one or more Machine elements.
+   */
+  double GetEyeSeparation(int viewerIndex) const;
   ///@}
 
   /**

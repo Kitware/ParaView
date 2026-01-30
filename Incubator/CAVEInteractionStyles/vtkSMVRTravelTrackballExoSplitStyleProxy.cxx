@@ -25,6 +25,7 @@ vtkStandardNewMacro(vtkSMVRTravelTrackballExoSplitStyleProxy);
 vtkSMVRTravelTrackballExoSplitStyleProxy::vtkSMVRTravelTrackballExoSplitStyleProxy()
   : Superclass()
 {
+  this->AddTrackerRole("Tracker");
   this->AddButtonRole("Reset");
   this->AddButtonRole("Rotate");
   this->AddButtonRole("Translate");

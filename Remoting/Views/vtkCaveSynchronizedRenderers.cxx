@@ -4,6 +4,7 @@
 
 #include "vtkCamera.h"
 #include "vtkDisplayConfiguration.h"
+#include "vtkIndependentViewerCollection.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -66,6 +67,38 @@ void vtkCaveSynchronizedRenderers::HandleStartRender()
 {
   this->ImageReductionFactor = 1;
   this->Superclass::HandleStartRender();
+
+  auto displayConfig = vtkRemotingCoreConfiguration::GetInstance()->GetDisplayConfiguration();
+  const auto rank = this->ParallelController ? this->ParallelController->GetLocalProcessId() : -1;
+
+  if (rank >= 0 && rank < this->NumberOfDisplays)
+  {
+    // Must decide whether or not to override the eye transform matrix already
+    // stored in the renderer's camera with one of the independent viewer eye
+    // transforms.
+    int displayVid = displayConfig->GetViewerId(rank);
+    vtkIndependentViewerCollection* viewers = this->IndependentViewers;
+    int numberOfViewers = viewers ? viewers->GetNumberOfIndependentViewers() : 0;
+
+    if (numberOfViewers > 0 && displayVid >= 0 && displayVid < numberOfViewers)
+    {
+      vtkCamera* cam = this->GetRenderer()->GetActiveCamera();
+      cam->SetEyeSeparation(viewers->GetEyeSeparation(displayVid));
+
+      std::vector<double> values;
+      viewers->GetEyeTransform(displayVid, values);
+
+      vtkMatrix4x4* eyeMatrix = cam->GetEyeTransformMatrix();
+      for (int i = 0; i < 4; ++i)
+      {
+        for (int j = 0; j < 4; ++j)
+        {
+          eyeMatrix->SetElement(i, j, values[i * 4 + j]);
+        }
+      }
+    }
+  }
+
   this->InitializeCamera(this->GetRenderer()->GetActiveCamera());
   this->GetRenderer()->ResetCameraClippingRange();
 }

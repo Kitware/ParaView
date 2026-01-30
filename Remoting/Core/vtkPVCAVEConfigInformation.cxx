@@ -28,6 +28,11 @@ public:
   std::vector<double> LowerLefts;
   std::vector<double> LowerRights;
   std::vector<double> UpperRights;
+  std::vector<std::string> Names;
+  std::vector<int> ViewerIds;
+  int NumberOfViewers;
+  std::vector<int> Ids;
+  std::vector<double> EyeSeparations;
 };
 
 //----------------------------------------------------------------------------
@@ -64,6 +69,8 @@ void vtkPVCAVEConfigInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   this->Internal->LowerLefts.resize(0);
   this->Internal->LowerRights.resize(0);
   this->Internal->UpperRights.resize(0);
+  this->Internal->Names.resize(0);
+  this->Internal->ViewerIds.resize(0);
 
   for (int i = 0; i < numberOfDisplays; ++i)
   {
@@ -93,6 +100,23 @@ void vtkPVCAVEConfigInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
     this->Internal->UpperRights.push_back(upperRight[0]);
     this->Internal->UpperRights.push_back(upperRight[1]);
     this->Internal->UpperRights.push_back(upperRight[2]);
+
+    const char* name = caveConfig->GetName(i) ? caveConfig->GetName(i) : "";
+    this->Internal->Names.emplace_back(name);
+
+    int viewerId = caveConfig->GetViewerId(i);
+    this->Internal->ViewerIds.push_back(viewerId);
+  }
+
+  int numberOfViewers = caveConfig->GetNumberOfViewers();
+  this->Internal->NumberOfViewers = numberOfViewers;
+  this->Internal->Ids.resize(0);
+  this->Internal->EyeSeparations.resize(0);
+
+  for (int i = 0; i < numberOfViewers; ++i)
+  {
+    this->Internal->Ids.push_back(caveConfig->GetId(i));
+    this->Internal->EyeSeparations.push_back(caveConfig->GetEyeSeparation(i));
   }
 }
 
@@ -121,6 +145,8 @@ void vtkPVCAVEConfigInformation::AddInformation(vtkPVInformation* pvinfo)
   this->Internal->LowerLefts.resize(0);
   this->Internal->LowerRights.resize(0);
   this->Internal->UpperRights.resize(0);
+  this->Internal->Names.resize(0);
+  this->Internal->ViewerIds.resize(0);
 
   for (int i = 0; i < numberOfDisplays; ++i)
   {
@@ -150,6 +176,19 @@ void vtkPVCAVEConfigInformation::AddInformation(vtkPVInformation* pvinfo)
     this->Internal->UpperRights.push_back(upperRight[0]);
     this->Internal->UpperRights.push_back(upperRight[1]);
     this->Internal->UpperRights.push_back(upperRight[2]);
+
+    this->Internal->Names.emplace_back(info->GetName(i));
+    this->Internal->ViewerIds.push_back(info->GetViewerId(i));
+  }
+
+  int numberOfViewers = info->GetNumberOfViewers();
+  this->Internal->Ids.resize(0);
+  this->Internal->EyeSeparations.resize(0);
+
+  for (int i = 0; i < numberOfViewers; ++i)
+  {
+    this->Internal->Ids.push_back(info->GetId(i));
+    this->Internal->EyeSeparations.push_back(info->GetEyeSeparation(i));
   }
 }
 
@@ -191,6 +230,28 @@ void vtkPVCAVEConfigInformation::CopyToStream(vtkClientServerStream* css)
   for (std::size_t i = 0; i < this->Internal->UpperRights.size(); ++i)
   {
     *css << this->Internal->UpperRights[i];
+  }
+
+  for (std::size_t i = 0; i < this->Internal->Names.size(); ++i)
+  {
+    *css << this->Internal->Names[i];
+  }
+
+  for (std::size_t i = 0; i < this->Internal->ViewerIds.size(); ++i)
+  {
+    *css << this->Internal->ViewerIds[i];
+  }
+
+  *css << this->Internal->NumberOfViewers;
+
+  for (std::size_t i = 0; i < this->Internal->Ids.size(); ++i)
+  {
+    *css << this->Internal->Ids[i];
+  }
+
+  for (std::size_t i = 0; i < this->Internal->EyeSeparations.size(); ++i)
+  {
+    *css << this->Internal->EyeSeparations[i];
   }
 
   *css << vtkClientServerStream::End;
@@ -321,6 +382,62 @@ void vtkPVCAVEConfigInformation::CopyFromStream(const vtkClientServerStream* css
       }
     }
   }
+
+  // Copy the Names values from the stream
+  this->Internal->Names.resize(numberOfDisplays);
+
+  for (int i = 0; i < numberOfDisplays; ++i)
+  {
+    if (!css->GetArgument(0, idx++, &(this->Internal->Names[i])))
+    {
+      vtkErrorMacro("Error parsing Names from message.");
+      return;
+    }
+  }
+
+  // Copy the ViewerId values from the stream
+  this->Internal->ViewerIds.resize(numberOfDisplays);
+
+  for (int i = 0; i < numberOfDisplays; ++i)
+  {
+    if (!css->GetArgument(0, idx++, &(this->Internal->ViewerIds[i])))
+    {
+      vtkErrorMacro("Error parsing ViewerIds from message.");
+      return;
+    }
+  }
+
+  if (!css->GetArgument(0, idx++, &this->Internal->NumberOfViewers))
+  {
+    vtkErrorMacro("Error parsing NumberOfViewers from message.");
+    return;
+  }
+
+  int numberOfViewers = this->Internal->NumberOfViewers;
+
+  // Copy the Id values from the stream
+  this->Internal->Ids.resize(numberOfViewers);
+
+  for (int i = 0; i < numberOfViewers; ++i)
+  {
+    if (!css->GetArgument(0, idx++, &(this->Internal->Ids[i])))
+    {
+      vtkErrorMacro("Error parsing Ids from message.");
+      return;
+    }
+  }
+
+  // Copy the EyeSeparation values from the stream
+  this->Internal->EyeSeparations.resize(numberOfViewers);
+
+  for (int i = 0; i < numberOfViewers; ++i)
+  {
+    if (!css->GetArgument(0, idx++, &(this->Internal->EyeSeparations[i])))
+    {
+      vtkErrorMacro("Error parsing EyeSeparations from message.");
+      return;
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -414,6 +531,36 @@ vtkTuple<double, 3> vtkPVCAVEConfigInformation::GetUpperRight(int index)
   ithTuple[1] = this->Internal->UpperRights.at(idx++);
   ithTuple[2] = this->Internal->UpperRights.at(idx++);
   return ithTuple;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVCAVEConfigInformation::GetName(int index)
+{
+  return this->Internal->Names.at(index).c_str();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVCAVEConfigInformation::GetViewerId(int index)
+{
+  return this->Internal->ViewerIds.at(index);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVCAVEConfigInformation::GetNumberOfViewers()
+{
+  return this->Internal->NumberOfViewers;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVCAVEConfigInformation::GetId(int viewerIndex)
+{
+  return this->Internal->Ids.at(viewerIndex);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVCAVEConfigInformation::GetEyeSeparation(int viewerIndex)
+{
+  return this->Internal->EyeSeparations.at(viewerIndex);
 }
 
 //----------------------------------------------------------------------------

@@ -48,6 +48,7 @@ class vtkPVCenterAxesActor;
 class vtkPVDataRepresentation;
 class vtkPVGridAxes3DActor;
 class vtkPVHardwareSelector;
+class vtkIndependentViewerCollection;
 class vtkPVInteractorStyle;
 class vtkPVMaterialLibrary;
 class vtkPVSynchronizedRenderer;
@@ -138,6 +139,8 @@ public:
   vtkCamera* GetActiveCamera();
   virtual void SetActiveCamera(vtkCamera*);
   ///@}
+
+  virtual void SetIndependentViewers(vtkIndependentViewerCollection* viewers);
 
   /**
    * Returns the interactor.
@@ -1311,6 +1314,7 @@ protected:
   vtkSmartPointer<vtkPolarAxesActor2D> PolarAxesActor;
   vtkNew<vtkSkybox> Skybox;
   vtkNew<vtkCameraOrientationWidget> CameraOrientationWidget;
+  vtkSmartPointer<vtkIndependentViewerCollection> ViewerCollection;
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;

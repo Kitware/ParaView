@@ -102,6 +102,23 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
     return false;
   }
 
+  // Locate the proxy -- prefer ID lookup.
+  this->SetControlledProxy(nullptr);
+  if (hasProxyId)
+  {
+    this->SetControlledProxy(locator->LocateProxy(id));
+  }
+  else if (hasProxyName)
+  {
+    pqApplicationCore* core = pqApplicationCore::instance();
+    pqServerManagerModel* model = core->getServerManagerModel();
+    pqProxy* proxy = model->findItem<pqProxy*>(child->GetAttribute("proxyName"));
+    if (proxy)
+    {
+      this->SetControlledProxy(proxy->getProxy());
+    }
+  }
+
   bool result = true;
   for (unsigned int neCount = 0; neCount < child->GetNumberOfNestedElements(); neCount++)
   {
@@ -176,23 +193,6 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
     {
       vtkWarningMacro(<< "Tracker role not defined: " << iter->first.c_str());
       result = false;
-    }
-  }
-
-  // Locate the proxy -- prefer ID lookup.
-  this->SetControlledProxy(nullptr);
-  if (hasProxyId)
-  {
-    this->SetControlledProxy(locator->LocateProxy(id));
-  }
-  else if (hasProxyName)
-  {
-    pqApplicationCore* core = pqApplicationCore::instance();
-    pqServerManagerModel* model = core->getServerManagerModel();
-    pqProxy* proxy = model->findItem<pqProxy*>(child->GetAttribute("proxyName"));
-    if (proxy)
-    {
-      this->SetControlledProxy(proxy->getProxy());
     }
   }
 

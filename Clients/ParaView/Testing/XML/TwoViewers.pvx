@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<pvx>
+  <Machine Name="Mach1"
+    ViewerId="0"
+    Geometry="320x180+50+50"
+    ShowBorders="0"
+    Show2DOverlays="0"
+    LowerLeft="-1.13 -0.635  -1.22"
+    LowerRight="1.13 -0.635 -1.22"
+    UpperRight="1.13  0.635 -1.22"
+  />
+  <Machine Name="Mach2"
+    ViewerId="1"
+    Geometry="320x180+50+230"
+    ShowBorders="0"
+    Show2DOverlays="0"
+    LowerLeft="-1.13 -0.635  -1.22"
+    LowerRight="1.13 -0.635 -1.22"
+    UpperRight="1.13  0.635 -1.22"
+  />
+</pvx>

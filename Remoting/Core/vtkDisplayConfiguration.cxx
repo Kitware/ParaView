@@ -10,6 +10,12 @@
 #include <vector>
 #include <vtk_pugixml.h>
 
+namespace
+{
+// Default eye separation to match the proxy property definition default
+constexpr double DEFAULT_EYE_SEPARATION = 0.065;
+}
+
 class vtkDisplayConfiguration::vtkInternals
 {
 public:
@@ -23,6 +29,8 @@ public:
     bool HasCorners = false;
     bool Coverable = false;
     bool Show2DOverlays = true;
+    int ViewerId = 0;
+    std::string Name;
 
     void Print(ostream& os, vtkIndent indent) const
     {
@@ -82,7 +90,15 @@ public:
     }
   };
 
+  struct IndependentViewer
+  {
+    int ViewerId;
+    double EyeSeparation;
+  };
+
   std::vector<Item> Displays;
+  std::vector<IndependentViewer> Viewers;
+  std::map<int, size_t> MachineCountsById;
 };
 
 vtkStandardNewMacro(vtkDisplayConfiguration);
@@ -90,6 +106,10 @@ vtkStandardNewMacro(vtkDisplayConfiguration);
 vtkDisplayConfiguration::vtkDisplayConfiguration()
   : Internals(new vtkDisplayConfiguration::vtkInternals())
 {
+  ShowBorders = false;
+  Coverable = false;
+  FullScreen = false;
+  EyeSeparation = DEFAULT_EYE_SEPARATION;
 }
 
 //----------------------------------------------------------------------------
@@ -100,6 +120,14 @@ int vtkDisplayConfiguration::GetNumberOfDisplays() const
 {
   const auto& internals = (*this->Internals);
   return static_cast<int>(internals.Displays.size());
+}
+
+//----------------------------------------------------------------------------
+const char* vtkDisplayConfiguration::GetName(int index) const
+{
+  const auto& internals = (*this->Internals);
+  auto& config = internals.Displays.at(index);
+  return config.Name.empty() ? nullptr : config.Name.c_str();
 }
 
 //----------------------------------------------------------------------------
@@ -143,6 +171,14 @@ bool vtkDisplayConfiguration::GetShow2DOverlays(int index) const
 }
 
 //----------------------------------------------------------------------------
+int vtkDisplayConfiguration::GetViewerId(int index) const
+{
+  const auto& internals = (*this->Internals);
+  auto& config = internals.Displays.at(index);
+  return config.ViewerId;
+}
+
+//----------------------------------------------------------------------------
 vtkTuple<double, 3> vtkDisplayConfiguration::GetLowerLeft(int index) const
 {
   const auto& internals = (*this->Internals);
@@ -164,6 +200,29 @@ vtkTuple<double, 3> vtkDisplayConfiguration::GetUpperRight(int index) const
   const auto& internals = (*this->Internals);
   auto& config = internals.Displays.at(index);
   return config.UpperRight;
+}
+
+//----------------------------------------------------------------------------
+int vtkDisplayConfiguration::GetNumberOfViewers() const
+{
+  const auto& internals = (*this->Internals);
+  return static_cast<int>(internals.Viewers.size());
+}
+
+//----------------------------------------------------------------------------
+int vtkDisplayConfiguration::GetId(int viewerIndex) const
+{
+  const auto& internals = (*this->Internals);
+  auto& viewerConfig = internals.Viewers.at(viewerIndex);
+  return viewerConfig.ViewerId;
+}
+
+//----------------------------------------------------------------------------
+double vtkDisplayConfiguration::GetEyeSeparation(int viewerIndex) const
+{
+  const auto& internals = (*this->Internals);
+  auto& viewerConfig = internals.Viewers.at(viewerIndex);
+  return viewerConfig.EyeSeparation;
 }
 
 //----------------------------------------------------------------------------
@@ -213,7 +272,8 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
     this->FullScreen = fullscreen.attribute("Value").as_bool(false);
   }
 
-  this->EyeSeparation = process.child("EyeSeparation").attribute("Value").as_double(0.0);
+  this->EyeSeparation =
+    process.child("EyeSeparation").attribute("Value").as_double(DEFAULT_EYE_SEPARATION);
 
   this->UseOffAxisProjection =
     process.child("UseOffAxisProjection").attribute("Value").as_bool(true);
@@ -235,13 +295,87 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
 
     info.Coverable = display.attribute("Coverable").as_bool();
 
+    auto vidAttr = display.attribute("ViewerId");
+    info.ViewerId = vidAttr.empty() ? 0 : display.attribute("ViewerId").as_int();
+
+    if (internals.MachineCountsById.count(info.ViewerId) < 1)
+    {
+      internals.MachineCountsById[info.ViewerId] = 0;
+    }
+
+    internals.MachineCountsById[info.ViewerId] += 1;
+
     auto showAttr = display.attribute("Show2DOverlays");
     if (!showAttr.empty())
     {
       info.Show2DOverlays = showAttr.as_bool();
     }
 
+    auto nameAttr = display.attribute("Name");
+    if (!nameAttr.empty())
+    {
+      info.Name = nameAttr.as_string();
+    }
+
     internals.Displays.push_back(std::move(info));
+  }
+
+  for (int i = 0; i < internals.MachineCountsById.size(); ++i)
+  {
+    if (internals.MachineCountsById.count(i) != 1)
+    {
+      vtkErrorMacro(<< "If ViewerId attributes are provided, they must include all "
+                    << "values from 0 to count - 1, and only those values.");
+      return false;
+    }
+  }
+
+  size_t numViewerIds = internals.MachineCountsById.size();
+  internals.Viewers.clear();
+  internals.Viewers.resize(numViewerIds);
+
+  // Create a default independent viewer for each viewer id found in the Machine
+  // elements (or just a single one for the implied ViewerId="0", if no Machine elements
+  // specified a ViewerId)
+  for (size_t i = 0; i < numViewerIds; ++i)
+  {
+    vtkInternals::IndependentViewer viewer;
+    viewer.ViewerId = static_cast<int>(i);
+    viewer.EyeSeparation = this->EyeSeparation;
+    internals.Viewers[i] = viewer;
+  }
+
+  // Look for optional IndependentViewers element
+  auto viewers = process.child("IndependentViewers");
+
+  if (viewers)
+  {
+    // Viewer elements found here can override the default EyeSeparation for
+    // any/all viewers.
+    for (auto viewer : viewers.children("Viewer"))
+    {
+      auto idAttr = viewer.attribute("Id");
+      auto eyeAttr = viewer.attribute("EyeSeparation");
+
+      if (idAttr.empty() || eyeAttr.empty())
+      {
+        vtkWarningMacro("Viewer elements without both Id and EyeSeparation will be ignored");
+        continue;
+      }
+
+      int viewerId = idAttr.as_int();
+
+      if (viewerId < 0 || viewerId >= internals.Viewers.size())
+      {
+        vtkWarningMacro(<< "Id attributes of Viewer elements must correspond to ViewerId "
+                        << "attributes of Machine elements, and " << viewerId << " does "
+                        << "not correspond to any known ViewerId.");
+        continue;
+      }
+
+      size_t viewerIndex = static_cast<size_t>(viewerId);
+      internals.Viewers[viewerIndex].EyeSeparation = eyeAttr.as_double(this->EyeSeparation);
+    }
   }
 
   return true;

@@ -16,7 +16,7 @@
 
 #include "vtkNew.h"
 #include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
-#include "vtkSMVRTrackStyleProxy.h"
+#include "vtkSMVRInteractorStyleProxy.h"
 
 class vtkCamera;
 class vtkMatrix4x4;
@@ -26,12 +26,13 @@ class vtkSMIntVectorProperty;
 struct vtkVREvent;
 
 class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRTravelGrabExoSplitStyleProxy
-  : public vtkSMVRTrackStyleProxy
+  : public vtkSMVRInteractorStyleProxy
 {
 public:
   static vtkSMVRTravelGrabExoSplitStyleProxy* New();
-  vtkTypeMacro(vtkSMVRTravelGrabExoSplitStyleProxy, vtkSMVRTrackStyleProxy);
+  vtkTypeMacro(vtkSMVRTravelGrabExoSplitStyleProxy, vtkSMVRInteractorStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+  int GetControlledPropertySize() override { return 16; }
 
   // Overridden to defer expensive calculations and update vtk objects
   bool Update() override;

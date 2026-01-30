@@ -19,6 +19,7 @@
 #include "vtkDynamicProperties.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
+#include "vtkIndependentViewerCollection.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
@@ -593,6 +594,9 @@ vtkPVRenderView::vtkPVRenderView()
   this->SynchronizedRenderers->Initialize(this->GetSession());
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
 
+  this->ViewerCollection = vtkSmartPointer<vtkIndependentViewerCollection>::New();
+  this->SynchronizedRenderers->SetIndependentViewers(this->ViewerCollection.Get());
+
   // Add skybox actor.
   this->GetRenderer()->AddActor(this->Skybox);
   this->Skybox->GammaCorrectOn();
@@ -725,6 +729,13 @@ void vtkPVRenderView::SetActiveCamera(vtkCamera* camera)
   {
     camera->SetParallelProjection(this->ParallelProjection);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetIndependentViewers(vtkIndependentViewerCollection* viewers)
+{
+  this->ViewerCollection = viewers;
+  this->SynchronizedRenderers->SetIndependentViewers(this->ViewerCollection.Get());
 }
 
 //----------------------------------------------------------------------------

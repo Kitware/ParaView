@@ -19,6 +19,7 @@ vtkStandardNewMacro(vtkSMVRTravelGrabEgoStyleProxy);
 vtkSMVRTravelGrabEgoStyleProxy::vtkSMVRTravelGrabEgoStyleProxy()
   : Superclass()
 {
+  this->AddTrackerRole("Tracker");
   this->AddButtonRole("Navigate");
   this->AddButtonRole("Reset");
   this->EnableNavigate = false;
