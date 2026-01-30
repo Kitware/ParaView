@@ -210,8 +210,29 @@ def execute(self, expression, multiline=False):
     FieldData cannot be overridden, as it always can handle any shape of arrays.
     """
 
+    # Custom list to access inputs by index or by key
+    class KeyedList(list):
+        def __init__(self):
+            super().__init__()
+            self.name_to_id: dict[str, int] = {}
+
+        def append(self, inputName: str, value):
+            self.name_to_id[inputName] = len(self)
+            super().append(value)
+
+        def __getitem__(self, index_or_key):
+            if(isinstance(index_or_key, int) or isinstance(index_or_key, slice)):
+                return super().__getitem__(index_or_key)
+            if(isinstance(index_or_key, str)):
+                return super().__getitem__(self.name_to_id[index_or_key])
+            raise RuntimeError("Accessing 'inputs' can only be done with int, slice or str")
+
+        def __setitem__(self, index_or_key, value):
+            raise RuntimeError("'inputs' structure is read-only")
+
     # Add inputs.
-    inputs = []
+    inputs = KeyedList()
+    variables = {}
 
     for index in range(self.GetNumberOfInputConnections(0)):
         # wrap all input data objects using vtkmodules.numpy_interface.dataset_adapter
@@ -220,7 +241,9 @@ def execute(self, expression, multiline=False):
         current_time = get_pipeline_time(self)
         wdo_input.time_value = wdo_input.t_value = t
         wdo_input.time_index = wdo_input.t_index = t_index
-        inputs.append(wdo_input)
+        inputName = self.GetInputName(index)
+        inputs.append(inputName, wdo_input)
+        variables[inputName] = wdo_input
 
     # Setup output.
     output = dsa.WrapDataObject(self.GetOutputDataObject(0))
@@ -233,7 +256,7 @@ def execute(self, expression, multiline=False):
 
     # get a dictionary for arrays in the dataset attributes. We pass that
     # as the variables in the eval namespace for compute.
-    variables = get_arrays(inputs[0].GetAttributes(self.GetArrayAssociation()))
+    variables.update(get_arrays(inputs[0].GetAttributes(self.GetArrayAssociation())))
     variables.update({"time_value": inputs[0].time_value,
                       "t_value": inputs[0].t_value,
                       "time_index": inputs[0].time_index,

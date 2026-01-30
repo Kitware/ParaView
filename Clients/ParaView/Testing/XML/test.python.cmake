@@ -93,6 +93,7 @@ if (numpy_found)
     ForceTimeDiamond.xml
     FreezeQueryMultiblock.xml
     IndexedLookupInitialization.xml # needs Python Calculator/numpy
+    PythonCalculatorNamedInputs.xml
     PlotOverLine_surface.xml # needs find data
     ProgrammableAnnotation.xml
     SelectionSaveStatePVSM.xml # find data needs python/numpy
