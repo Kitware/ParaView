@@ -302,6 +302,7 @@ if (NOT PARAVIEW_USE_EXTERNAL_VTK)
   include(vtkOpenGLOptions)
   include(vtkExternalData)
   include(vtkVersion)
+  include(vtkModuleThirdParty)
   include(VTKDetermineVersion)
   set(VTK_VERSION
       "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}")
