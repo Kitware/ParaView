@@ -8,17 +8,12 @@
 #include "pqPointPickingHelper.h"
 
 #include "vtkMath.h"
-#include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkVector.h"
 
 #include <QHeaderView>
 #include <QPointer>
-
-#include <sstream>
-#include <utility>
-#include <vector>
 
 //-----------------------------------------------------------------------------
 struct pqAnglePropertyWidget::pqInternals

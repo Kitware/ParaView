@@ -8,8 +8,6 @@
 
 #include <QScopedPointer>
 
-#include <array>
-
 /**
  * pqAnglePropertyWidget is a custom property widget that uses
  * "PolyLineWidgetRepresentation" to help users interactively set points that

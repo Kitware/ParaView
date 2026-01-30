@@ -6,8 +6,6 @@
 
 #include "pqApplicationComponentsModule.h"
 #include "pqInteractivePropertyWidgetAbstract.h"
-#include "pqSMProxy.h"
-#include "vtkBoundingBox.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 
 #include <QScopedPointer>
