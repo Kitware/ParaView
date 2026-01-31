@@ -29,6 +29,7 @@
 #endif
 
 #include "vtkCamera.h"
+#include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -183,6 +184,8 @@ void pqVRDockPanel::constructor()
   this->Internals->scaleValue->setValidator(new QDoubleValidator(this));
   connect(this->Internals->scaleValue, SIGNAL(editingFinished()), this, SLOT(scaleEdited()));
   this->Internals->NavigationObserver->SetScaleEdit(this->Internals->scaleValue);
+
+  connect(this->Internals->resetNavButton, SIGNAL(clicked()), SLOT(resetNavigation()));
 
   // Using size metrics about the font and margins, try to set the height
   // of the VR Connections list widget to accomodate 2.5 entries. If more
@@ -579,6 +582,15 @@ void pqVRDockPanel::scaleEdited()
   // re-observe the INTERACTOR_STYLE_NAVIGATION events
   viewProxy->AddObserver(
     vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_NAVIGATION, this->Internals->NavigationObserver);
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::resetNavigation()
+{
+  vtkSMRenderViewProxy* viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+  vtkNew<vtkMatrix4x4> newMatrix;
+  newMatrix->Identity();
+  vtkSMVRInteractorStyleProxy::SetNavigationMatrix(newMatrix, viewProxy);
 }
 
 //-----------------------------------------------------------------------------

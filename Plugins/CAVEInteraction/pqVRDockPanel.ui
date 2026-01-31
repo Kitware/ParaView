@@ -18,7 +18,7 @@
     <item row="1" column="0">
      <widget class="QListWidget" name="connectionsTable"/>
     </item>
-    <item row="13" column="0">
+    <item row="14" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QPushButton" name="saveState">
@@ -211,7 +211,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Apply this scale to ModelTransformMatrix (NavigationMatrix)</string>
+         <string>Apply this scale to the NavigationMatrix</string>
         </property>
         <property name="text">
          <string>Scale Factor</string>
@@ -241,6 +241,16 @@
      </layout>
     </item>
     <item row="11" column="0">
+      <widget class="QPushButton" name="resetNavButton">
+       <property name="toolTip">
+        <string>Reset the NavigationMatrix to the identity matrix</string>
+       </property>
+       <property name="text">
+        <string>Reset Navigation</string>
+       </property>
+      </widget>
+    </item>
+    <item row="12" column="0">
      <widget class="Line" name="anotherLine">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -302,7 +312,7 @@
       </item>
      </layout>
     </item>
-    <item row="12" column="0">
+    <item row="13" column="0">
      <layout class="QVBoxLayout" name="collaborationContainer"/>
     </item>
    </layout>

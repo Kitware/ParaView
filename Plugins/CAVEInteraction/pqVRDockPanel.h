@@ -63,6 +63,7 @@ private Q_SLOTS:
   void stop();
 
   void scaleEdited();
+  void resetNavigation();
 
 private:
   Q_DISABLE_COPY(pqVRDockPanel)
