@@ -382,6 +382,9 @@ public:
    */
   const char* GetName(int index);
 
+  int GetStereoType(int index);
+  bool GetStereoEnabled(int index);
+
   /**
    * @brief Get the optional viewer id associated with the screen at the
    * given index, or -1 if no viewer id was set.
@@ -482,6 +485,11 @@ private:
   bool SelectInternal(const vtkClientServerStream& cmd, vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections, int modifier = /* replace */ 0,
     bool selectBlocks = false);
+
+  /**
+   * Internal method to update stereo properties
+   */
+  void UpdateStereoProperties();
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
 

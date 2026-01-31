@@ -1097,7 +1097,7 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoType"
-                         default_values="none"
+                         default_values="10"
                          name="StereoType"
                          number_of_elements="1">
         <Documentation>
@@ -1125,6 +1125,8 @@
                  value="9" />
           <Entry text="None"
                  value="10" />
+          <Entry text="Emulate"
+                 value="11" />
         </EnumerationDomain>
         <Hints>
           <NoDefault />
@@ -1155,6 +1157,7 @@
           <Entry text="Checkerboard" value="8" />
           <Entry text="SplitViewportHorizontal" value="9" />
           <Entry text="None" value="10" />
+          <Entry text="Original Configuration" value="-1" />
         </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">

@@ -136,6 +136,20 @@ public:
 
   ///@{
   /**
+   * Return whether or not the indexed display has stereo enabled.
+   */
+  virtual bool GetStereoEnabled(int index);
+  ///@}
+
+  ///@{
+  /**
+   * Return configured stereo type for the indexed display.
+   */
+  virtual int GetStereoType(int index);
+  ///@}
+
+  ///@{
+  /**
    * Return the viewer id of the given display index, or -1 if none
    * was set.
    */
@@ -170,6 +184,12 @@ protected:
 private:
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internal;
+
+  // When adding information, we need to know the rank where the stereo
+  // configs were queried. This is because stereo can now be configured
+  // via pvx or cli, and while all ranks know all other ranks pvx config
+  // state, only each rank knows the cli arguments it was provided.
+  int GetRank();
 
   vtkPVCAVEConfigInformation(const vtkPVCAVEConfigInformation&) = delete;
   void operator=(const vtkPVCAVEConfigInformation&) = delete;

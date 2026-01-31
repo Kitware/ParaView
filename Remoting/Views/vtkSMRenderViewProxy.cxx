@@ -63,6 +63,7 @@ namespace
 {
 // magic number used as elevation to achieve an isometric view direction.
 const double isometric_elev = vtkMath::DegreesFromRadians(std::asin(std::tan(vtkMath::Pi() / 6.0)));
+const int VTK_STEREOTYPE_REMOTELY_MANAGED = -1;
 
 void RotateElevation(vtkCamera* camera, double angle)
 {
@@ -103,6 +104,19 @@ void RotateElevation(vtkCamera* camera, double angle)
   camera->SetFocalPoint(temp[0] * scale, temp[1] * scale, temp[2] * scale);
   temp = camera->GetPosition();
   camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
+}
+
+void CheckServerStereoTypes(const std::vector<int>& stereoTypes)
+{
+  int rendersPerFrame = vtkPVRenderView::GetNumberOfRendersPerFrame(stereoTypes[0]);
+  for (size_t i = 1; i < stereoTypes.size(); ++i)
+  {
+    if (vtkPVRenderView::GetNumberOfRendersPerFrame(stereoTypes[i]) != rendersPerFrame)
+    {
+      vtkErrorWithObjectMacro(nullptr, << "Stereo types for all server processes must use "
+                                       << "same number of renders per frame!");
+    }
+  }
 }
 }
 
@@ -265,6 +279,26 @@ public:
     return info->GetName(index);
   }
 
+  int GetStereoType(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, -1);
+    vtkCheckNumDisplaysMacro(info, index, -1);
+
+    return info->GetStereoType(index);
+  }
+
+  bool GetStereoEnabled(vtkSMSession* session, int index)
+  {
+    vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
+
+    vtkCheckCAVEModeMacro(info, false);
+    vtkCheckNumDisplaysMacro(info, index, false);
+
+    return info->GetStereoEnabled(index);
+  }
+
   int GetViewerId(vtkSMSession* session, int index)
   {
     vtkPVCAVEConfigInformation* info = GetOrCreateServerInfo(session);
@@ -303,6 +337,8 @@ public:
 
     return info->GetEyeSeparation(viewerIndex);
   }
+
+  std::vector<int> OriginalServerStereoTypes;
 
 private:
   vtkPVCAVEConfigInformation* GetOrCreateServerInfo(vtkSMSession* session)
@@ -744,6 +780,33 @@ vtkRenderWindow* vtkSMRenderViewProxy::GetRenderWindow()
   return rv ? rv->GetRenderWindow() : nullptr;
 }
 
+void vtkSMRenderViewProxy::UpdateStereoProperties()
+{
+  if (this->GetIsInCAVE())
+  {
+    auto* propStereoType = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("StereoType"));
+    int StereoType = propStereoType->GetElement(0);
+    auto* propServerStereoType =
+      vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("ServerStereoType"));
+    int ServerStereoType = propServerStereoType->GetElement(0);
+
+    if (ServerStereoType < 0)
+    {
+      // Server stereo type is remotely managed, if the requested client type isn't
+      // already compatible with the original server stereo types, we need to override
+      // with something compatible. We already warned if all server types weren't
+      // compatible with each other, so just pick any one.
+      int originalServerType = this->Internal->OriginalServerStereoTypes[0];
+
+      if (!vtkPVRenderView::AreStereoTypesCompatible(StereoType, originalServerType))
+      {
+        int newClientType = vtkPVRenderView::GetCompatibleStereoType(originalServerType);
+        vtkSMPropertyHelper(this, "StereoType").Set(newClientType);
+      }
+    }
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::CreateVTKObjects()
 {
@@ -787,11 +850,46 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     this->GetSubProxy("IndependentViewers")->GetClientSideObject());
   rv->SetIndependentViewers(viewers);
 
-  // We'll do this for now. But we need to not do this here. I am leaning
-  // towards not making stereo a command line option as mentioned by a very
-  // not-too-pleased user on the mailing list a while ago.
   auto config = vtkRemotingCoreConfiguration::GetInstance();
-  if (config->GetUseStereoRendering())
+
+  if (this->GetIsInCAVE())
+  {
+    // In CAVE mode, the default is to let stereo types on the server be remotely
+    // managed (specified per-process on cli or pvx file)
+    this->Internal->OriginalServerStereoTypes.clear();
+    bool enabledOnServer = false;
+
+    for (int i = 0; i < this->GetNumberOfDisplays(); ++i)
+    {
+      this->Internal->OriginalServerStereoTypes.push_back(this->GetStereoType(i));
+      if (this->GetStereoEnabled(i))
+      {
+        enabledOnServer = true;
+      }
+    }
+
+    CheckServerStereoTypes(this->Internal->OriginalServerStereoTypes);
+
+    int serverType = this->Internal->OriginalServerStereoTypes[0];
+    int clientType = config->GetStereoType();
+
+    if (!config->GetUseStereoRendering() ||
+      vtkPVRenderView::AreStereoTypesCompatible(clientType, serverType))
+    {
+      // If user didn't specify stereo on the client, or specified something that is
+      // incompatible with the server, pick something compatible for the client.
+      clientType = vtkPVRenderView::GetCompatibleStereoType(serverType);
+    }
+
+    if (enabledOnServer || config->GetUseStereoRendering())
+    {
+      vtkSMPropertyHelper(this, "StereoCapableWindow").Set(1);
+      vtkSMPropertyHelper(this, "StereoRender").Set(1);
+      vtkSMPropertyHelper(this, "StereoType").Set(clientType);
+      vtkSMPropertyHelper(this, "ServerStereoType").Set(VTK_STEREOTYPE_REMOTELY_MANAGED);
+    }
+  }
+  else if (config->GetUseStereoRendering())
   {
     vtkSMPropertyHelper(this, "StereoCapableWindow").Set(1);
     vtkSMPropertyHelper(this, "StereoRender").Set(1);
@@ -1229,6 +1327,7 @@ void vtkSMRenderViewProxy::UpdateVTKObjects()
       mlp->LoadDefaultMaterials();
     }
   }
+  this->UpdateStereoProperties();
   this->UpdateAnariProperties();
   this->Superclass::UpdateVTKObjects();
 }
@@ -1881,6 +1980,18 @@ vtkTuple<double, 3> vtkSMRenderViewProxy::GetUpperRight(int index)
 const char* vtkSMRenderViewProxy::GetName(int index)
 {
   return this->Internal->GetName(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMRenderViewProxy::GetStereoType(int index)
+{
+  return this->Internal->GetStereoType(this->GetSession(), index);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetStereoEnabled(int index)
+{
+  return this->Internal->GetStereoEnabled(this->GetSession(), index);
 }
 
 //----------------------------------------------------------------------------

@@ -20,6 +20,7 @@
 #include "vtkObject.h"
 #include "vtkProcessModule.h"      // for vtkProcessModule::ProcessTypes
 #include "vtkRemotingCoreModule.h" //needed for exports
+#include <memory>                  // for std::unique_ptr
 #include <string>                  // for std::string
 #include <utility>                 // for std::pair
 #include <vector>                  // for std::vector
@@ -207,14 +208,16 @@ public:
    * Get whether stereo rendering is enabled. This is only valid on rendering
    * processes.
    */
-  vtkGetMacro(UseStereoRendering, bool);
+  bool GetUseStereoRendering();
 
   /**
    * Get stereo type requested. Returned values are `VTK_STEREO_*` defined in
-   * vtkRenderWindow.h.
+   * vtkRenderWindow.h. Stereo type can be specified on the command line, or
+   * in a .pvx file. If specified in both places, the command line takes
+   * precedence.
    */
-  vtkGetMacro(StereoType, int);
-  const char* GetStereoTypeAsString() const;
+  int GetStereoType();
+  const char* GetStereoTypeAsString();
 
   /**
    * Eye separation to use when using stereo rendering.
@@ -367,7 +370,6 @@ private:
   int Timeout = 0;
   std::string TimeoutCommand;
   int TimeoutCommandInterval = 60;
-  bool UseStereoRendering = false;
   int StereoType = 0;
   double EyeSeparation = 0.06;
   bool DisableXDisplayTests = false;
@@ -389,6 +391,9 @@ private:
   int TileMullions[2] = { 0, 0 };
 
   vtkDisplayConfiguration* DisplayConfiguration = nullptr;
+
+  class vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
 };
 
 #endif

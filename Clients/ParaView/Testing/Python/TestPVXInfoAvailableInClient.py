@@ -1,5 +1,6 @@
 from paraview import servermanager
 from paraview import simple
+from vtkmodules.vtkRenderingCore import vtkRenderWindow
 
 
 # Make sure the test driver know that process has properly started
@@ -26,7 +27,7 @@ def runTest():
 
     assert renderView.GetIsInCAVE()
 
-    # Ensure we correctly get the values from "../XML/LeftRightHide2DOverlay.pvx"
+    # Ensure we correctly get the values from "../XML/CAVEFeatures.pvx"
 
     lower_left_d0 = renderView.GetLowerLeft(0)
     assert len(lower_left_d0) == 3
@@ -68,6 +69,9 @@ def runTest():
 
     assert renderView.GetShow2DOverlays(0) is False
     assert renderView.GetShow2DOverlays(1) is True
+
+    assert vtkRenderWindow.GetStereoTypeAsString(renderView.GetStereoType(0)) == "Left"
+    assert vtkRenderWindow.GetStereoTypeAsString(renderView.GetStereoType(1)) == "Right"
 
     simple.Disconnect()
 
