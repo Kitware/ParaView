@@ -369,7 +369,7 @@ void vtkPVProgressHandler::RefreshProgress(
 
     double le_progress = progress;
     vtkByteSwap::SwapLE(&progress);
-    memcpy(buffer.data(), &le_progress, sizeof(double));
+    memcpy(buffer.data() + sizeof(vtkTypeUInt32), &le_progress, sizeof(double));
 
     memcpy(
       buffer.data() + sizeof(vtkTypeUInt32) + sizeof(double), progress_text, progress_text_len);
@@ -455,18 +455,19 @@ bool vtkPVProgressHandler::OnWrongTagEvent(vtkObject*, unsigned long eventid, vo
     memcpy(&len, ptr, sizeof(len));
     ptr += sizeof(len);
 
+    vtkTypeUInt32 id = VTK_TYPE_UINT32_MAX;
+    memcpy(&id, ptr, sizeof(vtkTypeUInt32));
+    ptr += sizeof(vtkTypeUInt32);
+
     double progress = 0.0;
     memcpy(&progress, ptr, sizeof(double));
     ptr += sizeof(progress);
 
-    vtkTypeUInt32 id = VTK_TYPE_UINT32_MAX;
-    memcpy(&id, ptr, sizeof(vtkTypeUInt32));
-    ptr += sizeof(vtkTypeUInt32);
 #ifdef VTK_WORDS_BIGENDIAN
     // Progress is sent in little-endian form. We need to convert it to  big
     // endian.
-    vtkByteSwap::SwapLE(&progress);
     vtkByteSwap::SwapLE(&id);
+    vtkByteSwap::SwapLE(&progress);
 #endif
 
     this->RefreshProgress(ptr, progress, id);
