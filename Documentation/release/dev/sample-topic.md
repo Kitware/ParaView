@@ -34,6 +34,7 @@ Tips for writing a good release note:
   * Overlapping AMR Dataset instead of `vtkOverlappingAMR`
   * Hyper-tree Grid instead of `vtkHyperTreeGrid`
   * Table instead of `vtkTable`
+  * Point Set instead of `vtkPointSet`
   * Partitioned Dataset instead of `vtkPartitionedDataSet`
   * Partitioned Dataset Collection instead of `vtkPartitionedDataSetCollection`
 

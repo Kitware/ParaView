@@ -1,3 +1,0 @@
-## Add `current_time` variable to **Python Calculator** and **Python Annotation**
-
-The `current_time` variable contains the current time in ParaView's time controls. This is the same value as the "Current Time" field in the ParaView GUI's Information panel. In contrast to the `time_value` (`t_value`) variable already defined, which refer to the current time value of the data source, the `current_time` value refers to the global current time value set for all of ParaView. Unlike `time_value` and `time_index` (`t_index`), the `current_time` value is always available in the **Python Calculator** and **Python Annotation** filters.
