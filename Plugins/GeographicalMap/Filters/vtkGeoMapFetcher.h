@@ -4,7 +4,7 @@
 /**
  * @class   vtkGeoMapFetcher
  *
- * Download a map using a provider (GoogleMap or MapQuest) and position it
+ * Download a map using a provider (GoogleMap, MapQuest or OpenStreetMap) and position it
  * using X=lon and Y=lat (in degrees)
  *
  */
@@ -38,7 +38,8 @@ public:
   enum APIProvider
   {
     GoogleMap = 0,
-    MapQuest = 1
+    MapQuest = 1,
+    OpenStreetMap = 2
   };
 
   enum FetchingMethod
@@ -97,7 +98,7 @@ public:
    * Select the provider service used.
    * Default is MapQuest.
    */
-  vtkSetClampMacro(Provider, int, GoogleMap, MapQuest);
+  vtkSetClampMacro(Provider, int, GoogleMap, OpenStreetMap);
   vtkGetMacro(Provider, int);
   ///@}
 
@@ -158,6 +159,12 @@ protected:
    * Download data using CURL.
    */
   bool DownloadData(const std::string& url, std::vector<char>& buffer);
+
+  /**
+   * Overlay OpenStreetMap attribution at bottom-right of the image.
+   * Only applied when Provider is OpenStreetMap.
+   */
+  void OverlayOSMAttribution(vtkImageData* img);
 
   int FetchingMethod = ZoomCenter;
   double Center[2] = { 0.0, 0.0 };

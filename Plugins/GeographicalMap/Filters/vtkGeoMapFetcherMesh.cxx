@@ -7,11 +7,16 @@
 #include "vtkImageToStructuredGrid.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkLogger.h"
+#include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
+
+#include <algorithm>
+#include <cmath>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkGeoMapFetcherMesh);
@@ -29,9 +34,66 @@ int vtkGeoMapFetcherMesh::RequestInformation(
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  const int scale = (this->Fetcher->GetUpscale() ? 2 : 1);
-  int ext[6] = { 0, static_cast<int>(scale * this->Fetcher->GetDimension()[0] - 1), 0,
-    static_cast<int>(scale * this->Fetcher->GetDimension()[1] - 1), 0, 0 };
+  int scale = this->Fetcher->GetUpscale() ? 2 : 1;
+  int width = static_cast<int>(this->Fetcher->GetDimension()[0]);
+  int height = static_cast<int>(this->Fetcher->GetDimension()[1]);
+  if (this->Fetcher->GetProvider() == vtkGeoMapFetcher::OpenStreetMap)
+  {
+    // For OSM: compute mosaic extent in BoundingBox mode, else single 256x256
+    scale = 1;
+    if (this->Fetcher->GetFetchingMethod() == vtkGeoMapFetcher::BoundingBox)
+    {
+      int currentZoomLevel = this->Fetcher->GetZoomLevel();
+      const double* bb = this->Fetcher->GetMapBoundingBox();
+      double centerLat = (bb[0] + bb[1]) * 0.5;
+      double centerLon = (bb[2] + bb[3]) * 0.5;
+      double deltaLat = std::abs(2.0 * (bb[1] - centerLat));
+      double deltaLon = std::abs(2.0 * (bb[3] - centerLon));
+      if (!(deltaLat == 0.0 && deltaLon == 0.0))
+      {
+        if (deltaLat > deltaLon)
+        {
+          currentZoomLevel = static_cast<int>(std::round(std::log2(width / deltaLat)));
+        }
+        else
+        {
+          currentZoomLevel = static_cast<int>(std::round(std::log2(height / deltaLon)));
+        }
+      }
+      const int tilesPerAxis = (1 << currentZoomLevel);
+      auto lat2y = [&](double latDeg)
+      {
+        double latRadians = vtkMath::RadiansFromDegrees(latDeg);
+        return static_cast<int>(std::floor(
+          (1.0 - std::log(std::tan(latRadians) + 1.0 / std::cos(latRadians)) / vtkMath::Pi()) *
+          0.5 * tilesPerAxis));
+      };
+      auto lon2x = [&tilesPerAxis](double lonDeg)
+      { return static_cast<int>(std::floor((lonDeg + 180.0) / 360.0 * tilesPerAxis)); };
+
+      const double latMin = std::min(bb[0], bb[1]);
+      const double latMax = std::max(bb[0], bb[1]);
+      const double lonMin = std::min(bb[2], bb[3]);
+      const double lonMax = std::max(bb[2], bb[3]);
+
+      int xMin = lon2x(lonMin);
+      int xMax = lon2x(lonMax);
+      int yTop = lat2y(latMax);
+      int yBottom = lat2y(latMin);
+
+      int tilesX = xMax - xMin + 1;
+      int tilesY = yBottom - yTop + 1;
+      width = tilesX * 256;
+      height = tilesY * 256;
+    }
+    else
+    {
+      width = 256;
+      height = 256;
+    }
+  }
+  int ext[6] = { 0, static_cast<int>(scale * width - 1), 0, static_cast<int>(scale * height - 1), 0,
+    0 };
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), ext, 6);
   vtkDataObject::SetPointDataActiveScalarInfo(outInfo, VTK_UNSIGNED_CHAR, 3);
 
