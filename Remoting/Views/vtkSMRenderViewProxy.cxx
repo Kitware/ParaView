@@ -54,6 +54,7 @@
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
+#include <vtkPVCompositeRepresentation.h>
 
 #include <algorithm>
 #include <cassert>
@@ -1552,6 +1553,56 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(const int region[4],
          << region[1] << region[2] << region[3] << arrayName << vtkClientServerStream::End;
   return this->SelectInternal(stream, selectedRepresentations, selectionSources,
     multiple_selections, modifier, select_blocks);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectPointsByArrayValue(vtkCollection* selectedRepresentations,
+  vtkCollection* selectionSources, vtkSMRepresentationProxy* repr, const char* arrayName,
+  vtkIdType idValue, bool multiple_selections, int modifier, bool select_blocks)
+{
+  return this->SelectByArrayValue(selectedRepresentations, selectionSources, repr,
+    vtkDataObject::FIELD_ASSOCIATION_POINTS, arrayName, idValue, multiple_selections, modifier,
+    select_blocks);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectCellsByArrayValue(vtkCollection* selectedRepresentations,
+  vtkCollection* selectionSources, vtkSMRepresentationProxy* repr, const char* arrayName,
+  vtkIdType idValue, bool multiple_selections, int modifier, bool select_blocks)
+{
+  return this->SelectByArrayValue(selectedRepresentations, selectionSources, repr,
+    vtkDataObject::FIELD_ASSOCIATION_CELLS, arrayName, idValue, multiple_selections, modifier,
+    select_blocks);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectByArrayValue(vtkCollection* selectedRepresentations,
+  vtkCollection* selectionSources, vtkSMRepresentationProxy* repr, int fieldAssociation,
+  const char* arrayName, vtkIdType idValue, bool multiple_selections, int modifier,
+  bool select_blocks)
+{
+  if (!this->IsSelectionAvailable())
+  {
+    return false;
+  }
+
+  vtkScopedMonitorProgress monitorProgress(this);
+
+  this->IsSelectionCached = true;
+  // Call PreRender since Select making will cause multiple renders on the
+  // render window. Calling PreRender ensures that the view is ready to render.
+  this->PreRender(/*interactive=*/false);
+
+  vtkDataRepresentation* dataRepr =
+    vtkPVCompositeRepresentation::SafeDownCast(repr->GetClientSideObject())
+      ->GetActiveRepresentation();
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  rv->SelectByArrayValue(fieldAssociation, dataRepr, arrayName, idValue);
+
+  bool retVal = this->FetchLastSelection(
+    multiple_selections, selectedRepresentations, selectionSources, modifier, select_blocks);
+  this->PostRender(false);
+  return retVal;
 }
 
 //----------------------------------------------------------------------------

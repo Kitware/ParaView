@@ -19,6 +19,7 @@
 #include "vtkDynamicProperties.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkIndependentViewerCollection.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
@@ -1051,6 +1052,53 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4], const char* ar
   // we don't render labels for hardware selection
   this->NonCompositedRenderer->SetDraw(false);
   sel.TakeReference(this->Selector->Select(region));
+  this->NonCompositedRenderer->SetDraw(true);
+  this->PostSelect(sel, array);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SelectByArrayValue(
+  int fieldAssociation, vtkDataRepresentation* dataRepr, const char* array, vtkIdType id)
+{
+  // This gets called only the processes that are doing rendering i.e. it won't
+  // be called on data server or if doing local rendering in client-server mode,
+  // this won't be called on the remote processes.
+  assert(this->GetLocalProcessDoesRendering(this->GetUseDistributedRenderingForRender()));
+  if (!this->PrepareSelect(fieldAssociation, array))
+  {
+    return;
+  }
+  vtkNew<vtkSelection> sel;
+  // we don't render labels for hardware selection
+  this->NonCompositedRenderer->SetDraw(false);
+
+  vtkNew<vtkIdTypeArray> ids;
+  ids->SetName(array);
+  ids->SetNumberOfComponents(1);
+  ids->SetNumberOfTuples(1);
+  ids->SetTuple1(0, id);
+
+  vtkNew<vtkSelectionNode> child;
+  child->SetContentType(vtkSelectionNode::VALUES);
+  switch (fieldAssociation)
+  {
+    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+      child->SetFieldType(vtkSelectionNode::CELL);
+      break;
+
+    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+      child->SetFieldType(vtkSelectionNode::POINT);
+      break;
+  }
+
+  child->GetProperties()->Set(vtkSelectionNode::SOURCE(), dataRepr);
+  child->SetSelectionList(ids);
+  child->GetProperties()->Set(
+    vtkSelectionNode::PIXEL_COUNT(), 1); // This key is necessary to process selection
+  child->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), this->Selector->GetProcessID());
+
+  sel->AddNode(child);
+
   this->NonCompositedRenderer->SetDraw(true);
   this->PostSelect(sel, array);
 }

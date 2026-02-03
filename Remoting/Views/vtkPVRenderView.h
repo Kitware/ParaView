@@ -381,6 +381,13 @@ public:
   void Select(int field_association, int region[4], const char* array = nullptr);
   ///@}
 
+  /**
+   * Make a selection by using value of an array.
+   * WARNING: it only works for vtkIdType array.
+   */
+  void SelectByArrayValue(
+    int fieldAssociation, vtkDataRepresentation* dataRepr, const char* array, vtkIdType id);
+
   ///@{
   /**
    * Make a selection with a polygon. The polygon2DArray should contain
