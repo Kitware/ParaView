@@ -59,7 +59,7 @@
       </IntVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="bin bpf csd csv greyhound gpkg icebride las laz mat nitf nsf ntf pcd ply pts qi rxp sbet sqlite sid tindex txt h5"
+        <ReaderFactory extensions="bin bpf csd csv greyhound gpkg icebride las laz mat nitf nsf ntf pcd ply pts qi sbet sqlite sid tindex txt h5"
                        file_description="PDAL Files" />
       </Hints>
     </SourceProxy>
