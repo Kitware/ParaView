@@ -26,7 +26,7 @@ vtk_module_link(CDIReader::vtkCDIReader
 
 if (CDI_VERSION VERSION_GREATER_EQUAL 2.4.1)
   vtk_module_definitions(CDIReader::vtkCDIReader PRIVATE CDI_241_VLIST_API)
-endif ()  
+endif ()
 
 paraview_add_server_manager_xmls(
   XMLS  CDIReader.xml)

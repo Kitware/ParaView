@@ -21,7 +21,7 @@ set(QTTESTING_BUILD_AS_VTK_MODULE ON)
 set(BUILD_TESTING OFF)
 
 vtk_module_third_party_internal(
-  LICENSE_FILES 
+  LICENSE_FILES
     "vtkqttesting/Copyright.txt"
   SPDX_LICENSE_IDENTIFIER
     "BSD-3-Clause"
@@ -29,5 +29,5 @@ vtk_module_third_party_internal(
     "Copyright (c) 2005-2022 Kitware, inc."
   SPDX_DOWNLOAD_LOCATION
     "git+https://gitlab.kitware.com/third-party/paraview/qttesting@dfd965fa829f25707ab7e14b9d4a18238ddc4bdc"
-  VERSION       
+  VERSION
     "master")
