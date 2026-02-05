@@ -168,6 +168,8 @@ foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENT
   list(FILTER _paraview_component_vtk_optional_depends INCLUDE REGEX "^VTK::")
   string(REPLACE "VTK::" "" _paraview_component_vtk_depends "${_paraview_component_vtk_depends}")
   string(REPLACE "VTK::" "" _paraview_component_vtk_optional_depends "${_paraview_component_vtk_optional_depends}")
+  string(REPLACE "vtkviskores" "viskores" _paraview_component_vtk_depends "${_paraview_component_vtk_depends}")
+  string(REPLACE "vtkviskores" "viskores" _paraview_component_vtk_optional_depends "${_paraview_component_vtk_optional_depends}")
   if (${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_${_paraview_component})
     list(APPEND _paraview_vtk_components_to_request_required
       ${_paraview_component_vtk_depends})
