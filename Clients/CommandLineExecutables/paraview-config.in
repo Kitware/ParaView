@@ -9,7 +9,7 @@ import tempfile
 
 
 CMAKELISTS = """
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.12)
 project(find_paraview C CXX)
 
 find_package(ParaView REQUIRED COMPONENTS %(components)s)
