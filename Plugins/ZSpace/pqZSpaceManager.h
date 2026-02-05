@@ -75,7 +75,7 @@ private Q_SLOTS:
    */
   void onRenderEnded();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Event callback from the `vtkZSpaceSDKManager` class.
    */
