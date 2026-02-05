@@ -179,6 +179,7 @@ foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENT
     ${_paraview_component_vtk_optional_depends})
 endforeach ()
 unset(_paraview_component)
+unset(_paraview_search_components)
 unset(_paraview_component_depends)
 unset(_paraview_component_private_depends)
 unset(_paraview_component_optional_depends)
