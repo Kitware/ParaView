@@ -1,6 +1,6 @@
 vtk_module_third_party(
   INTERNAL
-    LICENSE_FILES 
+    LICENSE_FILES
       "vtknvpipe/LICENSE"
     SPDX_LICENSE_IDENTIFIER
       "BSD-3-Clause"
@@ -8,7 +8,7 @@ vtk_module_third_party(
       "Copyright (c) 2017, NVIDIA CORPORATION"
     SPDX_DOWNLOAD_LOCATION
       "git+https://gitlab.kitware.com/third-party/nvpipe.git@for/paraview-master-20180312"
-    VERSION       
+    VERSION
       "master"
     STANDARD_INCLUDE_DIRS
   EXTERNAL

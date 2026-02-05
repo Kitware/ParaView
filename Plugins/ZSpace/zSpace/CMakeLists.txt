@@ -2,7 +2,7 @@ set(classes
   vtkPVZSpaceView)
 
 if (PARAVIEW_USE_PYTHON)
-  list (APPEND classes 
+  list (APPEND classes
     vtkPVZSpaceSettings)
 endif ()
 

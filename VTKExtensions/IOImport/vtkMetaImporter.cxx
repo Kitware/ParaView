@@ -99,7 +99,7 @@ nlohmann::json to_json(vtkProperty* ppty)
     { "ShowTexturesOnBackface", ppty->GetShowTexturesOnBackface() },
     { "Shading", ppty->GetShading() },
     { "MaterialName", ppty->GetMaterialName() ? ppty->GetMaterialName() : "" },
-    { "Textures", 
+    { "Textures",
       nlohmann::json
       (
         {
@@ -131,8 +131,8 @@ nlohmann::json to_json(vtkActor* actor, const std::string& name)
     }
   }
   // clang-format off
-  return 
-  { 
+  return
+  {
     { "Name", name },
     { "IsIdentity", actor->GetIsIdentity() },
     { "DisplayProperty", to_json(actor->GetProperty()) },

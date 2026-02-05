@@ -384,7 +384,7 @@ void vtkOpenGLBatchedExtrusionMapper::GeneratePointScalarsExtrusionShaders(
 
   in float displacementScalar;
   in vec3 extrusionNormalsMC;
-  
+
   out vec4 vertexMCVSOutput;
   out vec3 vertexMCVSUnscaled;)");
 

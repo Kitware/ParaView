@@ -321,7 +321,7 @@ function(_get_prefix varname default)
   endif()
 endfunction()
 
-# If NUMSERVERS is specified in ${ARGN} then returns in varname the number of servers to use for the test, 
+# If NUMSERVERS is specified in ${ARGN} then returns in varname the number of servers to use for the test,
 # otherwise returns the "NOT_FOUND" value.
 function(_get_num_servers varname)
   cmake_parse_arguments(_get_num_servers
