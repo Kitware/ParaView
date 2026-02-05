@@ -319,6 +319,9 @@ std::string vtkPythonCalculator::GetInputName(int index)
   {
     return this->InputsName[index];
   }
-  vtkWarningMacro("The index is out of range, returning empty string");
+  if (!this->InputsName.empty())
+  {
+    vtkWarningMacro("The index is out of range, returning empty string");
+  }
   return "";
 }
