@@ -6,14 +6,15 @@
 
 #include "pqApplicationComponentsModule.h"
 #include "pqInteractivePropertyWidgetAbstract.h"
-#include "pqSMProxy.h"
-#include "vtkBoundingBox.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 
 #include <QScopedPointer>
 
 class vtkObject;
 class vtkSMPropertyGroup;
+class vtkRenderer;
+class vtkSMRenderViewProxy;
+class vtkVector3d;
 
 /**
  * pqInteractivePropertyWidget is an abstract pqPropertyWidget subclass
@@ -51,8 +52,33 @@ protected:
     return this->WidgetProxy;
   };
 
+  /**
+   * Convert the given display space coordinates into world space coordinates.
+   * If there is no renderer or render view proxy, it returns an empty vector.
+   */
+  std::vector<vtkVector3d> displayToWorldCoordinates(
+    const std::vector<vtkVector3d>& displayCoordPoints);
+
+  /**
+   * Return the Z coordinate of the focal point in display space.
+   * If there is no renderer or render view proxy, it returns -1.
+   */
+  double getFocalPointDepth();
+
+  /**
+   * Return the renderer object from the current active view.
+   * If the renderer does not exists, it returns a nullptr.
+   */
+  vtkRenderer* getRenderer();
+
 private:
   Q_DISABLE_COPY(pqInteractivePropertyWidget)
+
+  /**
+   * Return the current active view.
+   * If the render view does not exists, it returns a nullptr.
+   */
+  vtkSMRenderViewProxy* getActiveRenderViewProxy();
 
   vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;
 };

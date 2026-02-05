@@ -972,6 +972,7 @@
 
       <Hints>
         <Representation view="RenderView" type="ProtractorRepresentation" />
+        <RepositionToView />
       </Hints>
     </SourceProxy>
 

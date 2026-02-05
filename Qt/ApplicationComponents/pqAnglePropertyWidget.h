@@ -8,8 +8,6 @@
 
 #include <QScopedPointer>
 
-#include <array>
-
 /**
  * pqAnglePropertyWidget is a custom property widget that uses
  * "PolyLineWidgetRepresentation" to help users interactively set points that
@@ -47,7 +45,14 @@ protected Q_SLOTS:
   void placeWidget() override;
   void updateLabels();
 
-private:
+private Q_SLOTS:
+  /**
+   * Called when the button "Reposition to view" is clicked.
+   * This will set the position of both points relative to the camera of the active view.
+   */
+  void onRepositionToViewClicked();
+
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqAnglePropertyWidget)
 
   struct pqInternals;

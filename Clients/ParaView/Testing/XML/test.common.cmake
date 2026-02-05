@@ -1020,6 +1020,7 @@ list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
   IntegrationStrategy.xml
   OverrideProperty.xml
   PartialArrayInLineChart.xml
+  ProtractorRepositionToView.xml
   ProxyCategoriesConfiguration.xml
   ProxyCategoriesDialog.xml
   ProxyCategoriesDialogSettings.xml
