@@ -204,12 +204,13 @@ void pqAnglePropertyWidget::onRepositionToViewClicked()
   std::vector<vtkVector3d> worldCoordPoints = this->displayToWorldCoordinates(displayCoordPoints);
 
   // Convert result to understandable structure for this widget.
-  QList<QVariant> qWorldCoordPoints(worldCoordPoints.size() * 3);
+  QList<QVariant> qWorldCoordPoints;
+  qWorldCoordPoints.reserve(worldCoordPoints.size() * 3);
   for (std::size_t i = 0; i < displayCoordPoints.size(); i++)
   {
-    qWorldCoordPoints[i * 3 + 0] = worldCoordPoints[i].GetX();
-    qWorldCoordPoints[i * 3 + 1] = worldCoordPoints[i].GetY();
-    qWorldCoordPoints[i * 3 + 2] = worldCoordPoints[i].GetZ();
+    qWorldCoordPoints.push_back(worldCoordPoints[i].GetX());
+    qWorldCoordPoints.push_back(worldCoordPoints[i].GetY());
+    qWorldCoordPoints.push_back(worldCoordPoints[i].GetZ());
   }
   this->setPoints(qWorldCoordPoints);
 }
