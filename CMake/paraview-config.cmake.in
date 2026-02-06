@@ -141,7 +141,8 @@ else ()
   set(_paraview_search_components
     "@_paraview_all_components@")
 endif ()
-foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
+while (_paraview_search_components)
+  list(POP_FRONT _paraview_search_components _paraview_component)
   # Ignore non-existent components here.
   if (NOT TARGET "ParaView::${_paraview_component}")
     continue ()
@@ -168,6 +169,8 @@ foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENT
   list(FILTER _paraview_component_vtk_optional_depends INCLUDE REGEX "^VTK::")
   string(REPLACE "VTK::" "" _paraview_component_vtk_depends "${_paraview_component_vtk_depends}")
   string(REPLACE "VTK::" "" _paraview_component_vtk_optional_depends "${_paraview_component_vtk_optional_depends}")
+  string(REPLACE "vtkviskores" "viskores" _paraview_component_vtk_depends "${_paraview_component_vtk_depends}")
+  string(REPLACE "vtkviskores" "viskores" _paraview_component_vtk_optional_depends "${_paraview_component_vtk_optional_depends}")
   if (${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_${_paraview_component})
     list(APPEND _paraview_vtk_components_to_request_required
       ${_paraview_component_vtk_depends})
@@ -177,13 +180,25 @@ foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENT
   endif ()
   list(APPEND _paraview_vtk_components_to_request_optional
     ${_paraview_component_vtk_optional_depends})
-endforeach ()
+
+  # Traverse down to dependent ParaView components.
+  set(_paraview_component_paraview_depends
+    ${_paraview_component_depends}
+    ${_paraview_component_private_depends}
+    ${_paraview_component_optional_depends})
+  list(FILTER _paraview_component_paraview_depends INCLUDE REGEX "^ParaView::")
+  string(REPLACE "ParaView::" "" _paraview_component_paraview_depends "${_paraview_component_paraview_depends}")
+  list(APPEND _paraview_search_components
+    ${_paraview_component_paraview_depends})
+endwhile ()
 unset(_paraview_component)
+unset(_paraview_search_components)
 unset(_paraview_component_depends)
 unset(_paraview_component_private_depends)
 unset(_paraview_component_optional_depends)
 unset(_paraview_component_vtk_optional_depends)
 unset(_paraview_component_vtk_depends)
+unset(_paraview_component_paraview_depends)
 
 # Remove duplicate component requests.
 if (_paraview_vtk_components_to_request_required)
