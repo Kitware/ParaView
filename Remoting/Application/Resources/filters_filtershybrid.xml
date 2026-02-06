@@ -460,12 +460,13 @@
                          default_values="2"
                          name="CacheSize"
                          number_of_elements="1">
-        <IntRangeDomain max="10"
+        <IntRangeDomain max="100"
                         min="2"
                         name="range" />
         <Documentation>The cache size determines the number of time steps that
-        can be cached at one time. The maximum number is 10. The minimum is 2
-        (since it makes little sense to cache less than that).</Documentation>
+	can be cached at one time. The minimum is 2 (since it makes little sense to cache less than that).
+        There is no actual maximum but the available memory.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues">
