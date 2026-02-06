@@ -74,12 +74,6 @@ protected:
 private:
   Q_DISABLE_COPY(pqInteractivePropertyWidget)
 
-  /**
-   * Return the current active view.
-   * If the render view does not exists, it returns a nullptr.
-   */
-  vtkSMRenderViewProxy* getActiveRenderViewProxy();
-
   vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;
 };
 
