@@ -100,19 +100,19 @@ def _collectSelectionPorts(selectedReps, selectionSources, SelectBlocks=False, M
         return outputPorts
 
     for i in range(0, selectedReps.GetNumberOfItems()):
-        repr = selectedReps.GetItemAsObject(i)
+        representation = selectedReps.GetItemAsObject(i)
         selectionSource = selectionSources.GetItemAsObject(i)
 
-        if not repr:
+        if not representation:
             continue
 
         # Ensure selected representation is registered with the proxy manager
-        pxm = repr.GetSessionProxyManager()
+        pxm = representation.GetSessionProxyManager()
         if not pxm:
             return
 
         # Get the output port from the representation input
-        inputProperty = repr.GetProperty("Input")
+        inputProperty = representation.GetProperty("Input")
         selectedDataSource = inputProperty.GetProxy(0)
         portNumber = inputProperty.GetOutputPortForConnection(0)
 
@@ -329,11 +329,11 @@ def _selectIDsHelper(proxyname, IDs=[], FieldType='POINT', ContainingCells=False
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
-    repr = paraview.simple.GetRepresentation(Source)
+    representation = paraview.simple.GetRepresentation(Source)
 
     import paraview.vtk as vtk
     reprCollection = vtk.vtkCollection()
-    reprCollection.AddItem(repr.SMProxy)
+    reprCollection.AddItem(representation.SMProxy)
 
     selection = _createSelection(proxyname, IDs=IDs, FieldType=FieldType, ContainingCells=ContainingCells)
     if selection:
@@ -434,11 +434,11 @@ def SelectThresholds(Thresholds=[], ArrayName='', FieldType='POINT', Source=None
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
-    repr = paraview.simple.GetRepresentation(Source)
+    representation = paraview.simple.GetRepresentation(Source)
 
     import paraview.vtk as vtk
     reprCollection = vtk.vtkCollection()
-    reprCollection.AddItem(repr.SMProxy)
+    reprCollection.AddItem(representation.SMProxy)
 
     selection = _createSelection('ThresholdSelectionSource', Thresholds=Thresholds, ArrayName=ArrayName,
                                  FieldType=FieldType)
@@ -460,11 +460,11 @@ def SelectLocation(Locations=[], Source=None, Modifier=None):
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
-    repr = paraview.simple.GetRepresentation(Source)
+    representation = paraview.simple.GetRepresentation(Source)
 
     import paraview.vtk as vtk
     reprCollection = vtk.vtkCollection()
-    reprCollection.AddItem(repr.SMProxy)
+    reprCollection.AddItem(representation.SMProxy)
 
     selection = _createSelection('LocationSelectionSource', Locations=Locations, FieldType='POINT')
     if selection:
@@ -495,11 +495,11 @@ def QuerySelect(QueryString='', FieldType='POINT', Source=None, InsideOut=False)
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
-    repr = paraview.simple.GetRepresentation(Source)
+    representation = paraview.simple.GetRepresentation(Source)
 
     import paraview.vtk as vtk
     reprCollection = vtk.vtkCollection()
-    reprCollection.AddItem(repr.SMProxy)
+    reprCollection.AddItem(representation.SMProxy)
 
     # convert FieldType to ElementType. Eventually, all public API should change
     # to accepting ElementType but we'll do that after all selection sources use
@@ -595,14 +595,14 @@ def _selectDataByArrayValueHelper(ArrayName, IdValue, Source, Modifier, FieldTyp
     if not Source.GetDataInformation().GetArrayInformation(ArrayName, FieldTypeDO).GetDataTypeAsString() == "idtype":
         raise ValueError("'%s' is not a vtkIdTypeArray" % ArrayName)
 
-    repr = paraview.simple.GetRepresentation(Source)
+    representation = paraview.simple.GetRepresentation(Source)
 
     selectedReps = vtkCollection()
     selectionSources = vtkCollection()
     if(FieldType == "POINT"):
-        view.SelectPointsByArrayValue(selectedReps, selectionSources, repr, ArrayName, IdValue)
+        view.SelectPointsByArrayValue(selectedReps, selectionSources, representation, ArrayName, IdValue)
     else:
-        view.SelectCellsByArrayValue(selectedReps, selectionSources, repr, ArrayName, IdValue)
+        view.SelectCellsByArrayValue(selectedReps, selectionSources, representation, ArrayName, IdValue)
 
     _collectSelectionPorts(selectedReps, selectionSources, False, Modifier=Modifier)
 
