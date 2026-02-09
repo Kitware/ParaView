@@ -62,28 +62,6 @@ Please remove this comment.
         echo @VERSION@@RC@ > version.txt
         git commit -m 'Update version number to @VERSION@@RC@' version.txt
         ```
-<!-- if RC1 and patch == 0 -->
-      - [ ] Update VTK's `release` branch. The
-            [`release-mr`][release-mr]  script should be used to do this. Pass
-            `-c .kitware-release-paraview.json` to use the appropriate
-            configuration file.
-        - [ ] In VTK repository make a branch for the current paraview VTK
-          ```
-          git fetch origin
-          git checkout -b update-for-v@VERSION@@RC@ @PARAVIEW_VTK_CHECKSUM@
-          ```
-        - [ ] Add your development fork as a remote named `gitlab`
-          ```
-          git remote add gitlab <vtk fork url>
-          ```
-        - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
-              (ask `@utils/maintainers/release` if you do not have one)
-        - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
-              `Developer` privileges (so it can open MRs)
-<!-- endif -->
-        - [ ] Merge the VTK `release` update MR
-        - [ ] Update kwrobot with the new `release` branch rules
-              (`@utils/maintainers/ghostflow`)
     - Create a merge request targeting `release`
       - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
             (ask `@utils/maintainers/release` if you do not have one)
