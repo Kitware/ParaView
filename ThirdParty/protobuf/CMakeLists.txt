@@ -11,7 +11,7 @@ vtk_module_third_party(
     SPDX_COPYRIGHT_TEXT
       "Copyright 2008 Google Inc."
     SPDX_DOWNLOAD_LOCATION
-      "git+https://gitlab.kitware.com/third-party/protobuf.git@for/paraview-20220208-3.13.0"
+      "git+https://gitlab.kitware.com/third-party/protobuf.git@for/paraview-20260206-3.13.0"
     VERSION
       "3.13.0"
     STANDARD_INCLUDE_DIRS

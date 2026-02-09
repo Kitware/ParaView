@@ -5,7 +5,7 @@ if (HAVE_PTHREAD)
   add_definitions(-DHAVE_PTHREAD)
 endif ()
 
-add_library(protobuf
+vtk_module_add_module(ParaView::protobuf SOURCES
   google/protobuf/compiler/importer.cc
   google/protobuf/compiler/parser.cc
 
@@ -88,25 +88,22 @@ add_library(protobuf
   google/protobuf/wire_format.cc
   google/protobuf/wire_format_lite.cc
   google/protobuf/wrappers.pb.cc)
-_vtk_module_apply_properties(protobuf)
-_vtk_module_install(protobuf)
-target_compile_features(protobuf
+vtk_module_compile_features(ParaView::protobuf
   PUBLIC
     cxx_std_11)
-add_library(ParaView::protobuf ALIAS protobuf)
 
-target_include_directories(protobuf
+vtk_module_include(ParaView::protobuf
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:${_vtk_build_HEADERS_DESTINATION}/vtkprotobuf/src>")
-target_link_libraries(protobuf
+vtk_module_link(ParaView::protobuf
   PRIVATE
     ${THREAD_LINK_LIB})
-set_target_properties(protobuf
-  PROPERTIES
-    DEFINE_SYMBOL LIBPROTOBUF_EXPORTS)
+vtk_module_set_property(ParaView::protobuf
+  PROPERTY  DEFINE_SYMBOL
+  VALUE     LIBPROTOBUF_EXPORTS)
 if (BUILD_SHARED_LIBS)
-  target_compile_definitions(protobuf
+  vtk_module_definitions(ParaView::protobuf
     PUBLIC
       PROTOBUF_USE_DLLS)
 endif ()

@@ -34,11 +34,11 @@ vtk_module_add_module(ParaView::cosmohalofinder
   HEADERS ${headers}
   PRIVATE_HEADERS ${private_headers}
   HEADERS_SUBDIR "vtkcosmohalofinder")
-target_link_libraries(cosmohalofinder
+vtk_module_link(ParaView::cosmohalofinder
   PRIVATE
     ${GENERIC_IO_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT})
-target_include_directories(cosmohalofinder SYSTEM
+vtk_module_include(ParaView::cosmohalofinder SYSTEM
   INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
