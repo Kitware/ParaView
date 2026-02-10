@@ -1085,12 +1085,12 @@ if (PARAVIEW_USE_PYTHON)
       vtk_python_copy)
     if (TARGET VTK::WebPython)
       list(APPEND paraview_python_targets
-        WebPython-vtkmodules.web)
+        vtkWebPython-vtkmodules.web)
     endif ()
   endif ()
   if (TARGET ParaView::PVWebPython)
     list(APPEND paraview_python_targets
-      PVWebPython-paraview.web)
+      vtkPVWebPython-paraview.web)
   endif ()
   if (TARGET ParaView::CinemaSci)
     list(APPEND paraview_python_targets
