@@ -80,10 +80,19 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
 
   if (splitName.size() == 2 && splitName[0] == "ToolBar")
   {
-    QToolBar* tb = new QToolBar(splitName[1], mainWindow);
-    tb->setObjectName(splitName[1]);
-    tb->addActions(agi->actionGroup()->actions());
-    mainWindow->addToolBar(tb);
+    QToolBar* retrievedToolBar = mainWindow->findChild<QToolBar*>(splitName[1]);
+    if (retrievedToolBar)
+    {
+      retrievedToolBar->addSeparator();
+      retrievedToolBar->addActions(agi->actionGroup()->actions());
+    }
+    else
+    {
+      QToolBar* tb = new QToolBar(splitName[1], mainWindow);
+      tb->setObjectName(splitName[1]);
+      tb->addActions(agi->actionGroup()->actions());
+      mainWindow->addToolBar(tb);
+    }
   }
   else if (splitName.size() == 2 && splitName[0] == "MenuBar")
   {
