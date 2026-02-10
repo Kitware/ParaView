@@ -208,6 +208,22 @@ CheckSelection(numCells=240) # ((12 - 1) * (12 - 1)) * 2 - 2
 HideAll()
 ClearSelection()
 
+# Select block data
+groupDataset = GroupDatasets(Input=[s1, s2])
+Show(groupDataset)
+Render()
+
+SelectBlocks("/", groupDataset, FieldType='Cell')
+CheckSelection(numCells=400) # Sum total of cells
+SelectBlocks("/Root/Sphere2", groupDataset, FieldType='Cell', Modifier='SUBTRACT')
+CheckSelection(numCells=240) # Only Sphere3 is selected
+ClearSelection()
+SelectBlocks("/Root", groupDataset, FieldType='Point')
+CheckSelection(numPoints=204) # Sum total of points
+ClearSelection()
+HideAll()
+ClearSelection()
+
 try:
     SelectSurfacePoints(Rectangle=[0, 0], Polygon=[0, 0])
     sys.exit(1)  # Should not get here
