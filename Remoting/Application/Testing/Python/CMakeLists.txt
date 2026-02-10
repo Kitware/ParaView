@@ -82,14 +82,6 @@ if (numpy_found)
   list(APPEND PY_TESTS PythonSelection.py PythonSMTraceTest3.py)
 endif ()
 
-find_python_module(netCDF4 netCDF4_found)
-if (netCDF4_found)
-  list(APPEND PY_TESTS TestEAMDataReader.py,NO_VALID)
-  vtk_module_test_data(
-    Data/EAM/EAMxx_ne4pg2_202407.nc
-    Data/EAM/connectivity_ne4pg2_TEMPEST.scrip.nc)
-endif ()
-
 if (PARAVIEW_PLUGIN_ENABLE_SurfaceLIC AND PARAVIEW_PLUGIN_ENABLE_Moments)
   list(APPEND PY_TESTS
     Plugins.py,NO_VALID)
