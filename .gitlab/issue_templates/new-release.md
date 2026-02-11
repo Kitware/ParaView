@@ -16,6 +16,12 @@ Please remove this comment.
 
 # Preparatory steps
 
+<!-- if RC1 and patch == 0 -->
+  - Finalize previous release branch
+    - [ ] Update the local copy of `release`
+    - [ ] Create unannotated tag: `git tag vX.Y-final` where vX.Y is the last minor release of ParaView
+    - [ ] Push the tag: `git push origin vX.Y-final`.
+<!-- endif -->
   - Getting Started Guide
       - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
       - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
@@ -187,7 +193,6 @@ git submodule update --recursive --init
   - [ ] Install on arm64 from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
 
 # Validating binaries
-
 
 ## Linux
 
