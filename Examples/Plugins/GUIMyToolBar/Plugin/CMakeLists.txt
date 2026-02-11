@@ -5,9 +5,10 @@ set(sources
   MyToolBarActions.cxx
   MyToolBarActions.h)
 
+# If the toolbar name already exists, this macro will append the actions to it.
 paraview_plugin_add_action_group(
   CLASS_NAME MyToolBarActions
-  GROUP_NAME "ToolBar/MyActions"
+  GROUP_NAME "ToolBar/MainControlsToolbar"
   INTERFACES action_interfaces
   SOURCES action_sources)
 list(APPEND interfaces
@@ -30,3 +31,8 @@ paraview_add_plugin(GUIMyToolBar
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})
+
+option(BUILD_TESTING "Build Plugin Testing" OFF)
+if (BUILD_TESTING AND BUILD_SHARED_LIBS)
+  add_subdirectory(Testing)
+endif()
