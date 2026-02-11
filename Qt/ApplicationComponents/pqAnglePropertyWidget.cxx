@@ -123,7 +123,7 @@ pqAnglePropertyWidget::pqAnglePropertyWidget(
 
   // Internal toolbar
   ui.repositionToView->setVisible(false);
-  ui.toolbarLayout->setAlignment(Qt::AlignRight);
+  ui.toolbarLineHorizontalLayout->setAlignment(Qt::AlignRight);
   vtkPVXMLElement* hints = smproxy->GetHints();
   if (hints)
   {

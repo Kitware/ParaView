@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
-    <height>189</height>
+    <width>402</width>
+    <height>270</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,27 +31,7 @@
    <property name="spacing">
     <number>2</number>
    </property>
-   <item row="4" column="0">
-    <widget class="QLabel" name="labelPoint1">
-     <property name="text">
-      <string>Point 1</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="labelCenter">
-     <property name="text">
-      <string>Center</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="4">
+   <item row="0" column="0" colspan="4">
     <widget class="QLabel" name="labelAngle">
      <property name="font">
       <font>
@@ -64,38 +44,86 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="2">
-    <widget class="pqDoubleLineEdit" name="point2Y"/>
+   <item row="1" column="0" colspan="4">
+    <layout class="QHBoxLayout" name="toolbarLineHorizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="show3DWidget">
+       <property name="text">
+        <string>Show Widget</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="repositionToView">
+        <property name="toolTip">
+          <string>Reposition protractor to view</string>
+        </property>
+        <property name="text">
+           <string/>
+        </property>
+        <property name="icon">
+          <iconset>
+            <normaloff>:/pqWidgets/Icons/pqResetCameraData.svg</normaloff>:/pqWidgets/Icons/pqResetCameraData.svg</iconset>
+        </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="5" column="3">
-    <widget class="pqDoubleLineEdit" name="centerZ"/>
-   </item>
-   <item row="6" column="1">
-    <widget class="pqDoubleLineEdit" name="point2X"/>
-   </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QCheckBox" name="show3DWidget">
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelPoint1">
      <property name="text">
-      <string>Show Widget</string>
+      <string>Point 1</string>
      </property>
-     <property name="checked">
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="5" column="2">
-    <widget class="pqDoubleLineEdit" name="centerY"/>
-   </item>
-   <item row="6" column="3">
-    <widget class="pqDoubleLineEdit" name="point2Z"/>
-   </item>
-   <item row="4" column="2">
-    <widget class="pqDoubleLineEdit" name="point1Y"/>
-   </item>
-   <item row="4" column="1">
+   <item row="2" column="1">
     <widget class="pqDoubleLineEdit" name="point1X"/>
    </item>
-   <item row="6" column="0">
+   <item row="2" column="2">
+    <widget class="pqDoubleLineEdit" name="point1Y"/>
+   </item>
+   <item row="2" column="3">
+    <widget class="pqDoubleLineEdit" name="point1Z"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelCenter">
+     <property name="text">
+      <string>Center</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="pqDoubleLineEdit" name="centerX"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="pqDoubleLineEdit" name="centerY"/>
+   </item>
+   <item row="3" column="3">
+    <widget class="pqDoubleLineEdit" name="centerZ"/>
+   </item>
+   <item row="4" column="0">
     <widget class="QLabel" name="labelPoint2">
      <property name="text">
       <string>Point 2</string>
@@ -105,10 +133,16 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="3">
-    <widget class="pqDoubleLineEdit" name="point1Z"/>
+   <item row="4" column="1">
+    <widget class="pqDoubleLineEdit" name="point2X"/>
    </item>
-   <item row="7" column="0" colspan="4">
+   <item row="4" column="2">
+    <widget class="pqDoubleLineEdit" name="point2Y"/>
+   </item>
+   <item row="4" column="3">
+    <widget class="pqDoubleLineEdit" name="point2Z"/>
+   </item>
+   <item row="5" column="0" colspan="4">
     <widget class="QLabel" name="pickLabel">
      <property name="font">
       <font>
@@ -127,27 +161,6 @@ Use 'X'/'Y'/'Z' to constrain the movement to the X / Y / Z axis respectively.</s
       <bool>true</bool>
      </property>
     </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="pqDoubleLineEdit" name="centerX"/>
-   </item>
-   <item row="2" column="3">
-    <layout class="QHBoxLayout" name="toolbarLayout">
-     <item>
-      <widget class="QToolButton" name="repositionToView">
-       <property name="toolTip">
-        <string>Reposition protractor to view</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/pqWidgets/Icons/pqResetCameraData.svg</normaloff>:/pqWidgets/Icons/pqResetCameraData.svg</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>
