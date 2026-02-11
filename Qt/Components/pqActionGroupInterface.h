@@ -27,9 +27,9 @@ public:
   virtual QString groupName() = 0;
 
   /**
-   * the instance of the QActionGroup that defines the actions
+   * Create a new instance of the QActionGroup that defines the actions
    */
-  virtual QActionGroup* actionGroup() = 0;
+  virtual QActionGroup* actionGroup(QObject* parentWdg) = 0;
 };
 
 Q_DECLARE_INTERFACE(pqActionGroupInterface, "com.kitware/paraview/actiongroup")
