@@ -4811,5 +4811,91 @@ Every Nth Point.
     </SourceProxy>
     <!-- End vtkPVTableToStructuredGrid -->
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageBinaryThreshold"
+                 name="ImageBinaryThreshold">
+      <Documentation>
+        Image thresholding algorithm that allows to replace pixel data by comparing them with 2 thresholds.
+        Any input values between the 2 thresholds will be replaced by the "In Value" property. Likewise,
+        any values outside will be replaced by the "Out Value" property.
+        To control the output of the filter, "Replace In" and "Replace Out" can be set to specify whether to
+        use "In Value" and "Out Value" respectively to replace the input value.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetLowerThreshold"
+                            default_values="0.0"
+                            name="LowerThreshold"
+                            number_of_elements="1">
+        <Documentation>Set the value of the lower threshold.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetUpperThreshold"
+                            default_values="0.0"
+                            name="UpperThreshold"
+                            number_of_elements="1">
+        <Documentation>Set the value of the upper threshold.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetReplaceIn"
+                         default_values="0"
+                         name="ReplaceIn"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether or not the filter has to replace the values that
+          are inside the lower and upper threshold bounds</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetInValue"
+                            default_values="0.0"
+                            name="InValue"
+                            number_of_elements="1">
+        <Documentation>Set the value that will replace data inside the lower and upper threshold bounds.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="ReplaceIn"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetReplaceOut"
+                         default_values="0"
+                         name="ReplaceOut"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether or not the filter has to replace the values that
+          are outside the lower and upper threshold bounds</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOutValue"
+                            default_values="0.0"
+                            name="OutValue"
+                            number_of_elements="1">
+        <Documentation>Set the value that will replace data outside the lower and upper threshold bounds.</Documentation>
+        <Hints>
+        <PropertyWidgetDecorator type="GenericDecorator"
+                                 mode="enabled_state"
+                                 property="ReplaceOut"
+                                 value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="In range">
+        <Property name="ReplaceIn" />
+        <Property name="InValue" />
+      </PropertyGroup>
+      <PropertyGroup label="Out range">
+        <Property name="ReplaceOut" />
+        <Property name="OutValue" />
+      </PropertyGroup>
+    </SourceProxy>
+    <!-- End vtkImageThreshold -->
+
   </ProxyGroup>
 </ServerManagerConfiguration>
