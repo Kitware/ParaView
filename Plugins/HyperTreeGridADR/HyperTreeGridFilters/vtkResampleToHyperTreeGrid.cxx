@@ -146,6 +146,10 @@ int vtkResampleToHyperTreeGrid::RequestData(
   this->UpdateProgress(0.0);
 
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0]);
+  if (vtkDataSet* ds = vtkDataSet::SafeDownCast(inputDO))
+  {
+    ds->GetBounds(this->Bounds);
+  }
 
   assert(this->Controller != nullptr);
   int numberOfProcesses = this->Controller->GetNumberOfProcesses();
@@ -160,7 +164,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
     : vtkSmartPointer<vtkDataObject>(inputDO);
 
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
-  if (vtkDataSet* ds = vtkDataSet::SafeDownCast(inputDO))
+  if (vtkDataSet* ds = vtkDataSet::SafeDownCast(redistributedInputDO))
   {
     vtkHyperTreeGrid* output = vtkHyperTreeGrid::SafeDownCast(outputDO);
     if (!output)
@@ -197,7 +201,6 @@ bool vtkResampleToHyperTreeGrid::BuildHtgFromDataSet(
     this->Dimensions[2] < 1 ? 1 : this->Dimensions[2] };
 
   // Setting the point locations for the hyper tree grid
-  dataSet->GetBounds(this->Bounds);
   {
     vtkNew<vtkDoubleArray> coords;
     coords->SetNumberOfValues(dims[0]);
