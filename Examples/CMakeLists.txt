@@ -102,6 +102,7 @@ add_example(Plugins/Representation)
 # TODO: update this plugin to use the pipeline controller instead.
 #add_example(Plugins/RepresentationBehavior)
 add_example(Plugins/SMParametricSource)
+add_example(Plugins/MultiOutputPortReader)
 add_example(Plugins/SMMyProxy)
 add_example(Plugins/ServerSideQt)
 add_example(Plugins/SourceToolbar)
