@@ -20,8 +20,8 @@ plugin_path = r"$<TARGET_FILE:MultiOutputPortReader>"
 print(f"Loading plugin from: {plugin_path}")
 LoadPlugin(plugin_path, remote=False, ns=globals())
 
-# Find data directory (configured by CMake)
-data_dir = Path(r"@DATA_DIR@")
+# Find data directory (set via PARAVIEW_DATA_ROOT environment variable)
+data_dir = Path(os.environ["PARAVIEW_DATA_ROOT"])
 
 # Collect test data files
 files = sorted([

@@ -2,7 +2,7 @@
 #define vtkMultiOutputPortReader_h
 
 #include "MultiOutputPortReaderCoreModule.h" // For export macro
-#include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPolyDataAlgorithm.h"
 
 #include <string>
 
@@ -22,30 +22,21 @@
  * the number of output ports from the internal reader and configures itself
  * to match, enabling file series support for multi-output-port readers.
  */
-class MULTIOUTPUTPORTREADERCORE_EXPORT vtkMultiOutputPortReader
-  : public vtkMultiBlockDataSetAlgorithm
+class MULTIOUTPUTPORTREADERCORE_EXPORT vtkMultiOutputPortReader : public vtkPolyDataAlgorithm
 {
 public:
   static vtkMultiOutputPortReader* New();
-  vtkTypeMacro(vtkMultiOutputPortReader, vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkMultiOutputPortReader, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  ///@{
   /**
    * Specify the file name.
    */
-  vtkSetStringMacro(FileName);
-  vtkGetStringMacro(FileName);
-  ///@}
-
-  /**
-   * Test whether the file can be read.
-   */
-  int CanReadFile(const char* filename);
+  void SetFileName(const std::string& fname);
 
 protected:
   vtkMultiOutputPortReader();
-  ~vtkMultiOutputPortReader() override;
+  ~vtkMultiOutputPortReader() override = default;
 
   int FillOutputPortInformation(int port, vtkInformation* info) override;
   int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
@@ -55,16 +46,11 @@ private:
   vtkMultiOutputPortReader(const vtkMultiOutputPortReader&) = delete;
   void operator=(const vtkMultiOutputPortReader&) = delete;
 
-  char* FileName;
-
-  // Read the time value from file
   bool ReadTimeValue(const char* filename, double& time);
-
-  // Generate the square mesh for port 0
   vtkSmartPointer<vtkDataObject> GenerateSquareMesh(double time);
-
-  // Generate the circle mesh for port 1
   vtkSmartPointer<vtkDataObject> GenerateCircleMesh(double time);
+
+  std::string FileName;
 };
 
 #endif

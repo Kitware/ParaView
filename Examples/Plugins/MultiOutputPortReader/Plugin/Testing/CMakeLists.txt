@@ -1,19 +1,14 @@
-if (PARAVIEW_USE_PYTHON AND TARGET ParaView::pvpython)
-  # Configure the test script - first substitute CMake variables, then generator expressions
-  set(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data")
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/TestMultiOutputPortReader.py.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/TestMultiOutputPortReader.py.configured"
-    @ONLY)
-
+if (PARAVIEW_USE_PYTHON)
   file(GENERATE
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/TestMultiOutputPortReader.py"
-    INPUT "${CMAKE_CURRENT_BINARY_DIR}/TestMultiOutputPortReader.py.configured")
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/TestMultiOutputPortReader.py
+    INPUT ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiOutputPortReader.py.in)
 
   set(_vtk_build_TEST_FILE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  set(_vtk_build_TEST_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
   paraview_add_test_python(
     NO_RT DIRECT_DATA
     TestMultiOutputPortReader.py)
+
+  set_tests_properties(Python-TestMultiOutputPortReader
+    PROPERTIES ENVIRONMENT "PARAVIEW_DATA_ROOT=${CMAKE_CURRENT_SOURCE_DIR}/Data")
 endif()

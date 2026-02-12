@@ -4,7 +4,6 @@
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
@@ -14,36 +13,38 @@
 
 #include <cmath>
 #include <fstream>
-#include <sstream>
 
 vtkStandardNewMacro(vtkMultiOutputPortReader);
 
 namespace
 {
-const int SQUARE_RESOLUTION = 20; // 20x20 grid
-const int CIRCLE_RESOLUTION = 30; // 30 radial x 60 angular points
-const double PI = 3.14159265358979323846;
+constexpr int SQUARE_RESOLUTION = 20; // 20x20 grid
+constexpr int CIRCLE_RESOLUTION = 30; // 30 radial x 60 angular points
+constexpr double PI = 3.14159265358979323846;
 }
 
 //------------------------------------------------------------------------------
 vtkMultiOutputPortReader::vtkMultiOutputPortReader()
 {
-  this->FileName = nullptr;
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(2);
 }
 
 //------------------------------------------------------------------------------
-vtkMultiOutputPortReader::~vtkMultiOutputPortReader()
+void vtkMultiOutputPortReader::SetFileName(const std::string& fname)
 {
-  this->SetFileName(nullptr);
+  if (this->FileName != fname)
+  {
+    this->FileName = fname;
+    this->Modified();
+  }
 }
 
 //------------------------------------------------------------------------------
 void vtkMultiOutputPortReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << (this->FileName ? this->FileName : "(none)") << "\n";
+  os << indent << "FileName: " << this->FileName << "\n";
 }
 
 //------------------------------------------------------------------------------
@@ -51,27 +52,6 @@ int vtkMultiOutputPortReader::FillOutputPortInformation(int port, vtkInformation
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
   return 1;
-}
-
-//------------------------------------------------------------------------------
-int vtkMultiOutputPortReader::CanReadFile(const char* filename)
-{
-  if (!filename || !filename[0])
-  {
-    return 0;
-  }
-
-  // Check extension
-  std::string fname(filename);
-  const std::string ext = ".mopr";
-  if (fname.size() < ext.size() || fname.substr(fname.size() - ext.size()) != ext)
-  {
-    return 0;
-  }
-
-  // Try to read the time value
-  double time;
-  return this->ReadTimeValue(filename, time) ? 1 : 0;
 }
 
 //------------------------------------------------------------------------------
@@ -91,14 +71,14 @@ bool vtkMultiOutputPortReader::ReadTimeValue(const char* filename, double& time)
 int vtkMultiOutputPortReader::RequestInformation(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  if (!this->FileName)
+  if (this->FileName.empty())
   {
     vtkErrorMacro("No filename specified");
     return 0;
   }
 
   double time;
-  if (!this->ReadTimeValue(this->FileName, time))
+  if (!this->ReadTimeValue(this->FileName.c_str(), time))
   {
     vtkErrorMacro("Failed to read time from file: " << this->FileName);
     return 0;
@@ -120,14 +100,14 @@ int vtkMultiOutputPortReader::RequestInformation(
 int vtkMultiOutputPortReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  if (!this->FileName)
+  if (this->FileName.empty())
   {
     vtkErrorMacro("No filename specified");
     return 0;
   }
 
   double time;
-  if (!this->ReadTimeValue(this->FileName, time))
+  if (!this->ReadTimeValue(this->FileName.c_str(), time))
   {
     vtkErrorMacro("Failed to read time from file: " << this->FileName);
     return 0;
