@@ -1044,6 +1044,11 @@ list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
   YieldCriteria.xml
 )
 
+list (APPEND TEST_WITH_BASELINES_CLIENT_ONLY
+  # Does not work in client/server when there is more than 1 node.
+  # https://gitlab.kitware.com/vtk/vtk/-/issues/19951
+  ImageBinaryThresholdFilter.xml)
+
 list (APPEND TESTS_WITHOUT_BASELINES
   AbortExit.xml
   AboutDialog.xml
