@@ -681,7 +681,8 @@ void pqPropertiesPanel::updateButtonState()
       ui.Accept->setEnabled(true);
       ui.PropertiesSaveAsDefaults->setEnabled(true);
     }
-    else if (proxy->modifiedState() == pqProxy::MODIFIED)
+    else if (proxy->modifiedState() == pqProxy::MODIFIED ||
+      proxy->modifiedState() == pqProxy::ABORTED)
     {
       vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), previous_apply_state == false,
         "`Apply` button enabled since `%s` became modified.",
