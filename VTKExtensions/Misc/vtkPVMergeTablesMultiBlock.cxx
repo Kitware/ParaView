@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkPVMergeTablesMultiBlock.h"
 
 #include "vtkCompositeDataIterator.h"
