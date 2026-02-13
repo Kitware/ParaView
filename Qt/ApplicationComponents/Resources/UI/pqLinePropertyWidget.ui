@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>215</height>
+    <width>540</width>
+    <height>266</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,33 +31,7 @@
    <property name="spacing">
     <number>2</number>
    </property>
-   <item row="5" column="0">
-    <widget class="QLabel" name="labelPoint2">
-     <property name="text">
-      <string>Point 2</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="pqDoubleLineEdit" name="point2Y"/>
-   </item>
-   <item row="4" column="2">
-    <widget class="pqDoubleLineEdit" name="point1Y"/>
-   </item>
-   <item row="4" column="3">
-    <widget class="pqDoubleLineEdit" name="point1Z"/>
-   </item>
-   <item row="10" column="0" colspan="4">
-    <widget class="QPushButton" name="centerOnBounds">
-     <property name="text">
-      <string>Center on Bounds</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="4">
+   <item row="0" column="0" colspan="4">
     <widget class="QLabel" name="labelLength">
      <property name="font">
       <font>
@@ -70,10 +44,142 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="3">
+   <item row="1" column="0" colspan="4">
+    <layout class="QHBoxLayout" name="toolbarLineHorizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="show3DWidget">
+       <property name="text">
+        <string>Show Line</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QWidget" name="toolButtonsWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QHBoxLayout" name="toolButtonsHorizontalLayout">
+        <item>
+         <widget class="QToolButton" name="xAxis">
+          <property name="toolTip">
+           <string>Project on X Axis</string>
+          </property>
+          <property name="text">
+           <string>X</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="yAxis">
+          <property name="toolTip">
+           <string>Project on Y Axis</string>
+          </property>
+          <property name="text">
+           <string>Y</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="zAxis">
+          <property name="toolTip">
+           <string>Project on Z Axis</string>
+          </property>
+          <property name="text">
+           <string>Z</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="flipP2">
+          <property name="toolTip">
+           <string>Flip vector head</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/pqWidgets/Icons/pqSwapVector.svg</normaloff>:/pqWidgets/Icons/pqSwapVector.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="repositionToView">
+          <property name="toolTip">
+           <string>Reposition ruler to view</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/pqWidgets/Icons/pqResetCameraData.svg</normaloff>:/pqWidgets/Icons/pqResetCameraData.svg</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelPoint1">
+     <property name="text">
+      <string>Point 1</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="pqDoubleLineEdit" name="point1X"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="pqDoubleLineEdit" name="point1Y"/>
+   </item>
+   <item row="2" column="3">
+    <widget class="pqDoubleLineEdit" name="point1Z"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelPoint2">
+     <property name="text">
+      <string>Point 2</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="pqDoubleLineEdit" name="point2X"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="pqDoubleLineEdit" name="point2Y"/>
+   </item>
+   <item row="3" column="3">
     <widget class="pqDoubleLineEdit" name="point2Z"/>
    </item>
-   <item row="8" column="0" colspan="4">
+   <item row="4" column="0" colspan="4">
     <widget class="QLabel" name="pickLabel">
      <property name="font">
       <font>
@@ -95,93 +201,12 @@ Use 'X'/'Y'/'Z'/'L' to constrain the movement to the X / Y / Z / Line axis respe
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="pqDoubleLineEdit" name="point2X"/>
-   </item>
-   <item row="4" column="1">
-    <widget class="pqDoubleLineEdit" name="point1X"/>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="labelPoint1">
+   <item row="5" column="0" colspan="4">
+    <widget class="QPushButton" name="centerOnBounds">
      <property name="text">
-      <string>Point 1</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
+      <string>Center on Bounds</string>
      </property>
     </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QCheckBox" name="show3DWidget">
-     <property name="text">
-      <string>Show Line</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QToolButton" name="xAxis">
-       <property name="toolTip">
-        <string>Project on X Axis</string>
-       </property>
-       <property name="text">
-        <string>X</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="yAxis">
-       <property name="toolTip">
-        <string>Project on Y Axis</string>
-       </property>
-       <property name="text">
-        <string>Y</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="zAxis">
-       <property name="toolTip">
-        <string>Project on Z Axis</string>
-       </property>
-       <property name="text">
-        <string>Z</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="repositionToView">
-       <property name="toolTip">
-        <string>Reposition ruler to view</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/pqWidgets/Icons/pqResetCameraData.svg</normaloff>:/pqWidgets/Icons/pqResetCameraData.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="flipP2">
-       <property name="toolTip">
-        <string>Flip vector head</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/pqWidgets/Icons/pqSwapVector.svg</normaloff>:/pqWidgets/Icons/pqSwapVector.svg</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>

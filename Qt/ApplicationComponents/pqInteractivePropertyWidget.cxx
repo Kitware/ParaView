@@ -11,6 +11,7 @@
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -105,28 +106,23 @@ std::vector<vtkVector3d> pqInteractivePropertyWidget::displayToWorldCoordinates(
 //-----------------------------------------------------------------------------
 double pqInteractivePropertyWidget::getFocalPointDepth()
 {
-  vtkSMRenderViewProxy* renderViewProxy = this->getActiveRenderViewProxy();
   vtkRenderer* renderer = this->getRenderer();
-  if (!renderViewProxy || !renderer)
+  if (!renderer)
   {
     return -1.0;
   }
 
   // Recover focal point in display coordinates to get the Z coordinate for the new depth position
   // of the ruler.
-  double cameraFocalPointWorldCoord[3] = { 0.0, 0.0, 0.0 };
-  vtkSMPropertyHelper(renderViewProxy, "CameraFocalPoint").Get(cameraFocalPointWorldCoord, 3);
-  double cameraFocalPointDisplayCoord[3] = { 0.0, 0.0, 0.0 };
-  renderer->SetWorldPoint(cameraFocalPointWorldCoord[0], cameraFocalPointWorldCoord[1],
-    cameraFocalPointWorldCoord[2], 1.0);
-  renderer->WorldToDisplay(cameraFocalPointDisplayCoord[0], cameraFocalPointDisplayCoord[1],
-    cameraFocalPointDisplayCoord[2]);
-
-  return cameraFocalPointDisplayCoord[2];
+  double cameraFocalPointWorldCoord[4] = { 0.0, 0.0, 0.0, 0.0 };
+  renderer->GetActiveCamera()->GetFocalPoint(cameraFocalPointWorldCoord);
+  renderer->WorldToDisplay(
+    cameraFocalPointWorldCoord[0], cameraFocalPointWorldCoord[1], cameraFocalPointWorldCoord[2]);
+  return cameraFocalPointWorldCoord[2];
 }
 
 //-----------------------------------------------------------------------------
-vtkSMRenderViewProxy* pqInteractivePropertyWidget::getActiveRenderViewProxy()
+vtkRenderer* pqInteractivePropertyWidget::getRenderer()
 {
   pqRenderView* activeView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
   if (!activeView)
@@ -134,13 +130,8 @@ vtkSMRenderViewProxy* pqInteractivePropertyWidget::getActiveRenderViewProxy()
     return nullptr;
   }
 
-  return vtkSMRenderViewProxy::SafeDownCast(activeView->getProxy());
-}
-
-//-----------------------------------------------------------------------------
-vtkRenderer* pqInteractivePropertyWidget::getRenderer()
-{
-  vtkSMRenderViewProxy* renderViewProxy = this->getActiveRenderViewProxy();
+  vtkSMRenderViewProxy* renderViewProxy =
+    vtkSMRenderViewProxy::SafeDownCast(activeView->getProxy());
   if (!renderViewProxy)
   {
     return nullptr;
