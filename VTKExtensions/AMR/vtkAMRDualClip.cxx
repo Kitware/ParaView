@@ -1159,25 +1159,6 @@ vtkMultiBlockDataSet* vtkAMRDualClip::DoRequestData(
 }
 
 //----------------------------------------------------------------------------
-// The only data specific stuff we need to do for the contour.
-//----------------------------------------------------------------------------
-namespace
-{
-template <class T>
-void vtkDualGridContourCastCornerValues(T* ptr, vtkIdType offsets[8], double values[8])
-{
-  values[0] = (double)(ptr[offsets[0]]);
-  values[1] = (double)(ptr[offsets[1]]);
-  values[2] = (double)(ptr[offsets[2]]);
-  values[3] = (double)(ptr[offsets[3]]);
-  values[4] = (double)(ptr[offsets[4]]);
-  values[5] = (double)(ptr[offsets[5]]);
-  values[6] = (double)(ptr[offsets[6]]);
-  values[7] = (double)(ptr[offsets[7]]);
-}
-}
-
-//----------------------------------------------------------------------------
 void vtkAMRDualClip::ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block)
 {
   vtkAMRDualGridHelperBlock* neighbor;
@@ -1538,15 +1519,10 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
     return;
   }
 
-  void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
-  int dataType = volumeFractionArray->GetDataType();
   double cornerValues[8];
-  switch (dataType)
+  for (int i = 0; i < 8; ++i)
   {
-    vtkTemplateMacro(vtkDualGridContourCastCornerValues(
-      (VTK_TT*)(volumeFractionPtr), cornerOffsets, cornerValues));
-    default:
-      vtkGenericWarningMacro("Execute: Unknown ScalarType");
+    cornerValues[i] = volumeFractionArray->GetComponent(cornerOffsets[i], 0);
   }
   // compute the case index
   int cubeIndex = 0;
