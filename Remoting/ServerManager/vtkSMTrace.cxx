@@ -11,10 +11,8 @@
 #include "vtkSMTrace.h"
 
 #include "vtkCommand.h"
-#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMCoreUtilities.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -23,7 +21,6 @@
 #include "vtkSMSessionProxyManager.h"
 
 #include <cassert>
-#include <map>
 #include <sstream>
 
 #if !(VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                   \
