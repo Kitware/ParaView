@@ -21,16 +21,6 @@
 #include <vector>
 
 //----------------------------------------------------------------------------
-// Portability of typename keyword.
-#if defined(__sgi) && !defined(_COMPILER_VERSION) && !defined(__GNUC__)
-#define VTK_CSS_TYPENAME
-#elif defined(_MSC_VER) && (_MSC_VER < 1310)
-#define VTK_CSS_TYPENAME
-#else
-#define VTK_CSS_TYPENAME typename
-#endif
-
-//----------------------------------------------------------------------------
 // Macro to dispatch templated functions based on type in a switch.
 #define VTK_CSS_TEMPLATE_MACRO(kind, call)                                                         \
   case int8_##kind:                                                                                \
@@ -560,7 +550,7 @@ template <class T>
 vtkClientServerStream& vtkClientServerStreamOperatorSL(vtkClientServerStream* self, T x)
 {
   // Store the type first, then the value.
-  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
+  typedef typename vtkTypeTraits<T>::SizedType Type;
   *self << vtkClientServerTypeTraits<Type>::Value();
   return vtkClientServerStreamInternals::Write(*self, &x, sizeof(x));
 }
@@ -624,7 +614,7 @@ template <class T>
 vtkClientServerStream::Array vtkClientServerStreamInsertArray(const T* data, int length)
 {
   // Construct and return the array information structure.
-  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
+  typedef typename vtkTypeTraits<T>::SizedType Type;
   vtkClientServerStream::Array a = { vtkClientServerTypeTraits<Type>::Array(),
     static_cast<vtkTypeUInt32>(length), static_cast<vtkTypeUInt32>(sizeof(Type) * length), data };
   return a;
@@ -979,7 +969,7 @@ template <class T>
 int vtkClientServerStreamGetArgumentValue(
   const vtkClientServerStream* self, int midx, int argument, T* value, long)
 {
-  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
+  typedef typename vtkTypeTraits<T>::SizedType Type;
   if (const unsigned char* data =
         vtkClientServerStreamInternals::GetValue(*self, midx, 1 + argument))
   {
@@ -1071,7 +1061,7 @@ template <class T>
 int vtkClientServerStreamGetArgumentArray(
   const vtkClientServerStream* self, int midx, int argument, T* value, vtkTypeUInt32 length)
 {
-  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
+  typedef typename vtkTypeTraits<T>::SizedType Type;
   if (const unsigned char* data =
         vtkClientServerStreamInternals::GetValue(*self, midx, 1 + argument))
   {
@@ -2225,7 +2215,7 @@ template <class T>
 void vtkClientServerStreamValueToString(
   const vtkClientServerStream* self, ostream& os, int m, int a, T*)
 {
-  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::PrintType PrintType;
+  typedef typename vtkTypeTraits<T>::PrintType PrintType;
   T arg = T();
   self->GetArgument(m, a, &arg);
   os << static_cast<PrintType>(arg);
@@ -2237,7 +2227,7 @@ template <class T>
 void vtkClientServerStreamArrayToString(
   const vtkClientServerStream* self, ostream& os, int m, int a, T*)
 {
-  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::PrintType PrintType;
+  typedef typename vtkTypeTraits<T>::PrintType PrintType;
   vtkTypeUInt32 length;
   T arglocal[6];
   T* arg = arglocal;
