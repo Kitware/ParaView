@@ -704,13 +704,14 @@ vtkDataArray* AdiosStream::ReadDataArray(
       return nullptr;
       break;
   }
+  assert(array->HasStandardMemoryLayout() && "Array must have standard memory layout");
 
   // Init array meta-data
   array->SetName(var.GetName());
   array->SetNumberOfComponents(1);
   array->SetNumberOfTuples(resultSize);
 
-  // Schedule the read...
+  // Schedule the read...  NOLINTNEXTLINE(bugprone-unsafe-functions)
   adios_schedule_read_byid(this->File, selection, var.GetId(), 0, 1, array->GetVoidPointer(0));
 
   // Return the array (which is not properly filled)
