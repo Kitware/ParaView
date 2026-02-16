@@ -74,6 +74,7 @@ public:
   // to verify that the memory has been allocated etc.
   double* GetPointer(vtkIdType id);
   void* GetVoidPointer(vtkIdType id) override { return this->GetPointer(id); }
+  PARAVIEW_DEPRECATED_IN_6_2_0("Use DeepCopy with an vtkAOSDataArrayTemplate array")
   void ExportToVoidPointer(void* out_ptr) override;
 
   int Allocate(vtkIdType sz, vtkIdType ext = 1000) override
