@@ -15,8 +15,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     -Woverloaded-virtual
     -Wshadow
     -Wunused-parameter
-    -fno-check-new
-    -Werror=undef)
+    -fno-check-new)
 
   # This flag is useful as not returning from a non-void function is an error
   # with MSVC, but it is not supported on all GCC compiler versions
