@@ -563,12 +563,11 @@ void vtkCTHSource::AddNeighborArray(Block& b)
 //---------------------------------------------------------------------------
 void vtkCTHSource::AddAMRLevelArray(Block& b, int dx, int dy, int dz)
 {
-  vtkUnsignedCharArray* amrLevel = vtkUnsignedCharArray::New();
+  vtkNew<vtkUnsignedCharArray> amrLevel;
   amrLevel->SetNumberOfTuples(dx * dy * dz);
   amrLevel->SetName("vtkAMRLevel");
-  memset(amrLevel->GetVoidPointer(0), b.level, sizeof(unsigned char) * dx * dy * dz);
+  amrLevel->FillValue(b.level);
   b.ug->GetCellData()->AddArray(amrLevel);
-  amrLevel->Delete();
 }
 
 //---------------------------------------------------------------------------
