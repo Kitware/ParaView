@@ -217,12 +217,12 @@ class Trace(object):
             if pname:
                 if obj == simple.GetActiveSource():
                     accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                    cls.Output.append_separated([ \
+                    cls.get_targeted_trace_output().append_separated([ \
                         "# get active source.",
                         "%s = GetActiveSource()" % accessor])
                 else:
                     accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                    cls.Output.append_separated([ \
+                    cls.get_targeted_trace_output().append_separated([ \
                         "# find source",
                         "%s = FindSource('%s')" % (accessor, pname)])
                 return True
@@ -239,7 +239,7 @@ class Trace(object):
                     ctor_args = "'%s', viewtype='%s'" % (pname, obj.GetXMLName())
                     trace.append("# find view")
                     trace.append("%s = FindViewOrCreate(%s)" % (accessor, ctor_args))
-                cls.Output.append_separated(trace.raw_data())
+                cls.get_targeted_trace_output().append_separated(trace.raw_data())
                 return True
         if not skip_rendering and obj.SMProxy.IsA("vtkSMRepresentationProxy"):
             # handle representations.
@@ -251,7 +251,7 @@ class Trace(object):
                 if pname:
                     varname = "%sDisplay" % inputAccsr
                     accessor = ProxyAccessor(cls.get_varname(varname), obj)
-                    cls.Output.append_separated([ \
+                    cls.get_targeted_trace_output().append_separated([ \
                         "# get display properties",
                         "%s = GetRepresentation(%s, view=%s)" % \
                         (accessor, inputAccsr, viewAccessor)])
@@ -282,7 +282,7 @@ class Trace(object):
                 "GetScalarBar",
                 SupplementalProxy(ScalarBarProxyFilter()),
                 ctor_args="%s, %s" % (lutAccessor, viewAccessor)))
-            cls.Output.append_separated(trace.raw_data())
+            cls.get_targeted_trace_output().append_separated(trace.raw_data())
             return True
         if not skip_rendering and cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
@@ -290,7 +290,7 @@ class Trace(object):
             sourceAccessor = cls.get_accessor(obj.Source)
             varname = cls.get_varname("%sRepresentationAnimationHelper" % (sourceAccessor))
             accessor = ProxyAccessor(varname, obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 " # get animation representation helper for '%s'" % (sourceAccessor),
                 "%s = GetRepresentationAnimationHelper(%s)" % (accessor, sourceAccessor)])
             return True
@@ -300,27 +300,27 @@ class Trace(object):
                 viewAccessor = cls.get_accessor(view)
                 varname = cls.get_varname(cls.get_registered_name(obj, "layouts"))
                 accessor = ProxyAccessor(varname, obj)
-                cls.Output.append_separated([ \
+                cls.get_targeted_trace_output().append_separated([ \
                     "# get layout",
                     "%s = GetLayout()" % accessor])
                 return True
             else:
                 varname = cls.get_varname(cls.get_registered_name(obj, "layouts"))
                 accessor = ProxyAccessor(varname, obj)
-                cls.Output.append_separated([ \
+                cls.get_targeted_trace_output().append_separated([ \
                     "# get layout",
                     "%s = GetLayoutByName(\"%s\")" % (accessor, cls.get_registered_name(obj, "layouts"))])
                 return True
         if obj.SMProxy.IsA("vtkSMTimeKeeperProxy"):
             tkAccessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "timekeeper")), obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 "# get the time-keeper",
                 "%s = GetTimeKeeper()" % tkAccessor])
             return True
         if obj.SMProxy.IsA("vtkSMSettingsProxy"):
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("settings", obj.SMProxy)
             accessor = ProxyAccessor(cls.get_varname(pname), obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 "# find settings proxy",
                 "%s = GetSettingsProxy('%s')" % (accessor, pname)])
             return True
@@ -330,19 +330,19 @@ class Trace(object):
                 index = view.AdditionalLights.index(obj)
                 viewAccessor = cls.get_accessor(view)
                 accessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "additional_lights")), obj)
-                cls.Output.append_separated([ \
+                cls.get_targeted_trace_output().append_separated([ \
                     "# get light",
                     "%s = GetLight(%s, %s)" % (accessor, index, viewAccessor)])
             else:
                 # create a new light, should be handled by RegisterLightProxy
                 accessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "additional_lights")), obj)
-                cls.Output.append_separated([ \
+                cls.get_targeted_trace_output().append_separated([ \
                     "# create a new light",
                     "%s = CreateLight()" % (accessor)])
             return True
         if not skip_rendering and obj.SMProxy.IsA("vtkSMMaterialLibraryProxy"):
             tkAccessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "materiallibrary")), obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 "# get the material library",
                 "%s = GetMaterialLibrary()" % tkAccessor])
             return True
@@ -354,19 +354,19 @@ class Trace(object):
                 if mode == 'ReadFromFile':
                     filename = obj.FileName
                     # repr() will escape the path correctly, especially backslash on Windows.
-                    cls.Output.append_separated([ \
+                    cls.get_targeted_trace_output().append_separated([ \
                             "# a texture",
                             "%s = FindTextureOrCreate(registrationName=%s, filename=%s)" % (accessor, repr(pname), repr(filename))])
                 else:
                     tp_key = obj.TrivialProducerKey
-                    cls.Output.append_separated([ \
+                    cls.get_targeted_trace_output().append_separated([ \
                             "# a texture",
                             "%s = FindTextureOrCreate(registrationName=%s, filename=None, trivial_producer_key=%s)" % (accessor, repr(pname), repr(tp_key))])
             return True
         if cls.get_registered_name(obj, "extractors"):
             regName = cls.get_registered_name(obj, "extractors")
             accessor = ProxyAccessor(cls.get_varname(regName), obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 "# get extractor",
                 "%s = FindExtractor('%s')" % (accessor, regName)])
         return False
@@ -446,14 +446,14 @@ class Trace(object):
 
             varname = cls.get_varname("%s%s" % (varname, varsuffix))
             accessor = ProxyAccessor(varname, proxy)
-            # cls.Output.append_separated([\
+            # cls.get_targeted_trace_output().append_separated([\
             #    "# get %s for '%s'" % (comment, arrayName),
             #    "%s = %s('%s')" % (accessor, method, arrayName)])
             trace = TraceOutput()
             trace.append("# get %s for '%s'" % (comment, arrayName))
             trace.append(accessor.trace_ctor( \
                 method, SupplementalProxy(TransferFunctionProxyFilter()), ctor_args=args))
-            cls.Output.append_separated(trace.raw_data())
+            cls.get_targeted_trace_output().append_separated(trace.raw_data())
             return True
         return False
 
@@ -462,13 +462,13 @@ class Trace(object):
         pname = cls.get_registered_name(obj, "animation")
         if obj == simple.GetAnimationScene():
             sceneAccessor = ProxyAccessor(cls.get_varname(pname), obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 "# get animation scene",
                 "%s = GetAnimationScene()" % sceneAccessor])
             return True
         if obj == simple.GetTimeTrack():
             accessor = ProxyAccessor(cls.get_varname(pname), obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 "# get time animation track",
                 "%s = GetTimeTrack()" % accessor])
             return True
@@ -477,7 +477,7 @@ class Trace(object):
             view = obj.AnimatedProxy
             viewAccessor = cls.get_accessor(view)
             accessor = ProxyAccessor(cls.get_varname(pname), obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 "# get camera animation track for the view",
                 "%s = GetCameraTrack(view=%s)" % (accessor, viewAccessor)])
             return True
@@ -487,7 +487,7 @@ class Trace(object):
             animatedPropertyName = obj.AnimatedPropertyName
             varname = cls.get_varname("%s%sTrack" % (animatedProxyAccessor, animatedPropertyName))
             accessor = ProxyAccessor(varname, obj)
-            cls.Output.append_separated([ \
+            cls.get_targeted_trace_output().append_separated([ \
                 "# get animation track",
                 "%s = GetAnimationTrack('%s', index=%d, proxy=%s)" % \
                 (accessor, animatedPropertyName, animatedElement, animatedProxyAccessor)])
@@ -497,8 +497,8 @@ class Trace(object):
         if obj.GetXMLGroup() == "animation_keyframes":
             accessor = ProxyAccessor(cls.get_varname(pname), obj)
             ctor = sm._make_name_valid(obj.GetXMLLabel())
-            cls.Output.append_separated("# create a new key frame")
-            cls.Output.append(accessor.trace_ctor(ctor, ProxyFilter()))
+            cls.get_targeted_trace_output().append_separated("# create a new key frame")
+            cls.get_targeted_trace_output().append(accessor.trace_ctor(ctor, ProxyFilter()))
             return True
         return False
 
@@ -1355,7 +1355,7 @@ class RegisterPipelineProxy(TraceItem):
             filter_type = PipelineProxyFilter()
         ctor_args = "registrationName='%s'" % pname
         trace.append(accessor.trace_ctor(ctor, filter_type, ctor_args=ctor_args))
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
 
@@ -1378,7 +1378,7 @@ class RegisterSelectionProxy(TraceItem):
         filter_type = ProxyFilter(trace_all_in_ctor=True)
         ctor_args = "proxyname='%s', registrationname='%s', groupname='%s'" % (xmlname, pname, groupname)
         trace.append(accessor.trace_ctor("CreateSelection", filter_type, ctor_args=ctor_args))
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
 
@@ -1389,7 +1389,7 @@ class Delete(TraceItem):
         TraceItem.__init__(self)
         proxy = sm._getPyProxy(proxy)
         accessor = Trace.get_accessor(proxy)
-        Trace.Output.append_separated([ \
+        Trace.get_targeted_trace_output().append_separated([ \
             "# destroy %s" % (accessor),
             "Delete(%s)" % (accessor),
             "del %s" % accessor])
@@ -1438,7 +1438,7 @@ class PropertiesModified(NestableTraceItem):
         props = self.ProxyAccessor.get_properties()
         props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
         if props_to_trace:
-            Trace.Output.append_separated([
+            Trace.get_targeted_trace_output().append_separated([
                 self.Comment,
                 self.ProxyAccessor.trace_properties(props_to_trace, in_ctor=False)])
 
@@ -1467,7 +1467,7 @@ class PropertiesModified(NestableTraceItem):
                 props = valaccessor.get_properties()
                 props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
                 if props_to_trace:
-                    Trace.Output.append_separated([
+                    Trace.get_targeted_trace_output().append_separated([
                         "# Properties modified on %s" % valaccessor,
                         valaccessor.trace_properties(props_to_trace, in_ctor=False)])
         TraceItem.finalize(self)
@@ -1491,7 +1491,7 @@ class ScalarBarInteraction(RenderingMixin, NestableTraceItem):
         afilter = ScalarBarProxyFilter()
         props_to_trace = [k for k in props_to_trace if not afilter.should_never_trace(k)]
         if props_to_trace:
-            Trace.Output.append_separated([
+            Trace.get_targeted_trace_output().append_separated([
                 self.Comment,
                 self.ProxyAccessor.trace_properties(props_to_trace, in_ctor=False)])
 
@@ -1536,7 +1536,7 @@ class Show(RenderingMixin, TraceItem):
             output.append("%s = Show(%s, %s, '%s')" % \
                           (str(accessor), str(self.ProducerAccessor), str(self.ViewAccessor), \
                            str(display.GetXMLName())))
-        Trace.Output.append_separated(output.raw_data())
+        Trace.get_targeted_trace_output().append_separated(output.raw_data())
 
         output = TraceOutput()
         if trace_ctor:
@@ -1545,7 +1545,7 @@ class Show(RenderingMixin, TraceItem):
             if ctor_trace:
                 output.append("# trace defaults for the display properties.")
                 output.append(ctor_trace)
-        Trace.Output.append_separated(output.raw_data())
+        Trace.get_targeted_trace_output().append_separated(output.raw_data())
         TraceItem.finalize(self)
 
 
@@ -1560,7 +1560,7 @@ class Hide(RenderingMixin, TraceItem):
         producerAccessor = Trace.get_accessor(producer)
         viewAccessor = Trace.get_accessor(view)
 
-        Trace.Output.append_separated([ \
+        Trace.get_targeted_trace_output().append_separated([ \
             "# hide data in view",
             "Hide(%s, %s)" % (str(producerAccessor), str(viewAccessor)) if port == 0 else \
                 "Hide(OutputPort(%s, %d), %s)" % (str(producerAccessor), port, str(viewAccessor))])
@@ -1585,14 +1585,14 @@ class SetScalarColoring(RenderingMixin, TraceItem):
         if self.ArrayName:
             if self.Component is None:
                 if self.Separate:
-                    Trace.Output.append_separated([ \
+                    Trace.get_targeted_trace_output().append_separated([ \
                         "# set scalar coloring using an separate color/opacity maps",
                         "ColorBy(%s, ('%s', '%s'), %s)" % ( \
                             str(Trace.get_accessor(self.Display)),
                             sm.GetAssociationAsString(self.AttributeType),
                             self.ArrayName, self.Separate)])
                 else:
-                    Trace.Output.append_separated([ \
+                    Trace.get_targeted_trace_output().append_separated([ \
                         "# set scalar coloring",
                         "ColorBy(%s, ('%s', '%s'))" % ( \
                             str(Trace.get_accessor(self.Display)),
@@ -1600,21 +1600,21 @@ class SetScalarColoring(RenderingMixin, TraceItem):
                             self.ArrayName)])
             else:
                 if self.Separate:
-                    Trace.Output.append_separated([ \
+                    Trace.get_targeted_trace_output().append_separated([ \
                         "# set scalar coloring using an separate color/opacity maps",
                         "ColorBy(%s, ('%s', '%s', '%s'), %s)" % ( \
                             str(Trace.get_accessor(self.Display)),
                             sm.GetAssociationAsString(self.AttributeType),
                             self.ArrayName, self.Component, self.Separate)])
                 else:
-                    Trace.Output.append_separated([ \
+                    Trace.get_targeted_trace_output().append_separated([ \
                         "# set scalar coloring",
                         "ColorBy(%s, ('%s', '%s', '%s'))" % ( \
                             str(Trace.get_accessor(self.Display)),
                             sm.GetAssociationAsString(self.AttributeType),
                             self.ArrayName, self.Component)])
         else:
-            Trace.Output.append_separated([ \
+            Trace.get_targeted_trace_output().append_separated([ \
                 "# turn off scalar coloring",
                 "ColorBy(%s, None)" % str(Trace.get_accessor(self.Display))])
 
@@ -1648,7 +1648,7 @@ class SetBlocksScalarColoring(RenderingMixin, TraceItem):
             if self.ArrayName:
                 if self.Component is None:
                     if self.Separate:
-                        Trace.Output.append_separated([ \
+                        Trace.get_targeted_trace_output().append_separated([ \
                             "# set blocks scalar coloring using an separate color/opacity maps",
                             "ColorBlocksBy(%s, %s, ('%s', '%s'), %s)" % ( \
                                 str(Trace.get_accessor(self.Display)),
@@ -1656,7 +1656,7 @@ class SetBlocksScalarColoring(RenderingMixin, TraceItem):
                                 sm.GetAssociationAsString(self.AttributeType),
                                 self.ArrayName, self.Separate)])
                     else:
-                        Trace.Output.append_separated([ \
+                        Trace.get_targeted_trace_output().append_separated([ \
                             "# set blocks scalar coloring",
                             "ColorBlocksBy(%s, %s, ('%s', '%s'))" % ( \
                                 str(Trace.get_accessor(self.Display)),
@@ -1665,7 +1665,7 @@ class SetBlocksScalarColoring(RenderingMixin, TraceItem):
                                 self.ArrayName)])
                 else:
                     if self.Separate:
-                        Trace.Output.append_separated([ \
+                        Trace.get_targeted_trace_output().append_separated([ \
                             "# set blocks scalar coloring using an separate color/opacity maps",
                             "ColorBlocksBy(%s, %s, ('%s', '%s', '%s'), %s)" % ( \
                                 str(Trace.get_accessor(self.Display)),
@@ -1673,7 +1673,7 @@ class SetBlocksScalarColoring(RenderingMixin, TraceItem):
                                 sm.GetAssociationAsString(self.AttributeType),
                                 self.ArrayName, self.Component, self.Separate)])
                     else:
-                        Trace.Output.append_separated([ \
+                        Trace.get_targeted_trace_output().append_separated([ \
                             "# set blocks scalar coloring",
                             "ColorBlocksBy(%s, %s, ('%s', '%s', '%s'))" % ( \
                                 str(Trace.get_accessor(self.Display)),
@@ -1681,7 +1681,7 @@ class SetBlocksScalarColoring(RenderingMixin, TraceItem):
                                 sm.GetAssociationAsString(self.AttributeType),
                                 self.ArrayName, self.Component)])
             else:
-                Trace.Output.append_separated([ \
+                Trace.get_targeted_trace_output().append_separated([ \
                     "# turn off blocks scalar coloring",
                     "ColorBlocksBy(%s, %s, None)" % (str(Trace.get_accessor(self.Display)), str(self.BlockSelectors))])
 
@@ -1727,7 +1727,7 @@ class RegisterViewProxy(RenderingMixin, TraceItem):
         #         lightsList.append(lightAccessor)
         #     trace.append("%s.AdditionalLights = [%s]" % (Trace.get_accessor(self.Proxy), ", ".join(lightsList)))
 
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
         # we assume views don't have proxy list domains for now, and ignore tracing them.
         TraceItem.finalize(self)
 
@@ -1754,7 +1754,7 @@ class RegisterLightProxy(RenderingMixin, TraceItem):
             trace.append(accessor.trace_ctor("AddLight", filter, ctor_args="view=%s" % viewAccessor))
         else:
             trace.append(accessor.trace_ctor("CreateLight", filter))
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
 
@@ -1782,7 +1782,7 @@ class RegisterTextureProxy(RenderingMixin, TraceItem):
         elif self.read_from_memory:
             ctor_str = f"filename=None, trivial_producer_key={self.trivial_producer_key}, proxyname={self.proxyname}"
             trace.append(accessor.trace_ctor("CreateTexture", filter, ctor_args=ctor_str))
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
 
@@ -1832,7 +1832,7 @@ class TraceProxy(TraceItem):
         trace = TraceOutput()
         trace.append_separated(self.Description)
         trace.append(accessor.trace_ctor(None, self.Filter))
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
 
 
 class ExportView(RenderingMixin, TraceItem):
@@ -1853,7 +1853,7 @@ class ExportView(RenderingMixin, TraceItem):
                                         skip_assignment=True))
         exporterAccessor.finalize()  # so that it will get deleted
         del exporterAccessor
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
 
 
 class ImportView(RenderingMixin, TraceItem):
@@ -1874,7 +1874,7 @@ class ImportView(RenderingMixin, TraceItem):
               skip_assignment=True))
         importerAccessor.finalize() # so that it will get deleted
         del importerAccessor
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
 
 
 class SaveData(TraceItem):
@@ -1900,7 +1900,7 @@ class SaveData(TraceItem):
         writerAccessor.finalize()  # so that it will get deleted.
         del writerAccessor
         del writer
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
 
 
 class SaveScreenshotOrAnimation(RenderingMixin, TraceItem):
@@ -1944,7 +1944,7 @@ class SaveScreenshotOrAnimation(RenderingMixin, TraceItem):
         helperAccessor.finalize()
         del helperAccessor
         del helper
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
 
 
 class SaveAnimationExtracts(TraceItem):
@@ -1965,7 +1965,7 @@ class SaveAnimationExtracts(TraceItem):
                                 skip_assignment=True))
         del accessor
         del proxy
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
 
 
 class LoadState(TraceItem):
@@ -2025,7 +2025,7 @@ class LoadState(TraceItem):
                 trace.append("# load state")
                 trace.append("LoadState('%s')" % filename)
         del options
-        Trace.Output.append_separated(trace.raw_data())
+        Trace.get_targeted_trace_output().append_separated(trace.raw_data())
 
 
 class RegisterLayoutProxy(RenderingMixin, TraceItem):
@@ -2038,7 +2038,7 @@ class RegisterLayoutProxy(RenderingMixin, TraceItem):
             filter = lambda x: True
         pname = Trace.get_registered_name(self.Layout, "layouts")
         accessor = ProxyAccessor(Trace.get_varname(pname), self.Layout)
-        Trace.Output.append_separated([ \
+        Trace.get_targeted_trace_output().append_separated([ \
             "# create new layout object '%s'" % pname,
             "%s = CreateLayout(name='%s')" % (accessor, pname)])
 
@@ -2047,12 +2047,12 @@ class RegisterLayoutProxy(RenderingMixin, TraceItem):
             sdir = layout.GetSplitDirection(location)
             sfraction = layout.GetSplitFraction(location)
             if sdir == layout.SMProxy.VERTICAL:
-                Trace.Output.append([ \
+                Trace.get_targeted_trace_output().append([ \
                     "%s.SplitVertical(%d, %f)" % (laccessor, location, sfraction)])
                 _trace_layout(layout, laccessor, layout.GetFirstChild(location))
                 _trace_layout(layout, laccessor, layout.GetSecondChild(location))
             elif sdir == layout.SMProxy.HORIZONTAL:
-                Trace.Output.append([ \
+                Trace.get_targeted_trace_output().append([ \
                     "%s.SplitHorizontal(%d, %f)" % (laccessor, location, sfraction)])
                 _trace_layout(layout, laccessor, layout.GetFirstChild(location))
                 _trace_layout(layout, laccessor, layout.GetSecondChild(location))
@@ -2060,7 +2060,7 @@ class RegisterLayoutProxy(RenderingMixin, TraceItem):
                 view = layout.GetView(location)
                 if view and filter(view):
                     vaccessor = Trace.get_accessor(view)
-                    Trace.Output.append([ \
+                    Trace.get_targeted_trace_output().append([ \
                         "%s.AssignView(%d, %s)" % (laccessor, location, vaccessor)])
 
         _trace_layout(self.Layout, accessor, 0)
@@ -2068,13 +2068,13 @@ class RegisterLayoutProxy(RenderingMixin, TraceItem):
         # save size, if non-empty.
         lsize = self.Layout.GetSize()
         if lsize[0] > 0 and lsize[1] > 0:
-            Trace.Output.append("%s.SetSize(%d, %d)" % (accessor, lsize[0], lsize[1]))
+            Trace.get_targeted_trace_output().append("%s.SetSize(%d, %d)" % (accessor, lsize[0], lsize[1]))
         TraceItem.finalize(self)
 
 
 class LoadPlugin(TraceItem):
     def __init__(self, filename, remote):
-        Trace.Output.append_separated([ \
+        Trace.get_targeted_trace_output().append_separated([ \
             "# load plugin",
             "LoadPlugin('%s', remote=%s, ns=globals())" % (filename, remote)])
 
@@ -2102,7 +2102,7 @@ class RenameProxy(TraceItem):
     def finalize(self):
         if self.Accessor:
             newname = Trace.get_registered_name(self.Proxy, "sources")
-            Trace.Output.append_separated([ \
+            Trace.get_targeted_trace_output().append_separated([ \
                 "# rename source object",
                 "RenameSource('%s', %s)" % (newname, self.Accessor)])
         TraceItem.finalize(self)
@@ -2123,11 +2123,11 @@ class SetCurrentProxy(TraceItem):
         if selmodel is pxm.GetSelectionModel("ActiveView"):
             if RenderingMixin().skip_from_trace:
                 raise Untraceable("skipped")
-            Trace.Output.append_separated([ \
+            Trace.get_targeted_trace_output().append_separated([ \
                 "# set active view",
                 "SetActiveView(%s)" % accessor])
         elif selmodel is pxm.GetSelectionModel("ActiveSources"):
-            Trace.Output.append_separated([ \
+            Trace.get_targeted_trace_output().append_separated([ \
                 "# set active source",
                 "SetActiveSource(%s)" % accessor])
         else:
@@ -2139,7 +2139,7 @@ class CallMethod(TraceItem):
         TraceItem.__init__(self)
         trace = self.get_trace(proxy, methodname, args, kwargs)
         if trace:
-            Trace.Output.append_separated(trace)
+            Trace.get_targeted_trace_output().append_separated(trace)
 
     def get_trace(self, proxy, methodname, args, kwargs):
         to_trace = []
@@ -2191,7 +2191,7 @@ class CallMethodIfPropertiesModified(CallMethod):
         self.tag = None
         if self.modified:
             trace = self.get_trace(self.proxy, self.methodname, self.args, self.kwargs)
-            Trace.Output.append_separated(trace)
+            Trace.get_targeted_trace_output().append_separated(trace)
         CallMethod.finalize(self)
 
     def __del__(self):
@@ -2211,7 +2211,7 @@ class CallFunction(TraceItem):
         args = [str(CallMethod.marshall(x)) for x in args]
         args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.items()]
         to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
-        Trace.Output.append_separated(to_trace)
+        Trace.get_targeted_trace_output().append_separated(to_trace)
 
 
 class TraceText(TraceItem):
@@ -2226,7 +2226,7 @@ class TraceText(TraceItem):
         except KeyError:
             pass
         to_trace.append(text)
-        Trace.Output.append_separated(to_trace)
+        Trace.get_targeted_trace_output().append_separated(to_trace)
 
 
 class ChooseTexture(RenderingMixin, TraceItem):
@@ -2239,7 +2239,7 @@ class ChooseTexture(RenderingMixin, TraceItem):
         ownerAccessor = Trace.get_accessor(owner)
         textureAccessor = Trace.get_accessor(texture)
 
-        Trace.Output.append_separated([ \
+        Trace.get_targeted_trace_output().append_separated([ \
             "# change texture",
             "%s.%s = %s" % (str(ownerAccessor), prop.GetXMLName(), str(textureAccessor))])
 
@@ -2252,12 +2252,12 @@ class SaveCameras(RenderingMixin, BookkeepingItem):
     def __init__(self, proxy=None, **kwargs):
         trace = self.get_trace(proxy)
         try:
-            Trace.Output.append(["# " + kwargs["comment"]])
+            Trace.get_targeted_trace_output().append(["# " + kwargs["comment"]])
             del kwargs["comment"]
         except KeyError:
             pass
         if trace:
-            Trace.Output.append_separated(trace)
+            Trace.get_targeted_trace_output().append_separated(trace)
 
     @classmethod
     def get_trace(cls, proxy=None):
@@ -2306,7 +2306,7 @@ class SaveLayoutSizes(RenderingMixin, BookkeepingItem):
     def __init__(self, proxy=None):
         trace = self.get_trace(proxy)
         if trace:
-            Trace.Output.append_separated(trace)
+            Trace.get_targeted_trace_output().append_separated(trace)
 
     @classmethod
     def get_trace(cls, proxy=None):
@@ -2375,7 +2375,7 @@ class CreateExtractor(TraceItem):
         if ctor_trace:
             output.append("# trace defaults for the extractor.")
             output.append(ctor_trace)
-        Trace.Output.append_separated(output.raw_data())
+        Trace.get_targeted_trace_output().append_separated(output.raw_data())
         super(CreateExtractor, self).finalize()
 
 
@@ -2415,12 +2415,12 @@ def _start_trace_internal(preamble=None):
     """**internal** starts tracing. Called by vtkSMTrace::StartTrace()."""
     Trace.reset()
     if preamble:
-        Trace.Output.append(preamble)
-    Trace.Output.append([ \
+        Trace.get_targeted_trace_output().append(preamble)
+    Trace.get_targeted_trace_output().append([ \
         "#### import the simple module from the paraview",
         "from paraview.simple import *"])
     if not _get_skip_rendering():
-        Trace.Output.append([ \
+        Trace.get_targeted_trace_output().append([ \
             "#### disable automatic camera reset on 'Show'",
             "paraview.simple._DisableFirstRenderCameraReset()"])
 
@@ -2433,7 +2433,7 @@ def _stop_trace_internal():
         # ensure we trace the active view, so camera changes will be recorded.
         Trace.get_accessor(simple.GetActiveView())
 
-        Trace.Output.append_separated([ \
+        Trace.get_targeted_trace_output().append_separated([ \
             "#================================================================",
             "# addendum: following script captures some of the application",
             "# state to faithfully reproduce the visualization during playback",
@@ -2442,19 +2442,19 @@ def _stop_trace_internal():
         # save layout sizes
         layout_trace = SaveLayoutSizes.get_trace(None)
         if layout_trace:
-            Trace.Output.append_separated([ \
+            Trace.get_targeted_trace_output().append_separated([ \
                 "#--------------------------------",
                 "# saving layout sizes for layouts"])
-            Trace.Output.append_separated(layout_trace)
+            Trace.get_targeted_trace_output().append_separated(layout_trace)
 
         camera_trace = SaveCameras.get_trace(None)
         if camera_trace:
-            Trace.Output.append_separated([ \
+            Trace.get_targeted_trace_output().append_separated([ \
                 "#-----------------------------------",
                 "# saving camera placements for views"])
-            Trace.Output.append_separated(camera_trace)
-        Trace.Output.append_separated(_get_standard_postamble_comment())
-    trace = str(Trace.Output)
+            Trace.get_targeted_trace_output().append_separated(camera_trace)
+        Trace.get_targeted_trace_output().append_separated(_get_standard_postamble_comment())
+    trace = str(Trace.get_targeted_trace_output())
     Trace.reset()
 
     # essential to ensure any obsolete accessor don't linger can cause havoc
@@ -2515,7 +2515,7 @@ def stop_trace():
 
 def get_current_trace_output(raw=False):
     """Returns the trace generated so far in the tracing process."""
-    return str(Trace.Output) if not raw else Trace.Output.raw_data()
+    return str(Trace.get_targeted_trace_output()) if not raw else Trace.get_targeted_trace_output().raw_data()
 
 
 def get_current_trace_output_and_reset(raw=False):
@@ -2535,7 +2535,7 @@ def get_current_trace_output_and_reset(raw=False):
 def reset_trace_output():
     """Resets the trace output without resetting the tracing datastructures
     themselves."""
-    Trace.Output.reset()
+    Trace.get_targeted_trace_output().reset()
 
 
 # ------------------------------------------------------------------------------
