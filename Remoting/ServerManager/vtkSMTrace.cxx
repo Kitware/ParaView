@@ -40,7 +40,6 @@ public:
   vtkSmartPyObject UntraceableException;
 };
 
-vtkSmartPointer<vtkSMTrace> vtkSMTrace::ActiveTracer;
 vtkStandardNewMacro(vtkSMTrace);
 //----------------------------------------------------------------------------
 vtkSMTrace::vtkSMTrace()
@@ -94,11 +93,9 @@ vtkSMTrace::~vtkSMTrace()
 //----------------------------------------------------------------------------
 std::string vtkSMTrace::GetState(vtkSMProxy* options)
 {
-  if (vtkSMTrace::ActiveTracer.GetPointer() != nullptr)
-  {
-    vtkGenericWarningMacro("Tracing is active. Cannot save state.");
-    return std::string();
-  }
+  // Make sure to keep the activeTracer instance data and switch the static member to nullptr.
+  vtkSmartPointer<vtkSMTrace> activeTracer = vtkSMTrace::ActiveTracer;
+  vtkSMTrace::ActiveTracer = nullptr;
 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
@@ -122,6 +119,8 @@ std::string vtkSMTrace::GetState(vtkSMProxy* options)
       vtkGenericWarningMacro("Failed to generate state.");
       throw 1;
     }
+    // Restore active tracer back to normal.
+    vtkSMTrace::ActiveTracer = activeTracer;
     return std::string(PyUnicode_AsUTF8(result));
   }
   catch (int)
@@ -133,6 +132,10 @@ std::string vtkSMTrace::GetState(vtkSMProxy* options)
     }
   }
 #endif
+
+  // Restore active tracer back to normal.
+  vtkSMTrace::ActiveTracer = activeTracer;
+
   (void)options;
   return std::string();
 }
