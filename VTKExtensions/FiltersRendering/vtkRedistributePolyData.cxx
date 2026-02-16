@@ -1009,16 +1009,7 @@ void vtkRedistributePolyData::CopyCells(
 
   vtkPoints* outputPoints = output->GetPoints();
   vtkFloatArray* outputPointsArray = vtkFloatArray::SafeDownCast(outputPoints->GetData());
-  float* outputPointsArrayData = outputPointsArray->GetPointer(0);
-
-  vtkPoints* inputPoints = input->GetPoints();
-  void* inputPointsArrayData = nullptr;
-  int pointsType = VTK_VOID;
-  if (inputPoints != nullptr)
-  {
-    pointsType = inputPoints->GetData()->GetDataType();
-    inputPointsArrayData = inputPoints->GetVoidPointer(0);
-  }
+  vtkDataArray* inputPointsArray = input->GetPoints()->GetData();
 
 #if VTK_REDIST_DO_TIMING
   ::timerInfo8.Timer->StopTimer();
@@ -1034,7 +1025,8 @@ void vtkRedistributePolyData::CopyCells(
   //  from all of input) ...
 
   vtkIdType numPointsMax = input->GetNumberOfPoints();
-  vtkIdType* fromPtIds = new vtkIdType[numPointsMax];
+  vtkNew<vtkIdList> fromPtIds;
+  fromPtIds->SetNumberOfIds(numPointsMax);
 
   vtkIdType* usedIds = new vtkIdType[numPointsMax];
   for (i = 0; i < numPointsMax; i++)
@@ -1080,7 +1072,7 @@ void vtkRedistributePolyData::CopyCells(
             const vtkIdType newPt = pointIncr;
             cell->SetId(ptIdx, newPt);
             usedIds[pointId] = newPt;
-            fromPtIds[pointIncr] = pointId;
+            fromPtIds->SetId(pointIncr, pointId);
             pointIncr++;
           }
           else
@@ -1108,7 +1100,7 @@ void vtkRedistributePolyData::CopyCells(
             const vtkIdType newPt = pointIncr;
             cell->SetId(ptIdx, newPt);
             usedIds[pointId] = newPt;
-            fromPtIds[pointIncr] = pointId;
+            fromPtIds->SetId(pointIncr, pointId);
             pointIncr++;
           }
           else
@@ -1133,23 +1125,10 @@ void vtkRedistributePolyData::CopyCells(
 #endif
 
   // ... Copy cell points. ...
-  vtkIdType inLoc, outLoc;
   vtkIdType numPoints = pointIncr;
-  int j;
 
   // ... copy x,y,z coordinates ...
-  switch (pointsType)
-  {
-    vtkTemplateMacro(for (i = 0; i < numPoints; i++) {
-      inLoc = fromPtIds[i] * 3;
-      outLoc = i * 3;
-      for (j = 0; j < 3; j++)
-      {
-        outputPointsArrayData[outLoc + j] =
-          static_cast<float>(reinterpret_cast<VTK_TT*>(inputPointsArrayData)[inLoc + j]);
-      }
-    });
-  }
+  outputPointsArray->InsertTuplesStartingAt(0, fromPtIds, inputPointsArray);
 
 #if VTK_REDIST_DO_TIMING
   ::timerInfo8.Timer->StopTimer();
@@ -1165,8 +1144,7 @@ void vtkRedistributePolyData::CopyCells(
   vtkPointData* outputPointData = output->GetPointData();
 
   // ... copy point data arrays ...
-  this->CopyDataArrays(inputPointData, outputPointData, numPoints, fromPtIds, myId);
-  delete[] fromPtIds;
+  this->CopyDataArrays(inputPointData, outputPointData, numPoints, fromPtIds->GetPointer(0), myId);
 
 #if VTK_REDIST_DO_TIMING
   ::timerInfo8.Timer->StopTimer();

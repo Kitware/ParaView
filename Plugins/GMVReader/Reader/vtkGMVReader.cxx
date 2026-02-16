@@ -353,7 +353,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
             pts->SetNumberOfPoints(GMVRead::gmv_data.num);
             if (GMVRead::gmv_data.num > 0)
             {
-              float* ptr = (float*)pts->GetVoidPointer(0);
+              float* ptr = vtkFloatArray::FastDownCast(pts->GetData())->GetPointer(0);
               for (long i = 0; i < GMVRead::gmv_data.num; ++i)
               {
                 *ptr++ = GMVRead::gmv_data.doubledata1[i];
