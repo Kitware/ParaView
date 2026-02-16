@@ -3,8 +3,10 @@
 
 #include "vtkSelectionSerializer.h"
 
+#include "vtkArrayDispatch.h"
 #include "vtkClientServerStreamInstantiator.h"
 #include "vtkDataArray.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
@@ -98,17 +100,20 @@ void vtkSelectionSerializer::PrintXML(
 //----------------------------------------------------------------------------
 namespace
 {
-template <class T>
-void vtkSelectionSerializerWriteSelectionList(
-  ostream& os, vtkIndent indent, vtkIdType numElems, T* dataPtr)
+struct vtkSelectionSerializerWriteSelectionList
 {
-  os << indent;
-  for (vtkIdType idx = 0; idx < numElems; idx++)
+  template <class TArray>
+  void operator()(TArray* array, ostream& os, vtkIndent indent, vtkIdType numElems)
   {
-    os << dataPtr[idx] << " ";
+    auto data = vtk::DataArrayValueRange(array);
+    os << indent;
+    for (vtkIdType idx = 0; idx < numElems; idx++)
+    {
+      os << data[idx] << " ";
+    }
+    os << endl;
   }
-  os << endl;
-}
+};
 }
 
 //----------------------------------------------------------------------------
@@ -119,39 +124,36 @@ void vtkSelectionSerializer::WriteSelectionData(
   vtkDataSetAttributes* data = selection->GetSelectionData();
   for (int i = 0; i < data->GetNumberOfArrays(); i++)
   {
-    if (vtkDataArray::SafeDownCast(data->GetAbstractArray(i)))
+    auto aa = data->GetAbstractArray(i);
+    auto da = vtkDataArray::SafeDownCast(aa);
+    auto sa = vtkStringArray::SafeDownCast(aa);
+    if (da || sa)
     {
-      vtkDataArray* list = vtkDataArray::SafeDownCast(data->GetAbstractArray(i));
-      vtkIdType numTuples = list->GetNumberOfTuples();
-      vtkIdType numComps = list->GetNumberOfComponents();
+      vtkIdType numTuples = aa->GetNumberOfTuples();
+      vtkIdType numComps = aa->GetNumberOfComponents();
+      vtkIdType numValues = numTuples * numComps;
 
       os << indent << "<SelectionList"
-         << " classname=\"" << list->GetClassName() << "\" name=\""
-         << (list->GetName() ? list->GetName() : "") << "\" number_of_tuples=\"" << numTuples
+         << " classname=\"" << aa->GetClassName() << "\" name=\""
+         << (aa->GetName() ? aa->GetName() : "") << "\" number_of_tuples=\"" << numTuples
          << "\" number_of_components=\"" << numComps << "\">" << endl;
-      void* dataPtr = list->GetVoidPointer(0);
-      switch (list->GetDataType())
+      if (da)
       {
-        vtkTemplateMacro(::vtkSelectionSerializerWriteSelectionList(
-          os, indent, numTuples * numComps, (VTK_TT*)(dataPtr)));
+        vtkSelectionSerializerWriteSelectionList worker;
+        if (!vtkArrayDispatch::Dispatch::Execute(da, worker, os, indent, numValues))
+        {
+          worker(da, os, indent, numValues);
+        }
       }
-      os << indent << "</SelectionList>" << endl;
-    }
-    else if (vtkStringArray::SafeDownCast(selection->GetSelectionList()))
-    {
-      vtkStringArray* stringList = vtkStringArray::SafeDownCast(selection->GetSelectionList());
-      vtkIdType numTuples = stringList->GetNumberOfTuples();
-      vtkIdType numComps = stringList->GetNumberOfComponents();
-      os << indent << "<SelectionList"
-         << " classname=\"" << stringList->GetClassName() << "\" name=\""
-         << (stringList->GetName() ? stringList->GetName() : "") << "\" number_of_tuples=\""
-         << numTuples << "\" number_of_components=\"" << numComps << "\">" << endl;
-      vtkIndent ni = indent.GetNextIndent();
-      for (vtkIdType j = 0; j < numTuples * numComps; j++)
+      else // if (sa)
       {
-        os << ni << "<String>";
-        os << stringList->GetValue(j);
-        os << "</String>" << endl;
+        vtkIndent ni = indent.GetNextIndent();
+        for (vtkIdType j = 0; j < numValues; j++)
+        {
+          os << ni << "<String>";
+          os << sa->GetValue(j);
+          os << "</String>" << endl;
+        }
       }
       os << indent << "</SelectionList>" << endl;
     }

@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkMinMax.h"
-#include "vtkObjectFactory.h"
 
 #include "vtkAbstractArray.h"
+#include "vtkArrayDispatch.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
@@ -14,6 +14,7 @@
 #include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
@@ -22,11 +23,65 @@
 
 vtkStandardNewMacro(vtkMinMax);
 
-namespace
+struct vtkMinMax::vtkMinMaxWorker
 {
-template <class T>
-void vtkMinMaxExecute(vtkMinMax* self, int numComp, int compIdx, T* idata, T* odata);
-}
+  template <class TArrayIn, class TArrayOut>
+  void operator()(TArrayIn* inArray, TArrayOut* outArray, vtkMinMax* self)
+  {
+    auto in = vtk::DataArrayTupleRange(inArray);
+    auto out = vtk::DataArrayTupleRange(outArray);
+    vtkIdType numTuples = inArray->GetNumberOfTuples();
+    int numComp = inArray->GetNumberOfComponents();
+    int compIdx = self->ComponentIdx;
+    char* firstPasses = self->GetFirstPasses();
+    for (vtkIdType idx = 0; idx < numTuples; ++idx)
+    {
+      if ((self->GhostArray != nullptr) &&
+        (self->GhostArray->GetValue(idx) & vtkDataSetAttributes::DUPLICATECELL))
+      {
+        // skip cell and point attributes that don't belong to me
+        continue;
+      }
+      // go over each component of the tuple
+      for (int jdx = 0; jdx < numComp; jdx++)
+      {
+        auto iTuple = in[idx];
+        auto oTuple = out[0];
+
+        if (firstPasses[compIdx + jdx])
+        {
+          firstPasses[compIdx + jdx] = 0;
+          oTuple[jdx] = iTuple[jdx];
+          continue;
+        }
+
+        switch (self->GetOperation())
+        {
+          case vtkMinMax::MIN:
+          {
+            oTuple[jdx] = std::min(oTuple[jdx], iTuple[jdx]);
+            break;
+          }
+          case vtkMinMax::MAX:
+          {
+            oTuple[jdx] = std::max(oTuple[jdx], iTuple[jdx]);
+            break;
+          }
+          case vtkMinMax::SUM:
+          {
+            oTuple[jdx] += iTuple[jdx];
+            break;
+          }
+          default:
+          {
+            oTuple[jdx] = iTuple[jdx];
+            break;
+          }
+        }
+      }
+    }
+  }
+};
 
 //-----------------------------------------------------------------------------
 vtkMinMax::vtkMinMax()
@@ -269,95 +324,19 @@ void vtkMinMax::OperateOnField(vtkFieldData* ifd, vtkFieldData* ofd)
 //-----------------------------------------------------------------------------
 void vtkMinMax::OperateOnArray(vtkAbstractArray* ia, vtkAbstractArray* oa)
 {
-  vtkIdType numTuples = ia->GetNumberOfTuples();
-  int numComp = ia->GetNumberOfComponents();
-  int datatype = ia->GetDataType();
-
-  this->Name = ia->GetName();
-
-  // go over each tuple
-  for (vtkIdType idx = 0; idx < numTuples; idx++)
+  auto inDa = vtkDataArray::SafeDownCast(ia);
+  auto outDa = vtkDataArray::SafeDownCast(oa);
+  if (!inDa || !outDa)
   {
-    this->Idx = idx;
-
-    if ((this->GhostArray != nullptr) &&
-      (this->GhostArray->GetValue(idx) & vtkDataSetAttributes::DUPLICATECELL))
-    {
-      // skip cell and point attributes that don't belong to me
-      continue;
-    }
-
-    // get type agnostic access to the tuple
-    void* idata = ia->GetVoidPointer(idx * numComp);
-    void* odata = oa->GetVoidPointer(0);
-
-    // go over each component in the tuple (jdx)
-    // perform odata[jdx] = operation(idata[jdx],odata[jdx])
-    switch (datatype)
-    {
-      vtkTemplateMacro(::vtkMinMaxExecute(this, numComp, this->ComponentIdx,
-        static_cast<VTK_TT*>(idata), static_cast<VTK_TT*>(odata)));
-
-        // if you can make an operator for things like strings etc,
-        // put the cases for those strings here
-
-      default:
-        vtkErrorMacro(<< "Unknown data type refusing to operate on this array");
-        this->MismatchOccurred = 1;
-    }
+    vtkErrorMacro(<< "Can't operate on non-data arrays");
+    this->MismatchOccurred = 1;
+    return;
   }
-}
-
-//-----------------------------------------------------------------------------
-// This templated function performs the operation on any type of data.
-namespace
-{
-template <class T>
-void vtkMinMaxExecute(vtkMinMax* self, int numComp, int compIdx, T* idata, T* odata)
-{
-
-  // go over each component of the tuple
-  for (int jdx = 0; jdx < numComp; jdx++)
+  vtkMinMaxWorker worker;
+  if (!vtkArrayDispatch::Dispatch2SameValueType::Execute(inDa, outDa, worker, this))
   {
-
-    T* ivalue = idata + jdx;
-    T* ovalue = odata + jdx;
-
-    char* FirstPasses = self->GetFirstPasses();
-    if (FirstPasses[compIdx + jdx])
-    {
-      FirstPasses[compIdx + jdx] = 0;
-      *ovalue = *ivalue;
-      continue;
-    }
-
-    switch (self->GetOperation())
-    {
-      case vtkMinMax::MIN:
-      {
-        if (*ivalue < *ovalue)
-          *ovalue = *ivalue;
-        break;
-      }
-      case vtkMinMax::MAX:
-      {
-        if (*ivalue > *ovalue)
-          *ovalue = *ivalue;
-        break;
-      }
-      case vtkMinMax::SUM:
-      {
-        *ovalue += *ivalue;
-        break;
-      }
-      default:
-      {
-        *ovalue = *ivalue;
-        break;
-      }
-    }
+    worker(inDa, outDa, this);
   }
-}
 }
 
 //-----------------------------------------------------------------------------
