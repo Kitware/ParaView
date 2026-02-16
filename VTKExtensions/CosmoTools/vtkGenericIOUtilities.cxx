@@ -96,11 +96,11 @@ vtkDataArray* GetVtkDataArray(std::string name, int type, void* rawBuffer, int N
   dataArray->SetNumberOfComponents(1);
   dataArray->SetNumberOfTuples(N);
   dataArray->SetName(name.c_str());
+  auto inputDataArray = vtk::TakeSmartPointer(dataArray->NewInstance());
+  inputDataArray->SetVoidArray(rawBuffer, N, /*save*/ 1);
   if (N > 0)
   {
-    void* dataBuffer = dataArray->GetVoidPointer(0);
-    assert("pre: encountered nullptr data buffer!" && (dataBuffer != nullptr));
-    memcpy(dataBuffer, rawBuffer, N * dataSize);
+    dataArray->DeepCopy(inputDataArray);
   }
   return (dataArray);
 }
