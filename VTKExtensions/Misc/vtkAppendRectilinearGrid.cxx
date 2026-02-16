@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkAppendRectilinearGrid.h"
 
-#include "vtkArrayIteratorIncludes.h"
 #include "vtkCellData.h"
 #include "vtkDataArray.h"
 #include "vtkInformation.h"

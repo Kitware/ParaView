@@ -3,9 +3,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkAttributeDataReductionFilter.h"
 
-#include "vtkArrayIteratorIncludes.h"
+#include "vtkArrayDispatch.h"
+#include "vtkBitArray.h"
 #include "vtkCellData.h"
 #include "vtkDataArray.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -69,56 +71,46 @@ int vtkAttributeDataReductionFilter::RequestDataObject(
 //-----------------------------------------------------------------------------
 namespace
 {
-template <class iterT>
-void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter* self, iterT* toIter,
-  iterT* fromIter, double progress_offset, double progress_factor)
+struct vtkAttributeDataReductionFilterReduceWorker
 {
-  int mode = self->GetReductionType();
-  vtkIdType numValues = toIter->GetNumberOfValues();
-  numValues = fromIter->GetNumberOfValues() < numValues ? fromIter->GetNumberOfValues() : numValues;
-  for (vtkIdType cc = 0; cc < numValues; ++cc)
+  template <class TArrayIn, class TArrayOut, class TIn = vtk::GetAPIType<TArrayIn>,
+    class TOut = vtk::GetAPIType<TArrayOut>>
+  void operator()(TArrayIn* inArray, TArrayOut* outArray, vtkAttributeDataReductionFilter* self,
+    double progress_offset, double progress_factor)
   {
-    typename iterT::ValueType result = toIter->GetValue(cc);
-    switch (mode)
+    auto in = vtk::DataArrayValueRange(inArray);
+    auto out = vtk::DataArrayValueRange(outArray);
+    int mode = self->GetReductionType();
+    vtkIdType numValues = outArray->GetNumberOfValues();
+    numValues = inArray->GetNumberOfValues() < numValues ? inArray->GetNumberOfValues() : numValues;
+    for (vtkIdType cc = 0; cc < numValues; ++cc)
     {
-      case vtkAttributeDataReductionFilter::ADD:
-        result = result + fromIter->GetValue(cc);
+      TOut result = out[cc];
+      switch (mode)
+      {
+        case vtkAttributeDataReductionFilter::ADD:
+          result += in[cc];
+          break;
+
+        case vtkAttributeDataReductionFilter::MAX:
+        {
+          TIn v2 = in[cc];
+          result = (result > v2) ? result : v2;
+        }
         break;
 
-      case vtkAttributeDataReductionFilter::MAX:
-      {
-        typename iterT::ValueType v2 = fromIter->GetValue(cc);
-        result = (result > v2) ? result : v2;
+        case vtkAttributeDataReductionFilter::MIN:
+        {
+          TIn v2 = in[cc];
+          result = (result < v2) ? result : v2;
+        }
+        break;
       }
-      break;
-
-      case vtkAttributeDataReductionFilter::MIN:
-      {
-        typename iterT::ValueType v2 = fromIter->GetValue(cc);
-        result = (result > v2) ? result : v2;
-      }
-      break;
+      out[cc] = result;
+      self->UpdateProgress(progress_offset + progress_factor * cc / numValues);
     }
-    toIter->SetValue(cc, result);
-    self->UpdateProgress(progress_offset + progress_factor * cc / numValues);
   }
-}
-
-//-----------------------------------------------------------------------------
-template <>
-void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter*,
-  vtkArrayIteratorTemplate<vtkStdString>*, vtkArrayIteratorTemplate<vtkStdString>*, double, double)
-{
-  // Cannot reduce strings.
-}
-
-//-----------------------------------------------------------------------------
-template <>
-void vtkAttributeDataReductionFilterReduce(
-  vtkAttributeDataReductionFilter*, vtkBitArrayIterator*, vtkBitArrayIterator*, double, double)
-{
-  // Cannot reduce bit arrays.
-}
+};
 
 //-----------------------------------------------------------------------------
 void vtkAttributeDataReductionFilterReduce(vtkDataSetAttributes* output,
@@ -165,17 +157,12 @@ void vtkAttributeDataReductionFilterReduce(vtkDataSetAttributes* output,
         {
           return;
         }
-        vtkSmartPointer<vtkArrayIterator> toIter;
-        toIter.TakeReference(toDA->NewIterator());
-        vtkSmartPointer<vtkArrayIterator> fromIter;
-        fromIter.TakeReference(fromDA->NewIterator());
-        switch (toDA->GetDataType())
+        vtkAttributeDataReductionFilterReduceWorker worker;
+        using Arrays = vtkTypeList::Append<vtkArrayDispatch::Arrays, vtkBitArray>::Result;
+        if (!vtkArrayDispatch::Dispatch2ByArrayWithSameValueType<Arrays, Arrays>::Execute(
+              fromDA, toDA, worker, self, progress_offset, progress_factor))
         {
-          vtkArrayIteratorTemplateMacro(
-            ::vtkAttributeDataReductionFilterReduce(self, static_cast<VTK_TT*>(toIter.GetPointer()),
-              static_cast<VTK_TT*>(fromIter.GetPointer()), progress_offset, progress_factor));
-          default:
-            vtkGenericWarningMacro("Cannot reduce arrays of type: " << toDA->GetDataTypeAsString());
+          worker(fromDA, toDA, self, progress_offset, progress_factor);
         }
       };
       fieldList.TransformData(list_index, dsa, output, f);

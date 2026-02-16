@@ -13,6 +13,7 @@ CONDITION
 DEPENDS
   ParaView::Catalyst
   ParaView::PythonCatalyst
+  ParaView::Versioning
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

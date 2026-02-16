@@ -3,20 +3,21 @@
 
 #include "vtkClientServerStream.h"
 
-#include "vtkAbstractArray.h"
-#include "vtkArrayIterator.h"
-#include "vtkArrayIteratorIncludes.h"
+#include "vtkArrayDispatch.h"
+#include "vtkBitArray.h"
 #include "vtkByteSwap.h"
+#include "vtkDataArrayRange.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 #include "vtkStringScanner.h"
 #include "vtkType.h"
 #include "vtkTypeTraits.h"
 #include "vtkVariantExtract.h"
+#include <vtkVariantArray.h>
 
 #include <algorithm>
 #include <sstream>
 #include <string>
-#include <typeinfo>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -482,15 +483,19 @@ vtkClientServerStream& vtkClientServerStream::operator<<(const vtkStdString& val
 //----------------------------------------------------------------------------
 namespace
 {
-template <typename iterT>
-void vtkClientServerPutArrayVariant(vtkClientServerStream& css, iterT* it)
+struct vtkClientServerPutArrayVariantWorker
 {
-  vtkIdType numVals = it->GetNumberOfValues();
-  for (vtkIdType i = 0; i < numVals; ++i)
+  template <typename TArray>
+  void operator()(TArray* array, vtkClientServerStream& css)
   {
-    css << it->GetValue(i);
+    auto range = vtk::DataArrayValueRange(array);
+    vtkIdType numVals = array->GetNumberOfValues();
+    for (vtkIdType i = 0; i < numVals; ++i)
+    {
+      css << range[i];
+    }
   }
-}
+};
 }
 
 //----------------------------------------------------------------------------
@@ -519,13 +524,17 @@ vtkClientServerStream& vtkClientServerStream::operator<<(const vtkVariant& val)
         vtkTypeInt32 numComponents = array->GetNumberOfComponents();
         vtkTypeInt64 numTuples = array->GetNumberOfTuples();
         (*this) << arrayType << numComponents << numTuples;
-        vtkArrayIterator* iter = array->NewIterator();
-        switch (array->GetDataType())
+
+        vtkClientServerPutArrayVariantWorker worker;
+        using Arrays = vtkTypeList::Append<vtkArrayDispatch::AllArrays, vtkBitArray,
+          vtkVariantArray, vtkStringArray>::Result;
+        if (!vtkArrayDispatch::DispatchByArray<Arrays>::Execute(array, worker, *this))
         {
-          vtkExtendedArrayIteratorTemplateMacro(
-            ::vtkClientServerPutArrayVariant<VTK_TT>(*this, static_cast<VTK_TT*>(iter)));
+          if (auto da = vtkDataArray::SafeDownCast(array))
+          {
+            worker(da, *this);
+          }
         }
-        iter->Delete();
       }
       break;
     }

@@ -2,16 +2,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkSIIndexSelectionProperty.h"
 
-#include "vtkArrayIterator.h"
 #include "vtkDataArray.h"
-#include "vtkDoubleArray.h"
-#include "vtkFloatArray.h"
-#include "vtkIdTypeArray.h"
-#include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkSIProperty.h"
 #include "vtkSMMessage.h"
-#include "vtkStringArray.h"
 
 #include <sstream>
 #include <string>

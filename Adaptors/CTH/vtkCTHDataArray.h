@@ -7,6 +7,7 @@
 #include "vtkDataArray.h"
 #include "vtkDoubleArray.h"         // For multiple usage in implemented methods
 #include "vtkPVAdaptorsCTHModule.h" //For export macro
+#include "vtkParaViewDeprecation.h" // For PARAVIEW_DEPRECATED_IN_6_2_0
 
 class VTKPVADAPTORSCTH_EXPORT vtkCTHDataArray : public vtkDataArray
 {
@@ -59,6 +60,7 @@ public:
 
   // Description:
   // Returns an ArrayIterator over doubles, this will end up with a deep copy
+  PARAVIEW_DEPRECATED_IN_6_2_0("Use vtkArrayDispatch instead.")
   vtkArrayIterator* NewIterator() override;
 
   vtkIdType LookupValue(vtkVariant value) override;

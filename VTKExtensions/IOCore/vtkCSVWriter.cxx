@@ -6,7 +6,6 @@
 #include "vtkAlgorithm.h"
 #include "vtkArrayDispatch.h"
 #include "vtkArrayDispatchArrayList.h"
-#include "vtkArrayIteratorIncludes.h"
 #include "vtkAttributeDataToTableFilter.h"
 #include "vtkCellData.h"
 #include "vtkDataArray.h"

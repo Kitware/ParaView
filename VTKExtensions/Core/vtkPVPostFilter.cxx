@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVPostFilter.h"
 
-#include "vtkArrayIteratorIncludes.h"
+#include "vtkArrayComponents.h"
 #include "vtkCellData.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
-#include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
@@ -405,55 +404,6 @@ void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output, const char* name)
 }
 
 //----------------------------------------------------------------------------
-namespace
-{
-template <class T, class U>
-void CopyComponent(T* outIter, U* inIter, int compNo)
-{
-  vtkDataArray* inDa = vtkDataArray::SafeDownCast(inIter->GetArray());
-  vtkIdType numTuples = inIter->GetNumberOfTuples();
-
-  if (compNo == -1 && inDa == nullptr)
-  {
-    compNo = 0;
-  }
-
-  if (compNo == -1)
-  {
-    vtkDataArray* outDa = vtkDataArray::SafeDownCast(outIter->GetArray());
-    int numcomps = inIter->GetNumberOfComponents();
-    for (vtkIdType cc = 0; cc < numTuples; cc++)
-    {
-      double mag = 0.0;
-      double* tuple = inDa->GetTuple(cc);
-      for (int comp = 0; comp < numcomps; comp++)
-      {
-        mag += tuple[comp] * tuple[comp];
-      }
-      outDa->SetTuple1(cc, sqrt(mag));
-    }
-  }
-  else
-  {
-    for (vtkIdType cc = 0; cc < numTuples; cc++)
-    {
-      outIter->SetValue(cc, inIter->GetTuple(cc)[compNo]);
-    }
-  }
-}
-
-template <>
-void CopyComponent(vtkArrayIteratorTemplate<double>* /*outIter*/,
-  vtkArrayIteratorTemplate<vtkStdString>* /*inIter*/, int /*compNo*/)
-{
-  // Because the vtkTemplateMacro is coded to attempt to call
-  // the function with each use case, we have to handle the string to double
-  // conversion, which in reality should never happen. So for know we
-  // are leaving it empty
-}
-}
-
-//----------------------------------------------------------------------------
 int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa, const char* requested_name,
   const char* demangled_name, const char* demangled_component_name)
 {
@@ -509,37 +459,18 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa, const char* req
   // the result in a double array, since we don't the size of the
   // resulting data.
   bool isMagnitude = (cIndex == -1);
-  vtkAbstractArray* newArray = isMagnitude ? vtkDoubleArray::New() : array->NewInstance();
 
-  newArray->SetNumberOfComponents(1);
-  newArray->SetNumberOfTuples(array->GetNumberOfTuples());
-  newArray->SetName(requested_name);
-
-  vtkArrayIterator* inIter = array->NewIterator();
-  vtkArrayIterator* outIter = newArray->NewIterator();
-
+  vtkSmartPointer<vtkAbstractArray> newArray;
   if (isMagnitude)
   {
-    switch (array->GetDataType())
-    {
-      vtkArrayIteratorTemplateMacro(
-        ::CopyComponent(static_cast<vtkArrayIteratorTemplate<double>*>(outIter),
-          static_cast<VTK_TT*>(inIter), cIndex););
-    }
+    newArray = vtk::ComponentOrNormAsArray(array, vtkArrayComponents::L2Norm);
   }
   else
   {
-    switch (array->GetDataType())
-    {
-      vtkArrayIteratorTemplateMacro(
-        ::CopyComponent(static_cast<VTK_TT*>(outIter), static_cast<VTK_TT*>(inIter), cIndex););
-    }
+    newArray = vtk::ComponentOrNormAsArray(array, std::max(cIndex, 0));
   }
-
-  inIter->Delete();
-  outIter->Delete();
+  newArray->SetName(requested_name);
   dsa->AddArray(newArray);
-  newArray->FastDelete();
   return 1;
 }
 
