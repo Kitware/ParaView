@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkImageSimpleSource.h"
 
+#include "vtkAOSDataArrayTemplate.h"
 #include "vtkDataArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -266,20 +267,20 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
   // Get data arrays and starting pointers
   vtkPointData* pointData = imageData->GetPointData();
   vtkDataArray* xArray = pointData->GetArray(SIMPLE_FIELD_X.c_str());
-  float* xPtr = static_cast<float*>(xArray->GetVoidPointer(0)) + begin;
+  float* xPtr = vtkAOSDataArrayTemplate<float>::FastDownCast(xArray)->GetPointer(begin);
 
   float* distPtr = nullptr;
   if (this->EnableDistanceSquaredData)
   {
     vtkDataArray* distArray = pointData->GetArray(SIMPLE_FIELD_DISTANCESQUARED.c_str());
-    distPtr = static_cast<float*>(distArray->GetVoidPointer(0)) + begin;
+    distPtr = vtkAOSDataArrayTemplate<float>::FastDownCast(distArray)->GetPointer(begin);
   }
 
   float* swirlPtr = nullptr;
   if (this->EnableSwirlData)
   {
     vtkDataArray* swirlArray = pointData->GetArray(SIMPLE_FIELD_SWIRL.c_str());
-    swirlPtr = static_cast<float*>(swirlArray->GetVoidPointer(0)) + 3 * begin;
+    swirlPtr = vtkAOSDataArrayTemplate<float>::FastDownCast(swirlArray)->GetPointer(3 * begin);
   }
 
   int dZ = extent[5] - extent[4] + 1;

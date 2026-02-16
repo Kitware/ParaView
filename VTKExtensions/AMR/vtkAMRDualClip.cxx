@@ -1395,7 +1395,6 @@ void vtkAMRDualClip::ProcessBlock(
     return;
   }
 
-  // void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
   double origin[3];
   double* spacing;
   int extent[6];

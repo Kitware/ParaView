@@ -887,8 +887,8 @@ bool vtkParFlowMetaReader::ReadComponentSubgridOverlap(istream& pfb, const vtkVe
     extent[5] == si[2] + sn[2])
   {
     // Fast path the case where we can read directly into the array.
-    pfb.read(reinterpret_cast<char*>(variable->GetVoidPointer(0)), sizeof(double) * subgridSize);
-    vtkByteSwap::SwapBERange(reinterpret_cast<double*>(variable->GetVoidPointer(0)), subgridSize);
+    pfb.read(reinterpret_cast<char*>(variable->GetPointer(0)), sizeof(double) * subgridSize);
+    vtkByteSwap::SwapBERange(variable->GetPointer(0), subgridSize);
     return true;
   }
 

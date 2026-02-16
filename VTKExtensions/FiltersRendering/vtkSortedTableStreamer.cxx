@@ -1273,7 +1273,7 @@ public:
 
     // Try to sort array
     ArraySorter sortedArray;
-    sortedArray.Update(static_cast<T*>(dataA->GetVoidPointer(0)), dataA->GetNumberOfTuples(),
+    sortedArray.Update(reinterpret_cast<T*>(dataA->GetPointer(0)), dataA->GetNumberOfTuples(),
       dataA->GetNumberOfComponents(), 0, 100, dataA->GetRange(), false);
 
     double min = dataA->GetRange()[0];
@@ -1301,7 +1301,7 @@ public:
     }
 
     // Reserse order
-    sortedArray.Update(static_cast<T*>(dataA->GetVoidPointer(0)), dataA->GetNumberOfTuples(),
+    sortedArray.Update(reinterpret_cast<T*>(dataA->GetPointer(0)), dataA->GetNumberOfTuples(),
       dataA->GetNumberOfComponents(), 0, 100, dataA->GetRange(), true);
 
     if (sortedArray.ArraySize != dataA->GetNumberOfTuples())

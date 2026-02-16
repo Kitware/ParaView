@@ -688,7 +688,8 @@ void vtkMaterialInterfaceFilterBlock::InitializeVolumeFractionArray(int invertVo
   vtkMaterialInterfaceFilterHalfSphere* implicitFunction, vtkDataArray* volumeFractionArray)
 {
   double tmp;
-  unsigned char* inPtr = (unsigned char*)(volumeFractionArray->GetVoidPointer(0));
+  unsigned char* inPtr =
+    vtkAOSDataArrayTemplate<unsigned char>::FastDownCast(volumeFractionArray)->GetPointer(0);
 
   if (implicitFunction == nullptr)
   {

@@ -1871,7 +1871,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3], int level, in
   ghostArray->Delete();
   int planeSize = dims[0] * dims[1];
   int j, k;
-  unsigned char* ptr = static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
+  unsigned char* ptr = ghostArray->GetPointer(0);
   for (k = 0; k < dims[2]; k++)
   {
     // Is the entire ij plane a set of ghosts
@@ -1971,7 +1971,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3], int r
   ghostArray->SetName(vtkDataSetAttributes::GhostArrayName());
   cd->AddArray(ghostArray);
   ghostArray->Delete();
-  unsigned char* ptr = static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
+  unsigned char* ptr = ghostArray->GetPointer(0);
   int k, j;
   int planeSize = realDims[0] * realDims[1];
   int checkILower = (realExtents[0] == 0);
@@ -2480,7 +2480,7 @@ static void createSpyPlotLevelArray(vtkCellData* cd, int size, int level)
   array->SetName("levels");
   array->SetNumberOfComponents(1);
   array->SetNumberOfTuples(size);
-  int* ptr = static_cast<int*>(array->GetVoidPointer(0));
+  int* ptr = static_cast<vtkIntArray*>(array)->GetPointer(0);
   int i;
   for (i = 0; i < size; i++)
   {

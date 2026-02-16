@@ -872,8 +872,8 @@ void vtkPUnstructuredGridGhostCellsGenerator::ExtractAndSendGhostCells(
         &c.SendLen, 1, toRank, UGGCG_SIZE_EXCHANGE_TAG, c.SendReqs[0]);
 
       // Send raw data
-      this->Internals->SubController->NoBlockSend((char*)c.SendBuffer->GetVoidPointer(0), c.SendLen,
-        toRank, UGGCG_DATA_EXCHANGE_TAG, c.SendReqs[1]);
+      this->Internals->SubController->NoBlockSend(
+        c.SendBuffer->GetPointer(0), c.SendLen, toRank, UGGCG_DATA_EXCHANGE_TAG, c.SendReqs[1]);
     }
   }
 }
@@ -932,8 +932,8 @@ void vtkPUnstructuredGridGhostCellsGenerator::ReceiveAndMergeGhostCells(int ghos
       {
         c.CommStep = 1; // mark that this comm needs to receive the dataset
         c.RecvBuffer->SetNumberOfValues(c.RecvLen);
-        this->Internals->SubController->NoBlockReceive((char*)c.RecvBuffer->GetVoidPointer(0),
-          c.RecvLen, fromRank, UGGCG_DATA_EXCHANGE_TAG, c.RecvReqs[1]);
+        this->Internals->SubController->NoBlockReceive(
+          c.RecvBuffer->GetPointer(0), c.RecvLen, fromRank, UGGCG_DATA_EXCHANGE_TAG, c.RecvReqs[1]);
         nonEmptyNeighborCounter++;
       }
       else

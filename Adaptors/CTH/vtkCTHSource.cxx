@@ -481,7 +481,7 @@ void vtkCTHSource::AddGhostArray(Block& b, int dx, int dy, int dz)
     ghostsUpper[i] = (b.active && b.top[i] < 0);
   }
 
-  unsigned char* ptr = static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
+  unsigned char* ptr = ghostArray->GetPointer(0);
   for (int k = 0; k < dz; k++)
   {
     if ((dz > 1) && ((ghostsLower[2] && (k == 0)) || (ghostsUpper[2] && (k == (dz - 1)))))
@@ -527,7 +527,7 @@ void vtkCTHSource::AddBlockIdArray(Block& b, int dx, int dy, int dz)
   cd->AddArray(blockArray);
   blockArray->Delete();
 
-  int* ptr = static_cast<int*>(blockArray->GetVoidPointer(0));
+  int* ptr = blockArray->GetPointer(0);
   memset(ptr, b.id, dx * dy * dz);
 }
 

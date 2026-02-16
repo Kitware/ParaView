@@ -708,9 +708,9 @@ double vtkSpyPlotBlock::GetCellVolume(int i, int j, int k) const
   }
 
   // determine the volume by the blocks coordinate system:
-  float* x = static_cast<float*>(this->XYZArrays[0]->GetVoidPointer(0));
-  float* y = static_cast<float*>(this->XYZArrays[1]->GetVoidPointer(0));
-  float* z = static_cast<float*>(this->XYZArrays[2]->GetVoidPointer(0));
+  float* x = this->XYZArrays[0]->GetPointer(0);
+  float* y = this->XYZArrays[1]->GetPointer(0);
+  float* z = this->XYZArrays[2]->GetPointer(0);
   switch (this->CoordSystem)
   {
     case vtkSpyPlotBlock::Cylinder1D:

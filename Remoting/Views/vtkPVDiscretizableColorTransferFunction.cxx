@@ -242,7 +242,6 @@ void vtkPVDiscretizableColorTransferFunction::SetIndexedColorInFullSet(
     this->Modified();
   }
 
-  // double *currentRGB = static_cast<double*>(this->IndexedColorsInFullSet->GetVoidPointer(index));
   double currentRGB[3];
   this->IndexedColorsInFullSet->GetTypedTuple(index, currentRGB);
   if (currentRGB[0] != r || currentRGB[1] != g || currentRGB[2] != b)
