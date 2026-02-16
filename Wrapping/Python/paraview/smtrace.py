@@ -61,6 +61,7 @@ garbage collected since there's no reference to it.
 
 """
 from __future__ import absolute_import, division, print_function
+import enum
 
 import math
 import weakref
@@ -123,16 +124,28 @@ class TraceOutput:
         self.__data = []
 
 
+class TraceTargetType(enum.Enum):
+    RUNTIME = 0
+    STATEFILE = 1
+
 class Trace(object):
     __REGISTERED_ACCESSORS = {}
 
-    Output = None
+    output_target_type = TraceTargetType.RUNTIME
+    __outputs = {}
+
+    @classmethod
+    def get_targeted_trace_output(cls) -> TraceOutput:
+        """Return the output trace corresponding to the given output_target_type."""
+        assert cls.output_target_type in cls.__outputs, "Output target not initialized!"
+        return cls.__outputs[cls.output_target_type]
 
     @classmethod
     def reset(cls):
-        """Resets the Output and clears all register accessors."""
+        """Reset the targeted output set by output_target_type."""
         cls.__REGISTERED_ACCESSORS.clear()
-        cls.Output = TraceOutput()
+        assert cls.output_target_type in set(TraceTargetType), "Output target type not supported!"
+        cls.__outputs[cls.output_target_type] = TraceOutput()
 
     @classmethod
     def get_registered_name(cls, proxy, reggroup):
