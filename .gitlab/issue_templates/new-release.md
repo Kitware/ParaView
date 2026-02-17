@@ -206,7 +206,7 @@ git submodule update --recursive --init
           in paraview-superbuild
 
 # Sign Windows binaries
-  -  [ ] Request Windows binary signings (only .exe archives) on the Package
+  -  [ ] Request Windows binary signings (only .msi archives) on the Package
          Signing repo. Example request [here][win-sign-example].
 
 # Sign macOS binaries
@@ -267,9 +267,9 @@ Binary checklist
   - [ ] macOS x86\_64
   - [ ] Linux
   - [ ] Linux osmesa
-  - [ ] Windows MPI (.exe)
+  - [ ] Windows MPI (.msi)
   - [ ] Windows MPI (.zip)
-  - [ ] Windows no-MPI (.exe)
+  - [ ] Windows no-MPI (.msi)
   - [ ] Windows no-MPI (.zip)
 
 # Upload binaries
