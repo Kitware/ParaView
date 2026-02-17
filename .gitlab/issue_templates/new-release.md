@@ -16,11 +16,19 @@ Please remove this comment.
 
 # Preparatory steps
 
+<!-- if RC1 and patch == 0 -->
+  - Finalize previous release branch
+    - [ ] Update the local copy of `release`
+    - [ ] Create unannotated tag: `git tag vX.Y-final` where vX.Y is the last minor release of ParaView
+    - [ ] Push the tag: `git push origin vX.Y-final`.
+<!-- endif -->
   - Getting Started Guide
-      - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
-      - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
-  - macOS signing machine
-    - [ ] Check that the macOS signing machine is reachable. If not, request it to be switched on.
+    - [ ] Update if needed: repository is [here][getting-started-ref]
+    - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
+    - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
+  - Signing machines
+    - [ ] Check that the Kitare macOS signing machine is reachable. If not, request it to be switched on.
+    - [ ] Check that the Kitware Windows signing machine is reachable. If not, request it to be switched on.
 
 # Update ParaView
 
@@ -41,11 +49,11 @@ Please remove this comment.
   - Integrate changes.
     - Make a commit for each of these `release` changes on a single topic
       (suggested branch name: `update-to-v@VERSION@`):
-      - [ ] Move individual notes from `Documentation/release/dev` to
-        `Documentation/release/@MAJOR@.@MINOR@/`, keeping sample-topic.md.
-<!-- if @RC@ == "" -->
+      - [ ] Move individual release notes from `Documentation/release/dev` to
+        `Documentation/release/@MAJOR@.@MINOR@/`, but leave `sample-topic.md` in place.
+      - [ ] Integrate individual release notes into `Documentation/release/ParaView-@VERSION@.md`.
+<!-- if not RC -->
       - [ ] Remove `Documentation/release/@MAJOR@.@MINOR@/`
-      - [ ] Assemble release notes into `Documentation/release/ParaView-@VERSION@.md`.
 <!-- endif -->
 <!-- if RC1 and patch == 0 -->
       - [ ] Update `version.txt` to bump the minor version number.
@@ -198,18 +206,17 @@ git submodule update --recursive --init
           in paraview-superbuild
 
 # Sign Windows binaries
-  -  [ ] Request Windows binary signings (only .exe archives) on the Package
+  -  [ ] Request Windows binary signings (only .msi archives) on the Package
          Signing repo. Example request [here][win-sign-example].
 
 # Sign macOS binaries
   - [ ] Upload to signing server, run script, download resulting .pkg and .dmg files
   - [ ] Install on x86\_64 from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
-  - [ ] Install on arm64 from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
   - [ ] Install on x86\_64 from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
+  - [ ] Install on arm64 from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
   - [ ] Install on arm64 from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
 
 # Validating binaries
-
 
 ## Linux
 
@@ -256,13 +263,14 @@ Check that
   - Open can.ex2 example. Split screen horizontally. Switch to Volume rendering in one view, ray tracing in the other. Save screenshot (.png). Save Animation (.avi).
 
 Binary checklist
-  - [ ] macOS arm64
-  - [ ] macOS x86\_64
+  - [ ] macOS arm64 (.dmg)
+  - [ ] macOS arm64 (.pkg)
+  - [ ] macOS x86\_64 (.dmg)
+  - [ ] macOS x86\_64 (.pkg)
   - [ ] Linux
-  - [ ] Linux osmesa
-  - [ ] Windows MPI (.exe)
+  - [ ] Windows MPI (.msi)
   - [ ] Windows MPI (.zip)
-  - [ ] Windows no-MPI (.exe)
+  - [ ] Windows no-MPI (.msi)
   - [ ] Windows no-MPI (.zip)
 
 # Upload binaries
@@ -271,8 +279,8 @@ Binary checklist
   - [ ] Ask @cory.quammen to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website from within the directory corresponding to www.paraview.org/files/
 
 ```
-updateMD5sum.sh v@MAJOR@.@MINOR@
-buildListing.sh
+bash updateMD5.sh v@MAJOR@.@MINOR@
+bash buildListing.sh
 ```
 
   - [ ] Test download links on https://www.paraview.org/download
@@ -324,3 +332,4 @@ If making a non-RC release:
 
 [win-sign-example]:  https://kwgitlab.kitware.com/software-process/package-signing/-/issues/12
 [classroom-tutorials]:  https://docs.paraview.org/en/latest/Tutorials/ClassroomTutorials/index.html
+[getting-started-ref]: https://gitlab.kitware.com/paraview/paraview-docs/-/tree/master/gettingstarted?ref_type=heads
