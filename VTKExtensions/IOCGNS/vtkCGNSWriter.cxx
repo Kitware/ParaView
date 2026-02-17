@@ -1117,7 +1117,6 @@ void vtkCGNSWriter::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "OriginalInput "
      << (this->OriginalInput ? this->OriginalInput->GetClassName() : "(none)") << endl;
-  os << indent << "WasWritingSuccessful " << (this->WasWritingSuccessful ? "Yes" : "No") << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -1239,8 +1238,8 @@ int vtkCGNSWriter::RequestData(vtkInformation* request, vtkInformationVector** i
     request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
   }
 
-  this->WriteData();
-  if (!this->WasWritingSuccessful)
+  bool ret = this->WriteDataAndReturn();
+  if (!ret)
   {
     this->SetErrorCode(1L);
   }
@@ -1256,7 +1255,7 @@ int vtkCGNSWriter::RequestData(vtkInformation* request, vtkInformationVector** i
     }
   }
 
-  return this->WasWritingSuccessful ? 1 : 0;
+  return ret ? 1 : 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1270,12 +1269,12 @@ static bool SuffixValidation(char* fileNameSuffix)
 }
 
 //------------------------------------------------------------------------------
-void vtkCGNSWriter::WriteData()
+bool vtkCGNSWriter::WriteDataAndReturn()
 {
-  this->WasWritingSuccessful = false;
+  bool ret = false;
   if (!this->FileName || !this->OriginalInput)
   {
-    return;
+    return ret;
   }
 
   write_info info;
@@ -1312,7 +1311,7 @@ void vtkCGNSWriter::WriteData()
         vtkErrorMacro(
           "Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
                                  << ". Expected valid std::format style format specifiers!");
-        return;
+        return ret;
       }
     }
     else
@@ -1338,21 +1337,19 @@ void vtkCGNSWriter::WriteData()
   if (this->OriginalInput->IsA("vtkCompositeDataSet"))
   {
     vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(this->OriginalInput);
-    this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteComposite(composite, info, error);
+    ret = vtkCGNSWriter::vtkPrivate::WriteComposite(composite, info, error);
   }
   else if (this->OriginalInput->IsA("vtkDataSet"))
   {
     if (this->OriginalInput->IsA("vtkStructuredGrid"))
     {
       vtkStructuredGrid* structuredGrid = vtkStructuredGrid::SafeDownCast(this->OriginalInput);
-      this->WasWritingSuccessful =
-        vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(structuredGrid, info, error);
+      ret = vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(structuredGrid, info, error);
     }
     else if (this->OriginalInput->IsA("vtkPointSet"))
     {
       vtkPointSet* unstructuredGrid = vtkPointSet::SafeDownCast(this->OriginalInput);
-      this->WasWritingSuccessful =
-        vtkCGNSWriter::vtkPrivate::WritePointSet(unstructuredGrid, info, error);
+      ret = vtkCGNSWriter::vtkPrivate::WritePointSet(unstructuredGrid, info, error);
     }
     else if (this->OriginalInput->IsA("vtkRectilinearGrid"))
     {
@@ -1361,7 +1358,7 @@ void vtkCGNSWriter::WriteData()
       conv->SetInputData(rectilinearGrid);
       conv->Update();
       vtkStructuredGrid* sg = conv->GetOutput();
-      this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(sg, info, error);
+      ret = vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(sg, info, error);
     }
     else if (this->OriginalInput->IsA("vtkImageData"))
     {
@@ -1370,7 +1367,7 @@ void vtkCGNSWriter::WriteData()
       conv->SetInputData(cartesianGrid);
       conv->Update();
       vtkStructuredGrid* sg = conv->GetOutput();
-      this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(sg, info, error);
+      ret = vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(sg, info, error);
     }
     else
     {
@@ -1397,8 +1394,10 @@ void vtkCGNSWriter::WriteData()
     this->TimeValues = nullptr;
   }
 
-  if (!this->WasWritingSuccessful)
+  if (!ret)
   {
     vtkErrorMacro(<< " Writing failed: " << error);
+    return false;
   }
+  return true;
 }

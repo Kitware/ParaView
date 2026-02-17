@@ -29,6 +29,7 @@
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
+#include <iostream>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -170,7 +171,7 @@ int vtkCSVWriter::RequestData(vtkInformation* request,
     request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
   }
 
-  this->WriteData();
+  bool ret = this->WriteDataAndReturn();
 
   this->CurrentTimeIndex++;
   if (this->CurrentTimeIndex >= this->NumberOfTimeSteps)
@@ -183,7 +184,7 @@ int vtkCSVWriter::RequestData(vtkInformation* request,
     }
   }
 
-  return this->GetErrorCode() == vtkErrorCode::NoError ? 1 : 0;
+  return (ret && this->GetErrorCode() == vtkErrorCode::NoError) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -560,11 +561,11 @@ static bool SuffixValidation(char* fileNameSuffix)
 }
 
 //-----------------------------------------------------------------------------
-void vtkCSVWriter::WriteData()
+bool vtkCSVWriter::WriteDataAndReturn()
 {
   if (!this->FileName)
   {
-    return;
+    return false;
   }
   auto input = this->GetInput();
 
@@ -594,7 +595,7 @@ void vtkCSVWriter::WriteData()
       vtkErrorMacro(
         "Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
                                << ". Expected valid std::format style format specifiers!");
-      return;
+      return false;
     }
   }
   else
@@ -657,13 +658,15 @@ void vtkCSVWriter::WriteData()
       ? CSVFile::OpenMode::Append
       : CSVFile::OpenMode::Write;
     int error_code = file.Open(filename.str().c_str(), openMode);
+    bool ret = false;
     if (error_code == vtkErrorCode::NoError)
     {
       file.WriteHeader(table, this, openMode);
       file.WriteData(table, this);
+      ret = true;
     }
     this->SetErrorCode(error_code);
-    return;
+    return ret;
   }
 
   const int myRank = controller->GetLocalProcessId();
@@ -675,7 +678,7 @@ void vtkCSVWriter::WriteData()
     if (error_code != vtkErrorCode::NoError)
     {
       this->SetErrorCode(error_code);
-      return;
+      return false;
     }
 
     vtkIdType row_count = table->GetNumberOfRows();
@@ -702,6 +705,7 @@ void vtkCSVWriter::WriteData()
     }
     controller->Broadcast(&error_code, 1, 0);
     this->SetErrorCode(error_code);
+    return error_code != vtkErrorCode::NoError ? false : true;
   }
   else
   {
@@ -715,7 +719,7 @@ void vtkCSVWriter::WriteData()
     if (error_code != vtkErrorCode::NoError)
     {
       this->SetErrorCode(error_code);
-      return;
+      return false;
     }
 
     const vtkIdType row_count = table->GetNumberOfRows();
@@ -773,6 +777,7 @@ void vtkCSVWriter::WriteData()
     error_code = vtkErrorCode::NoError;
     controller->Broadcast(&error_code, 1, 0);
     this->SetErrorCode(error_code);
+    return error_code != vtkErrorCode::NoError ? false : true;
   }
 
   // the writer can be used for multiple timesteps
@@ -783,6 +788,7 @@ void vtkCSVWriter::WriteData()
     this->TimeValues->Delete();
     this->TimeValues = nullptr;
   }
+  return true;
 }
 
 //-----------------------------------------------------------------------------

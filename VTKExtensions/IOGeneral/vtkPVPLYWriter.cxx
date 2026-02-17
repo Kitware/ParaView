@@ -65,7 +65,7 @@ void vtkPVPLYWriter::SetLookupTable(vtkScalarsToColors* lut)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPLYWriter::WriteData()
+bool vtkPVPLYWriter::WriteDataAndReturn()
 {
   int fieldAssociation = 0;
   vtkPolyData* input = vtkPolyData::SafeDownCast(this->GetInputDataObject(0, 0));
@@ -99,8 +99,9 @@ void vtkPVPLYWriter::WriteData()
     this->Writer->SetColorModeToOff();
     this->Writer->EnableAlphaOff();
   }
-  this->Writer->Write();
+  bool ret = this->Writer->Write();
   this->Writer->SetInputDataObject(0, nullptr);
+  return ret;
 }
 
 //----------------------------------------------------------------------------

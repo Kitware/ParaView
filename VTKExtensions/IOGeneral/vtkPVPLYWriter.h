@@ -69,7 +69,7 @@ protected:
   ~vtkPVPLYWriter() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
-  void WriteData() override;
+  bool WriteDataAndReturn() override;
 
   bool EnableColoring;
   bool EnableAlpha;

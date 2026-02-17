@@ -63,7 +63,7 @@ protected:
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  void WriteData() override;
+  bool WriteDataAndReturn() override;
 
   int NumberOfPieces = 0;
   int RequestPiece = -1;

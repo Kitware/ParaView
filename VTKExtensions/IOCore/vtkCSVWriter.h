@@ -181,7 +181,7 @@ protected:
   vtkCSVWriter();
   ~vtkCSVWriter() override;
 
-  void WriteData() override;
+  bool WriteDataAndReturn() override;
 
   // see algorithm for more info.
   // This writer takes in vtkTable, vtkDataSet or vtkCompositeDataSet.
