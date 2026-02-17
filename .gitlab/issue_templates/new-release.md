@@ -268,7 +268,6 @@ Binary checklist
   - [ ] macOS x86\_64 (.dmg)
   - [ ] macOS x86\_64 (.pkg)
   - [ ] Linux
-  - [ ] Linux osmesa
   - [ ] Windows MPI (.msi)
   - [ ] Windows MPI (.zip)
   - [ ] Windows no-MPI (.msi)
