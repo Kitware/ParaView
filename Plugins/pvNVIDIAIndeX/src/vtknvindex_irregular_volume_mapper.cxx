@@ -363,7 +363,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     }
 
     // scalars
-    m_volume_data.scalars = m_scalar_array->GetVoidPointer(0);
+    m_volume_data.scalars = m_scalar_array->GetVoidPointer(0); // NOLINT(bugprone-unsafe-functions)
     m_volume_data.cell_flag = cell_flag;
     m_volume_data.num_scalars =
       (cell_flag == 1 ? m_volume_data.num_cells : m_volume_data.num_points);

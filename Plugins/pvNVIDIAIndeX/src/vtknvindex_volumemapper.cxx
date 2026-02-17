@@ -183,7 +183,7 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step)
       m_converted_scalar_arrays[time_step] = nullptr;
     }
 
-    m_subset_ptrs[time_step] = scalar_array->GetVoidPointer(0);
+    m_subset_ptrs[time_step] = scalar_array->GetVoidPointer(0); // NOLINT(bugprone-unsafe-functions)
   }
 
   // Write volume data to shared memory.
@@ -306,7 +306,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
     m_converted_scalar_arrays[0] = nullptr;
   }
 
-  m_subset_ptrs[0] = scalar_array->GetVoidPointer(0);
+  m_subset_ptrs[0] = scalar_array->GetVoidPointer(0); // NOLINT(bugprone-unsafe-functions)
 
   vtknvindex_regular_volume_data volume_data;
   volume_data.scalars = m_subset_ptrs.data();
