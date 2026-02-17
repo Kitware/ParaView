@@ -49,11 +49,11 @@ Please remove this comment.
   - Integrate changes.
     - Make a commit for each of these `release` changes on a single topic
       (suggested branch name: `update-to-v@VERSION@`):
-      - [ ] Move individual notes from `Documentation/release/dev` to
-        `Documentation/release/@MAJOR@.@MINOR@/`, keeping sample-topic.md.
-<!-- if @RC@ == "" -->
+      - [ ] Move individual release notes from `Documentation/release/dev` to
+        `Documentation/release/@MAJOR@.@MINOR@/`, but leave `sample-topic.md` in place.
+      - [ ] Integrate individual release notes into `Documentation/release/ParaView-@VERSION@.md`.
+<!-- if not RC -->
       - [ ] Remove `Documentation/release/@MAJOR@.@MINOR@/`
-      - [ ] Assemble release notes into `Documentation/release/ParaView-@VERSION@.md`.
 <!-- endif -->
 <!-- if RC1 and patch == 0 -->
       - [ ] Update `version.txt` to bump the minor version number.
