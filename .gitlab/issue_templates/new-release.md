@@ -23,10 +23,12 @@ Please remove this comment.
     - [ ] Push the tag: `git push origin vX.Y-final`.
 <!-- endif -->
   - Getting Started Guide
-      - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
-      - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
-  - macOS signing machine
-    - [ ] Check that the macOS signing machine is reachable. If not, request it to be switched on.
+    - [ ] Update if needed: repository is [here][getting-started-ref]
+    - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
+    - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
+  - Signing machines
+    - [ ] Check that the Kitare macOS signing machine is reachable. If not, request it to be switched on.
+    - [ ] Check that the Kitware Windows signing machine is reachable. If not, request it to be switched on.
 
 # Update ParaView
 
@@ -329,3 +331,4 @@ If making a non-RC release:
 
 [win-sign-example]:  https://kwgitlab.kitware.com/software-process/package-signing/-/issues/12
 [classroom-tutorials]:  https://docs.paraview.org/en/latest/Tutorials/ClassroomTutorials/index.html
+[getting-started-ref]: https://gitlab.kitware.com/paraview/paraview-docs/-/tree/master/gettingstarted?ref_type=heads
