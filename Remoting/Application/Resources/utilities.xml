@@ -841,7 +841,7 @@
     </Proxy>
 
     <!-- ==================================================================== -->
-    <WriterProxy class="vtkRemoteWriterHelper" name="RemoteWriterHelper" processes="client|dataserver">
+    <WriterProxy class="vtkRemoteWriterHelper" name="RemoteWriterHelper" processes="client|dataserver" stream_reply="false">
       <Documentation>
         Proxy used internally to help write data generated on the client-side on the data-server side.
       </Documentation>

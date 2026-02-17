@@ -578,14 +578,21 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
 
     case vtkPVSessionServer::EXECUTE_STREAM:
     {
-      int ignore_errors, size;
-      stream >> ignore_errors >> size;
+      int ignoreErrors, sendReply, size;
+      stream >> ignoreErrors >> sendReply >> size;
       unsigned char* css_data = new unsigned char[size + 1];
       this->Internal->GetActiveController()->Receive(
         css_data, size, 1, vtkPVSessionServer::EXECUTE_STREAM_TAG);
       vtkClientServerStream cssStream;
       cssStream.SetData(css_data, size);
-      this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS, cssStream, ignore_errors != 0);
+      this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS, cssStream, ignoreErrors != 0);
+
+      if (sendReply)
+      {
+        const unsigned char dummy = 0;
+        this->Internal->GetActiveController()->Send(
+          &dummy, 1, 1, vtkPVSessionServer::STREAM_EXECUTED);
+      }
       delete[] css_data;
     }
     break;

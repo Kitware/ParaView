@@ -3,7 +3,8 @@
     <!-- ==================================================================== -->
     <SourceProxy class="vtkClientServerMoveData"
                  name="ClientServerMoveData"
-                 processes="client|dataserver">
+                 processes="client|dataserver"
+                 stream_reply="false">
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">

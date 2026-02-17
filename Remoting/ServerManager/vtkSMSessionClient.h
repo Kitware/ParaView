@@ -103,10 +103,18 @@ public:
    */
   void PushState(vtkSMMessage* msg) override;
   void PullState(vtkSMMessage* message) override;
-  void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
-    bool ignore_errors = false) override;
   const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location) override;
   ///@}
+
+  /**
+   * Send a command to the server to be executed. Use GetLastResult() to obtain the
+   * last result after the command stream is evaluated.
+   * Set \c ignoreErrors to true to ignore any interpreting errors.
+   * Set \c sendReply to true to force the client to wait for a reply from server after executing
+   * the stream.
+   */
+  void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
+    bool ignoreErrors = false, bool sendReply = false) override;
 
   ///@{
   /**
