@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
 // SPDX-License-Identifier: BSD-3-Clause
+// PARAVIEW_DEPRECATED_IN_6_2_0()
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkFlashContour.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
