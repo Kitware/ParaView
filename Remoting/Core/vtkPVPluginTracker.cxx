@@ -620,34 +620,6 @@ unsigned int vtkPVPluginTracker::GetNumberOfPlugins()
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
-{
-  std::string defaultname = vtkGetPluginNameFromFileName(filename);
-  vtkPluginsList::iterator iter = this->PluginsList->LocateUsingFileName(filename);
-  if (iter == this->PluginsList->end())
-  {
-    iter = this->PluginsList->LocateUsingPluginName(defaultname.c_str());
-  }
-  if (iter == this->PluginsList->end())
-  {
-    vtkItem item;
-    item.FileName = filename;
-    item.PluginName = defaultname;
-    this->PluginsList->push_back(item);
-    this->InvokeEvent(vtkPVPluginTracker::RegisterAvailablePluginEvent);
-    return static_cast<unsigned int>(this->PluginsList->size() - 1);
-  }
-  else
-  {
-    // don't update the filename here. This avoids clobbering of paths for
-    // distributed plugins between servers that are named the same (as far as
-    // the client goes).
-    // iter->FileName = filename;
-    return static_cast<unsigned int>(iter - this->PluginsList->begin());
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
 {
   assert(plugin != nullptr);

@@ -15,7 +15,6 @@
 
 #include "vtkGhostCellsGenerator.h"
 #include "vtkPVVTKExtensionsFiltersParallelDIY2Module.h" // needed for exports
-#include "vtkParaViewDeprecation.h"                      // for PARAVIEW_DEPRECATED_IN_6_0_0
 
 class vtkDataObject;
 class vtkMultiProcessController;
@@ -35,11 +34,6 @@ protected:
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int, vtkInformation*) override;
-
-  PARAVIEW_DEPRECATED_IN_6_0_0(
-    "Use int GhostCellsGeneratorUsingSuperclassInstance(vtkDataObject*, vtkDataObject*)")
-  int GhostCellsGeneratorUsingSuperclassInstance(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Execute classic GCG on the input dataset

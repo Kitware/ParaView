@@ -123,7 +123,6 @@
   <Proxy group="filters" name="QuadraturePointStatistics" />
   <Proxy group="filters" name="QuadratureSchemeDictionaryGenerator" />
   <Proxy group="filters" name="QuadricClustering" />
-  <Proxy group="filters" name="ReflectionFilter" />
   <Proxy group="filters" name="RibbonFilter" />
   <Proxy group="filters" name="RotationalExtrusionFilter" />
   <Proxy group="filters" name="ScatterPlot"/>

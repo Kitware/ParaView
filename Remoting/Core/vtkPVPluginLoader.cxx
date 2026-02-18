@@ -508,14 +508,6 @@ bool vtkPVPluginLoader::LoadPluginByName(const char* name, bool acceptDelayed)
   return false;
 }
 
-// PARAVIEW_DEPRECATED_IN_6_0_0(): following method should be removed
-//-----------------------------------------------------------------------------
-bool vtkPVPluginLoader::LoadDelayedLoadPlugin(
-  const std::string& name, const std::vector<std::string>& xmls, const std::string& filename)
-{
-  return this->LoadDelayedLoadPlugin(name, xmls, filename, "", "");
-}
-
 //-----------------------------------------------------------------------------
 bool vtkPVPluginLoader::LoadDelayedLoadPlugin(const std::string& name,
   const std::vector<std::string>& xmls, const std::string& filename, const std::string& version,

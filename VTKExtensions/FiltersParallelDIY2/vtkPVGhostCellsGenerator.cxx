@@ -34,14 +34,6 @@ void vtkPVGhostCellsGenerator::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
-  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  return this->GhostCellsGeneratorUsingSuperclassInstance(
-    vtkDataObject::GetData(inputVector[0]), vtkDataObject::GetData(outputVector));
-}
-
-//----------------------------------------------------------------------------
-int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
   vtkDataObject* inputDO, vtkDataObject* outputDO)
 {
   if (!outputDO)

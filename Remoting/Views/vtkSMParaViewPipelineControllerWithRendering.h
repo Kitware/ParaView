@@ -22,8 +22,7 @@
 #ifndef vtkSMParaViewPipelineControllerWithRendering_h
 #define vtkSMParaViewPipelineControllerWithRendering_h
 
-#include "vtkParaViewDeprecation.h"
-#include "vtkRemotingViewsModule.h" //needed for exports
+#include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMParaViewPipelineController.h"
 
 class vtkSMSourceProxy;
@@ -174,28 +173,6 @@ public:
    * that set appropriate defaults where as much as possible.
    */
   bool RegisterRepresentationProxy(vtkSMProxy* proxy) override;
-
-  /**
-   * Control how scalar bar visibility is updated by the Hide call.
-   */
-  PARAVIEW_DEPRECATED_IN_6_0_0(
-    "Use vtkPVGeneralSettings::SetScalarBarMode(AUTOMATICALLY_HIDE_SCALAR_BARS) instead")
-  static void SetHideScalarBarOnHide(bool);
-
-  ///@{
-  /**
-   * Control whether representations try to maintain properties from an input
-   * representation, if present. e.g. if you "Transform" the representation for
-   * a source, then any filter that you connect to it should be transformed as
-   * well.
-   */
-  PARAVIEW_DEPRECATED_IN_6_0_0(
-    "Use vtkPVGeneralSettings::SetInheritRepresentationProperties() instead")
-  static void SetInheritRepresentationProperties(bool);
-  PARAVIEW_DEPRECATED_IN_6_0_0(
-    "Use vtkPVGeneralSettings::GetInheritRepresentationProperties() instead")
-  static bool GetInheritRepresentationProperties();
-  ///@}
 
   /**
    * Overridden to handle default ColorArrayName for representations correctly.

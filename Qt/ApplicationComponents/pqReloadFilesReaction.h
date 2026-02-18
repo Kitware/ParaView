@@ -5,7 +5,6 @@
 #define pqReloadFilesReaction_h
 
 #include "pqReaction.h"
-#include "vtkParaViewDeprecation.h"
 
 class vtkSMSourceProxy;
 
@@ -30,12 +29,6 @@ public:
 
   pqReloadFilesReaction(QAction* parent = nullptr, ReloadModes reloadMode = ActiveSource);
   ~pqReloadFilesReaction() override;
-
-  /**
-   * reload the active proxy if it supports reload. Returns true on success.
-   */
-  PARAVIEW_DEPRECATED_IN_6_0_0("Use reloadSources() instead.")
-  static bool reload();
 
   /**
    * reload the active source or all sources if they support reload. Returns true on success.

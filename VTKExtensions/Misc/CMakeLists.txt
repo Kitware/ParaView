@@ -18,7 +18,6 @@ set(classes
   vtkPVMergeTables
   vtkPVMergeTablesComposite
   vtkPVMergeTablesMultiBlock
-  vtkPVPlane
   vtkPVTransform
   vtkPVRotateAroundOriginTransform
   vtkReductionFilter

@@ -1,9 +1,7 @@
 if (USE_CATALYST)
   add_library(CxxMappedDataArrayExampleAdaptor
     FEAdaptor.cxx
-    FEAdaptor.h
-    vtkCPMappedVectorArrayTemplate.h
-    vtkCPMappedVectorArrayTemplate.txx)
+    FEAdaptor.h)
   target_link_libraries(CxxMappedDataArrayExampleAdaptor
     INTERFACE
       VTK::PythonUsed

@@ -21,8 +21,7 @@
 #define vtkPVPluginLoader_h
 
 #include "vtkObject.h"
-#include "vtkParaViewDeprecation.h" // for deprecation macro
-#include "vtkRemotingCoreModule.h"  //needed for exports
+#include "vtkRemotingCoreModule.h" //needed for exports
 
 #include <functional> // for std::function
 
@@ -45,15 +44,6 @@ public:
    */
   bool LoadPlugin(const char* filename) { return this->LoadPluginInternal(filename, false); }
   bool LoadPluginSilently(const char* filename) { return this->LoadPluginInternal(filename, true); }
-
-  /**
-   * Load a delayed load plugin with provided name, XMLs and an actual plugin filename
-   * The actual loading will take place the first time a VTK object for a XML proxy needs to be
-   * created.
-   */
-  PARAVIEW_DEPRECATED_IN_6_0_0("Use the overload with versions and description instead")
-  bool LoadDelayedLoadPlugin(
-    const std::string& name, const std::vector<std::string>& xmls, const std::string& filename);
 
   /**
    * Load a delayed load plugin with provided name, XMLs, an actual plugin filename, version and

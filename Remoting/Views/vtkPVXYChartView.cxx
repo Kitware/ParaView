@@ -30,9 +30,6 @@
 #include <cmath>
 #include <vtksys/SystemTools.hxx>
 
-// PARAVIEW_DEPRECATED_IN_6_0_0
-bool vtkPVXYChartView::IgnoreNegativeLogAxisWarning = false;
-
 class vtkPVXYChartView::vtkInternals
 {
 public:
@@ -925,16 +922,4 @@ void vtkPVXYChartView::Update()
 void vtkPVXYChartView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetIgnoreNegativeLogAxisWarning(bool val)
-{
-  vtkPVGeneralSettings::GetInstance()->SetIgnoreNegativeLogAxisWarning(val);
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVXYChartView::GetIgnoreNegativeLogAxisWarning()
-{
-  return vtkPVGeneralSettings::GetInstance()->GetIgnoreNegativeLogAxisWarning();
 }
