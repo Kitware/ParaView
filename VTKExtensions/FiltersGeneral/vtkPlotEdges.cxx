@@ -8,7 +8,7 @@
 #include "vtkCellData.h"
 #include "vtkCleanPolyData.h"
 #include "vtkCollection.h"
-#include "vtkCollectionIterator.h"
+#include "vtkCollectionRange.h"
 #include "vtkConvertToMultiBlockDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdList.h"
@@ -916,39 +916,36 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
 void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollection* nodes)
 {
   Node* node = nullptr;
-  vtkCollectionIterator* nodeIt = nodes->NewIterator();
+  auto range = vtk::Range(nodes);
+  auto nodeIt = range.begin();
   // do a first pass with straightforward nodes(2 branches)
-  nodeIt->GoToFirstItem();
-  while (!nodeIt->IsDoneWithTraversal())
+  while (nodeIt != range.end())
   {
-    node = Node::SafeDownCast(nodeIt->GetCurrentObject());
+    node = Node::SafeDownCast(*nodeIt);
     if (node->GetSegments()->GetNumberOfItems() == 2)
     {
       Segment* segmentA = Segment::SafeDownCast(node->GetSegments()->GetItemAsObject(0));
       Segment* segmentB = Segment::SafeDownCast(node->GetSegments()->GetItemAsObject(1));
       vtkPlotEdges::MergeSegments(segments, nodes, node, segmentA, segmentB);
-      nodeIt->GoToNextItem();
+      ++nodeIt;
       nodes->RemoveItem(node);
     }
     else
     {
-      nodeIt->GoToNextItem();
+      ++nodeIt;
     }
   }
 
   // do a second pass with the other nodes
-  nodeIt->GoToFirstItem();
-  while (!nodeIt->IsDoneWithTraversal())
+  nodeIt = range.begin();
+  while (nodeIt != range.end())
   {
-    node = Node::SafeDownCast(nodeIt->GetCurrentObject());
+    node = Node::SafeDownCast(*nodeIt);
     double point[3];
     node->GetPolyData()->GetPoint(node->GetPointId(), point);
 
     while (node->GetSegments()->GetNumberOfItems() > 1)
     {
-      vtkCollectionIterator* it = node->GetSegments()->NewIterator();
-      vtkCollectionIterator* it2 = node->GetSegments()->NewIterator();
-
       Segment* segmentI = nullptr;
       Segment* segmentJ = nullptr;
       Segment* segmentA = nullptr;
@@ -957,12 +954,12 @@ void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollecti
       double old_score = -2.;
       double score = 0;
 
-      for (it->GoToFirstItem(); (segmentI = Segment::SafeDownCast(it->GetCurrentObject()));
-           it->GoToNextItem())
+      for (auto segment : vtk::Range(node->GetSegments()))
       {
-        for (it2->GoToFirstItem(); (segmentJ = Segment::SafeDownCast(it2->GetCurrentObject()));
-             it2->GoToNextItem())
+        segmentI = Segment::SafeDownCast(segment);
+        for (auto segment2 : vtk::Range(node->GetSegments()))
         {
+          segmentJ = Segment::SafeDownCast(segment2);
           score = node->ComputeConnectionScore(segmentI, segmentJ);
 
           if (score > old_score)
@@ -974,15 +971,11 @@ void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollecti
         }
       }
       vtkPlotEdges::MergeSegments(segments, nodes, node, segmentA, segmentB);
-
-      it->Delete();
-      it2->Delete();
     }
 
     nodes->RemoveItem(node);
-    nodeIt->GoToFirstItem();
+    ++nodeIt;
   }
-  nodeIt->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -1001,35 +994,31 @@ void vtkPlotEdges::MergeSegments(
   node->GetSegments()->RemoveItem(segmentB);
 
   // replace segmentB by segmentA in other nodes
-  vtkCollectionIterator* nodeIt = nodes->NewIterator();
-  for (nodeIt->GoToFirstItem(); !nodeIt->IsDoneWithTraversal(); nodeIt->GoToNextItem())
+  for (auto item : vtk::Range(nodes))
   {
-    Node* node2 = Node::SafeDownCast(nodeIt->GetCurrentObject());
+    Node* node2 = Node::SafeDownCast(item);
     int segmentBPos = node2->GetSegments()->IsItemPresent(segmentB);
     if (segmentBPos)
     {
       node2->GetSegments()->ReplaceItem(segmentBPos - 1, segmentA);
     }
   }
-  nodeIt->Delete();
   segments->RemoveItem(segmentB);
 }
 
 //-----------------------------------------------------------------------------
 vtkPlotEdges::Node* vtkPlotEdges::GetNodeAtPoint(vtkCollection* nodes, vtkIdType pointId)
 {
-  vtkCollectionIterator* it = nodes->NewIterator();
   Node* res = nullptr;
-  for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+  for (auto item : vtk::Range(nodes))
   {
-    Node* node = Node::SafeDownCast(it->GetCurrentObject());
+    Node* node = Node::SafeDownCast(item);
     if (node->GetPointId() == pointId)
     {
       res = node;
       break;
     }
   }
-  it->Delete();
   return res;
 }
 
@@ -1104,10 +1093,9 @@ void vtkPlotEdges::SaveToMultiBlockDataSet(vtkCollection* segments, vtkMultiBloc
 //-----------------------------------------------------------------------------
 void vtkPlotEdges::PrintSegments(vtkCollection* segments)
 {
-  vtkSmartPointer<vtkCollectionIterator> it = segments->NewIterator();
-  for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+  for (auto item : vtk::Range(segments))
   {
-    Segment* segment = Segment::SafeDownCast(it->GetCurrentObject());
+    Segment* segment = Segment::SafeDownCast(item);
     segment->Print(std::cout);
   }
 }
