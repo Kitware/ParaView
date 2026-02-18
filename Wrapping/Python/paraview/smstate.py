@@ -462,6 +462,39 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                 "SetActiveSource(%s)" % smtrace.Trace.get_accessor(simple.GetActiveSource()),
                 "# ----------------------------------------------------------------"])
 
+        # Setup camera links
+        trace.append_separated(["# ----------------------------------------------------------------",
+                                "# setup camera links"])
+        number_of_links = sm.ProxyManager().GetNumberOfLinks()
+        for i in range(number_of_links):
+            link_name = sm.ProxyManager().GetLinkName(i)
+            link_proxy = sm.ProxyManager().GetRegisteredLink(link_name)
+            if (not isinstance(link_proxy, sm.vtkSMCameraLink)
+                or link_proxy.GetNumberOfLinkedObjects() != 4):
+                continue
+
+            # Bidirectional link means that the linked proxies have the following pattern:
+            # index 0: Proxy_0
+            # index 1: Proxy_1
+            # index 2: Proxy_1
+            # index 3: Proxy_0
+            is_bidirectional_link = (link_proxy.GetLinkedProxy(0) == link_proxy.GetLinkedProxy(3) and
+                                     link_proxy.GetLinkedProxy(1) == link_proxy.GetLinkedProxy(2))
+            if not is_bidirectional_link:
+                continue
+
+            # Everything is valid so we can add this to the linked proxies
+            first_proxy = link_proxy.GetLinkedProxy(0)
+            second_proxy = link_proxy.GetLinkedProxy(1)
+            linkitem = smtrace.CallFunction("AddCameraLink",
+                                            first_proxy,
+                                            second_proxy,
+                                            link_name)
+            linkitem.finalize()
+            del linkitem
+        trace.append(smtrace.get_current_trace_output_and_reset(raw=True))
+        trace.append("# ----------------------------------------------------------------")
+
         if postamble is None:
             trace.append_separated(smtrace._get_standard_postamble_comment())
         elif postamble:
