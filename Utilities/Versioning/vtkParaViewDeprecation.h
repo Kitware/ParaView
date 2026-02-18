@@ -30,16 +30,7 @@
 // // Hide PARAVIEW_DEPRECATED_IN_X_Y_Z() warnings for this class.
 // #define PARAVIEW_DEPRECATION_LEVEL 0
 //
-// #include "vtkLegacy.h"
-//
-// void oldApi()
-// {
-//   // One of:
-//   VTK_LEGACY_BODY(oldApi, "ParaView X.Y.Z");
-//   VTK_LEGACY_REPLACED_BODY(oldApi, "ParaView X.Y.Z", newApi);
-//
-//   // Remaining implementation.
-// }
+// #include …
 // ```
 //
 // Please note the `PARAVIEW_DEPRECATED_IN_` version in the
