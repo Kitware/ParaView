@@ -1078,7 +1078,7 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
     while (iter2 != this->Internals->SubProxyLinks.end())
     {
       iter2->GetPointer()->RemoveLinkedProxy(subProxy.GetPointer());
-      if (iter2->GetPointer()->GetNumberOfLinkedProxies() <= 1)
+      if (iter2->GetPointer()->GetNumberOfLinkedObjects() <= 1)
       {
         // link is useless, remove it.
         this->Internals->SubProxyLinks.erase(iter2);
