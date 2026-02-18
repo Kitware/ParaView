@@ -1,0 +1,76 @@
+<ServerManagerConfiguration>
+  <!-- Internal reader (core implementation) -->
+  <ProxyGroup name="internal_sources">
+    <Proxy name="MultiOutputPortReaderCore"
+           class="vtkMultiOutputPortReader">
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+      </StringVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <!-- Public reader with vtkFileSeriesReader wrapping -->
+  <ProxyGroup name="sources">
+    <SourceProxy name="MultiOutputPortReader"
+                 class="vtkFileSeriesReader"
+                 si_class="vtkSIMetaReaderProxy"
+                 file_name_method="SetFileName"
+                 label="Multi Output Port Reader">
+      <Documentation long_help="Example reader demonstrating vtkFileSeriesReader with multiple output ports."
+                     short_help="Read multi-output-port example data.">
+        This reader demonstrates vtkFileSeriesReader with multiple output ports.
+        It produces two outputs:
+        - Port 0 (Square): A square mesh with wave function f(t,x,y) = sin(2*pi*(x+y+t))
+        - Port 1 (Circle): A circular mesh with wave function f(t,x,y) = cos(2*pi*(r+t))
+
+        This example demonstrates how vtkFileSeriesReader automatically detects
+        the number of output ports from the internal reader.
+
+        File format: .mopr files containing a single floating-point time value.
+      </Documentation>
+
+      <OutputPort index="0" name="Square" />
+      <OutputPort index="1" name="Circle" />
+
+      <StringVectorProperty name="FileNameInfo"
+                            command="GetCurrentFileName"
+                            information_only="1">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FileName"
+                            animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          Specify the .mopr file(s) to read.
+          Select multiple files for a time series.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="TimestepValues"
+                            information_only="1"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="MultiOutputPortReaderCore" />
+      </SubProxy>
+
+      <Hints>
+        <ReaderFactory extensions="mopr"
+                       file_description="Multi Output Port Reader Data" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
