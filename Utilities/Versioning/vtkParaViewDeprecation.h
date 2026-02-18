@@ -68,32 +68,32 @@
 #endif
 
 // Deprecation macro support for various compilers.
-#if 0 && __cplusplus >= 201402L
-// This is currently hard-disabled because compilers do not mix C++ attributes
-// and `__attribute__` extensions together well.
-#define PARAVIEW_DEPRECATION(reason) [[deprecated(reason)]]
-#elif defined(VTK_WRAPPING_CXX)
+#if defined(VTK_WRAPPING_CXX)
 // Ignore deprecation in wrapper code.
 #define PARAVIEW_DEPRECATION(reason)
 #elif defined(__VTK_WRAP__)
 #define PARAVIEW_DEPRECATION(reason) [[vtk::deprecated(reason)]]
 #else
-#if defined(_WIN32) || defined(_WIN64)
-#define PARAVIEW_DEPRECATION(reason) __declspec(deprecated(reason))
-#elif defined(__clang__)
-#if __has_extension(attribute_deprecated_with_message)
+#if defined(__clang__)
+// Clang 12 and before mix [[deprecated]] with visibility macros, and cause parser like below
+// error: expected identifier before '__attribute__'
+// class [[deprecated("deprecated")]] __attribute__((visibility("default"))) Foo {};
+#if (__clang_major__ <= 12)
 #define PARAVIEW_DEPRECATION(reason) __attribute__((__deprecated__(reason)))
 #else
-#define PARAVIEW_DEPRECATION(reason) __attribute__((__deprecated__))
+#define PARAVIEW_DEPRECATION(reason) [[deprecated(reason)]]
 #endif
 #elif defined(__GNUC__)
-#if (__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5))
+// GCC 12 and before mix [[deprecated]] with visibility macros, and cause parser like below
+// error: expected identifier before '__attribute__'
+// class [[deprecated("deprecated")]] __attribute__((visibility("default"))) Foo {};
+#if (__GNUC__ <= 12)
 #define PARAVIEW_DEPRECATION(reason) __attribute__((__deprecated__(reason)))
 #else
-#define PARAVIEW_DEPRECATION(reason) __attribute__((__deprecated__))
+#define PARAVIEW_DEPRECATION(reason) [[deprecated(reason)]]
 #endif
 #else
-#define PARAVIEW_DEPRECATION(reason)
+#define PARAVIEW_DEPRECATION(reason) [[deprecated(reason)]]
 #endif
 #endif
 
