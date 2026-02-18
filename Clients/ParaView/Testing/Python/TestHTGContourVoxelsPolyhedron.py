@@ -49,12 +49,9 @@ hyperTreeGridRandom.Seed = 42
 hyperTreeGridRandom.Dimensions = [3, 3, 3]
 
 # create a new 'Slice'
-sliceZ = Slice(registrationName='SliceZ', Input=hyperTreeGridRandom)
-sliceZ.SliceType = 'Plane'
-sliceZ.HyperTreeGridSlicer = 'Axis Aligned Plane'
-sliceZ.SliceOffsetValues = [0.0]
-sliceZ.PointMergeMethod = 'Uniform Binning'
-sliceZ.HyperTreeGridSlicer.Normal = [0.0, 0.0, 1.0]
+sliceZ = AxisAlignedSlice(registrationName='SliceZ', Input=hyperTreeGridRandom)
+sliceZ.OffsetValues = [0.0]
+sliceZ.CutFunction.Normal = [0.0, 0.0, 1.0]
 
 # create a new 'Contour' using Voxels strategy (default)
 contourVoxels = Contour(registrationName='Contour-Voxels', Input=sliceZ)

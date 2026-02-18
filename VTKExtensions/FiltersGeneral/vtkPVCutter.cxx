@@ -75,16 +75,7 @@ int vtkPVCutter::RequestData(
         this->CreateDefaultLocator();
       }
 
-      bool multipleSlices = this->GetNumberOfContours() > 1;
-
-      // PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkAxisAlignedCutter instead")
-      // We do not support multiple axis-aligned slices in this filter. Following assertion can be
-      // removed once the specific axis-aligned codepath is dropped from vtkPVPlaneCutter.
-      if (plane->GetAxisAligned())
-      {
-        multipleSlices = false;
-      }
-
+      const bool multipleSlices = this->GetNumberOfContours() > 1;
       if (multipleSlices)
       {
         vtkNew<vtkAppendDataSets> append;
@@ -214,30 +205,14 @@ int vtkPVCutter::RequestDataObject(vtkInformation* vtkNotUsed(request),
       vtkErrorMacro(<< "Cut function not supported for vtkHyperTreeGrid");
       return 0;
     }
-    if (plane->GetAxisAligned())
+    vtkPolyData* output = vtkPolyData::GetData(outInfo);
+    if (!output)
     {
-      // PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkAxisAlignedCutter instead")
-      vtkHyperTreeGrid* output = vtkHyperTreeGrid::GetData(outInfo);
-      if (!output)
-      {
-        output = vtkHyperTreeGrid::New();
-        outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
-        this->GetOutputPortInformation(0)->Set(
-          vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-        output->FastDelete();
-      }
-    }
-    else
-    {
-      vtkPolyData* output = vtkPolyData::GetData(outInfo);
-      if (!output)
-      {
-        output = vtkPolyData::New();
-        outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
-        this->GetOutputPortInformation(0)->Set(
-          vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-        output->FastDelete();
-      }
+      output = vtkPolyData::New();
+      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      output->FastDelete();
     }
     return 1;
   }

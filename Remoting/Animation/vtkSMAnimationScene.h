@@ -24,7 +24,7 @@
 
 #include "vtkAnimationCue.h"
 #include "vtkCommand.h"                 // needed for vtkCommand::UserEvent
-#include "vtkParaViewDeprecation.h"     // For PARAVIEW_DEPRECATED_IN_5_13_0
+#include "vtkParaViewDeprecation.h"     // For PARAVIEW_DEPRECATED_IN_6_0_0
 #include "vtkRemotingAnimationModule.h" //needed for exports
 
 class vtkCompositeAnimationPlayer;

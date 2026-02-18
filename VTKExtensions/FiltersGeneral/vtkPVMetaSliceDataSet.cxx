@@ -142,17 +142,7 @@ int vtkPVMetaSliceDataSet::RequestDataObject(
     this->Internal->Cutter->SetCutFunction(this->ImplicitFunctions[METASLICE_HYPERTREEGRID]);
     this->Internal->ExtractCells->SetImplicitFunction(
       this->ImplicitFunctions[METASLICE_HYPERTREEGRID]);
-    // If plane is forced to be aligned to axis, the output is a vtkHyperTreeGrid
-    vtkPlane* plane = vtkPlane::SafeDownCast(this->Internal->Cutter->GetCutFunction());
-    if (plane && !plane->GetAxisAligned())
-    {
-      this->SetOutputType(VTK_POLY_DATA);
-    }
-    else
-    {
-      // PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkAxisAlignedCutter instead")
-      this->SetOutputType(VTK_HYPER_TREE_GRID);
-    }
+    this->SetOutputType(VTK_POLY_DATA);
   }
   else
   {
