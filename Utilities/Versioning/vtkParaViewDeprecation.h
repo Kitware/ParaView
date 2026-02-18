@@ -106,19 +106,12 @@
 #define PARAVIEW_DEPRECATED_IN_6_1_0(reason)
 #endif
 
-// APIs deprecated in 6.0.0.
-#if defined(__VTK_WRAP__)
-#define PARAVIEW_DEPRECATED_IN_6_0_0(reason) [[vtk::deprecated(reason, "6.0.0")]]
-#elif PARAVIEW_DEPRECATION_LEVEL >= PARAVIEW_VERSION_CHECK(6, 0, 20250101)
-#define PARAVIEW_DEPRECATED_IN_6_0_0(reason) PARAVIEW_DEPRECATION(reason)
-#else
-#define PARAVIEW_DEPRECATED_IN_6_0_0(reason)
-#endif
-
 // APIs deprecated in the older release always warn.
 #if defined(__VTK_WRAP__)
+#define PARAVIEW_DEPRECATED_IN_6_0_0(reason) [[vtk::deprecated(reason, "6.0.0")]]
 #define PARAVIEW_DEPRECATED_IN_5_13_0(reason) [[vtk::deprecated(reason, "5.13.0")]]
 #else
+#define PARAVIEW_DEPRECATED_IN_6_0_0(reason) PARAVIEW_DEPRECATION(reason)
 #define PARAVIEW_DEPRECATED_IN_5_13_0(reason) PARAVIEW_DEPRECATION(reason)
 #endif
 
