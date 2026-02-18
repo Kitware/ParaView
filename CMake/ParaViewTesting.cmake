@@ -1,3 +1,7 @@
+if (NOT DEFINED PARAVIEW_TEST_DIR)
+  set(PARAVIEW_TEST_DIR "${CMAKE_BINARY_DIR}/Testing/Temporary")
+endif ()
+
 function (paraview_add_test_python)
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvpython>")
   set(_vtk_test_python_args --dr ${paraview_python_args})
