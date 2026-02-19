@@ -522,15 +522,3 @@ void vtkSMChartSeriesSelectionDomain::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "HidePartialArrays: " << this->HidePartialArrays << endl;
 }
-
-//----------------------------------------------------------------------------
-void vtkSMChartSeriesSelectionDomain::SetLoadNoChartVariables(bool choice)
-{
-  vtkPVGeneralSettings::GetInstance()->SetLoadNoChartVariables(choice);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMChartSeriesSelectionDomain::GetLoadNoChartVariables()
-{
-  return vtkPVGeneralSettings::GetInstance()->GetLoadNoChartVariables();
-}

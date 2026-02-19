@@ -26,18 +26,6 @@
 #include <vector>
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationScene::SetGlobalUseGeometryCache(bool val)
-{
-  vtkPVGeneralSettings::GetInstance()->SetCacheGeometryForAnimation(val);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMAnimationScene::GetGlobalUseGeometryCache()
-{
-  return vtkPVGeneralSettings::GetInstance()->GetCacheGeometryForAnimation();
-}
-
-//----------------------------------------------------------------------------
 class vtkSMAnimationScene::vtkInternals
 {
   vtkNew<vtkSMTransferFunctionManager> TransferFunctionManager;

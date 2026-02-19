@@ -105,15 +105,6 @@ void pqReloadFilesReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-bool pqReloadFilesReaction::reload()
-{
-  vtkSMProxy* source = pqActiveObjects::instance().activeSource()
-    ? pqActiveObjects::instance().activeSource()->getProxy()
-    : nullptr;
-  return pqReloadFilesReaction::reload(vtkSMSourceProxy::SafeDownCast(source));
-}
-
-//-----------------------------------------------------------------------------
 bool pqReloadFilesReaction::reloadSources()
 {
   std::vector<vtkSMSourceProxy*> sources;

@@ -164,19 +164,6 @@ vtkPVXMLElement* pqServerConfiguration::hintsXML() const
 }
 
 //-----------------------------------------------------------------------------
-QString pqServerConfiguration::portForwardingLocalPort() const
-{
-  if (this->PortForwarding)
-  {
-    return QString::number(this->LocalPortForwardingPort);
-  }
-  else
-  {
-    return QString::number(this->resource().port(11111));
-  }
-}
-
-//-----------------------------------------------------------------------------
 void pqServerConfiguration::setDefaultLocalPortForwardingPort(int port)
 {
   this->DefaultLocalPortForwardingPort = port;

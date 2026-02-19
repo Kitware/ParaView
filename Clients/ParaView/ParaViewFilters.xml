@@ -45,18 +45,13 @@
       <Proxy group="filters" name="ExtractGhostCells" />
       <Proxy group="filters" name="Gradient" />
       <Proxy group="filters" name="GroupDataSets" />
-      <Proxy group="filters" name="HyperTreeGridAxisReflection" />
-      <Proxy group="filters" name="HyperTreeGridCellCenters" />
       <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
       <Proxy group="filters" name="HyperTreeGridEvaluateCoarse" />
-      <Proxy group="filters" name="HyperTreeGridFeatureEdges" />
       <Proxy group="filters" name="HyperTreeGridGenerateFields" />
       <Proxy group="filters" name="HyperTreeGridGeometry" />
-      <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
       <Proxy group="filters" name="HyperTreeGridRedistribute" />
       <Proxy group="filters" name="HyperTreeGridToDualGrid" />
       <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
-      <Proxy group="filters" name="HyperTreeGridVisibleLeavesSize" />
       <Proxy group="filters" name="Threshold" />
     </Category>
     <Category name="CosmoTools" menu_label="C&amp;osmoTools" show_in_toolbar="0">
@@ -402,18 +397,13 @@
   <Proxy group="filters" name="Gradient" />
   <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup.svg" />
   <Proxy group="filters" name="GroupTimeSteps" />
-  <Proxy group="filters" name="HyperTreeGridAxisReflection" />
-  <Proxy group="filters" name="HyperTreeGridCellCenters" />
   <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
   <Proxy group="filters" name="HyperTreeGridEvaluateCoarse" />
-  <Proxy group="filters" name="HyperTreeGridFeatureEdges" />
   <Proxy group="filters" name="HyperTreeGridGenerateFields" />
   <Proxy group="filters" name="HyperTreeGridGeometry" />
-  <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
   <Proxy group="filters" name="HyperTreeGridRedistribute" />
   <Proxy group="filters" name="HyperTreeGridToDualGrid" />
   <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
-  <Proxy group="filters" name="HyperTreeGridVisibleLeavesSize" />
   <Proxy group="filters" name="ImageClip"/>
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToAMR" />
@@ -497,7 +487,6 @@
   <Proxy group="filters" name="RectilinearGridConnectivity" />
   <Proxy group="filters" name="RectilinearGridToPointSet" />
   <Proxy group="filters" name="RedistributeDataSet" />
-  <Proxy group="filters" name="ReflectionFilter" icon=":/pqWidgets/Icons/pqReflect.svg" />
   <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="RenameArrays" />
   <Proxy group="filters" name="ResampleToImage" icon=":/pqWidgets/Icons/pqResampleToImage.svg" />

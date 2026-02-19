@@ -18,9 +18,8 @@
 
 #include "vtkCommand.h" // needed for vtkCommand
 #include "vtkObject.h"
-#include "vtkParaViewDeprecation.h" // for deprecation macro
-#include "vtkRemotingCoreModule.h"  // needed for exports
-#include "vtkSmartPointer.h"        // needed for vtkSmartPointer
+#include "vtkRemotingCoreModule.h" // needed for exports
+#include "vtkSmartPointer.h"       // needed for vtkSmartPointer
 
 #include <vector> // for std::vector
 
@@ -54,16 +53,6 @@ public:
    * it cannot be unloaded for the lifetime of the process.
    */
   void RegisterPlugin(vtkPVPlugin*);
-
-  /**
-   * This API is used to register available plugins without actually loading
-   * them.
-   *
-   * This fires `vtkPVPluginTracker::RegisterAvailablePluginEvent` to notify a
-   * new plugin has been made available.
-   */
-  PARAVIEW_DEPRECATED_IN_6_0_0("Use LoadPluginConfigurationXML instead.")
-  unsigned int RegisterAvailablePlugin(const char* filename);
 
   ///@{
   /**

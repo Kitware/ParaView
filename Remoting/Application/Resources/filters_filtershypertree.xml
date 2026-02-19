@@ -1,83 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkHyperTreeGridAxisReflection"
-                 name="HyperTreeGridAxisReflection"
-                 label="HyperTreeGrid Axis Reflection">
-      <Deprecated deprecated_in="6.0" to_remove_in="6.2">
-        This filter has been replaced by 'Axis-Aligned Reflect', that supports HyperTree Grids.
-        Please consider using that instead.
-      </Deprecated>
-      <Documentation short_help="Reflect an HTG across an axis-aligned plane.">
-        This filter reflect the cells of a hyper tree grid with respect to
-        one of the planes parallel to the bounding box of the data set.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-      </InputProperty>
-      <IntVectorProperty name="PlaneNormal"
-                         command="SetPlane"
-                         number_of_elements="1"
-                         default_values="0">
-          <EnumerationDomain name="enum">
-            <Entry text="X Axis" value="6" />
-            <Entry text="Y Axis" value="7" />
-            <Entry text="Z Axis" value="8" />
-          </EnumerationDomain>
-        <Documentation>Axis to use as the normal to the reflection plane.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty name="PlanePosition"
-                            command="SetCenter"
-                            number_of_elements="1"
-                            default_values="0.0">
-        <Documentation>Position of the reflection plane along the normal axis.</Documentation>
-      </DoubleVectorProperty>
-      <!-- End vtkHyperTreeGridAxisReflection -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkHyperTreeGridCellCenters"
-                 name="HyperTreeGridCellCenters"
-                 label="HyperTreeGrid Cell Centers">
-      <Deprecated deprecated_in="6.0" to_remove_in="6.2">
-        This filter has been replaced by 'Cell Centers', which now supports HyperTree Grids.
-        Please consider using that instead.
-      </Deprecated>
-      <Documentation short_help="Cell Centers an HTG">
-        This filter produces a cloud of points corresponding to the centers of the leaf cells.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-      </InputProperty>
-      <IntVectorProperty name="CreateVertexCells"
-                         command="SetVertexCells"
-                         default_values="1"
-                         number_of_elements="1">
-        <Documentation>
-          If enabled, vertex cells will be added to the output dataset. This
-          is useful for visualizing the output points, which are not rendered
-          otherwise.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <!-- End vtkHyperTreeGridCellCenters -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy name="HyperTreeGridGenerateFields"
                  class="vtkHyperTreeGridGenerateFields"
                  label="HyperTreeGrid Generate Fields">
@@ -194,53 +117,6 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy name="HyperTreeGridVisibleLeavesSize"
-                 class="vtkHyperTreeGridGenerateFields"
-                 label="HyperTreeGrid Visible Leaves Size">
-      <Deprecated deprecated_in="6.0" to_remove_in="6.2">
-        This filter has been replaced by 'HyperTreeGrid Generate Fields'.
-        Please consider using that instead.
-      </Deprecated>
-      <Documentation short_help="Compute size and validity cell fields for HTG leaves">
-        Create 2 new cell fields. The first one, named 'ValidCell' by default, has a value of 1.0
-        for leaf (non-refined) cells that are neither masked nor ghost, and 0.0 otherwise.
-        The second one, named 'CellSize' by default, is set to the size (volume) of the cell for 3D HTGs.
-        This field has a value for every cell traversed through the cursor, valid or not.
-        By extension, CellSize is set to the cell area for 2D HTG and cell length for 1D.
-       </Documentation>
-       <InputProperty command="SetInputConnection"
-                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-      </InputProperty>
-
-      <StringVectorProperty name="CellSizeArrayName"
-                            command="SetCellSizeArrayName"
-                            number_of_elements="1"
-                            default_values="CellSize">
-        <Documentation>
-          Name of the cell size array in the output.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ValidCellArrayName"
-                            command="SetValidCellArrayName"
-                            number_of_elements="1"
-                            default_values="ValidCell">
-        <Documentation>
-          Name of the cell validity array in the output.
-        </Documentation>
-      </StringVectorProperty>
-
-      <!-- End HyperTreeGridVisibleLeavesSize -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridDepthLimiter"
                  name="HyperTreeGridDepthLimiter"
                  label="HyperTreeGrid Depth Limiter">
@@ -349,38 +225,6 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End vtkHyperTreeGridGeometry -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkHyperTreeGridFeatureEdges"
-                 name="HyperTreeGridFeatureEdges"
-                 label="HyperTreeGrid Feature Edges Filter">
-      <Deprecated deprecated_in="6.0" to_remove_in="6.2">
-        This filter has been replaced by 'Feature Edges', which now supports HyperTree Grids.
-        Please consider using that instead.
-      </Deprecated>
-      <Documentation short_help="Generate feature edges of an HTG.">
-        Generate a vtkPolyData representing the feature edges of an HTG.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-      </InputProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetMergePoints"
-                         default_values="0"
-                         name="MergePoints"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Select whether to merge duplicated points.</Documentation>
-      </IntVectorProperty>
-      <!-- End vtkHyperTreeGridFeatureEdges -->
     </SourceProxy>
 
     <!-- ==================================================================== -->

@@ -4,7 +4,6 @@
 
 #include "vtkCollection.h"
 #include "vtkErrorCode.h"
-#include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
@@ -17,21 +16,16 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMProxySelectionModel.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
-#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
-#include "vtkSMUtilities.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
-
-#include "vtkSMMaterialLibraryProxy.h"
 
 #include <cassert>
 #include <sstream>
@@ -283,26 +277,6 @@ vtkSMParaViewPipelineControllerWithRendering::vtkSMParaViewPipelineControllerWit
 //----------------------------------------------------------------------------
 vtkSMParaViewPipelineControllerWithRendering::~vtkSMParaViewPipelineControllerWithRendering() =
   default;
-
-//----------------------------------------------------------------------------
-void vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(bool val)
-{
-  vtkPVGeneralSettings::GetInstance()->SetScalarBarMode(val
-      ? vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS
-      : vtkPVGeneralSettings::MANUAL_SCALAR_BARS);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(bool val)
-{
-  vtkPVGeneralSettings::GetInstance()->SetInheritRepresentationProperties(val);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties()
-{
-  return vtkPVGeneralSettings::GetInstance()->GetInheritRepresentationProperties();
-}
 
 //----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineControllerWithRendering::PostInitializeProxy(vtkSMProxy* proxy)

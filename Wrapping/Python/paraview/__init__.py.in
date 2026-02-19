@@ -25,7 +25,7 @@ ParaView modules to force backwards compatibility to an older version::
 """
 from __future__ import absolute_import
 try:
-    from warnings import deprecated # PARAVIEW_DEPRECATED_IN_6_0_0
+    from warnings import deprecated # Left here in case it's needed again in the future
 except ImportError: # XXX(python-3.13): warnings.deprecated is new
     class deprecated:
         def __init__(self, message) -> None:
@@ -232,18 +232,6 @@ class options:
     """When True, This mean the current process is a satellite and should not try to
     connect or do anything else."""
     satellite = False
-
-    @property
-    # PARAVIEW_DEPRECATED_IN_6_0_0
-    @deprecated("Use `satellite` instead (since 6.0.0)")
-    def satelite(self):
-        return self.satellite
-
-    @satelite.setter
-    # PARAVIEW_DEPRECATED_IN_6_0_0
-    @deprecated("Use `satellite` instead (since 6.0.0)")
-    def satelite(self, s):
-        self.satellite = s
 
 
 class NotSupportedException(Exception):

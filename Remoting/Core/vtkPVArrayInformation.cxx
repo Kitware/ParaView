@@ -379,21 +379,6 @@ void vtkPVArrayInformation::CopyFromArray(vtkFieldData* fieldData, int fdArrayId
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array, vtkFieldData* fieldData)
-{
-  if (fieldData != nullptr)
-  {
-    int arrayIdx = -1;
-    fieldData->GetAbstractArray(array->GetName(), arrayIdx);
-    this->CopyFromArray(fieldData, arrayIdx);
-  }
-  else
-  {
-    this->CopyFromArray(array);
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVArrayInformation::CopyFromCellAttribute(vtkCellGrid* grid, vtkCellAttribute* attribute)
 {
   assert(!!attribute);

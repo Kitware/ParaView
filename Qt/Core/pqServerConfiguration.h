@@ -6,8 +6,7 @@
 
 #include "pqCoreModule.h"
 #include "pqServerResource.h"
-#include "vtkPVXMLElement.h"        // needed for ivar
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_6_0_0
+#include "vtkPVXMLElement.h" // needed for ivar
 #include "vtkSmartPointer.h"
 
 #include <QObject>
@@ -176,14 +175,6 @@ public:
    * and is configured directly in xml server file
    */
   bool isPortForwarding() const { return this->PortForwarding; };
-
-  /**
-   * Get the port forwarding local port.
-   * Initialized by the server xml if port forwarding is used.
-   * Equal to the resource port if port forwarding is not used.
-   */
-  PARAVIEW_DEPRECATED_IN_6_0_0("Use int localPortForwardingPort() const instead")
-  QString portForwardingLocalPort() const;
 
   /**
    * Get the port local port using forwarding.

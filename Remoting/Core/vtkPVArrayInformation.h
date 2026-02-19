@@ -13,8 +13,7 @@
 #define vtkPVArrayInformation_h
 
 #include "vtkObject.h"
-#include "vtkParaViewDeprecation.h"
-#include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkRemotingCoreModule.h" // needed for exports
 #include "vtkTuple.h"              // for vtkTuple
 
 #include <set>    // for std::set
@@ -141,10 +140,6 @@ public:
    */
   void CopyFromArray(vtkAbstractArray* array);
   void CopyFromArray(vtkFieldData* fieldData, int fdArrayIdx);
-
-  PARAVIEW_DEPRECATED_IN_6_0_0("Please use the CopyFromArray(vtkAbstractArray*) or "
-                               "CopyFromArray(vtkFieldData*, int) overloads")
-  void CopyFromArray(vtkAbstractArray* array, vtkFieldData* fieldData);
   /// @}
 
   void CopyFromCellAttribute(vtkCellGrid* grid, vtkCellAttribute* attribute);
