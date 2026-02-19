@@ -159,8 +159,7 @@ public:
   std::string GetCurrentTrace();
 
   /**
-   * Generate a Python state for the application and return it. Note this cannot
-   * be called when Python tracing is active.
+   * Generate a Python state for the application and return it.
    *
    * `options` is a proxy with options to customize the state generation such as
    * `('pythontracing', 'PythonStateOptions')`.
@@ -244,7 +243,7 @@ private:
   vtkSMTrace(const vtkSMTrace&) = delete;
   void operator=(const vtkSMTrace&) = delete;
 
-  static vtkSmartPointer<vtkSMTrace> ActiveTracer;
+  inline static vtkSmartPointer<vtkSMTrace> ActiveTracer = nullptr;
   class vtkInternals;
   vtkInternals* Internals;
 

@@ -112,16 +112,6 @@ bool pqSaveStateReaction::savePythonState(
     return false;
   }
 
-  vtkSMTrace* tracer = vtkSMTrace::GetActiveTracer();
-  if (tracer)
-  {
-    QMessageBox::warning(pqCoreUtilities::mainWidget(),
-      tr("Trace and Python State incompatibility."),
-      tr("Save Python State can not work while Trace is active. Aborting."));
-
-    return false;
-  }
-
   const std::string state = vtkSMTrace::GetState(options);
   if (state.empty())
   {

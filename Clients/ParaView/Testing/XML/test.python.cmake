@@ -11,6 +11,7 @@ list(APPEND TESTS_WITHOUT_BASELINES
   PythonEditorTab.xml
   PythonResetSessionMacro.xml
   SpreadSheetNullArrayName.xml # needs programmable filter
+  PythonTraceSaveState.xml
   # TestPopOutWidget.xml
   TestPythonConsole.xml
   TraceIntegrateVariables.xml

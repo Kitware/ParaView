@@ -167,7 +167,10 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
     # proxies_of_interest is set of all proxies that we should trace.
     proxies_of_interest = producers.union(consumers)
 
+    previous_target_type = smtrace.Trace.output_target_type
+    smtrace.Trace.output_target_type = smtrace.TraceTargetType.STATEFILE
     tracer = smtrace.ScopedTracer(preamble="")
+    trace_result = ""
     with tracer:
         # this ensures that lookup tables/scalar bars etc. are fully traced.
         tracer.config.SetFullyTraceSupplementalProxies(True)
@@ -464,9 +467,10 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         elif postamble:
             trace.append_separated(postamble)
 
-        return str(trace) if not raw else trace.raw_data()
+        trace_result = str(trace) if not raw else trace.raw_data()
 
-    return ""
+    smtrace.Trace.output_target_type = previous_target_type
+    return trace_result
 
 
 if __name__ == "__main__":
