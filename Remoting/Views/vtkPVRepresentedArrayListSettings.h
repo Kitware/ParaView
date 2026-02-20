@@ -119,6 +119,22 @@ public:
   virtual bool GetSeriesVisibilityDefault(const char* name) const;
   ///@}
 
+  ///@{
+  /**
+   * Set/get the number of fields to hide when hover on points or cells.
+   */
+  virtual void SetNumberOfFieldsToHideHover(int n);
+  virtual int GetNumberOfFieldsToHideHover();
+  ///@}
+
+  ///@{
+  /**
+   * Set/get the fields to hide when hover on points or cells at index i.
+   */
+  virtual void SetFieldToHideHover(int i, const std::string& fields);
+  virtual std::string GetFieldToHideHover(int i);
+  ///@}
+
 protected:
   vtkPVRepresentedArrayListSettings();
   ~vtkPVRepresentedArrayListSettings() override;

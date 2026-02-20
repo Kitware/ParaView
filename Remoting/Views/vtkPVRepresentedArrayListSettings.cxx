@@ -23,6 +23,7 @@ class vtkPVRepresentedArrayListSettings::vtkInternals
 {
 public:
   std::vector<std::string> FilterExpressions;
+  std::vector<std::string> FieldsToHideHover;
   std::vector<int> ArrayMagnitudeExceptions;
 
   std::vector<std::string> ChartsDefaultXAxis;
@@ -108,6 +109,54 @@ const char* vtkPVRepresentedArrayListSettings::GetFilterExpression(int i)
   }
 
   return nullptr;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetNumberOfFieldsToHideHover(int n)
+{
+  if (n != this->GetNumberOfFieldsToHideHover())
+  {
+    this->Internals->FieldsToHideHover.resize(n);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRepresentedArrayListSettings::GetNumberOfFieldsToHideHover()
+{
+  return static_cast<int>(this->Internals->FieldsToHideHover.size());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetFieldToHideHover(int i, const std::string& expression)
+{
+  if (i >= 0 && i < this->GetNumberOfFieldsToHideHover())
+  {
+    if (this->Internals->FieldsToHideHover[i] != expression)
+    {
+      this->Internals->FieldsToHideHover[i] = expression;
+      this->Modified();
+    }
+  }
+  else
+  {
+    vtkErrorMacro("Index out of range: " << i);
+  }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVRepresentedArrayListSettings::GetFieldToHideHover(int i)
+{
+  if (i >= 0 && i < this->GetNumberOfFieldsToHideHover())
+  {
+    return this->Internals->FieldsToHideHover[i];
+  }
+  else
+  {
+    vtkErrorMacro("Index out of range: " << i);
+  }
+
+  return "";
 }
 
 //----------------------------------------------------------------------------
