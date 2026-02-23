@@ -246,6 +246,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel* panel)
   // find views that need updating and update them.
   Q_FOREACH (pqView* view, smmodel->findItems<pqView*>())
   {
+    // It means that the view thinks its rendering is obsolete and needs to be re-generated.
     if (view && view->getViewProxy()->GetNeedsUpdate())
     {
       dirty_views.push_back(view);

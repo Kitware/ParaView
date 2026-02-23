@@ -136,15 +136,6 @@ public:
    */
   virtual bool HasDirtyRepresentation() { return this->GetNeedsUpdate(); }
 
-  ///@{
-  /**
-   * Returns true if the subsequent call to Update() will result in an actual
-   * update. If returned true, it means that the view thinks its rendering is
-   * obsolete and needs to be re-generated.
-   */
-  vtkGetMacro(NeedsUpdate, bool);
-  ///@}
-
   /**
    * Return the vtkRenderWindow used by this view, if any. Note, views like
    * vtkSMComparativeViewProxy can have more than 1 render window in play, in
