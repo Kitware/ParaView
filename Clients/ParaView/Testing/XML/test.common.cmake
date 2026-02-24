@@ -1131,6 +1131,11 @@ if (WIN32)
     MP4Writer.xml)
 endif()
 
+if (PARAVIEW_ENABLE_FFMPEG)
+  list(APPEND TESTS_WITHOUT_BASELINES
+    FFmpegWriter.xml)
+endif ()
+
 list (APPEND TESTS_WITH_INLINE_COMPARES
   AxesGrid.xml
   AxisAlignedCutterMBHierarchy.xml
