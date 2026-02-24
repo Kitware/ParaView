@@ -210,9 +210,9 @@ void vtkContext2DScalarBarActor::SetDataRangeLabelFormat(const char* formatArg)
   std::string format = formatArg ? formatArg : "";
   if (vtk::is_printf_format(format))
   {
-    // PARAVIEW_DEPRECATED_IN_5_14_0
+    // PARAVIEW_DEPRECATED_IN_6_1_0
     vtkWarningMacro(<< "The given format " << format << " is a printf format. The format will be "
-                    << "converted to std::format. This conversion has been deprecated in 5.14.0");
+                    << "converted to std::format. This conversion has been deprecated in 6.1.0");
     format = vtk::printf_to_std_format(format);
   }
   const char* formatStr = format.c_str();
