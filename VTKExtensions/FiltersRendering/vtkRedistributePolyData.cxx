@@ -6,29 +6,19 @@
 #include "vtkCellArray.h"
 #include "vtkCellArrayIterator.h"
 #include "vtkCellData.h"
-#include "vtkCharArray.h"
+#include "vtkConstantArray.h"
 #include "vtkDataSetAttributes.h"
-#include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
-#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkIntArray.h"
-#include "vtkLongArray.h"
-#include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataWriter.h"
 #include "vtkSetGet.h"
-#include "vtkShortArray.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkUnsignedLongArray.h"
-#include "vtkUnsignedShortArray.h"
 
 #include <algorithm>
 
@@ -821,111 +811,56 @@ void vtkRedistributePolyData::CopyCellBlockDataArrays(vtkDataSetAttributes* from
   }
 }
 
-//------------------------------------------------------------------
-namespace
-{
-template <typename T>
-void CopyArraysTemplate(vtkDataArray* DataFrom, vtkDataArray* DataTo, vtkIdType numToCopy,
-  vtkIdType* fromId, int myId, bool fillWithMyId)
-{
-  T* from = (T*)DataFrom->GetVoidPointer(0);
-  T* to = (T*)DataTo->GetVoidPointer(0);
-  int numComps = DataFrom->GetNumberOfComponents();
-  if (fillWithMyId)
-  {
-    for (vtkIdType i = 0; i < numToCopy; ++i)
-    {
-      for (int j = 0; j < numComps; ++j)
-      {
-        to[numComps * i + j] = myId;
-      }
-    }
-  }
-  else
-  {
-    for (vtkIdType i = 0; i < numToCopy; ++i)
-    {
-      for (int j = 0; j < numComps; ++j)
-      {
-        to[numComps * i + j] = from[numComps * fromId[i] + j];
-      }
-    }
-  }
-}
-}
 //******************************************************************
 void vtkRedistributePolyData::CopyArrays(
   vtkDataArray* DataFrom, vtkDataArray* DataTo, vtkIdType numToCopy, vtkIdType* fromId, int myId)
 //******************************************************************
 {
   int dataType = DataFrom->GetDataType();
-
   bool fillWithMyId = (dataType == VTK_DOUBLE) && this->ColorProc;
-
-  switch (dataType)
+  if (fillWithMyId)
   {
-
-    // Only change is that vtk unsigned short is now allowed...
-    vtkTemplateMacro(
-      CopyArraysTemplate<VTK_TT>(DataFrom, DataTo, numToCopy, fromId, myId, fillWithMyId));
-    case VTK_BIT:
-      vtkErrorMacro("VTK_BIT not allowed for copy");
-      break;
-    default:
-      vtkErrorMacro("datatype = " << dataType << " not allowed for copy");
-  }
-}
-//------------------------------------------------------------------
-namespace
-{
-template <typename T>
-void CopyBlockArraysTemplate(vtkDataArray* DataFrom, vtkDataArray* DataTo, vtkIdType numToCopy,
-  vtkIdType startCell, vtkIdType fromOffset, vtkIdType toOffset, int myId, bool fillToWithMyId)
-{
-  T* from = (T*)DataFrom->GetVoidPointer(fromOffset);
-  T* to = (T*)DataTo->GetVoidPointer(toOffset);
-
-  int numComps = DataFrom->GetNumberOfComponents();
-
-  vtkIdType start = numComps * startCell;
-  vtkIdType size = numToCopy * numComps;
-  vtkIdType stop = start + size;
-
-  if (fillToWithMyId)
-  {
-    for (vtkIdType i = start; i < stop; i++)
+    switch (DataTo->GetDataType())
     {
-      to[i] = myId;
+      vtkTemplateMacro(vtkNew<vtkConstantArray<VTK_TT>> constArray;
+                       constArray->SetNumberOfComponents(DataFrom->GetNumberOfComponents());
+                       constArray->SetNumberOfValues(numToCopy);
+                       constArray->ConstructBackend(static_cast<VTK_TT>(myId));
+                       DataTo->InsertTuples(0, numToCopy, 0, constArray));
     }
   }
   else
   {
-    for (vtkIdType i = start; i < stop; i++)
-    {
-      to[i] = from[i];
-    }
+    vtkNew<vtkIdList> fromIdList;
+    fromIdList->SetArray(fromId, numToCopy, /*save*/ false);
+    DataTo->InsertTuplesStartingAt(0, fromIdList, DataFrom);
   }
 }
-}
+
 //******************************************************************
 void vtkRedistributePolyData::CopyBlockArrays(vtkDataArray* DataFrom, vtkDataArray* DataTo,
   vtkIdType numToCopy, vtkIdType startCell, vtkIdType fromOffset, vtkIdType toOffset, int myId)
 //******************************************************************
 {
   int dataType = DataFrom->GetDataType();
-
   bool fillWithMyId = (dataType == VTK_DOUBLE) && this->ColorProc;
-
-  switch (dataType)
+  assert(startCell == toOffset / DataFrom->GetNumberOfComponents());
+  (void)toOffset;
+  if (fillWithMyId)
   {
-    // Only change is that vtk unsigned short is now allowed...
-    vtkTemplateMacro(CopyBlockArraysTemplate<VTK_TT>(
-      DataFrom, DataTo, numToCopy, startCell, fromOffset, toOffset, myId, fillWithMyId));
-    case VTK_BIT:
-      vtkErrorMacro("VTK_BIT not allowed for copy");
-      break;
-    default:
-      vtkErrorMacro("datatype = " << dataType << " not allowed for copy");
+    switch (DataTo->GetDataType())
+    {
+      vtkTemplateMacro(vtkNew<vtkConstantArray<VTK_TT>> constArray;
+                       constArray->SetNumberOfComponents(DataFrom->GetNumberOfComponents());
+                       constArray->SetNumberOfValues(numToCopy);
+                       constArray->ConstructBackend(static_cast<VTK_TT>(myId));
+                       DataTo->InsertTuples(startCell, numToCopy, 0, constArray));
+    }
+  }
+  else
+  {
+    DataTo->InsertTuples(
+      startCell, numToCopy, fromOffset / DataFrom->GetNumberOfComponents(), DataFrom);
   }
 }
 //*****************************************************************
@@ -1009,16 +944,7 @@ void vtkRedistributePolyData::CopyCells(
 
   vtkPoints* outputPoints = output->GetPoints();
   vtkFloatArray* outputPointsArray = vtkFloatArray::SafeDownCast(outputPoints->GetData());
-  float* outputPointsArrayData = outputPointsArray->GetPointer(0);
-
-  vtkPoints* inputPoints = input->GetPoints();
-  void* inputPointsArrayData = nullptr;
-  int pointsType = VTK_VOID;
-  if (inputPoints != nullptr)
-  {
-    pointsType = inputPoints->GetData()->GetDataType();
-    inputPointsArrayData = inputPoints->GetVoidPointer(0);
-  }
+  vtkDataArray* inputPointsArray = input->GetPoints()->GetData();
 
 #if VTK_REDIST_DO_TIMING
   ::timerInfo8.Timer->StopTimer();
@@ -1034,7 +960,8 @@ void vtkRedistributePolyData::CopyCells(
   //  from all of input) ...
 
   vtkIdType numPointsMax = input->GetNumberOfPoints();
-  vtkIdType* fromPtIds = new vtkIdType[numPointsMax];
+  vtkNew<vtkIdList> fromPtIds;
+  fromPtIds->SetNumberOfIds(numPointsMax);
 
   vtkIdType* usedIds = new vtkIdType[numPointsMax];
   for (i = 0; i < numPointsMax; i++)
@@ -1080,7 +1007,7 @@ void vtkRedistributePolyData::CopyCells(
             const vtkIdType newPt = pointIncr;
             cell->SetId(ptIdx, newPt);
             usedIds[pointId] = newPt;
-            fromPtIds[pointIncr] = pointId;
+            fromPtIds->SetId(pointIncr, pointId);
             pointIncr++;
           }
           else
@@ -1108,7 +1035,7 @@ void vtkRedistributePolyData::CopyCells(
             const vtkIdType newPt = pointIncr;
             cell->SetId(ptIdx, newPt);
             usedIds[pointId] = newPt;
-            fromPtIds[pointIncr] = pointId;
+            fromPtIds->SetId(pointIncr, pointId);
             pointIncr++;
           }
           else
@@ -1133,23 +1060,10 @@ void vtkRedistributePolyData::CopyCells(
 #endif
 
   // ... Copy cell points. ...
-  vtkIdType inLoc, outLoc;
   vtkIdType numPoints = pointIncr;
-  int j;
 
   // ... copy x,y,z coordinates ...
-  switch (pointsType)
-  {
-    vtkTemplateMacro(for (i = 0; i < numPoints; i++) {
-      inLoc = fromPtIds[i] * 3;
-      outLoc = i * 3;
-      for (j = 0; j < 3; j++)
-      {
-        outputPointsArrayData[outLoc + j] =
-          static_cast<float>(reinterpret_cast<VTK_TT*>(inputPointsArrayData)[inLoc + j]);
-      }
-    });
-  }
+  outputPointsArray->InsertTuplesStartingAt(0, fromPtIds, inputPointsArray);
 
 #if VTK_REDIST_DO_TIMING
   ::timerInfo8.Timer->StopTimer();
@@ -1165,8 +1079,7 @@ void vtkRedistributePolyData::CopyCells(
   vtkPointData* outputPointData = output->GetPointData();
 
   // ... copy point data arrays ...
-  this->CopyDataArrays(inputPointData, outputPointData, numPoints, fromPtIds, myId);
-  delete[] fromPtIds;
+  this->CopyDataArrays(inputPointData, outputPointData, numPoints, fromPtIds->GetPointer(0), myId);
 
 #if VTK_REDIST_DO_TIMING
   ::timerInfo8.Timer->StopTimer();
@@ -1299,7 +1212,8 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
   //     all of input) ...
 
   vtkIdType numPointsMax = input->GetNumberOfPoints();
-  vtkIdType* fromPtIds = new vtkIdType[numPointsMax];
+  vtkNew<vtkIdList> fromPtIds;
+  fromPtIds->SetNumberOfIds(numPointsMax);
 
   vtkIdType* usedIds = new vtkIdType[numPointsMax];
   for (i = 0; i < numPointsMax; i++)
@@ -1353,7 +1267,7 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
             *ptr++ = newPt;
             ptcntr[type]++;
             usedIds[pointId] = newPt;
-            fromPtIds[pointIncr] = pointId;
+            fromPtIds->SetId(pointIncr, pointId);
             pointIncr++;
           }
           else
@@ -1387,7 +1301,7 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
             *ptr++ = newPt;
             ptcntr[type]++;
             usedIds[pointId] = newPt;
-            fromPtIds[pointIncr] = pointId;
+            fromPtIds->SetId(pointIncr, pointId);
             pointIncr++;
           }
           else
@@ -1470,30 +1384,16 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
 
   vtkPoints* inputPoints = input->GetPoints();
   vtkDataArray* inputPointsArray = inputPoints->GetData();
-  void* inputPointsArrayData = inputPointsArray->GetVoidPointer(0);
-
-  float* outputPointsArrayData = new float[3 * numPoints];
+  vtkNew<vtkAOSDataArrayTemplate<float>> outputPointsArray;
+  outputPointsArray->SetNumberOfComponents(3);
+  outputPointsArray->SetNumberOfTuples(numPoints);
 
   // ... send x,y, z coordinates of points
-
-  int j;
-  vtkIdType inLoc, outLoc;
-  switch (inputPointsArray->GetDataType())
-  {
-    vtkTemplateMacro(for (i = 0; i < numPoints; i++) {
-      inLoc = fromPtIds[i] * 3;
-      outLoc = i * 3;
-      for (j = 0; j < 3; j++)
-      {
-        outputPointsArrayData[outLoc + j] =
-          static_cast<float>(reinterpret_cast<VTK_TT*>(inputPointsArrayData)[inLoc + j]);
-      }
-    });
-  }
+  outputPointsArray->InsertTuplesStartingAt(0, fromPtIds, inputPointsArray);
 
   // ... Send points now ...
 
-  this->Controller->Send(outputPointsArrayData, 3 * numPoints, sendTo, POINTS_TAG);
+  this->Controller->Send(outputPointsArray->GetPointer(0), 3 * numPoints, sendTo, POINTS_TAG);
 
   // ... use output for flags only to avoid unnecessary sends ...
   vtkPointData* inputPointData = input->GetPointData();
@@ -1501,8 +1401,8 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
 
   int typetag = 5; //(typetag = 0 for cells + type, =5 for points)
 
-  this->SendDataArrays(inputPointData, outputPointData, numPoints, sendTo, fromPtIds, typetag);
-  delete[] fromPtIds;
+  this->SendDataArrays(
+    inputPointData, outputPointData, numPoints, sendTo, fromPtIds->GetPointer(0), typetag);
 }
 //****************************************************************
 void vtkRedistributePolyData::ReceiveCells(vtkIdType* startCell, vtkIdType* stopCell,
@@ -1759,7 +1659,6 @@ void vtkRedistributePolyData::SendCellBlockDataArrays(vtkDataSetAttributes* from
   int typetag)
 //*******************************************************************
 {
-
   vtkDataArray* Data;
   int numArrays = fromPd->GetNumberOfArrays();
 
@@ -1772,45 +1671,20 @@ void vtkRedistributePolyData::SendCellBlockDataArrays(vtkDataSetAttributes* from
     this->SendBlockArrays(Data, numToCopy, sendTo, startCell, sendTag);
   }
 }
-//------------------------------------------------------------------
-namespace
-{
-template <typename T>
-void SendArraysTemplate(vtkDataArray* Data, vtkIdType numToCopy, int sendTo, vtkIdType* fromId,
-  int sendTag, vtkMultiProcessController* controller)
-{
-  T* array = (T*)Data->GetVoidPointer(0);
-  int numComps = Data->GetNumberOfComponents();
-  T* buf = new T[numToCopy * numComps];
-  vtkIdType size = numToCopy * numComps;
-  for (vtkIdType i = 0; i < numToCopy; ++i)
-  {
-    for (int j = 0; j < numComps; ++j)
-    {
-      buf[numComps * i + j] = array[numComps * fromId[i] + j];
-    }
-  }
-  controller->Send(buf, size, sendTo, sendTag);
-  delete[] buf;
-}
-}
+
 //******************************************************************
 void vtkRedistributePolyData::SendArrays(
   vtkDataArray* Data, vtkIdType numToCopy, int sendTo, vtkIdType* fromId, int sendTag)
 //******************************************************************
 {
-  int dataType = Data->GetDataType();
+  vtkNew<vtkIdList> fromIdList;
+  fromIdList->SetArray(fromId, numToCopy, /*save*/ false);
+  auto dataToSend = vtk::TakeSmartPointer(vtkDataArray::CreateDataArray(Data->GetDataType()));
+  dataToSend->SetNumberOfComponents(Data->GetNumberOfComponents());
+  dataToSend->SetNumberOfTuples(numToCopy);
+  dataToSend->InsertTuplesStartingAt(0, fromIdList, Data);
 
-  switch (dataType)
-  {
-    vtkTemplateMacro(
-      SendArraysTemplate<VTK_TT>(Data, numToCopy, sendTo, fromId, sendTag, this->Controller));
-    case VTK_BIT:
-      vtkErrorMacro("VTK_BIT not allowed for send");
-      break;
-    default:
-      vtkErrorMacro("datatype = " << dataType << " not allowed for send");
-  }
+  this->Controller->Send(dataToSend, sendTo, sendTag);
 }
 //-----------------------------------------------------------------
 namespace
@@ -1820,12 +1694,19 @@ void SendBlockArraysTemplate(vtkDataArray* Data, vtkIdType numToCopy, int sendTo
   vtkIdType startCell, int sendTag, vtkMultiProcessController* controller)
 {
   int numComps = Data->GetNumberOfComponents();
-
-  vtkIdType start = numComps * startCell;
-  vtkIdType size = numToCopy * numComps;
-
-  T* array = (T*)Data->GetVoidPointer(0);
-  controller->Send((T*)&array[start], size, sendTo, sendTag);
+  vtkNew<vtkAOSDataArrayTemplate<T>> dataToSend;
+  dataToSend->SetNumberOfComponents(numComps);
+  if (dataToSend->HasStandardMemoryLayout())
+  {
+    auto aosData = vtkAOSDataArrayTemplate<T>::SafeDownCast(Data);
+    dataToSend->SetArray(
+      aosData->GetPointer(startCell * numComps), numToCopy * numComps, /*save*/ 1);
+  }
+  else
+  {
+    dataToSend->InsertTuples(0, numToCopy, startCell, Data);
+  }
+  controller->Send(dataToSend, sendTo, sendTag);
 }
 }
 //******************************************************************
@@ -1872,60 +1753,33 @@ void vtkRedistributePolyData::ReceiveDataArrays(
     this->ReceiveArrays(Data, numToCopy, recFrom, toId, recTag);
   }
 }
-//-------------------------------------------------------------------
-namespace
-{
-template <typename T>
-void ReceiveArraysTemplate(vtkDataArray* Data, vtkIdType numToCopy, int recFrom, vtkIdType* toId,
-  int recTag, vtkMultiProcessController* controller, bool setDataToRecFrom)
-{
-  int numComps = Data->GetNumberOfComponents();
 
-  T* array = (T*)Data->GetVoidPointer(0);
-  T* buf = new T[numToCopy * numComps];
+//*******************************************************************
+void vtkRedistributePolyData::ReceiveArrays(
+  vtkDataArray* DataTo, vtkIdType numToCopy, int recFrom, vtkIdType* toId, int recTag)
+//*******************************************************************
+{
+  auto DataFrom = vtk::TakeSmartPointer(vtkDataArray::CreateDataArray(DataTo->GetDataType()));
+  this->Controller->Receive(DataFrom, recFrom, recTag);
 
-  controller->Receive(buf, numToCopy * numComps, recFrom, recTag);
+  int dataType = DataTo->GetDataType();
+  bool setDataToRecFrom = (dataType == VTK_DOUBLE) && this->ColorProc;
   if (setDataToRecFrom)
   {
-    for (vtkIdType i = 0; i < numToCopy; ++i)
+    switch (DataTo->GetDataType())
     {
-      for (int j = 0; j < numComps; ++j)
-      {
-        array[toId[i] * numComps + j] = recFrom;
-      }
+      vtkTemplateMacro(vtkNew<vtkConstantArray<VTK_TT>> constArray;
+                       constArray->SetNumberOfComponents(DataFrom->GetNumberOfComponents());
+                       constArray->SetNumberOfValues(numToCopy);
+                       constArray->ConstructBackend(static_cast<VTK_TT>(recFrom));
+                       DataTo->InsertTuples(0, numToCopy, 0, constArray));
     }
   }
   else
   {
-    for (vtkIdType i = 0; i < numToCopy; ++i)
-    {
-      for (int j = 0; j < numComps; ++j)
-      {
-        array[toId[i] * numComps + j] = buf[numComps * i + j];
-      }
-    }
-  }
-  delete[] buf;
-}
-}
-//*******************************************************************
-void vtkRedistributePolyData::ReceiveArrays(
-  vtkDataArray* Data, vtkIdType numToCopy, int recFrom, vtkIdType* toId, int recTag)
-//*******************************************************************
-{
-  int dataType = Data->GetDataType();
-
-  bool setDataToRecFrom = (dataType == VTK_DOUBLE) && this->ColorProc;
-
-  switch (dataType)
-  {
-    vtkTemplateMacro(ReceiveArraysTemplate<VTK_TT>(
-      Data, numToCopy, recFrom, toId, recTag, this->Controller, setDataToRecFrom));
-    case VTK_BIT:
-      vtkErrorMacro("VTK_BIT not allowed for receive");
-      break;
-    default:
-      vtkErrorMacro("datatype = " << dataType << " not allowed for receive");
+    vtkNew<vtkIdList> toIdList;
+    toIdList->SetArray(toId, numToCopy, /*save*/ false);
+    DataTo->InsertTuplesStartingAt(0, toIdList, DataFrom);
   }
 }
 

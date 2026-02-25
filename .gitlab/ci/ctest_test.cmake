@@ -37,6 +37,10 @@ list(APPEND test_exclusions
   "\\.ComparativeViewOverlay$"
   # https://gitlab.kitware.com/paraview/paraview/-/issues/17941
   "^paraviewPython-TestGeometryBoundsClobber$"
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/23217
+  "^pv\\.HyperTreeGridGenerateFields$"
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/23219
+  "\\.HyperTreeGridEvaluateCoarse$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")

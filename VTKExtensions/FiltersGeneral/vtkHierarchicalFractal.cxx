@@ -1151,7 +1151,7 @@ void vtkHierarchicalFractal::AddFractalArray(vtkCompositeDataSet* output)
       fractalSource->Update();
       vtkDataArray* fractal;
       fractal = fractalSource->GetOutput()->GetPointData()->GetScalars();
-      float* fractalPtr = static_cast<float*>(fractal->GetVoidPointer(0));
+      float* fractalPtr = vtkAOSDataArrayTemplate<float>::FastDownCast(fractal)->GetPointer(0);
 
       for (int i = 0; i < fractal->GetNumberOfTuples(); ++i)
       {
@@ -1279,7 +1279,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet* grid, int dim[3], in
   int iLevel, jLevel, kLevel, tmp;
   unsigned char* ptr;
 
-  ptr = (unsigned char*)(array->GetVoidPointer(0));
+  ptr = array->GetPointer(0);
 
   for (k = 0; k < dims[2]; ++k)
   {

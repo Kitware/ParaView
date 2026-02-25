@@ -566,19 +566,19 @@ void vtkACosmoReader::ReadBlockFromFile(
   velocity->SetNumberOfComponents(3);
   velocity->SetNumberOfTuples(numParticles);
   velocity->SetName("velocity");
-  float* velPtr = static_cast<float*>(velocity->GetVoidPointer(0));
+  float* velPtr = velocity->GetPointer(0);
 
   vtkFloatArray* mass = vtkFloatArray::New();
   mass->SetNumberOfComponents(1);
   mass->SetNumberOfTuples(numParticles);
   mass->SetName("mass");
-  float* massPtr = static_cast<float*>(mass->GetVoidPointer(0));
+  float* massPtr = mass->GetPointer(0);
 
   vtkIdTypeArray* tag = vtkIdTypeArray::New();
   tag->SetNumberOfComponents(1);
   tag->SetNumberOfTuples(numParticles);
   tag->SetName("tag");
-  vtkIdType* tagPtr = static_cast<vtkIdType*>(tag->GetVoidPointer(0));
+  vtkIdType* tagPtr = tag->GetPointer(0);
 
   // STEP 4: Read the data
 

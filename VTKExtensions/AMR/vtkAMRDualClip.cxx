@@ -7,28 +7,23 @@
 #include <vector>
 
 // Pipeline & VTK
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkMarchingCubesTriangleCases.h"
-#include "vtkMultiProcessController.h"
-#include "vtkObject.h"
-#include "vtkObjectFactory.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-// PV interface
+#include "vtkArrayDispatch.h"
 #include "vtkCallbackCommand.h"
-#include "vtkDataArraySelection.h"
-#include "vtkMath.h"
-// Data sets
-#include "vtkAMRBox.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkIntArray.h"
+#include "vtkMarchingCubesTriangleCases.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiPieceDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNonOverlappingAMR.h"
+#include "vtkObject.h"
 #include "vtkPointData.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
@@ -201,46 +196,49 @@ vtkAMRDualClipLocator* vtkAMRDualClipGetBlockLocator(vtkAMRDualGridHelperBlock* 
 
 //----------------------------------------------------------------------------
 // The only data specific stuff we need to do for the contour.
-template <class T>
-void vtkDualGridClipInitializeLevelMask(
-  T* scalarPtr, double isoValue, unsigned char* levelMask, int dims[3])
+struct vtkDualGridClipInitializeLevelMask
 {
-  // unsigned char flag = 1;
-
-  // We only set the inside because the ghost regions can already be set.
-  scalarPtr += 1 + dims[0] + dims[0] * dims[1];
-  levelMask += 1 + dims[0] + dims[0] * dims[1];
-  // Start with two because skipping from and back ghost.
-  // The exact value of zz does not matter.
-  // This is easier than comparing < dim-1.
-  for (int zz = 2; zz < dims[2]; ++zz)
+  template <class TArray>
+  void operator()(TArray* scalarsArray, double isoValue, unsigned char* levelMask, int dims[3])
   {
-    for (int yy = 2; yy < dims[1]; ++yy)
+    // unsigned char flag = 1;
+    auto scalarPtr = vtk::DataArrayValueRange(scalarsArray).begin();
+
+    // We only set the inside because the ghost regions can already be set.
+    scalarPtr += 1 + dims[0] + dims[0] * dims[1];
+    levelMask += 1 + dims[0] + dims[0] * dims[1];
+    // Start with two because skipping from and back ghost.
+    // The exact value of zz does not matter.
+    // This is easier than comparing < dim-1.
+    for (int zz = 2; zz < dims[2]; ++zz)
     {
-      for (int xx = 2; xx < dims[0]; ++xx)
+      for (int yy = 2; yy < dims[1]; ++yy)
       {
-        // Lets do relative levels (to block) / level diff.
-        // Then we do not need the block level.  The only trouble is that
-        // we need to offset by 1 so that 0 can be special value (outside).
-        if (*scalarPtr++ > isoValue)
+        for (int xx = 2; xx < dims[0]; ++xx)
         {
-          *levelMask++ = 1;
+          // Lets do relative levels (to block) / level diff.
+          // Then we do not need the block level.  The only trouble is that
+          // we need to offset by 1 so that 0 can be special value (outside).
+          if (*scalarPtr++ > isoValue)
+          {
+            *levelMask++ = 1;
+          }
+          else
+          { // Special value  indicating point is outside clipped volume.
+            *levelMask++ = 0;
+            // flag = 0;
+          }
         }
-        else
-        { // Special value  indicating point is outside clipped volume.
-          *levelMask++ = 0;
-          // flag = 0;
-        }
+        // Skip last ghost of this row and first ghost of next.
+        levelMask += 2;
+        scalarPtr += 2;
       }
-      // Skip last ghost of this row and first ghost of next.
-      levelMask += 2;
-      scalarPtr += 2;
+      // Skip last ghost row of this plane and first ghost row of next.
+      levelMask += 2 * dims[0];
+      scalarPtr += 2 * dims[0];
     }
-    // Skip last ghost row of this plane and first ghost row of next.
-    levelMask += 2 * dims[0];
-    scalarPtr += 2 * dims[0];
   }
-}
+};
 }
 
 //----------------------------------------------------------------------------
@@ -259,12 +257,11 @@ void vtkAMRDualClipLocator::ComputeLevelMask(vtkDataArray* scalars, double isoVa
   dims[1] = this->DualCellDimensions[1] + 1;
   dims[2] = this->DualCellDimensions[2] + 1;
 
-  switch (scalars->GetDataType())
+  vtkDualGridClipInitializeLevelMask worker;
+  if (!vtkArrayDispatch::Dispatch::Execute(
+        scalars, worker, isoValue, this->GetLevelMaskPointer(), dims))
   {
-    vtkTemplateMacro(::vtkDualGridClipInitializeLevelMask(
-      (VTK_TT*)(scalars->GetVoidPointer(0)), isoValue, this->GetLevelMaskPointer(), dims));
-    default:
-      vtkGenericWarningMacro("Execute: Unknown ScalarType");
+    worker(scalars, isoValue, this->GetLevelMaskPointer(), dims);
   }
 
   // Reduce point levels based on cell neighbors.
@@ -1159,25 +1156,6 @@ vtkMultiBlockDataSet* vtkAMRDualClip::DoRequestData(
 }
 
 //----------------------------------------------------------------------------
-// The only data specific stuff we need to do for the contour.
-//----------------------------------------------------------------------------
-namespace
-{
-template <class T>
-void vtkDualGridContourCastCornerValues(T* ptr, vtkIdType offsets[8], double values[8])
-{
-  values[0] = (double)(ptr[offsets[0]]);
-  values[1] = (double)(ptr[offsets[1]]);
-  values[2] = (double)(ptr[offsets[2]]);
-  values[3] = (double)(ptr[offsets[3]]);
-  values[4] = (double)(ptr[offsets[4]]);
-  values[5] = (double)(ptr[offsets[5]]);
-  values[6] = (double)(ptr[offsets[6]]);
-  values[7] = (double)(ptr[offsets[7]]);
-}
-}
-
-//----------------------------------------------------------------------------
 void vtkAMRDualClip::ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block)
 {
   vtkAMRDualGridHelperBlock* neighbor;
@@ -1395,7 +1373,6 @@ void vtkAMRDualClip::ProcessBlock(
     return;
   }
 
-  // void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
   double origin[3];
   double* spacing;
   int extent[6];
@@ -1539,15 +1516,10 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
     return;
   }
 
-  void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
-  int dataType = volumeFractionArray->GetDataType();
   double cornerValues[8];
-  switch (dataType)
+  for (int i = 0; i < 8; ++i)
   {
-    vtkTemplateMacro(vtkDualGridContourCastCornerValues(
-      (VTK_TT*)(volumeFractionPtr), cornerOffsets, cornerValues));
-    default:
-      vtkGenericWarningMacro("Execute: Unknown ScalarType");
+    cornerValues[i] = volumeFractionArray->GetComponent(cornerOffsets[i], 0);
   }
   // compute the case index
   int cubeIndex = 0;

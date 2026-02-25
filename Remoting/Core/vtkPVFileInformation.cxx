@@ -4,7 +4,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
-#include "vtkCollectionIterator.h"
+#include "vtkCollectionRange.h"
 #include "vtkFileSequenceParser.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -1008,11 +1008,10 @@ bool vtkPVFileInformation::DetectType()
 {
   if (this->Type == FILE_GROUP)
   {
-    vtkSmartPointer<vtkCollectionIterator> iter;
-    iter.TakeReference(this->Contents->NewIterator());
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    auto range = vtk::Range(this->Contents);
+    for (auto iter = range.begin(); iter != range.end(); ++iter)
     {
-      vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(iter->GetCurrentObject());
+      vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(*iter);
       if (!child->DetectType() || child->Type != SINGLE_FILE)
       {
         return false;
@@ -1020,10 +1019,9 @@ bool vtkPVFileInformation::DetectType()
       if (this->FastFileTypeDetection)
       {
         // Assume all children are same as this child.
-        for (; !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+        for (; iter != range.end(); ++iter)
         {
-          vtkPVFileInformation* child2 =
-            vtkPVFileInformation::SafeDownCast(iter->GetCurrentObject());
+          vtkPVFileInformation* child2 = vtkPVFileInformation::SafeDownCast(*iter);
           child2->Type = child->Type;
         }
         break;
@@ -1146,12 +1144,10 @@ void vtkPVFileInformation::CopyToStream(vtkClientServerStream* stream)
           << this->Hidden << this->Contents->GetNumberOfItems() << this->Extension << this->Size
           << this->ModificationTime;
 
-  vtkSmartPointer<vtkCollectionIterator> iter;
-  iter.TakeReference(this->Contents->NewIterator());
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  for (auto content : vtk::Range(this->Contents))
   {
     vtkClientServerStream childStream;
-    vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(iter->GetCurrentObject());
+    vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(content);
     child->CopyToStream(&childStream);
     *stream << childStream;
   }

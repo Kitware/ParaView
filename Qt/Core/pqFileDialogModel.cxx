@@ -4,7 +4,24 @@
 
 #include "pqFileDialogModel.h"
 
-#include <algorithm>
+#include <vtkCollection.h>
+#include <vtkCollectionRange.h>
+#include <vtkDirectory.h>
+#include <vtkPVFileInformation.h>
+#include <vtkPVFileInformationHelper.h>
+#include <vtkPVSession.h>
+#include <vtkSMDirectoryProxy.h>
+#include <vtkSMPropertyHelper.h>
+#include <vtkSMProxy.h>
+#include <vtkSMSessionProxyManager.h>
+#include <vtkSMSettings.h>
+#include <vtkSmartPointer.h>
+#include <vtkStringList.h>
+
+#include "pqObjectBuilder.h"
+#include "pqSMAdaptor.h"
+#include <pqApplicationCore.h>
+#include <pqServer.h>
 
 #include <QApplication>
 #include <QDateTime>
@@ -13,28 +30,7 @@
 #include <QMessageBox>
 #include <QStyle>
 
-#include <pqApplicationCore.h>
-#include <pqServer.h>
-#include <vtkClientServerStream.h>
-#include <vtkCollection.h>
-#include <vtkCollectionIterator.h>
-#include <vtkDirectory.h>
-#include <vtkPVFileInformation.h>
-#include <vtkPVFileInformationHelper.h>
-#include <vtkPVSession.h>
-#include <vtkSMDirectoryProxy.h>
-#include <vtkSMIntVectorProperty.h>
-#include <vtkSMPropertyHelper.h>
-#include <vtkSMProxy.h>
-#include <vtkSMProxyManager.h>
-#include <vtkSMSessionProxyManager.h>
-#include <vtkSMSettings.h>
-#include <vtkSMStringVectorProperty.h>
-#include <vtkSmartPointer.h>
-#include <vtkStringList.h>
-
-#include "pqObjectBuilder.h"
-#include "pqSMAdaptor.h"
+#include <algorithm>
 
 //////////////////////////////////////////////////////////////////////
 // pqFileDialogModelFileInfo
@@ -393,12 +389,9 @@ public:
     QList<pqFileDialogModelFileInfo> dirs;
     QList<pqFileDialogModelFileInfo> files;
 
-    vtkSmartPointer<vtkCollectionIterator> iter;
-    iter.TakeReference(dir->GetContents()->NewIterator());
-
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    for (auto content : vtk::Range(dir->GetContents()))
     {
-      vtkPVFileInformation* info = vtkPVFileInformation::SafeDownCast(iter->GetCurrentObject());
+      vtkPVFileInformation* info = vtkPVFileInformation::SafeDownCast(content);
       if (!info)
       {
         continue;
@@ -422,13 +415,9 @@ public:
         info->GetType() == vtkPVFileInformation::DIRECTORY_GROUP)
       {
         QList<pqFileDialogModelFileInfo> groupFiles;
-        vtkSmartPointer<vtkCollectionIterator> childIter;
-        childIter.TakeReference(info->GetContents()->NewIterator());
-        for (childIter->InitTraversal(); !childIter->IsDoneWithTraversal();
-             childIter->GoToNextItem())
+        for (auto subContent : vtk::Range(info->GetContents()))
         {
-          vtkPVFileInformation* child =
-            vtkPVFileInformation::SafeDownCast(childIter->GetCurrentObject());
+          vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(subContent);
           groupFiles.push_back(pqFileDialogModelFileInfo(/*QString::fromUtf8*/ (child->GetName()),
             /*QString::fromUtf8*/ (child->GetFullPath()),
             static_cast<vtkPVFileInformation::FileTypes>(child->GetType()), child->GetHidden(),

@@ -440,8 +440,6 @@ void vtkParFlowReader::ReadBlockIntoArray(istream& file, vtkImageData* img, vtkD
   }
 
   vtkIdType numValues = arr->GetNumberOfTuples() * arr->GetNumberOfComponents();
-  file.read(reinterpret_cast<char*>(arr->GetVoidPointer(0)), sizeof(double) * numValues);
-  vtkByteSwap::SwapBERange(reinterpret_cast<double*>(arr->GetVoidPointer(0)), numValues);
-  // std::cout << arr->GetNumberOfComponents() << " " << numValues << "Read to byte " << pfb.tellg()
-  // << "\n";
+  file.read(reinterpret_cast<char*>(arr->GetPointer(0)), sizeof(double) * numValues);
+  vtkByteSwap::SwapBERange(arr->GetPointer(0), numValues);
 }

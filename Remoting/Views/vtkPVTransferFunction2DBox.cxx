@@ -107,8 +107,7 @@ void vtkPVTransferFunction2DBox::ComputeTexture()
   this->Texture->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
   auto arr = vtkUnsignedCharArray::FastDownCast(this->Texture->GetPointData()->GetScalars());
   arr->SetName("Transfer2DBoxScalars");
-  const auto dataPtr = arr->GetVoidPointer(0);
-  memset(dataPtr, 0, this->TextureSize[0] * this->TextureSize[1] * 4 * sizeof(unsigned char));
+  arr->FillValue(0);
 
   double colorC[3] = { 1.0, 1.0, 1.0 };
   colorC[0] = this->Color[0] * 255;

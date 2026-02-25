@@ -14,6 +14,7 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
+#include "vtkParaViewDeprecation.h"                 // For PARAVIEW_DEPRECATED_IN_6_2_0
 
 class vtkImageData;
 class vtkPoints;
@@ -23,7 +24,9 @@ class vtkPolyData;
 class vtkDoubleArray;
 class vtkIntArray;
 
-class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkFlashContour : public vtkMultiBlockDataSetAlgorithm
+class PARAVIEW_DEPRECATED_IN_6_2_0(
+  "No longer needed") VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkFlashContour
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkFlashContour* New();

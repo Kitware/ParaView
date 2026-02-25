@@ -4,29 +4,22 @@
 
 #include "pqFileDialogLocationModel.h"
 
-#include <pqFileDialogModel.h>
-#include <pqSMAdaptor.h>
-#include <pqServer.h>
-#include <pqServerResource.h>
-#include <vtkClientServerStream.h>
 #include <vtkCollection.h>
-#include <vtkCollectionIterator.h>
+#include <vtkCollectionRange.h>
 #include <vtkPVEnvironmentInformation.h>
 #include <vtkPVEnvironmentInformationHelper.h>
 #include <vtkPVFileInformation.h>
 #include <vtkPVFileInformationHelper.h>
-#include <vtkProcessModule.h>
-#include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMSettings.h>
-#include <vtkSMSettingsProxy.h>
-#include <vtkSMStringVectorProperty.h>
 #include <vtkSmartPointer.h>
-#include <vtkStringList.h>
+
+#include <pqFileDialogModel.h>
+#include <pqSMAdaptor.h>
+#include <pqServer.h>
 
 #include <QApplication>
-#include <QBrush>
 #include <QDir>
 #include <QFont>
 #include <QStyle>
@@ -223,11 +216,9 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
   }
 
   this->LocationList.clear();
-  vtkSmartPointer<vtkCollectionIterator> iter;
-  iter.TakeReference(information->GetContents()->NewIterator());
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  for (auto content : vtk::Range(information->GetContents()))
   {
-    vtkPVFileInformation* cur_info = vtkPVFileInformation::SafeDownCast(iter->GetCurrentObject());
+    vtkPVFileInformation* cur_info = vtkPVFileInformation::SafeDownCast(content);
     if (!cur_info)
     {
       continue;

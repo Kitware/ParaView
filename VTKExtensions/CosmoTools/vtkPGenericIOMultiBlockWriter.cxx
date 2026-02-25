@@ -256,7 +256,8 @@ static inline void addArray(vtkDataArray* array, gio::GenericIOWriter* writer, i
       {
         writer->AddVariable(array->GetName(), type);
       }
-      writer->AddDataForVariableInBlock(blockId, array->GetName(), array->GetVoidPointer(0));
+      auto aos = array->ToAOSDataArray(); // NOLINTNEXTLINE(bugprone-unsafe-functions)
+      writer->AddDataForVariableInBlock(blockId, array->GetName(), aos->GetVoidPointer(0));
     }
 
     // if it is a vector, compute three component arrays

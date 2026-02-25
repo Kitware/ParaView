@@ -649,13 +649,10 @@ vtkTable* vtkSMTransferFunctionProxy::ComputeDataHistogramTable(int numberOfBins
 
   // Copy histogram values, currently stored in an int array,
   // into a double array in order to be able to use shift scale in the related plots
-  vtkIdType nValue = valueArray->GetNumberOfTuples();
-  int* valuePointer = static_cast<int*>(valueArray->GetPointer(0));
   vtkNew<vtkDoubleArray> doubleValueArray;
   doubleValueArray->SetName(valueArray->GetName());
   doubleValueArray->SetNumberOfTuples(valueArray->GetNumberOfTuples());
-  std::copy(
-    valuePointer, valuePointer + nValue, static_cast<double*>(doubleValueArray->GetVoidPointer(0)));
+  doubleValueArray->DeepCopy(valueArray);
   this->HistogramTableCache->RemoveColumn(1);
   this->HistogramTableCache->AddColumn(doubleValueArray);
   return this->HistogramTableCache;

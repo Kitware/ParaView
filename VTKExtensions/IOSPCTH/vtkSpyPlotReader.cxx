@@ -4,6 +4,7 @@
 #include "vtkSpyPlotReader.h"
 
 #include "vtkAMRBox.h"
+#include "vtkArrayDispatch.h"
 #include "vtkBoundingBox.h"
 #include "vtkByteSwap.h"
 #include "vtkCallbackCommand.h"
@@ -11,10 +12,10 @@
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataArraySelection.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
-// #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -27,17 +28,15 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
-#include "vtkProcessGroup.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
-#include "vtkUniformGrid.h"
-#include "vtkUnsignedCharArray.h"
-
 #include "vtkSpyPlotBlock.h"
 #include "vtkSpyPlotBlockIterator.h"
 #include "vtkSpyPlotIStream.h"
 #include "vtkSpyPlotReaderMap.h"
 #include "vtkSpyPlotUniReader.h"
+#include "vtkUniformGrid.h"
+#include "vtkUnsignedCharArray.h"
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
@@ -414,60 +413,63 @@ enum
 
 namespace
 {
-template <class DataType>
-int vtkSpyPlotRemoveBadGhostCells(DataType* dataType, vtkDataArray* dataArray, int realExtents[6],
-  int realDims[3], int ptDims[3], int realPtDims[3])
+struct vtkSpyPlotRemoveBadGhostCells
 {
-  /*
-    vtkDebugMacro(
-    "//////////////////////////////////////////////////////////////////////////////////" );
-    vtkDebugMacro( << dataArray << " vtkSpyPlotRemoveBadGhostCells(" << dataArray->GetName() << ")"
-    );
-    vtkDebugMacro( "DataArray: ");
-    dataArray->Print(cout);
-    vtkDebugMacro( "Real Extents: " << coutVector6(realExtents) );
-    vtkDebugMacro( "Real Dims:    " << coutVector3(realDims) );
-    vtkDebugMacro( "PT Dims:      " << coutVector3(ptDims) );
-    vtkDebugMacro( "Real PT Dims: " << coutVector3(realPtDims) );
-    vtkDebugMacro(
-    "//////////////////////////////////////////////////////////////////////////////////" );
-  */
-  (void)*dataType;
-  // skip some cell data.
-
-  // Performance analysis has shown that using ComputeCellId to be a bottleneck of the reader
-  // so we are going to replace the method with an incremental algorithm that will reduce the total
-  // number of multiplications.
-  vtkIdType kOffset[2] = { 0, 0 }, jOffset[2] = { 0, 0 };
-  vtkIdType realCellId = 0, oldCellId = 0;
-
-  int xyz[3];
-  int destXyz[3];
-  DataType* dataPtr = static_cast<DataType*>(dataArray->GetVoidPointer(0));
-  for (xyz[2] = realExtents[4], destXyz[2] = 0; xyz[2] < realExtents[5]; ++xyz[2], ++destXyz[2])
+  template <class TArray>
+  void operator()(
+    TArray* array, int realExtents[6], int realDims[3], int ptDims[3], int realPtDims[3])
   {
-    kOffset[0] = destXyz[2] * (realPtDims[1] - 1);
-    kOffset[1] = xyz[2] * (ptDims[1] - 1);
+    /*
+      vtkDebugMacro(
+      "//////////////////////////////////////////////////////////////////////////////////" );
+      vtkDebugMacro( << dataArray << " vtkSpyPlotRemoveBadGhostCells(" << dataArray->GetName() <<
+      ")"
+      );
+      vtkDebugMacro( "DataArray: ");
+      dataArray->Print(cout);
+      vtkDebugMacro( "Real Extents: " << coutVector6(realExtents) );
+      vtkDebugMacro( "Real Dims:    " << coutVector3(realDims) );
+      vtkDebugMacro( "PT Dims:      " << coutVector3(ptDims) );
+      vtkDebugMacro( "Real PT Dims: " << coutVector3(realPtDims) );
+      vtkDebugMacro(
+      "//////////////////////////////////////////////////////////////////////////////////" );
+    */
+    // skip some cell data.
 
-    for (xyz[1] = realExtents[2], destXyz[1] = 0; xyz[1] < realExtents[3]; ++xyz[1], ++destXyz[1])
+    // Performance analysis has shown that using ComputeCellId to be a bottleneck of the reader
+    // so we are going to replace the method with an incremental algorithm that will reduce the
+    // total number of multiplications.
+    vtkIdType kOffset[2] = { 0, 0 }, jOffset[2] = { 0, 0 };
+    vtkIdType realCellId = 0, oldCellId = 0;
+
+    int xyz[3];
+    int destXyz[3];
+    auto data = vtk::DataArrayValueRange<1>(array);
+    for (xyz[2] = realExtents[4], destXyz[2] = 0; xyz[2] < realExtents[5]; ++xyz[2], ++destXyz[2])
     {
-      jOffset[0] = (kOffset[0] + destXyz[1]) * (realPtDims[0] - 1);
-      jOffset[1] = (kOffset[1] + xyz[1]) * (ptDims[0] - 1);
+      kOffset[0] = destXyz[2] * (realPtDims[1] - 1);
+      kOffset[1] = xyz[2] * (ptDims[1] - 1);
 
-      for (xyz[0] = realExtents[0], destXyz[0] = 0; xyz[0] < realExtents[1]; ++xyz[0], ++destXyz[0])
+      for (xyz[1] = realExtents[2], destXyz[1] = 0; xyz[1] < realExtents[3]; ++xyz[1], ++destXyz[1])
       {
-        realCellId = jOffset[0] + destXyz[0];
-        oldCellId = jOffset[1] + xyz[0];
-        dataPtr[realCellId] = dataPtr[oldCellId];
-        // old slow way of calculating cell id
-        // dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
-        //  dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
+        jOffset[0] = (kOffset[0] + destXyz[1]) * (realPtDims[0] - 1);
+        jOffset[1] = (kOffset[1] + xyz[1]) * (ptDims[0] - 1);
+
+        for (xyz[0] = realExtents[0], destXyz[0] = 0; xyz[0] < realExtents[1];
+             ++xyz[0], ++destXyz[0])
+        {
+          realCellId = jOffset[0] + destXyz[0];
+          oldCellId = jOffset[1] + xyz[0];
+          data[realCellId] = data[oldCellId];
+          // old slow way of calculating cell id
+          // data[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
+          //  data[vtkStructuredData::ComputeCellId(ptDims,xyz)];
+        }
       }
     }
+    array->SetNumberOfTuples(realDims[0] * realDims[1] * realDims[2]);
   }
-  dataArray->SetNumberOfTuples(realDims[0] * realDims[1] * realDims[2]);
-  return 1;
-}
+};
 }
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::UpdateTimeStep(
@@ -1062,29 +1064,40 @@ void vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da)
 namespace
 {
 // The templated execute function handles all the data types.
-template <class T>
-void vtkMergeVectorComponents(vtkIdType length, T* p1, T* p2, T* p3, T* po)
+struct vtkMergeVectorComponents
 {
-  vtkIdType idx;
-  if (p3)
+  template <class TArray1, class TArray2, class TArray3>
+  void operator()(TArray1* array1, TArray2* array2, TArray3* array3, vtkDataArray* resultArray)
   {
-    for (idx = 0; idx < length; ++idx)
+    auto a1 = vtk::DataArrayValueRange<1>(array1);
+    auto a2 = vtk::DataArrayValueRange<1>(array2);
+    auto a3 = vtk::DataArrayValueRange<1>(array3);
+    auto result = vtk::DataArrayTupleRange<3>(TArray1::FastDownCast(resultArray));
+    vtkIdType numTuples = array1->GetNumberOfTuples();
+    for (vtkIdType i = 0; i < numTuples; ++i)
     {
-      *po++ = *p1++;
-      *po++ = *p2++;
-      *po++ = *p3++;
+      auto tuple = result[i];
+      tuple[0] = a1[i];
+      tuple[1] = a2[i];
+      tuple[2] = a3[i];
     }
   }
-  else
+
+  template <class TArray1, class TArray2>
+  void operator()(TArray1* array1, TArray2* array2, vtkDataArray* resultArray)
   {
-    for (idx = 0; idx < length; ++idx)
+    auto a1 = vtk::DataArrayValueRange<1>(array1);
+    auto a2 = vtk::DataArrayValueRange<1>(array2);
+    auto result = vtk::DataArrayTupleRange<2>(TArray1::FastDownCast(resultArray));
+    vtkIdType numTuples = array1->GetNumberOfTuples();
+    for (vtkIdType i = 0; i < numTuples; ++i)
     {
-      *po++ = *p1++;
-      *po++ = *p2++;
-      *po++ = (T)0;
+      auto tuple = result[i];
+      tuple[0] = a1[i];
+      tuple[1] = a2[i];
     }
   }
-}
+};
 }
 
 //-----------------------------------------------------------------------------
@@ -1154,17 +1167,10 @@ int vtkSpyPlotReader::MergeVectors(
   newArray->SetNumberOfComponents(3);
   vtkIdType length = a1->GetNumberOfTuples();
   newArray->SetNumberOfTuples(length);
-  void* p1 = a1->GetVoidPointer(0);
-  void* p2 = a2->GetVoidPointer(0);
-  void* p3 = a3->GetVoidPointer(0);
-  void* pn = newArray->GetVoidPointer(0);
-  switch (a1->GetDataType())
+  vtkMergeVectorComponents worker;
+  if (!vtkArrayDispatch::Dispatch3SameValueType::Execute(a1, a2, a3, worker, newArray))
   {
-    vtkTemplateMacro(
-      ::vtkMergeVectorComponents(length, (VTK_TT*)p1, (VTK_TT*)p2, (VTK_TT*)p3, (VTK_TT*)pn));
-    default:
-      vtkErrorMacro(<< "Execute: Unknown ScalarType");
-      return 0;
+    worker(a1, a2, a3, newArray);
   }
   if (prefixFlag)
   {
@@ -1247,16 +1253,10 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da, vtkDataArray* a1, v
   newArray->SetNumberOfComponents(3);
   vtkIdType length = a1->GetNumberOfTuples();
   newArray->SetNumberOfTuples(length);
-  void* p1 = a1->GetVoidPointer(0);
-  void* p2 = a2->GetVoidPointer(0);
-  void* pn = newArray->GetVoidPointer(0);
-  switch (a1->GetDataType())
+  vtkMergeVectorComponents worker;
+  if (!vtkArrayDispatch::Dispatch2SameValueType::Execute(a1, a2, worker, newArray))
   {
-    vtkTemplateMacro(
-      ::vtkMergeVectorComponents(length, (VTK_TT*)p1, (VTK_TT*)p2, (VTK_TT*)nullptr, (VTK_TT*)pn));
-    default:
-      vtkErrorMacro(<< "Execute: Unknown ScalarType");
-      return 0;
+    worker(a1, a2, newArray);
   }
   if (prefixFlag)
   {
@@ -1871,7 +1871,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3], int level, in
   ghostArray->Delete();
   int planeSize = dims[0] * dims[1];
   int j, k;
-  unsigned char* ptr = static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
+  unsigned char* ptr = ghostArray->GetPointer(0);
   for (k = 0; k < dims[2]; k++)
   {
     // Is the entire ij plane a set of ghosts
@@ -1943,12 +1943,13 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3], int r
 
       if (!fixed)
       {
+        vtkSpyPlotRemoveBadGhostCells worker;
         vtkDebugMacro(" Fix bad ghost cells for the array: " << blockID << " / " << field << " ("
                                                              << uniReader->GetFileName() << ")");
-        switch (array->GetDataType())
+        if (!vtkArrayDispatch::Dispatch::Execute(
+              array, worker, realExtents, realDims, ptDims, realPtDims))
         {
-          vtkTemplateMacro(::vtkSpyPlotRemoveBadGhostCells(
-            static_cast<VTK_TT*>(nullptr), array, realExtents, realDims, ptDims, realPtDims));
+          worker(array, realExtents, realDims, ptDims, realPtDims);
         }
         uniReader->MarkCellFieldDataFixed(blockID, field);
       }
@@ -1971,7 +1972,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3], int r
   ghostArray->SetName(vtkDataSetAttributes::GhostArrayName());
   cd->AddArray(ghostArray);
   ghostArray->Delete();
-  unsigned char* ptr = static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
+  unsigned char* ptr = ghostArray->GetPointer(0);
   int k, j;
   int planeSize = realDims[0] * realDims[1];
   int checkILower = (realExtents[0] == 0);
@@ -2480,7 +2481,7 @@ static void createSpyPlotLevelArray(vtkCellData* cd, int size, int level)
   array->SetName("levels");
   array->SetNumberOfComponents(1);
   array->SetNumberOfTuples(size);
-  int* ptr = static_cast<int*>(array->GetVoidPointer(0));
+  int* ptr = static_cast<vtkIntArray*>(array)->GetPointer(0);
   int i;
   for (i = 0; i < size; i++)
   {

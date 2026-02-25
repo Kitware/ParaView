@@ -69,10 +69,6 @@ public:
   void FlagsForCells();
   ///@}
 
-  // temp for debugging
-  const char* Name;
-  vtkIdType Idx;
-
 protected:
   vtkMinMax();
   ~vtkMinMax() override;
@@ -106,6 +102,8 @@ protected:
 private:
   vtkMinMax(const vtkMinMax&) = delete;
   void operator=(const vtkMinMax&) = delete;
+
+  struct vtkMinMaxWorker;
 };
 
 #endif

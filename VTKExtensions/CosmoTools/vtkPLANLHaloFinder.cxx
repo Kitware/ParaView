@@ -469,7 +469,7 @@ void vtkPLANLHaloFinder::VectorizeData(vtkUnstructuredGrid* particles)
   haloTag->SetName("HaloID");
   haloTag->SetNumberOfComponents(1);
   haloTag->SetNumberOfTuples(points->GetNumberOfPoints());
-  int* haloTagPtr = static_cast<int*>(haloTag->GetVoidPointer(0));
+  int* haloTagPtr = haloTag->GetPointer(0);
 
   vtkIdType numParticles = points->GetNumberOfPoints();
   this->Particles->Resize(numParticles);
@@ -564,10 +564,10 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
 
   vtkPoints* pnts = haloCenters->GetPoints();
   vtkPointData* PD = haloCenters->GetPointData();
-  double* haloMass = static_cast<double*>(PD->GetArray("HaloMass")->GetVoidPointer(0));
-  double* haloAverageVel = static_cast<double*>(PD->GetArray("AverageVelocity")->GetVoidPointer(0));
-  double* haloVelDisp = static_cast<double*>(PD->GetArray("VelocityDispersion")->GetVoidPointer(0));
-  int* haloId = static_cast<int*>(PD->GetArray("HaloID")->GetVoidPointer(0));
+  double* haloMass = vtkDoubleArray::FastDownCast(PD->GetArray("HaloMass"))->GetPointer(0));
+  double* haloAverageVel = vtkDoubleArray::FastDownCast(PD->GetArray("AverageVelocity"))->GetPointer(0));
+  double* haloVelDisp = vtkDoubleArray::FastDownCast(PD->GetArray("VelocityDispersion"))->GetPointer(0));
+  int* haloId = vtkIntArray::SafeDownCast(PD->GetArray("HaloID"))->GetPointer(0);
 
   double center[3];
   for (unsigned int halo = 0; halo < this->Halos->ExtractedHalos.size(); ++halo)
@@ -598,7 +598,7 @@ void vtkPLANLHaloFinder::MarkHaloParticlesAndGetCenter(const unsigned int halo,
 
   // STEP 0: Get pointer to the haloTags array
   int* haloTags =
-    static_cast<int*>(particles->GetPointData()->GetArray("HaloID")->GetVoidPointer(0));
+    vtkIntArray::FastDownCast(particles->GetPointData()->GetArray("HaloID"))->GetPointer(0);
 
   // STEP 1: Construct FOF halo properties (TODO: we can modularize this part)
   int numberOfHalos = this->HaloFinder->getNumberOfHalos();
@@ -723,25 +723,25 @@ void vtkPLANLHaloFinder::InitializeHaloCenters(vtkUnstructuredGrid* haloCenters,
   haloMass->SetName("HaloMass");
   haloMass->SetNumberOfComponents(1);
   haloMass->SetNumberOfTuples(N);
-  double* haloMassArray = static_cast<double*>(haloMass->GetVoidPointer(0));
+  double* haloMassArray = haloMass->GetPointer(0);
 
   vtkDoubleArray* averageVelocity = vtkDoubleArray::New();
   averageVelocity->SetName("AverageVelocity");
   averageVelocity->SetNumberOfComponents(3);
   averageVelocity->SetNumberOfTuples(N);
-  double* velArray = static_cast<double*>(averageVelocity->GetVoidPointer(0));
+  double* velArray = averageVelocity->GetPointer(0);
 
   vtkDoubleArray* velDispersion = vtkDoubleArray::New();
   velDispersion->SetName("VelocityDispersion");
   velDispersion->SetNumberOfComponents(1);
   velDispersion->SetNumberOfTuples(N);
-  double* velDispArray = static_cast<double*>(velDispersion->GetVoidPointer(0));
+  double* velDispArray = velDispersion->GetPointer(0);
 
   vtkIntArray* haloIdx = vtkIntArray::New();
   haloIdx->SetName("HaloID");
   haloIdx->SetNumberOfComponents(1);
   haloIdx->SetNumberOfTuples(N);
-  int* haloIdxArray = static_cast<int*>(haloIdx->GetVoidPointer(0));
+  int* haloIdxArray = haloIdx->GetPointer(0);
 
   for (unsigned int i = 0; i < N; ++i)
   {

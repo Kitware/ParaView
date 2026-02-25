@@ -5,7 +5,7 @@
 
 #include "vtkArrayDispatch.h"
 #include "vtkCSVExporter.h"
-#include "vtkDataArrayAccessor.h"
+#include "vtkDataArrayRange.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
@@ -277,12 +277,12 @@ public:
   template <typename ArrayType>
   void operator()(ArrayType* darray)
   {
-    vtkDataArrayAccessor<ArrayType> accessor(darray);
+    auto data = vtk::DataArrayTupleRange(darray);
     if (darray->GetNumberOfTuples() == 1)
     {
       for (int cc = 0; cc < darray->GetNumberOfComponents(); ++cc)
       {
-        this->Stream << (cc > 0 ? this->Separator : "") << this->number(accessor.Get(0, cc));
+        this->Stream << (cc > 0 ? this->Separator : "") << this->number(data[0][cc]);
       }
     }
   }

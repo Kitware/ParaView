@@ -5,9 +5,8 @@
 #include "vtkPVContourFilter.h"
 
 #include "vtkArrayDispatch.h"
-#include "vtkAssume.h"
 #include "vtkDataArray.h"
-#include "vtkDataArrayAccessor.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataObject.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkEventForwarderCommand.h"
@@ -20,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
-#include "vtkSmartPointer.h"
 
 #include <cmath>
 #include <set>
@@ -167,19 +165,17 @@ struct Cleaner
   std::set<double> Values;
 
   template <typename ArrayT>
-  void operator()(ArrayT* scalars) const
+  void operator()(ArrayT* scalarsArray) const
   {
-    VTK_ASSUME(scalars->GetNumberOfComponents() == 1);
-    vtkDataArrayAccessor<ArrayT> accessor(scalars);
-    using ValueT = typename vtkDataArrayAccessor<ArrayT>::APIType;
+    auto scalars = vtk::DataArrayValueRange<1>(scalarsArray);
 
-    vtkSMPTools::For(0, scalars->GetNumberOfTuples(),
-      [this, &accessor](vtkIdType begin, vtkIdType end)
+    vtkSMPTools::For(0, scalarsArray->GetNumberOfTuples(),
+      [&](vtkIdType begin, vtkIdType end)
       {
+        using ValueT = vtk::GetAPIType<ArrayT>;
         for (vtkIdType cc = begin; cc < end; ++cc)
         {
-          accessor.Set(
-            cc, 0, static_cast<ValueT>(this->GetClosest(static_cast<double>(accessor.Get(cc, 0)))));
+          scalars[cc] = static_cast<ValueT>(this->GetClosest(static_cast<double>(scalars[cc])));
         }
       });
   }

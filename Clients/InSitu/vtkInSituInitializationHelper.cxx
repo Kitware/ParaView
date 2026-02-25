@@ -9,7 +9,7 @@
 #include "vtkConduitSource.h"
 #include <catalyst_conduit.hpp>
 #endif
-#include "vtkDataArrayAccessor.h"
+#include "vtkDataArrayRange.h"
 #include "vtkFieldData.h"
 #include "vtkInSituPipelinePython.h"
 #include "vtkMultiBlockDataSet.h"
@@ -97,12 +97,12 @@ struct PropertyCopier
     const vtkIdType numTuples = array->GetNumberOfTuples();
     const int numComponents = array->GetNumberOfComponents();
     this->SMProperty->SetNumberOfElements(static_cast<unsigned int>(numTuples * numComponents));
-    vtkDataArrayAccessor<ArrayType> accessor(array);
+    auto data = vtk::DataArrayTupleRange(array);
     for (vtkIdType cc = 0; cc < numTuples; ++cc)
     {
       for (int comp = 0; comp < numComponents; ++comp)
       {
-        this->SMProperty->SetElement(cc * numComponents + comp, accessor.Get(cc, comp));
+        this->SMProperty->SetElement(cc * numComponents + comp, data[cc][comp]);
       }
     }
   }

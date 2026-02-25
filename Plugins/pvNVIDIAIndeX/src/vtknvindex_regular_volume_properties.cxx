@@ -27,10 +27,11 @@
 // SPDX-FileCopyrightText: Copyright 2025 NVIDIA Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
+#include "vtkAOSDataArrayTemplate.h"
 #include "vtkCellData.h"
 #include "vtkCellIterator.h"
+#include "vtkDataArray.h"
 #include "vtkUnstructuredGrid.h"
-#include <vtkDataArray.h>
 
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_forwarding_logger.h"
@@ -323,25 +324,13 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
       return false;
     }
 
-    const std::string scalar_type = scalar_array->GetDataTypeAsString();
-    if (scalar_type == "double")
-    {
-      // Convert double to float data.
-      // shm_ptr and m_size were already set up for float data.
-      const mi::Size nb_voxels = shm_info->m_size / sizeof(mi::Float32);
-
-      const mi::Float64* src =
-        reinterpret_cast<const mi::Float64*>(scalar_array->GetVoidPointer(0));
-      mi::Float32* dst = reinterpret_cast<mi::Float32*>(shm_ptr);
-      for (mi::Size i = 0; i < nb_voxels; ++i)
-      {
-        dst[i] = static_cast<mi::Float32>(src[i]);
-      }
-    }
-    else
-    {
-      memcpy(shm_ptr, scalar_array->GetVoidPointer(0), shm_info->m_size);
-    }
+    // shm_ptr and m_size were already set up for float data.
+    const mi::Size nb_voxels = shm_info->m_size / sizeof(mi::Float32);
+    mi::Float32* dst = reinterpret_cast<mi::Float32*>(shm_ptr);
+    vtkNew<vtkAOSDataArrayTemplate<mi::Float32>> converted_array;
+    converted_array->SetNumberOfComponents(1);
+    converted_array->SetArray(dst, nb_voxels, /*save*/ 1);
+    converted_array->InsertTuples(0, nb_voxels, 0, scalar_array);
 
     // free memory space linked to shared memory
     vtknvindex::util::unmap_shm(shm_ptr, shm_info->m_size);

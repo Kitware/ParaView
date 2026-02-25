@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
 // SPDX-License-Identifier: BSD-3-Clause
+// PARAVIEW_DEPRECATED_IN_6_2_0()
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkFlashContour.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
@@ -229,7 +232,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro("Missing block map.");
     return 0;
   }
-  this->GlobalToLocalMap = (int*)(globalToLocalMapArray->GetVoidPointer(0));
+  this->GlobalToLocalMap = globalToLocalMapArray->GetPointer(0);
   this->NumberOfGlobalBlocks = globalToLocalMapArray->GetNumberOfTuples();
 
   da = mbdsInput->GetFieldData()->GetArray("BlockChildren");
@@ -239,7 +242,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro("Missing children array.");
     return 0;
   }
-  this->GlobalChildrenArray = (int*)(childrenIdArray->GetVoidPointer(0));
+  this->GlobalChildrenArray = childrenIdArray->GetPointer(0);
 
   da = mbdsInput->GetFieldData()->GetArray("BlockNeighbors");
   vtkIntArray* neighborIdArray = vtkIntArray::SafeDownCast(da);
@@ -248,7 +251,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro("Missing children array.");
     return 0;
   }
-  this->GlobalNeighborArray = (int*)(neighborIdArray->GetVoidPointer(0));
+  this->GlobalNeighborArray = neighborIdArray->GetPointer(0);
 
   da = mbdsInput->GetFieldData()->GetArray("BlockLevel");
   vtkIntArray* levelArray = vtkIntArray::SafeDownCast(da);
@@ -257,7 +260,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro("Missing level array.");
     return 0;
   }
-  this->GlobalLevelArray = (int*)(levelArray->GetVoidPointer(0));
+  this->GlobalLevelArray = levelArray->GetPointer(0);
 
   // Get the outputs
   // 0
@@ -674,25 +677,25 @@ void vtkFlashContour::ProcessBlock(vtkImageData* image)
   // How to do the dual grid contour?
   // Simple marching cubes (marching corners for dual :)
   vtkDataArray* da = image->GetCellData()->GetArray(this->CellArrayNameToProcess);
-  if (da->GetDataType() != VTK_DOUBLE)
+  auto* doubleArray = vtkAOSDataArrayTemplate<double>::FastDownCast(da);
+  if (!doubleArray)
   {
-    vtkErrorMacro("Expecting doubles");
+    vtkErrorMacro("Expecting a vtkDoubleArray");
     return;
   }
-  void* ptr = da->GetVoidPointer(0);
-  double* dPtr = (double*)(ptr);
+  double* dPtr = doubleArray->GetPointer(0);
   // For passing / interpolating one double array.
   double* pPtr = nullptr;
   if (this->PassArray)
   {
     da = image->GetCellData()->GetArray(this->PassAttribute);
-    if (da->GetDataType() != VTK_DOUBLE)
+    doubleArray = vtkAOSDataArrayTemplate<double>::FastDownCast(da);
+    if (!doubleArray)
     {
-      vtkErrorMacro("Expecting doubles");
+      vtkErrorMacro("Expecting a vtkDoubleArray");
       return;
     }
-    ptr = da->GetVoidPointer(0);
-    pPtr = (double*)(ptr);
+    pPtr = doubleArray->GetPointer(0);
   }
 
   double origin[3];
@@ -942,12 +945,13 @@ void vtkFlashContour::ProcessNeighborhoodSharedRegion(
     }
     // Get the pointer for the corner.
     vtkDataArray* da = image2->GetCellData()->GetArray(this->CellArrayNameToProcess);
-    if (da->GetDataType() != VTK_DOUBLE)
+    auto* doubleArray = vtkAOSDataArrayTemplate<double>::FastDownCast(da);
+    if (!doubleArray)
     {
-      vtkErrorMacro("Expecting doubles");
+      vtkErrorMacro("Expecting a vtkDoubleArray");
       return;
     }
-    ptrs[cornerId] = (double*)(da->GetVoidPointer(0));
+    ptrs[cornerId] = doubleArray->GetPointer(0);
     // Move pointer to the correct position.
     ptrs[cornerId] +=
       incs[0] * dualPoint2Index[0] + incs[1] * dualPoint2Index[1] + incs[2] * dualPoint2Index[2];
@@ -955,12 +959,13 @@ void vtkFlashContour::ProcessNeighborhoodSharedRegion(
     if (this->PassArray)
     {
       da = image2->GetCellData()->GetArray(this->PassAttribute);
-      if (da->GetDataType() != VTK_DOUBLE)
+      doubleArray = vtkAOSDataArrayTemplate<double>::FastDownCast(da);
+      if (!doubleArray)
       {
-        vtkErrorMacro("Expecting doubles");
+        vtkErrorMacro("Expecting a vtkDoubleArray");
         return;
       }
-      aptrs[cornerId] = (double*)(da->GetVoidPointer(0));
+      aptrs[cornerId] = doubleArray->GetPointer(0);
       // Move pointer to the correct position.
       aptrs[cornerId] +=
         incs[0] * dualPoint2Index[0] + incs[1] * dualPoint2Index[1] + incs[2] * dualPoint2Index[2];

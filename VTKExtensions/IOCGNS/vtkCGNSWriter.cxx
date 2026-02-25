@@ -6,7 +6,6 @@
 #include "vtkCGNSWriter.h"
 
 #include "vtkAppendDataSets.h"
-#include "vtkArrayIteratorIncludes.h"
 #include "vtkCellData.h"
 #include "vtkCellTypes.h"
 #include "vtkCompositeDataSet.h"
