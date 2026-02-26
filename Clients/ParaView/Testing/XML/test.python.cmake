@@ -21,6 +21,7 @@ list(APPEND TESTS_WITHOUT_BASELINES
 if(NOT APPLE)
   list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
     TooltipCopy.xml
+    TooltipHideInfo.xml
     TestHTGHoverOnCell.xml
     )
 endif()
