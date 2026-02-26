@@ -205,7 +205,7 @@ public:
 
 protected:
   vtkPGenericIOMultiBlockReader();
-  ~vtkPGenericIOMultiBlockReader();
+  ~vtkPGenericIOMultiBlockReader() override;
 
   char* XAxisVariableName;
   char* YAxisVariableName;
@@ -255,8 +255,8 @@ protected:
     vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 
   // Pipeline methods
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkPGenericIOMultiBlockReader(const vtkPGenericIOMultiBlockReader&) = delete;

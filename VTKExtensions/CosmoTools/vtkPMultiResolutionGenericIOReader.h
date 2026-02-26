@@ -97,7 +97,7 @@ public:
 
 protected:
   vtkPMultiResolutionGenericIOReader();
-  ~vtkPMultiResolutionGenericIOReader();
+  ~vtkPMultiResolutionGenericIOReader() override;
 
   int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;

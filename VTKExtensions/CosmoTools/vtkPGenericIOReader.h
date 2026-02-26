@@ -239,7 +239,7 @@ public:
 
 protected:
   vtkPGenericIOReader();
-  virtual ~vtkPGenericIOReader();
+  ~vtkPGenericIOReader() override;
 
   // Pipeline methods
   int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;

@@ -564,9 +564,11 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
 
   vtkPoints* pnts = haloCenters->GetPoints();
   vtkPointData* PD = haloCenters->GetPointData();
-  double* haloMass = vtkDoubleArray::FastDownCast(PD->GetArray("HaloMass"))->GetPointer(0));
-  double* haloAverageVel = vtkDoubleArray::FastDownCast(PD->GetArray("AverageVelocity"))->GetPointer(0));
-  double* haloVelDisp = vtkDoubleArray::FastDownCast(PD->GetArray("VelocityDispersion"))->GetPointer(0));
+  double* haloMass = vtkDoubleArray::FastDownCast(PD->GetArray("HaloMass"))->GetPointer(0);
+  double* haloAverageVel =
+    vtkDoubleArray::FastDownCast(PD->GetArray("AverageVelocity"))->GetPointer(0);
+  double* haloVelDisp =
+    vtkDoubleArray::FastDownCast(PD->GetArray("VelocityDispersion"))->GetPointer(0);
   int* haloId = vtkIntArray::SafeDownCast(PD->GetArray("HaloID"))->GetPointer(0);
 
   double center[3];
