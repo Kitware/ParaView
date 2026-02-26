@@ -717,8 +717,8 @@ void vtkPGenericIOReader::LoadData(
         onlyDataInHalo->SetNumberOfTuples(grid->GetNumberOfPoints());
         onlyDataInHalo->SetName(dataArray->GetName());
         vtkNew<vtkIdList> pointsInHaloList;
-        pointsInHaloList->Allocate(pointsInHalo.size());
-        for (const auto& id : pointsInHalo)
+        pointsInHaloList->Allocate(pointsInSelectedHalos.size());
+        for (const auto& id : pointsInSelectedHalos)
         {
           pointsInHaloList->InsertNextId(id);
         }
