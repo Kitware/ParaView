@@ -227,7 +227,6 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   this->Superclass::UpdatePipelineInformation();
 
   this->InvokeEvent(vtkCommand::UpdateInformationEvent);
-  // this->MarkModified(this);
 }
 
 //---------------------------------------------------------------------------

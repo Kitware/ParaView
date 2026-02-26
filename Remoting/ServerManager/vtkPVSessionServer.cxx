@@ -507,10 +507,10 @@ int vtkPVSessionServer::GetConnectID()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_length)
+void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int messageLength)
 {
   vtkMultiProcessStream stream;
-  stream.SetRawData(reinterpret_cast<const unsigned char*>(message), message_length);
+  stream.SetRawData(reinterpret_cast<const unsigned char*>(message), messageLength);
   int type;
   stream >> type;
   switch (type)
