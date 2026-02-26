@@ -52,7 +52,7 @@ public:
   static vtkPLANLHaloFinder* New();
 
   vtkTypeMacro(vtkPLANLHaloFinder, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
   /**
@@ -191,9 +191,9 @@ public:
 
 protected:
   vtkPLANLHaloFinder();
-  ~vtkPLANLHaloFinder();
+  ~vtkPLANLHaloFinder() override;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Checks the integrid of the output particles. Primarily the method ensures

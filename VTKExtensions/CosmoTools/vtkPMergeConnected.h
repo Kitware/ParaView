@@ -26,7 +26,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPMergeConnected : public vtkMultiBl
 public:
   static vtkPMergeConnected* New();
   vtkTypeMacro(vtkPMergeConnected, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   struct FaceWithKey
   {
@@ -37,10 +37,10 @@ public:
 
 protected:
   vtkPMergeConnected();
-  ~vtkPMergeConnected();
+  ~vtkPMergeConnected() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  int FillOutputPortInformation(int port, vtkInformation* info);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
 private:
   vtkPMergeConnected(const vtkPMergeConnected&) = delete;

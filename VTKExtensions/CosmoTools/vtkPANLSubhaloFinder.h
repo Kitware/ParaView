@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLSubhaloFinder : public vtkPassI
 
 public:
   static vtkPANLSubhaloFinder* New();
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum
   {
@@ -190,11 +190,11 @@ public:
 
 protected:
   vtkPANLSubhaloFinder();
-  virtual ~vtkPANLSubhaloFinder();
+  ~vtkPANLSubhaloFinder() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   double RL;
   double DeadSize;

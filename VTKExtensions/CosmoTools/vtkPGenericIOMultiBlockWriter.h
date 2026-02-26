@@ -26,10 +26,10 @@ public:
 
 protected:
   vtkPGenericIOMultiBlockWriter();
-  ~vtkPGenericIOMultiBlockWriter();
+  ~vtkPGenericIOMultiBlockWriter() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
-  virtual void WriteData();
+  void WriteData() override;
 
 private:
   class vtkInternals;

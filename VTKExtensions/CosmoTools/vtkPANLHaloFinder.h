@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLHaloFinder : public vtkUnstruct
 
 public:
   static vtkPANLHaloFinder* New();
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
   /**
@@ -272,11 +272,11 @@ public:
 
 protected:
   vtkPANLHaloFinder();
-  virtual ~vtkPANLHaloFinder();
+  ~vtkPANLHaloFinder() override;
 
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  int FillInputPortInformation(int port, vtkInformation* info);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   double RL;
   double DistanceConvertFactor;
