@@ -280,22 +280,22 @@ int vtkPCGNSWriter::RequestUpdateExtent(
 }
 
 //------------------------------------------------------------------------------
-void vtkPCGNSWriter::WriteData()
+bool vtkPCGNSWriter::WriteDataAndReturn()
 {
   vtkMPIController* mpicontroller = vtkMPIController::SafeDownCast(this->Controller);
   if (!mpicontroller)
   {
     vtkErrorMacro(<< "No MPI controller found");
     this->SetErrorCode(2L);
-    return;
+    return false;
   }
   if (!this->OriginalInput)
   {
     this->SetErrorCode(3L);
-    return;
+    return false;
   }
 
-  this->WasWritingSuccessful = false;
+  bool ret = false;
 
   std::vector<vtkSmartPointer<vtkDataObject>> collected;
   // what happens in the Gather step is that each part is
@@ -310,7 +310,7 @@ void vtkPCGNSWriter::WriteData()
     if (mpicontroller->GetLocalProcessId() == 0)
     {
       // append/merge into one data set and use
-      // the superclass' WriteData on that.
+      // the superclass' WriteDataAndReturn on that.
       vtkDataObject* toWrite(nullptr);
       if (this->OriginalInput->IsA("vtkPointSet"))
       {
@@ -350,8 +350,7 @@ void vtkPCGNSWriter::WriteData()
       {
         vtkErrorMacro(<< "Unable to write data object of class "
                       << this->OriginalInput->GetClassName());
-        this->WasWritingSuccessful = false;
-        return;
+        return false;
       }
 
       // exchange OriginalInput and write with the superclass
@@ -359,13 +358,13 @@ void vtkPCGNSWriter::WriteData()
       this->OriginalInput = toWrite;
       // set the information present on the original input
       toWrite->SetInformation(myOriginalInput->GetInformation());
-      vtkCGNSWriter::WriteData();
+      ret = vtkCGNSWriter::WriteDataAndReturn();
       this->OriginalInput = myOriginalInput;
       toWrite->UnRegister(this);
     }
     else
     {
-      this->WasWritingSuccessful = true;
+      ret = true;
     }
   }
 
@@ -374,4 +373,5 @@ void vtkPCGNSWriter::WriteData()
     this->TimeValues->Delete();
     this->TimeValues = nullptr;
   }
+  return ret;
 }

@@ -106,7 +106,7 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  void WriteData() override; // pure virtual override from vtkWriter
+  bool WriteDataAndReturn() override; // pure virtual override from vtkWriter
 
   char* FileName = nullptr;
   bool UseHDF5 = true;
@@ -119,7 +119,6 @@ protected:
   vtkDoubleArray* TimeValues = nullptr;
 
   vtkDataObject* OriginalInput = nullptr;
-  bool WasWritingSuccessful = false;
 
 private:
   vtkCGNSWriter(const vtkCGNSWriter&) = delete;
