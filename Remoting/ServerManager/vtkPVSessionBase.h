@@ -83,11 +83,12 @@ public:
 
   /**
    * Execute a command on the given processes. Use GetLastResult() to obtain the
-   * last result after the command stream is evaluated. Once can set
-   * \c ignore_errors to true, to ignore any interpreting errors.
+   * last result after the command stream is evaluated. One can set
+   * \c ignoreErrors to true, to ignore any interpreting errors.
+   * sendReply has no effect in this base implementation.
    */
-  virtual void ExecuteStream(
-    vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors = false);
+  virtual void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
+    bool ignoreErrors = false, bool sendReply = false);
 
   /**
    * Returns the response of the ExecuteStream() call from the location. Note if

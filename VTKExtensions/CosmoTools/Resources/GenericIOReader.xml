@@ -297,7 +297,7 @@
                file_name_method="SetFileName"
                name="GenericIOReader"
                si_class="vtkSIMetaReaderProxy"
-               mpi_required="1" >
+               mpi_required="true" >
     <Documentation long_help="Reads a cosmology file into a vtkUnstructuredGrid."
                    short_help="Read a cosmology file.">
                    Reads GenericIO. This is a distributed reader.
@@ -357,7 +357,7 @@
                file_name_method="SetFileName"
                name="GenericIOMultiBlockReader"
                si_class="vtkSIMetaReaderProxy"
-               mpi_required="1" >
+               mpi_required="true" >
     <Documentation long_help="Reads a cosmology file into a vtkMultiBlockDataSet."
                    short_help="Read a cosmology file.">
                    Reads GenericIO files into a vtkMultiBlockDataSet of unstructured grids.

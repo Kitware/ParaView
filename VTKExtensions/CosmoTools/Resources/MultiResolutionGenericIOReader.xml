@@ -3,7 +3,7 @@
     <!-- ================================================================== -->
     <SourceProxy class="vtkPMultiResolutionGenericIOReader"
                  name="MultiResGenericIO"
-                 mpi_required="1">
+                 mpi_required="true">
       <Documentation
         long_help=""
         short_help="">

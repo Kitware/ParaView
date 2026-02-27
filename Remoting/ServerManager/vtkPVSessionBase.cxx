@@ -143,14 +143,14 @@ void vtkPVSessionBase::PullState(vtkSMMessage* msg)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionBase::ExecuteStream(
-  vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors /*=false*/)
+void vtkPVSessionBase::ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
+  bool ignoreErrors /*=false*/, bool vtkNotUsed(sendReply))
 {
   this->Activate();
 
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
-  this->SessionCore->ExecuteStream(location, stream, ignore_errors);
+  this->SessionCore->ExecuteStream(location, stream, ignoreErrors);
 
   this->DeActivate();
 }
