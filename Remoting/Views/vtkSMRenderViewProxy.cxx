@@ -1341,13 +1341,13 @@ void vtkSMRenderViewProxy::UpdateAnariProperties()
   auto itEnableANARI = this->Internals->Properties.find("EnableANARI");
   auto* propEnableANARI = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("EnableANARI"));
   auto itANARILibrary = this->Internals->Properties.find("ANARILibrary");
-  if (itEnableANARI->second.ModifiedFlag && propEnableANARI->GetElement(0) ||
+  if ((itEnableANARI->second.ModifiedFlag && propEnableANARI->GetElement(0)) ||
     itANARILibrary->second.ModifiedFlag)
   {
     updateANARIRendererNames = true;
   }
   auto itANARIRenderer = this->Internals->Properties.find("ANARIRenderer");
-  if (itEnableANARI->second.ModifiedFlag && propEnableANARI->GetElement(0) ||
+  if ((itEnableANARI->second.ModifiedFlag && propEnableANARI->GetElement(0)) ||
     itANARILibrary->second.ModifiedFlag || itANARIRenderer->second.ModifiedFlag)
   {
     updateANARIRendererParameters = true;

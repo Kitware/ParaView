@@ -290,7 +290,7 @@ void vtkPythonCalculator::SetInputName(int index, const std::string& inputName)
   {
     this->InputsName.resize(this->GetTotalNumberOfInputConnections());
   }
-  if (index < 0 || index >= this->InputsName.size())
+  if (index < 0 || static_cast<std::size_t>(index) >= this->InputsName.size())
   {
     vtkErrorMacro("Invalid index specified '" << index << "'.");
     return;
@@ -315,7 +315,7 @@ void vtkPythonCalculator::ClearInputNames()
 //----------------------------------------------------------------------------
 std::string vtkPythonCalculator::GetInputName(int index)
 {
-  if (index >= 0 && index < this->InputsName.size())
+  if (index >= 0 && static_cast<std::size_t>(index) < this->InputsName.size())
   {
     return this->InputsName[index];
   }

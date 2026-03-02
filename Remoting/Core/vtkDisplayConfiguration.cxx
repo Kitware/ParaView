@@ -424,9 +424,9 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
     internals.Displays.push_back(std::move(info));
   }
 
-  for (int i = 0; i < internals.MachineCountsById.size(); ++i)
+  for (std::size_t i = 0; i < internals.MachineCountsById.size(); ++i)
   {
-    if (internals.MachineCountsById.count(i) != 1)
+    if (internals.MachineCountsById.count(static_cast<int>(i)) != 1)
     {
       vtkErrorMacro(<< "If ViewerId attributes are provided, they must include all "
                     << "values from 0 to count - 1, and only those values.");
@@ -469,7 +469,7 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
 
       int viewerId = idAttr.as_int();
 
-      if (viewerId < 0 || viewerId >= internals.Viewers.size())
+      if (viewerId < 0 || static_cast<std::size_t>(viewerId) >= internals.Viewers.size())
       {
         vtkWarningMacro(<< "Id attributes of Viewer elements must correspond to ViewerId "
                         << "attributes of Machine elements, and " << viewerId << " does "
@@ -477,7 +477,7 @@ bool vtkDisplayConfiguration::LoadPVX(const char* fname)
         continue;
       }
 
-      size_t viewerIndex = static_cast<size_t>(viewerId);
+      size_t viewerIndex = static_cast<std::size_t>(viewerId);
       internals.Viewers[viewerIndex].EyeSeparation = eyeAttr.as_double(this->EyeSeparation);
     }
   }

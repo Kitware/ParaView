@@ -288,7 +288,7 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
     this->AcceptableNumbersOfComponents.clear();
     for (VStrings::const_iterator iter = numbers.begin(); iter != numbers.end(); ++iter)
     {
-      int numComps;
+      int numComps = 0;
       VTK_FROM_CHARS_IF_ERROR_BREAK(*iter, numComps);
       this->AcceptableNumbersOfComponents.push_back(numComps);
     }
