@@ -28,6 +28,9 @@ class pqView;
  *
  * This behavior is also responsible for managing the AutoApply mechanism
  * with is controllable using vtkPVGeneralSettings
+ *
+ * This behavior is also responsible for enabling/disabling the abort
+ * mechanism on the progressManager.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqApplyBehavior : public QObject
 {
