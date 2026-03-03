@@ -87,7 +87,7 @@ public Q_SLOTS:
   /**
    * This is called when the user clicks on the "Abort" button.
    * It is used to abort the current operation on a vtkAlgorithm object.
-   * @warning This method only works in the built-in mode.
+   * @warning This method does not work in distributed client/server mode.
    */
   void triggerAbort();
 

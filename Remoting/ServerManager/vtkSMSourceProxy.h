@@ -290,6 +290,16 @@ public:
    */
   void MarkDirty(vtkSMProxy* modifiedProxy) override;
 
+  /**
+   * Enable AbortCheck on both remote and local progress handler for this proxy
+   */
+  void EnableAbortCheck();
+
+  /**
+   * Clear abort execute flags on remote vtk objects
+   */
+  void ClearAbortFlags();
+
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy() override;

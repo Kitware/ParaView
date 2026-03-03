@@ -59,6 +59,17 @@ public:
    */
   void RecreateVTKObjects() override;
 
+  /**
+   * Set AbortExecute and AbortOutput to false on the underlying VTK object.
+   */
+  void ClearAbortFlags();
+
+  /**
+   * Call vtkPVProgressHandler::EnableAbortCheck with the GlobalID of
+   * the underlying VTK object.
+   */
+  void EnableAbortCheck();
+
 protected:
   vtkSISourceProxy();
   ~vtkSISourceProxy() override;
