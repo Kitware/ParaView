@@ -34,6 +34,7 @@ struct vtkMinMax::vtkMinMaxWorker
     int numComp = inArray->GetNumberOfComponents();
     int compIdx = self->ComponentIdx;
     char* firstPasses = self->GetFirstPasses();
+    using TOut = vtk::GetAPIType<TArrayOut>;
     for (vtkIdType idx = 0; idx < numTuples; ++idx)
     {
       if ((self->GhostArray != nullptr) &&
@@ -59,12 +60,12 @@ struct vtkMinMax::vtkMinMaxWorker
         {
           case vtkMinMax::MIN:
           {
-            oTuple[jdx] = std::min(oTuple[jdx], iTuple[jdx]);
+            oTuple[jdx] = std::min<TOut>(oTuple[jdx], iTuple[jdx]);
             break;
           }
           case vtkMinMax::MAX:
           {
-            oTuple[jdx] = std::max(oTuple[jdx], iTuple[jdx]);
+            oTuple[jdx] = std::max<TOut>(oTuple[jdx], iTuple[jdx]);
             break;
           }
           case vtkMinMax::SUM:
