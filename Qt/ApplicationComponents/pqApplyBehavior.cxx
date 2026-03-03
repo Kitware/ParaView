@@ -10,6 +10,7 @@
 #include "pqObjectBuilder.h"
 #include "pqPVApplicationCore.h"
 #include "pqPipelineFilter.h"
+#include "pqProgressManager.h"
 #include "pqPropertiesPanel.h"
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqRenderView.h"
@@ -124,14 +125,24 @@ void pqApplyBehavior::onApplied(pqProxy* proxy)
   pqPropertiesPanel* panel = qobject_cast<pqPropertiesPanel*>(this->sender());
   if (panel)
   {
+    pqProgressManager* progressManager = pqApplicationCore::instance()->getProgressManager();
+    progressManager->setEnableAbort(true);
+
     this->applied(panel, proxy);
+
+    progressManager->setEnableAbort(false);
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqApplyBehavior::onApplied()
 {
+  pqProgressManager* progressManager = pqApplicationCore::instance()->getProgressManager();
+  progressManager->setEnableAbort(true);
+
   this->applied();
+
+  progressManager->setEnableAbort(false);
 }
 
 //-----------------------------------------------------------------------------
