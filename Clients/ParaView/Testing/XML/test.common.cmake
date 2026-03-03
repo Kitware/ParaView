@@ -2035,6 +2035,7 @@ set (TextSourceBorder_FORCE_SERIAL TRUE) # Seems to work better in serial
 set (ThresholdTable_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TimeKeeper_FORCE_SERIAL TRUE) # since this uses popup window
 set (TooltipCopy_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
+set (TooltipHideInfo_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TraceExportAndSaveData_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (XYBarChart_FORCE_SERIAL TRUE) # since this uses popup-menu

@@ -108,6 +108,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "pv\\.ComputeArrayMagnitudeSetting$"
     "TestPythonView$"
     "pv\\.TooltipCopy$"
+    "pv\\.TooltipHideInfo$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22801
     # There are warnings about initialization order confusion, but there are
