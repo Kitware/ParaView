@@ -193,6 +193,16 @@ bool vtkPVPythonAlgorithmPlugin::LoadPlugin(const char* pname)
     try
     {
       auto plugin = new vtkPVPythonAlgorithmPlugin(pname);
+      std::vector<std::string> xmls;
+      plugin->GetXMLs(xmls);
+
+      if (xmls.empty())
+      {
+        delete plugin;
+        throw std::runtime_error(
+          std::string("The script '") + pname + "' is not a paraview plugin.");
+      }
+
       return vtkPVPlugin::ImportPlugin(plugin);
     }
     catch (const std::runtime_error& err)
