@@ -30,7 +30,7 @@ pqCustomShortcutBehavior::pqCustomShortcutBehavior(QMainWindow* parentObject)
 namespace
 {
 
-void loadShortcuts(const QList<QAction*>& actions, pqSettings* settings)
+void loadShortcuts(const QList<QAction*>& actions, pqSettings* settings, QWidget* widget)
 {
   for (QAction* action : actions)
   {
@@ -41,7 +41,7 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings* settings)
     {
       auto menu = action->menu();
       settings->beginGroup(actionName);
-      loadShortcuts(menu->actions(), settings);
+      loadShortcuts(menu->actions(), settings, widget);
       settings->endGroup();
     }
     else if (!actionName.isEmpty())
@@ -53,8 +53,7 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings* settings)
       auto variant = settings->value(actionName, QVariant());
       if (variant.canConvert<QKeySequence>())
       {
-        pqKeySequences::instance().addModalShortcut(
-          variant.value<QKeySequence>(), action, qobject_cast<QWidget*>(action->parent()));
+        pqKeySequences::instance().addModalShortcut(variant.value<QKeySequence>(), action, widget);
       }
     }
   }
@@ -74,6 +73,6 @@ void pqCustomShortcutBehavior::loadMenuItemShortcuts()
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
   settings->beginGroup("pqCustomShortcuts");
-  loadShortcuts(menuBar->actions(), settings);
+  loadShortcuts(menuBar->actions(), settings, qobject_cast<QWidget*>(this->parent()));
   settings->endGroup();
 }
