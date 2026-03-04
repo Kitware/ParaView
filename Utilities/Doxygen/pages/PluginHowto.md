@@ -74,8 +74,8 @@ There are four ways for loading plugins:
       load them if they are flagged as auto load plugins. Once a plugin have been added
       this way, it is then saved in the settings. See below for the specification.
 
-![Plugin Manager when not connected to a remote server, showing loaded plugins on the local site.](images/LocalPlugin_Manager.png)
-![Plugin Manager when connected to a server showing loaded plugins on the local as well as remote sites.](images/RemotePlugin_Manager.png)
+![Plugin Manager when not connected to a remote server, showing loaded plugins on the local site.](LocalPlugin_Manager.png)
+![Plugin Manager when connected to a server showing loaded plugins on the local as well as remote sites.](RemotePlugin_Manager.png)
 
   * *Using environment variable* (Auto-loading plugins)
     - In order to have ParaView automatically load a set of plugins on startup,
@@ -811,7 +811,7 @@ a `ProgrammableFilter`:
 
 This will look like the following image:
 
-![Drop down list with values from input arrays](images/DropboxWithInputArrays.jpg)
+![Drop down list with values from input arrays](DropboxWithInputArrays.jpg)
 
 #### Drop Down List with Values from Input File
 
@@ -871,7 +871,7 @@ You may also do it in the following manner:
 
 In which case the result will look like this:
 
-![Drop down list with values from input file](images/DropdownListFromFile.jpg)
+![Drop down list with values from input file](DropdownListFromFile.jpg)
 
 <!-- TODO: port this section
 #### Tutorials for creating filters ====
@@ -1065,7 +1065,7 @@ paraview_add_plugin(SurfaceLIC
 This results in adding documentation to the *ParaView Online Help* when the
 plugin is loaded, as shown below.
 
-![](images/Paraview_doc_plugin.png)
+![](Paraview_doc_plugin.png)
 
 It is also possible to customize further the documentation with 3 additional
 options:
@@ -1305,7 +1305,7 @@ these 3 composite representations to support new representations types that the
 user can choose using the representation type combo box on the display tab or
 in the toolbar.
 
-![Representation type combo-box allowing user to choose the sub-representation to use](images/Representationplugin.png)
+![Representation type combo-box allowing user to choose the sub-representation to use](Representationplugin.png)
 
 ##### Using a New Mapper
 
