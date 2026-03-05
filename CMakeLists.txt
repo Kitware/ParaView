@@ -377,7 +377,11 @@ set(paraview_default_plugins
   pvblot
   XArrayCFReader)
 
-if (PARAVIEW_BUILD_TRANSLATIONS)
+if (PARAVIEW_BUILD_TESTING)
+  list(APPEND paraview_default_plugins AbortTesting)
+endif()  
+
+if (PARAVIEW_BUILD_TRANSLATIONS AND PARAVIEW_BUILD_TESTING)
   list(APPEND paraview_default_plugins TranslationsTesting)
 endif()
 

@@ -1,0 +1,6 @@
+WARNING
+
+Loading this plugin will force ParaView to abort for testing purpose.
+It is not meant to be loaded interactively in ParaView and can cause instabilities.
+
+Are you sure you want to continue ?
