@@ -267,6 +267,8 @@ macos-x86_64-python-qt:build:
         - .rules
     variables:
         PV_CI_RUN_MANUALLY: "true"
+        PV_CI_MERGED_ONLY: "true"
+        PV_CI_NIGHTLY_ONLY: "true"
 
 macos-x86_64-python-qt:test:
     extends:
@@ -275,6 +277,9 @@ macos-x86_64-python-qt:test:
         - .macos_x86_64_builder_tags
         - .cmake_test_artifacts
         - .rules
+    variables:
+        PV_CI_MERGED_ONLY: "true"
+        PV_CI_NIGHTLY_ONLY: "true"
     needs:
         - macos-x86_64-python-qt:build
 
