@@ -22,7 +22,7 @@ constexpr double PITCH_CLAMP_LIMIT = 1.4;
 
 // Joysticks are never at 0.0 so we define a minimum threshold value to consider the user is
 // moving the joystick
-constexpr double JOYSTICK_MIN_THRESHOLD = 0.1;
+constexpr double JOYSTICK_MIN_THRESHOLD = 0.2;
 }
 
 // ----------------------------------------------------------------------------
@@ -51,6 +51,8 @@ void vtkSMVRJoystickCameraStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Look rotation joystick sensitivity: " << this->LookRotationSensitivity
      << std::endl;
 
+  os << indent << "Move joystick sensitivity: " << this->MoveJoystickSensitivity << std::endl;
+
   os << indent << "Up Axis : ";
   switch (this->UpAxis)
   {
@@ -75,6 +77,9 @@ void vtkSMVRJoystickCameraStyleProxy::UpdateVTKObjects()
 
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("MoveCameraSensitivity"));
   this->SetMoveCameraSensitivity(dvp->GetElement(0));
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("MoveJoystickSensitivity"));
+  this->SetMoveJoystickSensitivity(dvp->GetElement(0));
 
   vtkSMIntVectorProperty* ivp;
   ivp = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("UpAxis"));
@@ -165,6 +170,29 @@ bool vtkSMVRJoystickCameraStyleProxy::Update()
 }
 
 // ----------------------------------------------------------------------------
+double vtkSMVRJoystickCameraStyleProxy::GetMovementValue(double valuatorValue, bool invert)
+{
+  if (std::abs(valuatorValue) <= ::JOYSTICK_MIN_THRESHOLD)
+  {
+    return 0;
+  }
+
+  double movementValue = std::abs(std::pow(valuatorValue, this->MoveJoystickSensitivity));
+
+  if (valuatorValue < 0)
+  {
+    movementValue *= -1;
+  }
+
+  if (invert)
+  {
+    movementValue *= -1;
+  }
+
+  return movementValue;
+}
+
+// ----------------------------------------------------------------------------
 void vtkSMVRJoystickCameraStyleProxy::HandleValuator(const vtkVREvent& event)
 {
   const unsigned int moveFwdIdx =
@@ -172,12 +200,10 @@ void vtkSMVRJoystickCameraStyleProxy::HandleValuator(const vtkVREvent& event)
   const unsigned int moveSideIdx =
     this->GetChannelIndexForValuatorRole(std::string(::MOVE_JOYSTICK_SIDE_ROLE));
 
-  this->MoveRight = std::abs(event.data.valuator.channel[moveSideIdx]) > ::JOYSTICK_MIN_THRESHOLD
-    ? event.data.valuator.channel[moveSideIdx]
-    : 0;
-  this->MoveForward = std::abs(event.data.valuator.channel[moveFwdIdx]) > ::JOYSTICK_MIN_THRESHOLD
-    ? -event.data.valuator.channel[moveFwdIdx]
-    : 0;
+  this->MoveForward =
+    GetMovementValue(event.data.valuator.channel[moveFwdIdx], this->InvertFwdMovement);
+  this->MoveRight =
+    GetMovementValue(event.data.valuator.channel[moveSideIdx], this->InvertRightMovement);
 
   const unsigned int orientationXIdx =
     this->GetChannelIndexForValuatorRole(std::string(::ORIENTATION_JOYSTICK_X_ROLE));
@@ -200,14 +226,5 @@ void vtkSMVRJoystickCameraStyleProxy::HandleValuator(const vtkVREvent& event)
   if (this->InvertYAxis)
   {
     this->OrientationY *= -1;
-  }
-
-  if (this->InvertFwdMovement)
-  {
-    this->MoveForward *= -1;
-  }
-  if (this->InvertRightMovement)
-  {
-    this->MoveRight *= -1;
   }
 }

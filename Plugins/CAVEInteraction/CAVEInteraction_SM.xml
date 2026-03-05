@@ -279,6 +279,13 @@
           Modify the move speed of the camera when we move the joystick.
         </Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty name="MoveJoystickSensitivity"
+                         default_values="2"
+                         number_of_elements="1">
+        <Documentation>
+          Controls how joystick sensitivity is mapped to speed. Higher values increase the precision near the center. At 0, the speed will always be constant as soon as we move the cursor in one direction.
+        </Documentation>
+      </DoubleVectorProperty>
       <Documentation>
         This interaction style uses a controller with two joysticks to control the position of the camera
         and its orientation.

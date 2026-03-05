@@ -46,6 +46,14 @@ public:
 
   ///@{
   /**
+   * Set/Get the joystick sensitivity value, used as exponent (2.0 by default).
+   */
+  vtkSetMacro(MoveJoystickSensitivity, double);
+  vtkGetMacro(MoveJoystickSensitivity, double);
+  ///@}
+
+  ///@{
+  /**
    * Set the sensitivity when moving the camera (0.1 by default).
    */
   vtkSetMacro(MoveCameraSensitivity, double);
@@ -112,6 +120,12 @@ private:
   vtkSMVRJoystickCameraStyleProxy(const vtkSMVRJoystickCameraStyleProxy&) = delete;
   void operator=(const vtkSMVRJoystickCameraStyleProxy&) = delete;
 
+  /**
+   * Compute and return a movement value using provided valuatorValue and invert, using the joystick
+   * sensitivity member.
+   */
+  double GetMovementValue(double valuatorValue, bool invert);
+
   double OrientationX = 0;
   bool InvertXAxis = false;
   double OrientationY = 0;
@@ -126,6 +140,8 @@ private:
 
   double LookRotationSensitivity = 0.01;
   double MoveCameraSensitivity = 0.1;
+
+  double MoveJoystickSensitivity = 2.0;
 };
 
 #endif //  vtkSMVRJoystickCameraStyleProxy_h
