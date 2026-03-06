@@ -1,4 +1,4 @@
-Restart and File Series Readers
+Restart and File Series Readers {#RestartAndFileSeriesReaders}
 ===============================
 
 This section is for developers who want to implement a restarted output reader or a reader for any other time series of files. Reading a time series of files is handled by the `vtkFileSeriesReader` class (located in the `VTKExtensions/IOCore/` directory). `vtkFileSeriesReader` is really a meta-reader that takes a “core” reader that will do the actual loading and parsing of data from files. In order to use `vtkFileSeriesReader`, you must set particular attributes on the `SourceProxy` you define.
