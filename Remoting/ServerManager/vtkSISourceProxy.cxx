@@ -305,8 +305,7 @@ void vtkSISourceProxy::ClearAbortFlags()
     if (algo)
     {
       algo->AbortExecuteOff();
-      // algo->AbortOutputOff(); https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12982
-      algo->SetAbortOutput(false);
+      algo->AbortOutputOff();
     }
   }
 }
