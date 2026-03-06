@@ -241,6 +241,11 @@ public:
    */
   void InvokeCommand(const char* name) { this->UpdateProperty(name, 1); }
 
+  /**
+   * Returns if the underlying VTK object needs to be updated or not
+   */
+  vtkGetMacro(NeedsUpdate, bool);
+
   ///@{
   /**
    * Returns the type of object managed by the proxy.

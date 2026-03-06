@@ -1063,6 +1063,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ForceStaticMesh.xml
   GradientBackwardsCompatibility.xml
   ImportCustomPresets.xml
+  InformationOutOfDateLabel.xml
   LogViewer.xml
   MergeTime.xml
   ModifyGUIWindowTitle.xml

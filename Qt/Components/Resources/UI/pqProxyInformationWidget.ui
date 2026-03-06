@@ -28,14 +28,106 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item row="8" column="0">
+   <item row="0" column="0" colspan="2">
+    <layout class="QVBoxLayout" name="verticalLayout_9">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="QWidget" name="outOfDateWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QWidget#outOfDateWidget {
+	background-color: rgb(255, 252, 244);
+	border: 3px solid rgb(250, 225, 157);
+	border-radius: 8px;
+	padding: 6px;
+}
+</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>13</number>
+        </property>
+        <property name="leftMargin">
+         <number>18</number>
+        </property>
+        <property name="topMargin">
+         <number>12</number>
+        </property>
+        <property name="rightMargin">
+         <number>21</number>
+        </property>
+        <property name="bottomMargin">
+         <number>12</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="warningIcon">
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/warning.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="outOfDateLabel">
+          <property name="styleSheet">
+           <string notr="true">	color: rgb(158, 134, 75);</string>
+          </property>
+          <property name="text">
+           <string>Information may not be up to date.
+Click Apply or show the data to refresh.</string>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="9" column="0">
     <widget class="QLabel" name="labelDataType">
      <property name="text">
       <string>Type</string>
      </property>
     </widget>
    </item>
-   <item row="13" column="1">
+   <item row="14" column="1">
     <widget class="QLabel" name="rowCount">
      <property name="text">
       <string>TextLabel</string>
@@ -48,7 +140,7 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="1">
+   <item row="12" column="1">
     <widget class="QLabel" name="edgeCount">
      <property name="text">
       <string>TextLabel</string>
@@ -61,7 +153,7 @@
      </property>
     </widget>
    </item>
-   <item row="18" column="1">
+   <item row="19" column="1">
     <widget class="QLabel" name="extents">
      <property name="text">
       <string>0 - 100
@@ -76,7 +168,7 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
+   <item row="7" column="0" colspan="2">
     <widget class="QTabWidget" name="dataGroupingTab">
      <property name="currentIndex">
       <number>0</number>
@@ -185,7 +277,7 @@
      </widget>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="6" column="0" colspan="2">
     <widget class="QLabel" name="labelDataGrouping">
      <property name="enabled">
       <bool>false</bool>
@@ -195,7 +287,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="2" column="1">
     <widget class="QLabel" name="filename">
      <property name="text">
       <string>TextLabel</string>
@@ -208,7 +300,7 @@
      </property>
     </widget>
    </item>
-   <item row="22" column="0" colspan="2">
+   <item row="23" column="0" colspan="2">
     <widget class="pqTreeView" name="timeValues">
      <property name="alternatingRowColors">
       <bool>true</bool>
@@ -221,14 +313,14 @@
      </property>
     </widget>
    </item>
-   <item row="13" column="0">
+   <item row="14" column="0">
     <widget class="QLabel" name="labelRowCount">
      <property name="text">
       <string># of Rows</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2">
+   <item row="8" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <property name="spacing">
       <number>0</number>
@@ -255,14 +347,14 @@
      </item>
     </layout>
    </item>
-   <item row="12" column="0">
+   <item row="13" column="0">
     <widget class="QLabel" name="labelVertexCount">
      <property name="text">
       <string># of Vertices</string>
      </property>
     </widget>
    </item>
-   <item row="18" column="0">
+   <item row="19" column="0">
     <widget class="QLabel" name="labelExtents">
      <property name="text">
       <string>Extents</string>
@@ -272,7 +364,7 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="1">
+   <item row="11" column="1">
     <widget class="QLabel" name="pointCount">
      <property name="text">
       <string>TextLabel</string>
@@ -285,7 +377,7 @@
      </property>
     </widget>
    </item>
-   <item row="19" column="0" colspan="2">
+   <item row="20" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <property name="spacing">
       <number>0</number>
@@ -312,7 +404,7 @@
      </item>
     </layout>
    </item>
-   <item row="21" column="0" colspan="2">
+   <item row="22" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0">
      <property name="spacing">
       <number>0</number>
@@ -339,7 +431,7 @@
      </item>
     </layout>
    </item>
-   <item row="17" column="1">
+   <item row="18" column="1">
     <widget class="QLabel" name="bounds">
      <property name="text">
       <string>0.000	- 0.000
@@ -357,14 +449,14 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="0">
+   <item row="10" column="0">
     <widget class="QLabel" name="labelCellCount">
      <property name="text">
       <string># of Cells</string>
      </property>
     </widget>
    </item>
-   <item row="16" column="1">
+   <item row="17" column="1">
     <widget class="QLabel" name="memory">
      <property name="text">
       <string>TextLabel</string>
@@ -374,14 +466,14 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="0">
+   <item row="11" column="0">
     <widget class="QLabel" name="labelPointCount">
      <property name="text">
       <string># of Points</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
+   <item row="10" column="1">
     <widget class="QLabel" name="cellCount">
      <property name="text">
       <string>TextLabel</string>
@@ -394,14 +486,14 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="0">
+   <item row="12" column="0">
     <widget class="QLabel" name="labelEdgeCount">
      <property name="text">
       <string># of Edges</string>
      </property>
     </widget>
    </item>
-   <item row="20" column="0" colspan="2">
+   <item row="21" column="0" colspan="2">
     <widget class="pqTreeView" name="dataArraysTable">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Ignored" vsizetype="MinimumExpanding">
@@ -420,7 +512,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
+   <item row="5" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
       <number>0</number>
@@ -447,14 +539,14 @@
      </item>
     </layout>
    </item>
-   <item row="16" column="0">
+   <item row="17" column="0">
     <widget class="QLabel" name="labelMemory">
      <property name="text">
       <string>Memory:</string>
      </property>
     </widget>
    </item>
-   <item row="17" column="0">
+   <item row="18" column="0">
     <widget class="QLabel" name="labelBounds">
      <property name="text">
       <string>Bounds</string>
@@ -464,7 +556,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="labelFilename">
      <property name="text">
       <string>Name</string>
@@ -474,7 +566,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="3" column="1">
     <widget class="QLabel" name="path">
      <property name="text">
       <string>TextLabel</string>
@@ -487,7 +579,7 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+   <item row="9" column="1">
     <widget class="QLabel" name="dataType">
      <property name="text">
       <string>TextLabel</string>
@@ -500,7 +592,7 @@
      </property>
     </widget>
    </item>
-   <item row="12" column="1">
+   <item row="13" column="1">
     <widget class="QLabel" name="vertexCount">
      <property name="text">
       <string>TextLabel</string>
@@ -513,7 +605,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="1" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
      <property name="spacing">
       <number>0</number>
@@ -540,14 +632,14 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="labelPath">
      <property name="text">
       <string>Path</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="4" column="0" colspan="2">
     <widget class="QLabel" name="labelFilePropertiesNA">
      <property name="enabled">
       <bool>false</bool>
@@ -557,28 +649,28 @@
      </property>
     </widget>
    </item>
-   <item row="14" column="0">
+   <item row="15" column="0">
     <widget class="QLabel" name="labelTimeSteps">
      <property name="text">
       <string># of TimeSteps</string>
      </property>
     </widget>
    </item>
-   <item row="14" column="1">
+   <item row="15" column="1">
     <widget class="QLabel" name="timeSteps">
      <property name="text">
       <string>1</string>
      </property>
     </widget>
    </item>
-   <item row="15" column="0">
+   <item row="16" column="0">
     <widget class="QLabel" name="labelCurrentTime">
      <property name="text">
       <string>Current Time</string>
      </property>
     </widget>
    </item>
-   <item row="15" column="1">
+   <item row="16" column="1">
     <widget class="QLabel" name="currentTime">
      <property name="text">
       <string>1 (range: [0, 1])</string>

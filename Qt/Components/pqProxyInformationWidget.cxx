@@ -495,6 +495,20 @@ public:
     }
   }
 
+  // update out of date label
+  void CheckForOutdatedInformation()
+  {
+    bool isInfoOutOfDate = false;
+    if (this->Port)
+    {
+      if (this->Port->getSource()->getSourceProxy()->GetNeedsUpdate())
+      {
+        isInfoOutOfDate = true;
+      }
+    }
+    this->Ui.outOfDateWidget->setVisible(isInfoOutOfDate);
+  }
+
   // update data statistics widgets
   void setDataStatistics(vtkPVDataInformation* dinfo)
   {
@@ -774,6 +788,7 @@ void pqProxyInformationWidget::updateSubsetUI()
   // all the following depends on subset data information, if the user chose to
   // see only part of the hierarchy.
   auto subsetInfo = internals.subsetDataInformation();
+  internals.CheckForOutdatedInformation();
   internals.setDataStatistics(subsetInfo);
   internals.setDataArrays(subsetInfo);
 }
