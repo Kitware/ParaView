@@ -1,5 +1,4 @@
-Restart and File Series Readers {#RestartAndFileSeriesReaders}
-===============================
+# Restart and File Series Readers {#RestartAndFileSeriesReaders}
 
 This section is for developers who want to implement a restarted output reader or a reader for any other time series of files. Reading a time series of files is handled by the `vtkFileSeriesReader` class (located in the `VTKExtensions/IOCore/` directory). `vtkFileSeriesReader` is really a meta-reader that takes a “core” reader that will do the actual loading and parsing of data from files. In order to use `vtkFileSeriesReader`, you must set particular attributes on the `SourceProxy` you define.
 
@@ -7,8 +6,7 @@ There are two modes with which `vtkFileSeriesReader` can read a sequence of file
 
 The rest of this document assumes that you already have an implementation of the core reader for a single output set. It also assumes that you either already have the server manager XML for accessing the reader or are capable of creating it.
 
-Collection of Files
--------------------
+## Collection of Files
 
 If the restarts are generally written as (or can be referenced as) a sequence of numbered files, then you should just allow `vtkFileSeriesReader` to load them directly. This is the default mode. Since `vtkFileSeriesReader` is just as capable of loading a single file as a series of files and since the ParaView GUI does not really distinguish selecting a single file from a group of numbered files, you should probably “hide” the definition for the core reader by placing it in a ProxyGroup other than sources, for example `internal_sources`.
 
@@ -75,8 +73,7 @@ The parameters you need to edit are as follows:
 
 Register the reader proxy with the GUI in the same way you would register the core reader. For an example of a reader that uses the `vtkFileSeriesReader` in this way, see the legacy file reader.
 
-Meta File
----------
+## Meta File
 
 When using the meta file option with `vtkFileSeriesReader`, the reader can no longer behave like a reader for a single file set. It will be a separate reader that takes a different file format (the meta or case file). Thus, when you create the XML for your core reader, be sure to expose it as a reader (by putting it in the sources proxy group) and registering it as itself in the GUI.
 
@@ -136,8 +133,7 @@ The parameters you need to edit are as follows:
 
 Register the reader proxy with the GUI in the same way you would register any other reader. Of course, make sure you use a different file extension for the meta/case file than the types of files it points to. For an example of a reader that uses the `vtkFileSeriesReader` in this way, see the SPCTH restart reader.
 
-Gotchas
--------
+## Gotchas
 
 Ideally, you can create a restart reader by simply wrapping your core reader in a `vtkFileSeriesReader` as described previously. However, in this imperfect world there are sometimes some stumbling blocks in getting this to work. There are sometimes “gotchas” that will require extra work on your part. In this section we try to capture them and provide advice on how to solve them.
 
