@@ -111,6 +111,7 @@ if (numpy_found)
 
   # Test without baselines and could only run in built-in mode.
   list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
+    BoundsDomainInitialization.xml # uses numpy wrapping in programmable filter
     HyperTreeGridGenerateFields.xml
     HTGPlotSelectionOverTime.xml
     MultipleNumberOfComponents.xml
