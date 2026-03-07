@@ -13,6 +13,7 @@ DEPENDS
 OPTIONAL_DEPENDS
   ParaView::RemotingViews
   VTK::RenderingRayTracing
+  VTK::RenderingAnari
 #KIT
 #  This module cannot be part of a kit because it links to ClientServer
 #  wrappings of all modules. This ends up with a cycle in a shared kit build.
