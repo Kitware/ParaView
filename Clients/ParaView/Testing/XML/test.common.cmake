@@ -584,6 +584,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MathTextColumn.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MergePointBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MergeVectorComponents.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MeshCacheBlockColorsOverTime.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MeshCacheCompositeIndexOverTime.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-BallStick.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-Custom.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-Liquorice.png}"
@@ -1190,6 +1192,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   LogColorMapToggle.xml
   LogoSourcesInChartViews.xml
   MemoryInspectorPanel.xml
+  MeshCacheAddedArraysOverTime.xml
   Molecule.xml
   MultiBlockInspectorMultiBlock.xml
   MultiBlockInspectorProperties.xml
