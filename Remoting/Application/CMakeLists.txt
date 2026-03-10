@@ -395,6 +395,10 @@ _paraview_remoting_application_optional_xml(
           Resources/writers_ioopenvdb.xml)
 
 _paraview_remoting_application_optional_xml(
+  TARGETS VTK::IONanoVDB
+  FILES   Resources/writers_ionanovdb.xml)
+
+_paraview_remoting_application_optional_xml(
   TARGETS VTK::IOCatalystConduit
   FILES   Resources/proxies_conduit.xml)
 
