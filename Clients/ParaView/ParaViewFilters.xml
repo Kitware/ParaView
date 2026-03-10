@@ -127,6 +127,7 @@
       <Proxy group="filters" name="ProbeLine" />
       <Proxy group="filters" name="ProbePoint" />
       <Proxy group="filters" name="ProgrammableFilter" />
+      <Proxy group="filters" name="ScatterPlot" omit_from_toolbar="1" />
       <Proxy group="filters" name="ThresholdTable" omit_from_toolbar="1" />
       <Proxy group="filters" name="TransposeTable" omit_from_toolbar="1" />
     </Category>
