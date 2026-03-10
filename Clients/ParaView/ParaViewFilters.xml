@@ -293,6 +293,7 @@
   <Proxy group="filters" name="AxisAlignedReflect" icon=":/pqWidgets/Icons/pqReflect.svg"/>
   <Proxy group="filters" name="AxisAlignedSlice" />
   <Proxy group="filters" name="AxisAlignedTransform"/>
+  <Proxy group="filters" name="ImageBinaryThreshold" />
   <Proxy group="filters" name="BlockIdScalars" />
   <Proxy group="filters" name="BlockIds" />
   <Proxy group="filters" name="BoundaryMeshQuality"/>
