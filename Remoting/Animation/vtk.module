@@ -13,6 +13,7 @@ CONDITION
 KIT
   ParaView::ServerManagerKit
 DEPENDS
+  ParaView::RemotingExport
   ParaView::RemotingServerManager
   ParaView::RemotingViews
   ParaView::VTKExtensionsIOCore

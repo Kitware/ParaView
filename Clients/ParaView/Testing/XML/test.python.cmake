@@ -1,4 +1,4 @@
-# Tests that require python
+# Tests that require python
 
 list(APPEND TESTS_WITHOUT_BASELINES
   AllPropertiesSaveStatePython.xml
@@ -182,6 +182,12 @@ set(paraview_python_verify_tests
   ExportMultiblockFieldDataSpreadsheet
   ExportSceneSpreadSheetView
 )
+
+if (numpy_found)
+  list(APPEND paraview_python_verify_tests
+    ExportAnimatedSpreadSheetView
+  )
+endif()
 
 if (PARAVIEW_ENABLE_WEB)
   list(APPEND paraview_python_verify_tests

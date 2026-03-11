@@ -4,10 +4,10 @@
 
 #include "vtkAnimationCue.h"
 #include "vtkCommand.h"
+#include "vtkLogger.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMAnimationScene.h"
 #include "vtkSMProxy.h"
-#include "vtkSMSession.h"
 
 #include <algorithm>
 
@@ -106,16 +106,11 @@ void vtkSMAnimationSceneWriter::ExecuteEvent(
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneWriter::Save()
 {
+  vtkLogScopeF(TRACE, "Save animation scene.");
   if (this->Saving)
   {
     vtkErrorMacro("Already saving an animation. "
       << "Wait till that is done before calling Save again.");
-    return false;
-  }
-
-  if (!this->AnimationScene)
-  {
-    vtkErrorMacro("Cannot save, no AnimationScene.");
     return false;
   }
 
@@ -125,6 +120,20 @@ bool vtkSMAnimationSceneWriter::Save()
     return false;
   }
 
+  if (!this->AnimationScene || !this->WriteTimeSteps)
+  {
+    vtkLogScopeF(TRACE, "Save only current scene time. Reason:");
+    vtkLogIf(TRACE, !this->AnimationScene, "No animation scene set.");
+    vtkLogIf(TRACE, !this->WriteTimeSteps, "Only current time requested.");
+
+    bool result = this->SaveInitialize(0);
+    result =
+      result && this->SaveFrame(this->AnimationScene ? this->AnimationScene->GetSceneTime() : 0.);
+    result = result && this->SaveFinalize();
+    return result;
+  }
+
+  vtkLogF(TRACE, "Prepare animation scene.");
   // Take the animation scene to the beginning.
   this->AnimationScene->GoToFirst();
 
@@ -141,12 +150,14 @@ bool vtkSMAnimationSceneWriter::Save()
     int currentStride = this->AnimationScene->GetStride();
     this->AnimationScene->SetPlaybackTimeWindow(this->GetPlaybackTimeWindow());
     this->AnimationScene->SetStride(this->GetStride());
+    vtkLogF(TRACE, "Play animation scene.");
     this->AnimationScene->Play();
     this->AnimationScene->SetPlaybackTimeWindow(currentTimeWindow); // Restore previous range
     this->AnimationScene->SetStride(currentStride);                 // Restore previous stride
     this->Saving = false;
   }
 
+  vtkLogF(TRACE, "Restore animation scene.");
   status = this->SaveFinalize() && status;
 
   // Restore scene parameters, if changed.
@@ -181,4 +192,23 @@ void vtkSMAnimationSceneWriter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AnimationScene: " << this->AnimationScene << endl;
   os << indent << "FileName: " << (this->FileName ? this->FileName : "(null)") << endl;
+  os << indent << "FrameExporterDelegate: " << this->FrameExporterDelegate << endl;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMExporterProxy* vtkSMAnimationSceneWriter::GetFrameExporterDelegate()
+{
+  return this->FrameExporterDelegate;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMAnimationSceneWriter::SetFrameExporterDelegate(vtkSMExporterProxy* exporter)
+{
+  this->FrameExporterDelegate = exporter;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMAnimationSceneWriter::AnimationEnabled()
+{
+  return this->GetWriteTimeSteps() && this->GetAnimationScene();
 }
