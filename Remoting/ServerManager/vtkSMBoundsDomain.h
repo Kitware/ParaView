@@ -129,6 +129,12 @@ protected:
 
   bool IsAxisEnabled(int axis);
 
+  /**
+   * Initialize domain Entries from given bounds.
+   * If bounds are not initialized, use [0, 0, 0, 0, 0, 0] instead.
+   *
+   * @see SetEntries
+   */
   void SetDomainValues(double bounds[6]);
 
   void UpdateOriented();
