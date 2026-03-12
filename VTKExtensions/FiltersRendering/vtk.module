@@ -44,6 +44,7 @@ PRIVATE_DEPENDS
   VTK::ChartsCore
 OPTIONAL_DEPENDS
   VTK::IOImage
+  ParaView::nvpipe
 TEST_DEPENDS
   VTK::CommonSystem
   VTK::IOImage
