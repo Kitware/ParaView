@@ -196,6 +196,12 @@ cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" "${parav
 
 # NvPipe requires an NVIDIA GPU.
 option(PARAVIEW_ENABLE_NVPIPE "Build ParaView with NvPipe remoting. Requires CUDA and an NVIDIA GPU" OFF)
+if (PARAVIEW_ENABLE_NVPIPE)
+  message(DEPRECATION
+    "NvPipe is not longer supported. See "
+    "https://gitlab.kitware.com/paraview/paraview/-/issues/23231 for progress")
+  set(PARAVIEW_ENABLE_NVPIPE OFF)
+endif ()
 
 option(PARAVIEW_ENABLE_ALEMBIC "Enable Alembic support." OFF)
 
