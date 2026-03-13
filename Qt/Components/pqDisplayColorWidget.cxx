@@ -42,6 +42,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <unordered_map>
 #include <vector>
 
 namespace
@@ -247,12 +248,17 @@ public:
   unsigned long DomainObserverId = 0;
 
   int OutOfDomainEntryIndex;
+  int OutOfDomainComponentEntryIndex;
   QSet<QString> NoSolidColor;
 
   vtkNew<vtkSMColorMapEditorHelper> ColorMapEditorHelper;
 
+  std::unordered_map<vtkPVDataInformation*, int> PreviouslySelectedComponentNumber;
+  bool ShouldUpdateComponentNumber = false;
+
   pqInternals()
     : OutOfDomainEntryIndex(-1)
+    , OutOfDomainComponentEntryIndex(-1)
   {
   }
 };
@@ -293,7 +299,11 @@ pqDisplayColorWidget::pqDisplayColorWidget(QWidget* parentObject)
       Q_EMIT this->arraySelectionChanged();
     });
   QObject::connect(this->Components, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-    &pqDisplayColorWidget::componentNumberChanged);
+    [this]()
+    {
+      this->componentNumberChanged();
+      this->pruneOutOfDomainComponentEntries();
+    });
 
   QObject::connect(&this->Internals->Links, &pqPropertyLinks::qtWidgetChanged, this,
     &pqDisplayColorWidget::renderActiveView);
@@ -358,6 +368,7 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr, int sel
   this->Variables->clear();
   this->Components->clear();
   this->Internals->OutOfDomainEntryIndex = -1;
+  this->Internals->OutOfDomainComponentEntryIndex = -1;
 
   // now, save the new repr.
   this->Representation = repr;
@@ -570,6 +581,12 @@ void pqDisplayColorWidget::refreshColorArrayNames()
   // updateColorTransferFunction() ensures that widget is updated to reflect the
   // current component number selection, if applicable.
   this->updateColorTransferFunction();
+
+  if (this->Internals->ShouldUpdateComponentNumber)
+  {
+    this->Internals->ShouldUpdateComponentNumber = false;
+    this->componentNumberChanged();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -591,11 +608,10 @@ void pqDisplayColorWidget::setComponentNumber(int val)
     if (index == -1)
     {
       this->Components->blockSignals(true);
-      this->Components->addItem(QString("%1").arg(val), val);
+      this->addOutOfDomainComponentEntry(QString("%1").arg(val), val);
       this->Components->blockSignals(false);
 
       index = this->Components->findData(val);
-      qDebug() << "Component " << val << " is not currently known. Will add a new entry for it.";
     }
     assert(index != -1);
     this->Components->blockSignals(true);
@@ -677,6 +693,8 @@ void pqDisplayColorWidget::refreshComponents()
     return;
   }
 
+  this->Internals->OutOfDomainComponentEntryIndex = -1;
+
   const int compNumber = this->componentNumber();
   const QPair<int, QString> val = this->arraySelection();
   const int association = val.first;
@@ -699,6 +717,11 @@ void pqDisplayColorWidget::refreshComponents()
     const bool prev = this->Components->blockSignals(true);
     this->Components->clear();
     this->Components->blockSignals(prev);
+    if ((!arrayInfo || (arrayInfo && arrayInfo->GetNumberOfComponents() == 0)) && compNumber != -1)
+    {
+      // No data / zero components
+      this->Internals->PreviouslySelectedComponentNumber[dataInfo] = compNumber;
+    }
     return;
   }
 
@@ -718,15 +741,23 @@ void pqDisplayColorWidget::refreshComponents()
   {
     this->Components->addItem(arrayInfo->GetComponentName(comp), comp);
   }
+  this->Components->setEnabled(this->Components->count() > 0);
 
   /// restore component choice if possible.
-  const int idx = this->Components->findData(compNumber);
-  if (idx != -1)
+  if (this->Internals->PreviouslySelectedComponentNumber.find(dataInfo) !=
+    this->Internals->PreviouslySelectedComponentNumber.end())
   {
-    this->Components->setCurrentIndex(idx);
+    this->setComponentNumber(this->Internals->PreviouslySelectedComponentNumber.at(dataInfo));
+    this->Internals->ShouldUpdateComponentNumber = true;
+    this->Internals->PreviouslySelectedComponentNumber.erase(dataInfo);
   }
+  else if (compNumber >= nComponents)
+  {
+    this->setComponentNumber(arraySettings->ShouldUseMagnitudeMode(nComponents) ? -1 : 0);
+    this->Internals->ShouldUpdateComponentNumber = true;
+  }
+
   this->Components->blockSignals(prev);
-  this->Components->setEnabled(this->Components->count() > 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -769,6 +800,14 @@ int pqDisplayColorWidget::addOutOfDomainEntry(int association, const QString& ar
 }
 
 //-----------------------------------------------------------------------------
+int pqDisplayColorWidget::addOutOfDomainComponentEntry(const QString& componentName, int index)
+{
+  this->Internals->OutOfDomainComponentEntryIndex = this->Components->count();
+  this->Components->addItem(componentName + " (?)", index);
+  return this->Internals->OutOfDomainComponentEntryIndex;
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayColorWidget::pruneOutOfDomainEntries()
 {
   if (this->Internals->OutOfDomainEntryIndex != -1 &&
@@ -777,6 +816,24 @@ void pqDisplayColorWidget::pruneOutOfDomainEntries()
     // Yay! Prune that entry!
     this->Variables->removeItem(this->Internals->OutOfDomainEntryIndex);
     this->Internals->OutOfDomainEntryIndex = -1;
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayColorWidget::pruneOutOfDomainComponentEntries()
+{
+  if (this->Internals->OutOfDomainComponentEntryIndex != -1 &&
+    this->Components->currentIndex() != this->Internals->OutOfDomainComponentEntryIndex)
+  {
+    this->Components->removeItem(this->Internals->OutOfDomainComponentEntryIndex);
+    this->Internals->OutOfDomainComponentEntryIndex = -1;
+    if (this->Components->count() == 1)
+    {
+      this->Components->setEnabled(false);
+      const bool prev = this->Components->blockSignals(true);
+      this->Components->clear();
+      this->Components->blockSignals(prev);
+    }
   }
 }
 
