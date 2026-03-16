@@ -29,7 +29,7 @@ set(classes
   vtkZlibImageCompressor
   )
 
-if (PARAVIEW_ENABLE_NVPIPE)
+if (TARGET ParaView::nvpipe)
   list(APPEND classes
     vtkNvPipeCompressor)
 endif ()
