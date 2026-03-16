@@ -837,3 +837,9 @@ The `vtkCaveSynchronizedRenderers` class has been cleaned up. The function `Comp
  - `double DisplayX[3];`
  - `double DisplayY[3];`
  - `int once;`
+
+
+## nvpipe deprecation
+
+The NvPipe support in ParaView was discovered to not compile properly. It has
+been deprecated pending a decision of its future.
