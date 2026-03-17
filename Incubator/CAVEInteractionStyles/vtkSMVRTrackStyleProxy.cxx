@@ -192,17 +192,9 @@ void vtkSMVRTrackStyleProxy::HandleTracker(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMVRTrackStyleProxy::SaveConfiguration()
+bool vtkSMVRTrackStyleProxy::LoadProxyProperties(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
 {
-  vtkPVXMLElement* elt = Superclass::SaveConfiguration();
-  this->SaveXMLState(elt);
-  return elt;
-}
-
-// ----------------------------------------------------------------------------
-bool vtkSMVRTrackStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
-{
-  bool result = Superclass::Configure(child, locator);
+  bool result = false;
 
   if (this->GetControlledProxy() == nullptr)
   {
@@ -242,20 +234,7 @@ bool vtkSMVRTrackStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLocator
   }
   else
   {
-    vtkPVXMLElement* proxyChild = child->FindNestedElementByName("Proxy");
-    if (proxyChild)
-    {
-      if (this->LoadXMLState(proxyChild, locator) > 0)
-      {
-        this->UpdateVTKObjects();
-      }
-      else
-      {
-        vtkWarningMacro(<< "Encountered an error loading proxy properties from state, "
-                        << "vtkSMVRInteractorStyle may not function as expected. "
-                        << "See warnings printed above for details.");
-      }
-    }
+    result = Superclass::LoadProxyProperties(child, locator);
   }
 
   if (!result)

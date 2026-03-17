@@ -328,10 +328,8 @@ void vtkSMVRPythonInteractorStyleProxy::HandleButton(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMVRPythonInteractorStyleProxy::SaveConfiguration()
+void vtkSMVRPythonInteractorStyleProxy::SaveProxyProperties(vtkPVXMLElement* xml)
 {
-  vtkPVXMLElement* elt = Superclass::SaveConfiguration();
-
   vtkSMStringVectorProperty* svp;
 
   // Save the FileName
@@ -341,15 +339,13 @@ vtkPVXMLElement* vtkSMVRPythonInteractorStyleProxy::SaveConfiguration()
   vtkPVXMLElement* fileNameElt = vtkPVXMLElement::New();
   fileNameElt->SetName("FileName");
   fileNameElt->AddAttribute("value", fileName);
-  elt->AddNestedElement(fileNameElt);
+  xml->AddNestedElement(fileNameElt);
   fileNameElt->FastDelete();
-
-  return elt;
 }
 
 // ----------------------------------------------------------------------------
-bool vtkSMVRPythonInteractorStyleProxy::Configure(
-  vtkPVXMLElement* child, vtkSMProxyLocator* locator)
+bool vtkSMVRPythonInteractorStyleProxy::LoadProxyProperties(
+  vtkPVXMLElement* child, vtkSMProxyLocator* vtkNotUsed(locator))
 {
   bool result = true;
 
@@ -378,7 +374,6 @@ bool vtkSMVRPythonInteractorStyleProxy::Configure(
   if (result)
   {
     this->UpdateVTKObjects();
-    result = Superclass::Configure(child, locator);
   }
 
   return result;
