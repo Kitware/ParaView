@@ -279,6 +279,13 @@
           Modify the move speed of the camera when we move the joystick.
         </Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty name="FastMovementMultiplier"
+                         default_values="4.0"
+                         number_of_elements="1">
+        <Documentation>
+          Controls the factor for the movement speed when the fast movement is pressed.
+        </Documentation>
+      </DoubleVectorProperty>
       <DoubleVectorProperty name="MoveJoystickSensitivity"
                          default_values="2"
                          number_of_elements="1">

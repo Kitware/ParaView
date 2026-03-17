@@ -80,6 +80,15 @@ public:
   vtkGetMacro(InvertRightMovement, bool);
   ///@}
 
+  ///@{
+  /**
+   * Set the multiplier for the movement speed when the fast button movement is
+   * pressed (4.0 by default).
+   */
+  vtkSetMacro(FastMovementMultiplier, double);
+  vtkGetMacro(FastMovementMultiplier, double);
+  ///@}
+
   /**
    * Enum axis to retrieve the forward, the right and the up axis of the scene
    */
@@ -114,6 +123,7 @@ protected:
   vtkSMVRJoystickCameraStyleProxy();
   ~vtkSMVRJoystickCameraStyleProxy() override = default;
 
+  void HandleButton(const vtkVREvent& event) override;
   void HandleValuator(const vtkVREvent& event) override;
 
 private:
@@ -135,6 +145,9 @@ private:
   bool InvertFwdMovement = false;
   double MoveRight = 0;
   bool InvertRightMovement = false;
+
+  double FastMovementMultiplier = 4.0;
+  bool FastMovement = false;
 
   Axis UpAxis = Y_AXIS;
 

@@ -17,6 +17,7 @@ constexpr std::string_view MOVE_JOYSTICK_FORWARD_ROLE = "Move joystick forward";
 constexpr std::string_view MOVE_JOYSTICK_SIDE_ROLE = "Move joystick side";
 constexpr std::string_view ORIENTATION_JOYSTICK_X_ROLE = "Orientation joystick X";
 constexpr std::string_view ORIENTATION_JOYSTICK_Y_ROLE = "Orientation joystick Y";
+constexpr std::string_view FAST_MOVEMENT_BUTTON = "Fast movement";
 
 constexpr double PITCH_CLAMP_LIMIT = 1.4;
 
@@ -35,6 +36,7 @@ vtkSMVRJoystickCameraStyleProxy::vtkSMVRJoystickCameraStyleProxy()
   this->AddValuatorRole(std::string(::MOVE_JOYSTICK_SIDE_ROLE));
   this->AddValuatorRole(std::string(::ORIENTATION_JOYSTICK_X_ROLE));
   this->AddValuatorRole(std::string(::ORIENTATION_JOYSTICK_Y_ROLE));
+  this->AddButtonRole(std::string(::FAST_MOVEMENT_BUTTON));
 }
 
 // ----------------------------------------------------------------------------
@@ -52,6 +54,9 @@ void vtkSMVRJoystickCameraStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
      << std::endl;
 
   os << indent << "Move joystick sensitivity: " << this->MoveJoystickSensitivity << std::endl;
+
+  os << indent << "Fast movement multiplier: " << this->FastMovementMultiplier << std::endl;
+  os << indent << "Using fast movement : " << (this->FastMovement ? "On" : "Off") << std::endl;
 
   os << indent << "Up Axis : ";
   switch (this->UpAxis)
@@ -80,6 +85,9 @@ void vtkSMVRJoystickCameraStyleProxy::UpdateVTKObjects()
 
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("MoveJoystickSensitivity"));
   this->SetMoveJoystickSensitivity(dvp->GetElement(0));
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("FastMovementMultiplier"));
+  this->SetFastMovementMultiplier(dvp->GetElement(0));
 
   vtkSMIntVectorProperty* ivp;
   ivp = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("UpAxis"));
@@ -189,6 +197,11 @@ double vtkSMVRJoystickCameraStyleProxy::GetMovementValue(double valuatorValue, b
     movementValue *= -1;
   }
 
+  if (this->FastMovement)
+  {
+    movementValue *= this->FastMovementMultiplier;
+  }
+
   return movementValue;
 }
 
@@ -226,5 +239,16 @@ void vtkSMVRJoystickCameraStyleProxy::HandleValuator(const vtkVREvent& event)
   if (this->InvertYAxis)
   {
     this->OrientationY *= -1;
+  }
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRJoystickCameraStyleProxy::HandleButton(const vtkVREvent& event)
+{
+  std::string role = this->GetButtonRole(event.name);
+
+  if (role == ::FAST_MOVEMENT_BUTTON)
+  {
+    this->FastMovement = static_cast<bool>(event.data.button.state);
   }
 }
