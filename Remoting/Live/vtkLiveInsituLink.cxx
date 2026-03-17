@@ -324,6 +324,7 @@ vtkLiveInsituLink::vtkLiveInsituLink()
 //----------------------------------------------------------------------------
 vtkLiveInsituLink::~vtkLiveInsituLink()
 {
+  this->DropLiveInsituConnection();
   this->SetHostname(nullptr);
   this->SetURL(nullptr);
 
@@ -385,7 +386,7 @@ void vtkLiveInsituLink::InitializeLive()
     // if the Insitu connection ever drops, we need to communicate to the
     // client on the LiveSession that the catalyst server no longer
     // exists.
-    nam->AddObserver(
+    this->ConnectionClosedObserverTag = nam->AddObserver(
       vtkCommand::ConnectionClosedEvent, this, &vtkLiveInsituLink::OnConnectionClosedEvent);
 
     std::ostringstream url;
@@ -407,7 +408,7 @@ void vtkLiveInsituLink::InitializeLive()
     }
     else
     {
-      nam->AddObserver(
+      this->ConnectionCreatedObserverTag = nam->AddObserver(
         vtkCommand::ConnectionCreatedEvent, this, &vtkLiveInsituLink::OnConnectionCreatedEvent);
     }
   }
@@ -535,7 +536,29 @@ void vtkLiveInsituLink::OnConnectionClosedEvent(vtkObject*, unsigned long, void*
 //----------------------------------------------------------------------------
 void vtkLiveInsituLink::DropLiveInsituConnection()
 {
-  // smart pointers below
+  // Remove NAM observers to prevent stale callbacks on reconnect.
+  // Without this cleanup, a disconnect/reconnect cycle crashes because
+  // the old OnConnectionCreatedEvent callback fires on a link that still
+  // has Proc0NodesController set, hitting the assertion in InsituConnect().
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm)
+  {
+    vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
+    if (nam)
+    {
+      if (this->ConnectionClosedObserverTag)
+      {
+        nam->RemoveObserver(this->ConnectionClosedObserverTag);
+        this->ConnectionClosedObserverTag = 0;
+      }
+      if (this->ConnectionCreatedObserverTag)
+      {
+        nam->RemoveObserver(this->ConnectionCreatedObserverTag);
+        this->ConnectionCreatedObserverTag = 0;
+      }
+    }
+  }
+
   this->Proc0NodesController = nullptr;
   this->ExtractsDeliveryHelper = nullptr;
   this->SimulationPaused = 0;

@@ -239,6 +239,13 @@ protected:
   vtkSmartPointer<vtkMultiProcessController> Proc0NodesController;
   vtkSmartPointer<vtkExtractsDeliveryHelper> ExtractsDeliveryHelper;
 
+  /**
+   * Observer tags for NetworkAccessManager events, stored so they
+   * can be removed on disconnect to prevent stale callbacks on reconnect.
+   */
+  unsigned long ConnectionCreatedObserverTag = 0;
+  unsigned long ConnectionClosedObserverTag = 0;
+
 private:
   vtkLiveInsituLink(const vtkLiveInsituLink&) = delete;
   void operator=(const vtkLiveInsituLink&) = delete;
