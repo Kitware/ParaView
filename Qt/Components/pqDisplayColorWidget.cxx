@@ -253,8 +253,8 @@ public:
 
   vtkNew<vtkSMColorMapEditorHelper> ColorMapEditorHelper;
 
-  std::unordered_map<vtkPVDataInformation*, int> PreviouslySelectedComponentNumber;
-  bool ShouldUpdateComponentNumber = false;
+  std::unordered_map<QString, int> PreviouslySelectedComponentNumber;
+  bool ShouldUpdateScalarBarsComponentTitle = false;
 
   pqInternals()
     : OutOfDomainEntryIndex(-1)
@@ -582,10 +582,17 @@ void pqDisplayColorWidget::refreshColorArrayNames()
   // current component number selection, if applicable.
   this->updateColorTransferFunction();
 
-  if (this->Internals->ShouldUpdateComponentNumber)
+  if (this->Internals->ShouldUpdateScalarBarsComponentTitle)
   {
-    this->Internals->ShouldUpdateComponentNumber = false;
-    this->componentNumberChanged();
+    this->Internals->ShouldUpdateScalarBarsComponentTitle = false;
+    vtkSMProxy* repr = this->Representation ? this->Representation->getProxy() : nullptr;
+    const std::vector<vtkSMProxy*> luts =
+      this->Internals->ColorMapEditorHelper->GetSelectedLookupTables(repr);
+    vtkNew<vtkSMTransferFunctionManager> tmgr;
+    for (const auto& lut : luts)
+    {
+      tmgr->UpdateScalarBarsComponentTitle(lut, repr);
+    }
   }
 }
 
@@ -678,6 +685,11 @@ void pqDisplayColorWidget::componentNumberChanged()
     {
       tmgr->UpdateScalarBarsComponentTitle(lut, repr);
     }
+
+    if (!arrayName.isNull())
+    {
+      this->Internals->PreviouslySelectedComponentNumber[arrayName] = number;
+    }
     END_UNDO_SET();
 
     // render all views since this could affect multiple views.
@@ -720,7 +732,7 @@ void pqDisplayColorWidget::refreshComponents()
     if ((!arrayInfo || (arrayInfo && arrayInfo->GetNumberOfComponents() == 0)) && compNumber != -1)
     {
       // No data / zero components
-      this->Internals->PreviouslySelectedComponentNumber[dataInfo] = compNumber;
+      this->Internals->PreviouslySelectedComponentNumber[arrayName] = compNumber;
     }
     return;
   }
@@ -744,18 +756,16 @@ void pqDisplayColorWidget::refreshComponents()
   this->Components->setEnabled(this->Components->count() > 0);
 
   /// restore component choice if possible.
-  if (this->Internals->PreviouslySelectedComponentNumber.find(dataInfo) !=
+  if (this->Internals->PreviouslySelectedComponentNumber.find(arrayName) !=
     this->Internals->PreviouslySelectedComponentNumber.end())
   {
-    this->setComponentNumber(this->Internals->PreviouslySelectedComponentNumber.at(dataInfo));
-    this->Internals->ShouldUpdateComponentNumber = true;
-    this->Internals->PreviouslySelectedComponentNumber.erase(dataInfo);
+    this->setComponentNumber(this->Internals->PreviouslySelectedComponentNumber.at(arrayName));
   }
   else if (compNumber >= nComponents)
   {
     this->setComponentNumber(arraySettings->ShouldUseMagnitudeMode(nComponents) ? -1 : 0);
-    this->Internals->ShouldUpdateComponentNumber = true;
   }
+  this->Internals->ShouldUpdateScalarBarsComponentTitle = true;
 
   this->Components->blockSignals(prev);
 }
