@@ -186,20 +186,6 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
   vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "failed!!!");
   return std::string();
 }
-
-/**
- * Converts a filename for a plugin to it's name i.e. removes the library
- * prefix and suffix, if any.
- */
-std::string vtkGetPluginNameFromFileName(const std::string& filename)
-{
-  std::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(filename);
-  if (defaultname.size() > 3 && VTKSTRNCASECMP(defaultname.c_str(), "lib", 3) == 0)
-  {
-    defaultname.erase(0, 3);
-  }
-  return defaultname;
-}
 }
 
 class vtkPVPluginTracker::vtkPluginsList : public std::vector<vtkItem>

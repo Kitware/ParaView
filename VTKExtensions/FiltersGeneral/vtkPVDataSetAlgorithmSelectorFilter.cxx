@@ -104,8 +104,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
     }
     else
     {
-      vtkErrorMacro(
-        "Algorithm of type " << activeFilterToUse->GetClassName() << " is not supported yet");
+      vtkErrorMacro("Provided algorithm is not supported yet");
     }
   }
   return 1;

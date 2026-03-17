@@ -58,6 +58,7 @@ public:
    */
   void SetValue(double value);
 
+  using Superclass::SetInputArrayToProcess;
   void SetInputArrayToProcess(
     int idx, int port, int connection, int fieldAssociation, const char* name) override;
   void SetInputArrayToProcess(

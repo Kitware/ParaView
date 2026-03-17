@@ -219,6 +219,8 @@ struct AbstractStreamWorker
   {
   }
 
+  virtual ~AbstractStreamWorker() = default;
+
   virtual void operator()(ostream& stream, vtkCSVWriter* writer, vtkIdType index) = 0;
   vtkIdType NumberOfComponents;
 };

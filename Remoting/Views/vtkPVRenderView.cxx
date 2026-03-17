@@ -133,8 +133,10 @@ struct ValuePassStateT
   bool AnnotationVisibility;
   bool CenterAxesVisibility;
 };
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
 const char* LIBRARY_KEY = "library";
 const char* RENDERER_KEY = "renderer";
+#endif
 }
 
 class vtkPVRenderView::vtkInternals

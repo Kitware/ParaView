@@ -136,7 +136,7 @@ public:
     std::string client_url;
     if (pvserver.find(url))
     {
-      int port;
+      int port = -1;
       VTK_FROM_CHARS_IF_ERROR_BREAK(pvserver.match(3), port);
       port = (port < 0) ? 11111 : port;
 
@@ -150,7 +150,7 @@ public:
     else if (pvserver_reverse.find(url))
     {
       std::string hostname = pvserver_reverse.match(1);
-      int port;
+      int port = -1;
       VTK_FROM_CHARS_IF_ERROR_BREAK(pvserver_reverse.match(3), port);
       port = (port <= 0) ? 11111 : port;
       std::ostringstream stream;
@@ -159,7 +159,8 @@ public:
     }
     else if (pvrenderserver.find(url))
     {
-      int dsport, rsport;
+      int dsport = -1;
+      int rsport = -1;
       VTK_FROM_CHARS_IF_ERROR_BREAK(pvrenderserver.match(3), dsport);
       dsport = (dsport < 0) ? 11111 : dsport;
 
@@ -184,7 +185,8 @@ public:
     }
     else if (pvrenderserver_reverse.find(url))
     {
-      int dsport, rsport;
+      int dsport = -1;
+      int rsport = -1;
       std::string dataserverhost = pvrenderserver_reverse.match(1);
       VTK_FROM_CHARS_IF_ERROR_BREAK(pvrenderserver_reverse.match(3), dsport);
       dsport = (dsport <= 0) ? 11111 : dsport;

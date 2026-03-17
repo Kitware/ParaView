@@ -290,14 +290,15 @@ vtkRenderWindow* vtkPVProcessWindow::NewCAVEWindow()
     auto parts = vtksys::SystemTools::SplitString(pv_shared_window_size, 'x');
     if (parts.size() == 2)
     {
-      int w, h;
+      int w = 0;
+      int h = 0;
       VTK_FROM_CHARS_IF_ERROR_BREAK(parts[0], w);
       VTK_FROM_CHARS_IF_ERROR_BREAK(parts[1], h);
       window->SetSize(w, h);
     }
     else
     {
-      int sz;
+      int sz = 50;
       VTK_FROM_CHARS_IF_ERROR_BREAK(parts[0], sz);
       sz = std::max(50, sz);
       window->SetSize(sz, sz);

@@ -356,7 +356,7 @@ int vtkSciVizStatistics::RequestData(
   vtkNew<vtkGenerateStatistics> modelData;
   modelData->SetController(this->Controller);
   modelData->SetInputDataObject(0, inData);
-  modelData->SetTrainingFraction(this->Task == Tasks::MODEL_INPUT ? 1.0 : this->TrainingFraction);
+  modelData->SetTrainingFraction(trainingFraction);
 
   // Ensure the same arrays+components are requested across all ranks, even
   // those with no data.

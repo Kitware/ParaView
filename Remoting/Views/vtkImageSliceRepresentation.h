@@ -30,6 +30,7 @@ public:
   vtkTypeMacro(vtkImageSliceRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  using Superclass::SetInputArrayToProcess;
   ///@{
   /**
    * Set the input data arrays that this algorithm will process. Overridden to

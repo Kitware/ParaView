@@ -86,6 +86,7 @@ public:
   vtkGetMacro(StreamingRequestSize, int);
   ///@}
 
+  using Superclass::SetInputArrayToProcess;
   ///@{
   /**
    * Set the input data arrays that this algorithm will process.

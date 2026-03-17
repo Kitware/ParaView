@@ -206,7 +206,7 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout, bool (*callback)(
   if (pvserver.find(url))
   {
     std::string hostname = pvserver.match(1);
-    int port;
+    int port = -1;
     VTK_FROM_CHARS_IF_ERROR_BREAK(pvserver.match(3), port);
     port = (port <= 0) ? 11111 : port;
 
@@ -217,7 +217,7 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout, bool (*callback)(
   else if (pvserver_reverse.find(url))
   {
     // 0 ports are acceptable for reverse connections.
-    int port;
+    int port = -1;
     VTK_FROM_CHARS_IF_ERROR_BREAK(pvserver_reverse.match(3), port);
     port = (port < 0) ? 11111 : port;
     std::ostringstream stream;
@@ -227,7 +227,8 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout, bool (*callback)(
   }
   else if (pvrenderserver.find(url))
   {
-    int dsport, rsport;
+    int dsport = -1;
+    int rsport = -1;
     std::string dataserverhost = pvrenderserver.match(1);
     VTK_FROM_CHARS_IF_ERROR_BREAK(pvrenderserver.match(2), dsport);
     dsport = (dsport <= 0) ? 11111 : dsport;
@@ -249,7 +250,8 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout, bool (*callback)(
   else if (pvrenderserver_reverse.find(url))
   {
     // 0 ports are acceptable for reverse connections.
-    int dsport, rsport;
+    int dsport = -1;
+    int rsport = -1;
     VTK_FROM_CHARS_IF_ERROR_BREAK(pvrenderserver_reverse.match(4), dsport);
     dsport = (dsport < 0) ? 11111 : dsport;
     VTK_FROM_CHARS_IF_ERROR_BREAK(pvrenderserver_reverse.match(7), rsport);

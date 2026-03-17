@@ -1516,7 +1516,7 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
     return;
   }
 
-  double cornerValues[8];
+  double cornerValues[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
   for (int i = 0; i < 8; ++i)
   {
     cornerValues[i] = volumeFractionArray->GetComponent(cornerOffsets[i], 0);
