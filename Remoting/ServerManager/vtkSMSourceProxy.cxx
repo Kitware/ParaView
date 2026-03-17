@@ -22,7 +22,6 @@
 #include "vtkStringScanner.h"
 
 #include <cassert>
-#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
