@@ -164,6 +164,15 @@ protected:
   virtual void HandleValuator(const vtkVREvent& event);
   virtual void HandleTracker(const vtkVREvent& event);
 
+  ///@{
+  /**
+   * Load/Save custom properties from the interactor style in the .pvvr file
+   * Can be overriden to use a custom mechanism to load/save properties.
+   */
+  virtual void SaveProxyProperties(vtkPVXMLElement* xml);
+  virtual bool LoadProxyProperties(vtkPVXMLElement* xml, vtkSMProxyLocator* locator);
+  ///@}
+
   static std::vector<std::string> Tokenize(std::string input);
 
   vtkSMProxy* ControlledProxy;
