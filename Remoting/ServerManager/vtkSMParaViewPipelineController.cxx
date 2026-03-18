@@ -26,6 +26,7 @@
 #include "vtkSMTimeKeeperProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringFormatter.h"
 #include "vtkWeakPointer.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -1363,6 +1364,23 @@ bool vtkSMParaViewPipelineController::UnRegisterDependencies(vtkSMProxy* proxy)
       this->UnRegisterProxy(consumer);
     }
   }
+
+  //---------------------------------------------------------------------------
+  // check if there are related selection proxies and unregister them if any
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  vtkSMSourceProxy* appendSelectionProxy =
+    vtkSMSourceProxy::SafeDownCast(pxm->GetProxy("selections", "AppendSelections"));
+  if (appendSelectionProxy && appendSelectionProxy->GetSelectionId() == proxy->GetGlobalID())
+  {
+    unsigned int numSelSources =
+      vtkSMPropertyHelper(appendSelectionProxy, "Input").GetNumberOfElements();
+    pxm->UnRegisterProxy("AppendSelections");
+    for (unsigned int i = 0; i < numSelSources; ++i)
+    {
+      pxm->UnRegisterProxy(("SelectionSource" + vtk::to_string(i)).c_str());
+    }
+  }
+
   //---------------------------------------------------------------------------
 
   // TODO: remove any property links/proxy link setup for this proxy.
