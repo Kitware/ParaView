@@ -89,7 +89,7 @@ void vtkSMAnimationSceneWriter::ExecuteEvent(
       // current time to progress in range [0, 1].
       double window[2];
       this->GetPlaybackTimeWindow(window);
-      if (window[0] <= window[1])
+      if (window[0] > window[1])
       {
         window[0] = cueInfo->StartTime;
         window[1] = cueInfo->EndTime;
