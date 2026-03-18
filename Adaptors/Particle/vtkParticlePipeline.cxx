@@ -268,8 +268,8 @@ int vtkParticlePipeline::CoProcess(vtkCPDataDescription* desc)
   if (ctrl->GetLocalProcessId() == 0)
   {
     this->w2i->Modified();
-    auto outString = vtk::format(this->Filename, timestep);
-    this->writer->SetFileName(outString.c_str());
+    VTK_FORMAT_IF_ERROR_RETURN(auto outString = vtk::format(this->Filename, timestep);
+                               this->writer->SetFileName(outString.c_str()), 0);
     this->writer->Write();
   }
 

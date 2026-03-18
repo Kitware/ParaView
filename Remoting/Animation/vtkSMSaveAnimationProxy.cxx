@@ -298,8 +298,9 @@ protected:
     assert(remoteWriterAlgorithm);
 
     char buffer[1024];
-    auto result = vtk::format_to_n(buffer, 1024, this->SuffixFormat, this->Counter);
-    *result.out = '\0';
+    VTK_FORMAT_IF_ERROR_RETURN(
+      auto result = vtk::format_to_n(buffer, 1024, this->SuffixFormat, this->Counter);
+      *result.out = '\0', false);
 
     std::ostringstream str;
     str << this->Prefix << buffer << this->Extension;
