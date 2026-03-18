@@ -14,6 +14,7 @@
 #ifndef vtkSMProxyLink_h
 #define vtkSMProxyLink_h
 
+#include "vtkParaViewDeprecation.h"
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMLink.h"
 
@@ -64,6 +65,8 @@ public:
    * Get the number of proxies that are involved in this link.
    */
   unsigned int GetNumberOfLinkedObjects() override;
+  PARAVIEW_DEPRECATED_IN_6_1_0(
+    "GetNumerOfLinkedProxies is deprectated, please use GetNumberOfLinkedObjects instead.")
   unsigned int GetNumberOfLinkedProxies();
   ///@}
 
