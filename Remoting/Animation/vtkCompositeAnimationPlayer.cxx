@@ -122,6 +122,12 @@ void vtkCompositeAnimationPlayer::SetNumberOfFrames(int val)
   this->SequenceAnimationPlayer->SetNumberOfFrames(val);
 }
 
+//----------------------------------------------------------------------------
+int vtkCompositeAnimationPlayer::GetNumberOfFrames()
+{
+  return this->SequenceAnimationPlayer->GetNumberOfFrames();
+}
+
 // Forwarded to vtkTimestepsAnimationPlayer.
 //----------------------------------------------------------------------------
 void vtkCompositeAnimationPlayer::AddTimeStep(double val)

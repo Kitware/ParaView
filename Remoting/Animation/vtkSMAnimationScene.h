@@ -134,6 +134,12 @@ public:
   vtkGetVector2Macro(PlaybackTimeWindow, double);
   ///@}
 
+  /**
+   * Clamp frameWindow to be inside [0, maxFrame].
+   * Also fill timeWindow with the time values counterpart of frameWindow.
+   */
+  void SanitizeFrameWindow(int frameWindow[2], double timeWindow[2]);
+
   ///@{
   /**
    * Forwarded to vtkCompositeAnimationPlayer.
@@ -150,6 +156,7 @@ public:
   void SetPlayMode(int val);
   int GetPlayMode();
   void SetNumberOfFrames(int val);
+  int GetNumberOfFrames();
 
   void SetFramesPerTimestep(int val);
   void SetStride(int val);

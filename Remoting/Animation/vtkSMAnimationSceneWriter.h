@@ -64,9 +64,17 @@ public:
    * Get/Set time window that we want to write
    * If PlaybackTimeWindow[0] > PlaybackTimeWindow[1] that mean that we
    * want to export the full time range available.
+   * This handles time values and not time steps.
    */
   vtkSetVector2Macro(PlaybackTimeWindow, double);
   vtkGetVector2Macro(PlaybackTimeWindow, double);
+  ///@}
+
+  /**
+   * Use window to set PlaybackTimeWindow based on AnimationScene times.
+   */
+  void SetFrameWindow(int window[2]);
+  void SetFrameWindow(int min, int max);
   ///@}
 
   ///@{

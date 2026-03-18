@@ -156,6 +156,26 @@ bool vtkSMAnimationSceneWriter::Save()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMAnimationSceneWriter::SetFrameWindow(int window[2])
+{
+  if (!this->AnimationScene)
+  {
+    return;
+  }
+  double timeWindow[2];
+  this->AnimationScene->SanitizeFrameWindow(window, timeWindow);
+  this->SetPlaybackTimeWindow(timeWindow);
+  this->SetStartFileCount(window[0]);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMAnimationSceneWriter::SetFrameWindow(int min, int max)
+{
+  int window[2] = { min, max };
+  this->SetFrameWindow(window);
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMAnimationSceneWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
