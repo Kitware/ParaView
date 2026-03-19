@@ -6,7 +6,7 @@
  *
  * vtkSMAnimationFrameWindowDomain is used on the "FrameWindow" property on the
  * "SaveAnimation" proxy. It's a int-range, where the range is determined using
- * the animation scene's play mode and frame rate.
+ * the animation scene's play mode.
  */
 
 #ifndef vtkSMAnimationFrameWindowDomain_h

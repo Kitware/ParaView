@@ -676,7 +676,6 @@
         <AnimationFrameWindowDomain name="range" default_mode="min,max">
           <RequiredProperties>
             <Property name="AnimationScene" function="AnimationScene" />
-            <Property name="FrameRate" function="FrameRate" />
           </RequiredProperties>
         </AnimationFrameWindowDomain>
         <Documentation>
@@ -793,7 +792,6 @@
         <AnimationFrameWindowDomain name="range" default_mode="min,max">
           <RequiredProperties>
             <Property name="AnimationScene" function="AnimationScene"/>
-            <Property name="FrameRate" function="FrameRate"/>
           </RequiredProperties>
         </AnimationFrameWindowDomain>
         <Documentation>

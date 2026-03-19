@@ -21,15 +21,9 @@ vtkSMAnimationFrameWindowDomain::~vtkSMAnimationFrameWindowDomain() = default;
 void vtkSMAnimationFrameWindowDomain::Update(vtkSMProperty*)
 {
   vtkSMProperty* sceneProperty = this->GetRequiredProperty("AnimationScene");
-  vtkSMProperty* frameRateProperty = this->GetRequiredProperty("FrameRate");
   if (!sceneProperty)
   {
     vtkErrorMacro("Missing required 'AnimationScene' property.");
-    return;
-  }
-  if (!frameRateProperty)
-  {
-    vtkErrorMacro("Missing required 'FrameRate' property.");
     return;
   }
 
