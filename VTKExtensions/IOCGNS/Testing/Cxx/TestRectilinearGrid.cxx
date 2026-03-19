@@ -47,21 +47,21 @@ void Create(vtkRectilinearGrid* rg, vtkIdType I, vtkIdType J, vtkIdType K)
 
   vtkNew<vtkDoubleArray> cellPressure;
   cellPressure->SetName("Pressure");
-  cellPressure->Allocate(I * J * K);
+  cellPressure->ReserveValues(I * J * K);
 
   vtkNew<vtkDoubleArray> vertexPressure;
   vertexPressure->SetName("Pressure");
-  vertexPressure->Allocate(I * J * K);
+  vertexPressure->ReserveValues(I * J * K);
 
   vtkNew<vtkDoubleArray> cellVelocity;
   cellVelocity->SetName("Velocity");
   cellVelocity->SetNumberOfComponents(3);
-  cellVelocity->Allocate(3 * I * J * K);
+  cellVelocity->ReserveTuples(I * J * K);
 
   vtkNew<vtkDoubleArray> vertexVelocity;
   vertexVelocity->SetName("Velocity");
   vertexVelocity->SetNumberOfComponents(3);
-  vertexVelocity->Allocate(3 * I * J * K);
+  vertexVelocity->ReserveTuples(I * J * K);
 
   vtkNew<vtkDoubleArray> x, y, z;
   for (i = 0; i < I; ++i)

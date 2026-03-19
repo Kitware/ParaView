@@ -85,7 +85,7 @@ public:
         dstArray = otherArray->NewInstance();
         dstArray->SetNumberOfComponents(otherArray->GetNumberOfComponents());
         dstArray->SetName(otherArray->GetName());
-        dstArray->Allocate(minSize * otherArray->GetNumberOfComponents());
+        dstArray->ReserveTuples(minSize);
         if (auto oinfo = otherArray->GetInformation())
         {
           dstArray->CopyInformation(oinfo);
@@ -811,8 +811,7 @@ public:
       {
         vtkSmartPointer<vtkIdTypeArray> processIdArray = vtkSmartPointer<vtkIdTypeArray>::New();
         processIdArray->SetName("vtkOriginalProcessIds");
-        processIdArray->SetNumberOfComponents(1);
-        processIdArray->Allocate(blockSize);
+        processIdArray->ReserveValues(blockSize);
         vtkIdType processId = this->Me;
         for (vtkIdType idx = 0; idx < localResult->GetNumberOfRows(); idx++)
         {
@@ -927,8 +926,7 @@ public:
     {
       vtkSmartPointer<vtkIdTypeArray> processIdArray = vtkSmartPointer<vtkIdTypeArray>::New();
       processIdArray->SetName("vtkOriginalProcessIds");
-      processIdArray->SetNumberOfComponents(1);
-      processIdArray->Allocate((blockSize < localSize) ? localSize : blockSize);
+      processIdArray->ReserveValues((blockSize < localSize) ? localSize : blockSize);
       for (vtkIdType idx = 0; idx < localSubset->GetNumberOfRows(); idx++)
       {
         processIdArray->InsertNextTuple1(mergePid);
@@ -1084,7 +1082,7 @@ public:
       vtkAbstractArray* subArray = srcArray->NewInstance();
       subArray->SetNumberOfComponents(srcArray->GetNumberOfComponents());
       subArray->SetName(srcArray->GetName());
-      subArray->Allocate(size * srcArray->GetNumberOfComponents());
+      subArray->ReserveTuples(size);
       if (auto sinfo = srcArray->GetInformation())
       {
         subArray->CopyInformation(sinfo);
@@ -1158,7 +1156,7 @@ public:
       {
         vtkIdTypeArray* structuredIndices = vtkIdTypeArray::New();
         structuredIndices->SetNumberOfComponents(3);
-        structuredIndices->Allocate(output->GetNumberOfRows() * 3);
+        structuredIndices->ReserveTuples(output->GetNumberOfRows());
         structuredIndices->SetName("Structured Coordinates");
 
         vtkIdTypeArray* idsArray =
@@ -1470,7 +1468,7 @@ vtkSmartPointer<vtkUnsignedIntArray> vtkSortedTableStreamer::GenerateCompositeIn
     if (compositeIndex->GetNumberOfTuples() == 0)
     {
       compositeIndex->SetNumberOfComponents(num_components);
-      compositeIndex->Allocate(num_components * maxSize);
+      compositeIndex->ReserveTuples(maxSize);
     }
     assert(num_components == compositeIndex->GetNumberOfComponents());
 
@@ -1513,7 +1511,7 @@ vtkSmartPointer<vtkStringArray> vtkSortedTableStreamer::GenerateBlockNameArray(
   }
   auto localBlockNames = vtkSmartPointer<vtkStringArray>::New();
   localBlockNames->SetName("vtkBlockNames");
-  localBlockNames->Allocate(static_cast<vtkIdType>(blockNamesSet.size()));
+  localBlockNames->ReserveValues(static_cast<vtkIdType>(blockNamesSet.size()));
   for (const auto& name : blockNamesSet)
   {
     localBlockNames->InsertNextValue(name);
@@ -1554,7 +1552,7 @@ vtkSmartPointer<vtkStringArray> vtkSortedTableStreamer::GenerateBlockNameArray(
       }
     }
     globalBlockNames->SetName("vtkBlockNames");
-    globalBlockNames->Allocate(static_cast<vtkIdType>(globalBlockNamesSet.size()));
+    globalBlockNames->ReserveValues(static_cast<vtkIdType>(globalBlockNamesSet.size()));
     for (const auto& name : globalBlockNamesSet)
     {
       globalBlockNames->InsertNextValue(name);
@@ -1576,7 +1574,7 @@ vtkSmartPointer<vtkIdTypeArray> vtkSortedTableStreamer::GenerateBlockIndicesArra
   }
 
   auto blockIndices = vtkSmartPointer<vtkIdTypeArray>::New();
-  blockIndices->Allocate(maxSize);
+  blockIndices->ReserveValues(maxSize);
   blockIndices->SetName("vtkBlockNameIndices");
   for (unsigned int cc = 0, max = ptd->GetNumberOfPartitions(); cc < max; ++cc)
   {

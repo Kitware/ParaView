@@ -667,7 +667,7 @@ vtkAbstractArray* vtkPVProminentValuesInformation::GetProminentComponentValues(i
   va = vtkVariantArray::New();
   int nc = (component < 0 ? this->NumberOfComponents : 1);
   va->SetNumberOfComponents(nc);
-  va->Allocate(nt * nc);
+  va->ReserveTuples(nt);
   vtkInternalDistinctValues::mapped_type::iterator eit;
   for (eit = compEntry->second.begin(); eit != compEntry->second.end(); ++eit)
   {

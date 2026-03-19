@@ -5,6 +5,7 @@
 #define PARAVIEW_DEPRECATION_LEVEL 0
 
 #include "vtkFlashContour.h"
+
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkDataArray.h"
@@ -12,7 +13,7 @@
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMarchingCubesTriangleCases.h"
+#include "vtkMarchingCellsContourCases.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkObjectFactory.h"
@@ -33,11 +34,6 @@ vtkStandardNewMacro(vtkFlashContour);
 // for shared regions we will have to interpolated between two blocks.
 // We cannot use InterpolatePoint (whatever it is called in vtkDataArray).
 // I would have to write a similar method that takes two FieldDatas as input.
-
-static int vtkFlashIsoEdgeToPointsTable[12][2] = { { 0, 1 }, { 1, 3 }, { 2, 3 }, { 0, 2 }, { 4, 5 },
-  { 5, 7 }, { 6, 7 }, { 4, 6 }, { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 } };
-static int vtkFlashIsoEdgeToVTKPointsTable[12][2] = { { 0, 1 }, { 1, 2 }, { 3, 2 }, { 0, 3 },
-  { 4, 5 }, { 5, 6 }, { 7, 6 }, { 4, 7 }, { 0, 4 }, { 1, 5 }, { 3, 7 }, { 2, 6 } };
 
 //============================================================================
 //----------------------------------------------------------------------------
@@ -1218,15 +1214,13 @@ void vtkFlashContour::ProcessCellFinal(const double cornerPoints[32], const doub
   int cubeCase, const double passValues[8])
 {
   vtkIdType pointIds[6];
-  vtkMarchingCubesTriangleCases *triCase, *triCases;
-  int* edge;
   double k, v0, v1;
-  triCases = vtkMarchingCubesTriangleCases::GetCases();
 
   // We have the points, now contour the cell.
   // Get edges.
-  triCase = triCases + cubeCase;
-  edge = triCase->edges;
+  static const auto voxelEdges = vtkMarchingCellsContourCases::GetCellEdges(VTK_VOXEL);
+  static const auto hexEdges = vtkMarchingCellsContourCases::GetCellEdges(VTK_HEXAHEDRON);
+  auto edge = vtkMarchingCellsContourCases::GetHexahedronCase(cubeCase);
   double pt[3];
 
   // loop over triangles
@@ -1244,12 +1238,12 @@ void vtkFlashContour::ProcessCellFinal(const double cornerPoints[32], const doub
       if (ptId == -1)
       {
         // Compute the interpolation factor.
-        v0 = cornerValues[vtkFlashIsoEdgeToVTKPointsTable[*edge][0]];
-        v1 = cornerValues[vtkFlashIsoEdgeToVTKPointsTable[*edge][1]];
+        v0 = cornerValues[hexEdges[*edge][0]];
+        v1 = cornerValues[hexEdges[*edge][1]];
         k = (this->IsoValue - v0) / (v1 - v0);
         // Add the point to the output and get the index of the point.
-        int pt1Idx = (vtkFlashIsoEdgeToPointsTable[*edge][0] << 2);
-        int pt2Idx = (vtkFlashIsoEdgeToPointsTable[*edge][1] << 2);
+        int pt1Idx = (voxelEdges[*edge][0] << 2);
+        int pt2Idx = (voxelEdges[*edge][1] << 2);
         // I wonder if this is any faster than incrementing a pointer.
         pt[0] = cornerPoints[pt1Idx] + k * (cornerPoints[pt2Idx] - cornerPoints[pt1Idx]);
         pt[1] =
@@ -1262,8 +1256,8 @@ void vtkFlashContour::ProcessCellFinal(const double cornerPoints[32], const doub
         {
           double p0;
           double p1;
-          p0 = passValues[vtkFlashIsoEdgeToVTKPointsTable[*edge][0]];
-          p1 = passValues[vtkFlashIsoEdgeToVTKPointsTable[*edge][1]];
+          p0 = passValues[hexEdges[*edge][0]];
+          p1 = passValues[hexEdges[*edge][1]];
           double value = p0 + k * (p1 - p0);
           this->PassArray->InsertNextValue(value);
         }

@@ -255,7 +255,7 @@ void PillarGridGenerator(
   vtkIdType expectedCells = lnx * lny * lnz;
 
   vtkNew<vtkPoints> points;
-  points->Allocate(expectedCells * 8);
+  points->Reserve(expectedCells * 8);
 
   vtkNew<vtkFloatArray> dist_array;
   dist_array->SetName("Distance2Origin");
@@ -350,7 +350,7 @@ void DiscontinuousGridGenerator(
   vtkIdType expectedCells = lnx * lny * lnz;
 
   vtkNew<vtkPoints> points;
-  points->Allocate(expectedCells * 8);
+  points->Reserve(expectedCells * 8);
 
   vtkNew<vtkFloatArray> dist_array;
   dist_array->SetName("Distance2Origin");
@@ -429,7 +429,7 @@ void ContinuousGridGenerator(
   int npz = lnz + 1;
 
   vtkNew<vtkPoints> points;
-  points->Allocate(npx * npy * npz);
+  points->Reserve(npx * npy * npz);
 
   vtkNew<vtkFloatArray> dist_array;
   dist_array->SetName("Distance2Origin");
@@ -516,7 +516,7 @@ void StepsGridGenerator(
   int lstep = (nx / nsteps);
 
   vtkNew<vtkPoints> points;
-  points->Allocate(expectedCells * 8);
+  points->Reserve(expectedCells * 8);
 
   vtkNew<vtkFloatArray> dist_array;
   dist_array->SetName("Distance2Origin");
@@ -655,7 +655,7 @@ void PyramidGridGenerator(
   vtkIdType expectedCells = lnx * lny * lnz;
 
   vtkNew<vtkPoints> points;
-  points->Allocate(expectedCells * 8);
+  points->Reserve(expectedCells * 8);
 
   vtkNew<vtkFloatArray> dist_array;
   dist_array->SetName("Distance2Origin");

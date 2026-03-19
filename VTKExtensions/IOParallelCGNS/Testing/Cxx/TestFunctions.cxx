@@ -22,7 +22,7 @@ void Create(vtkPolyData* polyData, int rank, int size)
   vertexVelocity->SetNumberOfComponents(3);
   cellVelocity->SetNumberOfComponents(3);
 
-  points->Allocate(8);
+  points->Reserve(8);
 
   points->InsertNextPoint(rank + 0, rank + 0, rank + 0);
   points->InsertNextPoint(rank + 0, rank + 1, rank + 0);
@@ -81,7 +81,7 @@ void CreatePolygonal(vtkPolyData* polyData, int rank)
   points->InsertNextPoint(0, 2, rank);
 
   vtkNew<vtkIdList> polygon;
-  polygon->Allocate(10);
+  polygon->Reserve(10);
 
   polygon->InsertNextId(0);
   polygon->InsertNextId(1);
@@ -146,7 +146,7 @@ void CreatePolyhedral(vtkUnstructuredGrid* polyhedral, int rank)
   points->InsertNextPoint(2, 2, 2 * rank + 1);
 
   vtkNew<vtkIdList> polyhedron;
-  polyhedron->Allocate(50);
+  polyhedron->Reserve(50);
   polyhedron->InsertNextId(7); // faces
 
   polyhedron->InsertNextId(4); // face0-4verts
@@ -265,7 +265,7 @@ void Create(vtkUnstructuredGrid* unstructuredGrid, int rank, int size)
   vertexVelocity->SetNumberOfComponents(3);
   cellVelocity->SetNumberOfComponents(3);
 
-  points->Allocate(8);
+  points->Reserve(8);
 
   points->InsertNextPoint(rank + 0, rank + 0, rank + 0);
   points->InsertNextPoint(rank + 0, rank + 1, rank + 0);
@@ -341,7 +341,7 @@ void CreatePartial(vtkUnstructuredGrid* polyhedral, int rank)
   points->InsertNextPoint(2 + 0, 1, 2 * rank + 1);
 
   vtkNew<vtkIdList> polyhedron;
-  polyhedron->Allocate(50);
+  polyhedron->Reserve(50);
   polyhedron->InsertNextId(7); // faces
 
   polyhedron->InsertNextId(4); // face0-4verts

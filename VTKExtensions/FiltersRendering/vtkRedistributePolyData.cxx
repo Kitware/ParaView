@@ -832,7 +832,7 @@ void vtkRedistributePolyData::CopyArrays(
   else
   {
     vtkNew<vtkIdList> fromIdList;
-    fromIdList->SetArray(fromId, numToCopy, /*save*/ false);
+    fromIdList->SetList(fromId, numToCopy, /*save*/ true);
     DataTo->InsertTuplesStartingAt(0, fromIdList, DataFrom);
   }
 }
@@ -1559,7 +1559,7 @@ void vtkRedistributePolyData::AllocateArrays(vtkDataArray* Data, vtkIdType numTo
 
   if (numToCopyTotal > 0)
   {
-    if (Data->WriteVoidPointer(0, numToCopyTotal * numComp) == nullptr)
+    if (!Data->SetNumberOfValues(numToCopyTotal * numComp))
     {
       vtkErrorMacro("Error: can't alloc mem for data array");
     }
@@ -1678,7 +1678,7 @@ void vtkRedistributePolyData::SendArrays(
 //******************************************************************
 {
   vtkNew<vtkIdList> fromIdList;
-  fromIdList->SetArray(fromId, numToCopy, /*save*/ false);
+  fromIdList->SetList(fromId, numToCopy, /*save*/ true);
   auto dataToSend = vtk::TakeSmartPointer(vtkDataArray::CreateDataArray(Data->GetDataType()));
   dataToSend->SetNumberOfComponents(Data->GetNumberOfComponents());
   dataToSend->SetNumberOfTuples(numToCopy);
@@ -1778,7 +1778,7 @@ void vtkRedistributePolyData::ReceiveArrays(
   else
   {
     vtkNew<vtkIdList> toIdList;
-    toIdList->SetArray(toId, numToCopy, /*save*/ false);
+    toIdList->SetList(toId, numToCopy, /*save*/ true);
     DataTo->InsertTuplesStartingAt(0, toIdList, DataFrom);
   }
 }

@@ -75,23 +75,23 @@ void Create(vtkUnstructuredGrid* ug, vtkIdType N)
   vtkIdType i, j, k;
   vtkNew<vtkDoubleArray> cellPressure;
   cellPressure->SetName("Pressure");
-  cellPressure->Allocate(N * N * N);
+  cellPressure->ReserveValues(N * N * N);
 
   vtkNew<vtkDoubleArray> vertexPressure;
   vertexPressure->SetName("Pressure");
-  vertexPressure->Allocate(N * N * N);
+  vertexPressure->ReserveValues(N * N * N);
 
   vtkNew<vtkDoubleArray> cellVelocity;
   cellVelocity->SetName("Velocity");
   cellVelocity->SetNumberOfComponents(3);
-  cellVelocity->Allocate(3 * N * N * N);
+  cellVelocity->ReserveTuples(N * N * N);
 
   vtkNew<vtkDoubleArray> vertexVelocity;
   vertexVelocity->SetName("Velocity");
   vertexVelocity->SetNumberOfComponents(3);
-  vertexVelocity->Allocate(3 * N * N * N);
+  vertexVelocity->ReserveTuples(N * N * N);
 
-  pts->Allocate(N * N * N);
+  pts->Reserve(N * N * N);
 
   double xyz[3];
 
@@ -127,7 +127,7 @@ void Create(vtkUnstructuredGrid* ug, vtkIdType N)
   };
 
   vtkNew<vtkIdList> cellIds;
-  cellIds->Allocate(8);
+  cellIds->Reserve(8);
   for (i = 0; i < N - 1; ++i)
   {
     const auto di = static_cast<double>(i);

@@ -280,7 +280,7 @@ void setmarkergeometry_(int* nvp, char* nframe, int* nframelen, char* version, i
   // Allocate points and cells for all markers, but don't fill in
   vtkPoints* points = vtkPoints::New();
   points->SetDataTypeToFloat();
-  points->Allocate(numberOfMarkers);
+  points->Reserve(numberOfMarkers);
 
   ugrid->Allocate(numberOfMarkers);
   ugrid->SetPoints(points);
@@ -337,7 +337,7 @@ void addmarkerscalarfield_(char* fname, int* len, int* numberAdded, float* data)
     vtkFloatArray* arr = vtkFloatArray::New();
     arr->SetName(varName.c_str());
     arr->SetNumberOfComponents(1);
-    arr->Allocate(numberOfMarkers);
+    arr->ReserveTuples(numberOfMarkers);
     ugrid->GetPointData()->AddArray(arr);
     arr->Delete();
     dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));
@@ -374,7 +374,7 @@ void addmarkervectorfield_(
     vtkFloatArray* arr = vtkFloatArray::New();
     arr->SetName(varName.c_str());
     arr->SetNumberOfComponents(3);
-    arr->Allocate(numberOfMarkers);
+    arr->ReserveTuples(numberOfMarkers);
     ugrid->GetPointData()->AddArray(arr);
     arr->Delete();
     dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));
@@ -415,7 +415,7 @@ void addmarkertensorfield_(char* fname, int* len, int* numberAdded, float* data0
     vtkFloatArray* arr = vtkFloatArray::New();
     arr->SetName(varName.c_str());
     arr->SetNumberOfComponents(6);
-    arr->Allocate(numberOfMarkers);
+    arr->ReserveTuples(numberOfMarkers);
     ugrid->GetPointData()->AddArray(arr);
     arr->Delete();
     dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));

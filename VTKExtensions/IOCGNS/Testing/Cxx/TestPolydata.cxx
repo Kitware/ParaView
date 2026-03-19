@@ -75,7 +75,7 @@ void Create(vtkPolyData* pd)
   vtkNew<vtkPoints> pts;
 
   pd->SetPoints(pts);
-  pts->Allocate(7);
+  pts->Reserve(7);
   pd->Allocate(3);
 
   pts->InsertNextPoint(0, 0, 0);

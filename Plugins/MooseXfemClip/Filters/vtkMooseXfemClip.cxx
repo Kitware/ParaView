@@ -108,12 +108,12 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   vtkNew<vtkFloatArray> cellScalars;
-  cellScalars->Allocate(8 /*hex*/);
+  cellScalars->ReserveValues(8 /*hex*/);
   vtkNew<vtkCellArray> conn;
   conn->AllocateEstimate(numCells, 8 /*hex*/);
   conn->InitTraversal();
   vtkNew<vtkUnsignedCharArray> types;
-  types->Allocate(numCells);
+  types->ReserveValues(numCells);
   vtkNew<vtkPoints> newPoints;
 
   // set precision for the points in the output
@@ -134,7 +134,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
     newPoints->SetDataType(VTK_DOUBLE);
   }
 
-  newPoints->Allocate(numPts, numPts / 2);
+  newPoints->Reserve(numPts);
 
   this->Locator->InitPointInsertion(newPoints, input->GetBounds());
 

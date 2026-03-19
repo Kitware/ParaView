@@ -463,9 +463,9 @@ void vtkPrismSESAMEReader::ReadSurfaceTable(std::FILE* file, vtkPolyData* output
   vtkNew<vtkFloatArray> xCoords;
   vtkNew<vtkFloatArray> yCoords;
   vtkNew<vtkFloatArray> zCoords;
-  xCoords->Allocate(NR);
-  yCoords->Allocate(NT);
-  zCoords->Allocate(1);
+  xCoords->ReserveValues(NR);
+  yCoords->ReserveValues(NT);
+  zCoords->ReserveValues(1);
   zCoords->InsertNextValue(0.0);
 
   // create scalar arrays
@@ -476,7 +476,7 @@ void vtkPrismSESAMEReader::ReadSurfaceTable(std::FILE* file, vtkPolyData* output
     scalars.emplace_back(newArray);
     if (newArray)
     {
-      newArray->Allocate(NRxNT);
+      newArray->ReserveValues(NRxNT);
       newArray->SetName(tableArrays->GetValue(i).c_str());
     }
   }
@@ -631,7 +631,7 @@ void vtkPrismSESAMEReader::ReadCurveTable(std::FILE* file, vtkPolyData* output, 
     scalars.emplace_back(newArray);
     if (newArray)
     {
-      newArray->Allocate(NR);
+      newArray->ReserveValues(NR);
       newArray->SetName(tableArrays->GetValue(i).c_str());
     }
   }
@@ -777,7 +777,7 @@ void vtkPrismSESAMEReader::ReadVaporizationCurveTable(
     scalars.emplace_back(newArray);
     if (newArray)
     {
-      newArray->Allocate(NT);
+      newArray->ReserveValues(NT);
       newArray->SetName(tableArrays->GetValue(i).c_str());
     }
   }

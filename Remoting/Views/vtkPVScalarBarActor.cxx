@@ -639,7 +639,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
   tickCells->AllocateEstimate(ticks.size(), 20);
 
   vtkNew<vtkPoints> tickPoints;
-  tickPoints->Allocate(ticks.size() * 20);
+  tickPoints->Reserve(ticks.size() * 20);
 
   double targetWidth = this->P->TickBox.Size[this->P->TL[0]];
   double targetHeight = this->P->TickBox.Size[this->P->TL[1]];
