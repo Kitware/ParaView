@@ -16,8 +16,8 @@
 #include "vtkOutputWindow.h"
 #include "vtkPVLogger.h"
 #include "vtkPVProgressHandler.h"
-#include "vtkSMProxy.h"
 #include "vtkSMSession.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkTimerLog.h"
 
 //-----------------------------------------------------------------------------
@@ -167,32 +167,22 @@ void pqProgressManager::setEnableProgress(bool enable)
 void pqProgressManager::triggerAbort()
 {
   pqApplicationCore* appCore = pqApplicationCore::instance();
-  if (auto* server = appCore->getActiveServer())
+  if (pqServer* server = appCore->getActiveServer())
   {
-    if (auto* progressHandler = server->session()->GetProgressHandler())
+    if (vtkPVProgressHandler* progressHandler = server->session()->GetProgressHandler())
     {
       const auto abortGid = progressHandler->GetLastProgressId();
       if (abortGid > 0)
       {
-        if (auto* proxy = vtkSMProxy::SafeDownCast(server->session()->GetRemoteObject(abortGid)))
+        if (vtkSMSourceProxy::SafeDownCast(server->session()->GetRemoteObject(abortGid)))
         {
-          if (auto* algorithm = vtkAlgorithm::SafeDownCast(proxy->GetClientSideObject()))
-          {
-            vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
-              "abort gid=" << abortGid << ",object=" << algorithm->GetObjectDescription());
-            algorithm->SetAbortExecuteAndUpdateTime();
-          }
-          else
-          {
-            vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
-              "abort triggered, but no vtkAlgorithm found for gid="
-                << abortGid << ", found " << proxy->GetClassName() << " instead.");
-          }
+          // Only abort if we find the proxy client side
+          progressHandler->Abort(abortGid);
         }
         else
         {
           vtkVLog(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
-            "abort triggered, but no vtkSMProxy found for gid=" << abortGid);
+            "abort triggered, but no vtkSMSourceProxy found for gid=" << abortGid);
         }
       }
       else
@@ -255,11 +245,5 @@ void pqProgressManager::onProgress(vtkObject* caller)
   // mainly because of subtle timing issues from QTimers that are expected
   // to expire in a certain order
   processEvents &= (oldProgress > 0);
-  // must be builtin to safely process events.
-  if (auto* server = pqApplicationCore::instance()->getActiveServer())
-  {
-    // processEvents &= session->HasProcessRole(vtkPVSession::CLIENT_AND_SERVERS);
-    processEvents &= server->isRemote() ? false : true;
-  }
   this->setProgress(text, oldProgress, processEvents);
 }

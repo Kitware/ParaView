@@ -1,0 +1,9 @@
+NAME
+  AbortTesting
+DESCRIPTION
+  Modify ParaView Behavior to abort when receiving a progress event > 0.25
+CONDITION
+  PARAVIEW_USE_QT AND BUILD_TESTING
+REQUIRES_MODULES
+  ParaView::pqComponents
+  ParaView::qttesting

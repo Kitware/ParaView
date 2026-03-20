@@ -12,7 +12,10 @@
  * may not faithfully report the progress, this avoid nasty MPI issues that can
  * be painful to debug and diagnose.
  *
+ * This also handles abort by sending an abort flag back on each progress event.
+ *
  * Progress events are currently not supported in multi-clients mode.
+ * Abort is current only supported in built-in and non-distributed client-server mode.
  *
  * @par Events:
  * vtkCommand::StartEvent
@@ -33,6 +36,8 @@
 
 #include "vtkObject.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
+
+#include <set>
 
 class vtkMultiProcessController;
 class vtkPVSession;
@@ -105,12 +110,38 @@ public:
   vtkGetMacro(LastProgressId, vtkTypeUInt32);
   ///@}
 
+  /**
+   * Abort the object linked with provided object id.
+   * This method only store the information which will only
+   * be used on the next progress id of this object.
+   * This class is only able to SetAbortExecute flag.
+   * Use vtkSMProxy/vtkSIProxy ClearAbortFlags to remove them.
+   * @warning this does not work with a distributed server.
+   */
+  void Abort(vtkTypeUInt32 objectId);
+
+  /**
+   * Recover the set of all aborted object ids
+   */
+  std::set<int> GetAbortedObjectIds();
+
+  /**
+   * Clear the set of all aborted object ids
+   */
+  void ClearAbortedObjectIds();
+
+  /**
+   * Enable abort checking for a specific object
+   */
+  void EnableAbortCheck(vtkTypeUInt32 objectId);
+
 protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler() override;
 
   enum TAGS
   {
+    ABORT_TAG = 188968,
     CLEANUP_TAG = 188969,
     PROGRESS_EVENT_TAG = 188970,
     MESSAGE_EVENT_TAG = 188971
@@ -155,6 +186,14 @@ private:
    * Update the last message and invokes a message event
    */
   void RefreshMessage(const char* message_text, int eventid, bool is_local);
+
+  /**
+   * Check if provided progressId was aborted and set the abort execute flag server side if needed
+   * Server side, caller is exepected to be non-null.
+   * Client side, communicator is expected to be non-null.
+   * @warning this does not work with a distributed server.
+   */
+  void CheckAbort(vtkTypeUInt32 progressId, vtkObject* caller, vtkObject* communicator);
 
   bool AddedHandlers;
   class vtkInternals;

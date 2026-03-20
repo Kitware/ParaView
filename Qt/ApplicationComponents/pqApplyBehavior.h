@@ -55,8 +55,15 @@ Q_SIGNALS:
   void triggerApply();
 
 protected Q_SLOTS:
+  ///@{
+  /**
+   * Called when apply is triggered.
+   * Update the pipeline and show the data as needed.
+   * Also handle aborting the pipeline.
+   */
   virtual void applied(pqPropertiesPanel* panel, pqProxy* proxy);
   virtual void applied(pqPropertiesPanel* panel = nullptr);
+  ///@}
 
 private Q_SLOTS:
   void onApplied(pqProxy*);
@@ -69,6 +76,12 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqApplyBehavior)
+
+  /**
+   * Call ClearAbortFlags on all proxies that have been aborted
+   */
+  void clearAbortFlags();
+
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;
 };
