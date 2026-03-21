@@ -17,7 +17,7 @@ paraview.simple._DisableFirstRenderCameraReset()
 renderView1 = GetActiveViewOrCreate('RenderView')
 
 # import file
-ImportView(os.path.join(vtkGetDataRoot(), 'Testing/Data/glTF/NestedRings/NestedRings.glb'), view=renderView1, NodeSelectors=['/assembly/Axle', '/assembly/OuterRing/Torus002', '/assembly/OuterRing/MiddleRing/InnerRing'])
+ImportView(os.path.join(vtkGetDataRoot(), 'Testing/Data/glTF/NestedRings/NestedRings.glb'), view=renderView1, NodeSelectors=['/assembly/Axle', '/assembly/OuterRing/Torus.002', '/assembly/OuterRing/MiddleRing/InnerRing'])
 
 # get active source.
 innerRing_Torus001 = GetActiveSource()
