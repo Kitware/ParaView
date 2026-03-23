@@ -4,6 +4,7 @@
 
 #include "vtkJSONSceneExporter.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMExporterProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -67,6 +68,17 @@ void vtkSMAnimationSceneWebWriter::SetRenderView(vtkSMRenderViewProxy* rv)
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneWebWriter::SaveInitialize(int vtkNotUsed(startCount))
 {
+  if (!this->GetWriteTimeSteps())
+  {
+    auto delegate = this->GetFrameExporterDelegate();
+    if (delegate)
+    {
+      vtkSMPropertyHelper(delegate, "FileName").Set(this->GetFileName());
+      return true;
+    }
+    return true;
+  }
+
   if (this->RenderView == nullptr)
   {
     vtkErrorMacro("No view from which to save the geometry is set.");
@@ -120,6 +132,18 @@ bool vtkSMAnimationSceneWebWriter::SaveInitialize(int vtkNotUsed(startCount))
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneWebWriter::SaveFrame(double time)
 {
+  if (!this->GetWriteTimeSteps())
+  {
+    auto delegate = this->GetFrameExporterDelegate();
+    if (delegate)
+    {
+      delegate->UpdateVTKObjects();
+      delegate->Write();
+      return true;
+    }
+    return false;
+  }
+
   std::size_t counter = this->Internals->FrameCounter;
   vtkJSONSceneExporter* exporter = this->Internals->Exporter;
 
@@ -174,6 +198,11 @@ bool vtkSMAnimationSceneWebWriter::SaveFrame(double time)
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneWebWriter::SaveFinalize()
 {
+  if (!this->GetWriteTimeSteps())
+  {
+    return true;
+  }
+
   // Write the root json information
   std::stringstream& fileStr = this->Internals->RootIndexStr;
   fileStr << "\n    ]\n"

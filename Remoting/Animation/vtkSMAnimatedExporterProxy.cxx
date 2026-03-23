@@ -4,6 +4,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMAnimationSceneSeriesWriter.h"
+#include "vtkSMAnimationSceneWebWriter.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
@@ -31,6 +32,12 @@ void vtkSMAnimatedExporterProxy::SetView(vtkSMViewProxy* view)
   if (realExporter)
   {
     realExporter->SetView(this->GetView());
+  }
+
+  auto webWriter = vtkSMAnimationSceneWebWriter::SafeDownCast(this->GetClientSideObject());
+  if (webWriter)
+  {
+    webWriter->SetRenderView(vtkSMRenderViewProxy::SafeDownCast(this->GetView()));
   }
 }
 
