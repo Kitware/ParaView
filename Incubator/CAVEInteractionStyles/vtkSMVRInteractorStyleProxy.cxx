@@ -82,7 +82,6 @@ void vtkSMVRInteractorStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
   }
 }
 // ----------------------------------------------------------------------------
-// Read from a State file (PVSM file)
 bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
 {
   if (!child->GetName() || strcmp(child->GetName(), "Style") != 0 ||
@@ -219,11 +218,33 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
     result = false;
   }
 
+  result = LoadProxyProperties(child, locator);
+
   return result;
 }
 
 // ----------------------------------------------------------------------------
-// Save to a State file (PVSM file)
+bool vtkSMVRInteractorStyleProxy::LoadProxyProperties(
+  vtkPVXMLElement* xml, vtkSMProxyLocator* locator)
+{
+  vtkPVXMLElement* proxyChild = xml->FindNestedElementByName("Proxy");
+  if (proxyChild)
+  {
+    if (this->LoadXMLState(proxyChild, locator) > 0)
+    {
+      this->UpdateVTKObjects();
+    }
+    else
+    {
+      vtkWarningMacro(<< "Encountered an error loading proxy properties from state, "
+                      << "it may not function as expected. ");
+      return false;
+    }
+  }
+  return true;
+}
+
+// ----------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMVRInteractorStyleProxy::SaveConfiguration()
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
@@ -275,7 +296,15 @@ vtkPVXMLElement* vtkSMVRInteractorStyleProxy::SaveConfiguration()
     tracker->FastDelete();
   }
 
+  this->SaveProxyProperties(child);
+
   return child;
+}
+
+// -----------------------------------------------------------------------------
+void vtkSMVRInteractorStyleProxy::SaveProxyProperties(vtkPVXMLElement* xml)
+{
+  this->SaveXMLState(xml);
 }
 
 // -----------------------------------------------------------------------------

@@ -239,10 +239,8 @@ bool vtkSMVRControlLocationStyleProxy::GetDeferredUpdate()
 }
 
 // ----------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMVRControlLocationStyleProxy::SaveConfiguration()
+void vtkSMVRControlLocationStyleProxy::SaveProxyProperties(vtkPVXMLElement* xml)
 {
-  vtkPVXMLElement* elt = Superclass::SaveConfiguration();
-
   vtkSMIntVectorProperty* ivp;
 
   // Save the DeferredUpdate flag
@@ -252,14 +250,13 @@ vtkPVXMLElement* vtkSMVRControlLocationStyleProxy::SaveConfiguration()
   vtkPVXMLElement* deferredUpdateElt = vtkPVXMLElement::New();
   deferredUpdateElt->SetName("DeferredUpdate");
   deferredUpdateElt->AddAttribute("value", value);
-  elt->AddNestedElement(deferredUpdateElt);
+  xml->AddNestedElement(deferredUpdateElt);
   deferredUpdateElt->FastDelete();
-
-  return elt;
 }
 
 // ----------------------------------------------------------------------------
-bool vtkSMVRControlLocationStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
+bool vtkSMVRControlLocationStyleProxy::LoadProxyProperties(
+  vtkPVXMLElement* child, vtkSMProxyLocator* vtkNotUsed(locator))
 {
   bool result = true;
 
@@ -290,7 +287,6 @@ bool vtkSMVRControlLocationStyleProxy::Configure(vtkPVXMLElement* child, vtkSMPr
   if (result)
   {
     this->UpdateVTKObjects();
-    result = Superclass::Configure(child, locator);
   }
 
   return result;

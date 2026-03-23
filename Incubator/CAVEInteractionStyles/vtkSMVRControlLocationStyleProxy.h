@@ -38,10 +38,16 @@ protected:
   vtkSMVRControlLocationStyleProxy();
   ~vtkSMVRControlLocationStyleProxy() override = default;
 
+  ///@{
+  /**
+   * Save/Load "DeferredUpdate" property with custom XML label
+   */
+  void SaveProxyProperties(vtkPVXMLElement* xml) override;
+  bool LoadProxyProperties(vtkPVXMLElement* xml, vtkSMProxyLocator* locator) override;
+  ///@}
+
   void HandleButton(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
-  vtkPVXMLElement* SaveConfiguration() override;
-  bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator) override;
 
 private:
   vtkSMVRControlLocationStyleProxy(

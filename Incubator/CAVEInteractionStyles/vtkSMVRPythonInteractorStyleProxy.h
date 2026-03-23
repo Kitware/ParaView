@@ -89,11 +89,17 @@ protected:
   void HandleValuator(const vtkVREvent& event) override;
   void HandleButton(const vtkVREvent& event) override;
   void InvokeHandler(const char* mname, const vtkVREvent& event);
-  vtkPVXMLElement* SaveConfiguration() override;
-  bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator) override;
 
   // Read the python file located on the filesystem at "path" into "contents"
   bool ReadPythonFile(const char* path, std::string& contents);
+
+  ///@{
+  /**
+   * Save/Load the Python "Filename" with custom XML label
+   */
+  void SaveProxyProperties(vtkPVXMLElement* xml) override;
+  bool LoadProxyProperties(vtkPVXMLElement* xml, vtkSMProxyLocator* locator) override;
+  ///@}
 
   char* FileName;
 

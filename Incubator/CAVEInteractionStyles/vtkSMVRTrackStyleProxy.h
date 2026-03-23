@@ -42,8 +42,10 @@ protected:
   ~vtkSMVRTrackStyleProxy() override = default;
   void HandleTracker(const vtkVREvent& event) override;
 
-  vtkPVXMLElement* SaveConfiguration() override;
-  bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator) override;
+  /**
+   * Add extra error message when loading tracker elements
+   */
+  bool LoadProxyProperties(vtkPVXMLElement* xml, vtkSMProxyLocator* locator) override;
 
 private:
   vtkSMVRTrackStyleProxy(const vtkSMVRTrackStyleProxy&) = delete; // Not implemented.
