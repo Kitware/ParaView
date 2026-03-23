@@ -300,6 +300,12 @@ public:
    */
   void ClearAbortFlags();
 
+  /**
+   * Overidden to handle disabling abort check for the deleted objects
+   * Also calls superclass
+   */
+  void RecreateVTKObjects() override;
+
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy() override;

@@ -63,6 +63,11 @@ public:
   void RegisterProgressEvent(vtkObject* object, int id);
 
   /**
+   * Remove an object from all event maps and abort sets
+   */
+  void UnregisterObject(vtkObject* object);
+
+  /**
    * This method resets all the progress counters and prepares progress
    * reporting. All progress events before this call are ignored.
    */
@@ -134,6 +139,11 @@ public:
    * Enable abort checking for a specific object
    */
   void EnableAbortCheck(vtkTypeUInt32 objectId);
+
+  /**
+   * Disable abort checking for a specific object
+   */
+  void DisableAbortCheck(vtkTypeUInt32 objectId);
 
 protected:
   vtkPVProgressHandler();
