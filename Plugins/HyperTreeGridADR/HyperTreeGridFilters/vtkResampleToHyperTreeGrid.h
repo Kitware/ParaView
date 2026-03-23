@@ -494,6 +494,11 @@ private:
   unsigned int CellDims[3] = { 3, 3, 3 };
 
   /**
+   * Whether we are resampling to a 3D HTG or not
+   */
+  bool IsHTG3D = false;
+
+  /**
    * Stores the number of children given input dimensions and branch factor
    */
   vtkIdType NumberOfChildren = 0;

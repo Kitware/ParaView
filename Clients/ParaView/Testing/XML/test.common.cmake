@@ -144,6 +144,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/HTG/binary_3D_333_mask.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/donut_XZ_shift_2d.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/ghost.htg}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTG2Dims.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGCellCentersBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGFeatureEdgesBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGGhostCellsGeneratorBackwardCompat.pvsm}"
@@ -1343,6 +1344,7 @@ list(APPEND TESTS_WITH_BASELINES
   TestHiddenLineRemoval.xml
   TestOpenFOAMWeighByCell.xml
   TestParallelProjectionAnnotations.xml
+  TestResampleHTG2Dims.xml
   TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
   UnlinkCameraView.xml
