@@ -191,7 +191,7 @@ endif()
 
 if (PARAVIEW_ENABLE_WEB)
   list(APPEND paraview_python_verify_tests
-    AnimatedExportScene
+    ExportToVTKJSWithTimeSteps
   )
 endif()
 
