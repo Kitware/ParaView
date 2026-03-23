@@ -4,6 +4,7 @@
 
 #include "vtkPVContourFilter.h"
 
+#include "vtkAMRContourFilter.h"
 #include "vtkArrayDispatch.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayRange.h"
@@ -15,8 +16,10 @@
 #include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
 #include "vtkLogger.h"
+#include "vtkMergeBlocks.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
 
@@ -98,6 +101,30 @@ int vtkPVContourFilter::RequestData(
     return 1;
   }
 
+  // Check if input is a vtkOverlappingAMR
+  if (vtkOverlappingAMR::SafeDownCast(inDataObj))
+  {
+    vtkNew<vtkAMRContourFilter> contourFilter;
+    contourFilter->SetInputData(inDataObj);
+    contourFilter->SetContourValues(this->GetContourValues());
+    contourFilter->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+    contourFilter->SetComputeNormals(this->GetComputeNormals());
+    contourFilter->SetComputeScalars(this->GetComputeScalars());
+    contourFilter->SetGenerateTriangles(this->GetGenerateTriangles());
+
+    vtkNew<vtkMergeBlocks> merger;
+    merger->SetInputConnection(contourFilter->GetOutputPort());
+    merger->MergePointsOn();
+    merger->SetTolerance(1e-6);
+    merger->ToleranceIsAbsoluteOn();
+    merger->SetOutputDataSetType(VTK_POLY_DATA);
+
+    bool ret = merger->Update();
+
+    outDataObj->ShallowCopy(merger->GetOutput(0));
+    return ret;
+  }
+
   vtkDataArray* array = this->GetInputArrayToProcess(0, inputVector);
   if (!array)
   {
@@ -149,9 +176,7 @@ int vtkPVContourFilter::ContourUsingSuperclass(
 int vtkPVContourFilter::FillInputPortInformation(int port, vtkInformation* info)
 {
   this->Superclass::FillInputPortInformation(port, info);
-
-  // According to the documentation this is the way to append additional
-  // input data set type since VTK 5.2.
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkOverlappingAMR");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkNonOverlappingAMR");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   return 1;

@@ -708,6 +708,7 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkOverlappingAMR" />
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
