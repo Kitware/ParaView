@@ -228,6 +228,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
 
   output->SetDimensions(dims);
   output->GetCellDims(this->CellDims);
+  this->IsHTG3D = output->GetDimension() == 3;
 
   // Setting up a few useful values during the pipeline
   this->ResolutionPerTree.resize(this->MaxDepth + 1);
@@ -1785,21 +1786,21 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
       j * tree->GetBranchFactor() + jj, k * tree->GetBranchFactor() + kk, multiResolutionGrid);
     cursor->ToParent();
 
-    if (this->CellDims[0] != 1)
+    if (this->CellDims[0] != 1 || IsHTG3D)
     {
       ++ii;
     }
-    if (ii == tree->GetBranchFactor() || this->CellDims[0] == 1)
+    if (ii == tree->GetBranchFactor() || (this->CellDims[0] == 1 && !IsHTG3D))
     {
       ii = 0;
-      if (this->CellDims[1] != 1)
+      if (this->CellDims[1] != 1 || IsHTG3D)
       {
         ++jj;
       }
-      if (jj == tree->GetBranchFactor() || this->CellDims[1] == 1)
+      if (jj == tree->GetBranchFactor() || (this->CellDims[1] == 1 && !IsHTG3D))
       {
         jj = 0;
-        if (this->CellDims[2] != 1)
+        if (this->CellDims[2] != 1 || IsHTG3D)
         {
           ++kk;
         }
