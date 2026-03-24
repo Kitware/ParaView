@@ -274,6 +274,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/DecimatePolyline.vtp}"
 
   # Baselines
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AMRAxisAlignedSlice_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AAXAxis.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AAYAxis.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AAZAxis.png}"
@@ -1264,6 +1265,7 @@ if(NOT APPLE)
 endif()
 
 list(APPEND TESTS_WITH_BASELINES
+  AMRAxisAlignedSlice.xml
   AMRRectGridOutline.xml
   AMRRectGridSurface.xml
   AMRUniformGridOutline.xml
