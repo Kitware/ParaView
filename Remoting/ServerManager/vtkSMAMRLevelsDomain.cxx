@@ -25,7 +25,7 @@ void vtkSMAMRLevelsDomain::Update(vtkSMProperty*)
   auto* dataInfo = this->GetInputInformation();
   int numberOfLevels = dataInfo ? dataInfo->GetNumberOfAMRLevels() : 0;
   std::vector<vtkEntry> entries;
-  entries.emplace_back(0, numberOfLevels - 1);
+  entries.emplace_back(0, numberOfLevels > 0 ? numberOfLevels - 1 : 0);
   this->SetEntries(entries);
 }
 
