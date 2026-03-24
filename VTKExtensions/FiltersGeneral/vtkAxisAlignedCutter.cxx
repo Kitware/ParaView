@@ -552,10 +552,20 @@ void vtkAxisAlignedCutter::CutAMRWithAAPlane(
 
   this->AMRCutter->SetOffsetFromOrigin(plane->GetOffset() + offset);
   this->AMRCutter->SetNormal(planeNormalAxis);
-  this->AMRCutter->SetMaxResolution(this->LevelOfResolution);
+  if (this->LevelOfResolution < 0)
+  {
+    vtkWarningMacro(
+      "Force LevelOfResolution to 0, negative value not supported: " << this->LevelOfResolution);
+    this->AMRCutter->SetMaxResolution(0);
+  }
+  else
+  {
+    this->AMRCutter->SetMaxResolution(this->LevelOfResolution);
+  }
   this->AMRCutter->SetInputData(input);
   this->AMRCutter->Update();
 
   output->ShallowCopy(this->AMRCutter->GetOutput());
 }
+
 VTK_ABI_NAMESPACE_END
