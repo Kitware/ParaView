@@ -445,7 +445,8 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     {
       this->DataAssembly->DeepCopy(pdc->GetDataAssembly());
     }
-    else if (auto amr = vtkUniformGridAMR::SafeDownCast(subset))
+
+    if (auto amr = vtkAMRDataObject::SafeDownCast(subset))
     {
       this->NumberOfAMRLevels = amr->GetNumberOfLevels();
       this->AMRNumberOfDataSets.resize(this->NumberOfAMRLevels);
