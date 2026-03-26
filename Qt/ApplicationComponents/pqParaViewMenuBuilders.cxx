@@ -226,6 +226,8 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqCopyReaction(ui.actionCopyPipeline, false, true);
   new pqCopyReaction(ui.actionPastePipeline, true, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
+  ui.actionEditSettings->setShortcut(QKeySequence(pqKeyCombo(Qt::CTRL, Qt::Key_Comma)));
+  ui.actionEditSettings->setAutoRepeat(false);
   new pqDataQueryReaction(ui.actionQuery);
   new pqSearchItemReaction(ui.actionSearch);
   new pqResetDefaultSettingsReaction(ui.actionResetDefaultSettings);
