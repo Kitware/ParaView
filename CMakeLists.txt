@@ -70,7 +70,7 @@ option(PARAVIEW_USE_EXTERNAL_VTK "Use an external VTK." OFF)
 mark_as_advanced(PARAVIEW_USE_EXTERNAL_VTK)
 
 if (PARAVIEW_USE_EXTERNAL_VTK)
-  find_package(VTK CONFIG COMPONENTS CommonCore)
+  find_package(VTK 9.6.1 CONFIG COMPONENTS CommonCore)
   if (NOT VTK_FOUND)
     message(FATAL_ERROR
       "External VTK not found but ParaView requires VTK to function")
