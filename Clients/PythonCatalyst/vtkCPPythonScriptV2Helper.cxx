@@ -383,12 +383,6 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(
     return false;
   }
 
-  if (!this->IsActivated(timestep, time))
-  {
-    // skip calling RequestDataDescription.
-    return true;
-  }
-
   auto& internals = (*this->Internals);
 
   // populate execute parameters.
@@ -396,6 +390,12 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(
   for (auto& param : params)
   {
     internals.ParametersList->AddString(param.c_str());
+  }
+
+  if (!this->IsActivated(timestep, time))
+  {
+    // skip calling RequestDataDescription.
+    return true;
   }
 
   // Update ViewTime on each of the views.

@@ -378,6 +378,59 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
 
   float background[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
+#ifdef __APPLE__
+  // macOS Metal shader cache workaround -- site #2 of a two-site fix.
+  //
+  // Root cause: Metal uses flock(LOCK_EX) on a shared on-disk shader cache
+  // (libCoreFSCache.dylib). When multiple MPI ranks simultaneously compile
+  // a shader for the first time, the rank holding the lock deadlocks: Metal's
+  // XPC compiler needs the main thread run loop to deliver results, but the
+  // main thread is blocked in flock() waiting for the lock.
+  //
+  // Two flock sites exist in the render path:
+  //   Site #1 -- vtkPVProcessWindow::PrepareForRendering():
+  //     glBlitFramebuffer -> beginRenderPass -> BackgroundObjectProgramKey.
+  //     Fixed there by serializing the singleton window Render() across ranks.
+  //   Site #2 -- HERE, inside icetDrawFrame:
+  //     Scene rendering shaders (surface, contour, volume, etc.) compiled on
+  //     the first actual draw. Fixed by the sequential pre-warm below.
+  //
+  // Pre-warm: each rank renders the scene once sequentially before
+  // icetDrawFrame runs in parallel. Only one rank compiles shaders at a time,
+  // so the flock is never contested. After frame 1 all scene shaders are in
+  // each rank's process-local Metal cache.
+  //
+  // Known limitation: this fires only once (static bool), so new shader
+  // variants introduced by adding representations mid-session in an
+  // interactive ParaView+MPI session on macOS are not protected. A proper
+  // fix requires vtkOpenGLShaderCache to expose a compiled-program counter
+  // (its internal std::map grows when new GLSL programs are compiled, but
+  // it neither calls Modified() nor exposes the count externally). That is
+  // a separate VTK enhancement. For the primary in-situ use case -- fixed
+  // pipeline, all representations created before the first render -- the
+  // static bool is correct and sufficient.
+  //
+  // MPI safety: all ranks hit this block on frame 1 before any collective
+  // IceT calls, so the Barrier() loop is safe and all ranks set the flag.
+  static bool s_macOSShaderCacheWarmed = false;
+  if (!s_macOSShaderCacheWarmed && this->Controller && this->Controller->GetNumberOfProcesses() > 1)
+  {
+    vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "Pre-warming Metal shader cache sequentially");
+
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    int myRank = this->Controller->GetLocalProcessId();
+    for (int r = 0; r < numProcs; r++)
+    {
+      if (myRank == r && this->RenderPass)
+      {
+        this->RenderPass->Render(render_state);
+      }
+      this->Controller->Barrier();
+    }
+    s_macOSShaderCacheWarmed = true;
+  }
+#endif
+
   // here is where the actual drawing occurs
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: icetDrawFrame Start");
   IceTImage renderedImage =
