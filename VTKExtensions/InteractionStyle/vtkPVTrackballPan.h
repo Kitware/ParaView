@@ -14,14 +14,14 @@
 #ifndef vtkPVTrackballPan_h
 #define vtkPVTrackballPan_h
 
-#include "vtkCameraManipulator.h"
+#include "vtkPVCameraManipulator.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballPan : public vtkCameraManipulator
+class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballPan : public vtkPVCameraManipulator
 {
 public:
   static vtkPVTrackballPan* New();
-  vtkTypeMacro(vtkPVTrackballPan, vtkCameraManipulator);
+  vtkTypeMacro(vtkPVTrackballPan, vtkPVCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{

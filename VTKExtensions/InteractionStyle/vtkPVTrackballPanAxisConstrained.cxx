@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
-#include "vtkTrackballPan.h"
+#include "vtkPVTrackballPanAxisConstrained.h"
 
 #include "vtkCamera.h"
 #include "vtkMath.h"
@@ -19,24 +19,24 @@ enum PanAxis
 };
 }
 
-struct vtkTrackballPan::Internal
+struct vtkPVTrackballPanAxisConstrained::Internal
 {
   PanAxis AxisOfMovement = AXIS_XY;
 };
 
-vtkStandardNewMacro(vtkTrackballPan);
+vtkStandardNewMacro(vtkPVTrackballPanAxisConstrained);
 
 //-------------------------------------------------------------------------
-vtkTrackballPan::vtkTrackballPan()
-  : Internals(new vtkTrackballPan::Internal)
+vtkPVTrackballPanAxisConstrained::vtkPVTrackballPanAxisConstrained()
+  : Internals(new vtkPVTrackballPanAxisConstrained::Internal)
 {
 }
 
 //-------------------------------------------------------------------------
-vtkTrackballPan::~vtkTrackballPan() = default;
+vtkPVTrackballPanAxisConstrained::~vtkPVTrackballPanAxisConstrained() = default;
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::OnKeyUp(vtkRenderWindowInteractor* interactor)
+void vtkPVTrackballPanAxisConstrained::OnKeyUp(vtkRenderWindowInteractor* interactor)
 {
   const auto sym = std::string(interactor->GetKeySym());
 
@@ -47,7 +47,7 @@ void vtkTrackballPan::OnKeyUp(vtkRenderWindowInteractor* interactor)
 }
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::OnKeyDown(vtkRenderWindowInteractor* interactor)
+void vtkPVTrackballPanAxisConstrained::OnKeyDown(vtkRenderWindowInteractor* interactor)
 {
   const auto sym = std::string(interactor->GetKeySym());
   if (sym == "x")
@@ -61,16 +61,21 @@ void vtkTrackballPan::OnKeyDown(vtkRenderWindowInteractor* interactor)
 }
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
+void vtkPVTrackballPanAxisConstrained::OnButtonDown(
+  int, int, vtkRenderer*, vtkRenderWindowInteractor*)
+{
+}
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
+void vtkPVTrackballPanAxisConstrained::OnButtonUp(
+  int, int, vtkRenderer*, vtkRenderWindowInteractor*)
 {
   this->Internals->AxisOfMovement = AXIS_XY;
 }
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
+void vtkPVTrackballPanAxisConstrained::OnMouseMove(
+  int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
   if (ren == nullptr)
   {
@@ -175,7 +180,7 @@ void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindo
 }
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVTrackballPanAxisConstrained::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

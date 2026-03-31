@@ -12,14 +12,14 @@
 #ifndef vtkPVTrackballRoll_h
 #define vtkPVTrackballRoll_h
 
-#include "vtkCameraManipulator.h"
+#include "vtkPVCameraManipulator.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballRoll : public vtkCameraManipulator
+class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballRoll : public vtkPVCameraManipulator
 {
 public:
   static vtkPVTrackballRoll* New();
-  vtkTypeMacro(vtkPVTrackballRoll, vtkCameraManipulator);
+  vtkTypeMacro(vtkPVTrackballRoll, vtkPVCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{

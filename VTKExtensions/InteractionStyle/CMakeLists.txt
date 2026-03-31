@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
-  vtkCameraManipulator
+  vtkPVCameraManipulator
   vtkCameraManipulatorGUIHelper
   vtkPVInteractorStyle
   vtkPVJoystickFly
@@ -11,12 +11,12 @@ set(classes
   vtkPVTrackballMoveActor
   vtkPVTrackballMultiRotate
   vtkPVTrackballPan
+  vtkPVTrackballPanAxisConstrained
   vtkPVTrackballRoll
   vtkPVTrackballRotate
   vtkPVTrackballEnvironmentRotate
   vtkPVTrackballZoom
-  vtkPVTrackballZoomToMouse
-  vtkTrackballPan)
+  vtkPVTrackballZoomToMouse)
 
 vtk_module_add_module(ParaView::VTKExtensionsInteractionStyle
   CLASSES ${classes})

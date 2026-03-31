@@ -1,17 +1,17 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
-#include "vtkCameraManipulator.h"
+#include "vtkPVCameraManipulator.h"
 
 #include "vtkCameraManipulatorGUIHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkStandardNewMacro(vtkCameraManipulator);
-vtkCxxSetObjectMacro(vtkCameraManipulator, GUIHelper, vtkCameraManipulatorGUIHelper);
+vtkStandardNewMacro(vtkPVCameraManipulator);
+vtkCxxSetObjectMacro(vtkPVCameraManipulator, GUIHelper, vtkCameraManipulatorGUIHelper);
 
 //-------------------------------------------------------------------------
-vtkCameraManipulator::vtkCameraManipulator()
+vtkPVCameraManipulator::vtkPVCameraManipulator()
 {
   this->Button = 1;
   this->Shift = 0;
@@ -26,35 +26,35 @@ vtkCameraManipulator::vtkCameraManipulator()
 }
 
 //-------------------------------------------------------------------------
-vtkCameraManipulator::~vtkCameraManipulator()
+vtkPVCameraManipulator::~vtkPVCameraManipulator()
 {
   this->SetManipulatorName(nullptr);
   this->SetGUIHelper(nullptr);
 }
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::StartInteraction() {}
+void vtkPVCameraManipulator::StartInteraction() {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::EndInteraction() {}
+void vtkPVCameraManipulator::EndInteraction() {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
+void vtkPVCameraManipulator::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
+void vtkPVCameraManipulator::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnMouseMove(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
+void vtkPVCameraManipulator::OnMouseMove(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnKeyUp(vtkRenderWindowInteractor*) {}
+void vtkPVCameraManipulator::OnKeyUp(vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnKeyDown(vtkRenderWindowInteractor*) {}
+void vtkPVCameraManipulator::OnKeyDown(vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::ComputeDisplayCenter(vtkRenderer* ren)
+void vtkPVCameraManipulator::ComputeDisplayCenter(vtkRenderer* ren)
 {
   double* pt;
 
@@ -67,7 +67,7 @@ void vtkCameraManipulator::ComputeDisplayCenter(vtkRenderer* ren)
 }
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 

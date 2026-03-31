@@ -1,18 +1,18 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 /**
- * @class   vtkCameraManipulator
+ * @class   vtkPVCameraManipulator
  * @brief   Abstraction of style away from button.
  *
- * vtkCameraManipulator is a superclass foractions inside an
+ * vtkPVCameraManipulator is a superclass foractions inside an
  * interactor style and associated with a single button. An example
  * might be rubber-band bounding-box zoom. This abstraction allows a
  * camera manipulator to be assigned to any button.  This super class
  * might become a subclass of vtkInteractorObserver in the future.
  */
 
-#ifndef vtkCameraManipulator_h
-#define vtkCameraManipulator_h
+#ifndef vtkPVCameraManipulator_h
+#define vtkPVCameraManipulator_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
@@ -21,11 +21,11 @@ class vtkCameraManipulatorGUIHelper;
 class vtkRenderer;
 class vtkRenderWindowInteractor;
 
-class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkCameraManipulator : public vtkObject
+class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVCameraManipulator : public vtkObject
 {
 public:
-  static vtkCameraManipulator* New();
-  vtkTypeMacro(vtkCameraManipulator, vtkObject);
+  static vtkPVCameraManipulator* New();
+  vtkTypeMacro(vtkPVCameraManipulator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
@@ -99,8 +99,8 @@ public:
   vtkGetObjectMacro(GUIHelper, vtkCameraManipulatorGUIHelper);
 
 protected:
-  vtkCameraManipulator();
-  ~vtkCameraManipulator() override;
+  vtkPVCameraManipulator();
+  ~vtkPVCameraManipulator() override;
   ///@}
 
   char* ManipulatorName;
@@ -117,8 +117,8 @@ protected:
   vtkCameraManipulatorGUIHelper* GUIHelper;
 
 private:
-  vtkCameraManipulator(const vtkCameraManipulator&) = delete;
-  void operator=(const vtkCameraManipulator&) = delete;
+  vtkPVCameraManipulator(const vtkPVCameraManipulator&) = delete;
+  void operator=(const vtkPVCameraManipulator&) = delete;
 };
 
 #endif
