@@ -27,21 +27,21 @@ Please remove this comment.
     - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
     - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
   - Signing machines
-    - [ ] Check that the Kitare macOS signing machine is reachable. If not, request it to be switched on.
+    - [ ] Check that the Kitware macOS signing machine is reachable. If not, request it to be switched on.
     - [ ] Check that the Kitware Windows signing machine is reachable. If not, request it to be switched on.
 
 # Update ParaView
 
   - Update the local copy of `@BASEBRANCH@`.
-    - If `@PATCH@@RC@` is `0-RC1`, update `master`
-    - Otherwise, update `release`
+    - [ ] If `@PATCH@@RC@` is `0-RC1`, update `master`
+    - [ ] Otherwise, update `release`
       ```
       git fetch origin
       git checkout @BASEBRANCH@
       git merge --ff-only origin/@BASEBRANCH@ # if this fails, there are local commits that need to be removed
       git submodule update --recursive --init
       ```
-    - If `@BASEBRANCH@` is not `master`, ensure merge requests which should be
+    - [ ] If `@BASEBRANCH@` is not `master`, ensure merge requests which should be
       in the release have been merged. The [`backport-mrs.py`][backport-mrs]
       script can be used to find and ensure that merge requests assigned to the
       associated milestone are available on the `release` branch.
@@ -75,7 +75,7 @@ Please remove this comment.
             (ask `@utils/maintainers/release` if you do not have one)
       - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
             `Developer` privileges (so it can open MRs)
-      - [ ] Use [the `release-mr`][release-mr] script to open the create the
+      - [ ] Use [the `release-mr`][release-mr] script to create the
             Merge Request (see script for usage)
         - [ ] Pull the script for each release; it may have been updated since it
           was last used
@@ -150,7 +150,7 @@ git submodule update --recursive --init
             set(paraview_SOURCE_SELECTION "@VERSION@@RC@" CACHE STRING "Force version to @VERSION@@RC@" FORCE)
             set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
             ```
-      - [ ] Create fixup commit with the above changes `git commit -a --fixup=@`. The fixup commit will prevent merging of the temporary code above; it will be removed in a future step.
+        - [ ] Create fixup commit with the above changes `git commit -a --fixup=@`. The fixup commit will prevent merging of the temporary code above; it will be removed in a future step.
       - [ ] Create a merge request targeting `release`
     - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
           (ask @ben.boeckel if you do not have one)
@@ -171,8 +171,8 @@ git submodule update --recursive --init
           build products. They will be deleted within 24 hours.
 
   - [ ] Remove fixup commit: `git reset --hard @^`
-  - [ ] Get positive review
   - [ ] Force push `git push -f gitlab`
+  - [ ] Get positive review
   - [ ] `Do: merge`
   - Software process updates (these can all be done independently)
     - [ ] Update kwrobot with the new `release` branch rules (@ben.boeckel)
@@ -294,8 +294,7 @@ If making a non-RC release:
 <!--
 If making a non-RC release:
 
-  - [ ] Request from marketing@kitware.com an update of version number in "Download Latest Release" text on www.paraview.org
-  - [ ] Move unclosed issues in GitLab to the next release milestone in GitLab
+  - [ ] Move unclosed issues in GitLab to the next minor release milestone in GitLab
 -->
 
 /cc @ben.boeckel
