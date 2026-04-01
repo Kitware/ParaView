@@ -279,11 +279,9 @@ If making a non-RC release:
 
 # Update documentation
   - [ ] Submit a Merge Request for release that updates the version to @VERSION@ in https://gitlab.kitware.com/paraview/paraview-docs/-/blob/master/doc/source/conf.py` for `paraview-docs`
-  - [ ] Upload versioned documentation to `https://github.com/kitware/paraview-docs` (see `https://github.com/Kitware/paraview-docs/blob/master/README.md`)
-  - [ ] Tag the HEAD of release in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
+  - [ ] Tag the HEAD of `release-v@MAJOR@.@MINOR@` in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
   - [ ] Activate the tag on [readthedocs](https://readthedocs.org/projects/paraview/versions/) and build it [here](https://readthedocs.org/projects/paraview/)
   - [ ] Go to readthedocs.org and activate
-  - [ ] Head to [ParaView developer docs](github.com/Kitware/paraview-docs) and generate the new developer documentation, following the directions in the README.
   - [ ] Write and publish blog post with release notes.
 -->
 
