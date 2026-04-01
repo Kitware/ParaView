@@ -130,6 +130,8 @@ git submodule update --recursive --init
 <!-- endif -->
       - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
       - [ ] `PARAVIEW_VERSION_DEFAULT` in  CMakeLists.txt
+      - [ ] `paraview_doc_ver_series` and `paraview_doc_ver` in versions.cmake
+      - [ ] Update default version to @VERSION@ in `superbuild_set_selectable_source(paraview)` in versions.cmake
       - [ ] Commit changes
         - [ ] `git add README.md versions.cmake CMakeLists.txt`
         - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
