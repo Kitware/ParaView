@@ -16,6 +16,7 @@
 #include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
 
+#include <array>
 #include <map>
 #include <set>
 #include <string>
@@ -83,6 +84,7 @@ class vtkPVProgressHandler::vtkInternals
 public:
   // abort related
   std::map<vtkObject*, int> RegisteredObjects;
+  std::map<vtkObject*, std::array<unsigned long, 2>> RegisteredObserverTags;
   std::set<int> AbortedObjectIds;
   std::set<int> EnabledAbortCheckObjectIds;
 
@@ -154,11 +156,33 @@ void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* object, int id)
     (object->IsA("vtkAlgorithm") || object->IsA("vtkExporter") || object->IsA("vtkMetaImporter") ||
       object->IsA("vtkSMAnimationSceneWriter")))
   {
-    // TODO Add a UnregistedObject(id) method to be called on deletion of VTK objects
     this->Internals->RegisteredObjects[object] = id;
-    object->AddObserver(vtkCommand::ProgressEvent, this, &vtkPVProgressHandler::OnProgressEvent);
-    object->AddObserver(vtkCommand::MessageEvent, this, &vtkPVProgressHandler::OnMessageEvent);
+    std::array<unsigned long, 2> tags;
+    tags[0] =
+      object->AddObserver(vtkCommand::ProgressEvent, this, &vtkPVProgressHandler::OnProgressEvent);
+    tags[1] =
+      object->AddObserver(vtkCommand::MessageEvent, this, &vtkPVProgressHandler::OnMessageEvent);
+    this->Internals->RegisteredObserverTags[object] = tags;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::UnregisterObject(vtkObject* object)
+{
+  auto mapIt = this->Internals->RegisteredObjects.find(object);
+  if (mapIt == this->Internals->RegisteredObjects.end())
+  {
+    return;
+  }
+  int id = mapIt->second;
+  this->Internals->RegisteredObjects.erase(mapIt);
+
+  auto tagIt = this->Internals->RegisteredObserverTags.at(object);
+  object->RemoveObserver(tagIt.at(0));
+  object->RemoveObserver(tagIt.at(1));
+
+  this->Internals->AbortedObjectIds.erase(id);
+  this->Internals->EnabledAbortCheckObjectIds.erase(id);
 }
 
 //----------------------------------------------------------------------------
@@ -507,6 +531,12 @@ void vtkPVProgressHandler::ClearAbortedObjectIds()
 void vtkPVProgressHandler::EnableAbortCheck(vtkTypeUInt32 objectId)
 {
   this->Internals->EnabledAbortCheckObjectIds.emplace(objectId);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::DisableAbortCheck(vtkTypeUInt32 objectId)
+{
+  this->Internals->EnabledAbortCheckObjectIds.erase(objectId);
 }
 
 //----------------------------------------------------------------------------

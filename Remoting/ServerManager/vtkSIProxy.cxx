@@ -386,6 +386,18 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSIProxy::DeleteVTKObjects()
 {
+  // Unregister object in progress handler
+  if (vtkProcessModule::GetProcessModule() && this->Interpreter && this->VTKObject)
+  {
+    vtkClientServerStream substream;
+    substream << vtkClientServerStream::Invoke << vtkClientServerID(1) << "GetActiveProgressHandler"
+              << vtkClientServerStream::End;
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << substream << "UnregisterObject" << this->VTKObject
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+  }
+
   this->VTKObject = nullptr;
   this->ObjectsCreated = false;
 }

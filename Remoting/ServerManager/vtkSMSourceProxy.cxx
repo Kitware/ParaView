@@ -489,6 +489,18 @@ void vtkSMSourceProxy::CreateVTKObjects()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMSourceProxy::RecreateVTKObjects()
+{
+  if (std::string(this->SIClassName) == "vtkSISourceProxy" && this->StreamReply)
+  {
+    vtkPVProgressHandler* progressHandler = this->Session->GetProgressHandler();
+    progressHandler->DisableAbortCheck(this->GetGlobalID());
+  }
+
+  this->Superclass::RecreateVTKObjects();
+}
+
+//---------------------------------------------------------------------------
 unsigned int vtkSMSourceProxy::GetNumberOfAlgorithmOutputPorts()
 {
   if (this->NumberOfAlgorithmOutputPorts != VTK_UNSIGNED_INT_MAX)
