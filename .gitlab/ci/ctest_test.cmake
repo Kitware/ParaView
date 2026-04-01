@@ -346,6 +346,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # See also the "^paraviewPython-MPI-Batch-VolumeCellSelection$" exclusion
     # in the "_mpi" list above.
     "^paraviewPython-Batch-VolumeCellSelection$"
+
+    # see https://gitlab.kitware.com/paraview/paraview/-/work_items/23247
+    # Python libraries do not load properly for this test.
+    "ParaViewExample-CustomApplications/ServerManagerRemoteConnection"
     )
 endif ()
 
