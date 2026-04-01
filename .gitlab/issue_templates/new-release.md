@@ -200,11 +200,12 @@ git submodule update --recursive --init
 
 ## Linux
 
-- Run in client-server configuration with 4 server ranks.
+- Navigate to the install directory and run in client-server configuration with 4 server ranks.
 
 ```
-> mpirun -n 4 pvserver --mpi --hostname=localhost -p 11111 &
-> paraview --server localhost:11111
+bin/mpiexec -n 4 bin/pvserver --mpi --hostname=localhost -p 11111 &
+sleep 5
+bin/paraview --server localhost:11111
 ```
 
 - Start trace. Open disk_out_ref. Clip.Create Screenshot. Create Animation. Stop trace. Save macro. Reset Session. Delete screenshot and animation. Run macro. Check generate screenshots and animations are correct.
@@ -226,11 +227,12 @@ Check that
   - Help -> Getting Started with ParaView menu opens PDF document
   - Help -> Reader, Filter, and Writer lists information about selected sources properly
   - Help -> try every other item in the menu. Note that the Release Notes link will bring you to a missing page until the release notes are published, which may not be until the very end of the release cycle. Check that the URL is the expected one, though.
-  - Run remote server with 8 ranks. Connect the client to it and check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog:
+  - Navigate to install directory and run remote server with 8 ranks. Connect the client to it and check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog:
 
 ```
-> mpirun -n 8 pvserver --mpi --hostname=localhost -p 11111 &
-> paraview --server localhost:11111
+bin/mpiexec -n 8 bin/pvserver --mpi --hostname=localhost -p 11111 &
+sleep 5
+bin/paraview --server localhost:11111
 ```
 
   - Help -> About shows reasonable and accurate information
