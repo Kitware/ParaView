@@ -43,6 +43,12 @@ protected:
   int FillInputPortInformation(int, vtkInformation* info) override;
   int FillOutputPortInformation(int, vtkInformation* info) override;
 
+  /**
+   * Here we instantiate a new filter instead of simply use polymorphism and call the parent
+   * RequestData to benefit from the override mechanism (like Viskores variant).
+   *
+   * @see vtkObjectFactory and  vtkObjectFactoryNewMacro.
+   */
   int CutUsingSuperclassInstance(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   bool Dual = false;
@@ -51,6 +57,15 @@ protected:
 private:
   vtkPVCutter(const vtkPVCutter&) = delete;
   void operator=(const vtkPVCutter&) = delete;
+  /**
+   * Update geometry and attributes.
+   */
+  ///@{
+  bool CutLeaf(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  bool CutDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  ///@}
 };
 
 #endif

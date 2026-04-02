@@ -4,10 +4,13 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkCallbackCommand.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkDataObject.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkImplicitFunction.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkPolyDataAlgorithm.h"
@@ -255,6 +258,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::FillInputPortInformation(int, vtkInform
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 
@@ -269,10 +273,12 @@ int vtkPVDataSetAlgorithmSelectorFilter::FillOutputPortInformation(
 
 //----------------------------------------------------------------------------
 int vtkPVDataSetAlgorithmSelectorFilter::RequestDataObject(
-  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
   vtkInformation* info = outputVector->GetInformationObject(0);
 
+  vtkSmartPointer<vtkDataObject> newOutput;
   switch (this->OutputType)
   {
     case VTK_POLY_DATA:
@@ -283,11 +289,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::RequestDataObject(
       }
       else
       {
-        vtkPolyData* output = vtkPolyData::New();
-        this->GetExecutive()->SetOutputData(0, output);
-        output->FastDelete();
-        this->GetOutputPortInformation(0)->Set(
-          vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+        newOutput.TakeReference(vtkPolyData::New());
       }
       break;
     case VTK_UNSTRUCTURED_GRID:
@@ -298,11 +300,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::RequestDataObject(
       }
       else
       {
-        vtkUnstructuredGrid* output = vtkUnstructuredGrid::New();
-        this->GetExecutive()->SetOutputData(0, output);
-        output->FastDelete();
-        this->GetOutputPortInformation(0)->Set(
-          vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+        newOutput.TakeReference(vtkUnstructuredGrid::New());
       }
       break;
     case VTK_HYPER_TREE_GRID:
@@ -313,16 +311,36 @@ int vtkPVDataSetAlgorithmSelectorFilter::RequestDataObject(
       }
       else
       {
-        vtkHyperTreeGrid* output = vtkHyperTreeGrid::New();
-        this->GetExecutive()->SetOutputData(0, output);
-        output->FastDelete();
-        this->GetOutputPortInformation(0)->Set(
-          vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+        newOutput.TakeReference(vtkHyperTreeGrid::New());
+      }
+      break;
+    case VTK_MULTIBLOCK_DATA_SET:
+      if (vtkMultiBlockDataSet::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT())))
+      {
+        return 1;
+      }
+      else
+      {
+        newOutput.TakeReference(vtkMultiBlockDataSet::New());
+      }
+      break;
+    case VTK_COMPOSITE_DATA_SET:
+      if (vtkCompositeDataSet::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT())))
+      {
+        return 1;
+      }
+      else
+      {
+        newOutput.TakeReference(input->NewInstance());
       }
       break;
     default:
       vtkErrorMacro("Invalid output type");
       return 0;
   }
+
+  this->GetExecutive()->SetOutputData(0, newOutput);
+  this->GetOutputPortInformation(0)->Set(
+    vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
   return 1;
 }

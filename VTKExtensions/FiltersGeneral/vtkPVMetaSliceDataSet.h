@@ -36,11 +36,6 @@ public:
    */
   void PreserveInputCells(int keepCellAsIs);
 
-  /**
-   * Override it so we can change the output type of the filter
-   */
-  vtkAlgorithm* SetActiveFilter(int index) override;
-
   void SetImplicitFunction(vtkImplicitFunction* func);
 
   /**
