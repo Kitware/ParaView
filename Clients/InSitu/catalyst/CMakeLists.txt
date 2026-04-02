@@ -52,6 +52,8 @@ _vtk_module_optional_dependency_exists(VTK::IOIOSS
   SATISFIED_VAR _have_vtk_ioioss)
 _vtk_module_optional_dependency_exists(VTK::IOFides
   SATISFIED_VAR _have_vtk_iofides)
+_vtk_module_optional_dependency_exists(VTK::vtkviskores
+  SATISFIED_VAR _have_vtk_vtkviskores)
 
 if (_have_vtk_parallelmpi)
   target_link_libraries(catalyst-paraview
@@ -71,11 +73,18 @@ if (_have_vtk_iofides)
       VTK::IOFides)
 endif ()
 
+if (_have_vtk_vtkviskores)
+  target_link_libraries(catalyst-paraview
+    PRIVATE
+      VTK::vtkviskores)
+endif ()
+
 target_compile_definitions(catalyst-paraview
   PRIVATE
     "VTK_MODULE_ENABLE_VTK_ParallelMPI=$<BOOL:${_have_vtk_parallelmpi}>"
     "VTK_MODULE_ENABLE_VTK_IOIOSS=$<BOOL:${_have_vtk_ioioss}>"
-    "VTK_MODULE_ENABLE_VTK_IOFides=$<BOOL:${_have_vtk_iofides}>")
+    "VTK_MODULE_ENABLE_VTK_IOFides=$<BOOL:${_have_vtk_iofides}>"
+    "VTK_MODULE_ENABLE_VTK_vtkviskores=$<BOOL:${_have_vtk_vtkviskores}>")
 
 _vtk_module_optional_dependency_exists(VTK::Python
   SATISFIED_VAR _have_vtk_python)
