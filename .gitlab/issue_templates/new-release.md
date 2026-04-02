@@ -297,6 +297,7 @@ If making a non-RC release:
 If making a non-RC release:
 
   - [ ] Move unclosed issues in GitLab to the next minor release milestone in GitLab
+  - [ ] Create the `v@VERSION@` label
 -->
 
 /cc @ben.boeckel
