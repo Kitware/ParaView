@@ -51,7 +51,7 @@ PropertyItem::PropertyItem(
       {
         this->Storage.TakeReference(vtkStringArray::New());
       }
-      this->Storage->Allocate(numRecords);
+      this->Storage->ReserveValues(numRecords);
       this->Storage->SetName(this->name.c_str());
       break;
     case 0:

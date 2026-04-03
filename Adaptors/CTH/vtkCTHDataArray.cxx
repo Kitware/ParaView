@@ -84,7 +84,7 @@ void vtkCTHDataArray::SetDimensions(int x, int y, int z)
   this->Dimensions[2] = z;
   this->MaxId = x * y * z - 1;
   int numComp = this->GetNumberOfComponents();
-  this->Size = (MaxId + 1) * numComp;
+  this->Capacity = (MaxId + 1) * numComp;
 
   if (this->Data)
   {
@@ -113,14 +113,14 @@ void vtkCTHDataArray::SetExtents(int x0, int x1, int y0, int y1, int z0, int z1)
   this->MaxId = this->Dx * this->Dy * this->Dz - 1;
 
   int numComp = this->GetNumberOfComponents();
-  this->Size = (MaxId + 1) * numComp;
+  this->Capacity = (MaxId + 1) * numComp;
   this->ExtentsSet = true;
 }
 
 void vtkCTHDataArray::UnsetExtents()
 {
   this->MaxId = this->Dimensions[0] * this->Dimensions[1] * this->Dimensions[2] - 1;
-  this->Size = (MaxId + 1) * this->GetNumberOfComponents();
+  this->Capacity = (MaxId + 1) * this->GetNumberOfComponents();
   this->ExtentsSet = false;
 }
 
@@ -268,6 +268,18 @@ void vtkCTHDataArray::ExportToVoidPointer(void* out_ptr)
   }
 }
 
+int vtkCTHDataArray::Allocate(vtkIdType sz, vtkIdType ext)
+{
+  BuildFallback();
+  return Fallback->Allocate(sz, ext);
+}
+
+int vtkCTHDataArray::Resize(vtkIdType numTuples)
+{
+  this->BuildFallback();
+  return this->Fallback->Resize(numTuples);
+}
+
 vtkIdType vtkCTHDataArray::LookupValue(vtkVariant var)
 {
   if (this->Fallback)
@@ -390,7 +402,7 @@ void vtkCTHDataArray::BuildFallback()
     da->SetNumberOfTuples(this->GetNumberOfTuples());
     da->SetNumberOfComponents(this->GetNumberOfComponents());
     // Avoid calling GetPointer so that we don't make an unnecessary copy.
-    for (vtkIdType i = 0; i < this->Size; i++)
+    for (vtkIdType i = 0; i < this->Capacity; i++)
     {
       da->SetTypedTuple(i, this->GetTuple(i));
     }

@@ -436,7 +436,7 @@ int vtkPEnSightGoldReader::ReadMeasuredGeometryFile(
   geom = vtkPolyData::SafeDownCast(ds);
 
   newPoints = vtkPoints::New();
-  newPoints->Allocate(this->GetPointIds(partId)->GetLocalNumberOfIds());
+  newPoints->Reserve(this->GetPointIds(partId)->GetLocalNumberOfIds());
 
   for (i = 0; i < this->NumberOfMeasuredPoints; i++)
   {
@@ -2685,7 +2685,7 @@ int vtkPEnSightGoldReader::CreateStructuredGridOutput(
   output->SetDimensions(newDimensions);
   //   output->SetWholeExtent(
   //                          0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
-  points->Allocate(this->GetPointIds(partId)->GetLocalNumberOfIds());
+  points->Reserve(this->GetPointIds(partId)->GetLocalNumberOfIds());
 
   for (i = 0; i < numPts; i++)
   {
@@ -2817,9 +2817,9 @@ int vtkPEnSightGoldReader::CreateRectilinearGridOutput(
   output->SetDimensions(newDimensions);
   //   output->SetWholeExtent(
   //                          0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
-  xCoords->Allocate(newDimensions[0]);
-  yCoords->Allocate(newDimensions[1]);
-  zCoords->Allocate(newDimensions[2]);
+  xCoords->ReserveValues(newDimensions[0]);
+  yCoords->ReserveValues(newDimensions[1]);
+  zCoords->ReserveValues(newDimensions[2]);
 
   int beginDimension[3];
 
@@ -3141,7 +3141,6 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(
     {
       // Inject really needed points
       int localNumberOfIds = this->GetPointIds(partId)->GetLocalNumberOfIds();
-      points->Allocate(localNumberOfIds);
       points->SetNumberOfPoints(localNumberOfIds);
 
       for (i = 0; i < numPts; i++)

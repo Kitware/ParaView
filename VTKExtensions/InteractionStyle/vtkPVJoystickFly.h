@@ -11,15 +11,15 @@
 #ifndef vtkPVJoystickFly_h
 #define vtkPVJoystickFly_h
 
-#include "vtkCameraManipulator.h"
+#include "vtkPVCameraManipulator.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
 
 class vtkRenderer;
 
-class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVJoystickFly : public vtkCameraManipulator
+class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVJoystickFly : public vtkPVCameraManipulator
 {
 public:
-  vtkTypeMacro(vtkPVJoystickFly, vtkCameraManipulator);
+  vtkTypeMacro(vtkPVJoystickFly, vtkPVCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{

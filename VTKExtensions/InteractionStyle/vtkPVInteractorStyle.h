@@ -18,7 +18,7 @@
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
 
-class vtkCameraManipulator;
+class vtkPVCameraManipulator;
 class vtkCollection;
 
 class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVInteractorStyle
@@ -62,7 +62,7 @@ public:
   /**
    * Access to adding or removing manipulators.
    */
-  void AddManipulator(vtkCameraManipulator* m);
+  void AddManipulator(vtkPVCameraManipulator* m);
 
   /**
    * Removes all manipulators.
@@ -116,7 +116,7 @@ public:
   /**
    * Returns the chosen manipulator based on the modifiers.
    */
-  virtual vtkCameraManipulator* FindManipulator(int button, int shift, int control);
+  virtual vtkPVCameraManipulator* FindManipulator(int button, int shift, int control);
 
   /**
    * Dolly the renderer's camera to a specific point
@@ -136,7 +136,7 @@ protected:
 
   void Dolly(double factor) override;
 
-  vtkCameraManipulator* CurrentManipulator;
+  vtkPVCameraManipulator* CurrentManipulator;
   bool MouseWheelZoomsToCursor = false;
   double CenterOfRotation[3];
   double RotationFactor;

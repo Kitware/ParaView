@@ -100,23 +100,23 @@ void Create(vtkStructuredGrid* sg, vtkIdType I, vtkIdType J, vtkIdType K)
 
   vtkNew<vtkDoubleArray> cellPressure;
   cellPressure->SetName("Pressure");
-  cellPressure->Allocate(I * J * K);
+  cellPressure->ReserveValues(I * J * K);
 
   vtkNew<vtkDoubleArray> vertexPressure;
   vertexPressure->SetName("Pressure");
-  vertexPressure->Allocate(I * J * K);
+  vertexPressure->ReserveValues(I * J * K);
 
   vtkNew<vtkDoubleArray> cellVelocity;
   cellVelocity->SetName("Velocity");
   cellVelocity->SetNumberOfComponents(3);
-  cellVelocity->Allocate(3 * I * J * K);
+  cellVelocity->ReserveTuples(I * J * K);
 
   vtkNew<vtkDoubleArray> vertexVelocity;
   vertexVelocity->SetName("Velocity");
   vertexVelocity->SetNumberOfComponents(3);
-  vertexVelocity->Allocate(3 * I * J * K);
+  vertexVelocity->ReserveTuples(I * J * K);
 
-  pts->Allocate(I * J * K);
+  pts->Reserve(I * J * K);
 
   double xyz[3];
 

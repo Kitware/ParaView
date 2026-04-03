@@ -109,7 +109,7 @@ protected:
     this->SetPrimaryRenderer(nullptr);
   }
 
-  vtkCameraManipulator* FindManipulator(int button, int shift, int control) override
+  vtkPVCameraManipulator* FindManipulator(int button, int shift, int control) override
   {
     if (this->CurrentRenderer == this->PrimaryRenderer)
     {

@@ -3,13 +3,13 @@
 #include "vtkPVInteractorStyle.h"
 
 #include "vtkCamera.h"
-#include "vtkCameraManipulator.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCameraManipulator.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
@@ -40,7 +40,7 @@ void vtkPVInteractorStyle::RemoveAllManipulators()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVInteractorStyle::AddManipulator(vtkCameraManipulator* m)
+void vtkPVInteractorStyle::AddManipulator(vtkPVCameraManipulator* m)
 {
   this->CameraManipulators->AddItem(m);
 }
@@ -95,12 +95,12 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 }
 
 //-------------------------------------------------------------------------
-vtkCameraManipulator* vtkPVInteractorStyle::FindManipulator(int button, int shift, int control)
+vtkPVCameraManipulator* vtkPVInteractorStyle::FindManipulator(int button, int shift, int control)
 {
   // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
-  vtkCameraManipulator* manipulator = nullptr;
-  while ((manipulator = (vtkCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
+  vtkPVCameraManipulator* manipulator = nullptr;
+  while ((manipulator = (vtkPVCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
   {
     if (manipulator->GetButton() == button && manipulator->GetShift() == shift &&
       manipulator->GetControl() == control)
@@ -212,8 +212,8 @@ void vtkPVInteractorStyle::OnKeyDown()
 {
   // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
-  vtkCameraManipulator* manipulator = nullptr;
-  while ((manipulator = (vtkCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
+  vtkPVCameraManipulator* manipulator = nullptr;
+  while ((manipulator = (vtkPVCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
   {
     manipulator->OnKeyDown(this->Interactor);
   }
@@ -224,8 +224,8 @@ void vtkPVInteractorStyle::OnKeyUp()
 {
   // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
-  vtkCameraManipulator* manipulator = nullptr;
-  while ((manipulator = (vtkCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
+  vtkPVCameraManipulator* manipulator = nullptr;
+  while ((manipulator = (vtkPVCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
   {
     manipulator->OnKeyUp(this->Interactor);
   }

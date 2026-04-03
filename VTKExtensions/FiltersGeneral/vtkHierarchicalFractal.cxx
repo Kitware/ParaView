@@ -1004,7 +1004,6 @@ void vtkHierarchicalFractal::AddTestArray(vtkCompositeDataSet* output)
 
     vtkDoubleArray* array = vtkDoubleArray::New();
     int numCells = grid->GetNumberOfCells();
-    array->Allocate(numCells);
     array->SetNumberOfTuples(numCells);
     double* arrayPtr = static_cast<double*>(array->GetPointer(0));
     double spacing[3];
@@ -1061,7 +1060,6 @@ void vtkHierarchicalFractal::AddVectorArray(vtkCompositeDataSet* output)
     vtkDoubleArray* array = vtkDoubleArray::New();
     array->SetNumberOfComponents(3);
     int numCells = grid->GetNumberOfCells();
-    array->Allocate(numCells);
     array->SetNumberOfTuples(numCells);
     double* arrayPtr = static_cast<double*>(array->GetPointer(0));
     double spacing[3];
@@ -1119,7 +1117,6 @@ void vtkHierarchicalFractal::AddFractalArray(vtkCompositeDataSet* output)
 
       vtkDoubleArray* array = vtkDoubleArray::New();
       int numCells = grid->GetNumberOfCells();
-      array->Allocate(numCells);
       array->SetNumberOfTuples(numCells);
       double* arrayPtr = static_cast<double*>(array->GetPointer(0));
       double spacing[3];
@@ -1171,7 +1168,6 @@ void vtkHierarchicalFractal::AddFractalArray(vtkCompositeDataSet* output)
 
       vtkDoubleArray* array = vtkDoubleArray::New();
       int numCells = grid->GetNumberOfCells();
-      array->Allocate(numCells);
       array->SetNumberOfTuples(numCells);
       double* arrayPtr = static_cast<double*>(array->GetPointer(0));
 
@@ -1202,7 +1198,7 @@ void vtkHierarchicalFractal::AddBlockIdArray(vtkCompositeDataSet* output)
 
     vtkIntArray* array = vtkIntArray::New();
     int numCells = grid->GetNumberOfCells();
-    array->Allocate(numCells);
+    array->ReserveValues(numCells);
     int cell = 0;
     while (cell < numCells)
     {
@@ -1231,7 +1227,7 @@ void vtkHierarchicalFractal::AddDepthArray(vtkOverlappingAMR* output)
       {
         vtkIntArray* array = vtkIntArray::New();
         int numCells = grid->GetNumberOfCells();
-        array->Allocate(numCells);
+        array->ReserveValues(numCells);
         int cell = 0;
         while (cell < numCells)
         {

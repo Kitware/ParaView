@@ -409,8 +409,7 @@ vtkSmartPointer<vtkDoubleArray> vtkCDIReader::ReadTimeAxis()
   }
 
   auto timeValues = vtkSmartPointer<vtkDoubleArray>::New();
-  timeValues->Allocate(this->NumberOfTimeSteps);
-  timeValues->SetNumberOfComponents(1);
+  timeValues->ReserveValues(this->NumberOfTimeSteps);
   int start = 0;
   int counter = 0;
   for (int step = 0; step < this->FileSeriesNumber; step++)
@@ -2247,14 +2246,14 @@ void vtkCDIReader::OutputPoints(bool init)
   if (init)
   {
     points = vtkSmartPointer<vtkPoints>::New();
-    points->Allocate(this->MaximumPoints, this->MaximumPoints);
+    points->Reserve(this->MaximumPoints);
     this->Output->SetPoints(points);
   }
   else
   {
     points = this->Output->GetPoints();
     points->Initialize();
-    points->Allocate(this->MaximumPoints, this->MaximumPoints);
+    points->Reserve(this->MaximumPoints);
   }
 
   if (this->DepthVar.empty())

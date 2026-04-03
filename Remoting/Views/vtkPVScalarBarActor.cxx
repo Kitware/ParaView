@@ -269,8 +269,9 @@ int vtkPVScalarBarActor::CreateLabel(
   else
   {
     // Potential of buffer overrun (onto the stack) here.
-    auto result = vtk::format_to_n(string, 1023, this->LabelFormat, value);
-    *result.out = '\0';
+    VTK_FORMAT_IF_ERROR_RETURN(
+      auto result = vtk::format_to_n(string, 1023, this->LabelFormat, value);
+      *result.out = '\0', 0);
   }
 
   // Set the txt label
@@ -639,7 +640,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
   tickCells->AllocateEstimate(ticks.size(), 20);
 
   vtkNew<vtkPoints> tickPoints;
-  tickPoints->Allocate(ticks.size() * 20);
+  tickPoints->Reserve(ticks.size() * 20);
 
   double targetWidth = this->P->TickBox.Size[this->P->TL[0]];
   double targetHeight = this->P->TickBox.Size[this->P->TL[1]];

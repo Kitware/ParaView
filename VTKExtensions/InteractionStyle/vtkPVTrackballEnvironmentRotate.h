@@ -10,15 +10,15 @@
 #ifndef vtkPVTrackballEnvironmentRotate_h
 #define vtkPVTrackballEnvironmentRotate_h
 
-#include "vtkCameraManipulator.h"
+#include "vtkPVCameraManipulator.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
 
 class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballEnvironmentRotate
-  : public vtkCameraManipulator
+  : public vtkPVCameraManipulator
 {
 public:
   static vtkPVTrackballEnvironmentRotate* New();
-  vtkTypeMacro(vtkPVTrackballEnvironmentRotate, vtkCameraManipulator);
+  vtkTypeMacro(vtkPVTrackballEnvironmentRotate, vtkPVCameraManipulator);
 
   ///@{
   /**

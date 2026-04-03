@@ -8,7 +8,7 @@
 // Pipeline & VTK
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMarchingCubesTriangleCases.h"
+#include "vtkMarchingCellsContourCases.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
@@ -1086,10 +1086,7 @@ void vtkAMRDualContour::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int bl
 
   int nx, ny, nz; // Neighbor index [3][3][3];
   vtkIdType pointIds[6];
-  vtkMarchingCubesTriangleCases *triCase, *triCases;
-  int* edge;
   double k, v0, v1;
-  triCases = vtkMarchingCubesTriangleCases::GetCases();
 
   // Compute the spacing for this level and one lower level;
   const double* tmp = this->Helper->GetRootSpacing();
@@ -1233,8 +1230,7 @@ void vtkAMRDualContour::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int bl
 
   // We have the points, now contour the cell.
   // Get edges.
-  triCase = triCases + cubeCase;
-  edge = triCase->edges;
+  auto edge = vtkMarchingCellsContourCases::GetHexahedronCase(cubeCase);
   double pt[3];
 
   // Save the edge point ids in case we need to create a capping surface.

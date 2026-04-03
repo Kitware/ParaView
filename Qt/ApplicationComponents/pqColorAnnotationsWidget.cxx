@@ -998,7 +998,7 @@ bool pqColorAnnotationsWidget::addActiveAnnotationsFromVisibleSources(bool force
   }
 
   vtkNew<vtkVariantArray> uniqueAnnotationsArray;
-  uniqueAnnotationsArray->Allocate(static_cast<vtkIdType>(uniqueAnnotations.size()));
+  uniqueAnnotationsArray->ReserveValues(static_cast<vtkIdType>(uniqueAnnotations.size()));
   for (const vtkVariant& val : uniqueAnnotations)
   {
     uniqueAnnotationsArray->InsertNextValue(val);

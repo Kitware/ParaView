@@ -153,7 +153,7 @@ void vtkEquivalenceSet::Squeeze()
 //----------------------------------------------------------------------------
 vtkIdType vtkEquivalenceSet::Capacity()
 {
-  return this->EquivalenceArray->GetSize();
+  return this->EquivalenceArray->GetCapacity();
 }
 
 //----------------------------------------------------------------------------

@@ -61,6 +61,7 @@
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVTrackballEnvironmentRotate.h"
 #include "vtkPVTrackballMultiRotate.h"
+#include "vtkPVTrackballPanAxisConstrained.h"
 #include "vtkPVTrackballRoll.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
@@ -86,7 +87,6 @@
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkToneMappingPass.h"
-#include "vtkTrackballPan.h"
 #include "vtkTransform.h"
 #include "vtkType.h"
 #include "vtkValuePass.h"
@@ -526,30 +526,25 @@ vtkPVRenderView::vtkPVRenderView()
 
     // Add some default manipulators. Applications can override them without
     // much ado.
-    vtkPVTrackballRotate* manip = vtkPVTrackballRotate::New();
+    vtkNew<vtkPVTrackballRotate> manip;
     manip->SetButton(1);
     this->ThreeDInteractorStyle->AddManipulator(manip);
-    manip->Delete();
 
-    vtkPVTrackballZoom* manip2 = vtkPVTrackballZoom::New();
+    vtkNew<vtkPVTrackballZoom> manip2;
     manip2->SetButton(3);
     this->ThreeDInteractorStyle->AddManipulator(manip2);
-    manip2->Delete();
 
-    vtkTrackballPan* manip3 = vtkTrackballPan::New();
+    vtkNew<vtkPVTrackballPanAxisConstrained> manip3;
     manip3->SetButton(2);
     this->ThreeDInteractorStyle->AddManipulator(manip3);
-    manip3->Delete();
 
-    vtkTrackballPan* manip4 = vtkTrackballPan::New();
+    vtkNew<vtkPVTrackballPanAxisConstrained> manip4;
     manip4->SetButton(1);
     this->TwoDInteractorStyle->AddManipulator(manip4);
-    manip4->Delete();
 
-    vtkPVTrackballZoom* manip5 = vtkPVTrackballZoom::New();
+    vtkNew<vtkPVTrackballZoom> manip5;
     manip5->SetButton(3);
     this->TwoDInteractorStyle->AddManipulator(manip5);
-    manip5->Delete();
 
     this->RubberBandStyle = vtkInteractorStyleRubberBand3D::New();
     this->RubberBandStyle->RenderOnMouseMoveOff();
@@ -3390,11 +3385,11 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
     for (int button = 0; button < 3; button++)
     {
       int manipType = manipulators[3 * manip + button];
-      vtkSmartPointer<vtkCameraManipulator> cameraManipulator;
+      vtkSmartPointer<vtkPVCameraManipulator> cameraManipulator;
       switch (manipType)
       {
         case PAN:
-          cameraManipulator = vtkSmartPointer<vtkTrackballPan>::New();
+          cameraManipulator = vtkSmartPointer<vtkPVTrackballPanAxisConstrained>::New();
           break;
         case ZOOM:
           cameraManipulator = vtkSmartPointer<vtkPVTrackballZoom>::New();

@@ -57,7 +57,6 @@ public:
 
     if (vtkarray->GetNumberOfTuples() < (index + 1))
     {
-      vtkarray->Resize(512 * (static_cast<vtkIdType>(index + 512) / 512));
       vtkarray->SetNumberOfTuples(index + 1);
     }
     if (NumComponents == 1)

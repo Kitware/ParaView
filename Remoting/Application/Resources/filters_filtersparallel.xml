@@ -297,6 +297,20 @@
           This property specifies the number of target processes to aggregate the dataset onto.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetTargetProcess"
+                         default_values="1"
+                         name="TargetProcess"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Root Process"
+                 value="0"/>
+          <Entry text="Process With Most Points"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies the target process to aggregate the dataset onto.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End AggregateDataSet -->
     </SourceProxy>
 

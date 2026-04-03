@@ -1227,7 +1227,7 @@ int vtkPEnSightGoldBinaryReader::ReadMeasuredGeometryFile(
   yCoords = new float[this->NumberOfMeasuredPoints];
   zCoords = new float[this->NumberOfMeasuredPoints];
 
-  points->Allocate(this->GetPointIds(partId)->GetLocalNumberOfIds());
+  points->Reserve(this->GetPointIds(partId)->GetLocalNumberOfIds());
   pd->Allocate(this->GetPointIds(partId)->GetLocalNumberOfIds());
 
   // Extract the array of point indices. Note EnSight Manual v8.2 (pp. 559,
@@ -3731,7 +3731,7 @@ int vtkPEnSightGoldBinaryReader::CreateStructuredGridOutput(
   output->SetDimensions(newDimensions);
   //   output->SetWholeExtent(
   //                          0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
-  points->Allocate(this->GetPointIds(partId)->GetLocalNumberOfIds());
+  points->Reserve(this->GetPointIds(partId)->GetLocalNumberOfIds());
 
   long currentPositionInFile = this->IFile->tellg();
 
@@ -3891,9 +3891,9 @@ int vtkPEnSightGoldBinaryReader::CreateRectilinearGridOutput(
   output->SetDimensions(newDimensions);
   //   output->SetWholeExtent(
   //                          0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
-  xCoords->Allocate(newDimensions[0]);
-  yCoords->Allocate(newDimensions[1]);
-  zCoords->Allocate(newDimensions[2]);
+  xCoords->ReserveValues(newDimensions[0]);
+  yCoords->ReserveValues(newDimensions[1]);
+  zCoords->ReserveValues(newDimensions[2]);
 
   int beginDimension[3];
 
@@ -4342,7 +4342,6 @@ int vtkPEnSightGoldBinaryReader::ReadOrSkipCoordinates(
       // Inject really needed points
       vtkIdType i;
       int localNumberOfIds = this->GetPointIds(partId)->GetLocalNumberOfIds();
-      points->Allocate(localNumberOfIds);
       points->SetNumberOfPoints(localNumberOfIds);
       int maxId = -1;
       int minId = -1;

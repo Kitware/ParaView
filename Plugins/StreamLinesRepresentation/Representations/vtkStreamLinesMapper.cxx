@@ -244,7 +244,7 @@ void vtkStreamLinesMapper::Private::SetNumberOfParticles(int nbParticles)
   this->ParticlesTTL.resize(nbParticles, 0);
   if (this->InterpolationScalarArray)
   {
-    this->InterpolationScalarArray->Resize(nbParticles * 2);
+    this->InterpolationScalarArray->SetNumberOfTuples(nbParticles * 2);
   }
 }
 

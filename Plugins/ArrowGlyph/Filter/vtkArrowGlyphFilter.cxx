@@ -331,7 +331,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, v
   // we know the output will require NumPoints in Arrow * NumPoints in MaskPoints
   // so we can pre-allocate the output space.
   vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
-  newPoints->Allocate(numArrowPoints * numMaskedPoints);
+  newPoints->Reserve(numArrowPoints * numMaskedPoints);
   outPd->CopyAllocate(inPd, numArrowPoints * numMaskedPoints);
 
   // Setting up for calls to PolyData::InsertNextCell()
@@ -343,7 +343,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, v
   // track pt, cell increments for copying old point data into new geometry
   vtkIdType ptIncr = 0;
   vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
-  pts->Allocate(VTK_CELL_SIZE);
+  pts->Reserve(VTK_CELL_SIZE);
 
   //
   // Loop over all our points and do the actual glyphing

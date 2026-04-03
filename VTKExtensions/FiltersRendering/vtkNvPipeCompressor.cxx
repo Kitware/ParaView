@@ -73,7 +73,7 @@ int vtkNvPipeCompressor::Compress()
   const uint8_t* rgba = (const uint8_t*)input->GetPointer(0);
 
   size_t output_size = num_pixels * 3;
-  uint8_t* obuf = static_cast<uint8_t*>(this->Output->WriteVoidPointer(0, output_size));
+  unsigned char* obuf = this->Output->WritePointer(0, output_size);
   if (nullptr == obuf)
   {
     vtkErrorMacro("Error obtaining (allocating) output buffer");

@@ -108,7 +108,7 @@ void CreatePolyhedral(vtkUnstructuredGrid* ph)
   pts->InsertNextPoint(2, 2, 1);
 
   vtkNew<vtkIdList> polyhedron;
-  polyhedron->Allocate(50);
+  polyhedron->Reserve(50);
   polyhedron->InsertNextId(7); // faces
 
   polyhedron->InsertNextId(4); // face0-4verts

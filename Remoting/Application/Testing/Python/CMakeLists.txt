@@ -132,7 +132,7 @@ set(PVBATCH_TESTS
   UserTransformOnRepresentation.py
   )
 
-if (numpy_found AND PARAVIEW_USE_MPI)
+if (numpy_found AND PARAVIEW_USE_MPI AND NOT VTK_ENABLE_VISKORES_OVERRIDES)
   list(APPEND PVBATCH_TESTS
     D3CellsWithNegativeVolumes.py,NO_VALID)
 endif()

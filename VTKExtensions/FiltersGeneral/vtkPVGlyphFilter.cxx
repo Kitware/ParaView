@@ -831,7 +831,7 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
   vtkDebugMacro(<< "Generating glyphs");
 
   auto pts = vtkSmartPointer<vtkIdList>::New();
-  pts->Allocate(VTK_CELL_SIZE);
+  pts->Reserve(VTK_CELL_SIZE);
 
   unsigned char* inGhostLevels = nullptr;
   vtkDataArray* temp = nullptr;
@@ -862,7 +862,7 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
     vtkNew<vtkPolyData> defaultSource;
     defaultSource->Allocate();
     vtkNew<vtkPoints> defaultPoints;
-    defaultPoints->Allocate(6);
+    defaultPoints->Reserve(2);
     defaultPoints->InsertNextPoint(0, 0, 0);
     defaultPoints->InsertNextPoint(1, 0, 0);
     vtkIdType defaultPointIds[2];
@@ -910,14 +910,14 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
     newPts->SetDataType(VTK_DOUBLE);
   }
 
-  newPts->Allocate(numPts * numSourcePts);
+  newPts->Reserve(numPts * numSourcePts);
 
   vtkSmartPointer<vtkFloatArray> newNormals;
   if (sourceNormals)
   {
     newNormals.TakeReference(vtkFloatArray::New());
     newNormals->SetNumberOfComponents(3);
-    newNormals->Allocate(3 * numPts * numSourcePts);
+    newNormals->ReserveValues(numPts * numSourcePts);
     newNormals->SetName("Normals");
   }
 
@@ -926,7 +926,7 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
 
   vtkSmartPointer<vtkPoints> transformedSourcePts = vtkSmartPointer<vtkPoints>::New();
   transformedSourcePts->SetDataTypeToDouble();
-  transformedSourcePts->Allocate(numSourcePts);
+  transformedSourcePts->Reserve(numSourcePts);
 
   // Traverse all Input points, transforming Source points and copying
   // point attributes.

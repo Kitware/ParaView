@@ -266,7 +266,7 @@ public:
   void Squeeze() { this->EquivalenceArray->Squeeze(); }
 
   // Report used memory
-  vtkIdType Capacity() { return this->EquivalenceArray->GetSize(); }
+  vtkIdType Capacity() { return this->EquivalenceArray->GetCapacity(); }
 
   // We should fix the pointer API and hide this ivar.
   int Resolved;

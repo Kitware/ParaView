@@ -974,7 +974,7 @@ void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollecti
     }
 
     nodes->RemoveItem(node);
-    ++nodeIt;
+    nodeIt = range.begin();
   }
 }
 

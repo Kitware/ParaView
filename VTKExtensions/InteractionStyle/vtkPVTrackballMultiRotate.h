@@ -19,18 +19,18 @@
 #ifndef vtkPVTrackballMultiRotate_h
 #define vtkPVTrackballMultiRotate_h
 
-#include "vtkCameraManipulator.h"
+#include "vtkPVCameraManipulator.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
 
-class vtkCameraManipulator;
+class vtkPVCameraManipulator;
 class vtkPVTrackballRoll;
 class vtkPVTrackballRotate;
 
 class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballMultiRotate
-  : public vtkCameraManipulator
+  : public vtkPVCameraManipulator
 {
 public:
-  vtkTypeMacro(vtkPVTrackballMultiRotate, vtkCameraManipulator);
+  vtkTypeMacro(vtkPVTrackballMultiRotate, vtkPVCameraManipulator);
   static vtkPVTrackballMultiRotate* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -51,7 +51,7 @@ protected:
   vtkPVTrackballRotate* RotateManipulator;
   vtkPVTrackballRoll* RollManipulator;
 
-  vtkCameraManipulator* CurrentManipulator;
+  vtkPVCameraManipulator* CurrentManipulator;
 
 private:
   vtkPVTrackballMultiRotate(const vtkPVTrackballMultiRotate&) = delete;
