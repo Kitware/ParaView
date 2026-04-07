@@ -40,7 +40,6 @@ public:
 
   /**
    * Returns if the view can be exported.
-   * Default implementation return true if the view is a render view.
    */
   virtual bool CanExport(vtkSMProxy*) = 0;
 

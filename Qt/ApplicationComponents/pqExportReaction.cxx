@@ -4,10 +4,12 @@
 #include "pqExportReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqAnimationManager.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqProxyWidget.h"
 #include "pqUndoStack.h"
+
 #include "vtkNew.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMTrace.h"

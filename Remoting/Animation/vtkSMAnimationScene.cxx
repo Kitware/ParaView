@@ -575,6 +575,12 @@ void vtkSMAnimationScene::SetNumberOfFrames(int val)
 }
 
 //----------------------------------------------------------------------------
+int vtkSMAnimationScene::GetNumberOfFrames()
+{
+  return this->AnimationPlayer->GetNumberOfFrames();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMAnimationScene::SetFramesPerTimestep(int val)
 {
   this->AnimationPlayer->SetFramesPerTimestep(val);
@@ -596,4 +602,36 @@ int vtkSMAnimationScene::GetStride()
 bool vtkSMAnimationScene::GetInPlay()
 {
   return this->AnimationPlayer->GetInPlay();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationScene::SanitizeFrameWindow(int frameWindow[2], double playbackTimeWindow[2])
+{
+  switch (this->GetPlayMode())
+  {
+    case vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS:
+    {
+      vtkSMProxy* timeKeeper = this->GetTimeKeeper();
+      const vtkSMPropertyHelper tsValuesHelper(timeKeeper, "TimestepValues");
+      const int numTS = tsValuesHelper.GetNumberOfElements();
+      frameWindow[0] = std::max(frameWindow[0], 0);
+      frameWindow[1] = std::min(frameWindow[1], numTS - 1);
+      playbackTimeWindow[0] = tsValuesHelper.GetAsDouble(frameWindow[0]);
+      playbackTimeWindow[1] = tsValuesHelper.GetAsDouble(frameWindow[1]);
+      break;
+    }
+    case vtkCompositeAnimationPlayer::SEQUENCE:
+    default:
+    {
+      const int numFrames = this->GetNumberOfFrames();
+      const double startTime = this->GetStartTime();
+      const double endTime = this->GetEndTime();
+      frameWindow[0] = std::max(frameWindow[0], 0);
+      frameWindow[1] = std::min(frameWindow[1], numFrames - 1);
+      const int denominator = std::max(numFrames - 1, 1);
+      playbackTimeWindow[0] = startTime + ((endTime - startTime) * frameWindow[0]) / denominator;
+      playbackTimeWindow[1] = startTime + ((endTime - startTime) * frameWindow[1]) / denominator;
+      break;
+    }
+  }
 }

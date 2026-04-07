@@ -7,6 +7,14 @@
  *
  * vtkSMAnimationSceneWriter is an abstract superclass for writers
  * that can write animations out.
+ *
+ * If an animation scene is provided and WriteTimeSteps is true (default),
+ * it is expected to play the animation scene and output each frames.
+ * Otherwise (no animation scene or WriteTimeSteps to false), it outputs
+ * only the current frame.
+ *
+ * The main work for a subclass is to implement SaveFrame, that will
+ * be called sequencially for each required frame.
  */
 
 #ifndef vtkSMAnimationSceneWriter_h
@@ -16,6 +24,7 @@
 #include "vtkSMSessionObject.h"
 
 class vtkSMAnimationScene;
+class vtkSMExporterProxy;
 class vtkSMProxy;
 
 class VTKREMOTINGANIMATION_EXPORT vtkSMAnimationSceneWriter : public vtkSMSessionObject
@@ -38,10 +47,22 @@ public:
   ///@}
 
   /**
-   * Begin the saving. This will result in playing of the animation.
+   * Begin the saving.
+   * If WriteTimeSteps is true, this will result in playing of the animation.
+   * Otherwise it juste save the current frame.
+   *
    * Returns the status of the save.
    */
   bool Save();
+
+  /**
+   * Enable the writing of all timesteps.
+   * When false, only current scene time is considered.
+   * Default is true.
+   */
+  vtkSetMacro(WriteTimeSteps, bool);
+  vtkGetMacro(WriteTimeSteps, bool);
+  vtkBooleanMacro(WriteTimeSteps, bool);
 
   ///@{
   /**
@@ -64,9 +85,18 @@ public:
    * Get/Set time window that we want to write
    * If PlaybackTimeWindow[0] > PlaybackTimeWindow[1] that mean that we
    * want to export the full time range available.
+   * This handles time values and not time steps.
    */
   vtkSetVector2Macro(PlaybackTimeWindow, double);
   vtkGetVector2Macro(PlaybackTimeWindow, double);
+  ///@}
+
+  ///@{
+  /**
+   * Use window to set PlaybackTimeWindow based on AnimationScene times.
+   */
+  void SetFrameWindow(int window[2]);
+  void SetFrameWindow(int min, int max);
   ///@}
 
   ///@{
@@ -79,6 +109,12 @@ public:
   vtkSetMacro(Stride, int);
   vtkGetMacro(Stride, int);
   ///@}
+
+  /**
+   * Set an exporter to use for single frame export.
+   * Default is nullptr.
+   */
+  void SetFrameExporterDelegate(vtkSMExporterProxy* exporter);
 
 protected:
   vtkSMAnimationSceneWriter();
@@ -107,6 +143,17 @@ protected:
 
   void ExecuteEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
+  /**
+   * Return the Exporter to use for a single frame export, if any.
+   */
+  vtkSMExporterProxy* GetFrameExporterDelegate();
+
+  /**
+   * Return true if the current configuration allows for animation export.
+   * i.e. if WriteTimeSteps is true and AnimationScene is set.
+   */
+  bool AnimationEnabled();
+
   // Flag indicating if we are currently saving.
   // Set on entering Save() and cleared before leaving Save().
   bool Saving;
@@ -119,6 +166,10 @@ protected:
 private:
   vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&) = delete;
   void operator=(const vtkSMAnimationSceneWriter&) = delete;
+
+  bool WriteTimeSteps = true;
+
+  vtkSMExporterProxy* FrameExporterDelegate = nullptr;
 };
 
 #endif

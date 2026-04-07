@@ -7,6 +7,8 @@
 #include "pqApplicationComponentsModule.h"
 #include "pqReaction.h"
 
+#include "vtkParaViewDeprecation.h" // for deprec macro
+
 /**
  * @ingroup Reactions
  * Reaction to export a script that will produce configured temporal data
@@ -15,7 +17,8 @@
  * the data spatially as usual.
  */
 
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTemporalExportReaction : public pqReaction
+class PARAVIEW_DEPRECATED_IN_6_2_0("Noop for a while. Use Extractors instead.")
+  PQAPPLICATIONCOMPONENTS_EXPORT pqTemporalExportReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;

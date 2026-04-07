@@ -38,10 +38,13 @@ public:
   vtkGetMacro(PlayMode, int);
   ///@}
 
+  ///@{
   /**
    * Forwarded to vtkSequenceAnimationPlayer
    */
   void SetNumberOfFrames(int val);
+  int GetNumberOfFrames();
+  ///@}
 
   ///@{
   /**

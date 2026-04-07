@@ -10,6 +10,7 @@
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
@@ -108,6 +109,15 @@ vtkSMExporterProxy* vtkSMViewExportHelper::CreateExporter(
           controller->PreInitializeProxy(exporter);
           exporter->SetView(view);
           vtkSMPropertyHelper(exporter, "FileName").Set(filename);
+
+          auto scene = controller->GetAnimationScene(pxm->GetSession());
+          auto sceneProp =
+            vtkSMProxyProperty::SafeDownCast(exporter->GetProperty("AnimationScene"));
+          if (sceneProp && scene)
+          {
+            vtkSMPropertyHelper(exporter, "AnimationScene").Set(scene);
+          }
+
           controller->PostInitializeProxy(exporter);
           exporter->UpdateVTKObjects();
           return exporter;

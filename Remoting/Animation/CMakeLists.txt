@@ -21,12 +21,14 @@ set(classes
   vtkPVRepresentationAnimationHelper
   vtkPVSinusoidKeyFrame
   vtkSIXMLAnimationWriterRepresentationProperty
+  vtkSMAnimatedExporterProxy
   vtkSMAnimationFrameWindowDomain
   vtkSMAnimationScene
   vtkSMAnimationSceneGeometryWriter
   vtkSMAnimationSceneWebWriter
   vtkSMAnimationSceneProxy
   vtkSMAnimationSceneWriter
+  vtkSMAnimationSceneSeriesWriter
   vtkSMSaveAnimationExtractsProxy
   vtkSMSaveAnimationProxy
   vtkSequenceAnimationPlayer
