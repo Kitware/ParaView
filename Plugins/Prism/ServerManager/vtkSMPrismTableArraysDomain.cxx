@@ -6,6 +6,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStringScanner.h"
 
 #include <sstream>
 
@@ -25,24 +26,6 @@ void vtkSMPrismTableArraysDomain::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DefaultArrayId: " << this->DefaultArrayId << endl;
 }
 
-//=============================================================================
-namespace
-{
-template <typename T>
-T lexical_cast(const std::string& s)
-{
-  std::stringstream ss(s);
-
-  T result;
-  if ((ss >> result).fail() || !(ss >> std::ws).eof())
-  {
-    throw std::bad_cast();
-  }
-
-  return result;
-}
-}
-
 //-----------------------------------------------------------------------------
 int vtkSMPrismTableArraysDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
@@ -51,14 +34,13 @@ int vtkSMPrismTableArraysDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXML
     return 0;
   }
 
-  const char* default_array_id = element->GetAttribute("default_array_id");
-  if (default_array_id)
+  if (const char* default_array_id = element->GetAttribute("default_array_id"))
   {
-    try
+    if (auto result = vtk::scan_int<int>(default_array_id))
     {
-      this->DefaultArrayId = lexical_cast<int>(default_array_id);
+      this->DefaultArrayId = result->value();
     }
-    catch (const std::bad_cast&)
+    else
     {
       vtkErrorMacro("Invalid default_array_id attribute: " << default_array_id);
       return 0;
@@ -91,17 +73,13 @@ void vtkSMPrismTableArraysDomain::Update(vtkSMProperty*)
   for (unsigned int i = 0; i < flatArraysOfTablesHelper.GetNumberOfElements(); ++i)
   {
     const auto str = flatArraysOfTablesHelper.GetAsString(i);
-    try
+    if (auto result = vtk::scan_int<int>(str))
     {
-      int value = lexical_cast<int>(str);
-      currentTableId = value;
+      currentTableId = result->value();
     }
-    catch (const std::bad_cast&)
+    else if (currentTableId != -1)
     {
-      if (currentTableId != -1)
-      {
-        arraysOfTables[currentTableId].emplace_back(str);
-      }
+      arraysOfTables[currentTableId].emplace_back(str);
     }
   }
 

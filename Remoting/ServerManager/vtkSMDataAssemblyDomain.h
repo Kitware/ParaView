@@ -79,7 +79,7 @@
  *     </Documentation>
  *   </IntVectorProperty>
  *
- *   <StringVectorProperty name="AssemmblySelectors"
+ *   <StringVectorProperty name="AssemblySelectors"
  *     command="AddSelector"
  *     clean_command="ClearSelectors"
  *     repeat_command="1"
