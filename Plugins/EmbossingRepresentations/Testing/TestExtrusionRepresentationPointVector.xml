@@ -7,7 +7,6 @@
 
    <!-- Add a sphere with resoltuion of 32x32, radius of 5. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
-  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Data Objects" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Geometric Shapes" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/GeometricShapes" command="activate" arguments="SphereSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ThetaResolution/LineEdit0" command="set_string" arguments="32" />

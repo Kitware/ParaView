@@ -9,6 +9,7 @@
 
   <!-- Create a slice filter, set it to "frustum" type and delete it right away. Just checking that it's available -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Common" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Common" command="activate" arguments="Cut" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/comboBox" command="activated" arguments="Frustum" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
