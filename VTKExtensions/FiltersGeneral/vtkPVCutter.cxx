@@ -4,30 +4,38 @@
 
 #include "vtkAMRDataObject.h"
 #include "vtkAppendDataSets.h"
-#include "vtkCellData.h"
-#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
+#include "vtkDataObjectMeshCache.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkIncrementalPointLocator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMeshCacheRunner.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVPlaneCutter.h"
 #include "vtkPlane.h"
-#include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkProbeFilter.h"
 #include "vtkType.h"
+
+#include "Private/vtkEdgesCacheInternal.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutter);
 
 //----------------------------------------------------------------------------
-vtkPVCutter::vtkPVCutter() = default;
+vtkPVCutter::vtkPVCutter()
+  : EdgesCache(std::make_unique<vtkEdgesCacheInternal>())
+{
+  this->MeshCache->SetConsumer(this);
+  this->MeshCache->ForwardAttribute(vtkDataObject::CELL);
+}
 
 //----------------------------------------------------------------------------
 vtkPVCutter::~vtkPVCutter() = default;
@@ -48,64 +56,92 @@ int vtkPVCutter::RequestData(
   vtkDataObject* input = vtkDataObject::GetData(inInfo);
   vtkDataObject* output = vtkDataObject::GetData(outInfo);
 
+  vtkMeshCacheRunner runner{ this->MeshCache, input, output, true };
+  if (runner.GetCacheLoaded())
+  {
+    return this->EdgesCache->UpdateAttributes(input, output) ? 1 : 0;
+  }
+
+  this->EdgesCache->InvalidateCache();
+
   return this->CutDataObject(request, inputVector, outputVector) ? 1 : 0;
+}
+
+//------------------------------------------------------------------------------
+vtkSmartPointer<vtkInformationVector> vtkPVCutter::DuplicateInfoForLeaf(
+  vtkInformationVector* inputInfo, vtkDataObject* leaf)
+{
+  vtkNew<vtkInformationVector> leafVector;
+  leafVector->Copy(inputInfo, 1);
+  vtkInformation* leafInfo = leafVector->GetInformationObject(0);
+  leafInfo->Set(vtkDataObject::DATA_OBJECT(), leaf);
+
+  return leafVector;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::InitializeOutput(vtkDataObjectTree* treeInput, vtkDataObjectTree* treeOutput)
+{
+  // initialize output: polydata everywhere
+  treeOutput->CopyStructure(treeInput);
+
+  vtkSmartPointer<vtkDataObjectTreeIterator> outIter;
+  outIter.TakeReference(treeOutput->NewTreeIterator());
+  outIter->SkipEmptyNodesOff();
+
+  for (outIter->InitTraversal(); !outIter->IsDoneWithTraversal(); outIter->GoToNextItem())
+  {
+    vtkNew<vtkPolyData> newOutput;
+    treeOutput->SetDataSet(outIter, newOutput);
+  }
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVCutter::CutDataObject(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  auto compositeInput = vtkCompositeDataSet::GetData(inputVector[0]);
-  auto compositeOutput = vtkCompositeDataSet::GetData(outputVector);
+  auto treeInput = vtkDataObjectTree::GetData(inputVector[0]);
+  auto treeOutput = vtkDataObjectTree::GetData(outputVector);
 
-  if (compositeInput && compositeOutput)
+  if (treeInput && treeOutput)
   {
-    vtkLogScopeF(INFO, "cut composite");
-
-    // initialize output: polydata everywhere
-    compositeOutput->CopyStructure(compositeInput);
-    vtkSmartPointer<vtkCompositeDataIterator> outIter;
-    outIter.TakeReference(compositeInput->NewIterator());
-    outIter->SkipEmptyNodesOff();
-    for (outIter->InitTraversal(); outIter->IsDoneWithTraversal(); outIter->GoToNextItem())
-    {
-      if (!outIter->GetDataSet())
-      {
-        vtkNew<vtkPolyData> newOutput;
-        compositeOutput->SetDataSet(outIter, newOutput);
-      }
-    }
-    outIter->SkipEmptyNodesOn();
-    outIter->InitTraversal();
-
-    vtkSmartPointer<vtkCompositeDataIterator> inputIter;
-    inputIter.TakeReference(compositeInput->NewIterator());
-    inputIter->SkipEmptyNodesOn();
+    this->InitializeOutput(treeInput, treeOutput);
 
     bool ret = true;
-    vtkNew<vtkInformationVector> outLeafVector;
-    outLeafVector->Copy(outputVector);
-    vtkNew<vtkInformationVector> inLeafVector;
-    inLeafVector->Copy(inputVector[0]);
-    std::vector<vtkInformationVector*> inLeafVectors;
-    inLeafVectors.push_back(inLeafVector);
 
-    for (inputIter->InitTraversal(); !inputIter->IsDoneWithTraversal(); inputIter->GoToNextItem())
+    vtkSmartPointer<vtkDataObjectTreeIterator> outIter;
+    outIter.TakeReference(treeOutput->NewTreeIterator());
+    outIter->SkipEmptyNodesOff();
+
+    vtkSmartPointer<vtkDataObjectTreeIterator> inputIter;
+    inputIter.TakeReference(treeInput->NewTreeIterator());
+    inputIter->SkipEmptyNodesOff();
+
+    outIter->InitTraversal();
+    for (inputIter->InitTraversal(); !inputIter->IsDoneWithTraversal();
+         inputIter->GoToNextItem(), outIter->GoToNextItem())
     {
-      auto inputLeaf = vtkDataSet::SafeDownCast(inputIter->GetCurrentDataObject());
-      auto outLeaf = vtkPolyData::SafeDownCast(outIter->GetCurrentDataObject());
-      vtkInformation* outInfo = outLeafVector->GetInformationObject(0);
-      outInfo->Set(vtkDataObject::DATA_OBJECT(), outLeaf);
-      inLeafVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), inputLeaf);
+      if (!inputIter->GetCurrentDataObject())
+      {
+        // nothing to do
+        continue;
+      }
+      // Internal API for leaf processing uses vtkInformationVector.
+      // As our input is (now) a Composite, we should replace the DATA_OBJECT key content
+      // by the current leaf dataset.
+      auto inLeafVector =
+        this->DuplicateInfoForLeaf(inputVector[0], inputIter->GetCurrentDataObject());
+      std::vector<vtkInformationVector*> inLeafVectors;
+      inLeafVectors.push_back(inLeafVector);
+      auto outLeafVector =
+        this->DuplicateInfoForLeaf(outputVector, outIter->GetCurrentDataObject());
 
       ret = ret && this->CutLeaf(request, inLeafVectors.data(), outLeafVector);
-      outIter->GoToNextItem();
     }
     return ret;
   }
   else
   {
-    vtkLogScopeF(INFO, "cut dataset");
     return this->CutLeaf(request, inputVector, outputVector);
   }
 
