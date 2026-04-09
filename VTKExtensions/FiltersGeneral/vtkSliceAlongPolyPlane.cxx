@@ -27,7 +27,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkThreshold.h"
 #include "vtkTransform.h"
-#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransformFilter.h"
 #include "vtkType.h"
 
 #include <algorithm>
@@ -335,7 +335,7 @@ bool vtkSliceAlongPolyPlane::Execute(
     return true;
   }
 
-  vtkNew<vtkTransformPolyDataFilter> transformOutputFilter;
+  vtkNew<vtkTransformFilter> transformOutputFilter;
   vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
   transform->Identity();
   transform->Scale(1, 1, 0);
@@ -347,7 +347,7 @@ bool vtkSliceAlongPolyPlane::Execute(
   arcLengthFilter->SetInputData(lineDataSet);
   arcLengthFilter->Update();
 
-  vtkNew<vtkTransformPolyDataFilter> transformLineFilter;
+  vtkNew<vtkTransformFilter> transformLineFilter;
   transformLineFilter->SetTransform(transform);
   transformLineFilter->SetInputConnection(arcLengthFilter->GetOutputPort());
   transformLineFilter->Update();
