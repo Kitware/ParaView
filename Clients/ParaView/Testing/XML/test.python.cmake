@@ -134,6 +134,7 @@ if (numpy_found)
     SelectionAndAutoSaveState.xml
     StaticMeshCompositeSlice.xml # uses numpy in python calc
     StaticMeshSlice.xml # uses numpy in python calc
+    StaticMeshSliceWithPlane.xml # uses numpy in python calc
     )
 
   set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)

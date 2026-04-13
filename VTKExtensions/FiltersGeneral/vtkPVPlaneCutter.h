@@ -13,7 +13,10 @@
 
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 #include "vtkPlaneCutter.h"
+#include <memory>
 
+class vtkDataObjectMeshCache;
+class vtkEdgesCacheInternal;
 class vtkAMRCutPlane;
 class vtkHyperTreeGridPlaneCutter;
 
@@ -80,6 +83,9 @@ protected:
 private:
   vtkPVPlaneCutter(const vtkPVPlaneCutter&) = delete;
   void operator=(const vtkPVPlaneCutter&) = delete;
+
+  vtkNew<vtkDataObjectMeshCache> MeshCache;
+  std::unique_ptr<vtkEdgesCacheInternal> EdgesCache;
 };
 
 #endif

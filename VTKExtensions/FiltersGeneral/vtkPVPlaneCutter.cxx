@@ -3,11 +3,13 @@
 #include "vtkPVPlaneCutter.h"
 
 #include "vtkAMRCutPlane.h"
+#include "vtkDataObjectMeshCache.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridPlaneCutter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMeshCacheRunner.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -15,11 +17,18 @@
 #include "vtkPlane.h"
 #include "vtkPlaneCutter.h"
 
+#include "Private/vtkEdgesCacheInternal.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlaneCutter);
 
 //----------------------------------------------------------------------------
-vtkPVPlaneCutter::vtkPVPlaneCutter() = default;
+vtkPVPlaneCutter::vtkPVPlaneCutter()
+  : EdgesCache(std::make_unique<vtkEdgesCacheInternal>())
+{
+  this->MeshCache->SetConsumer(this);
+  this->MeshCache->ForwardAttribute(vtkDataObject::CELL);
+}
 
 //----------------------------------------------------------------------------
 vtkPVPlaneCutter::~vtkPVPlaneCutter() = default;
@@ -50,6 +59,16 @@ int vtkPVPlaneCutter::RequestData(
     return 0;
   }
 
+  vtkMeshCacheRunner runner{ this->MeshCache, input, output, false };
+  if (runner.GetCacheLoaded())
+  {
+    this->EdgesCache->UpdateAttributes(input, output);
+    return 1;
+  }
+
+  this->EdgesCache->InvalidateCache();
+
+  int ret = 0;
   if (auto inHyperTreeGrid = vtkHyperTreeGrid::SafeDownCast(input))
   {
     double* normal = plane->GetNormal();
@@ -58,7 +77,7 @@ int vtkPVPlaneCutter::RequestData(
     this->HTGPlaneCutter->SetInputData(inHyperTreeGrid);
     this->HTGPlaneCutter->Update();
     output->ShallowCopy(this->HTGPlaneCutter->GetOutput());
-    return 1;
+    ret = 1;
   }
   else if (auto inOverlappingAMR = vtkOverlappingAMR::SafeDownCast(input))
   {
@@ -73,10 +92,20 @@ int vtkPVPlaneCutter::RequestData(
     this->AMRPlaneCutter->Update();
     vtkMultiBlockDataSet::SafeDownCast(output)->CompositeShallowCopy(
       this->AMRPlaneCutter->GetOutput());
-    return 1;
+    ret = 1;
   }
-  // Not dealing with hyper tree grids, we execute RequestData of vktCutter
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+  else
+  {
+    // Not dealing with hyper tree grids, we execute RequestData of vtkCutter
+    ret = this->Superclass::RequestData(request, inputVector, outputVector);
+  }
+
+  if (ret == 1)
+  {
+    runner.UpdateCache();
+  }
+
+  return ret;
 }
 
 //----------------------------------------------------------------------------
