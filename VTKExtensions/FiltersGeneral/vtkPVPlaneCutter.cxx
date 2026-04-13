@@ -3,11 +3,8 @@
 #include "vtkPVPlaneCutter.h"
 
 #include "vtkAMRCutPlane.h"
-#include "vtkAMRSliceFilter.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkDataSet.h"
+#include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
-#include "vtkHyperTreeGridAxisCut.h"
 #include "vtkHyperTreeGridPlaneCutter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -17,8 +14,6 @@
 #include "vtkOverlappingAMR.h"
 #include "vtkPlane.h"
 #include "vtkPlaneCutter.h"
-#include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlaneCutter);
@@ -82,34 +77,6 @@ int vtkPVPlaneCutter::RequestData(
   }
   // Not dealing with hyper tree grids, we execute RequestData of vktCutter
   return this->Superclass::RequestData(request, inputVector, outputVector);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVPlaneCutter::ProcessRequest(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  // create the output
-  if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
-  {
-    return this->RequestDataObject(request, inputVector, outputVector);
-  }
-
-  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVPlaneCutter::FillInputPortInformation(int port, vtkInformation* info)
-{
-  this->Superclass::FillInputPortInformation(port, info);
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVPlaneCutter::FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info)
-{
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
-  return 1;
 }
 
 //----------------------------------------------------------------------------
