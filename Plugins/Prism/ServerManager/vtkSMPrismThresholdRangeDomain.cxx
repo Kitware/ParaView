@@ -8,6 +8,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStringScanner.h"
 
 #include <sstream>
 
@@ -27,24 +28,6 @@ void vtkSMPrismThresholdRangeDomain::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AxisId: " << this->AxisId << endl;
 }
 
-//=============================================================================
-namespace
-{
-template <typename T>
-T lexical_cast(const std::string& s)
-{
-  std::stringstream ss(s);
-
-  T result;
-  if ((ss >> result).fail() || !(ss >> std::ws).eof())
-  {
-    throw std::bad_cast();
-  }
-
-  return result;
-}
-}
-
 //------------------------------------------------------------------------------
 int vtkSMPrismThresholdRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
@@ -53,14 +36,13 @@ int vtkSMPrismThresholdRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPV
     return 0;
   }
 
-  const char* axis_id = element->GetAttribute("axis_id");
-  if (axis_id)
+  if (const char* axis_id = element->GetAttribute("axis_id"))
   {
-    try
+    if (auto result = vtk::scan_int<int>(axis_id))
     {
-      this->AxisId = lexical_cast<int>(axis_id);
+      this->AxisId = result->value();
     }
-    catch (const std::bad_cast&)
+    else
     {
       vtkErrorMacro("Invalid axis_id attribute: " << axis_id);
       return 0;

@@ -15,6 +15,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStringScanner.h"
 
 #include <sstream>
 
@@ -29,24 +30,6 @@ vtkSMDataAssemblyDomain::vtkSMDataAssemblyDomain()
 //----------------------------------------------------------------------------
 vtkSMDataAssemblyDomain::~vtkSMDataAssemblyDomain() = default;
 
-//=============================================================================
-namespace
-{
-template <typename T>
-T lexical_cast(const std::string& s)
-{
-  std::stringstream ss(s);
-
-  T result;
-  if ((ss >> result).fail() || !(ss >> std::ws).eof())
-  {
-    throw std::bad_cast();
-  }
-
-  return result;
-}
-}
-
 //-----------------------------------------------------------------------------
 int vtkSMDataAssemblyDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
@@ -55,14 +38,13 @@ int vtkSMDataAssemblyDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElem
     return 0;
   }
 
-  const char* entity_type_string = element->GetAttribute("entity_type");
-  if (entity_type_string)
+  if (const char* entity_type_string = element->GetAttribute("entity_type"))
   {
-    try
+    if (auto result = vtk::scan_int<int>(entity_type_string))
     {
-      this->EntityType = lexical_cast<int>(entity_type_string);
+      this->EntityType = result->value();
     }
-    catch (const std::bad_cast&)
+    else
     {
       vtkErrorMacro("Invalid entity_type_string attribute: " << entity_type_string);
       return 0;
