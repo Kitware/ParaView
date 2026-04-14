@@ -98,6 +98,10 @@ vtkSmartPointer<vtkPropertyDecorator> vtkPropertyDecorator::Create(
   {
     decorator = vtk::TakeSmartPointer(vtkOSPRayHidingDecorator::New());
   }
+  if (type == "ANARIHidingDecorator")
+  {
+    decorator = vtk::TakeSmartPointer(vtkANARIHidingDecorator::New());
+  }
   if (type == "MultiComponentsDecorator")
   {
     decorator = vtk::TakeSmartPointer(vtkMultiComponentsDecorator::New());

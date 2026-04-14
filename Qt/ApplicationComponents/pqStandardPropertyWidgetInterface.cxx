@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqStandardPropertyWidgetInterface.h"
 
+#include "pqANARIHidingDecorator.h"
 #include "pqAnglePropertyWidget.h"
 #include "pqAnimationShortcutDecorator.h"
 #include "pqAnnulusPropertyWidget.h"
@@ -419,6 +420,10 @@ pqPropertyWidgetDecorator* pqStandardPropertyWidgetInterface::createWidgetDecora
   if (type == "OSPRayHidingDecorator")
   {
     return new pqOSPRayHidingDecorator(config, widget);
+  }
+  if (type == "ANARIHidingDecorator")
+  {
+    return new pqANARIHidingDecorator(config, widget);
   }
   if (type == "MultiComponentsDecorator")
   {
