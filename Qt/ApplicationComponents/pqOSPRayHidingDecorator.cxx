@@ -12,9 +12,6 @@ pqOSPRayHidingDecorator::pqOSPRayHidingDecorator(
 }
 
 //-----------------------------------------------------------------------------
-pqOSPRayHidingDecorator::~pqOSPRayHidingDecorator() = default;
-
-//-----------------------------------------------------------------------------
 bool pqOSPRayHidingDecorator::canShowWidget(bool show_advanced) const
 {
   return this->decoratorLogic->CanShow(show_advanced);

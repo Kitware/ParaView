@@ -22,7 +22,7 @@ class pqOSPRayHidingDecorator : public pqPropertyWidgetDecorator
 
 public:
   pqOSPRayHidingDecorator(vtkPVXMLElement* config, pqPropertyWidget* parentObject);
-  ~pqOSPRayHidingDecorator() override;
+  ~pqOSPRayHidingDecorator() override = default;
 
   /**
    * Overridden to hide the widget when OSPRay is not compiled in

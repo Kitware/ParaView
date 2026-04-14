@@ -79,8 +79,7 @@ bool vtkSessionTypeDecorator::Enable() const
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSessionTypeDecorator::CanShow(bool show_advanced) const
+bool vtkSessionTypeDecorator::CanShow(bool vtkNotUsed(showAdvanced)) const
 {
-  (void)(show_advanced);
   return this->IsVisible;
 }

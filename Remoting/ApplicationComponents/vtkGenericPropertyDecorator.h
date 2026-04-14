@@ -38,7 +38,7 @@ public:
   /**
    * Methods overridden from vtkPropertyDecorator.
    */
-  bool CanShow(bool show_advanced) const override;
+  bool CanShow(bool showAdvanced) const override;
   bool Enable() const override;
 
   void UpdateState();

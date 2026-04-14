@@ -13,8 +13,6 @@
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
 #include "vtkWeakPointer.h"
 
-#include <string>
-
 class vtkPVXMLElement;
 class vtkSMProxy;
 
@@ -53,11 +51,7 @@ public:
    * Thus subclasses typically override this method only to force the widget
    * invisible given the current state.
    */
-  virtual bool CanShow(bool show_advanced) const
-  {
-    (void)show_advanced;
-    return true;
-  }
+  virtual bool CanShow(bool vtkNotUsed(showAdvanced)) const { return true; }
 
   /**
    * Override this method to override the enable state of the widget in the

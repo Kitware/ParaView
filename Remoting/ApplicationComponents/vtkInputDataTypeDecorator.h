@@ -36,7 +36,7 @@ public:
   /**
    * Overriden to show or not the widget based on input data type.
    */
-  bool CanShow(bool show_advanced) const override;
+  bool CanShow(bool showAdvanced) const override;
 
 protected:
   vtkInputDataTypeDecorator();

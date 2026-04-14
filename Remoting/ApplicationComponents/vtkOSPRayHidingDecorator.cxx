@@ -12,12 +12,6 @@
 vtkStandardNewMacro(vtkOSPRayHidingDecorator);
 
 //-----------------------------------------------------------------------------
-vtkOSPRayHidingDecorator::vtkOSPRayHidingDecorator() = default;
-
-//-----------------------------------------------------------------------------
-vtkOSPRayHidingDecorator::~vtkOSPRayHidingDecorator() = default;
-
-//-----------------------------------------------------------------------------
 void vtkOSPRayHidingDecorator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

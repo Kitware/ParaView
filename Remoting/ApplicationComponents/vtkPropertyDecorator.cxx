@@ -2,10 +2,10 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPropertyDecorator.h"
-#include "vtkLogger.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
+#include "vtkANARIHidingDecorator.h"
 #include "vtkCompositePropertyDecorator.h"
 #include "vtkEnableDecorator.h"
 #include "vtkGenericPropertyDecorator.h"

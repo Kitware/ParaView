@@ -49,7 +49,7 @@ void vtkMultiComponentsDecorator::Initialize(vtkPVXMLElement* config, vtkSMProxy
 }
 
 //-----------------------------------------------------------------------------
-bool vtkMultiComponentsDecorator::CanShow(bool show_advanced) const
+bool vtkMultiComponentsDecorator::CanShow(bool showAdvanced) const
 {
 #if VTK_MODULE_ENABLE_ParaView_RemotingViews
   vtkPVArrayInformation* info =
@@ -67,5 +67,5 @@ bool vtkMultiComponentsDecorator::CanShow(bool show_advanced) const
   }
 #endif
 
-  return this->Superclass::CanShow(show_advanced);
+  return this->Superclass::CanShow(showAdvanced);
 }

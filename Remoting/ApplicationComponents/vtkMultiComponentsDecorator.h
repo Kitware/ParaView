@@ -24,7 +24,7 @@ public:
   /**
    * Overridden to hide the widget
    */
-  bool CanShow(bool show_advanced) const override;
+  bool CanShow(bool showAdvanced) const override;
 
 protected:
   vtkMultiComponentsDecorator();

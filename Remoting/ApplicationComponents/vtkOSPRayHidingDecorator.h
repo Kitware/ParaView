@@ -25,8 +25,8 @@ public:
   bool CanShow(bool show_advanced) const override;
 
 protected:
-  vtkOSPRayHidingDecorator();
-  ~vtkOSPRayHidingDecorator() override;
+  vtkOSPRayHidingDecorator() = default;
+  ~vtkOSPRayHidingDecorator() override = default;
 
 private:
   vtkOSPRayHidingDecorator(const vtkOSPRayHidingDecorator&) = delete;
