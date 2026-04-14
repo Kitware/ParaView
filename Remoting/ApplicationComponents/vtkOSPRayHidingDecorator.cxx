@@ -18,29 +18,22 @@ void vtkOSPRayHidingDecorator::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkOSPRayHidingDecorator::CanShow(bool show_advanced) const
+bool vtkOSPRayHidingDecorator::CanShow([[maybe_unused]] bool showAdvanced) const
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
-  // If Anari is enabled, show the widget.
-  // TODO: Separate the anari and ospray decorators so that we can show the widget when Anari is
-  // enabled but OSPRay is not.
-  return this->Superclass::CanShow(show_advanced);
-#elif VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   bool enableVisRTX = vtkOSPRayPass::IsBackendAvailable("optix pathtracer") &&
     vtksys::SystemTools::GetEnv("VTK_DISABLE_VISRTX") == nullptr;
   bool enableOSPRay = vtkOSPRayPass::IsBackendAvailable("OSPRay pathtracer") &&
     vtksys::SystemTools::GetEnv("VTK_DISABLE_OSPRAY") == nullptr;
   if (enableOSPRay || enableVisRTX)
   {
-    return this->Superclass::CanShow(show_advanced);
+    return this->Superclass::CanShow(showAdvanced);
   }
   else
   {
-    (void)show_advanced;
     return false;
   }
 #else
-  (void)show_advanced;
   return false;
 #endif
 }
