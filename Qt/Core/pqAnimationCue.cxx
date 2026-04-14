@@ -332,7 +332,24 @@ QString pqAnimationCue::getDisplayName()
     pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
     if (pqProxy* animation_pqproxy = model->findItem<pqProxy*>(pxy))
     {
-      return QString("Camera - %1").arg(animation_pqproxy->getSMName());
+      int mode = pqSMAdaptor::getElementProperty(this->getProxy()->GetProperty("Mode")).toInt();
+      QString type;
+      switch (mode)
+      {
+        case vtkPVCameraCueManipulator::PATH:
+          type = QString("Follow Path");
+          break;
+        case vtkPVCameraCueManipulator::FOLLOW_DATA:
+          type = QString("Follow Data");
+          break;
+        case vtkPVCameraCueManipulator::CAMERA:
+          type = QString("Interpolate Cameras");
+          break;
+        default:
+          type = QString("");
+          break;
+      }
+      return QString("Camera (%1) - %2").arg(type).arg(animation_pqproxy->getSMName());
     }
 
     return "Camera";
