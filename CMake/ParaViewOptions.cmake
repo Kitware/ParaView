@@ -176,12 +176,15 @@ endif ()
 # Options that toggle features. These should begin with `PARAVIEW_ENABLE_`.
 #========================================================================
 
-vtk_deprecated_setting(raytracing_default PARAVIEW_ENABLE_RAYTRACING PARAVIEW_USE_RAYTRACING "OFF")
-option(PARAVIEW_ENABLE_RAYTRACING "Build ParaView with OSPray, ANARI and/or OptiX ray-tracing support" "${raytracing_default}")
+option(PARAVIEW_ENABLE_ANARI "Enable Anari Support" OFF)
 
-cmake_dependent_option(PARAVIEW_ENABLE_ANARI
-  "Enable Anari Support" OFF
-  "PARAVIEW_ENABLE_RAYTRACING" ON)
+vtk_deprecated_setting(raytracing_default PARAVIEW_ENABLE_RAYTRACING PARAVIEW_USE_RAYTRACING "OFF")
+option(PARAVIEW_ENABLE_RAYTRACING "Build ParaView with OSPray and/or OptiX ray-tracing support" ${raytracing_default})
+
+if (PARAVIEW_ENABLE_RAYTRACING AND NOT VTK_ENABLE_OSPRAY AND NOT VTK_ENABLE_VISRTX)
+  message(WARNING "Ray Tracing module is activated without any ray tracing implementation.
+  Please activate either VTK_ENABLE_OSPRAY and/or VTK_ENABLE_VISRTX in order to provide a raytracing implementation for ParaView.")
+endif ()
 
 set(paraview_web_default ON)
 if (PARAVIEW_USE_PYTHON AND WIN32)
@@ -409,7 +412,7 @@ paraview_require_module(
   EXCLUSIVE)
 
 paraview_require_module(
-  CONDITION PARAVIEW_ENABLE_RAYTRACING AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_ENABLE_ANARI
+  CONDITION PARAVIEW_ENABLE_RENDERING AND PARAVIEW_ENABLE_ANARI
   MODULES   VTK::RenderingAnari
   EXCLUSIVE)
 
