@@ -27,21 +27,21 @@ Please remove this comment.
     - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
     - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
   - Signing machines
-    - [ ] Check that the Kitare macOS signing machine is reachable. If not, request it to be switched on.
+    - [ ] Check that the Kitware macOS signing machine is reachable. If not, request it to be switched on.
     - [ ] Check that the Kitware Windows signing machine is reachable. If not, request it to be switched on.
 
 # Update ParaView
 
   - Update the local copy of `@BASEBRANCH@`.
-    - If `@PATCH@@RC@` is `0-RC1`, update `master`
-    - Otherwise, update `release`
+    - [ ] If `@PATCH@@RC@` is `0-RC1`, update `master`
+    - [ ] Otherwise, update `release`
       ```
       git fetch origin
       git checkout @BASEBRANCH@
       git merge --ff-only origin/@BASEBRANCH@ # if this fails, there are local commits that need to be removed
       git submodule update --recursive --init
       ```
-    - If `@BASEBRANCH@` is not `master`, ensure merge requests which should be
+    - [ ] If `@BASEBRANCH@` is not `master`, ensure merge requests which should be
       in the release have been merged. The [`backport-mrs.py`][backport-mrs]
       script can be used to find and ensure that merge requests assigned to the
       associated milestone are available on the `release` branch.
@@ -75,7 +75,7 @@ Please remove this comment.
             (ask `@utils/maintainers/release` if you do not have one)
       - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
             `Developer` privileges (so it can open MRs)
-      - [ ] Use [the `release-mr`][release-mr] script to open the create the
+      - [ ] Use [the `release-mr`][release-mr] script to create the
             Merge Request (see script for usage)
         - [ ] Pull the script for each release; it may have been updated since it
           was last used
@@ -130,6 +130,8 @@ git submodule update --recursive --init
 <!-- endif -->
       - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
       - [ ] `PARAVIEW_VERSION_DEFAULT` in  CMakeLists.txt
+      - [ ] `paraview_doc_ver_series` and `paraview_doc_ver` in versions.cmake
+      - [ ] Update default version to @VERSION@ in `superbuild_set_selectable_source(paraview)` in versions.cmake
       - [ ] Commit changes
         - [ ] `git add README.md versions.cmake CMakeLists.txt`
         - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
@@ -150,7 +152,7 @@ git submodule update --recursive --init
             set(paraview_SOURCE_SELECTION "@VERSION@@RC@" CACHE STRING "Force version to @VERSION@@RC@" FORCE)
             set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
             ```
-      - [ ] Create fixup commit with the above changes `git commit -a --fixup=@`. The fixup commit will prevent merging of the temporary code above; it will be removed in a future step.
+        - [ ] Create fixup commit with the above changes `git commit -a --fixup=@`. The fixup commit will prevent merging of the temporary code above; it will be removed in a future step.
       - [ ] Create a merge request targeting `release`
     - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
           (ask @ben.boeckel if you do not have one)
@@ -171,8 +173,8 @@ git submodule update --recursive --init
           build products. They will be deleted within 24 hours.
 
   - [ ] Remove fixup commit: `git reset --hard @^`
-  - [ ] Get positive review
   - [ ] Force push `git push -f gitlab`
+  - [ ] Get positive review
   - [ ] `Do: merge`
   - Software process updates (these can all be done independently)
     - [ ] Update kwrobot with the new `release` branch rules (@ben.boeckel)
@@ -198,11 +200,12 @@ git submodule update --recursive --init
 
 ## Linux
 
-- Run in client-server configuration with 4 server ranks.
+- Navigate to the install directory and run in client-server configuration with 4 server ranks.
 
 ```
-> mpirun -n 4 pvserver --mpi --hostname=localhost -p 11111 &
-> paraview --server localhost:11111
+bin/mpiexec -n 4 bin/pvserver --mpi --hostname=localhost -p 11111 &
+sleep 5
+bin/paraview --server localhost:11111
 ```
 
 - Start trace. Open disk_out_ref. Clip.Create Screenshot. Create Animation. Stop trace. Save macro. Reset Session. Delete screenshot and animation. Run macro. Check generate screenshots and animations are correct.
@@ -224,11 +227,12 @@ Check that
   - Help -> Getting Started with ParaView menu opens PDF document
   - Help -> Reader, Filter, and Writer lists information about selected sources properly
   - Help -> try every other item in the menu. Note that the Release Notes link will bring you to a missing page until the release notes are published, which may not be until the very end of the release cycle. Check that the URL is the expected one, though.
-  - Run remote server with 8 ranks. Connect the client to it and check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog:
+  - Navigate to install directory and run remote server with 8 ranks. Connect the client to it and check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog:
 
 ```
-> mpirun -n 8 pvserver --mpi --hostname=localhost -p 11111 &
-> paraview --server localhost:11111
+bin/mpiexec -n 8 bin/pvserver --mpi --hostname=localhost -p 11111 &
+sleep 5
+bin/paraview --server localhost:11111
 ```
 
   - Help -> About shows reasonable and accurate information
@@ -277,11 +281,9 @@ If making a non-RC release:
 
 # Update documentation
   - [ ] Submit a Merge Request for release that updates the version to @VERSION@ in https://gitlab.kitware.com/paraview/paraview-docs/-/blob/master/doc/source/conf.py` for `paraview-docs`
-  - [ ] Upload versioned documentation to `https://github.com/kitware/paraview-docs` (see `https://github.com/Kitware/paraview-docs/blob/master/README.md`)
-  - [ ] Tag the HEAD of release in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
+  - [ ] Tag the HEAD of `release-v@MAJOR@.@MINOR@` in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
   - [ ] Activate the tag on [readthedocs](https://readthedocs.org/projects/paraview/versions/) and build it [here](https://readthedocs.org/projects/paraview/)
   - [ ] Go to readthedocs.org and activate
-  - [ ] Head to [ParaView developer docs](github.com/Kitware/paraview-docs) and generate the new developer documentation, following the directions in the README.
   - [ ] Write and publish blog post with release notes.
 -->
 
@@ -294,8 +296,8 @@ If making a non-RC release:
 <!--
 If making a non-RC release:
 
-  - [ ] Request from marketing@kitware.com an update of version number in "Download Latest Release" text on www.paraview.org
-  - [ ] Move unclosed issues in GitLab to the next release milestone in GitLab
+  - [ ] Move unclosed issues in GitLab to the next minor release milestone in GitLab
+  - [ ] Create the `v@VERSION@` label
 -->
 
 /cc @ben.boeckel
