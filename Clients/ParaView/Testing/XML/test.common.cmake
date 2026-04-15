@@ -693,6 +693,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFWithCache0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFWithCache1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFWithCache2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadFLUENTCFFFaces.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadFLUENTCFFFormat.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RectilinearVolumeRendering.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReloadAMReXGrid-AfterReload.png}"
@@ -1241,6 +1242,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   ReadCGNSBCDataset.xml
   ReadIOHDFFileSeries.xml
   ReadIOHDFWithCache.xml
+  ReadFLUENTCFFFaces.xml
   ReadFLUENTCFFFormat.xml
   RectilinearFractal.xml
   ReloadAMReXGrid.xml
