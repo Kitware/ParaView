@@ -24,6 +24,57 @@
           <Documentation>Select which cell-centered arrays to
           read.</Documentation>
         </StringVectorProperty>
+
+        <IntVectorProperty command="SetRenameArrays"
+                         name="RenameArrays"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="default">
+          <BooleanDomain name="bool" />
+          <Documentation>
+            Renames arrays with a more meaningful name from common fluids data model or not.
+          </Documentation>
+        </IntVectorProperty>
+
+        <IntVectorProperty command="SetReadFaces"
+                         name="ReadFaces"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="default">
+          <BooleanDomain name="bool" />
+          <Documentation>
+            Read face data or not. This option is set by default to false as it computationally heavy.
+          </Documentation>
+        </IntVectorProperty>
+
+        <StringVectorProperty information_only="1"
+                              name="FaceArrayInfo">
+          <ArraySelectionInformationHelper attribute_name="Face" />
+        </StringVectorProperty>
+        <StringVectorProperty command="SetFaceArrayStatus"
+                              element_types="2 0"
+                              information_property="FaceArrayInfo"
+                              label="Face Arrays"
+                              name="FaceArrayStatus"
+                              number_of_elements="0"
+                              number_of_elements_per_command="2"
+                              repeat_command="1">
+          <ArraySelectionDomain name="array_list">
+            <RequiredProperties>
+              <Property function="ArrayList"
+                        name="FaceArrayInfo" />
+            </RequiredProperties>
+          </ArraySelectionDomain>
+          <Documentation>
+            Select which face arrays to read.
+          </Documentation>
+          <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator"
+                                    mode="visibility"
+                                    property="ReadFaces"
+                                    value="1" />
+          </Hints>
+        </StringVectorProperty>
         <!-- FLUENTCFFReaderCore -->
       </Proxy>
     <!-- end of "internal_sources" -->
@@ -65,6 +116,10 @@
           <ExposedProperties>
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
+            <Property name="RenameArrays" />
+            <Property name="ReadFaces" />
+            <Property name="FaceArrayInfo" />
+            <Property name="FaceArrayStatus" />
           </ExposedProperties>
         </SubProxy>
         <Hints>
