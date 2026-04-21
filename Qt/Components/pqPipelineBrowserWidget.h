@@ -15,7 +15,7 @@ class pqPipelineSource;
 class pqOutputPort;
 class pqView;
 class QMenu;
-class vtkSession;
+class vtkPVSession;
 
 /**
  * pqPipelineBrowserWidget is the widget for the pipeline  browser. This is a
@@ -60,7 +60,7 @@ public:
   /**
    * Set Session filter to use
    */
-  void enableSessionFilter(vtkSession* session);
+  void enableSessionFilter(vtkPVSession* session);
 
   /**
    * Disable any Session filter

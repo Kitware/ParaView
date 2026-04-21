@@ -93,7 +93,7 @@ void pqServerManagerModel::setActiveResource(const pqServerResource& resource)
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqServerManagerModel::findServer(vtkSession* session) const
+pqServer* pqServerManagerModel::findServer(vtkPVSession* session) const
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   return this->findServer(pm->GetSessionID(session));

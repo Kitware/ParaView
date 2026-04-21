@@ -10,56 +10,10 @@
 #ifndef vtkSessionIterator_h
 #define vtkSessionIterator_h
 
-#include "vtkObject.h"
-#include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkPVSessionIterator.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED
 
-class vtkSession;
-
-class VTKREMOTINGCORE_EXPORT vtkSessionIterator : public vtkObject
-{
-public:
-  static vtkSessionIterator* New();
-  vtkTypeMacro(vtkSessionIterator, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  /**
-   * Begin iterating over the composite dataset structure.
-   */
-  virtual void InitTraversal();
-
-  /**
-   * Move the iterator to the next item in the collection.
-   */
-  virtual void GoToNextItem();
-
-  /**
-   * Test whether the iterator is finished with the traversal.
-   * Returns 1 for yes, and 0 for no.
-   * It is safe to call any of the GetCurrent...() methods only when
-   * IsDoneWithTraversal() returns 0.
-   */
-  virtual bool IsDoneWithTraversal();
-
-  /**
-   * Returns the current session.
-   */
-  vtkSession* GetCurrentSession();
-
-  /**
-   * Returns the current session id.
-   */
-  vtkIdType GetCurrentSessionId();
-
-protected:
-  vtkSessionIterator();
-  ~vtkSessionIterator() override;
-
-  class vtkInternals;
-  vtkInternals* Internals;
-
-private:
-  vtkSessionIterator(const vtkSessionIterator&) = delete;
-  void operator=(const vtkSessionIterator&) = delete;
-};
+PARAVIEW_DEPRECATED_IN_6_1_0("Please use the `vtkPVSessionIterator` class instead.")
+typedef vtkPVSessionIterator vtkSessionIterator;
 
 #endif

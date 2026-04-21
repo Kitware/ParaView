@@ -5,6 +5,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkPVServerInformation.h"
+#include "vtkProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkPVSession::vtkPVSession()
@@ -117,10 +118,29 @@ bool vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSession::Activate()
+{
+  if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
+  {
+    pm->PushActiveSession(this);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSession::DeActivate()
+{
+  if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
+  {
+    pm->PopActiveSession(this);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSession::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
 //----------------------------------------------------------------------------
 bool vtkPVSession::IsMultiClients()
 {

@@ -22,8 +22,8 @@ class vtkInformation;
 class vtkMultiProcessController;
 class vtkNetworkAccessManager;
 class vtkProcessModuleInternals;
-class vtkSession;
-class vtkSessionIterator;
+class vtkPVSession;
+class vtkPVSessionIterator;
 class vtkThreadedCallbackQueue;
 
 class VTKREMOTINGCORE_EXPORT vtkProcessModule : public vtkObject
@@ -104,7 +104,7 @@ public:
    * registered. The event-data for this event is a vtkIdType whose value is the
    * session id.
    */
-  vtkIdType RegisterSession(vtkSession*);
+  vtkIdType RegisterSession(vtkPVSession*);
 
   ///@{
   /**
@@ -118,7 +118,7 @@ public:
    * session id.
    */
   bool UnRegisterSession(vtkIdType sessionID);
-  bool UnRegisterSession(vtkSession* session);
+  bool UnRegisterSession(vtkPVSession* session);
   ///@}
 
   ///@{
@@ -134,33 +134,33 @@ public:
   /**
    * Returns the session associated with a given ID.
    */
-  vtkSession* GetSession(vtkIdType);
+  vtkPVSession* GetSession(vtkIdType);
 
   /**
    * Returns the session id for the session, if any. Return 0 is the session has
    * not been registered with the process module.
    */
-  vtkIdType GetSessionID(vtkSession*);
+  vtkIdType GetSessionID(vtkPVSession*);
 
   /**
    * Returns a new session iterator that can be used to iterate over the
    * registered sessions.
    */
-  vtkSessionIterator* NewSessionIterator();
+  vtkPVSessionIterator* NewSessionIterator();
 
   /**
    * Whenever any session is processing some message, it typically marks itself
    * active with the process module. The active session can be accessed using
    * this method.
    */
-  vtkSession* GetActiveSession();
+  vtkPVSession* GetActiveSession();
 
   /**
    * This is a convenience method that either returns the active session, if
    * present, otherwise the first session. Don't use this for new API. This is
    * provided for some old api.
    */
-  vtkSession* GetSession();
+  vtkPVSession* GetSession();
 
   ///@{
   /**
@@ -279,15 +279,15 @@ protected:
   /**
    * Push/Pop the active session.
    */
-  void PushActiveSession(vtkSession*);
-  void PopActiveSession(vtkSession*);
+  void PushActiveSession(vtkPVSession*);
+  void PopActiveSession(vtkPVSession*);
   ///@}
 
   /**
-   * Marking vtkSession as friend since it needs access to
+   * Marking vtkPVSession as friend since it needs access to
    * PushActiveSession/PopActiveSession.
    */
-  friend class vtkSession;
+  friend class vtkPVSession;
 
   vtkNetworkAccessManager* NetworkAccessManager;
 
@@ -305,9 +305,9 @@ protected:
 
   vtkProcessModuleInternals* Internals;
 
-  // vtkSessionIterator needs access to vtkInternals to be able to iterate over
+  // vtkPVSessionIterator needs access to vtkInternals to be able to iterate over
   // the sessions efficiently.
-  friend class vtkSessionIterator;
+  friend class vtkPVSessionIterator;
 
   bool ReportInterpreterErrors;
 

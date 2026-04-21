@@ -450,7 +450,7 @@ void pqPipelineBrowserWidget::disableAnnotationFilter()
   this->FilteredPipelineModel->disableAnnotationFilter();
 }
 //----------------------------------------------------------------------------
-void pqPipelineBrowserWidget::enableSessionFilter(vtkSession* session)
+void pqPipelineBrowserWidget::enableSessionFilter(vtkPVSession* session)
 {
   this->FilteredPipelineModel->enableSessionFilter(session);
 }

@@ -16,9 +16,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkPSystemTools.h"
+#include "vtkPVSessionIterator.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModuleConfiguration.h"
-#include "vtkSessionIterator.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringFormatter.h"
 #include "vtkTCPNetworkAccessManager.h"
@@ -425,7 +425,7 @@ bool vtkProcessModule::GetSymmetricMPIMode()
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkProcessModule::RegisterSession(vtkSession* session)
+vtkIdType vtkProcessModule::RegisterSession(vtkPVSession* session)
 {
   assert(session != nullptr);
   this->MaxSessionId++;
@@ -454,7 +454,7 @@ bool vtkProcessModule::UnRegisterSession(vtkIdType sessionID)
 }
 
 //----------------------------------------------------------------------------
-bool vtkProcessModule::UnRegisterSession(vtkSession* session)
+bool vtkProcessModule::UnRegisterSession(vtkPVSession* session)
 {
   vtkProcessModuleInternals::MapOfSessions::iterator iter;
   for (iter = this->Internals->Sessions.begin(); iter != this->Internals->Sessions.end(); ++iter)
@@ -474,7 +474,7 @@ bool vtkProcessModule::UnRegisterSession(vtkSession* session)
 }
 
 //----------------------------------------------------------------------------
-vtkSession* vtkProcessModule::GetSession(vtkIdType sessionID)
+vtkPVSession* vtkProcessModule::GetSession(vtkIdType sessionID)
 {
   vtkProcessModuleInternals::MapOfSessions::iterator iter =
     this->Internals->Sessions.find(sessionID);
@@ -487,7 +487,7 @@ vtkSession* vtkProcessModule::GetSession(vtkIdType sessionID)
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkProcessModule::GetSessionID(vtkSession* session)
+vtkIdType vtkProcessModule::GetSessionID(vtkPVSession* session)
 {
   vtkProcessModuleInternals::MapOfSessions::iterator iter;
   for (iter = this->Internals->Sessions.begin(); iter != this->Internals->Sessions.end(); ++iter)
@@ -501,9 +501,9 @@ vtkIdType vtkProcessModule::GetSessionID(vtkSession* session)
 }
 
 //----------------------------------------------------------------------------
-vtkSessionIterator* vtkProcessModule::NewSessionIterator()
+vtkPVSessionIterator* vtkProcessModule::NewSessionIterator()
 {
-  vtkSessionIterator* iter = vtkSessionIterator::New();
+  vtkPVSessionIterator* iter = vtkPVSessionIterator::New();
   return iter;
 }
 
@@ -532,7 +532,7 @@ bool vtkProcessModule::IsMPIInitialized()
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::PushActiveSession(vtkSession* session)
+void vtkProcessModule::PushActiveSession(vtkPVSession* session)
 {
   assert(session != nullptr);
 
@@ -540,7 +540,7 @@ void vtkProcessModule::PushActiveSession(vtkSession* session)
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::PopActiveSession(vtkSession* session)
+void vtkProcessModule::PopActiveSession(vtkPVSession* session)
 {
   assert(session != nullptr);
 
@@ -553,7 +553,7 @@ void vtkProcessModule::PopActiveSession(vtkSession* session)
 }
 
 //----------------------------------------------------------------------------
-vtkSession* vtkProcessModule::GetActiveSession()
+vtkPVSession* vtkProcessModule::GetActiveSession()
 {
   if (this->Internals->ActiveSessionStack.empty())
   {
@@ -563,9 +563,9 @@ vtkSession* vtkProcessModule::GetActiveSession()
 }
 
 //----------------------------------------------------------------------------
-vtkSession* vtkProcessModule::GetSession()
+vtkPVSession* vtkProcessModule::GetSession()
 {
-  vtkSession* activeSession = this->GetActiveSession();
+  vtkPVSession* activeSession = this->GetActiveSession();
   if (activeSession)
   {
     return activeSession;

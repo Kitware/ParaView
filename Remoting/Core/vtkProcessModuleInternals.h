@@ -4,7 +4,7 @@
 #define vtkProcessModuleInternals_h
 
 #include "vtkNew.h"
-#include "vtkSession.h"      // for vtkSession
+#include "vtkPVSession.h"    // for vtkPVSession
 #include "vtkSmartPointer.h" // for vtkSmartPointer
 #include "vtkThreadedCallbackQueue.h"
 #include "vtkWeakPointer.h" // for vtkWeakPointer
@@ -15,10 +15,10 @@
 class vtkProcessModuleInternals
 {
 public:
-  typedef std::map<vtkIdType, vtkSmartPointer<vtkSession>> MapOfSessions;
+  typedef std::map<vtkIdType, vtkSmartPointer<vtkPVSession>> MapOfSessions;
   MapOfSessions Sessions;
 
-  typedef std::vector<vtkWeakPointer<vtkSession>> ActiveSessionStackType;
+  typedef std::vector<vtkWeakPointer<vtkPVSession>> ActiveSessionStackType;
   ActiveSessionStackType ActiveSessionStack;
 
   vtkNew<vtkThreadedCallbackQueue> CallbackQueue;

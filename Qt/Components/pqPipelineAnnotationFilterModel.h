@@ -13,7 +13,7 @@
 #include "pqComponentsModule.h"
 #include <QSortFilterProxyModel>
 
-class vtkSession;
+class vtkPVSession;
 
 /**
  * \class pqPipelineAnnotationFilterModel
@@ -40,7 +40,7 @@ public:
    */
   void setAnnotationFilterMatching(bool matching);
 
-  void enableSessionFilter(vtkSession* session);
+  void enableSessionFilter(vtkPVSession* session);
   void disableSessionFilter();
 
 protected:

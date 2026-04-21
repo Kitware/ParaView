@@ -41,7 +41,7 @@ class pqPipelineSource;
 class pqServer;
 class pqServerManagerModel;
 class pqServerManagerModelItem;
-class vtkSession;
+class vtkPVSession;
 
 /**
  * This class is the model for the PipelineLine browser tree view.
@@ -289,7 +289,7 @@ public:
    *   get called.
    * \param session that will be lookup inside the above code.
    */
-  void enableFilterSession(vtkSession* session);
+  void enableFilterSession(vtkPVSession* session);
 
   /**
    * \brief
@@ -428,7 +428,7 @@ private: // NOLINT(readability-redundant-access-specifiers)
   bool Editable;
   bool FilterAnnotationMatching;
   QString FilterRoleAnnotationKey;
-  vtkSession* FilterRoleSession;
+  vtkPVSession* FilterRoleSession;
   ModifiedLiveInsituLink* LinkCallback;
   void constructor();
 
