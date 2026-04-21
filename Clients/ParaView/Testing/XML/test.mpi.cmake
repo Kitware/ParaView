@@ -134,6 +134,13 @@ paraview_add_client_server_tests(
   NUMSERVERS 4
 )
 
+# Piece distribution makes sense only in parallel
+# using 3 servers to showcase the different distribution modes
+paraview_add_client_server_tests(
+  TEST_SCRIPTS VTKHDFReaderPieceDistribution.xml
+  NUMSERVERS 3
+)
+
 paraview_add_client_server_tests(
   TEST_SCRIPTS GhostFeatureEdgesAndWireframe.xml
   )
