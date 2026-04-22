@@ -1088,13 +1088,14 @@ struct vtkMergeVectorComponents
   {
     auto a1 = vtk::DataArrayValueRange<1>(array1);
     auto a2 = vtk::DataArrayValueRange<1>(array2);
-    auto result = vtk::DataArrayTupleRange<2>(TArray1::FastDownCast(resultArray));
+    auto result = vtk::DataArrayTupleRange<3>(TArray1::FastDownCast(resultArray));
     vtkIdType numTuples = array1->GetNumberOfTuples();
     for (vtkIdType i = 0; i < numTuples; ++i)
     {
       auto tuple = result[i];
       tuple[0] = a1[i];
       tuple[1] = a2[i];
+      tuple[2] = 0;
     }
   }
 };
@@ -1249,7 +1250,7 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da, vtkDataArray* a1, v
   }
   // Merge the arrays.
   vtkDataArray* newArray = a1->NewInstance();
-  // Creae the third componnt and set to 0.
+  // Create the third component and set to 0.
   newArray->SetNumberOfComponents(3);
   vtkIdType length = a1->GetNumberOfTuples();
   newArray->SetNumberOfTuples(length);
