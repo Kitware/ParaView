@@ -163,6 +163,13 @@ bool vtkSMVRJoystickCameraStyleProxy::Update()
     this->MoveCameraSensitivity *
       (this->MoveForward * newForwardVector[2] + this->MoveRight * newRightVector.GetZ()) };
 
+  if (this->FastMovement)
+  {
+    moveVector[0] *= this->FastMovementMultiplier;
+    moveVector[1] *= this->FastMovementMultiplier;
+    moveVector[2] *= this->FastMovementMultiplier;
+  }
+
   camPosition[0] += moveVector[0];
   camPosition[1] += moveVector[1];
   camPosition[2] += moveVector[2];
@@ -195,11 +202,6 @@ double vtkSMVRJoystickCameraStyleProxy::GetMovementValue(double valuatorValue, b
   if (invert)
   {
     movementValue *= -1;
-  }
-
-  if (this->FastMovement)
-  {
-    movementValue *= this->FastMovementMultiplier;
   }
 
   return movementValue;
