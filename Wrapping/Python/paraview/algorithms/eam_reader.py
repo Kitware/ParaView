@@ -172,6 +172,15 @@ class VarMeta:
     def __repr__(self):
         return f"VarMeta(name='{self.name}', dims={self.dimensions})"
 
+class OutputType:
+    '''
+    Constants for output type: AllLayers, Surface, MiddleLayer, InterfaceLayer
+    '''
+    AllLayers = 0
+    Surface = 1
+    MiddleLayer = 2
+    InterfaceLayer = 3
+
 
 # ==============================================================================
 # Helper Functions
@@ -514,8 +523,10 @@ class EAMDataReader(VTKPythonAlgorithmBase):
     """
 
     def __init__(self):
+        if not hasattr(self, '_output_type'):
+            self._output_type = OutputType.AllLayers
         VTKPythonAlgorithmBase.__init__(
-            self, nInputPorts=0, nOutputPorts=3, outputType='vtkUnstructuredGrid')
+            self, nInputPorts=0, nOutputPorts=self.GetOutputPortsCount(), outputType='vtkUnstructuredGrid')
 
         self._data_filename = None
         self._conn_filename = None
@@ -621,11 +632,17 @@ class EAMDataReader(VTKPythonAlgorithmBase):
 
             ndims = len(info.dimensions)
             if ndims == 2:
-                self._surface_selection.AddArray(name)
+                if (self._output_type == OutputType.AllLayers or
+                    self._output_type == OutputType.Surface):
+                    self._surface_selection.AddArray(name)
             elif ndims == 3:
-                if AtmosphereConstants.LEV in info.dimensions:
+                if (AtmosphereConstants.LEV in info.dimensions and
+                    (self._output_type == OutputType.AllLayers or
+                     self._output_type == OutputType.MiddleLayer)):
                     self._middle_layer_selection.AddArray(name)
-                elif AtmosphereConstants.ILEV in info.dimensions:
+                elif (AtmosphereConstants.ILEV in info.dimensions and
+                      (self._output_type == OutputType.AllLayers or
+                       self._output_type == OutputType.InterfaceLayer)):
                     self._interface_layer_selection.AddArray(name)
 
         self._surface_selection.DisableAllArrays()
@@ -662,9 +679,26 @@ class EAMDataReader(VTKPythonAlgorithmBase):
     def GetInterfaceLayerDataArrays(self):
         return self._interface_layer_selection
 
+    def SetOutputType(self, output_type):
+        if self._output_type != output_type:
+            if output_type < 0 or output_type > OutputType.InterfaceLayer:
+                print_error(f"Output type is invalid: {output_type}")
+            self._output_type = output_type
+            self.Modified()
+
+    def GetOutputType(self):
+        return self._output_type
+
+    def GetOutputPortsCount(self):
+        output_ports_count = 1
+        if self._output_type == OutputType.AllLayers:
+            output_ports_count = 3
+        return output_ports_count
+
     def RequestInformation(self, request, inInfo, outInfo):
         executive = self.GetExecutive()
-        for i in range(3):
+        output_ports_count = self.GetOutputPortsCount()
+        for i in range(output_ports_count):
             port = outInfo.GetInformationObject(i)
             port.Remove(executive.TIME_STEPS())
             port.Remove(executive.TIME_RANGE())
@@ -706,6 +740,13 @@ class EAMDataReader(VTKPythonAlgorithmBase):
             print_error("Could not find lat/lon variables in connectivity file")
             return 0
 
+        output_port_surface = 0
+        output_port_middle = 0
+        output_port_interface = 0
+        if self._output_type == OutputType.AllLayers:
+            output_port_middle = 1
+            output_port_interface = 2
+
         lat = meshdata[lat_var][:].data.flatten()
         lon = meshdata[lon_var][:].data.flatten()
         ncells2D = meshdata.dimensions[self._horizontal_dim].size
@@ -715,57 +756,80 @@ class EAMDataReader(VTKPythonAlgorithmBase):
         time_idx = self._get_time_index(outInfo, from_port)
 
         # Output 0: Surface data
-        outputSurface = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 0))
-        vtk_coords, cell_types, cell_array = build_2d_geometry(lat, lon, ncells2D)
-        outputSurface.SetPoints(vtk_coords)
-        outputSurface.VTKObject.SetCells(cell_types, cell_array)
+        if (self._output_type == OutputType.AllLayers or
+            self._output_type == OutputType.Surface):
+            outputSurface = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, output_port_surface))
+            vtk_coords, cell_types, cell_array = build_2d_geometry(lat, lon, ncells2D)
+            outputSurface.SetPoints(vtk_coords)
+            outputSurface.VTKObject.SetCells(cell_types, cell_array)
 
-        for name, varmeta in self._variables.items():
-            if self._surface_selection.ArrayIsEnabled(name):
-                data = load_variable_data(vardata, varmeta, time_idx)
-                outputSurface.CellData.append(data, name)
+            for name, varmeta in self._variables.items():
+                if self._surface_selection.ArrayIsEnabled(name):
+                    data = load_variable_data(vardata, varmeta, time_idx)
+                    outputSurface.CellData.append(data, name)
 
         # Output 1: Middle layer (lev) - volumetric hexahedral mesh
-        try:
-            lev = FindSpecialVariable(vardata, AtmosphereConstants.LEV, AtmosphereConstants.HYAM, AtmosphereConstants.HYBM)
-            if lev is not None:
-                nlev = len(lev)
-                outputMiddle = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 1))
-                vtk_coords, cell_types, cell_array = build_3d_volume_geometry(lat, lon, lev, ncells2D)
-                outputMiddle.SetPoints(vtk_coords)
-                outputMiddle.VTKObject.SetCells(cell_types, cell_array)
+        if (self._output_type == OutputType.AllLayers or
+            self._output_type == OutputType.MiddleLayer):
+            try:
+                lev = FindSpecialVariable(vardata, AtmosphereConstants.LEV, AtmosphereConstants.HYAM, AtmosphereConstants.HYBM)
+                if lev is not None:
+                    nlev = len(lev)
+                    outputMiddle = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, output_port_middle))
+                    vtk_coords, cell_types, cell_array = build_3d_volume_geometry(lat, lon, lev, ncells2D)
+                    outputMiddle.SetPoints(vtk_coords)
+                    outputMiddle.VTKObject.SetCells(cell_types, cell_array)
 
-                for name, varmeta in self._variables.items():
-                    if self._middle_layer_selection.ArrayIsEnabled(name):
-                        data = load_variable_data_averaged(vardata, varmeta, time_idx, ncells2D, nlev)
-                        outputMiddle.CellData.append(data, name)
+                    for name, varmeta in self._variables.items():
+                        if self._middle_layer_selection.ArrayIsEnabled(name):
+                            data = load_variable_data_averaged(vardata, varmeta, time_idx, ncells2D, nlev)
+                            outputMiddle.CellData.append(data, name)
 
-                outputMiddle.FieldData.append(nlev - 1, "numlev")
-                outputMiddle.FieldData.append(lev, "lev")
-        except Exception as e:
-            print_error(f"Error processing middle layer variables: {e}")
+                    outputMiddle.FieldData.append(nlev - 1, "numlev")
+                    outputMiddle.FieldData.append(lev, "lev")
+            except Exception as e:
+                print_error(f"Error processing middle layer variables: {e}")
 
         # Output 2: Interface layer (ilev) - volumetric hexahedral mesh
-        try:
-            ilev = FindSpecialVariable(vardata, AtmosphereConstants.ILEV, AtmosphereConstants.HYAI, AtmosphereConstants.HYBI)
-            if ilev is not None:
-                nilev = len(ilev)
-                outputInterface = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, 2))
-                vtk_coords, cell_types, cell_array = build_3d_volume_geometry(lat, lon, ilev, ncells2D)
-                outputInterface.SetPoints(vtk_coords)
-                outputInterface.VTKObject.SetCells(cell_types, cell_array)
+        if (self._output_type == OutputType.AllLayers or
+            self._output_type == OutputType.InterfaceLayer):
+            try:
+                ilev = FindSpecialVariable(vardata, AtmosphereConstants.ILEV, AtmosphereConstants.HYAI, AtmosphereConstants.HYBI)
+                if ilev is not None:
+                    nilev = len(ilev)
+                    outputInterface = dsa.WrapDataObject(vtkUnstructuredGrid.GetData(outInfo, output_port_interface))
+                    vtk_coords, cell_types, cell_array = build_3d_volume_geometry(lat, lon, ilev, ncells2D)
+                    outputInterface.SetPoints(vtk_coords)
+                    outputInterface.VTKObject.SetCells(cell_types, cell_array)
 
-                for name, varmeta in self._variables.items():
-                    if self._interface_layer_selection.ArrayIsEnabled(name):
-                        data = load_variable_data_averaged(vardata, varmeta, time_idx, ncells2D, nilev)
-                        outputInterface.CellData.append(data, name)
+                    for name, varmeta in self._variables.items():
+                        if self._interface_layer_selection.ArrayIsEnabled(name):
+                            data = load_variable_data_averaged(vardata, varmeta, time_idx, ncells2D, nilev)
+                            outputInterface.CellData.append(data, name)
 
-                outputInterface.FieldData.append(nilev - 1, "numilev")
-                outputInterface.FieldData.append(ilev, "ilev")
-        except Exception as e:
-            print_error(f"Error processing interface layer variables: {e}")
+                    outputInterface.FieldData.append(nilev - 1, "numilev")
+                    outputInterface.FieldData.append(ilev, "ilev")
+            except Exception as e:
+                print_error(f"Error processing interface layer variables: {e}")
 
         return 1
+
+
+class EAMDataReaderSurface(EAMDataReader):
+    def __init__(self):
+        self._output_type = OutputType.Surface
+        EAMDataReader.__init__(self)
+
+class EAMDataReaderMiddleLayer(EAMDataReader):
+    def __init__(self):
+        self._output_type = OutputType.MiddleLayer
+        EAMDataReader.__init__(self)
+
+class EAMDataReaderInterfaceLayer(EAMDataReader):
+    def __init__(self):
+        self._output_type = OutputType.InterfaceLayer
+        EAMDataReader.__init__(self)
+
 
 
 # ==============================================================================
