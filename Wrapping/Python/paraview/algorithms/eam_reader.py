@@ -462,8 +462,7 @@ def process_point_to_sphere(point, max_z, radius, scale):
 # ==============================================================================
 
 class EAMDataReader(VTKPythonAlgorithmBase):
-    """
-    Multi-output NetCDF reader for E3SM/EAM atmospheric model data.
+    """Multi-output NetCDF reader for E3SM/EAM atmospheric model data.
 
     This reader produces three separate outputs for different variable types:
     - Port 0 (Surface): Surface variables with 2 dimensions (time, ncol) as quad mesh
@@ -477,6 +476,11 @@ class EAMDataReader(VTKPythonAlgorithmBase):
     The reader automatically detects horizontal dimensions by matching the connectivity
     file's cell count with dimensions in the data file. It handles fill values
     (_FillValue, missing_value) by converting them to NaN.
+
+    See also: EAMDataReaderSurface, EAMDataReaderMiddleLayer,
+    EAMDataReaderInterfaceLayer. These are versions of this reader
+    that offer only one type of output (Surface, MiddleLayer and
+    InterfaceLayer) to save memory.
 
     Parameters
     ----------
@@ -679,13 +683,6 @@ class EAMDataReader(VTKPythonAlgorithmBase):
     def GetInterfaceLayerDataArrays(self):
         return self._interface_layer_selection
 
-    def SetOutputType(self, output_type):
-        if self._output_type != output_type:
-            if output_type < 0 or output_type > OutputType.InterfaceLayer:
-                print_error(f"Output type is invalid: {output_type}")
-            self._output_type = output_type
-            self.Modified()
-
     def GetOutputType(self):
         return self._output_type
 
@@ -816,16 +813,28 @@ class EAMDataReader(VTKPythonAlgorithmBase):
 
 
 class EAMDataReaderSurface(EAMDataReader):
+    """Version of EAMDataReader that offers only Surface output to
+    save memory.
+
+    """
     def __init__(self):
         self._output_type = OutputType.Surface
         EAMDataReader.__init__(self)
 
 class EAMDataReaderMiddleLayer(EAMDataReader):
+    """Version of EAMDataReader that offers only MiddleLayer output
+    to save memory.
+
+    """
     def __init__(self):
         self._output_type = OutputType.MiddleLayer
         EAMDataReader.__init__(self)
 
 class EAMDataReaderInterfaceLayer(EAMDataReader):
+    """Version of EAMDataReader that offers only InterfaceLayer
+    output to save memory.
+
+    """
     def __init__(self):
         self._output_type = OutputType.InterfaceLayer
         EAMDataReader.__init__(self)
