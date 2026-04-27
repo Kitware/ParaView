@@ -2,29 +2,36 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class   vtkPVSession
- * @brief   extends vtkSession to add API for ParaView sessions.
  *
- * vtkPVSession adds APIs to vtkSession for ParaView-specific sessions, namely
- * those that are used to communicate between data-server,render-server and
- * client. This is an abstract class.
+ * vtkPVSession defines a session i.e. a conversation, namely, those that are
+ * used to communicate between data-server,render-server and client.
+ * It can be between different processes or same process. What types of
+ * conversations are possible i.e what protocols are supported, is defined
+ * by the subclasses. This is an abstract class.
  */
 
 #ifndef vtkPVSession_h
 #define vtkPVSession_h
 
-#include "vtkRemotingCoreModule.h" //needed for exports
-#include "vtkSession.h"
+#include "vtkObject.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED
+#include "vtkRemotingCoreModule.h"  //needed for exports
 
 class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
 class vtkPVProgressHandler;
 class vtkPVServerInformation;
 
-class VTKREMOTINGCORE_EXPORT vtkPVSession : public vtkSession
+class VTKREMOTINGCORE_EXPORT vtkPVSession : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkPVSession, vtkSession);
+  vtkTypeMacro(vtkPVSession, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  /**
+   * Returns true is this session is active/alive/valid.
+   */
+  virtual bool GetIsAlive() = 0;
 
   enum ServerFlags
   {
@@ -128,6 +135,20 @@ protected:
   virtual void CleanupPendingProgressInternal();
   ///@}
 
+  /**
+   * Subclasses must call this to mark the session active. This sets the active
+   * session pointer held by the vtkProcessModule, making it easier for filters
+   * etc. that need information about the active session to access it.
+   */
+  virtual void Activate();
+
+  /**
+   * Subclasses must call this to mark the session inactive. This sets the active
+   * session pointer held by the vtkProcessModule, making it easier for filters
+   * etc. that need information about the active session to access it.
+   */
+  virtual void DeActivate();
+
   vtkPVProgressHandler* ProgressHandler;
 
 private:
@@ -139,5 +160,8 @@ private:
   // to finish, we don't start new progress-pairs.
   bool InCleanupPendingProgress;
 };
+
+PARAVIEW_DEPRECATED_IN_6_1_0("Please use the `vtkPVSession` class instead.")
+typedef vtkPVSession vtkSession;
 
 #endif

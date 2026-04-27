@@ -11,13 +11,13 @@ extern "C"
 #include "vtkLogger.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVPluginTracker.h"
+#include "vtkPVSessionIterator.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
-#include "vtkSessionIterator.h"
 
 #include <vector>
 #include <vtksys/SystemTools.hxx>

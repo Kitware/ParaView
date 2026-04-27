@@ -39,13 +39,12 @@ set(classes
   vtkPVServerInformation
   vtkPVServerManagerPluginInterface
   vtkPVSession
+  vtkPVSessionIterator
   vtkPVSystemConfigInformation
   vtkPVSystemInformation
   vtkPVTemporalDataInformation
   vtkPVTimerInformation
   vtkRemotingCoreConfiguration
-  vtkSession
-  vtkSessionIterator
   vtkTCPNetworkAccessManager)
 
 set(sources)
@@ -53,7 +52,9 @@ set(private_headers
   vtkProcessModuleInternals.h)
 
 set(headers
-  vtkReservedRemoteObjectIds.h)
+  vtkReservedRemoteObjectIds.h
+  vtkSessionIterator.h
+)
 if (APPLE)
   list(APPEND sources
     vtkPVMacFileInformationHelper.mm)

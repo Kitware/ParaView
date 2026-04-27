@@ -84,7 +84,7 @@ void pqPipelineAnnotationFilterModel::disableAnnotationFilter()
 }
 //-----------------------------------------------------------------------------
 
-void pqPipelineAnnotationFilterModel::enableSessionFilter(vtkSession* session)
+void pqPipelineAnnotationFilterModel::enableSessionFilter(vtkPVSession* session)
 {
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if (model)

@@ -1577,7 +1577,7 @@ void pqPipelineModel::disableFilterAnnotationKey()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::enableFilterSession(vtkSession* session)
+void pqPipelineModel::enableFilterSession(vtkPVSession* session)
 {
   this->FilterRoleSession = session;
 }

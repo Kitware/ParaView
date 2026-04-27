@@ -5,6 +5,7 @@
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSessionIterator.h"
 #include "vtkPVVersion.h" // for PARAVIEW_VERSION_*
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
@@ -16,7 +17,6 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMWriterFactory.h"
-#include "vtkSessionIterator.h"
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
@@ -179,7 +179,7 @@ void vtkSMProxyManager::ConnectionsUpdated(vtkObject*, unsigned long eventid, vo
 
       // Find another session, if available, and make that active.
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-      vtkSessionIterator* iter = pm->NewSessionIterator();
+      vtkPVSessionIterator* iter = pm->NewSessionIterator();
       for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
         if (iter->GetCurrentSession() != nullptr && iter->GetCurrentSessionId() != sid)
@@ -327,7 +327,7 @@ std::string vtkSMProxyManager::GetUniqueProxyName(
 {
   std::vector<vtkSMSessionProxyManager*> pxms;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkSessionIterator* iter = pm->NewSessionIterator();
+  vtkPVSessionIterator* iter = pm->NewSessionIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     if (auto session = vtkSMSession::SafeDownCast(iter->GetCurrentSession()))

@@ -14,9 +14,9 @@
 #include <pqServerConfiguration.h>
 #include <pqServerConnectReaction.h>
 #include <pqServerManagerModel.h>
+#include <vtkPVSession.h>
 #include <vtkProcessModule.h>
 #include <vtkSMSession.h>
-#include <vtkSession.h>
 
 #include <QComboBox>
 

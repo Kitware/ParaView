@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
-#include "vtkSessionIterator.h"
+#include "vtkPVSessionIterator.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -8,28 +8,28 @@
 
 #include <cassert>
 
-class vtkSessionIterator::vtkInternals
+class vtkPVSessionIterator::vtkInternals
 {
 public:
   vtkProcessModuleInternals::MapOfSessions::iterator Iter;
 };
 
-vtkStandardNewMacro(vtkSessionIterator);
+vtkStandardNewMacro(vtkPVSessionIterator);
 //----------------------------------------------------------------------------
-vtkSessionIterator::vtkSessionIterator()
+vtkPVSessionIterator::vtkPVSessionIterator()
 {
   this->Internals = new vtkInternals();
   this->InitTraversal();
 }
 
 //----------------------------------------------------------------------------
-vtkSessionIterator::~vtkSessionIterator()
+vtkPVSessionIterator::~vtkPVSessionIterator()
 {
   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-void vtkSessionIterator::InitTraversal()
+void vtkPVSessionIterator::InitTraversal()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -43,7 +43,7 @@ void vtkSessionIterator::InitTraversal()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSessionIterator::IsDoneWithTraversal()
+bool vtkPVSessionIterator::IsDoneWithTraversal()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -56,7 +56,7 @@ bool vtkSessionIterator::IsDoneWithTraversal()
 }
 
 //----------------------------------------------------------------------------
-void vtkSessionIterator::GoToNextItem()
+void vtkPVSessionIterator::GoToNextItem()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -68,7 +68,7 @@ void vtkSessionIterator::GoToNextItem()
 }
 
 //----------------------------------------------------------------------------
-vtkSession* vtkSessionIterator::GetCurrentSession()
+vtkPVSession* vtkPVSessionIterator::GetCurrentSession()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -82,7 +82,7 @@ vtkSession* vtkSessionIterator::GetCurrentSession()
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSessionIterator::GetCurrentSessionId()
+vtkIdType vtkPVSessionIterator::GetCurrentSessionId()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -96,7 +96,7 @@ vtkIdType vtkSessionIterator::GetCurrentSessionId()
 }
 
 //----------------------------------------------------------------------------
-void vtkSessionIterator::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVSessionIterator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

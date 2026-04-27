@@ -19,7 +19,7 @@ class pqServerManagerObserver;
 class pqServerResource;
 class pqView;
 class vtkPVXMLElement;
-class vtkSession;
+class vtkPVSession;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMSession;
@@ -70,10 +70,10 @@ public:
   pqServer* findServer(vtkIdType cid) const;
 
   /**
-   * Given a vtkSession*, returns the pqServer instance for that session, if
+   * Given a vtkPVSession*, returns the pqServer instance for that session, if
    * any.
    */
-  pqServer* findServer(vtkSession*) const;
+  pqServer* findServer(vtkPVSession*) const;
   pqServer* findServer(vtkSMSession*) const;
 
   /**

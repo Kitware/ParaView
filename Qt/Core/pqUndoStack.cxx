@@ -7,6 +7,7 @@
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqServer.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVSessionIterator.h"
 #include "vtkProcessModule.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
@@ -15,7 +16,6 @@
 #include "vtkSMUndoElement.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMUndoStackBuilder.h"
-#include "vtkSessionIterator.h"
 #include "vtkSmartPointer.h"
 #include "vtkUndoSet.h"
 
@@ -189,12 +189,13 @@ void pqUndoStack::redo()
 
   Q_EMIT this->redone();
 }
+
 //-----------------------------------------------------------------------------
 void pqUndoStack::updateAllModifiedProxies()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSessionIterator* iter = pm->NewSessionIterator();
+  vtkPVSessionIterator* iter = pm->NewSessionIterator();
   iter->InitTraversal();
 
   while (!iter->IsDoneWithTraversal())
