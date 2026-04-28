@@ -1,9 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
     <!-- =================================================================== -->
-    <SourceProxy name="EAMDataReader"
-                 label="EAM Data Reader"
-                 class="paraview.algorithms.eam_reader.EAMDataReader"
+    <SourceProxy name="EAMDataReaderBase"
+                 label="EAM Data Reader Base"
                  si_class="vtkSIPythonSourceProxy">
 
       <Documentation>
@@ -16,11 +15,13 @@
 
         The 3D outputs are converted to volumetric data, producing hexahedral cells that span
         between adjacent vertical levels for immediate volume rendering support.
-      </Documentation>
 
-      <OutputPort index="0" name="Surface" />
-      <OutputPort index="1" name="Middle Layer" />
-      <OutputPort index="2" name="Interface Layer" />
+        The multi-output reader is also offered in three additional
+        versions that only have one output: Surface, MiddleLayer and
+        InterfaceLayer output. Any of these additional readers can be
+        used instead of the multi-output reader to save memory, if you
+        are only interested in that type of output.
+      </Documentation>
 
       <StringVectorProperty command="SetDataFileName"
                             name="FileName1"
@@ -44,6 +45,22 @@
                             si_class="vtkSITimeStepsProperty">
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
+
+      <!-- end of EAMDataReaderBase -->
+    </SourceProxy>
+
+
+    <SourceProxy name="EAMDataReader"
+                 label="EAM Data Reader"
+                 class="paraview.algorithms.eam_reader.EAMDataReader"
+                 si_class="vtkSIPythonSourceProxy"
+                 base_proxygroup="sources"
+                 base_proxyname="EAMDataReaderBase">
+
+      <OutputPort index="0" name="Surface" />
+      <OutputPort index="1" name="Middle Layer" />
+      <OutputPort index="2" name="Interface Layer" />
+
 
       <StringVectorProperty name="SurfaceVariablesInfo"
                             command="GetSurfaceDataArrays"
@@ -125,6 +142,130 @@
       </Hints>
 
       <!-- end of EAMDataReader -->
+    </SourceProxy>
+
+
+    <SourceProxy name="EAMDataReaderSurface"
+                 label="EAM Data Reader Surface"
+                 class="paraview.algorithms.eam_reader.EAMDataReaderSurface"
+                 si_class="vtkSIPythonSourceProxy"
+                 base_proxygroup="sources"
+                 base_proxyname="EAMDataReaderBase">
+
+      <OutputPort index="0" name="Surface" />
+
+      <StringVectorProperty name="SurfaceVariablesInfo"
+                            command="GetSurfaceDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="SurfaceVariables"
+                            label="Surface Variables"
+                            command="GetSurfaceDataArrays"
+                            information_property="SurfaceVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="SurfaceVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the surface variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="nc" file_description="EAM NetCDF files" />
+      </Hints>
+
+      <!-- end of EAMDataReaderSurface -->
+    </SourceProxy>
+
+    <SourceProxy name="EAMDataReaderMiddleLayer"
+                 label="EAM Data Reader Middle Layer"
+                 class="paraview.algorithms.eam_reader.EAMDataReaderMiddleLayer"
+                 si_class="vtkSIPythonSourceProxy"
+                 base_proxygroup="sources"
+                 base_proxyname="EAMDataReaderBase">
+
+      <OutputPort index="0" name="MiddleLayer" />
+
+      <StringVectorProperty name="MiddleLayerVariablesInfo"
+                            command="GetMiddleLayerDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="MiddleLayerVariables"
+                            label="MiddleLayer Variables"
+                            command="GetMiddleLayerDataArrays"
+                            information_property="MiddleLayerVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="MiddleLayerVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the surface variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="nc" file_description="EAM NetCDF files" />
+      </Hints>
+
+      <!-- end of EAMDataReaderMiddleLayer -->
+    </SourceProxy>
+
+    <SourceProxy name="EAMDataReaderInterfaceLayer"
+                 label="EAM Data Reader Interface Layer"
+                 class="paraview.algorithms.eam_reader.EAMDataReaderInterfaceLayer"
+                 si_class="vtkSIPythonSourceProxy"
+                 base_proxygroup="sources"
+                 base_proxyname="EAMDataReaderBase">
+
+      <OutputPort index="0" name="InterfaceLayer" />
+
+      <StringVectorProperty name="InterfaceLayerVariablesInfo"
+                            command="GetInterfaceLayerDataArrays"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="InterfaceLayerVariables"
+                            label="InterfaceLayer Variables"
+                            command="GetInterfaceLayerDataArrays"
+                            information_property="InterfaceLayerVariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="InterfaceLayerVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the surface variables to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="nc" file_description="EAM NetCDF files" />
+      </Hints>
+
+      <!-- end of EAMDataReaderInterfaceLayer -->
     </SourceProxy>
 
   </ProxyGroup>
