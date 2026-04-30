@@ -2031,14 +2031,15 @@ found and the point will be rejected.</Documentation>
       </IntVectorProperty>
 
       <!-- cell locator begin -->
-      <ProxyProperty command="SetCellLocatorPrototype"
+      <ProxyProperty command="SetCellLocator"
                      label="Cell Locator"
                      name="CellLocator"
                      panel_visibility="advanced">
         <ProxyListDomain name="proxy_list">
           <Group name="cell_locators" default="StaticCellLocator" />
         </ProxyListDomain>
-        <Documentation>The cell locator to use for finding cells for probing.
+        <Documentation>
+          The cell locator to use for finding cells for probing.
         </Documentation>
       </ProxyProperty>
       <!-- cell locator end -->
