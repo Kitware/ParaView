@@ -258,6 +258,9 @@
     <Proxy class="vtkStaticCellLocator"
            name="StaticCellLocator"
            label="Static Cell Locator"/>
+    <Proxy class="vtkJumpAndWalkCellLocator"
+           name="JumpAndWalkCellLocator"
+           label="Jump And Walk Cell Locator"/>
   </ProxyGroup>
 
   <ProxyGroup name="implicit_functions">
@@ -739,8 +742,7 @@
       <!-- End of TimerLog -->
     </Proxy>
 
-    <Proxy class="vtkPExecutableRunner"
-           name="ExecutableRunner" >
+    <Proxy class="vtkPExecutableRunner" name="ExecutableRunner">
       <Documentation>
         Execute a process on server side.
       </Documentation>
@@ -841,7 +843,8 @@
     </Proxy>
 
     <!-- ==================================================================== -->
-    <WriterProxy class="vtkRemoteWriterHelper" name="RemoteWriterHelper" processes="client|dataserver" stream_reply="false">
+    <WriterProxy class="vtkRemoteWriterHelper" name="RemoteWriterHelper" processes="client|dataserver"
+                 stream_reply="false">
       <Documentation>
         Proxy used internally to help write data generated on the client-side on the data-server side.
       </Documentation>
@@ -2189,8 +2192,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="polyline_decimation_strategies">
-    <Proxy class="vtkDecimatePolylineDistanceStrategy"
-               name="DecimationDistanceStrategy">
+    <Proxy class="vtkDecimatePolylineDistanceStrategy" name="DecimationDistanceStrategy">
       <Documentation>
         Decimation strategy that uses the eulerian distance between 3 consecutive points
         to compute its error.
@@ -2211,7 +2213,7 @@
         through the FieldName property.
       </Documentation>
       <InputProperty is_internal="1" name="DummyInput">
-        <InputArrayDomain name = "input_array_point"
+        <InputArrayDomain name="input_array_point"
                           attribute_type="point"/>
       </InputProperty>
       <Hints>
@@ -2230,7 +2232,7 @@
         <ArrayListDomain input_domain_name="input_array_point"
                          name="array_list">
           <RequiredProperties>
-            <Property function="Input" name="DummyInput" />
+            <Property function="Input" name="DummyInput"/>
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
