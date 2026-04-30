@@ -5,8 +5,9 @@
 
 #include "vtkCell.h"
 
-vtkEdgeInternal::vtkEdgeInternal(double weight, vtkCell* edge)
-  : Weight(weight)
+vtkEdgeInternal::vtkEdgeInternal(vtkIdType outId, double weight, vtkCell* edge)
+  : OutId(outId)
+  , Parametric(weight)
 {
   this->Ids[0] = edge->GetPointId(0);
   this->Ids[1] = edge->GetPointId(1);

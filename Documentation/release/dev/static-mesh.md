@@ -9,12 +9,6 @@ This includes the following filters:
 - **Slice**
 - **Slice with Plane**
 - **Transform**
-- **Axis Aligned Reflect**
-
-To do:
-- **Append DataSets**
-- **Append Geometry**
-- **Clip**
 
 This requires a compatible reader that marks the mesh as static over time.
 For now only the VTKHDF reader supports this. If you know that your data is actually static,
@@ -22,4 +16,4 @@ but not read as such (non-VTKHDF format) you can enforce the behavior with the *
 
 Note that the speedup are most significant with unstructured data.
 
-For early benchmark, you can see this blog post:
+For early benchmark, you can see this [blog post](https://www.kitware.com/staticmeshplugin/)

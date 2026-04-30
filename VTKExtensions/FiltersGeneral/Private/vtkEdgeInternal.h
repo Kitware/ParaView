@@ -17,10 +17,11 @@ class vtkCell;
 
 struct vtkEdgeInternal
 {
+  vtkIdType OutId;
   vtkIdType Ids[2];
-  double Weight;
+  double Parametric;
   vtkEdgeInternal() = default;
-  vtkEdgeInternal(double weight, vtkCell* edge);
+  vtkEdgeInternal(vtkIdType outId, double weight, vtkCell* edge);
 };
 
 VTK_ABI_NAMESPACE_END

@@ -8,6 +8,7 @@
 #include "vtkCellData.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataObjectMeshCache.h"
 #include "vtkDataObjectTree.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSet.h"
@@ -21,6 +22,8 @@
 #include "vtkInformationVector.h"
 #include "vtkMassProperties.h"
 #include "vtkMathUtilities.h"
+#include "vtkMeshCacheRunner.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkNonMergingPointLocator.h"
 #include "vtkObjectFactory.h"
@@ -32,12 +35,17 @@
 #include "vtkQuadric.h"
 #include "vtkSmartPointer.h"
 #include "vtkSphere.h"
+#include "vtkTableBasedClipDataSet.h"
 #include "vtkUnstructuredGrid.h"
+
+#include "Private/vtkEdgesCacheInternal.h"
 
 vtkStandardNewMacro(vtkPVClipDataSet);
 
 //----------------------------------------------------------------------------
 vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction* vtkNotUsed(cf))
+  : EdgesCache(std::make_unique<vtkEdgesCacheInternal>(
+      vtkTableBasedClipDataSet::GetPointTypesArrayName(), vtkTableBasedClipDataSet::InputPoint))
 {
   // setting NumberOfOutputPorts to 1 because ParaView does not allow you to
   // generate the clipped output
@@ -45,6 +53,11 @@ vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction* vtkNotUsed(cf))
 
   this->UseAMRDualClipForAMR = true;
   this->ExactBoxClip = false;
+  this->GenerateClipPointTypesOn(); // needed by cache
+  this->MeshCache->SetConsumer(this);
+  this->MeshCache->ForwardAttribute(vtkDataObject::CELL);
+  this->MeshCache->AddPreservedCachedArray(vtkTableBasedClipDataSet::GetPointTypesArrayName());
+  this->MeshCache->AddPreservedCachedArray(vtkDataObjectMeshCache::GetDefaultIdsName());
 }
 
 //----------------------------------------------------------------------------
@@ -61,6 +74,7 @@ void vtkPVClipDataSet::PrintSelf(ostream& os, vtkIndent indent)
 int vtkPVClipDataSet::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  vtkLogScopeFunction(INFO);
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
   if (!inInfo)
@@ -88,6 +102,20 @@ int vtkPVClipDataSet::RequestData(
   {
     vtkErrorMacro(<< "Failed to get output data object.");
   }
+
+  // when clip function is nullptr clip is based on scalars: static mesh cannot be ensured.
+  if (!this->GetClipFunction())
+  {
+    this->MeshCache->InvalidateCache();
+  }
+
+  vtkMeshCacheRunner runner{ this->MeshCache, inDataObj, outDataObj, true };
+  if (runner.GetCacheLoaded())
+  {
+    return this->EdgesCache->UpdateAttributes(inDataObj, outDataObj);
+  }
+
+  this->EdgesCache->InvalidateCache();
 
   return this->ClipDataObject(request, inputVector, outputVector) ? 1 : 0;
 }
@@ -546,6 +574,7 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
   instance->SetGenerateClippedOutput(this->GetGenerateClippedOutput());
   instance->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
   instance->SetBatchSize(this->GetBatchSize());
+  instance->SetGenerateClipPointTypes(true);
 
   // Dataset with "normals" will use non merging point locator instead of vtkMergePoints to avoid
   // potential artefacts
