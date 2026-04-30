@@ -9,6 +9,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
@@ -17,7 +18,7 @@
 #include "vtkRenderer.h"
 #include "vtkStringFormatter.h"
 #include "vtkTransform.h"
-#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransformFilter.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkVRMLImporter.h"
 
@@ -151,13 +152,13 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         mbOutput->SetBlock(idx, output);
       }
 
-      vtkTransformPolyDataFilter* tf = vtkTransformPolyDataFilter::New();
-      vtkTransform* trans = vtkTransform::New();
+      vtkNew<vtkTransformFilter> tf;
+      vtkNew<vtkTransform> trans;
       tf->SetInputData(input);
       tf->SetTransform(trans);
       tf->Update();
       trans->SetMatrix(actor->GetMatrix());
-      input = tf->GetOutput();
+      input = tf->GetPolyDataOutput();
 
       output->CopyStructure(input);
       // Only copy well formed arrays.
@@ -224,10 +225,6 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
       output = nullptr;
 
       ++idx;
-      tf->Delete();
-      tf = nullptr;
-      trans->Delete();
-      trans = nullptr;
     }
   }
 
