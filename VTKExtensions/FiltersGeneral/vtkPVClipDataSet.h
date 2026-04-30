@@ -15,6 +15,8 @@
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 #include "vtkTableBasedClipDataSet.h"
 
+class vtkDataObjectTree;
+
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVClipDataSet : public vtkTableBasedClipDataSet
 {
 public:
@@ -71,6 +73,10 @@ protected:
 private:
   vtkPVClipDataSet(const vtkPVClipDataSet&) = delete;
   void operator=(const vtkPVClipDataSet&) = delete;
+
+  bool ClipDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  bool ClipLeaf(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  void InitializeOutput(vtkDataObjectTree* input, vtkDataObjectTree* output);
 };
 
 #endif

@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVMetaClipDataSet.h"
 
+#include "vtkAMRDataObject.h"
 #include "vtkAlgorithm.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkExtractGeometry.h"
 #include "vtkHyperTreeGrid.h"
@@ -13,6 +15,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkSmartPointer.h"
+#include "vtkType.h"
 
 class vtkPVMetaClipDataSet::vtkInternals
 {
@@ -193,9 +196,9 @@ int vtkPVMetaClipDataSet::RequestDataObject(
     return 0;
   }
 
-  vtkInformation* info = inputVector[0]->GetInformationObject(0);
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
 
-  if (info && vtkHyperTreeGrid::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT())))
+  if (vtkHyperTreeGrid::SafeDownCast(input))
   {
     this->SetOutputType(VTK_HYPER_TREE_GRID);
     this->Internal->Clip->SetClipFunction(this->ImplicitFunctions[METACLIP_HYPERTREEGRID]);
@@ -204,9 +207,19 @@ int vtkPVMetaClipDataSet::RequestDataObject(
   }
   else
   {
-    this->SetOutputType(VTK_UNSTRUCTURED_GRID);
     this->Internal->Clip->SetClipFunction(this->ImplicitFunctions[METACLIP_DATASET]);
     this->Internal->ExtractCells->SetImplicitFunction(this->ImplicitFunctions[METACLIP_DATASET]);
+    int outType = VTK_UNSTRUCTURED_GRID;
+    if (vtkAMRDataObject::SafeDownCast(input))
+    {
+      // We do not support AMR as output. Fallback to MultiBlock, as CompositePipeline does.
+      outType = VTK_MULTIBLOCK_DATA_SET;
+    }
+    else if (vtkCompositeDataSet::SafeDownCast(input))
+    {
+      outType = VTK_COMPOSITE_DATA_SET;
+    }
+    this->SetOutputType(outType);
   }
 
   return this->Superclass::RequestDataObject(request, inputVector, outputVector);

@@ -2,9 +2,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVClipDataSet.h"
 
+#include "vtkAMRDataObject.h"
+#include "vtkAbstractTransform.h"
 #include "vtkAppendDataSets.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetTriangleFilter.h"
 #include "vtkDemandDrivenPipeline.h"
@@ -27,7 +32,6 @@
 #include "vtkQuadric.h"
 #include "vtkSmartPointer.h"
 #include "vtkSphere.h"
-#include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkPVClipDataSet);
@@ -85,6 +89,15 @@ int vtkPVClipDataSet::RequestData(
     vtkErrorMacro(<< "Failed to get output data object.");
   }
 
+  return this->ClipDataObject(request, inputVector, outputVector) ? 1 : 0;
+}
+
+bool vtkPVClipDataSet::ClipLeaf(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  vtkDataObject* inDataObj = vtkDataObject::GetData(inputVector[0]);
+  vtkDataObject* outDataObj = vtkDataObject::GetData(outputVector);
+
   if (vtkDataSet::SafeDownCast(inDataObj)) // For vtkDataSet.
   {
     if (this->GetClipFunction())
@@ -95,8 +108,7 @@ int vtkPVClipDataSet::RequestData(
     vtkDataSet* ds = vtkDataSet::SafeDownCast(inDataObj);
     if (!ds)
     {
-      vtkErrorMacro("Failed to get vtkDataSet.");
-      return 1;
+      return true;
     }
 
     int association = this->GetInputArrayAssociation(0, ds);
@@ -113,6 +125,7 @@ int vtkPVClipDataSet::RequestData(
     else
     {
       vtkErrorMacro("Unhandled association: " << association);
+      return false;
     }
   } // End for vtkDataSet.
   else if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
@@ -205,15 +218,16 @@ int vtkPVClipDataSet::RequestData(
     else
     {
       vtkErrorMacro(<< "Clipping function not supported");
-      return 0;
+      return false;
     }
     htgClip->SetInsideOut(this->GetInsideOut() != 0);
     htgClip->SetInputData(0, vtkHyperTreeGrid::SafeDownCast(inDataObj));
     htgClip->Update();
     outDataObj->ShallowCopy(htgClip->GetOutput(0));
-    return 1;
+    return true;
   }
-  return 0;
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -554,7 +568,77 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
     return 1;
   }
 
+  vtkErrorMacro("Internal update fails");
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClipDataSet::InitializeOutput(vtkDataObjectTree* treeInput, vtkDataObjectTree* treeOutput)
+{
+  // initialize output: polydata everywhere
+  treeOutput->CopyStructure(treeInput);
+
+  vtkSmartPointer<vtkDataObjectTreeIterator> outIter;
+  outIter.TakeReference(treeOutput->NewTreeIterator());
+  outIter->SkipEmptyNodesOff();
+  outIter->VisitOnlyLeavesOn();
+
+  for (outIter->InitTraversal(); !outIter->IsDoneWithTraversal(); outIter->GoToNextItem())
+  {
+    vtkNew<vtkUnstructuredGrid> newOutput;
+    treeOutput->SetDataSet(outIter, newOutput);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVClipDataSet::ClipDataObject(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  auto treeInput = vtkDataObjectTree::GetData(inputVector[0]);
+  auto treeOutput = vtkDataObjectTree::GetData(outputVector);
+
+  if (treeInput && treeOutput)
+  {
+    this->InitializeOutput(treeInput, treeOutput);
+
+    bool ret = true;
+
+    // Internal API expect vtkInformationVector for each leaf.
+    // Duplicate those from current pipeline and replace DATA_OBJECT by leaf.
+    vtkNew<vtkInformationVector> outLeafVector;
+    outLeafVector->Copy(outputVector, 1);
+    vtkNew<vtkInformationVector> inLeafVector;
+    inLeafVector->Copy(inputVector[0], 1);
+    std::vector<vtkInformationVector*> inLeafVectors;
+    inLeafVectors.push_back(inLeafVector);
+
+    vtkSmartPointer<vtkDataObjectTreeIterator> outIter;
+    outIter.TakeReference(treeOutput->NewTreeIterator());
+    outIter->SkipEmptyNodesOff();
+    outIter->VisitOnlyLeavesOn();
+
+    vtkSmartPointer<vtkDataObjectTreeIterator> inputIter;
+    inputIter.TakeReference(treeInput->NewTreeIterator());
+    inputIter->SkipEmptyNodesOff();
+    inputIter->VisitOnlyLeavesOn();
+
+    outIter->InitTraversal();
+    for (inputIter->InitTraversal(); !inputIter->IsDoneWithTraversal(); inputIter->GoToNextItem())
+    {
+      auto inputLeaf = vtkDataSet::SafeDownCast(inputIter->GetCurrentDataObject());
+      inLeafVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), inputLeaf);
+
+      auto outLeaf = vtkUnstructuredGrid::SafeDownCast(outIter->GetCurrentDataObject());
+      vtkInformation* outInfo = outLeafVector->GetInformationObject(0);
+      outInfo->Set(vtkDataObject::DATA_OBJECT(), outLeaf);
+
+      ret = ret && this->ClipLeaf(request, inLeafVectors.data(), outLeafVector);
+      outIter->GoToNextItem();
+    }
+    return ret;
+  }
+
+  return this->ClipLeaf(request, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------
@@ -570,38 +654,54 @@ int vtkPVClipDataSet::RequestDataObject(vtkInformation* vtkNotUsed(request),
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
+  vtkDataObject* newOutput = nullptr;
   if (vtkHyperTreeGrid::SafeDownCast(inputDO))
   {
-    vtkHyperTreeGrid* output = vtkHyperTreeGrid::GetData(outInfo);
-    if (!output)
+    if (!vtkHyperTreeGrid::GetData(outInfo))
     {
-      output = vtkHyperTreeGrid::New();
-      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
-      this->GetOutputPortInformation(0)->Set(
-        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-      output->FastDelete();
+      newOutput = vtkHyperTreeGrid::New();
     }
-    return 1;
+  }
+  else if (vtkAMRDataObject::SafeDownCast(inputDO))
+  {
+    // We do not produces AMR in output. for compat with the CompositePipeline, turn it into
+    // MultiBlock.
+    if (!vtkMultiBlockDataSet::GetData(outInfo))
+    {
+      newOutput = vtkMultiBlockDataSet::New();
+    }
+  }
+  else if (vtkCompositeDataSet::SafeDownCast(inputDO))
+  {
+    if (!vtkCompositeDataSet::GetData(outInfo))
+    {
+      vtkCompositeDataSet* compositeInput = vtkCompositeDataSet::SafeDownCast(inputDO);
+      newOutput = compositeInput->NewInstance();
+    }
   }
   else
   {
-    vtkDataSet* output = vtkDataSet::GetData(outInfo);
-    if (!output)
+    if (!vtkUnstructuredGrid::GetData(outInfo))
     {
-      output = vtkUnstructuredGrid::New();
-      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
-      this->GetOutputPortInformation(0)->Set(
-        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-      output->FastDelete();
+      newOutput = vtkUnstructuredGrid::New();
     }
-    return 1;
   }
+
+  if (newOutput)
+  {
+    outInfo->Set(vtkDataObject::DATA_OBJECT(), newOutput);
+    this->GetOutputPortInformation(0)->Set(
+      vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+    newOutput->FastDelete();
+  }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVClipDataSet::FillInputPortInformation(int port, vtkInformation* info)
 {
   this->Superclass::FillInputPortInformation(port, info);
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 
