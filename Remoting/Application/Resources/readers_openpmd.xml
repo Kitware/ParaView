@@ -97,6 +97,14 @@
         </Hints>
       </StringVectorProperty>
 
+      <IntVectorProperty name="Thetas"
+                    command="SetNumThetas"
+                    number_of_elements="1"
+                    default_values="12">
+        <IntRangeDomain name="range" min="2" />
+        <Documentation>Set the theta resolution for RZ grids.</Documentation>
+      </IntVectorProperty>
+
       <!-- Position coordinate mapping properties -->
       <StringVectorProperty name="PositionCoordinatesInfo"
         command="GetPositionCoordinatesInfo"

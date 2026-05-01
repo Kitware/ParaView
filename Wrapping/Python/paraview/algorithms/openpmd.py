@@ -1,11 +1,8 @@
 # Authors: Berk Geveci, Axel Huebl, Utkarsh Ayachit
 #
-
 from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
 
 from .. import print_error
-
-import math
 
 try:
     import numpy as np
@@ -49,10 +46,52 @@ def mesh_needs_transpose(mesh):
     first_axis_label = mesh.axis_labels[0] if meta_data_in_C else mesh.axis_labels[-1]
     last_axis_label = mesh.axis_labels[-1] if meta_data_in_C else mesh.axis_labels[0]
     # common for 1D and 2D data in openPMD from accelerator physics: axes labeled as x-z and only z
-    if (first_axis_label == "x" and last_axis_label == "z"):
+    if first_axis_label == "x" and last_axis_label == "z":
         return False
     else:
         return True
+
+
+def _string_attribute(value):
+    if hasattr(value, "decode"):
+        return value.decode()
+    return str(value)
+
+
+def _parse_theta_mode_parameters(mesh, stored_modes):
+    params = {}
+    geometry_parameters = getattr(mesh, "geometry_parameters", "")
+    if callable(geometry_parameters):
+        geometry_parameters = geometry_parameters()
+    for item in _string_attribute(geometry_parameters).split(";"):
+        key, separator, value = item.partition("=")
+        if separator:
+            params[key.strip()] = value.strip()
+
+    num_modes = int(params["m"]) if "m" in params else (stored_modes + 1) // 2
+    if num_modes < 1:
+        raise ValueError("thetaMode geometry must contain at least one mode.")
+
+    expected_modes = 2 * num_modes - 1
+    if stored_modes != expected_modes:
+        raise ValueError(
+            "thetaMode geometryParameters m={0} expects {1} stored mode "
+            "planes, but the mesh contains {2}.".format(
+                num_modes, expected_modes, stored_modes
+            )
+        )
+
+    imag_parameter = params.get("imag", "+")
+    if imag_parameter == "+":
+        imag_sign = 1.0
+    elif imag_parameter == "-":
+        imag_sign = -1.0
+    else:
+        raise ValueError(
+            "Unsupported thetaMode imag parameter: {0}".format(imag_parameter)
+        )
+
+    return num_modes, imag_sign
 
 class openPMDReader(VTKPythonAlgorithmBase):
     """A reader that reads openPMD format.
@@ -85,6 +124,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
         self._series = None  # openPMD-api's data series holder
         self._timemap = {}  # maps time steps (int) in _series to physical time (float)
         self._timevalues = None  # the float values in _timemap (TODO: deduplicate, get on the fly from _timemap)
+        self._numthetas = 12
 
         # instructs ParaView what data sources to expect
         # this registers observers and callbacks
@@ -186,6 +226,12 @@ class openPMDReader(VTKPythonAlgorithmBase):
         TODO: remove this, duplicate of GetSpeciesSelection
         """
         return self._speciesselection
+
+    def SetNumThetas(self, thetas):
+        thetas = max(2, int(thetas))
+        if self._numthetas != thetas:
+            self._numthetas = thetas
+            self.Modified()
 
     def SetFileName(self, name):
         """Specify filename for the file to read.
@@ -503,15 +549,13 @@ class openPMDReader(VTKPythonAlgorithmBase):
             in_grid_offsets.append(scalar.position)
             comp = scalar.load_chunk(chunk_offset, chunk_extent)
             self._series.flush()
-            if not math.isclose(1.0, scalar.unit_SI):
-                comp = comp * scalar.unit_SI
+            comp = comp * scalar.unit_SI
             if len(shp) == 3:
                 arrays.append(np.transpose(comp, _3d) if mesh_needs_transpose(var) else comp)
             elif len(shp) == 2:
                 arrays.append(np.transpose(comp.reshape(shp[0], shp[1], 1), _2d) if mesh_needs_transpose(var) else comp)
             else:
                 arrays.append(comp)
-
         ncomp = len(var)
         if ncomp > 1:
             flt = np.ravel(arrays, order="F")
@@ -519,16 +563,101 @@ class openPMDReader(VTKPythonAlgorithmBase):
         else:
             return arrays[0].flatten(order="F"), in_grid_offsets
 
+    def _theta_mode_info(self, var, shape, spacing, grid_offset):
+        axis_labels = [_string_attribute(label) for label in var.axis_labels]
+        if len(axis_labels) != 2 or "r" not in axis_labels or "z" not in axis_labels:
+            raise ValueError(
+                "thetaMode meshes require r and z axisLabels, got {0}.".format(
+                    axis_labels
+                )
+            )
+        if len(shape) != 3:
+            raise ValueError(
+                "thetaMode meshes must be stored as (mode, axis0, axis1), got shape {0}.".format(
+                    shape
+                )
+            )
+
+        num_modes, imag_sign = _parse_theta_mode_parameters(var, shape[0])
+        r_axis = axis_labels.index("r")
+        z_axis = axis_labels.index("z")
+
+        return {
+            "axis_labels": axis_labels,
+            "num_modes": num_modes,
+            "stored_modes": shape[0],
+            "imag_sign": imag_sign,
+            "r_axis": r_axis,
+            "z_axis": z_axis,
+            "nr": shape[1 + r_axis],
+            "nz": shape[1 + z_axis],
+            "r_spacing": spacing[r_axis],
+            "z_spacing": spacing[z_axis],
+            "r_offset": grid_offset[r_axis],
+            "z_offset": grid_offset[z_axis],
+        }
+
+    def _reconstruct_theta_mode_component(self, values, theta_info, thetas):
+        values = np.moveaxis(
+            values,
+            [0, 1 + theta_info["z_axis"], 1 + theta_info["r_axis"]],
+            [0, 1, 2],
+        )
+
+        result = np.repeat(values[0, :, :, np.newaxis], len(thetas), axis=2)
+        for mode in range(1, theta_info["num_modes"]):
+            real = values[2 * mode - 1, :, :]
+            imag = values[2 * mode, :, :]
+            result += real[:, :, np.newaxis] * np.cos(mode * thetas)
+            result += (
+                theta_info["imag_sign"]
+                * imag[:, :, np.newaxis]
+                * np.sin(mode * thetas)
+            )
+        return result
+
+    def _load_theta_mode_array(self, var, chunk_offset, chunk_extent, theta_info, thetas):
+        arrays = []
+        for component_name, scalar in var.items():
+            comp = scalar.load_chunk(chunk_offset, chunk_extent)
+            self._series.flush()
+            comp = comp * scalar.unit_SI
+            arrays.append(
+                (
+                    _string_attribute(component_name),
+                    self._reconstruct_theta_mode_component(comp, theta_info, thetas),
+                )
+            )
+
+        if len(arrays) == 1:
+            return arrays[0][1].ravel(order="C")
+
+        array_by_name = {name: array for name, array in arrays}
+        if all(component in array_by_name for component in ("r", "t", "z")):
+            cos_theta = np.cos(thetas)[np.newaxis, np.newaxis, :]
+            sin_theta = np.sin(thetas)[np.newaxis, np.newaxis, :]
+            radial = array_by_name["r"]
+            azimuthal = array_by_name["t"]
+            vector = np.stack(
+                (
+                    radial * cos_theta - azimuthal * sin_theta,
+                    radial * sin_theta + azimuthal * cos_theta,
+                    array_by_name["z"],
+                ),
+                axis=-1,
+            )
+        else:
+            vector = np.stack([array for _, array in arrays], axis=-1)
+
+        return vector.reshape((-1, vector.shape[-1]), order="C")
+
     def _find_array(self, itr, name):
         var = itr.meshes[name]
-        theta_modes = None
-        if var.geometry == io.Geometry.thetaMode:
-            theta_modes = 3  # hardcoded, parse from geometry_parameters
         return (
             var,
             np.array(var.grid_spacing) * var.grid_unit_SI,
             np.array(var.grid_global_offset) * var.grid_unit_SI,
-            theta_modes,
+            var.geometry == io.Geometry.thetaMode,
         )
 
     def _get_num_particles(self, itr, species):
@@ -542,9 +671,9 @@ class openPMDReader(VTKPythonAlgorithmBase):
         arrays = []
         for name, scalar in var.items():
             comp = scalar.load_chunk([start], [end - start + 1])
-            self._series.flush()
-            if not math.isclose(1.0, scalar.unit_SI):
+            if np.issubdtype(comp.dtype, np.floating):
                 comp = comp * scalar.unit_SI
+            self._series.flush()
             arrays.append(comp)
 
         ncomp = len(var)
@@ -599,9 +728,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
         for array in arrays:
             if array[1] == "position" or array[1] == "positionOffset":
                 continue
-            ugrid.PointData.append(
-                self._load_particle_array(itr, array[0], array[1], start, end), array[1]
-            )
+            nparr = self._load_particle_array(itr, array[0], array[1], start, end)
+            ugrid.PointData.append(nparr, array[1])
         from vtkmodules.vtkCommonDataModel import vtkCellArray
 
         ca = vtkCellArray()
@@ -626,7 +754,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
     def _RequestFieldData(self, executive, output, outInfo, timeInfo):
         from vtkmodules.numpy_interface import dataset_adapter as dsa
-        from vtkmodules.vtkCommonDataModel import vtkImageData
+        from vtkmodules.vtkCommonDataModel import vtkImageData, vtkStructuredGrid
         from vtkmodules.vtkCommonExecutionModel import vtkExtentTranslator
 
         piece = outInfo.Get(executive.UPDATE_PIECE_NUMBER())
@@ -647,7 +775,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
                     arrays.append((name, self._find_array(itr, name)))
         shp = None
         spacing = None
-        theta_modes = None
+        theta_mode = None
+        theta_info = None
         grid_offset = None
         for _, ary in arrays:
             var = ary[0]
@@ -668,87 +797,86 @@ class openPMDReader(VTKPythonAlgorithmBase):
                 shp = shape
             elif shape != shp:  # all arrays needs to have the same shape
                 return 0
-            if not theta_modes:
-                theta_modes = ary[3]
+            if theta_mode is None:
+                theta_mode = ary[3]
+            elif theta_mode != ary[3]:
+                return 0
+            if ary[3]:
+                try:
+                    info = self._theta_mode_info(var, shape, ary[1], ary[2])
+                except ValueError as e:
+                    print_error(str(e))
+                    return 0
+                if theta_info is None:
+                    theta_info = info
+                elif theta_info != info:
+                    return 0
 
         # fields/meshes: RZ
-        if theta_modes and shp is not None:
-            et.SetWholeExtent(0, shp[0] - 1, 0, shp[1] - 1, 0, shp[2] - 1)
+        if theta_mode and shp is not None:
+            nthetas = max(2, int(self._numthetas))
+            et.SetWholeExtent(
+                0,
+                nthetas - 1,
+                0,
+                theta_info["nr"] - 1,
+                0,
+                theta_info["nz"] - 1,
+            )
             et.SetSplitModeToZSlab()  # note: Y and Z are both fine
             et.SetPiece(piece)
             et.SetNumberOfPieces(npieces)
-            # et.SetGhostLevel(nghosts)
             et.PieceToExtentByPoints()
             ext = et.GetExtent()
 
-            chunk_offset = [ext[0], ext[2], ext[4]]
-            chunk_extent = [
-                ext[1] - ext[0] + 1,
-                ext[3] - ext[2] + 1,
-                ext[5] - ext[4] + 1,
-            ]
+            theta_start = ext[0]
+            theta_count = ext[1] - ext[0] + 1
+            r_start = ext[2]
+            r_count = ext[3] - ext[2] + 1
+            z_start = ext[4]
+            z_count = ext[5] - ext[4] + 1
+
+            chunk_offset = [0, 0, 0]
+            chunk_extent = [theta_info["stored_modes"], 0, 0]
+            chunk_offset[1 + theta_info["r_axis"]] = r_start
+            chunk_extent[1 + theta_info["r_axis"]] = r_count
+            chunk_offset[1 + theta_info["z_axis"]] = z_start
+            chunk_extent[1 + theta_info["z_axis"]] = z_count
+
+            all_thetas = np.linspace(0.0, 2.0 * np.pi, nthetas)
+            t_coord = all_thetas[theta_start : theta_start + theta_count]
+            r_coord = theta_info["r_offset"] + (
+                np.arange(r_start, r_start + r_count) * theta_info["r_spacing"]
+            )
+            z_coord = theta_info["z_offset"] + (
+                np.arange(z_start, z_start + z_count) * theta_info["z_spacing"]
+            )
 
             data = []
-            nthetas = 100  # user parameter
-            thetas = np.linspace(0.0, 2.0 * np.pi, nthetas)
-            chunk_cyl_shape = (chunk_extent[1], chunk_extent[2], nthetas)  # z, r, theta
             for name, var in arrays:
-                cyl_values = np.zeros(chunk_cyl_shape)
-                values, in_grid_offsets = self._load_array(var[0], chunk_offset, chunk_extent)
-                self._series.flush()
+                values = self._load_theta_mode_array(
+                    var[0], chunk_offset, chunk_extent, theta_info, t_coord
+                )
+                data.append((name, values))
 
-                for ntheta in range(nthetas):
-                    cyl_values[:, :, ntheta] += values[0, :, :]
-                data.append((name, cyl_values))
-                # add all other modes via loop
-                # for m in range(theta_modes):
+            dims = (len(t_coord), len(r_coord), len(z_coord))
 
-            cyl_spacing = [spacing[0], spacing[1], thetas[1] - thetas[0]]
-
-            z_coord = np.linspace(
-                0.0, cyl_spacing[0] * chunk_cyl_shape[0], chunk_cyl_shape[0]
-            )
-            r_coord = np.linspace(
-                0.0, cyl_spacing[1] * chunk_cyl_shape[1], chunk_cyl_shape[1]
-            )
-            t_coord = thetas
-
-            # to cartesian
-            cyl_coords = np.meshgrid(r_coord, z_coord, t_coord)
-            rs = cyl_coords[1]
-            zs = cyl_coords[0]
-            thetas = cyl_coords[2]
-
-            y_coord = rs * np.sin(thetas)
+            zs, rs, thetas = np.meshgrid(z_coord, r_coord, t_coord, indexing="ij")
             x_coord = rs * np.cos(thetas)
-            z_coord = zs
-            # mesh_pts = np.zeros((chunk_cyl_shape[0], chunk_cyl_shape[1], chunk_cyl_shape[2], 3))
-            # mesh_pts[:, :, :, 0] = z_coord
+            y_coord = rs * np.sin(thetas)
+            coords = np.empty((y_coord.size, 3), dtype=np.float64)
+            coords[:, 0] = x_coord.ravel(order="C")
+            coords[:, 1] = y_coord.ravel(order="C")
+            coords[:, 2] = zs.ravel(order="C")
 
-            img = vtkImageData()
-            img.SetExtent(
-                chunk_offset[1],
-                chunk_offset[1] + chunk_cyl_shape[0] - 1,
-                chunk_offset[2],
-                chunk_offset[2] + chunk_cyl_shape[1] - 1,
-                0,
-                nthetas - 1,
-            )
-            img.SetSpacing(cyl_spacing)
+            img = vtkStructuredGrid()
 
+            img.SetDimensions(dims[0], dims[1], dims[2])
             imgw = dsa.WrapDataObject(img)
+            imgw.SetPoints(coords)
             output.SetPartition(0, img)
             for name, array in data:
-                # print(array.shape)
-                # print(array.transpose(2,1,0).flatten(order='C').shape)
-                imgw.PointData.append(array.transpose(2, 1, 0).flatten(order="C"), name)
-
-            # data = []
-            # for name, var in arrays:
-            #     unit_SI = var[0].unit_SI
-            #     data.append((name, unit_SI * var[0].load_chunk(chunk_offset, chunk_extent)))
-            # self._series.flush()
-
+                imgw.PointData.append(array, name)
         # fields/meshes: 1D-3D
         elif shp is not None:
             whole_extent = []
