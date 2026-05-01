@@ -10,6 +10,7 @@
 #endif
 
 #if XRINTERFACE_HAS_OPENXR_SUPPORT
+#include "vtkOpenXRManagerConnection.h"
 #include "vtkOpenXRRenderWindow.h"
 #include "vtkOpenXRRenderWindowInteractor.h"
 #include "vtkOpenXRRenderer.h"
@@ -1984,7 +1985,7 @@ std::string vtkPVXRInterfaceHelper::GetOpenXRRuntimeVersionString() const
     }
   }
 
-  const auto version = vtkOpenXRManager::QueryInstanceVersion(cs);
+  const auto version = vtkOpenXRRenderWindow::QueryInstanceVersion(cs);
 
   if (version.Major == 0 && version.Minor == 0 && version.Patch == 0)
   {
