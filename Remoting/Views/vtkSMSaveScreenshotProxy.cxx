@@ -916,10 +916,10 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage(
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(shProxy);
+  controller->PostInitializeProxy(shProxy);
   vtkSMPropertyHelper(shProxy, "View").Set(view);
   vtkSMPropertyHelper(shProxy, "SaveAllViews").Set(0);
   vtkSMPropertyHelper(shProxy, "ImageResolution").Set(size.GetData(), 2);
-  controller->PostInitializeProxy(shProxy);
   return shProxy->CaptureImage();
 }
 
@@ -945,10 +945,10 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage(
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(shProxy);
+  controller->PostInitializeProxy(shProxy);
   vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
   vtkSMPropertyHelper(shProxy, "SaveAllViews").Set(1);
   vtkSMPropertyHelper(shProxy, "ImageResolution").Set(size.GetData(), 2);
-  controller->PostInitializeProxy(shProxy);
   return shProxy->CaptureImage();
 }
 
