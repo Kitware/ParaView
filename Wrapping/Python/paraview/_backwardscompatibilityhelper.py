@@ -695,6 +695,14 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                 "'InterpolatorType' is obsolete as of ParaView 6.2. "
                 "Please use the 'CellLocator' property to specify a locator proxy instead.")
+    # 6.1 -> 6.2: ChoosetheoutputblocksarraysfortheExodusEntityType replaced by EntityType
+    if pname == "ChoosetheoutputblocksarraysfortheExodusEntityType":
+        if compatibility_version < (6, 2):
+            return proxy.GetProperty("EntityType").SetData(value)
+        else:
+            raise NotSupportedException(
+                "'Chooseth outputblocksarraysfortheExodusEntityType' is obsolete as of ParaView 6.2. "
+                "Please use the 'EntityType' property to specify the Exodus entity type instead.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
