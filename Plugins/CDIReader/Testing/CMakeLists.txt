@@ -9,6 +9,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/NetCDF/edges.nc}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/NetCDF/ts.nc}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/NetCDF/fesom.nc}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/NetCDF/R2B11_asR2B4.nc}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDISimpleRead_A.png,:}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDISimpleRead_B.png,:}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDISimpleRead_C.png,:}"
@@ -22,12 +23,14 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDIUseMask_F.png,:}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDIDimensionsTest_A.png,:}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDIDimensionsTest_B.png,:}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDI3DMaskRegression.png,:}"
 )
 
 set (xml_tests
   CDISimpleRead.xml
   CDIUseMask.xml
   CDIDimensionsTest.xml
+  CDI3DMaskRegression.xml
 )
 
 set(CDISimpleRead_METHOD LOOSE_VALID)

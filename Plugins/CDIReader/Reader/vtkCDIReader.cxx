@@ -1835,12 +1835,13 @@ int vtkCDIReader::CheckForMaskData()
     if (this->ShowMultilayerView)
     {
       this->CellMask.resize(this->MaximumCells * this->Bloat);
-      float* dataTmpMask = new float[this->MaximumCells];
+      int maskLevels = std::min(this->MaximumNVertLevels, cdiVar->NLevel);
+      float* dataTmpMask = new float[this->NumberLocalCells * maskLevels];
       CHECK_NEW(dataTmpMask);
 
       cdi_set_cur(cdiVar, 0, 0);
-      cdi_tools::cdi_get_part<float>(cdiVar, this->BeginCell, this->NumberLocalCells, dataTmpMask,
-        this->MaximumNVertLevels, this->Grib);
+      cdi_tools::cdi_get_part<float>(
+        cdiVar, this->BeginCell, this->NumberLocalCells, dataTmpMask, maskLevels, this->Grib);
       vtkDebugMacro("Done with read of 3d Mask data");
 
       // readjust the data
@@ -1850,7 +1851,8 @@ int vtkCDIReader::CheckForMaskData()
         {
           int i = j * this->MaximumNVertLevels;
           this->CellMask[i + levelNum] =
-            (dataTmpMask[j + (levelNum * this->NumberLocalCells)] == maskVal);
+            (dataTmpMask[j + (std::min(levelNum, maskLevels - 1) * this->NumberLocalCells)] ==
+              maskVal);
         }
       }
 
