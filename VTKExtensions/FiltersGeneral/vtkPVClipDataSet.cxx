@@ -6,7 +6,6 @@
 #include "vtkAbstractTransform.h"
 #include "vtkAppendDataSets.h"
 #include "vtkCellData.h"
-#include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObjectMeshCache.h"
 #include "vtkDataObjectTree.h"
@@ -265,11 +264,7 @@ int vtkPVClipDataSet::ClipUsingThreshold(
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
 
-  auto threshold = vtkSmartPointer<vtkPVThreshold>::New();
-
-  vtkCompositeDataPipeline* executive = vtkCompositeDataPipeline::New();
-  threshold->SetExecutive(executive);
-  executive->FastDelete();
+  vtkNew<vtkPVThreshold> threshold;
 
   vtkDataObject* inputClone = inputDO->NewInstance();
   inputClone->ShallowCopy(inputDO);
@@ -587,7 +582,7 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
 
   instance->SetInputDataObject(inputDO);
   instance->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
-  if (instance->GetExecutive()->Update())
+  if (instance->Update())
   {
     outputDO->ShallowCopy(instance->GetOutput());
     if (instance->GetClippedOutput())
