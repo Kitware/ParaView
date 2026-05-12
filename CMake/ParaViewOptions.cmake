@@ -654,12 +654,19 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
     VTK::xdmf2
     VTK::xdmf3)
 
-  # PARAVIEW_ENABLE_CGNS_* are the only options that can force the need for cgns and
-  # hdf5 TPLs when PARAVIEW_ENABLE_NONESSENTIAL is true.
+  # PARAVIEW_ENABLE_CGNS_* are the only options that can force the need for cgns
+  # TPL when PARAVIEW_ENABLE_NONESSENTIAL is true.
   if (NOT PARAVIEW_ENABLE_CGNS_READER AND NOT PARAVIEW_ENABLE_CGNS_WRITER)
     list(APPEND nonessential_modules
-      VTK::cgns
-      VTK::hdf5)
+      VTK::cgns)
+
+    # if testing is enabled, this is expected to have hdf5 TPL
+    # as VTK::IOHDF is a dependency of vtkTestingCore. But usual features should not
+    # depends on it.
+    if (PARAVIEW_BUILD_TESTING STREQUAL "OFF")
+      list(APPEND nonessential_modules
+        VTK::hdf5)
+    endif()
   endif()
 
   list(APPEND paraview_rejected_modules
