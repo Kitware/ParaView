@@ -113,11 +113,12 @@ paraview_add_client_server_render_tests(
   TEST_SCRIPTS GhostCellsGeneratorImageDistributed.xml
   NUMSERVERS 2
   )
-paraview_add_client_server_tests(
-  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS HyperTreeGridGhostCellsGeneratorComposite.xml
-  NUMSERVERS 2
-  )
+# excluded in https://gitlab.kitware.com/paraview/paraview/-/work_items/23283
+#paraview_add_client_server_tests(
+#  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+#  TEST_SCRIPTS HyperTreeGridGhostCellsGeneratorComposite.xml
+#  NUMSERVERS 2
+#  )
 paraview_add_client_server_tests(
   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
   TEST_SCRIPTS RedistributeHyperTreeGrid.xml
