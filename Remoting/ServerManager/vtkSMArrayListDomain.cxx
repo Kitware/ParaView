@@ -217,8 +217,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
 
   // iterate over attributes arrays in dataInfo and add acceptable arrays to the
   // domain.
-  for (int type = vtkSMInputArrayDomain::POINT;
-       type < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES; type++)
+  for (const int& type : dataInfo->GetAttributeTypes())
   {
     if (type == vtkSMInputArrayDomain::ANY)
     {

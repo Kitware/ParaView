@@ -98,18 +98,12 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy, unsigned int outp
     }
   }
 
-  int attribute_types_to_try[] = { vtkDataObject::POINT, vtkDataObject::CELL, vtkDataObject::FIELD,
-    vtkDataObject::VERTEX, vtkDataObject::EDGE, vtkDataObject::ROW, -1 };
-
-  for (int kk = 0; attribute_types_to_try[kk] != -1; kk++)
+  for (const int& attributeType : info->GetAttributeTypes())
   {
-    int attribute_type = attribute_types_to_try[kk];
-
     // check if attribute_type is acceptable.
-    if (this->IsAttributeTypeAcceptable(attribute_type))
+    if (this->IsAttributeTypeAcceptable(attributeType))
     {
-      vtkPVDataSetAttributesInformation* dsaInfo =
-        info->GetAttributeInformation(attribute_types_to_try[kk]);
+      vtkPVDataSetAttributesInformation* dsaInfo = info->GetAttributeInformation(attributeType);
       if (this->HasAcceptableArray(dsaInfo))
       {
         return vtkSMDomain::IN_DOMAIN;

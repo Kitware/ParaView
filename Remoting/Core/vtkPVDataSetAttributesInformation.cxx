@@ -82,12 +82,14 @@ vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
   : Internals(new vtkPVDataSetAttributesInformation::vtkInternals())
 {
   this->FieldAssociation = vtkDataObject::NUMBER_OF_ASSOCIATIONS;
+  this->FieldName = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::~vtkPVDataSetAttributesInformation()
 {
   delete this->Internals;
+  this->SetFieldName(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -117,7 +119,8 @@ void vtkPVDataSetAttributesInformation::Initialize()
 //----------------------------------------------------------------------------
 void vtkPVDataSetAttributesInformation::DeepCopy(vtkPVDataSetAttributesInformation* other)
 {
-  assert(this->FieldAssociation == other->FieldAssociation);
+  this->FieldAssociation = other->FieldAssociation;
+  this->SetFieldName(other->GetFieldName());
   auto& internals = (*this->Internals);
   const auto& ointernals = (*other->Internals);
 
@@ -162,21 +165,18 @@ void vtkPVDataSetAttributesInformation::CopyFromDataObject(vtkDataObject* dobj)
 
   // Handle vtkCellGrid cell-data specially.
   auto* cg = vtkCellGrid::SafeDownCast(dobj);
-  if (cg)
+  if (cg && this->FieldAssociation == vtkDataObject::CELL)
   {
-    if (this->FieldAssociation == vtkDataObject::CELL)
+    for (const auto& attId : cg->GetCellAttributeIds())
     {
-      for (const auto& attId : cg->GetCellAttributeIds())
+      auto* cellAtt = cg->GetCellAttributeById(attId);
+      if (!cellAtt)
       {
-        auto* cellAtt = cg->GetCellAttributeById(attId);
-        if (!cellAtt)
-        {
-          continue; // TODO: Warn?
-        }
-        auto ainfo = vtkPVArrayInformation::New();
-        ainfo->CopyFromCellAttribute(cg, cellAtt);
-        internals.GetOrCreateArrayInformation(cellAtt->GetName().Data()).TakeReference(ainfo);
+        continue; // TODO: Warn?
       }
+      auto ainfo = vtkPVArrayInformation::New();
+      ainfo->CopyFromCellAttribute(cg, cellAtt);
+      internals.GetOrCreateArrayInformation(cellAtt->GetName().Data()).TakeReference(ainfo);
     }
     internals.ValuesPopulated = true;
     return;

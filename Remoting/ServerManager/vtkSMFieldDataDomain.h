@@ -63,17 +63,23 @@ public:
    */
   int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
+  ///@{
   /**
    * Convenience method to return the string for an attribute type. Will return nullptr
    * for unsupported or invalid type.
    */
+  static std::string GetAttributeTypeAsString(vtkPVDataInformation* dataInfo, int attrType);
   static const char* GetAttributeTypeAsString(int attrType);
+  ///@}
 
+  ///@{
   /**
    * Convenience method to return the string for an element type. Will return nullptr
    * for unsupported or invalid type.
    */
+  static std::string GetElementTypeAsString(vtkPVDataInformation* dataInfo, int attrType);
   static const char* GetElementTypeAsString(int attrType);
+  ///@}
 
   /**
    * Updates the available field data based on the input dataset type, if possible.

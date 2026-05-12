@@ -28,20 +28,11 @@
                          name="FieldAssociation"
                          number_of_elements="1">
         <Documentation>Select the attribute data to pass.</Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Points"
-                 value="0" />
-          <Entry text="Cells"
-                 value="1" />
-          <Entry text="Field Data"
-                 value="2" />
-          <Entry text="Vertices"
-                 value="4" />
-          <Entry text="Edges"
-                 value="5" />
-          <Entry text="Rows"
-                 value="6" />
-        </EnumerationDomain>
+        <FieldDataDomain name="enum" enable_field_data="1" use_element_types="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetAddMetaData"
                          default_values="0"

@@ -80,10 +80,11 @@ void pqSurfaceRepresentationBehavior::onRepresentationAdded(pqRepresentation* re
     {
       vtkPVDataInformation* dataInfo = sourceProxy->GetDataInformation();
 
-      if (dataInfo->GetPointDataInformation()->GetNumberOfArrays() > 0)
+      vtkPVDataSetAttributesInformation* ptInfo = dataInfo->GetPointDataInformation();
+      vtkPVDataSetAttributesInformation* cellInfo = dataInfo->GetCellDataInformation();
+      if (ptInfo && ptInfo->GetNumberOfArrays() > 0)
       {
-        const char* scalarName =
-          dataInfo->GetPointDataInformation()->GetArrayInformation(0)->GetName();
+        const char* scalarName = ptInfo->GetArrayInformation(0)->GetName();
         pipelineRep->colorByArray(scalarName, 0); // 0: POINT_DATA / 1:CELL_DATA
 
         // --------------------------------------------------------------------
@@ -98,10 +99,9 @@ void pqSurfaceRepresentationBehavior::onRepresentationAdded(pqRepresentation* re
         pipelineRep->getLookupTable()->setScalarRangeLock(true);
         pipelineRep->getLookupTable()->setScalarRange(min, max);
       }
-      else if (dataInfo->GetCellDataInformation()->GetNumberOfArrays() > 0)
+      else if (cellInfo && cellInfo->GetNumberOfArrays() > 0)
       {
-        const char* scalarName =
-          dataInfo->GetCellDataInformation()->GetArrayInformation(0)->GetName();
+        const char* scalarName = cellInfo->GetArrayInformation(0)->GetName();
         pipelineRep->colorByArray(scalarName, 1); // 0: POINT_DATA / 1:CELL_DATA
 
         // --------------------------------------------------------------------

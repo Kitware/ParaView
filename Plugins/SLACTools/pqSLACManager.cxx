@@ -353,14 +353,17 @@ void pqSLACManager::checkActionEnabled()
     vtkPVDataInformation* dataInfo = outputPort->getDataInformation();
     vtkPVDataSetAttributesInformation* pointFields = dataInfo->GetPointDataInformation();
 
-    this->actionShowEField()->setEnabled(pointFields->GetArrayInformation("efield") != nullptr);
-    this->actionShowBField()->setEnabled(pointFields->GetArrayInformation("bfield") != nullptr);
+    this->actionShowEField()->setEnabled(
+      pointFields && pointFields->GetArrayInformation("efield") != nullptr);
+    this->actionShowBField()->setEnabled(
+      pointFields && pointFields->GetArrayInformation("bfield") != nullptr);
 
     this->actionSolidMesh()->setEnabled(true);
     this->actionWireframeSolidMesh()->setEnabled(true);
     this->actionWireframeAndBackMesh()->setEnabled(true);
 
-    this->actionPlotOverZ()->setEnabled(pointFields->GetArrayInformation("efield") != nullptr);
+    this->actionPlotOverZ()->setEnabled(
+      pointFields && pointFields->GetArrayInformation("efield") != nullptr);
 
     this->actionTemporalResetRange()->setEnabled(true);
     this->actionCurrentTimeResetRange()->setEnabled(true);
@@ -412,6 +415,8 @@ void pqSLACManager::showField(const char* name)
   // Get information about the field we are supposed to be showing.
   vtkPVDataInformation* dataInfo = repr->getInputDataInformation();
   vtkPVDataSetAttributesInformation* pointInfo = dataInfo->GetPointDataInformation();
+  if (!pointInfo)
+    return;
   vtkPVArrayInformation* arrayInfo = pointInfo->GetArrayInformation(name);
   if (!arrayInfo)
     return;

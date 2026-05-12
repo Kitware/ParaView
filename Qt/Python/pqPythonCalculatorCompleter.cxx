@@ -39,18 +39,19 @@ QStringList pqPythonCalculatorCompleter::getPythonCompletions(
   {
     results += hardCodedVariables;
 
-    if (inputInformation->GetPointDataInformation()->GetNumberOfArrays() > 0)
-      results << "PointData";
-    if (inputInformation->GetCellDataInformation()->GetNumberOfArrays() > 0)
-      results << "CellData";
-    if (inputInformation->GetFieldDataInformation()->GetNumberOfArrays() > 0)
-      results << "FieldData";
-    if (inputInformation->GetVertexDataInformation()->GetNumberOfArrays() > 0)
-      results << "VertexData";
-    if (inputInformation->GetEdgeDataInformation()->GetNumberOfArrays() > 0)
-      results << "EdgeData";
-    if (inputInformation->GetRowDataInformation()->GetNumberOfArrays() > 0)
-      results << "RowData";
+    auto addIfNonEmpty = [&](vtkPVDataSetAttributesInformation* dsa, const char* name)
+    {
+      if (dsa && dsa->GetNumberOfArrays() > 0)
+      {
+        results << name;
+      }
+    };
+    addIfNonEmpty(inputInformation->GetPointDataInformation(), "PointData");
+    addIfNonEmpty(inputInformation->GetCellDataInformation(), "CellData");
+    addIfNonEmpty(inputInformation->GetFieldDataInformation(), "FieldData");
+    addIfNonEmpty(inputInformation->GetVertexDataInformation(), "VertexData");
+    addIfNonEmpty(inputInformation->GetEdgeDataInformation(), "EdgeData");
+    addIfNonEmpty(inputInformation->GetRowDataInformation(), "RowData");
 
     return results;
   }

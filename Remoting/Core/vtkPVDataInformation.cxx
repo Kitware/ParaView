@@ -212,18 +212,20 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
      << this->Extent[2] << ", " << this->Extent[3] << ", " << this->Extent[4] << ", "
      << this->Extent[5] << endl;
 
-  os << indent << "PointDataInformation " << endl;
-  this->GetPointDataInformation()->PrintSelf(os, i2);
-  os << indent << "CellDataInformation " << endl;
-  this->GetCellDataInformation()->PrintSelf(os, i2);
-  os << indent << "VertexDataInformation" << endl;
-  this->GetVertexDataInformation()->PrintSelf(os, i2);
-  os << indent << "EdgeDataInformation" << endl;
-  this->GetEdgeDataInformation()->PrintSelf(os, i2);
-  os << indent << "RowDataInformation" << endl;
-  this->GetRowDataInformation()->PrintSelf(os, i2);
-  os << indent << "FieldDataInformation " << endl;
-  this->GetFieldDataInformation()->PrintSelf(os, i2);
+  auto printDSA = [&](const char* label, vtkPVDataSetAttributesInformation* dsa)
+  {
+    os << indent << label << endl;
+    if (dsa)
+    {
+      dsa->PrintSelf(os, i2);
+    }
+  };
+  printDSA("PointDataInformation ", this->GetPointDataInformation());
+  printDSA("CellDataInformation ", this->GetCellDataInformation());
+  printDSA("VertexDataInformation", this->GetVertexDataInformation());
+  printDSA("EdgeDataInformation", this->GetEdgeDataInformation());
+  printDSA("RowDataInformation", this->GetRowDataInformation());
+  printDSA("FieldDataInformation ", this->GetFieldDataInformation());
   os << indent << "PointArrayInformation " << endl;
   this->GetPointArrayInformation()->PrintSelf(os, i2);
 
@@ -242,38 +244,67 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataSetAttributesInformation* vtkPVDataInformation::GetAttributeInformation(
-  int fieldAssociation) const
+int vtkPVDataInformation::GetNumberOfAttributeTypes() const
 {
-  switch (fieldAssociation)
+  return static_cast<int>(this->AttributeMetadata.size());
+}
+
+//----------------------------------------------------------------------------
+std::vector<int> vtkPVDataInformation::GetAttributeTypes() const
+{
+  std::vector<int> attributeTypes;
+  attributeTypes.reserve(this->AttributeMetadata.size());
+  for (const auto& [key, _] : this->AttributeMetadata)
   {
-    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-    case vtkDataObject::FIELD_ASSOCIATION_NONE:
-    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      return this->AttributeInformations[fieldAssociation];
-    default:
-      return nullptr;
+    attributeTypes.push_back(key);
   }
+  return attributeTypes;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> vtkPVDataInformation::GetAttributeNames() const
+{
+  std::vector<std::string> attributeNames;
+  attributeNames.reserve(this->AttributeMetadata.size());
+  for (const auto& [_, value] : this->AttributeMetadata)
+  {
+    attributeNames.push_back(value.Name);
+  }
+  return attributeNames;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVDataInformation::GetAttributeName(int attributeType) const
+{
+  auto result = this->AttributeMetadata.find(attributeType);
+  if (result != this->AttributeMetadata.end())
+  {
+    return result->second.Name;
+  }
+  return "";
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation* vtkPVDataInformation::GetAttributeInformation(
+  int attributeType) const
+{
+  auto result = this->AttributeMetadata.find(attributeType);
+  if (result != this->AttributeMetadata.end())
+  {
+    return result->second.Information.Get();
+  }
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkTypeInt64 vtkPVDataInformation::GetNumberOfElements(int elementType) const
 {
-  switch (elementType)
+  auto result = this->AttributeMetadata.find(elementType);
+  if (result != this->AttributeMetadata.end())
   {
-    case vtkDataObject::POINT:
-    case vtkDataObject::CELL:
-    case vtkDataObject::FIELD:
-    case vtkDataObject::VERTEX:
-    case vtkDataObject::EDGE:
-    case vtkDataObject::ROW:
-      return this->NumberOfElements[elementType];
-    default:
-      return 0;
+    return result->second.NumberOfElements;
   }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -284,12 +315,14 @@ void vtkPVDataInformation::Initialize()
   this->FirstLeafCompositeIndex = 0;
   this->UniqueBlockTypes.clear();
 
-  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
-  {
-    this->NumberOfElements[cc] = 0;
-    this->AttributeInformations[cc]->Initialize();
-    this->AttributeInformations[cc]->SetFieldAssociation(cc);
-  }
+  this->AttributeMetadata.clear();
+  auto& attributeType = this->AttributeMetadata[vtkDataObject::FIELD];
+  attributeType.Name = "Field";
+  attributeType.NumberOfElements = 0;
+  attributeType.Information = vtkSmartPointer<vtkPVDataSetAttributesInformation>::New();
+  attributeType.Information->Initialize();
+  attributeType.Information->SetFieldAssociation(vtkDataObject::FIELD);
+  attributeType.Information->SetFieldName(attributeType.Name.c_str());
 
   this->NumberOfTrees = 0;
   this->NumberOfLeaves = 0;
@@ -523,19 +556,34 @@ void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
   this->MemorySize = dobj->GetActualMemorySize();
   this->NumberOfDataSets = 1;
 
+  const bool isCellGrid = dobj->IsA("vtkCellGrid");
   for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
   {
-    this->AttributeInformations[cc]->CopyFromDataObject(dobj);
-    switch (cc)
+    if (dobj->GetFieldData() && cc == vtkDataObject::FIELD)
     {
-      case vtkDataObject::FIELD:
-        // for field data, we get the maximum number of tuples in field data.
-        this->NumberOfElements[cc] = this->AttributeInformations[cc]->GetMaximumNumberOfTuples();
-        break;
-
-      default:
-        this->NumberOfElements[cc] = dobj->GetNumberOfElements(cc);
-        break;
+      auto& attributeMetadata = this->AttributeMetadata[cc];
+      attributeMetadata.Information->CopyFromDataObject(dobj);
+      // for field data, we get the maximum number of tuples in field data.
+      attributeMetadata.NumberOfElements =
+        attributeMetadata.Information->GetMaximumNumberOfTuples();
+    }
+    else if ((!isCellGrid && dobj->GetAttributesAsFieldData(cc)) ||
+      (isCellGrid && cc == vtkDataObject::CELL))
+    {
+      std::string_view prefix = "vtkDataObject::";
+      std::string_view attributeNameView = vtkDataObject::GetAttributeTypeAsString(cc);
+      assert(attributeNameView.substr(0, prefix.size()) == prefix);
+      attributeNameView.remove_prefix(prefix.size());
+      std::string attributeName(attributeNameView);
+      std::transform(attributeName.begin() + 1, attributeName.end(), attributeName.begin() + 1,
+        [](unsigned char c) { return std::tolower(c); });
+      this->AttributeMetadata[cc] = { attributeName, dobj->GetNumberOfElements(cc),
+        vtkSmartPointer<vtkPVDataSetAttributesInformation>::New() };
+      auto& attributeMetadata = this->AttributeMetadata[cc];
+      attributeMetadata.Information->Initialize();
+      attributeMetadata.Information->SetFieldAssociation(cc);
+      attributeMetadata.Information->SetFieldName(attributeMetadata.Name.c_str());
+      attributeMetadata.Information->CopyFromDataObject(dobj);
     }
   }
 
@@ -596,8 +644,21 @@ void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
   else if (auto cg = vtkCellGrid::SafeDownCast(dobj))
   {
     cg->GetBounds(this->Bounds);
-    this->NumberOfElements[vtkDataObject::CELL] = cg->GetNumberOfCells();
-    // this->AttributeInformations[cc]->CopyFromDataObject(dobj);
+    for (const auto& [key, value] : cg->GetArrayGroups())
+    {
+      vtkStringToken::Hash hash = key;
+      vtkStringToken token(hash);
+      if (token.HasData())
+      {
+        this->AttributeMetadata[key] = { token.Data(), cg->GetNumberOfElements(key),
+          vtkSmartPointer<vtkPVDataSetAttributesInformation>::New() };
+        auto& attributeMetadata = this->AttributeMetadata[key];
+        attributeMetadata.Information->Initialize();
+        attributeMetadata.Information->SetFieldAssociation(key);
+        attributeMetadata.Information->SetFieldName(attributeMetadata.Name.c_str());
+        attributeMetadata.Information->CopyFromDataObject(dobj);
+      }
+    }
   }
 }
 
@@ -665,20 +726,30 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
   cellTypes.merge(otherCellTypes);
   this->UniqueCellTypes = std::vector<unsigned char>(cellTypes.begin(), cellTypes.end());
 
-  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  for (const auto& [key, otherAttributeMetadata] : other->AttributeMetadata)
   {
-    switch (cc)
+    auto result = this->AttributeMetadata.find(key);
+    if (result == this->AttributeMetadata.end())
+    {
+      this->AttributeMetadata[key] = { otherAttributeMetadata.Name,
+        otherAttributeMetadata.NumberOfElements,
+        vtkSmartPointer<vtkPVDataSetAttributesInformation>::New() };
+      this->AttributeMetadata[key].Information->DeepCopy(otherAttributeMetadata.Information);
+      continue;
+    }
+    auto& attributeMetadata = result->second;
+    switch (key)
     {
       case vtkDataObject::FIELD:
-        this->NumberOfElements[cc] =
-          std::max(this->NumberOfElements[cc], other->NumberOfElements[cc]);
+        attributeMetadata.NumberOfElements =
+          std::max(attributeMetadata.NumberOfElements, otherAttributeMetadata.NumberOfElements);
         break;
 
       default:
-        this->NumberOfElements[cc] += other->NumberOfElements[cc];
+        attributeMetadata.NumberOfElements += otherAttributeMetadata.NumberOfElements;
     }
 
-    this->AttributeInformations[cc]->AddInformation(other->AttributeInformations[cc]);
+    attributeMetadata.Information->AddInformation(otherAttributeMetadata.Information);
   }
   this->PointArrayInformation->AddInformation(other->PointArrayInformation, vtkDataObject::POINT);
 
@@ -712,20 +783,21 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation* other)
   this->AMRNumberOfDataSets = other->AMRNumberOfDataSets;
   this->NumberOfDataSets = other->NumberOfDataSets;
   this->MemorySize = other->MemorySize;
-  std::copy(other->Bounds, other->Bounds + 6, this->Bounds);
-  std::copy(other->Extent, other->Extent + 6, this->Extent);
+  std::copy_n(other->Bounds, 6, this->Bounds);
+  std::copy_n(other->Extent, 6, this->Extent);
   this->HasTime = other->HasTime;
   this->Time = other->Time;
-  std::copy(other->TimeRange, other->TimeRange + 2, this->TimeRange);
+  std::copy_n(other->TimeRange, 2, this->TimeRange);
   this->TimeSteps = other->TimeSteps;
   this->TimeLabel = other->TimeLabel;
   this->UniqueBlockTypes = other->UniqueBlockTypes;
   this->UniqueCellTypes = other->UniqueCellTypes;
-  std::copy(other->NumberOfElements,
-    other->NumberOfElements + vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES, this->NumberOfElements);
-  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  this->AttributeMetadata.clear();
+  for (const auto& [key, value] : other->AttributeMetadata)
   {
-    this->AttributeInformations[cc]->DeepCopy(other->AttributeInformations[cc]);
+    this->AttributeMetadata[key] = { value.Name, value.NumberOfElements,
+      vtkSmartPointer<vtkPVDataSetAttributesInformation>::New() };
+    this->AttributeMetadata[key].Information->DeepCopy(value.Information);
   }
   this->PointArrayInformation->DeepCopy(other->PointArrayInformation);
   this->Hierarchy->DeepCopy(other->Hierarchy);
@@ -950,11 +1022,11 @@ bool vtkPVDataInformation::HasUnstructuredData() const
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation) const
+bool vtkPVDataInformation::IsAttributeValid(int attributeType) const
 {
-  auto f = [&fieldAssociation](int dtype)
+  auto f = [&attributeType](int dtype)
   {
-    switch (fieldAssociation)
+    switch (attributeType)
     {
       case vtkDataObject::FIELD_ASSOCIATION_NONE:
         return true;
@@ -977,6 +1049,11 @@ bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation) const
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_TABLE);
 
       default:
+        if (vtkDataObjectTypes::TypeIdIsA(dtype, VTK_CELL_GRID) &&
+          vtkStringToken(static_cast<vtkStringToken::Hash>(attributeType)).HasData())
+        {
+          return true;
+        }
         return false;
     }
   };
@@ -1014,8 +1091,29 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6) << this->HasTime << this->Time
        << vtkClientServerStream::InsertArray(this->TimeRange, 2) << this->TimeLabel
-       << vtkClientServerStream::InsertArray(
-            this->NumberOfElements, vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES);
+       << static_cast<int>(this->AttributeMetadata.size());
+  if (!this->AttributeMetadata.empty())
+  {
+    std::vector<int> attributeTypes;
+    std::vector<vtkTypeInt64> numberOfElements;
+    std::vector<std::string> attributeNames;
+    attributeTypes.reserve(this->AttributeMetadata.size());
+    numberOfElements.reserve(this->AttributeMetadata.size());
+    attributeNames.reserve(this->AttributeMetadata.size());
+    for (const auto& [key, value] : this->AttributeMetadata)
+    {
+      attributeTypes.push_back(key);
+      numberOfElements.push_back(value.NumberOfElements);
+      attributeNames.push_back(value.Name);
+    }
+    int attributeMetadataSize = static_cast<int>(this->AttributeMetadata.size());
+    *css << vtkClientServerStream::InsertArray(attributeTypes.data(), attributeMetadataSize)
+         << vtkClientServerStream::InsertArray(numberOfElements.data(), attributeMetadataSize);
+    for (const auto& name : attributeNames)
+    {
+      *css << name;
+    }
+  }
 
   *css << static_cast<int>(this->TimeSteps.size());
   if (!this->TimeSteps.empty())
@@ -1044,10 +1142,10 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   this->PointArrayInformation->CopyToStream(&temp);
   *css << temp;
 
-  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  for (const auto& [key, value] : this->AttributeMetadata)
   {
     temp.Reset();
-    this->AttributeInformations[cc]->CopyToStream(&temp);
+    this->AttributeMetadata[key].Information->CopyToStream(&temp);
     *css << temp;
   }
 
@@ -1073,7 +1171,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
 void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
 {
   // argument counter.
-  int argument = 0;
+  int argument = 0, attributeMetadataSize = 0;
 
   if (!css->GetArgument(0, argument++, &this->DataSetType) ||
     !css->GetArgument(0, argument++, &this->CompositeDataSetType) ||
@@ -1088,13 +1186,45 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     !css->GetArgument(0, argument++, &this->HasTime) ||
     !css->GetArgument(0, argument++, &this->Time) ||
     !css->GetArgument(0, argument++, this->TimeRange, 2) ||
-    !css->GetArgument(0, argument++, &this->TimeLabel) ||
-    !css->GetArgument(
-      0, argument++, this->NumberOfElements, vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES))
+    !css->GetArgument(0, argument++, &this->TimeLabel))
   {
     this->Initialize();
     vtkErrorMacro("Error parsing stream.");
     return;
+  }
+  if (!css->GetArgument(0, argument++, &attributeMetadataSize))
+  {
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
+    return;
+  }
+  std::vector<int> attributeTypes;
+  std::vector<vtkTypeInt64> numberOfElements;
+  std::vector<std::string> attributeNames;
+  attributeTypes.resize(attributeMetadataSize);
+  numberOfElements.resize(attributeMetadataSize);
+  attributeNames.resize(attributeMetadataSize);
+  if (attributeMetadataSize > 0 &&
+    (!css->GetArgument(0, argument++, attributeTypes.data(), attributeMetadataSize) ||
+      !css->GetArgument(0, argument++, numberOfElements.data(), attributeMetadataSize)))
+  {
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
+    return;
+  }
+  for (int i = 0; i < attributeMetadataSize; i++)
+  {
+    if (!css->GetArgument(0, argument++, &attributeNames[i]))
+    {
+      this->Initialize();
+      vtkErrorMacro("Error parsing stream.");
+      return;
+    }
+  }
+  for (int i = 0; i < attributeMetadataSize; ++i)
+  {
+    this->AttributeMetadata[attributeTypes[i]] = { attributeNames[i], numberOfElements[i],
+      vtkSmartPointer<vtkPVDataSetAttributesInformation>::New() };
   }
 
   // read TimeSteps
@@ -1158,7 +1288,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   }
   this->PointArrayInformation->CopyFromStream(&temp);
 
-  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  for (const auto& [key, value] : this->AttributeMetadata)
   {
     temp.Reset();
     if (!css->GetArgument(0, argument++, &temp))
@@ -1167,7 +1297,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
       vtkErrorMacro("Error parsing stream.");
       return;
     }
-    this->AttributeInformations[cc]->CopyFromStream(&temp);
+    this->AttributeMetadata[key].Information->CopyFromStream(&temp);
   }
 
   if (this->CompositeDataSetType != -1)
@@ -1198,9 +1328,9 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation* vtkPVDataInformation::GetArrayInformation(
-  const char* arrayname, int attribute_type) const
+  const char* arrayname, int attributeType) const
 {
-  vtkPVDataSetAttributesInformation* attrInfo = this->GetAttributeInformation(attribute_type);
+  vtkPVDataSetAttributesInformation* attrInfo = this->GetAttributeInformation(attributeType);
   return attrInfo ? attrInfo->GetArrayInformation(arrayname) : nullptr;
 }
 

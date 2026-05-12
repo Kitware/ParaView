@@ -132,35 +132,50 @@ void vtkSMNumberOfComponentsDomain::Update(
     iadAttributeType == vtkSMInputArrayDomain::ANY ||
     iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD)
   {
-    ai = info->GetPointDataInformation()->GetArrayInformation(arrayName);
+    if (auto* ptInfo = info->GetPointDataInformation())
+    {
+      ai = ptInfo->GetArrayInformation(arrayName);
+    }
   }
   if (iadAttributeType == vtkSMInputArrayDomain::CELL ||
     ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
        iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
       !ai))
   {
-    ai = info->GetCellDataInformation()->GetArrayInformation(arrayName);
+    if (auto* cellInfo = info->GetCellDataInformation())
+    {
+      ai = cellInfo->GetArrayInformation(arrayName);
+    }
   }
   if (iadAttributeType == vtkSMInputArrayDomain::VERTEX ||
     ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
        iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
       !ai))
   {
-    ai = info->GetVertexDataInformation()->GetArrayInformation(arrayName);
+    if (auto* vtxInfo = info->GetVertexDataInformation())
+    {
+      ai = vtxInfo->GetArrayInformation(arrayName);
+    }
   }
   if (iadAttributeType == vtkSMInputArrayDomain::EDGE ||
     ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
        iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
       !ai))
   {
-    ai = info->GetEdgeDataInformation()->GetArrayInformation(arrayName);
+    if (auto* edgeInfo = info->GetEdgeDataInformation())
+    {
+      ai = edgeInfo->GetArrayInformation(arrayName);
+    }
   }
   if (iadAttributeType == vtkSMInputArrayDomain::ROW ||
     ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
        iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
       !ai))
   {
-    ai = info->GetRowDataInformation()->GetArrayInformation(arrayName);
+    if (auto* rowInfo = info->GetRowDataInformation())
+    {
+      ai = rowInfo->GetArrayInformation(arrayName);
+    }
   }
 
   if (ai)

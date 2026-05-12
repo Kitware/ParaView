@@ -5,15 +5,11 @@
 #include "ui_pqSpreadSheetViewDecorator.h"
 
 // Qt Includes.
-#include <QCheckBox>
 #include <QClipboard>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QKeyEvent>
-#include <QMenu>
-#include <QVBoxLayout>
 #include <QWidget>
-#include <QWidgetAction>
 
 #include "pqDataRepresentation.h"
 #include "pqEventDispatcher.h"
@@ -23,24 +19,22 @@
 #include "pqSpreadSheetColumnsVisibility.h"
 #include "pqSpreadSheetView.h"
 #include "pqSpreadSheetViewModel.h"
-#include "pqSpreadSheetViewWidget.h"
 #include "pqUndoStack.h"
 #include "pqWidgetUtilities.h"
+
 #include "vtkDataObject.h"
 #include "vtkNew.h"
-#include "vtkSMEnumerationDomain.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSMFieldDataDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 #include "vtkSMViewProxy.h"
-#include "vtkSpreadSheetView.h"
 
 #include <algorithm>
 #include <cassert>
-#include <memory>
-#include <set>
 
 namespace
 {
@@ -259,6 +253,85 @@ void pqSpreadSheetViewDecorator::setFieldAssociation(int val)
   }
 }
 
+void pqSpreadSheetViewDecorator::repopulateAttributes(pqDataRepresentation* repr)
+{
+  auto& internal = *this->Internal;
+
+  // Remember the current selection so we can try to restore it.
+  const int previous = internal.Attribute->currentData().isValid()
+    ? internal.Attribute->currentData().toInt()
+    : vtkDataObject::FIELD_ASSOCIATION_POINTS;
+
+  // Block signals only while rebuilding the item list — we want the
+  // final setCurrentIndex to fire currentIndexChanged so the property
+  // link pushes the value to the proxy.
+  {
+    QSignalBlocker blocker(internal.Attribute);
+    internal.Attribute->clear();
+
+    if (!repr)
+    {
+      return;
+    }
+    auto port = repr->getOutputPortFromInput();
+    if (!port)
+    {
+      return;
+    }
+    auto dataInfo = port->getDataInformation();
+    if (!dataInfo)
+    {
+      return;
+    }
+
+    bool hasFieldData = false;
+    for (const int& attributeType : dataInfo->GetAttributeTypes())
+    {
+      if (attributeType == vtkDataObject::FIELD)
+      {
+        hasFieldData = true;
+        continue;
+      }
+      if (!dataInfo->IsAttributeValid(attributeType))
+      {
+        continue;
+      }
+      QString attributeName = QCoreApplication::translate("ServerManagerXML",
+        vtkSMFieldDataDomain::GetAttributeTypeAsString(dataInfo, attributeType).c_str());
+      internal.Attribute->addItem(attributeName, attributeType);
+    }
+    // add fieldData last
+    if (hasFieldData)
+    {
+      QString attributeName = QCoreApplication::translate("ServerManagerXML",
+        vtkSMFieldDataDomain::GetAttributeTypeAsString(dataInfo, vtkDataObject::FIELD).c_str());
+      internal.Attribute->addItem(attributeName, vtkDataObject::FIELD);
+    }
+  } // blocker released here
+
+  if (internal.Attribute->count() == 0)
+  {
+    return;
+  }
+  int idx = internal.Attribute->findData(previous);
+  if (idx == -1)
+  {
+    idx = 0;
+  }
+  if (internal.Attribute->currentIndex() == idx)
+  {
+    // setCurrentIndex won't emit currentIndexChanged if the index is
+    // already what we want — force the property link to sync by
+    // emitting uiModified ourselves.
+    this->onCurrentAttributeChange(idx);
+    Q_EMIT this->uiModified();
+  }
+  else
+  {
+    internal.Attribute->setCurrentIndex(idx);
+  }
+}
+
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
 {
@@ -270,6 +343,7 @@ void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
   {
     this->Internal->Source->setCurrentPort(nullptr);
   }
+  this->repopulateAttributes(repr);
   this->Internal->Attribute->setEnabled(repr != nullptr);
 }
 
