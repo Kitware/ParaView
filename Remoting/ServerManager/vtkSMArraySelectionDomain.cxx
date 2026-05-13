@@ -3,6 +3,7 @@
 #include "vtkSMArraySelectionDomain.h"
 
 #include "vtkCellTypeUtilities.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
@@ -13,7 +14,11 @@
 vtkStandardNewMacro(vtkSMArraySelectionDomain);
 
 //---------------------------------------------------------------------------
-vtkSMArraySelectionDomain::vtkSMArraySelectionDomain() = default;
+vtkSMArraySelectionDomain::vtkSMArraySelectionDomain()
+{
+  this->AddObserver(
+    vtkCommand::DomainModifiedEvent, this, &vtkSMArraySelectionDomain::OnDomainModified);
+}
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionDomain::~vtkSMArraySelectionDomain() = default;
@@ -25,12 +30,8 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_un
   vtkSMVectorProperty* infoProp = vtkSMVectorProperty::SafeDownCast(prop->GetInformationProperty());
   if (vprop && infoProp)
   {
-    if (use_unchecked_values)
-    {
-      vtkWarningMacro("Developer Warnings: missing unchecked implementation.");
-    }
-
     vtkSMPropertyHelper helper(vprop);
+    helper.SetUseUnchecked(use_unchecked_values);
     if (infoProp->GetNumberOfElements() / 2 != this->GetNumberOfStrings())
     {
       for (unsigned int i = 0; i < this->GetNumberOfStrings(); i++)
@@ -40,7 +41,9 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_un
     }
     else
     {
-      vprop->Copy(infoProp);
+      vtkSMPropertyHelper helperInfo(infoProp);
+      helperInfo.SetUseUnchecked(use_unchecked_values);
+      helper.Copy(helperInfo);
     }
 
     if (vtkSMArraySelectionDomain::GetLoadAllVariables())
@@ -112,4 +115,15 @@ int vtkSMArraySelectionDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEl
   this->UseCellTypes = (mode && strcmp(mode, "cell_types") == 0);
 
   return this->Superclass::ReadXMLAttributes(prop, element);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMArraySelectionDomain::OnDomainModified()
+{
+  vtkSMProperty* prop = this->GetProperty();
+  this->SetDefaultValues(prop, false);
+  if (prop->GetParent())
+  {
+    prop->GetParent()->UpdateProperty(prop->GetXMLName());
+  }
 }

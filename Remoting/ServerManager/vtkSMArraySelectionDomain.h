@@ -66,6 +66,8 @@ protected:
    */
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
+  void OnDomainModified();
+
 private:
   vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&) = delete;
   void operator=(const vtkSMArraySelectionDomain&) = delete;
