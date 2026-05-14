@@ -44,6 +44,13 @@ public:
   void CloseFile();
 
   /**
+   * Reopen H5 file for data reading without re-reading mesh metadata.
+   * Requires a prior successful LoadFile() call. Pair with CloseFile()
+   * when done to release the OS file handle.
+   */
+  void ReopenForData();
+
+  /**
    * Return dimension of the mesh (2 or 3)
    */
   unsigned int GetDimension() const;
