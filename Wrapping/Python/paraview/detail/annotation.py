@@ -22,6 +22,35 @@ import paraview.modules.vtkPVVTKExtensionsFiltersPython
 import sys  # also for sys.stderr
 
 
+def _unwrap_scalar_value(value):
+    """
+    Unwrap a scalar value from an array or return the value as-is.
+
+    Converts array-like objects containing a single scalar element into
+    a native Python scalar. If the value is None, a NoneArray, or cannot
+    be converted to an array, returns the original value unchanged.
+
+    Args:
+        value: A scalar, array-like object, or None.
+
+    Returns:
+        A native Python scalar if the input is a single-element array,
+        otherwise the input value unchanged.
+    """
+    if value is None or value is dsa.NoneArray:
+        return value
+
+    try:
+        array = np.asarray(value)
+    except (TypeError, ValueError):
+        return value
+
+    if array.ndim == 0 or array.size == 1:
+        return array.reshape(()).item()
+
+    return value
+
+
 def _get_ns(self, do, association):
     if association == vtkDataObject.FIELD:
         # For FieldData, it gets tricky. In general, one would think we are going
@@ -42,7 +71,8 @@ def _get_ns(self, do, association):
                     if (not fieldData is None) and (len(fieldData.keys()) > 0): break
     else:
         fieldData = do.GetAttributes(association)
-    arrays = calculator.get_arrays(fieldData)
+    arrays = {name: _unwrap_scalar_value(value)
+              for name, value in calculator.get_arrays(fieldData).items()}
 
     ns = {}
     ns["input"] = do

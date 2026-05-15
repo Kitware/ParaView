@@ -83,12 +83,17 @@ spec:
 
     script:
         - *before_script_macos
+        - env "CMAKE_CONFIGURATION=macos314_$(uname -m)" cmake -P .gitlab/ci/download_wheel_python.cmake
+        - export PYTHON_PREFIX=$GIT_CLONE_PATH/.gitlab/python/Python.framework/Versions/Current
+        - export PATH=$GIT_CLONE_PATH/.gitlab/python/Python.framework/Versions/Current/bin:$PATH
+        - python3 --version
+
         - .gitlab/ci/sccache.sh
         # Build and activate the venv
-        # - python3 -m venv build/ci-venv
-        # - . ./build/ci-venv/bin/activate
-        # - pip install -qq -r .gitlab/ci/requirements-phase1.txt
-        # - pip install -qq -r .gitlab/ci/requirements-phase2.txt
+        - python3 -m venv build/ci-venv
+        - . ./build/ci-venv/bin/activate
+        - python3 -m pip install --upgrade pip
+        - pip install -qq -r .gitlab/ci/requirements.txt
         # Allow the server to already be running.
         - "sccache --start-server || :"
         - sccache --show-stats
@@ -109,9 +114,14 @@ spec:
 
     script:
         - *before_script_macos
-        # Reuse the venv from the build step (avoids version changes between
-        # build and testing).
-        # - . ./build/ci-venv/bin/activate
+        - env "CMAKE_CONFIGURATION=macos314_$(uname -m)" cmake -P .gitlab/ci/download_wheel_python.cmake
+        - export PYTHON_PREFIX=$GIT_CLONE_PATH/.gitlab/python/Python.framework/Versions/Current
+        - PYTHON_VERSION_SUFFIX=`"$PYTHON_PREFIX/bin/python3" -c 'import sys;print(f"{sys.version_info[0]}.{sys.version_info[1]}")'`
+        # This is set up manually because venv activate does not set
+        # PYTHONPATH which is needed for ParaView and pvpython to find the venv packages
+        - export PATH=$PWD/build/ci-venv/bin:$PATH
+        - export PYTHONPATH=$PWD/build/ci-venv/lib/python$PYTHON_VERSION_SUFFIX/site-packages
+        - build/bin/pvpython -c "import numpy"
         - ctest --output-on-failure -V -S .gitlab/ci/ctest_test.cmake
     interruptible: true
     timeout: 2 hours

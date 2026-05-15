@@ -111,7 +111,8 @@ spec:
         # This may be necessary when running manually.
         # Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
         - . .\build\ci-venv\Scripts\Activate.ps1
-        - pip install -qq -r $pwdpath\.gitlab\ci\requirements.txt
+        - pip --version
+        - pip install --verbose --no-cache-dir -r $pwdpath\.gitlab\ci\requirements.txt
         - Invoke-Expression -Command .gitlab/ci/buildcache.ps1
         - Set-Item -Force -Path "env:PATH" -Value "$env:PATH;$pwdpath\.gitlab\buildcache\bin"
         - Invoke-Expression -Command .gitlab/ci/vcvarsall.ps1
