@@ -19,7 +19,7 @@
   "homepage": "https://github.com/Kitware/paraview-docs#readme",
   "devDependencies": {},
   "dependencies": {
-    "css-loader": "1.0.0",
+    "css-loader": "7.1.4",
     "file-loader": "2.0.0",
     "style-loader": "0.23.0",
     "expose-loader": "0.7.5",
