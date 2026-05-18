@@ -246,7 +246,6 @@
   <addaction name="separator"/>
   <addaction name="actionImport"/>
   <addaction name="actionExport"/>
-  <addaction name="actionAnimatedExport"/>
   <addaction name="separator"/>
   <addaction name="actionFileSaveAnimation"/>
   <addaction name="actionFileSaveExtracts"/>
