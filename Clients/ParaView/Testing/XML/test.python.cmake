@@ -187,6 +187,7 @@ if (numpy_found)
   list(APPEND paraview_python_verify_tests
     ExportAnimatedSpreadSheetView
   )
+  set(ExportAnimatedSpreadSheetView_FORCE_SERIAL TRUE) # since this uses popup-menu
 endif()
 
 if (PARAVIEW_ENABLE_WEB)
@@ -210,5 +211,8 @@ if (PARAVIEW_USE_PYTHON)
       -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTestDriver.cmake
     )
     set_tests_properties(${tname} PROPERTIES LABELS "paraview")
+    if ("${${test_name}_FORCE_SERIAL}")
+      set_tests_properties(${tname} PROPERTIES RUN_SERIAL ON)
+    endif ()
   endforeach()
 endif()
