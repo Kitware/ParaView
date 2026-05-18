@@ -2608,7 +2608,10 @@ private:
 //===========================================================================
 struct Process_6_1_to_6_2
 {
-  bool operator()(xml_document& document) { return HandleRenamedProxies(document); }
+  bool operator()(xml_document& document)
+  {
+    return this->HandleRenamedProxies(document) && this->HandleInterpolatorType(document);
+  }
 
   bool HandleRenamedProxies(xml_document& document)
   {
@@ -2630,7 +2633,109 @@ struct Process_6_1_to_6_2
         node.attribute("type").set_value(proxy.second.c_str());
       }
     }
+    return true;
+  }
 
+  bool HandleInterpolatorType(xml_document& document)
+  {
+    std::vector<std::string> targetFilters = { "LegacyParticlePath", "LegacyStreakLine",
+      "EvenlySpacedStreamlines2D", "ParticlePath", "ParticleTracer", "StreakLine", "StreamTracer",
+      "ArbitrarySourceStreamTracer" };
+
+    // 1. Check if we actually have any work to do
+    bool found = false;
+    for (const auto& filterType : targetFilters)
+    {
+      std::string request = "//Proxy[@group='filters' and @type='" + filterType + "']";
+      if (!document.select_nodes(request.c_str()).empty())
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found)
+    {
+      return true;
+    }
+
+    // 2. Generate Unique IDs for the locators
+    UniqueIdGenerator generator(document);
+
+    const std::array<vtkTypeUInt32, 6> cellLocatorIds = { { generator.GetNextUniqueId(),
+      generator.GetNextUniqueId(), generator.GetNextUniqueId(), generator.GetNextUniqueId(),
+      generator.GetNextUniqueId(), generator.GetNextUniqueId() } };
+    const auto idJumpAndWalk = cellLocatorIds[2];
+    const auto idStatic = cellLocatorIds[5];
+
+    // 3. Append the new locator proxies to the global ServerManagerState
+    pugi::xml_node smstate = document.root().child("ServerManagerState");
+    std::ostringstream stream;
+
+    std::array<std::string, 6> cellLocatorTypes = { { "CellLocator", "CellTreeLocator",
+      "JumpAndWalkCellLocator", "ModifiedBSPTree", "OBBTree", "StaticCellLocator" } };
+
+    for (size_t i = 0; i < cellLocatorTypes.size(); i++)
+    {
+      stream << "<Proxy group=\"cell_locators\" type=\"" << cellLocatorTypes[i] << "\" id=\""
+             << cellLocatorIds[i] << "\" servers=\"1\" />\n";
+    }
+
+    const std::string buffer = stream.str();
+    if (!smstate.append_buffer(buffer.c_str(), buffer.size()))
+    {
+      vtkGenericWarningMacro("Unable to append cell locator proxies to state.");
+      return false;
+    }
+
+    // 4. Update the properties on the filters
+    for (const auto& filterType : targetFilters)
+    {
+      std::string request = "//Proxy[@group='filters' and @type='" + filterType + "']";
+      pugi::xpath_node_set xpath_set = document.select_nodes(request.c_str());
+
+      for (auto xpath_node : xpath_set)
+      {
+        pugi::xml_node proxyNode = xpath_node.node();
+        std::string proxyId = proxyNode.attribute("id").as_string();
+
+        pugi::xml_node interpolatorProp =
+          proxyNode.find_child_by_attribute("Property", "name", "InterpolatorType");
+
+        if (interpolatorProp)
+        {
+          int val = 0;
+          pugi::xml_node element = interpolatorProp.child("Element");
+          if (element && element.attribute("value"))
+          {
+            val = element.attribute("value").as_int();
+          }
+
+          // Create the new Property node: <Property name="CellLocator" ...>
+          pugi::xml_node locatorProp = proxyNode.append_child("Property");
+          locatorProp.append_attribute("name").set_value("CellLocator");
+          locatorProp.append_attribute("id").set_value((proxyId + ".CellLocator").c_str());
+          locatorProp.append_attribute("number_of_elements").set_value("1");
+
+          // Set the active proxy based on old val (0 -> JumpAndWalk, 1 -> Static)
+          pugi::xml_node activeProxy = locatorProp.append_child("Proxy");
+          activeProxy.append_attribute("value").set_value(val == 0 ? idJumpAndWalk : idStatic);
+
+          // Add the Domain proxy_list containing all generated IDs
+          pugi::xml_node domain = locatorProp.append_child("Domain");
+          domain.append_attribute("name").set_value("proxy_list");
+          domain.append_attribute("id").set_value((proxyId + ".CellLocator.proxy_list").c_str());
+
+          for (size_t i = 0; i < cellLocatorIds.size(); i++)
+          {
+            domain.append_child("Proxy").append_attribute("value").set_value(cellLocatorIds[i]);
+          }
+
+          // Remove the legacy property
+          proxyNode.remove_child(interpolatorProp);
+        }
+      }
+    }
     return true;
   }
 };

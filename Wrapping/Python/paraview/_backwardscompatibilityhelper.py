@@ -678,6 +678,24 @@ def setattr(proxy, pname, value):
                                         "supports 'EmbedParaViewState' and it has been replaced by "
                                         "'Format.EmbedParaViewState'.")
 
+    # 6.1 -> 6.2: InterpolatorType (int) replaced by CellLocator (proxy)
+    # Target filters: StreamTracer, ParticleTracer, etc.
+    if pname == "InterpolatorType" and proxy.SMProxy.GetProperty("CellLocator"):
+        if compatibility_version < (6, 2):
+            # Map 0 -> JumpAndWalk, 1 -> Static
+            locator_type = "JumpAndWalkCellLocator" if value == 0 else "StaticCellLocator"
+
+            # Create the sub-proxy for the locator
+            locator_proxy = sm.CreateProxy("cell_locators", locator_type)
+            if locator_proxy:
+                # Update the CellLocator property with the new proxy
+                proxy.GetProperty("CellLocator").SetData(locator_proxy)
+                raise Continue()
+        else:
+            raise NotSupportedException(
+                "'InterpolatorType' is obsolete as of ParaView 6.2. "
+                "Please use the 'CellLocator' property to specify a locator proxy instead.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -1377,6 +1395,21 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                 "'EmbedParaViewState' property has been removed in ParaView 6.1. Please use the "
                 "'Format.EmbedParaViewState' property to get/set the EmbedParaViewState instead.")
+
+    # 6.1 -> 6.2: InterpolatorType (int) replaced by CellLocator (proxy)
+    if pname == "InterpolatorType" and proxy.SMProxy.GetProperty("CellLocator"):
+        if compatibility_version < (6, 2):
+            # Get the currently assigned locator proxy
+            locator = proxy.CellLocator
+            if locator:
+                xml_name = locator.GetXMLName()
+                # Return 0 for JumpAndWalk, 1 for everything else (usually Static)
+                return 0 if xml_name == "JumpAndWalkCellLocator" else 1
+            return 0
+        else:
+            raise NotSupportedException(
+                "'InterpolatorType' is obsolete as of ParaView 6.2. "
+                "Please access the 'CellLocator' property instead.")
 
     raise Continue()
 

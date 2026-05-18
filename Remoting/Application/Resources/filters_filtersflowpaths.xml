@@ -62,23 +62,18 @@
           This property contains the name of the vector array from which to generate streamlines.
         </Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetInterpolatorType"
-                         default_values="0"
-                         name="InterpolatorType"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <EnumerationDomain name="enum">
-          <Entry text="Interpolator with Point Locator"
-                 value="0"/>
-          <Entry text="Interpolator with Cell Locator"
-                 value="1"/>
-        </EnumerationDomain>
+      <ProxyProperty command="SetCellLocator"
+                     label="Cell Locator"
+                     name="CellLocator"
+                     panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Group name="cell_locators" default="JumpAndWalkCellLocator"/>
+        </ProxyListDomain>
         <Documentation>
-          This property determines which interpolator to use for
-          evaluating the velocity vector field. The first is faster though the
-          second is more robust in locating cells during streamline integration.
+          This property determines which cell locator to be used by the interpolator
+          for evaluating the velocity vector field.
         </Documentation>
-      </IntVectorProperty>
+      </ProxyProperty>
       <IntVectorProperty command="SetIntegratorType"
                          default_values="1"
                          name="IntegratorType"
@@ -327,22 +322,18 @@
           data structures, such as locators or cell links are not rebuilt for each timestep.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetInterpolatorType"
-                         default_values="1"
-                         name="InterpolatorType"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <EnumerationDomain name="enum">
-          <Entry text="Interpolator with Point Locator"
-                 value="0"/>
-          <Entry text="Interpolator with Cell Locator"
-                 value="1"/>
-        </EnumerationDomain>
+      <ProxyProperty command="SetCellLocator"
+                     label="Cell Locator"
+                     name="CellLocator"
+                     panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Group name="cell_locators" default="StaticCellLocator"/>
+        </ProxyListDomain>
         <Documentation>
-          This property determines which interpolator to use for evaluating the velocity vector field. The first is
-          faster though the second is more robust in locating cells during streamline integration.
+          This property determines which cell locator to be used by the interpolator
+          for evaluating the velocity vector field.
         </Documentation>
-      </IntVectorProperty>
+      </ProxyProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
@@ -467,22 +458,18 @@
           data structures, such as locators or cell links are not rebuilt for each timestep.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetInterpolatorType"
-                         default_values="1"
-                         name="InterpolatorType"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <EnumerationDomain name="enum">
-          <Entry text="Interpolator with Point Locator"
-                 value="0"/>
-          <Entry text="Interpolator with Cell Locator"
-                 value="1"/>
-        </EnumerationDomain>
+      <ProxyProperty command="SetCellLocator"
+                     label="Cell Locator"
+                     name="CellLocator"
+                     panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Group name="cell_locators" default="StaticCellLocator"/>
+        </ProxyListDomain>
         <Documentation>
-          This property determines which interpolator to use for evaluating the velocity vector field. The first is
-          faster though the second is more robust in locating cells during streamline integration.
+          This property determines which cell locator to be used by the interpolator
+          for evaluating the velocity vector field.
         </Documentation>
-      </IntVectorProperty>
+      </ProxyProperty>
 
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues">
@@ -597,22 +584,18 @@
           data structures, such as locators or cell links are not rebuilt for each timestep.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetInterpolatorType"
-                         default_values="1"
-                         name="InterpolatorType"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <EnumerationDomain name="enum">
-          <Entry text="Interpolator with Point Locator"
-                 value="0"/>
-          <Entry text="Interpolator with Cell Locator"
-                 value="1"/>
-        </EnumerationDomain>
+      <ProxyProperty command="SetCellLocator"
+                     label="Cell Locator"
+                     name="CellLocator"
+                     panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Group name="cell_locators" default="StaticCellLocator"/>
+        </ProxyListDomain>
         <Documentation>
-          This property determines which interpolator to use for evaluating the velocity vector field. The first is
-          faster though the second is more robust in locating cells during streamline integration.
+          This property determines which cell locator to be used by the interpolator
+          for evaluating the velocity vector field.
         </Documentation>
-      </IntVectorProperty>
+      </ProxyProperty>
       <InputProperty clean_command="RemoveAllSources"
                      command="AddSourceConnection"
                      label="Seed Source"
@@ -729,22 +712,18 @@
           This property contains the name of the vector array from which to generate streamlines.
         </Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetInterpolatorType"
-                         default_values="0"
-                         name="InterpolatorType"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <EnumerationDomain name="enum">
-          <Entry text="Interpolator with Point Locator"
-                 value="0"/>
-          <Entry text="Interpolator with Cell Locator"
-                 value="1"/>
-        </EnumerationDomain>
+      <ProxyProperty command="SetCellLocator"
+                     label="Cell Locator"
+                     name="CellLocator"
+                     panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Group name="cell_locators" default="JumpAndWalkCellLocator"/>
+        </ProxyListDomain>
         <Documentation>
-          This property determines which interpolator to use for evaluating the velocity vector field. The first is
-          faster though the second is more robust in locating cells during streamline integration.
+          This property determines which cell locator to be used by the interpolator
+          for evaluating the velocity vector field.
         </Documentation>
-      </IntVectorProperty>
+      </ProxyProperty>
       <IntVectorProperty command="SetSurfaceStreamlines"
                          default_values="0"
                          name="Surface Streamlines"
@@ -1019,23 +998,18 @@
           This property contains the name of the vector array from which to generate streamlines.
         </Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetInterpolatorType"
-                         default_values="0"
-                         name="InterpolatorType"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <EnumerationDomain name="enum">
-          <Entry text="Interpolator with Point Locator"
-                 value="0"/>
-          <Entry text="Interpolator with Cell Locator"
-                 value="1"/>
-        </EnumerationDomain>
+      <ProxyProperty command="SetCellLocator"
+                     label="Cell Locator"
+                     name="CellLocator"
+                     panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Group name="cell_locators" default="JumpAndWalkCellLocator"/>
+        </ProxyListDomain>
         <Documentation>
-          This property determines which interpolator to use for
-          evaluating the velocity vector field. The first is faster though the
-          second is more robust in locating cells during streamline integration.
+          This property determines which cell locator to be used by the interpolator
+          for evaluating the velocity vector field.
         </Documentation>
-      </IntVectorProperty>
+      </ProxyProperty>
       <IntVectorProperty command="SetSurfaceStreamlines"
                          default_values="0"
                          name="Surface Streamlines"
