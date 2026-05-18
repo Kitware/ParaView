@@ -91,6 +91,13 @@ public:
   static vtkInSituPipeline* AddPipeline(const std::string& pipeline_name, const std::string& path);
 
   /**
+   * Returns the registered pipeline with the given name, or nullptr if no
+   * pipeline with that name has been registered. Lookup is by exact name
+   * match against names set via AddPipeline.
+   */
+  static vtkInSituPipeline* GetPipeline(const std::string& pipeline_name);
+
+  /**
    * Add a vtkInSituPipeline instance.
    */
   static void AddPipeline(vtkInSituPipeline* pipeline);
