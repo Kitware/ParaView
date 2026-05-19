@@ -55,7 +55,7 @@ set_property(CACHE PARAVIEW_BUILD_EDITION
     STRINGS "CORE;RENDERING;CATALYST;CATALYST_RENDERING;CANONICAL")
 
 cmake_dependent_option(PARAVIEW_BUILD_EDITION_STRICT
-  "Restrict VTK modules to those stricktly needed by the PARAVIEW_BUILD_EDITION" ON
+  "Restrict VTK modules to those strictly needed by the PARAVIEW_BUILD_EDITION" ON
   "NOT PARAVIEW_USE_EXTERNAL_VTK" OFF)
 
 set(PARAVIEW_BUILD_CANONICAL OFF)
@@ -674,7 +674,7 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   endif()
 
   if (PARAVIEW_BUILD_EDITION_STRICT)
-    # Don't reject non-essential modules if not in strict mode
+    # Reject non-essential modules if in strict mode
     list(APPEND paraview_rejected_modules
       ${nonessential_modules})
   endif ()
@@ -717,7 +717,7 @@ if (NOT PARAVIEW_ENABLE_RENDERING)
   set(rendering_modules
     VTK::glad)
   if (PARAVIEW_BUILD_EDITION_STRICT)
-    # Don't reject rendering modules if not in strict mode
+    # Reject rendering modules if in strict mode
     list(APPEND paraview_rejected_modules
       ${rendering_modules})
   endif ()
