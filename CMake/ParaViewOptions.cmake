@@ -54,6 +54,10 @@ set_property(CACHE PARAVIEW_BUILD_EDITION
   PROPERTY
     STRINGS "CORE;RENDERING;CATALYST;CATALYST_RENDERING;CANONICAL")
 
+cmake_dependent_option(PARAVIEW_BUILD_EDITION_STRICT
+  "Restrict VTK modules to those stricktly needed by the PARAVIEW_BUILD_EDITION" ON
+  "NOT PARAVIEW_USE_EXTERNAL_VTK" OFF)
+
 set(PARAVIEW_BUILD_CANONICAL OFF)
 set(PARAVIEW_ENABLE_RENDERING OFF)
 set(PARAVIEW_ENABLE_NONESSENTIAL OFF)
@@ -669,16 +673,24 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
     endif()
   endif()
 
-  list(APPEND paraview_rejected_modules
-    ${nonessential_modules})
+  if (PARAVIEW_BUILD_EDITION_STRICT)
+    # Don't reject non-essential modules if not in strict mode
+    list(APPEND paraview_rejected_modules
+      ${nonessential_modules})
+  endif ()
   foreach (nonessential_module IN LISTS nonessential_modules)
     set("_vtk_module_reason_${nonessential_module}"
       "via `PARAVIEW_ENABLE_NONESSENTIAL` (via `PARAVIEW_BUILD_EDITION=${PARAVIEW_BUILD_EDITION}`)")
   endforeach ()
 
   function (_paraview_io_option_conflict option name)
+    set(_error_level FATAL_ERROR)
+    if (NOT PARAVIEW_BUILD_EDITION_STRICT)
+      # Demote fatal error to debug for diagnostic purposes only.
+      set(_error_level DEBUG)
+    endif ()
     if (${option})
-      message(FATAL_ERROR
+      message(${_error_level}
         "ParaView is configured without I/O support (via the "
         "${PARAVIEW_BUILD_EDITION} edition) which is incompatible with the "
         "request for ${name} support (via the `${option}` configure option)")
@@ -704,16 +716,24 @@ if (NOT PARAVIEW_ENABLE_RENDERING)
   # modules when PARAVIEW_ENABLE_RENDERING is OFF.
   set(rendering_modules
     VTK::glad)
-  list(APPEND paraview_rejected_modules
-    ${rendering_modules})
+  if (PARAVIEW_BUILD_EDITION_STRICT)
+    # Don't reject rendering modules if not in strict mode
+    list(APPEND paraview_rejected_modules
+      ${rendering_modules})
+  endif ()
   foreach (rendering_module IN LISTS rendering_modules)
     set("_vtk_module_reason_${rendering_module}"
       "via `PARAVIEW_ENABLE_RENDERING` (via `PARAVIEW_BUILD_EDITION=${PARAVIEW_BUILD_EDITION}`)")
   endforeach ()
 
   function (_paraview_rendering_option_conflict option name)
+    set(_error_level FATAL_ERROR)
+    if (NOT PARAVIEW_BUILD_EDITION_STRICT)
+      # Demote fatal error to debug for diagnostic purposes only.
+      set(_error_level DEBUG)
+    endif ()
     if (${option})
-      message(FATAL_ERROR
+      message(${_error_level}
         "ParaView is configured without Rendering support (via the "
         "${PARAVIEW_BUILD_EDITION} edition) which is incompatible with the "
         "request for ${name} support (via the `${option}` configure option)")
