@@ -113,6 +113,8 @@ endif ()
 
 option(PARAVIEW_ENABLE_OPENVDB  "Enable the OpenVDB Writer" OFF)
 
+option(PARAVIEW_ENABLE_NANOVDB "Enable the NanoVDB Writer" OFF)
+
 option(PARAVIEW_GENERATE_SPDX  "Generate SPDX file for each module." OFF)
 mark_as_advanced(PARAVIEW_GENERATE_SPDX)
 
@@ -495,6 +497,11 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_OPENVDB
   MODULES   VTK::IOOpenVDB
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_NANOVDB
+  MODULES   VTK::IONanoVDB
   EXCLUSIVE)
 
 paraview_require_module(
