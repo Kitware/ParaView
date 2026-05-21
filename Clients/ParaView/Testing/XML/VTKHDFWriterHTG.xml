@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Create a random HTG source -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RandomHyperTreeGridSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Seed/LineEdit0" command="set_string" arguments="1234" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Dimensions/LineEdit1" command="set_string" arguments="5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/OutputBounds/DoubleLineEdit1" command="set_string" arguments="19" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SplitFraction/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/MaskedFraction/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Save to disk-->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionSaveData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/htg.vtkhdf" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ChunkSize/LineEdit0" command="set_string" arguments="2000" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CompressionLevel/IntRangeWidget/Slider" command="set_int" arguments="2" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Reset session -->
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionDelete_All" />
+
+  <!-- Open it again & setup view -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/htg.vtkhdf" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Depth" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionIsometricView" command="activate" arguments="" />
+</pqevents>

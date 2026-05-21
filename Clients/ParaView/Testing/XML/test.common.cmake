@@ -1842,11 +1842,16 @@ if (NOT PARAVIEW_USE_MPI)
   )
 endif()
 
-# VTKHDFWriter does not support writing external partitions/compositte with MPI yet
-# See issue https://gitlab.kitware.com/vtk/vtk/-/issues/19857
 if (TARGET VTK::IOHDF)
+  # VTKHDFWriter does not support writing external partitions/compositte with MPI yet
+  # See issue https://gitlab.kitware.com/vtk/vtk/-/issues/19857
   paraview_add_client_tests(
     TEST_SCRIPTS VTKHDFWriter.xml
+  )
+
+  paraview_add_client_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS VTKHDFWriterHTG.xml
   )
 endif()
 
