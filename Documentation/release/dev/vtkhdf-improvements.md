@@ -7,3 +7,7 @@ This used to be possible only for point and cell arrays.
 
 When reading partitioned VTKHDF data in parallel, you can now choose how blocks are allocated to processes.
 The "Block" mode will allocate partitions by block to each pvserver process, and "Interleave" will allocate using a round-robin algorithm.
+
+## VTKHDF Writer: support for HyperTreeGrid
+
+ParaView can now write HyperTreeGrid datasets to disk in .vtkhdf. This also works for distributed and composite data.
