@@ -111,13 +111,6 @@ if (UNIX AND NOT APPLE)
   option(PARAVIEW_USE_MEMKIND  "Build support for extended memory" OFF)
 endif ()
 
-option(PARAVIEW_ENABLE_OPENVDB  "Enable the OpenVDB Writer" OFF)
-
-option(PARAVIEW_ENABLE_NANOVDB "Enable the NanoVDB Writer" OFF)
-
-option(PARAVIEW_GENERATE_SPDX  "Generate SPDX file for each module." OFF)
-mark_as_advanced(PARAVIEW_GENERATE_SPDX)
-
 # Add option to disable Fortran
 if (NOT WIN32)
   include(CheckFortran)
@@ -208,6 +201,10 @@ if (PARAVIEW_ENABLE_NVPIPE)
   set(PARAVIEW_ENABLE_NVPIPE OFF)
 endif ()
 
+option(PARAVIEW_ENABLE_OPENVDB  "Enable the OpenVDB Writer" OFF)
+
+option(PARAVIEW_ENABLE_NANOVDB "Enable the NanoVDB Writer" OFF)
+
 option(PARAVIEW_ENABLE_ALEMBIC "Enable Alembic support." OFF)
 
 option(PARAVIEW_ENABLE_GDAL "Enable GDAL support." OFF)
@@ -281,6 +278,8 @@ mark_as_advanced(PARAVIEW_INSTALL_DEVELOPMENT_FILES)
 option(PARAVIEW_RELOCATABLE_INSTALL "Do not embed hard-coded paths into the install" ON)
 mark_as_advanced(PARAVIEW_RELOCATABLE_INSTALL)
 
+option(PARAVIEW_GENERATE_SPDX  "Generate SPDX file for each module." OFF)
+mark_as_advanced(PARAVIEW_GENERATE_SPDX)
 
 cmake_dependent_option(PARAVIEW_INITIALIZE_MPI_ON_CLIENT
   "Initialize MPI on client-processes by default. Can be overridden using command line arguments" ON
