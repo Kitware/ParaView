@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Added this Key to deal with QT issue when running on MacOS 26 and later systems
+		 The issue is a problem related to the new Liquid Glass look and feel
+		 see - https://www.qt.io/blog/qt-on-macos-26-tahoe -->
+	<key>UIDesignRequiresCompatibility</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
