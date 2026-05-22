@@ -405,16 +405,12 @@ pqAnimationCue* pqAnimationScene::createCueInternal(
     pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedPropertyName"), propertyname);
     pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedElement"), index);
     cueProxy->UpdateVTKObjects();
+    this->initializeCue(proxy, propertyname, index, cue);
   }
 
   vtkSMProxy* sceneProxy = this->getProxy();
   pqSMAdaptor::addProxyProperty(sceneProxy->GetProperty("Cues"), cueProxy);
   sceneProxy->UpdateVTKObjects();
-
-  if (proxy)
-  {
-    this->initializeCue(proxy, propertyname, index, cue);
-  }
 
   // We don't directly add this cue to the internal Cues, it will get added
   // as a side effect of the change in the "Cues" property.
