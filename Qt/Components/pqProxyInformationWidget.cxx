@@ -14,10 +14,10 @@
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
-#include "pqDoubleLineEdit.h"
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqOutputPort.h"
 #include "pqWidgetUtilities.h"
+
 #include "vtkCommand.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
@@ -27,9 +27,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeneralSettings.h"
-#include "vtkPVLogger.h"
 #include "vtkSMCoreUtilities.h"
-#include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -37,6 +35,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <cctype>
 #include <memory>
 #include <tuple>
@@ -85,7 +84,7 @@ public:
   {
     return static_cast<int>(this->ArrayInformation.size());
   }
-  int columnCount(const QModelIndex&) const override { return 3; }
+  int columnCount(const QModelIndex&) const override { return this->IsCellGrid ? 5 : 3; }
   QVariant data(const QModelIndex& indx, int role) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
@@ -102,6 +101,10 @@ public:
         return "Type";
       case 2:
         return "Ranges";
+      case 3:
+        return "Polynomial Order";
+      case 4:
+        return "Degrees of Freedom";
     }
     return this->Superclass::headerData(section, orientation, role);
   }
@@ -114,6 +117,8 @@ public:
 
 private:
   Q_DISABLE_COPY(pqArraysModel);
+
+  bool IsCellGrid = false;
 
   QIcon Pixmaps[vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES] = {
     QIcon(":/pqWidgets/Icons/pqPointData.svg"),
@@ -172,6 +177,9 @@ void pqArraysModel::setDataInformation(vtkPVDataInformation* dinfo)
       ++arrayIdx;
     }
   }
+  this->IsCellGrid = std::any_of(this->ArrayInformation.begin(), this->ArrayInformation.end(),
+    [](const auto& tup) { return std::get<3>(tup)->GetIsCellGrid(); });
+
   this->endResetModel();
 }
 
@@ -218,6 +226,7 @@ QVariant pqArraysModel::data(const QModelIndex& indx, int role) const
     return QVariant();
   }
 
+  auto l = QLocale::system();
   switch (indx.column())
   {
     case 0:
@@ -228,10 +237,26 @@ QVariant pqArraysModel::data(const QModelIndex& indx, int role) const
       return ainfo->GetDataTypeAsString();
 
     case 2:
+    {
       auto settings = vtkPVGeneralSettings::GetInstance();
       int lowExponent = settings->GetFullNotationLowExponent();
       int highExponent = settings->GetFullNotationHighExponent();
       return ainfo->GetRangesAsString(lowExponent, highExponent).c_str();
+    }
+    case 3:
+    {
+      const int* range = ainfo->GetPolynomialOrderRange();
+      if (range[0] > range[1])
+      {
+        return QString("(n/a)");
+      }
+      return QString("[%1, %2]").arg(l.toString(range[0])).arg(l.toString(range[1]));
+    }
+    case 4:
+    {
+      vtkTypeInt64 dof = ainfo->GetDegreesOfFreedom();
+      return dof > 0 ? QString("%1").arg(l.toString(dof)) : QString("(n/a)");
+    }
   }
   return QVariant();
 }
