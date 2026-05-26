@@ -2819,8 +2819,12 @@
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
-                          name="input_array"
+                          name="cell_arrays"
                           number_of_components="1" />
+        <InputArrayDomain name="field_arrays"
+                          attribute_type="field"
+                          number_of_components="1"
+                          optional="1" />
         <Documentation>Expects a DataSet with cell scalars as input.</Documentation>
       </InputProperty>
 
@@ -2830,6 +2834,7 @@
                             name="Scalars"
                             number_of_elements="5">
         <ArrayListDomain attribute_type="Scalars"
+                         input_domain_name="cell_arrays"
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
@@ -2838,6 +2843,65 @@
         </ArrayListDomain>
         <Documentation>This property contains the name of the scalar array to use.
         </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseNamesFromArray"
+                         command="SetUsePartitionNamesFromFieldData"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="default">
+        <BooleanDomain name="bool"/>
+        <Documentation>When enabled, the output partitions are named accordingly to the FieldData arrays,
+          provided as PartitionNames and optionally PartitionValues for the mapping.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="PartitionsNames"
+        command="SetPartitionNamesArray"
+        number_of_elements="1" >
+
+        <ArrayListDomain name="array_list"
+                         data_type="VTK_STRING"
+                         input_domain_name="field_arrays"
+                         none_string="None">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Choose the array containing the partition names.
+        </Documentation>
+
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="NamesFromArray"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PartitionsValues"
+        command="SetPartitionValuesArray"
+        number_of_elements="1" >
+
+        <ArrayListDomain name="array_list"
+                         data_type="VTK_DATA_ARRAY"
+                         input_domain_name="field_arrays"
+                         none_string="">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Choose the array containing the partition values.
+        </Documentation>
+
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="NamesFromArray"
+                                   value="1" />
+        </Hints>
       </StringVectorProperty>
 
     </SourceProxy>

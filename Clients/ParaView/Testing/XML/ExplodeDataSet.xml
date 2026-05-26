@@ -3,7 +3,7 @@
   <!-- open file with some "material id" as cell data -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/waveletMaterial.vti" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/waveletNamedMaterials.vti" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- add more data arrays: they should be forwarded -->
@@ -20,20 +20,54 @@
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExplodeDataSet" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
-  <!-- check output content -->
+  <!-- check output content: default partition names -->
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="vtkBlockColors" />
   <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.0.0,Material_0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.1.0,Material_1" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.2.0,Material_2" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.3.0,Material_3" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.4.0,Material_4" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.5.0,Material_5" />
   <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0" />
-  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelRowCount" arguments="5" />
-  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="4.0,Material" />
-  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="4.2,[0, 5]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelRowCount" arguments="7" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="4.0,EvenNames" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="5.0,EvenValues" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="6.0,Material" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="6.2,[0, 5]" />
 
   <!-- check last ugrid part -->
   <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.5.0" />
 
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataType" property="text" arguments="Partitioned Dataset (Unstructured Grid)" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/cellCount" property="text" arguments="322" />
-  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="4.0,Material" />
-  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="4.2,[5, 5]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="6.0,Material" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="6.2,[5, 5]" />
+
+  <!-- use named materials as found in FieldData, with default mapping to value -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/UseNamesFromArray/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PartitionsNames/ComboBox" command="activated" arguments="EvenNames" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.0.0,zero" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.1.0,two" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.2.0,four" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.3.0,Material_3" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.4.0,Material_4" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.5.0,Material_5" />
+
+  <!-- use named materials as found in FieldData, with value mapping -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PartitionsValues/ComboBox" command="activated" arguments="EvenValues" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.0.0,zero" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.1.0,Material_1" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.2.0,two" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.3.0,Material_3" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.4.0,four" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.5.0,Material_5" />
 </pqevents>
