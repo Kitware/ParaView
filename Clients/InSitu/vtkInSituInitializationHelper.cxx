@@ -305,6 +305,24 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(
 }
 
 //----------------------------------------------------------------------------
+vtkInSituPipeline* vtkInSituInitializationHelper::GetPipeline(const std::string& pipeline_name)
+{
+  if (vtkInSituInitializationHelper::Internals == nullptr)
+  {
+    return nullptr;
+  }
+  auto& internals = (*vtkInSituInitializationHelper::Internals);
+  for (auto& item : internals.Pipelines)
+  {
+    if (item.Pipeline && item.Pipeline->GetName() && pipeline_name == item.Pipeline->GetName())
+    {
+      return item.Pipeline;
+    }
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
 void vtkInSituInitializationHelper::AddPipeline(vtkInSituPipeline* pipeline)
 {
   if (pipeline)
@@ -426,7 +444,19 @@ bool vtkInSituInitializationHelper::ExecutePipelines(const conduit_node* params)
     const conduit_index_t nchildren = state_pipelines.number_of_children();
     for (conduit_index_t i = 0; i < nchildren; ++i)
     {
-      pipelines.push_back(state_pipelines.child(i).as_string());
+      const auto entry = state_pipelines.child(i);
+      // Accept either a string (selection by name) or an object carrying
+      // dynamic registration info (name + filename + optional args).
+      // Dynamic registration is handled in catalyst_execute_paraview before
+      // this is reached; here we only need the pipeline name for selection.
+      if (entry.dtype().is_string())
+      {
+        pipelines.push_back(entry.as_string());
+      }
+      else if (entry.dtype().is_object() && entry.has_child("name"))
+      {
+        pipelines.push_back(entry["name"].as_string());
+      }
     }
   }
   else

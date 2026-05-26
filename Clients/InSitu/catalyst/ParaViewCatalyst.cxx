@@ -427,6 +427,165 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
     return pvcatalyst_err(invalid_node);
   }
 
+  // Dynamic pipeline registration via 'state/pipelines'.
+  //
+  // Each child of 'state/pipelines' may be either:
+  //   - a string: name of an already-registered pipeline to execute, or
+  //   - an object describing a pipeline to register on-the-fly (if not
+  //     already known) and then execute.
+  //
+  // The object form is dispatched on the 'type' field (default "script"):
+  //   - "script": Python script pipeline, schema {name, filename, [args]}
+  //               where filename is the path to the .py script.
+  //               Requires Python support.
+  //   - "io":     C++ pre-compiled file-writer pipeline, schema
+  //               {name, type, filename, channel} where filename is the
+  //               output path and channel selects which mesh to write.
+  //               The actual writer is chosen by extension via
+  //               vtkSMWriterFactory (XML VTK formats, legacy VTK, CGNS,
+  //               Exodus, IOSS, image formats, etc.).
+  //
+  // String-form children are passed through unchanged and selected for
+  // execution later in vtkInSituInitializationHelper::ExecutePipelines.
+  //
+  // Schema and type guarantees: vtkCatalystBlueprint::Verify("execute",
+  // root) above has already validated the per-type field shapes (string
+  // 'name', string 'type' if present, string 'filename', string 'args'
+  // children, string 'channel'). The .as_string() calls below are safe
+  // by construction; we do not re-check types here.
+  //
+  // Name is identity: an object-form entry referencing an
+  // already-registered name is treated as selection only. If its
+  // distinguishing fields (filename or args for scripts; filename or
+  // channel for io) differ from what was registered, the user is warned
+  // and the existing registration is retained. To use different values,
+  // register under a new name.
+  if (root.has_path("state/pipelines"))
+  {
+    const auto state_pipelines = root["state/pipelines"];
+    const conduit_index_t nchildren = state_pipelines.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
+    {
+      const auto entry = state_pipelines.child(i);
+      if (!entry.dtype().is_object())
+      {
+        // String-form entry: handled later as a selection-only name
+        // by vtkInSituInitializationHelper::ExecutePipelines.
+        continue;
+      }
+      const std::string name = entry["name"].as_string();
+      const std::string type = entry.has_child("type") ? entry["type"].as_string() : "script";
+
+      auto* existing = vtkInSituInitializationHelper::GetPipeline(name);
+      if (existing != nullptr)
+      {
+        // Name already registered. Warn on mismatches against the
+        // appropriate fields for this entry's type.
+        if (type == "script")
+        {
+          auto* existingPy = vtkInSituPipelinePython::SafeDownCast(existing);
+          const std::string fname = entry["filename"].as_string();
+          if (existingPy != nullptr && existingPy->GetFileName() != nullptr &&
+            fname != existingPy->GetFileName())
+          {
+            vtkLogF(WARNING,
+              "dynamic 'state/pipelines' entry '%s' (type=script) references an "
+              "already-registered pipeline with a different filename. Existing "
+              "registration is retained; the new filename '%s' and any new args "
+              "are ignored. To use different values, register under a new name.",
+              name.c_str(), fname.c_str());
+          }
+          else if (existingPy != nullptr && entry.has_path("args"))
+          {
+            // Compare args against existing without allocating: bail on
+            // length mismatch or first per-element difference.
+            const auto args_node = entry["args"];
+            const conduit_index_t nargs = args_node.number_of_children();
+            const auto& existing_args = existingPy->GetArguments();
+            bool args_differ = (static_cast<size_t>(nargs) != existing_args.size());
+            for (conduit_index_t a = 0; !args_differ && a < nargs; ++a)
+            {
+              if (args_node.child(a).as_string() != existing_args[a])
+              {
+                args_differ = true;
+              }
+            }
+            if (args_differ)
+            {
+              vtkLogF(WARNING,
+                "dynamic 'state/pipelines' entry '%s' (type=script) references an "
+                "already-registered pipeline with different args. Existing args "
+                "are retained; the new args are ignored. To use different args, "
+                "register under a new name.",
+                name.c_str());
+            }
+          }
+        }
+        else if (type == "io")
+        {
+          auto* existingIO = vtkInSituPipelineIO::SafeDownCast(existing);
+          const std::string fname = entry["filename"].as_string();
+          const std::string channel = entry["channel"].as_string();
+          if (existingIO != nullptr && existingIO->GetFileName() != nullptr &&
+            fname != existingIO->GetFileName())
+          {
+            vtkLogF(WARNING,
+              "dynamic 'state/pipelines' entry '%s' (type=io) references an "
+              "already-registered pipeline with a different output filename. "
+              "Existing registration is retained; the new filename '%s' is "
+              "ignored. To use different values, register under a new name.",
+              name.c_str(), fname.c_str());
+          }
+          else if (existingIO != nullptr && existingIO->GetChannelName() != nullptr &&
+            channel != existingIO->GetChannelName())
+          {
+            vtkLogF(WARNING,
+              "dynamic 'state/pipelines' entry '%s' (type=io) references an "
+              "already-registered pipeline with a different channel. Existing "
+              "registration is retained; the new channel '%s' is ignored. "
+              "To use different values, register under a new name.",
+              name.c_str(), channel.c_str());
+          }
+        }
+        continue; // already registered: selection only
+      }
+
+      if (type == "script")
+      {
+        if (!vtkInSituInitializationHelper::IsPythonSupported())
+        {
+          vtkLogF(WARNING,
+            "Python support not enabled, dynamic 'state/pipelines' entry '%s' "
+            "(type=script) is ignored.",
+            name.c_str());
+          continue;
+        }
+        const std::string fname = entry["filename"].as_string();
+        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+          "Dynamically registering analysis script: '%s' (name='%s')", fname.c_str(), name.c_str());
+        auto* pipeline = vtkInSituInitializationHelper::AddPipeline(name, fname);
+        if (pipeline && entry.has_path("args"))
+        {
+          ::process_script_args(vtkInSituPipelinePython::SafeDownCast(pipeline), entry["args"]);
+        }
+      }
+      else if (type == "io")
+      {
+        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+          "Dynamically registering C++ IO pipeline (name='%s', filename='%s', channel='%s')",
+          name.c_str(), entry["filename"].as_string().c_str(),
+          entry["channel"].as_string().c_str());
+        auto pipeline = ::create_precompiled_pipeline(entry);
+        if (pipeline)
+        {
+          pipeline->SetName(name.c_str());
+          vtkInSituInitializationHelper::AddPipeline(pipeline);
+        }
+      }
+      // Unknown types were rejected by the verifier above.
+    }
+  }
+
   // catalyst/timestep or catalyst/cycle is used to indicate the timestep
   // catalyst/time is used to provide the time
   const int timestep = root.has_path("state/timestep")

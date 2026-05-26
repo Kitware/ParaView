@@ -318,6 +318,103 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
       PARAVIEW_LOG_CATALYST_VERBOSITY(), "'multiblock' set to %" PRIi32, n["multiblock"].to_int());
   }
 
+  if (n.has_child("pipelines"))
+  {
+    const auto pipelines_node = n["pipelines"];
+    const conduit_index_t nchildren = pipelines_node.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
+    {
+      const auto entry = pipelines_node.child(i);
+      // Validate only object children, which describe new dynamic
+      // registrations and therefore need shape verification. String
+      // children are selection-only names that pass through to
+      // ExecutePipelines (existing pre-feature behavior). Any other
+      // dtype is silently ignored here for backward compatibility:
+      // before this feature, the parser called .as_string() on every
+      // child and a non-string child became an empty selection (which
+      // matched no registered pipeline and was silently skipped).
+      // Rejecting non-string non-object children here would surface a
+      // new error for inputs that previously degraded silently.
+      if (!entry.dtype().is_object())
+      {
+        continue;
+      }
+      if (!entry.has_child("name") || !entry["name"].dtype().is_string())
+      {
+        vtkLogF(ERROR, "dynamic 'state/pipelines' entry must have a string 'name' child.");
+        return false;
+      }
+      // Dispatch on 'type':
+      //   absent or "script" -> Python script schema: {name, filename, [args]}
+      //   "io"               -> C++ file-writer schema:  {name, type, filename, channel}
+      //   other              -> unsupported
+      std::string type = "script";
+      if (entry.has_child("type"))
+      {
+        if (!entry["type"].dtype().is_string())
+        {
+          vtkLogF(ERROR, "dynamic 'state/pipelines' entry '%s' has a non-string 'type' child.",
+            entry["name"].as_string().c_str());
+          return false;
+        }
+        type = entry["type"].as_string();
+      }
+      if (type == "script")
+      {
+        if (!entry.has_child("filename") || !entry["filename"].dtype().is_string())
+        {
+          vtkLogF(ERROR,
+            "dynamic 'state/pipelines' entry '%s' (type=script) must have a string 'filename' "
+            "child (path to the Python script).",
+            entry["name"].as_string().c_str());
+          return false;
+        }
+        // 'args' is optional, but if present every child must be a string.
+        if (entry.has_child("args"))
+        {
+          const auto args_node = entry["args"];
+          const conduit_index_t nargs = args_node.number_of_children();
+          for (conduit_index_t a = 0; a < nargs; ++a)
+          {
+            if (!args_node.child(a).dtype().is_string())
+            {
+              vtkLogF(ERROR,
+                "dynamic 'state/pipelines' entry '%s' has a non-string 'args' child at index %d.",
+                entry["name"].as_string().c_str(), static_cast<int>(a));
+              return false;
+            }
+          }
+        }
+      }
+      else if (type == "io")
+      {
+        if (!entry.has_child("filename") || !entry["filename"].dtype().is_string())
+        {
+          vtkLogF(ERROR,
+            "dynamic 'state/pipelines' entry '%s' (type=io) must have a string 'filename' "
+            "child (output path).",
+            entry["name"].as_string().c_str());
+          return false;
+        }
+        if (!entry.has_child("channel") || !entry["channel"].dtype().is_string())
+        {
+          vtkLogF(ERROR,
+            "dynamic 'state/pipelines' entry '%s' (type=io) must have a string 'channel' child.",
+            entry["name"].as_string().c_str());
+          return false;
+        }
+      }
+      else
+      {
+        vtkLogF(ERROR,
+          "dynamic 'state/pipelines' entry '%s' has unsupported type '%s'. "
+          "Supported types are 'script' (default) and 'io'.",
+          entry["name"].as_string().c_str(), type.c_str());
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 } // namespace state
