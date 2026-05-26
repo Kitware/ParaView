@@ -1494,6 +1494,16 @@ def GetProxy(module, key, **kwargs):
             ioss_reader.ReadAllFilesToDetermineStructure = 1
             return ioss_reader
 
+    if compatibility_version <= (6, 1):
+        # In 6.2, the default for SidesToShow changed from NextLowestDimension (37) to
+        # SurfacesOfInputs (32) in CellGridSurfaceRepresentation. Restore the old default
+        # so scripts written against 6.1 keep their previous rendering behavior.
+        if key in ["CellGridRepresentation", "CellGridSurfaceRepresentation"]:
+            rep = builtins.getattr(module, key)(**kwargs)
+            if "SidesToShow" not in kwargs:
+                rep.SidesToShow = 37
+            return rep
+
     # deprecation case
     if type(key) == tuple and len(key) == 2:
         proxy = builtins.getattr(module, key[1])(**kwargs)

@@ -3306,8 +3306,9 @@
       </StringVectorProperty>
       <IntVectorProperty name="SidesToShow"
         number_of_elements="1"
-        default_values="37"
-        command="SetSidesToShow">
+        default_values="32"
+        command="SetSidesToShow"
+        panel_visibility="never">
         <EnumerationDomain name="enum">
           <!--
           <Entry text="Vertices of Edges"     value="1"/>
