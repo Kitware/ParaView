@@ -3321,6 +3321,7 @@
           <Entry text="Surfaces of Inputs"    value="32"/>
           <Entry text="Edges of Inputs"       value="20"/>
           <Entry text="Vertices of Inputs"    value="11"/>
+          <Entry text="Surfaces and Edges of Inputs" value="52"/>
           <Entry text="All Sides"             value="63"/>
           <Entry text="Next Lowest Dimension" value="37"/>
         </EnumerationDomain>
@@ -3927,6 +3928,24 @@
         Default is false.</Documentation>
       </IntVectorProperty>
     <!-- End of CellGridSurfaceRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkCellGridRepresentation"
+                         name="CellGridSurfaceWithEdgesRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="CellGridSurfaceRepresentation">
+      <Documentation>Representation to show surfaces and edges of a cell-grid in a 3D render view.</Documentation>
+      <IntVectorProperty name="SidesToShow"
+        number_of_elements="1"
+        default_values="52"
+        command="SetSidesToShow"
+        override="1"
+        panel_visibility="never">
+        <Documentation>Choose how to render the input. Defaults to showing both surfaces and edges.</Documentation>
+      </IntVectorProperty>
+      <!-- End of CellGridSurfaceWithEdgesRepresentation -->
     </RepresentationProxy>
 
     <!-- ================================================================== -->

@@ -659,6 +659,8 @@
       <RepresentationType subproxy="CellGridSurfaceRepresentation"
                           subtype="Surface"
                           text="Surface" />
+      <RepresentationType subproxy="CellGridSurfaceWithEdgesRepresentation"
+                          text="Surface With Edges" />
       <StringVectorProperty command="GetRepresentationTypes"
                             information_only="1"
                             name="RepresentationTypesInfo"
@@ -847,6 +849,16 @@
         <ShareProperties subproxy="CellGridSurfaceRepresentation">
           <Exception name="Input" />
           <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CellGridSurfaceWithEdgesRepresentation"
+               proxygroup="representations"
+               proxyname="CellGridSurfaceWithEdgesRepresentation"></Proxy>
+        <ShareProperties subproxy="CellGridSurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="SidesToShow" />
         </ShareProperties>
       </SubProxy>
       <ProxyProperty name="DataAxesGrid"
