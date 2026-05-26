@@ -3,7 +3,6 @@
 #include "vtkFeatureEdgesRepresentation.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVGeometryFilter.h"
 
 vtkStandardNewMacro(vtkFeatureEdgesRepresentation);
 //----------------------------------------------------------------------------

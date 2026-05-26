@@ -4,9 +4,9 @@
 #include "vtkClipDataSet.h"
 #include "vtkContourFilter.h"
 #include "vtkDataSetMapper.h"
+#include "vtkGeometryFilterDispatcher.h"
 #include "vtkGlyphSource2D.h"
 #include "vtkMergeArrays.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPlane.h"
@@ -56,7 +56,7 @@ int TestPVFilters(int argc, char* argv[])
   clip->GenerateClipScalarsOn();
   clip->SetValue(0.5);
 
-  vtkPVGeometryFilter* geometry = vtkPVGeometryFilter::New();
+  vtkGeometryFilterDispatcher* geometry = vtkGeometryFilterDispatcher::New();
   geometry->SetInputConnection(contour->GetOutputPort());
 
   vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();

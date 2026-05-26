@@ -28,9 +28,9 @@
 #include <vector>        // needed for std::vector
 
 class vtkCompositeDataDisplayAttributes;
+class vtkGeometryFilterDispatcher;
 class vtkMapper;
 class vtkPiecewiseFunction;
-class vtkPVGeometryFilter;
 class vtkPVLODActor;
 class vtkScalarsToColors;
 class vtkTexture;
@@ -69,7 +69,7 @@ public:
   ///@{
   /**
    * Determines the number of distinct values in vtkBlockColors
-   * See also vtkPVGeometryFilter
+   * See also vtkGeometryFilterDispatcher
    */
   void SetBlockColorsDistinctValues(int distinctValues);
   int GetBlockColorsDistinctValues();
@@ -173,7 +173,7 @@ public:
   virtual void SetTangentArray(const char* val);
 
   //***************************************************************************
-  // Forwarded to vtkPVGeometryFilter
+  // Forwarded to vtkGeometryFilterDispatcher
   virtual void SetUseOutline(int);
   void SetTriangulate(int);
   void SetNonlinearSubdivisionLevel(int);
@@ -416,7 +416,7 @@ public:
    * input that lives on the server.
    *
    * In the past, we were always creating a placeholder of type vtkMultiBlockDataSet when no
-   * input was available on the client. This is no longer valid because vtkPVGeometryFilter
+   * input was available on the client. This is no longer valid because vtkGeometryFilterDispatcher
    * can now generate also vtkPartitionedDataSetCollection.
    *
    * This can be potentially removed in the future once vtkMultiBlockDataSet is deprecated.
@@ -528,7 +528,7 @@ protected:
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
   vtkGeometryRepresentation_detail::DecimationFilterType* Decimator;
-  vtkPVGeometryFilter* LODOutlineFilter;
+  vtkGeometryFilterDispatcher* LODOutlineFilter;
 
   vtkMapper* Mapper;
   vtkMapper* LODMapper;

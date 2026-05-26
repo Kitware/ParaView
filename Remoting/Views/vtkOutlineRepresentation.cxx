@@ -3,7 +3,6 @@
 #include "vtkOutlineRepresentation.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVGeometryFilter.h"
 
 vtkStandardNewMacro(vtkOutlineRepresentation);
 //----------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "vtkCommand.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkGeometryFilterDispatcher.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -17,7 +18,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyDataMapper.h"
@@ -53,7 +53,7 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
 
   this->ResampleToImageFilter->SetSamplingDimensions(128, 128, 128);
 
-  this->LODGeometryFilter->SetUseOutline(0);
+  this->LODGeometryFilter->SetUseOutline(false);
 
   this->Actor->SetMapper(this->DefaultMapper);
   this->Actor->SetLODMapper(this->LODMapper);
@@ -201,7 +201,7 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
   {
     this->LODGeometryFilter->SetInputData(vtkPVView::GetPiece(inInfo, this));
     this->LODGeometryFilter->SetUseOutline(
-      inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD()) ? 1 : 0);
+      inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD()) ? true : false);
     this->LODGeometryFilter->Update();
     vtkPVRenderView::SetPieceLOD(inInfo, this, this->LODGeometryFilter->GetOutputDataObject(0));
   }

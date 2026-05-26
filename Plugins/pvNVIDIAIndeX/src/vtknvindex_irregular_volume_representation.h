@@ -42,7 +42,6 @@ class vtkMultiProcessController;
 class vtkOrderedCompositeDistributor;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
-class vtkPVGeometryFilter;
 class vtkPVLODVolume;
 class vtkPVUpdateSuppressor;
 class vtkResampleToImage;

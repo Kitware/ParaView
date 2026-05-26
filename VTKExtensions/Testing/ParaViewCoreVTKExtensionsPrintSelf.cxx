@@ -84,7 +84,6 @@
 #include "vtkPVExponentialKeyFrame.h"
 #include "vtkPVExtractVOI.h"
 #include "vtkPVFrustumActor.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVJoystickFly.h"
 #include "vtkPVJoystickFlyIn.h"
@@ -261,7 +260,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char*[])
   PRINT_SELF(vtkPVExponentialKeyFrame);
   PRINT_SELF(vtkPVExtractVOI);
   PRINT_SELF(vtkPVFrustumActor);
-  PRINT_SELF(vtkPVGeometryFilter);
   PRINT_SELF(vtkPVInteractorStyle);
   PRINT_SELF(vtkPVJoystickFly);
   PRINT_SELF(vtkPVJoystickFlyIn);

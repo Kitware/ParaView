@@ -20,7 +20,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLHyperTreeGridMapper.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkProcessModule.h"
