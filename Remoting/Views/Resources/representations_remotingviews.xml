@@ -3949,6 +3949,24 @@
     </RepresentationProxy>
 
     <!-- ================================================================== -->
+    <RepresentationProxy class="vtkCellGridRepresentation"
+                         name="CellGridSurfaceWithEdgesAndVerticesRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="CellGridSurfaceRepresentation">
+      <Documentation>Representation to show surfaces, edges, and vertices of a cell-grid in a 3D render view.</Documentation>
+      <IntVectorProperty name="SidesToShow"
+        number_of_elements="1"
+        default_values="63"
+        command="SetSidesToShow"
+        override="1"
+        panel_visibility="never">
+        <Documentation>Choose how to render the input. Defaults to showing surfaces, edges, and vertices.</Documentation>
+      </IntVectorProperty>
+      <!-- End of CellGridSurfaceWithEdgesAndVerticesRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
     <RepresentationProxy base_proxygroup="internal_representations"
                          base_proxyname="SurfaceRepresentationBase"
                          class="vtkGeometryRepresentationWithFaces"
