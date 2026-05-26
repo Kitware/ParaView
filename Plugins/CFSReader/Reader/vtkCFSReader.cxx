@@ -425,10 +425,17 @@ void vtkCFSReader::ReadHdf5Informations()
 int vtkCFSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
+  // Reopen file if metadata was already loaded and file was closed after previous request
+  if (this->Hdf5InfoRead && this->MSStepChanged)
+  {
+    this->Reader.ReopenForData();
+  }
+
   // Read basic information from HDF5
   this->ReadHdf5Informations();
   if (!this->Hdf5InfoRead)
   {
+    this->Reader.CloseFile();
     return 0;
   }
 
@@ -499,6 +506,7 @@ int vtkCFSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   {
     vtkErrorMacro(<< "Caught exception when trying to request information from file '"
                   << this->FileName << "' : '" << er.what() << "'");
+    this->Reader.CloseFile();
     return 0;
   }
 
@@ -523,6 +531,7 @@ int vtkCFSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
       static_cast<double*>(this->TimeStepValuesRange), 2);
   }
 
+  this->Reader.CloseFile();
   return 1;
 }
 
@@ -601,6 +610,8 @@ void vtkCFSReader::ReadFile(vtkMultiBlockDataSet* output)
 {
   try
   {
+    this->Reader.ReopenForData();
+
     // The first time, the reader is initialized, we have to
     // fill the  multi block data set
     if (!this->IsInitialized)
@@ -655,10 +666,12 @@ void vtkCFSReader::ReadFile(vtkMultiBlockDataSet* output)
       this->ReadNodeCellData(this->MBActiveDataSet, false);
     }
     // Use the active set as base for the current set
+    this->Reader.CloseFile();
     output->ShallowCopy(this->MBActiveDataSet);
   }
   catch (const std::runtime_error& er)
   {
+    this->Reader.CloseFile();
     vtkErrorMacro(<< "Caught exception when trying read file '" << this->FileName << "' : '"
                   << er.what() << "'");
   }

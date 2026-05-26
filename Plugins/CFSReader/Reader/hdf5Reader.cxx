@@ -35,10 +35,35 @@ void Hdf5Reader::CloseFile()
 
     H5Fclose(this->MainFile);
     this->MainFile = -1;
+  }
 
+  if (this->FileProperties != -1)
+  {
     H5Pclose(this->FileProperties);
     this->FileProperties = -1;
   }
+}
+
+//-----------------------------------------------------------------------------
+void Hdf5Reader::ReopenForData()
+{
+  this->CloseFile();
+
+  this->FileProperties = H5Pcreate(H5P_FILE_ACCESS);
+  if (this->FileProperties < 0)
+  {
+    throw std::runtime_error(std::string("cannot reopen file ") + this->FileName);
+  }
+
+  this->MainFile = H5Fopen(this->FileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+  if (this->MainFile < 0)
+  {
+    this->CloseFile(); // closes FileProperties
+    throw std::runtime_error(std::string("cannot reopen file ") + this->FileName);
+  }
+
+  this->MainRoot = H5CFS::OpenGroup(this->MainFile, "/");
+  this->MeshRoot = H5CFS::OpenGroup(this->MainRoot, "Mesh");
 }
 
 //-----------------------------------------------------------------------------
