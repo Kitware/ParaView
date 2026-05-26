@@ -61,6 +61,15 @@ public:
    */
   void SetOmitSidesForRenderableInputs(bool shouldOmit);
 
+  /**
+   * Set the strategy used by vtkCellGridComputeSides to decide which sides
+   * to include in the output. Accepts integer values from
+   * vtkCellGridSidesQuery::SummaryStrategy (Winding=0, AnyOccurrence=1,
+   * Boundary=2). Use AnyOccurrence for edge/vertex representations that
+   * should include every occurrence rather than only boundary sides.
+   */
+  void SetSidesStrategy(int strategy);
+
 protected:
   vtkCellGridRepresentation();
   ~vtkCellGridRepresentation() override;

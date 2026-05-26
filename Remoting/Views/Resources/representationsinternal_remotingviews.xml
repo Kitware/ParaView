@@ -663,6 +663,10 @@
                           text="Surface With Edges" />
       <RepresentationType subproxy="CellGridSurfaceWithEdgesAndVerticesRepresentation"
                           text="Surface With Edges And Vertices" />
+      <RepresentationType subproxy="CellGridAllEdgesRepresentation"
+                          text="All Edges" />
+      <RepresentationType subproxy="CellGridAllCornersRepresentation"
+                          text="All Corners" />
       <StringVectorProperty command="GetRepresentationTypes"
                             information_only="1"
                             name="RepresentationTypesInfo"
@@ -747,16 +751,16 @@
                       panel_visibility="default" />
             <Property name="PointSize"
                       panel_visibility="advanced"
-                      panel_visibility_default_for_representation="points" />
+                      panel_visibility_default_for_representation="All Corners" />
             <Property name="LineWidth"
                       panel_visibility="advanced"
-                      panel_visibility_default_for_representation="wireframe" />
+                      panel_visibility_default_for_representation="All Edges" />
             <Property name="RenderLinesAsTubes"
                       panel_visibility="advanced"
-                      panel_visibility_default_for_representation="wireframe"/>
+                      panel_visibility_default_for_representation="All Edges" />
             <Property name="RenderPointsAsSpheres"
                       panel_visibility="advanced"
-                      panel_visibility_default_for_representation="points"/>
+                      panel_visibility_default_for_representation="All Corners"/>
           </PropertyGroup>
           <PropertyGroup name="Lighting">
             <Property name="Interpolation"
@@ -871,6 +875,28 @@
           <Exception name="Input" />
           <Exception name="Visibility" />
           <Exception name="SidesToShow" />
+        </ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CellGridAllEdgesRepresentation"
+               proxygroup="representations"
+               proxyname="CellGridAllEdgesRepresentation"></Proxy>
+        <ShareProperties subproxy="CellGridSurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="SidesToShow" />
+          <Exception name="SidesStrategy" />
+        </ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CellGridAllCornersRepresentation"
+               proxygroup="representations"
+               proxyname="CellGridAllCornersRepresentation"></Proxy>
+        <ShareProperties subproxy="CellGridSurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="SidesToShow" />
+          <Exception name="SidesStrategy" />
         </ShareProperties>
       </SubProxy>
       <ProxyProperty name="DataAxesGrid"

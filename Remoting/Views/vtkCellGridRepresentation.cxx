@@ -361,6 +361,17 @@ void vtkCellGridRepresentation::SetPreserveRenderableInputs(bool shouldPreserve)
   this->MarkModified();
 }
 
+void vtkCellGridRepresentation::SetSidesStrategy(int strategy)
+{
+  auto* surfaceFilter = vtkCellGridComputeSides::SafeDownCast(this->GeometryFilter);
+  if (!surfaceFilter)
+  {
+    return;
+  }
+  surfaceFilter->SetStrategy(strategy);
+  this->MarkModified();
+}
+
 void vtkCellGridRepresentation::SetOmitSidesForRenderableInputs(bool shouldOmit)
 {
   auto* surfaceFilter = vtkCellGridComputeSides::SafeDownCast(this->GeometryFilter);
