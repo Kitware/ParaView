@@ -20,6 +20,7 @@
                         name="input_type">
           <DataType value="vtkUnstructuredGrid"/>
           <DataType value="vtkPolyData"/>
+          <DataType value="vtkHyperTreeGrid"/>
           <DataType value="vtkPartitionedDataSetCollection"/>
           <DataType value="vtkMultiBlockDataSet"/>
         </DataTypeDomain>
