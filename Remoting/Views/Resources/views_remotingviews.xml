@@ -1347,6 +1347,38 @@
                                    property="BackgroundColorMode" value="3" />
         </Hints>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetSkyboxBlur"
+                         default_values="0"
+                         name="SkyboxBlur"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable or disable the blur for the skybox background.
+        </Documentation>
+        <Hints>
+          <!-- hide widget unless mode is "Skybox" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                   property="BackgroundColorMode" value="3" />
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetSkyboxBlurRadius"
+                         default_values="20.0"
+                         name="SkyboxBlurRadius"
+                         number_of_elements="1">
+        <Documentation>
+          Control the blur amount. The higher the number, the more instance the blur will be.
+        </Documentation>
+        <DoubleRangeDomain min="0.0" max="50.0" name="range" />
+        <Hints>
+          <!-- hide widget unless mode is "Skybox" and "SkyboxBlur" is enabled. -->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="BackgroundColorMode" value="3" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="SkyboxBlur" value="1" />
+            </Expression>
+        </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
       <DoubleVectorProperty command="GetSkyboxRotation"
                             default_values="0.0 0.0 0.0"
                             information_only="1"
@@ -2033,6 +2065,8 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="SkyboxRotation"/>
         <Property name="BackgroundTexture"/>
         <Property name="UseEnvironmentLighting"/>
+        <Property name="SkyboxBlur" />
+        <Property name="SkyboxBlurRadius" />
       </PropertyGroup>
       <PropertyGroup label="Stereo">
         <Property name="StereoCapableWindow" />

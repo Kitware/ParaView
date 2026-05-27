@@ -4411,3 +4411,15 @@ void vtkPVRenderView::SetHardwareSelector(vtkPVHardwareSelector* selector)
     this->Selector->SetView(this); // not reference counted.
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetSkyboxBlur(bool value)
+{
+  this->GetRenderer()->SetSkyboxBlurEnabled(value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetSkyboxBlurRadius(double radius)
+{
+  this->GetRenderer()->SetSkyboxBlurRadius(radius);
+}
