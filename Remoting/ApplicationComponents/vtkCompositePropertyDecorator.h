@@ -58,7 +58,7 @@ public:
 
   void Initialize(vtkPVXMLElement* config, vtkSMProxy* proxy) override;
 
-  bool CanShow(bool show_advanced) const override;
+  bool CanShow(bool showAdvanced) const override;
   bool Enable() const override;
 
   /*

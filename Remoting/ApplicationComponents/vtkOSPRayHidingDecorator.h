@@ -22,11 +22,11 @@ public:
   /**
    * Overridden to hide the widget when OSPRay is not compiled in
    */
-  bool CanShow(bool show_advanced) const override;
+  bool CanShow(bool showAdvanced) const override;
 
 protected:
-  vtkOSPRayHidingDecorator();
-  ~vtkOSPRayHidingDecorator() override;
+  vtkOSPRayHidingDecorator() = default;
+  ~vtkOSPRayHidingDecorator() override = default;
 
 private:
   vtkOSPRayHidingDecorator(const vtkOSPRayHidingDecorator&) = delete;

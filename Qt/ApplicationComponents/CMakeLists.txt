@@ -11,6 +11,7 @@ set(classes
   pqAboutDialogReaction
   pqAddToFavoritesReaction
   pqAlwaysConnectedBehavior
+  pqANARIHidingDecorator
   pqAnglePropertyWidget
   pqAnimatedExportReaction
   pqAnimationShortcutDecorator

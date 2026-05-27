@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <pqOSPRayHidingDecorator.h>
+#include <pqANARIHidingDecorator.h>
+
 //-----------------------------------------------------------------------------
-pqOSPRayHidingDecorator::pqOSPRayHidingDecorator(
+pqANARIHidingDecorator::pqANARIHidingDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
   : Superclass(config, parentObject)
 {
@@ -12,7 +12,7 @@ pqOSPRayHidingDecorator::pqOSPRayHidingDecorator(
 }
 
 //-----------------------------------------------------------------------------
-bool pqOSPRayHidingDecorator::canShowWidget(bool show_advanced) const
+bool pqANARIHidingDecorator::canShowWidget(bool showAdvanced) const
 {
-  return this->decoratorLogic->CanShow(show_advanced);
+  return this->decoratorLogic->CanShow(showAdvanced);
 }

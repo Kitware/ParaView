@@ -4,8 +4,6 @@
 #include "vtkGenericPropertyDecorator.h"
 
 #include "vtkCommand.h"
-#include "vtkDataObject.h"
-#include "vtkDataSetAttributes.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -280,9 +278,8 @@ void vtkGenericPropertyDecorator::UpdateState()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkGenericPropertyDecorator::CanShow(bool show_advanced) const
+bool vtkGenericPropertyDecorator::CanShow(bool vtkNotUsed(showAdvanced)) const
 {
-  (void)(show_advanced);
   return this->Internals->Visible;
 }
 

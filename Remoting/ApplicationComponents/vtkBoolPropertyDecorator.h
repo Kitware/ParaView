@@ -43,7 +43,7 @@ private:
   vtkBoolPropertyDecorator(const vtkBoolPropertyDecorator&) = delete;
   void operator=(const vtkBoolPropertyDecorator&) = delete;
 
-  void SetBoolProperty(bool);
+  void SetBoolProperty(bool val);
 
   friend class pqBoolPropertyWidgetDecorator;
   void UpdateBoolPropertyState();

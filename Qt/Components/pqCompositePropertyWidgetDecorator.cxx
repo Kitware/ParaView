@@ -23,9 +23,9 @@ public:
   vtkTypeMacro(vtkQtPropertyDecorator, vtkPropertyDecorator);
   // void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  bool CanShow(bool show_advanced) const override
+  bool CanShow(bool showAdvanced) const override
   {
-    return this->decoratorLogic->canShowWidget(show_advanced);
+    return this->decoratorLogic->canShowWidget(showAdvanced);
   }
 
   bool Enable() const override { return this->decoratorLogic->enableWidget(); }
@@ -105,9 +105,9 @@ pqCompositePropertyWidgetDecorator::pqCompositePropertyWidgetDecorator(
 pqCompositePropertyWidgetDecorator::~pqCompositePropertyWidgetDecorator() = default;
 
 //-----------------------------------------------------------------------------
-bool pqCompositePropertyWidgetDecorator::canShowWidget(bool show_advanced) const
+bool pqCompositePropertyWidgetDecorator::canShowWidget(bool showAdvanced) const
 {
-  return this->decoratorLogic->CanShow(show_advanced);
+  return this->decoratorLogic->CanShow(showAdvanced);
 }
 
 //-----------------------------------------------------------------------------

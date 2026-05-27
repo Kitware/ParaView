@@ -76,7 +76,7 @@ bool vtkInputDataTypeDecorator::Enable() const
 }
 
 //-----------------------------------------------------------------------------
-bool vtkInputDataTypeDecorator::CanShow(bool show_advanced) const
+bool vtkInputDataTypeDecorator::CanShow(bool showAdvanced) const
 {
   const char* showWidgetActive = this->XML()->GetAttribute("mode");
   // By default, if show_toggle is not set, we DO NOT go through
@@ -87,7 +87,7 @@ bool vtkInputDataTypeDecorator::CanShow(bool show_advanced) const
       return false;
     }
   }
-  return this->Superclass::CanShow(show_advanced);
+  return this->Superclass::CanShow(showAdvanced);
 }
 
 //-----------------------------------------------------------------------------

@@ -211,11 +211,11 @@ void vtkCompositePropertyDecorator::Initialize(vtkPVXMLElement* xmlConfig, vtkSM
 }
 
 //-----------------------------------------------------------------------------
-bool vtkCompositePropertyDecorator::CanShow(bool show_advanced) const
+bool vtkCompositePropertyDecorator::CanShow(bool showAdvanced) const
 {
   auto internals = (*this->Internals);
-  return internals.Expression ? internals.Expression->CanShow(show_advanced)
-                              : this->Superclass::CanShow(show_advanced);
+  return internals.Expression ? internals.Expression->CanShow(showAdvanced)
+                              : this->Superclass::CanShow(showAdvanced);
 }
 
 //-----------------------------------------------------------------------------
