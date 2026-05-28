@@ -95,11 +95,13 @@ paraview_add_client_server_render_tests(
   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
   TEST_SCRIPTS GhostCellsGenerator.xml
   )
-
-# Different result for RandomHTG in serial & parallel
-  paraview_add_client_server_tests(
+paraview_add_client_server_tests(
   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS VTKHDFWriterHTGDistributed.xml
+  TEST_SCRIPTS HyperTreeGridGhostCellsGenerator.xml
+  )
+paraview_add_client_server_render_tests(
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS HyperTreeGridGhostCellsGenerator.xml
   )
 
 # HTG Source has special features when used in an MPI setting
