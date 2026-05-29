@@ -17,6 +17,7 @@
 #include "vtkHyperTreeGridGhostCellsGenerator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -121,33 +122,79 @@ int vtkPVGhostCellsGenerator::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro(<< "Failed to get output data object.");
   }
 
-  // Input dataset is neither directly a HTG or a composite structure containing HTG.
+  return this->ProcessDataObject(input, output);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGhostCellsGenerator::ProcessDataObject(vtkDataObject* input, vtkDataObject* output)
+{
   // Fast forward it to the classic GCG filter.
   bool inputHasHTG = vtkPVGhostCellsGenerator::HasHTG(this->GetController(), input);
   if (!inputHasHTG)
   {
     return this->GhostCellsGeneratorUsingSuperclassInstance(input, output);
   }
-
-  // Simple non-composite HTG
-  auto compositeInput = vtkCompositeDataSet::SafeDownCast(input);
-  if (!compositeInput)
+  // Input dataset is neither directly a HTG or a composite structure containing HTG.
+  auto inputMB = vtkMultiBlockDataSet::SafeDownCast(input);
+  if (inputMB)
   {
+    auto outputMB = vtkMultiBlockDataSet::SafeDownCast(output);
+    if (!outputMB)
+    {
+      vtkErrorMacro(<< "Failed to get a multiblock output structure");
+      return 0;
+    }
+    return this->ProcessMultiBlockDataSet(inputMB, outputMB);
+  }
+
+  auto compositeInput = vtkCompositeDataSet::SafeDownCast(input);
+  if (compositeInput)
+  {
+    auto compositeOutput = vtkCompositeDataSet::SafeDownCast(output);
+    if (!compositeOutput)
+    {
+      vtkErrorMacro(<< "Failed to get a composite output structure");
+      return 0;
+    }
+    return this->ProcessPartitionedDataSet(compositeInput, compositeOutput);
+  }
+
+  else
+  {
+    // Generate an empty HTG if the input is null
+    if (input == nullptr)
+    {
+      vtkNew<vtkHyperTreeGrid> emptyHTG;
+      emptyHTG->Initialize();
+      output = nullptr;
+      return this->GhostCellsGeneratorUsingHyperTreeGrid(emptyHTG, nullptr);
+    }
     return this->GhostCellsGeneratorUsingHyperTreeGrid(input, output);
   }
-
-  auto compositeOutput = vtkCompositeDataSet::SafeDownCast(output);
-  if (!compositeOutput)
-  {
-    vtkErrorMacro(<< "Failed to get a composite output structure");
-  }
-
-  // Composite structure: iterate recursively over composite datasets and partitioned datasets,
-  // routing to either HTG or classic GCG
-  return this->ProcessComposite(compositeInput, compositeOutput);
 }
 
-int vtkPVGhostCellsGenerator::ProcessComposite(
+//----------------------------------------------------------------------------
+int vtkPVGhostCellsGenerator::ProcessMultiBlockDataSet(
+  vtkMultiBlockDataSet* input, vtkMultiBlockDataSet* output)
+{
+  int result = 1;
+
+  output->CopyStructure(input);
+  // For MultiBlockDataSet containing HTG, we process each block individually
+  // We don't generate ghost cells between different blocks
+  for (unsigned int i = 0; i < input->GetNumberOfBlocks(); i++)
+  {
+    auto inputDO = input->GetBlock(i);
+    auto outputDO = output->GetBlock(i);
+
+    result &= this->ProcessDataObject(inputDO, outputDO);
+  }
+
+  return result;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGhostCellsGenerator::ProcessPartitionedDataSet(
   vtkCompositeDataSet* input, vtkCompositeDataSet* output)
 {
   int result = 1;
@@ -155,51 +202,22 @@ int vtkPVGhostCellsGenerator::ProcessComposite(
   output->CopyStructure(input);
   auto outputRange = vtk::Range(output, vtk::CompositeDataSetOptions::None);
   auto inputRange = vtk::Range(input, vtk::CompositeDataSetOptions::None);
+
+  // For PartitionedDataSet and PDC containing HTG, we skip empty nodes when computing ghost cells
   for (auto inIt = inputRange.begin(), outIt = outputRange.begin(); inIt != inputRange.end();
        ++inIt, ++outIt)
   {
-    bool hasHTG = vtkPVGhostCellsGenerator::HasHTG(this->GetController(), *inIt);
     if (*inIt)
     {
       *outIt = vtkSmartPointer<vtkDataObject>::Take(inIt->NewInstance());
 
-      auto inputComposite = vtkCompositeDataSet::SafeDownCast(*inIt);
-      auto outputComposite = vtkCompositeDataSet::SafeDownCast(*outIt);
-
-      bool isComposite = inputComposite != nullptr;
-      bool isPDS = inIt->GetDataObjectType() == VTK_PARTITIONED_DATA_SET;
-
-      // Composite but not PartitionedDS: recurse over the composite structure
-      if (isComposite && !isPDS)
-      {
-        if (!outputComposite)
-        {
-          vtkErrorMacro(<< "Found no composite output data object");
-        }
-        result &= this->ProcessComposite(inputComposite, outputComposite);
-      }
-      else if (hasHTG)
-      {
-        // Not composite or PartitionedDS: process data either in HTG GCG or classic GCG
-        result &= this->GhostCellsGeneratorUsingHyperTreeGrid(*inIt, *outIt);
-      }
-      else
-      {
-        result &= this->GhostCellsGeneratorUsingSuperclassInstance(*inIt, *outIt);
-      }
+      result &= this->ProcessDataObject(*inIt, *outIt);
     }
     else
     {
-      if (hasHTG)
-      {
-        vtkNew<vtkHyperTreeGrid> emptyHTG;
-        emptyHTG->Initialize();
-        this->GhostCellsGeneratorUsingHyperTreeGrid(emptyHTG, nullptr);
-      }
       *outIt = nullptr;
     }
   }
-
   return result;
 }
 
