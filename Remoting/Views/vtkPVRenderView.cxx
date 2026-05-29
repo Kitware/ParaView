@@ -3789,6 +3789,24 @@ void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
   if (this->Internals->AnariPass)
   {
     vtkDebugMacro("SetANARILibrary: " << l);
+    std::string currentLib = this->Internals->AnariPass->GetAnariDevice()->GetAnariLibraryName();
+    if (!currentLib.empty() && currentLib != l)
+    {
+      // Create a new AnariPass since the library is changing
+      vtkRenderer* ren = this->GetRenderer();
+      if (this->Internals->AnariPass)
+      {
+        this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
+        this->SynchronizedRenderers->SetRenderPass(nullptr);
+        this->Internals->AnariPass = nullptr;
+      }
+      this->Internals->AnariPass = vtkSmartPointer<vtkAnariPass>::New();
+      this->Internals->AnariPass->GetSceneGraph()->SetCompositeOnGL(ren, 1);
+      if (this->Internals->IsInAnari)
+      {
+        this->SynchronizedRenderers->SetRenderPass(this->Internals->AnariPass);
+      }
+    }
     this->Internals->AnariPass->GetAnariDevice()->SetupAnariDeviceFromLibrary(
       l.c_str(), "default", false);
     // Proxy properties defaults
