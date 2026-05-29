@@ -1502,9 +1502,9 @@
       </IntVectorProperty>
       <StringVectorProperty command="SetANARILibrary"
                             default_values="visrtx"
+                            label="ANARI Library"
                             name="ANARILibrary"
-                            number_of_elements="1"
-                            panel_visibility="never">
+                            number_of_elements="1">
         <StringListDomain name="list">
           <String value="visrtx" />
           <String value="helide" />
