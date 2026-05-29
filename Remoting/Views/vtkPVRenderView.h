@@ -1044,6 +1044,13 @@ public:
   const char* GetANARILibrary();
   ///@}
 
+  /**
+   * Returns the value of the ANARI_LIBRARY environment variable, or an empty
+   * string if it is not set. Used to display the active library when the
+   * ANARILibrary property is set to "environment".
+   */
+  const char* GetANARIEnvironmentVariable();
+
   ///@{
   /**
    * Set/Get the ANARI renderer

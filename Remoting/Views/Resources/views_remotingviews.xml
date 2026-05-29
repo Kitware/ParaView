@@ -1506,17 +1506,40 @@
                             name="ANARILibrary"
                             number_of_elements="1">
         <StringListDomain name="list">
-          <String value="visrtx" />
-          <String value="helide" />
           <String value="environment" />
+          <String value="helide" />
+          <String value="visrtx" />
         </StringListDomain>
-        <Documentation>Set the ANARI backend.</Documentation>
+        <Documentation>
+          Set the ANARI backend library. Choose "environment" to use
+          the library specified by the ANARI_LIBRARY environment variable.
+        </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="ANARIHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="EnableANARI"
                                    values="1" />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetANARIEnvironmentVariable"
+                            information_only="1"
+                            label="ANARI_LIBRARY"
+                            name="ANARIEnvironmentVariable"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <SimpleStringInformationHelper />
+        <Documentation>Current value of the ANARI_LIBRARY environment variable.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ANARIHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableANARI"
+                                   values="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ANARILibrary"
+                                   values="environment" />
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty
@@ -2084,6 +2107,8 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       <PropertyGroup label="Rendering Backend"
                      panel_visibility="advanced">
         <Property name="EnableANARI"/>
+        <Property name="ANARILibrary"/>
+        <Property name="ANARIEnvironmentVariable"/>
         <Property name="EnableOSPRay"/>
         <Property name="Shadows"/>
         <Property name="OSPRayRendererType"/>
