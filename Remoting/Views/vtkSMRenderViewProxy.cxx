@@ -833,6 +833,14 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     vtkCamera::SafeDownCast(this->GetSubProxy("ActiveCamera")->GetClientSideObject());
   rv->SetActiveCamera(camera);
 
+  // Fetch the ANARI_LIBRARY environment variable value upfront so the
+  // read-only label in the Properties panel is populated immediately.
+  if (auto* propEnvVar =
+        vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARIEnvironmentVariable")))
+  {
+    this->UpdatePropertyInformation(propEnvVar);
+  }
+
   if (this->GetIsInCAVE())
   {
     // Update the local proxy property from the remote cave configuration
@@ -1354,6 +1362,12 @@ void vtkSMRenderViewProxy::UpdateAnariProperties()
   // update ANARI properties in the correct order
   this->UpdateProperty("EnableANARI");
   this->UpdateProperty("ANARILibrary");
+  if (itANARILibrary->second.ModifiedFlag || itEnableANARI->second.ModifiedFlag)
+  {
+    vtkSMStringVectorProperty* propEnvVar =
+      vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARIEnvironmentVariable"));
+    this->UpdatePropertyInformation(propEnvVar);
+  }
   if (updateANARIRendererNames)
   {
     vtkSMStringVectorProperty* propRendererNames =
