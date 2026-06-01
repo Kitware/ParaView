@@ -2030,6 +2030,7 @@ set (MathTextColumn_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (MoleculeToLines_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (ParallelCoordinatesView_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PartialArrayInLineChart_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (PickCenter_FORCE_SERIAL TRUE) # since this involves picking
 set (Plot3DReader_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PlotDataOverTime-NonDistributed_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PlotMatrixViewArraySelection_FORCE_SERIAL TRUE) # since this uses popup-menu
