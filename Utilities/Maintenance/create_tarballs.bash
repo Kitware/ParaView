@@ -275,7 +275,7 @@ git_archive () {
     local temppath="$output.tmp$$"
     readonly temppath
 
-    git -c core.autocrlf=false archive $verbose "--format=$format" "--prefix=$prefix/" "$revision" | \
+    git -c core.autocrlf=false archive $verbose "--format=$format" "--prefix=$prefix/" "$revision" -- ':!Utilities/DocsUploader' | \
         $compress > "$temppath"
     mv "$temppath" "$output"
 
