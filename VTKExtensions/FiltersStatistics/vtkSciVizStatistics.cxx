@@ -131,6 +131,7 @@ vtkSciVizStatistics::vtkSciVizStatistics()
   this->SetNumberOfOutputPorts(2); // model + assessed input
   this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
+  this->GlobalModel = true;
 }
 
 vtkSciVizStatistics::~vtkSciVizStatistics()
@@ -145,6 +146,7 @@ void vtkSciVizStatistics::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Task: " << this->Task << "\n";
   os << indent << "AttributeMode: " << this->AttributeMode << "\n";
   os << indent << "TrainingFraction: " << this->TrainingFraction << "\n";
+  os << indent << "GlobalModel: " << (this->GlobalModel ? "ON" : "OFF") << "\n";
 }
 
 int vtkSciVizStatistics::GetNumberOfAttributeArrays()
@@ -357,6 +359,7 @@ int vtkSciVizStatistics::RequestData(
   modelData->SetController(this->Controller);
   modelData->SetInputDataObject(0, inData);
   modelData->SetTrainingFraction(trainingFraction);
+  modelData->SetSingleModel(this->GlobalModel);
 
   // Ensure the same arrays+components are requested across all ranks, even
   // those with no data.
