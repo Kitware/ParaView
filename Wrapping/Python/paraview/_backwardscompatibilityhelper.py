@@ -1659,6 +1659,12 @@ def handle_legacy_view_creation(view_xml_name, view, controller):
             view.RightAxisTitleFontSize = 18
             view.TopAxisTitleFontSize = 18
 
+    if paraview.compatibility.GetVersion() <= (6, 1):
+        if hasattr(view, "PolarGrid"):
+            # default font size of polar grid labels was changed from 12
+            view.PolarGrid.AxesLabelBold = False
+            view.PolarGrid.AxesLabelFontSize = 12
+
     return view
 
 def handle_legacy_scalarbar_creation(scalarbar):
