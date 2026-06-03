@@ -1665,6 +1665,21 @@ def handle_legacy_view_creation(view_xml_name, view, controller):
             view.PolarGrid.AxesLabelBold = False
             view.PolarGrid.AxesLabelFontSize = 12
 
+        if hasattr(view, "AxesGrid"):
+            # default font size of axis labels was changed from 12
+            view.AxesGrid.XTitleBold = False
+            view.AxesGrid.XTitleFontSize = 12
+            view.AxesGrid.YTitleBold = False
+            view.AxesGrid.YTitleFontSize = 12
+            view.AxesGrid.ZTitleBold = False
+            view.AxesGrid.ZTitleFontSize = 12
+            view.AxesGrid.XLabelBold = False
+            view.AxesGrid.XLabelFontSize = 12
+            view.AxesGrid.YLabelBold = False
+            view.AxesGrid.YLabelFontSize = 12
+            view.AxesGrid.ZLabelBold = False
+            view.AxesGrid.ZLabelFontSize = 12
+
     return view
 
 def handle_legacy_scalarbar_creation(scalarbar):
@@ -1674,3 +1689,46 @@ def handle_legacy_scalarbar_creation(scalarbar):
     if paraview.compatibility.GetVersion() <= (6, 1):
         # older versions allowed overlapping labels to be shown
         scalarbar.AllowOverlappingLabels = True
+
+
+def handle_representation_creation(representation):
+    """
+    Provide backwards compatibility for show creation by reverting to previous default
+    values for some properties on the representation.
+    """
+    if paraview.compatibility.GetVersion() <= (6, 1):
+        # Check if this is a representation based on "PVRepresentationBase"
+        # If so, revert the default font size and boldness for axis titles and labels in DataAxesGrid and PolarAxes to the previous values.
+        if sm.ActiveConnection and sm.ActiveConnection.Session:
+            xml_group = representation.GetXMLGroup()
+            xml_name = representation.GetXMLName()
+            pxm = sm.ActiveConnection.Session.GetSessionProxyManager()
+            xml = pxm.GetProxyDefinition(xml_group, xml_name)
+            if not xml:
+                return
+
+            xml_base_proxyname = xml.GetAttribute("base_proxyname")
+            if xml_group == "representations" and xml_base_proxyname == "PVRepresentationBase":
+                representation.DataAxesGrid.XTitleBold = False
+                representation.DataAxesGrid.YTitleBold = False
+                representation.DataAxesGrid.ZTitleBold = False
+                representation.DataAxesGrid.XTitleFontSize = 12
+                representation.DataAxesGrid.YTitleFontSize = 12
+                representation.DataAxesGrid.ZTitleFontSize = 12
+                representation.DataAxesGrid.XLabelBold = False
+                representation.DataAxesGrid.YLabelBold = False
+                representation.DataAxesGrid.ZLabelBold = False
+                representation.DataAxesGrid.XLabelFontSize = 12
+                representation.DataAxesGrid.YLabelFontSize = 12
+                representation.DataAxesGrid.ZLabelFontSize = 12
+
+                representation.PolarAxes.PolarAxisTitleBold = False
+                representation.PolarAxes.PolarAxisTitleFontSize = 12
+                representation.PolarAxes.PolarAxisLabelBold = False
+                representation.PolarAxes.PolarAxisLabelFontSize = 12
+                representation.PolarAxes.LastRadialAxisTextBold = False
+                representation.PolarAxes.LastRadialAxisTextFontSize = 12
+                representation.PolarAxes.SecondaryRadialAxesTextBold = False
+                representation.PolarAxes.SecondaryRadialAxesTextFontSize = 12
+
+    return
