@@ -101,7 +101,7 @@ def GetRepresentation(proxy=None, view=None):
     rep = servermanager.GetRepresentation(proxy, view)
     if not rep:
         controller = servermanager.ParaViewPipelineController()
-        return controller.Show(proxy, proxy.Port, view)
+        return Show(proxy, view)
     return rep
 
 
