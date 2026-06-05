@@ -4,8 +4,8 @@
 #include "vtkCompositePolyDataMapper.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDummyController.h"
+#include "vtkGeometryFilterDispatcher.h"
 #include "vtkPVAMRDualClip.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkRegressionTestImage.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   typedef vtkSmartPointer<vtkRenderer> vtkRenderRefPtr;
   typedef vtkSmartPointer<vtkRenderWindow> vtkRenderWindowRefPtr;
   typedef vtkSmartPointer<vtkDummyController> vtkDummyControllerRefPtr;
-  typedef vtkSmartPointer<vtkPVGeometryFilter> vtkPVGeometryFilterRefPtr;
+  typedef vtkSmartPointer<vtkGeometryFilterDispatcher> vtkPVGeometryFilterRefPtr;
   typedef vtkSmartPointer<vtkRenderWindowInteractor> vtkRenderWindowInteractorRefPtr;
 
   const char* fname =

@@ -17,7 +17,8 @@
 #include "vtkObject.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
 
-#include <memory> // For unique_ptr
+#include <memory> // For std::unique_ptr
+#include <string> // For std::string
 
 class vtkClientServerStream;
 class vtkDataObject;
@@ -58,8 +59,11 @@ public:
    * Returned value can be vtkDataObject::POINT, vtkDataObject::CELL,
    * vtkDataObject::FIELD, etc i.e. vtkDataObject::FieldAssociations or
    * vtkDataObject::AttributeTypes.
+   *
+   * For vtkCellGrid, this can be the hash value of the string token of each attribute.
    */
   vtkGetMacro(FieldAssociation, int);
+  vtkGetStringMacro(FieldName);
   ///@}
 
   /**
@@ -113,10 +117,13 @@ protected:
   friend class vtkPVDataInformation;
   friend class vtkPVDataInformationAccumulator;
 
+  ///@{
   /**
-   * Set field association.
+   * Set field association and name
    */
   vtkSetMacro(FieldAssociation, int);
+  vtkSetStringMacro(FieldName);
+  ///@}
 
   ///@{
   /**
@@ -146,6 +153,7 @@ private:
   void operator=(const vtkPVDataSetAttributesInformation&) = delete;
 
   int FieldAssociation;
+  char* FieldName;
 
   class vtkInternals;
   vtkInternals* Internals;

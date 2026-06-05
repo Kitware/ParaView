@@ -13,6 +13,7 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
+#include "vtkParaViewDeprecation.h"                   // For PARAVIEW_DEPRECATED_IN_6_2_0
 #include "vtkSmartPointer.h"                          // needed for vtkSmartPointer
 
 #include "vtkNew.h" // for vtkNew
@@ -41,7 +42,8 @@ class vtkStructuredGrid;
 class vtkUnstructuredGridBase;
 class vtkUnstructuredGridGeometryFilter;
 
-class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
+class PARAVIEW_DEPRECATED_IN_6_2_0("Use vtkGeometryFilterDispatcher instead")
+  VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkPVGeometryFilter* New();

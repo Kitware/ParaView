@@ -16,6 +16,7 @@
 #include "vtkRemotingCoreModule.h" // needed for exports
 #include "vtkTuple.h"              // for vtkTuple
 
+#include <array>  // for std::array
 #include <set>    // for std::set
 #include <string> // for std::string
 #include <vector> // for std::vector
@@ -116,6 +117,20 @@ public:
   vtkGetMacro(IsPartial, bool);
   ///@}
 
+  /**
+   * Returns true if this array information was populated from a vtkCellAttribute
+   * (i.e., the containing dataset is a vtkCellGrid).
+   */
+  vtkGetMacro(IsCellGrid, bool);
+
+  /// Return the [min, max] range of polynomial orders found.
+  ///
+  /// An invalid range (range[0] > range[1]) means no attributes were encountered.
+  vtkGetVector2Macro(PolynomialOrderRange, int);
+
+  /// Return the DOF count for a specific attribute (0 if not found).
+  vtkGetMacro(DegreesOfFreedom, vtkTypeInt64);
+
   ///@{
   /**
    * Get information on the InformationKeys of this array
@@ -170,6 +185,9 @@ private:
   int DataType = -1;
   vtkTypeInt64 NumberOfTuples = 0;
   bool IsPartial = false;
+  bool IsCellGrid = false;
+  int PolynomialOrderRange[2] = { VTK_INT_MAX, -VTK_INT_MAX };
+  vtkTypeInt64 DegreesOfFreedom = 0;
 
   struct ComponentInfo
   {

@@ -19,11 +19,11 @@
 class vtkAbstractVolumeMapper;
 class vtkColorTransferFunction;
 class vtkDataSet;
+class vtkGeometryFilterDispatcher;
 class vtkOutlineSource;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkProjectedTetrahedraMapper;
-class vtkPVGeometryFilter;
 class vtkPVLODVolume;
 class vtkResampleToImage;
 class vtkVolumeProperty;
@@ -129,7 +129,7 @@ protected:
 
   vtkNew<vtkResampleToImage> ResampleToImageFilter;
 
-  vtkNew<vtkPVGeometryFilter> LODGeometryFilter;
+  vtkNew<vtkGeometryFilterDispatcher> LODGeometryFilter;
   vtkNew<vtkPolyDataMapper> LODMapper;
 
   bool UseDataPartitions = false;

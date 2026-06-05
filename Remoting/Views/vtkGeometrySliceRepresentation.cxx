@@ -9,6 +9,7 @@
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkFieldData.h"
+#include "vtkGeometryFilterDispatcher.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
@@ -17,7 +18,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkPVChangeOfBasisHelper.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVMultiSliceView.h"
 #include "vtkPVOrthographicSliceView.h"
@@ -54,7 +54,7 @@ bool GetNormalsToBasisPlanes(vtkMatrix4x4* changeOfBasisMatrix, vtkVector3d slic
   return true;
 }
 
-class vtkGSRGeometryFilter : public vtkPVGeometryFilter
+class vtkGSRGeometryFilter : public vtkGeometryFilterDispatcher
 {
   std::vector<double> SlicePositions[3];
 
@@ -104,7 +104,7 @@ public:
   }
 
   static vtkGSRGeometryFilter* New();
-  vtkTypeMacro(vtkGSRGeometryFilter, vtkPVGeometryFilter);
+  vtkTypeMacro(vtkGSRGeometryFilter, vtkGeometryFilterDispatcher);
 
   int RequestData(vtkInformation* req, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override

@@ -5,6 +5,7 @@
 #include "vtkAbstractArray.h"
 #include "vtkCellAttribute.h"
 #include "vtkCellGrid.h"
+#include "vtkCellGridSummaryInformationQuery.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataArray.h"
 #include "vtkFieldData.h"
@@ -21,7 +22,6 @@
 #include "vtkStringFormatter.h"
 
 #include <algorithm>
-#include <map>
 #include <set>
 #include <sstream>
 #include <vector>
@@ -59,6 +59,10 @@ void vtkPVArrayInformation::Initialize()
   this->DataType = -1;
   this->NumberOfTuples = 0;
   this->IsPartial = false;
+  this->IsCellGrid = false;
+  this->PolynomialOrderRange[0] = VTK_INT_MAX;
+  this->PolynomialOrderRange[1] = -VTK_INT_MAX;
+  this->DegreesOfFreedom = 0;
   this->Components.clear();
   this->StringValues.clear();
   this->InformationKeys.clear();
@@ -75,6 +79,10 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfComponents: " << this->Components.size() << endl;
   os << indent << "NumberOfTuples: " << this->NumberOfTuples << endl;
   os << indent << "IsPartial: " << this->IsPartial << endl;
+  os << indent << "IsCellGrid: " << this->IsCellGrid << endl;
+  os << indent << "PolynomialOrderRange: " << this->PolynomialOrderRange[0] << ", "
+     << this->PolynomialOrderRange[1] << endl;
+  os << indent << "DegreesOfFreedom: " << this->DegreesOfFreedom << endl;
   os << indent << "InformationKeys (count=" << this->InformationKeys.size() << "):" << endl;
   for (auto& pair : this->InformationKeys)
   {
@@ -247,6 +255,10 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation* other)
   this->DataType = other->DataType;
   this->NumberOfTuples = other->NumberOfTuples;
   this->IsPartial = other->IsPartial;
+  this->IsCellGrid = other->IsCellGrid;
+  this->PolynomialOrderRange[0] = other->PolynomialOrderRange[0];
+  this->PolynomialOrderRange[1] = other->PolynomialOrderRange[1];
+  this->DegreesOfFreedom = other->DegreesOfFreedom;
   this->Components = other->Components;
   this->StringValues = other->StringValues;
   this->InformationKeys = other->InformationKeys;
@@ -385,6 +397,7 @@ void vtkPVArrayInformation::CopyFromCellAttribute(vtkCellGrid* grid, vtkCellAttr
   const int numComponents = attribute->GetNumberOfComponents();
   assert(numComponents > 0);
 
+  this->IsCellGrid = true;
   this->Name = attribute->GetName().Data();
   this->DataType = VTK_DOUBLE; // TODO: vtkCellAttribute doesn't force this.
   // this->NumberOfTuples = 0; // TODO: Should we even try to answer this?
@@ -397,6 +410,15 @@ void vtkPVArrayInformation::CopyFromCellAttribute(vtkCellGrid* grid, vtkCellAttr
     grid->GetCellAttributeRange(
       attribute, comp < 0 ? -2 : comp, compInfo.FiniteRange.GetData(), true);
     compInfo.DefaultName = vtkPVPostFilter::DefaultComponentName(comp, numComponents);
+  }
+  vtkNew<vtkCellGridSummaryInformationQuery> summaryQuery;
+  summaryQuery->SetAttributeName(this->Name.c_str());
+  if (grid->Query(summaryQuery))
+  {
+    auto summaryInfo = summaryQuery->GetSummaryInformation(attribute);
+    this->PolynomialOrderRange[0] = summaryInfo.OrderRange[0];
+    this->PolynomialOrderRange[1] = summaryInfo.OrderRange[1];
+    this->DegreesOfFreedom = summaryInfo.DOFCount;
   }
 }
 
@@ -436,6 +458,9 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css) const
   *css << this->DataType;
   *css << this->NumberOfTuples;
   *css << this->IsPartial;
+  *css << this->IsCellGrid;
+  *css << vtkClientServerStream::InsertArray(this->PolynomialOrderRange, 2);
+  *css << this->DegreesOfFreedom;
   *css << static_cast<int>(this->Components.size());
 
   // components
@@ -473,7 +498,10 @@ bool vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
   if (!css->GetArgument(0, argument++, &this->Name) ||
     !css->GetArgument(0, argument++, &this->DataType) ||
     !css->GetArgument(0, argument++, &this->NumberOfTuples) ||
-    !css->GetArgument(0, argument++, &this->IsPartial))
+    !css->GetArgument(0, argument++, &this->IsPartial) ||
+    !css->GetArgument(0, argument++, &this->IsCellGrid) ||
+    !css->GetArgument(0, argument++, this->PolynomialOrderRange, 2) ||
+    !css->GetArgument(0, argument++, &this->DegreesOfFreedom))
   {
     vtkErrorMacro("Error parsing message.");
     return false;
@@ -597,6 +625,15 @@ void vtkPVArrayInformation::AddInformation(vtkPVArrayInformation* other, int fie
   }
 
   this->InformationKeys.insert(other->InformationKeys.begin(), other->InformationKeys.end());
+
+  if (this->IsCellGrid && other->IsCellGrid)
+  {
+    this->PolynomialOrderRange[0] =
+      std::min(this->PolynomialOrderRange[0], other->PolynomialOrderRange[0]);
+    this->PolynomialOrderRange[1] =
+      std::max(this->PolynomialOrderRange[1], other->PolynomialOrderRange[1]);
+    this->DegreesOfFreedom += other->DegreesOfFreedom;
+  }
 }
 
 //----------------------------------------------------------------------------

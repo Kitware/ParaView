@@ -14,6 +14,7 @@ DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
   VTK::FiltersCore
+  VTK::FiltersParallel
   VTK::ParallelCore
   VTK::RenderingCore
   VTK::RenderingOpenGL2

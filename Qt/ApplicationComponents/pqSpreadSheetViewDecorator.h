@@ -58,6 +58,7 @@ public:
 
   void setPrecision(int);
   void setFixedRepresentation(bool);
+  void repopulateAttributes(pqDataRepresentation* repr);
 
   /**
    * Returns whether the user should allowed to interactive change the source.

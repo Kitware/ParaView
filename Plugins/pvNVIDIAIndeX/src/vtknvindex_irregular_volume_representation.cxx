@@ -41,7 +41,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderViewDataDeliveryManager.h"

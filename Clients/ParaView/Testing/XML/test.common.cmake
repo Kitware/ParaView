@@ -333,6 +333,11 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoricalAutomaticAnnotationsInterC.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoricalAutomaticAnnotationsInterD.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoriesWithNaN.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CellGridRenderView-Surface.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CellGridRenderView-AllCorners.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CellGridRenderView-AllEdges.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CellGridRenderView-SurfaceWithEdges.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CellGridRenderView-SurfaceWithEdgesAndVertices.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CGNSReaderCellMesh.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CGNSReaderFaceMesh.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsA.png}"
@@ -1015,6 +1020,7 @@ set(ZoomToData_TIMEOUT 150)
 
 # Test without baselines and could only run in built-in mode.
 list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
+  CellGridSpreadSheetViewClient.xml
   CellQualityForPixel.xml
   ComputeArrayMagnitudeSetting.xml
   DefaultReadersSetting.xml
@@ -1078,6 +1084,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ArrayBoundsScaleDomain.xml
   ArraySelectionWidget.xml
   AutoConvertSingleProperty.xml
+  CellGridInformationPanel.xml
   CSVPreview.xml
   ChangeFileNameReaction.xml
   CustomOutputFormat.xml
@@ -1174,6 +1181,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   BlockLinkedSelection.xml
   CalculatorQuotedVariable.xml
   CameraLink.xml
+  CellGridRenderViewRepresentations.xml
   CGNSReaderDataLocation.xml
   CGNSReaderSurfacePatches.xml
   ChartDefaultSettings.xml

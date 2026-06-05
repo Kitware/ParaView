@@ -12,9 +12,12 @@
 #define vtkPVFeatureEdges_h
 
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
+#include "vtkParaViewDeprecation.h"       // For PARAVIEW_DEPRECATED_IN_6_2_0
 #include "vtkPolyDataAlgorithm.h"
 
-class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVFeatureEdges : public vtkPolyDataAlgorithm
+class PARAVIEW_DEPRECATED_IN_6_2_0(
+  "Use vtkGeometryFilterDispatcher instead") VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVFeatureEdges
+  : public vtkPolyDataAlgorithm
 {
 
 public:

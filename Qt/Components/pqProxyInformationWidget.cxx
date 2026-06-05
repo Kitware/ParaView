@@ -14,10 +14,10 @@
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
-#include "pqDoubleLineEdit.h"
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqOutputPort.h"
 #include "pqWidgetUtilities.h"
+
 #include "vtkCommand.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
@@ -27,16 +27,17 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeneralSettings.h"
-#include "vtkPVLogger.h"
 #include "vtkSMCoreUtilities.h"
-#include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
-#include <memory>
+
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
+#include <cctype>
+#include <memory>
 #include <tuple>
 
 // ParaView components includes
@@ -81,9 +82,9 @@ public:
 
   int rowCount(const QModelIndex&) const override
   {
-    return static_cast<int>(this->ArrayInformations.size());
+    return static_cast<int>(this->ArrayInformation.size());
   }
-  int columnCount(const QModelIndex&) const override { return 3; }
+  int columnCount(const QModelIndex&) const override { return this->IsCellGrid ? 5 : 3; }
   QVariant data(const QModelIndex& indx, int role) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
@@ -100,6 +101,10 @@ public:
         return "Type";
       case 2:
         return "Ranges";
+      case 3:
+        return "Polynomial Order";
+      case 4:
+        return "Degrees of Freedom";
     }
     return this->Superclass::headerData(section, orientation, role);
   }
@@ -113,7 +118,9 @@ public:
 private:
   Q_DISABLE_COPY(pqArraysModel);
 
-  QIcon Pixmaps[vtkDataObject::NUMBER_OF_ASSOCIATIONS] = {
+  bool IsCellGrid = false;
+
+  QIcon Pixmaps[vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES] = {
     QIcon(":/pqWidgets/Icons/pqPointData.svg"),
     QIcon(":/pqWidgets/Icons/pqCellData.svg"),
     QIcon(":/pqWidgets/Icons/pqGlobalData.svg"),
@@ -123,10 +130,11 @@ private:
     QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"),
   };
 
-  // elements have the structure [association, array index, array info]
-  std::vector<std::tuple<int, int, vtkSmartPointer<vtkPVArrayInformation>>> ArrayInformations;
-  vtkSmartPointer<vtkPVDataSetAttributesInformation>
-    AttributeInformations[vtkDataObject::NUMBER_OF_ASSOCIATIONS];
+  // elements have the structure
+  // [attribute type, attribute name, array index, array info]
+  std::vector<std::tuple<int, std::string, int, vtkSmartPointer<vtkPVArrayInformation>>>
+    ArrayInformation;
+  std::map<int, vtkSmartPointer<vtkPVDataSetAttributesInformation>> AttributeInformation;
   vtkSmartPointer<vtkPVDataInformation> DataInformation;
 };
 
@@ -134,29 +142,44 @@ void pqArraysModel::setDataInformation(vtkPVDataInformation* dinfo)
 {
   this->beginResetModel();
   this->DataInformation = dinfo;
-  this->ArrayInformations.clear();
-  for (int attributeIdx = 0; dinfo && attributeIdx < vtkDataObject::NUMBER_OF_ASSOCIATIONS;
-       ++attributeIdx)
+  this->AttributeInformation.clear();
+  this->ArrayInformation.clear();
+  if (!dinfo)
   {
-    if (auto dsa = dinfo->GetAttributeInformation(attributeIdx))
-    {
-      this->AttributeInformations[attributeIdx] = dsa;
+    this->endResetModel();
+    return;
+  }
 
-      std::shared_ptr<vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator> iter(
-        dsa->NewAlphabeticalArrayInformationIterator());
-      int arrayIdx = 0;
-      for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-        this->ArrayInformations.emplace_back(
-          attributeIdx, arrayIdx, iter->GetCurrentArrayInformation());
-        ++arrayIdx;
-      }
-    }
-    else
+  const auto types = dinfo->GetAttributeTypes();
+  const auto names = dinfo->GetAttributeNames();
+  for (size_t i = 0; i < types.size(); ++i)
+  {
+    const int attributeType = types[i];
+    const std::string& attributeName = names[i];
+    auto dsa = dinfo->GetAttributeInformation(attributeType);
+    if (!dsa)
     {
-      this->AttributeInformations[attributeIdx] = nullptr;
+      continue;
+    }
+    this->AttributeInformation[attributeType] = dsa;
+    if (attributeType < 0 || attributeType >= vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES)
+    {
+      continue; // only show arrays from known attribute types
+    }
+
+    std::shared_ptr<vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator> iter(
+      dsa->NewAlphabeticalArrayInformationIterator());
+    int arrayIdx = 0;
+    for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      this->ArrayInformation.emplace_back(
+        attributeType, attributeName, arrayIdx, iter->GetCurrentArrayInformation());
+      ++arrayIdx;
     }
   }
+  this->IsCellGrid = std::any_of(this->ArrayInformation.begin(), this->ArrayInformation.end(),
+    [](const auto& tup) { return std::get<3>(tup)->GetIsCellGrid(); });
+
   this->endResetModel();
 }
 
@@ -164,14 +187,14 @@ QVariant pqArraysModel::data(const QModelIndex& indx, int role) const
 {
   const int r = indx.row();
   const int c = indx.column();
-  auto& tuple = this->ArrayInformations.at(r);
-  int fieldAssociation = std::get<0>(tuple);
-  int arrayIndex = std::get<1>(tuple);
-  auto ainfo = std::get<2>(tuple);
+  auto& tuple = this->ArrayInformation.at(r);
+  const int attributeType = std::get<0>(tuple);
+  const int arrayIndex = std::get<2>(tuple);
+  auto ainfo = std::get<3>(tuple);
 
   if (role == Qt::DecorationRole && c == 0)
   {
-    return this->Pixmaps[fieldAssociation];
+    return this->Pixmaps[attributeType];
   }
   else if (role == Qt::ForegroundRole)
   {
@@ -186,13 +209,15 @@ QVariant pqArraysModel::data(const QModelIndex& indx, int role) const
   }
   else if (role == Qt::ToolTipRole)
   {
-    vtkPVDataSetAttributesInformation* dsa = this->AttributeInformations[fieldAssociation];
-    int attributeType = dsa ? dsa->IsArrayAnAttribute(arrayIndex) : -1;
+    auto result = this->AttributeInformation.find(attributeType);
+    assert(result != this->AttributeInformation.end());
+    vtkPVDataSetAttributesInformation* dsa = result->second;
+    int datasetAttributeType = dsa ? dsa->IsArrayAnAttribute(arrayIndex) : -1;
 
-    QString retStr = QString("Attribute Type: ");
-    if (attributeType != -1)
+    QString retStr = QString("Dataset Attribute Type: ");
+    if (datasetAttributeType != -1)
     {
-      return retStr + QString(vtkDataSetAttributes::GetAttributeTypeAsString(attributeType));
+      return retStr + QString(vtkDataSetAttributes::GetAttributeTypeAsString(datasetAttributeType));
     }
     return retStr + QString("None");
   }
@@ -201,6 +226,7 @@ QVariant pqArraysModel::data(const QModelIndex& indx, int role) const
     return QVariant();
   }
 
+  auto l = QLocale::system();
   switch (indx.column())
   {
     case 0:
@@ -211,10 +237,26 @@ QVariant pqArraysModel::data(const QModelIndex& indx, int role) const
       return ainfo->GetDataTypeAsString();
 
     case 2:
+    {
       auto settings = vtkPVGeneralSettings::GetInstance();
       int lowExponent = settings->GetFullNotationLowExponent();
       int highExponent = settings->GetFullNotationHighExponent();
       return ainfo->GetRangesAsString(lowExponent, highExponent).c_str();
+    }
+    case 3:
+    {
+      const int* range = ainfo->GetPolynomialOrderRange();
+      if (range[0] > range[1])
+      {
+        return QString("(n/a)");
+      }
+      return QString("[%1, %2]").arg(l.toString(range[0])).arg(l.toString(range[1]));
+    }
+    case 4:
+    {
+      vtkTypeInt64 dof = ainfo->GetDegreesOfFreedom();
+      return dof > 0 ? QString("%1").arg(l.toString(dof)) : QString("(n/a)");
+    }
   }
   return QVariant();
 }
@@ -496,7 +538,7 @@ public:
   }
 
   // update out of date label
-  void CheckForOutdatedInformation()
+  void checkForOutdatedInformation()
   {
     bool isInfoOutOfDate = false;
     if (this->Port)
@@ -788,7 +830,7 @@ void pqProxyInformationWidget::updateSubsetUI()
   // all the following depends on subset data information, if the user chose to
   // see only part of the hierarchy.
   auto subsetInfo = internals.subsetDataInformation();
-  internals.CheckForOutdatedInformation();
+  internals.checkForOutdatedInformation();
   internals.setDataStatistics(subsetInfo);
   internals.setDataArrays(subsetInfo);
 }

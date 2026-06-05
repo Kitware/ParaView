@@ -3306,8 +3306,9 @@
       </StringVectorProperty>
       <IntVectorProperty name="SidesToShow"
         number_of_elements="1"
-        default_values="37"
-        command="SetSidesToShow">
+        default_values="32"
+        command="SetSidesToShow"
+        panel_visibility="never">
         <EnumerationDomain name="enum">
           <!--
           <Entry text="Vertices of Edges"     value="1"/>
@@ -3320,6 +3321,7 @@
           <Entry text="Surfaces of Inputs"    value="32"/>
           <Entry text="Edges of Inputs"       value="20"/>
           <Entry text="Vertices of Inputs"    value="11"/>
+          <Entry text="Surfaces and Edges of Inputs" value="52"/>
           <Entry text="All Sides"             value="63"/>
           <Entry text="Next Lowest Dimension" value="37"/>
         </EnumerationDomain>
@@ -3338,6 +3340,18 @@
         command="SetOmitSidesForRenderableInputs">
         <BooleanDomain name="bool" />
         <Documentation>Set whether to compute sides for renderable inputs or only for volumetric cells.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="SidesStrategy"
+        number_of_elements="1"
+        default_values="2"
+        command="SetSidesStrategy"
+        panel_visibility="never">
+        <EnumerationDomain name="enum">
+          <Entry text="Winding"        value="0"/>
+          <Entry text="Any Occurrence" value="1"/>
+          <Entry text="Boundary"       value="2"/>
+        </EnumerationDomain>
+        <Documentation>Set the strategy used to decide which sides to include in the output.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetAmbient"
                             default_values="0.0"
@@ -3926,6 +3940,94 @@
         Default is false.</Documentation>
       </IntVectorProperty>
     <!-- End of CellGridSurfaceRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkCellGridRepresentation"
+                         name="CellGridSurfaceWithEdgesRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="CellGridSurfaceRepresentation">
+      <Documentation>Representation to show surfaces and edges of a cell-grid in a 3D render view.</Documentation>
+      <IntVectorProperty name="SidesToShow"
+        number_of_elements="1"
+        default_values="52"
+        command="SetSidesToShow"
+        override="1"
+        panel_visibility="never">
+        <Documentation>Choose how to render the input. Defaults to showing both surfaces and edges.</Documentation>
+      </IntVectorProperty>
+      <!-- End of CellGridSurfaceWithEdgesRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkCellGridRepresentation"
+                         name="CellGridSurfaceWithEdgesAndVerticesRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="CellGridSurfaceRepresentation">
+      <Documentation>Representation to show surfaces, edges, and vertices of a cell-grid in a 3D render view.</Documentation>
+      <IntVectorProperty name="SidesToShow"
+        number_of_elements="1"
+        default_values="63"
+        command="SetSidesToShow"
+        override="1"
+        panel_visibility="never">
+        <Documentation>Choose how to render the input. Defaults to showing surfaces, edges, and vertices.</Documentation>
+      </IntVectorProperty>
+      <!-- End of CellGridSurfaceWithEdgesAndVerticesRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkCellGridRepresentation"
+                         name="CellGridAllEdgesRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="CellGridSurfaceRepresentation">
+      <Documentation>Representation to show all edges of a cell-grid in a 3D render view.</Documentation>
+      <IntVectorProperty name="SidesToShow"
+        number_of_elements="1"
+        default_values="20"
+        command="SetSidesToShow"
+        override="1"
+        panel_visibility="never">
+        <Documentation>Fixed to EdgesOfInputs for this representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="SidesStrategy"
+        number_of_elements="1"
+        default_values="1"
+        command="SetSidesStrategy"
+        override="1"
+        panel_visibility="never">
+        <Documentation>Fixed to AnyOccurrence so all edges are emitted, not just boundary ones.</Documentation>
+      </IntVectorProperty>
+      <!-- End of CellGridAllEdgesRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkCellGridRepresentation"
+                         name="CellGridAllCornersRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="CellGridSurfaceRepresentation">
+      <Documentation>Representation to show all vertices of a cell-grid in a 3D render view.</Documentation>
+      <IntVectorProperty name="SidesToShow"
+        number_of_elements="1"
+        default_values="11"
+        command="SetSidesToShow"
+        override="1"
+        panel_visibility="never">
+        <Documentation>Fixed to VerticesOfInputs for this representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="SidesStrategy"
+        number_of_elements="1"
+        default_values="1"
+        command="SetSidesStrategy"
+        override="1"
+        panel_visibility="never">
+        <Documentation>Fixed to AnyOccurrence so all vertices are emitted, not just boundary ones.</Documentation>
+      </IntVectorProperty>
+      <!-- End of CellGridAllCornersRepresentation -->
     </RepresentationProxy>
 
     <!-- ================================================================== -->

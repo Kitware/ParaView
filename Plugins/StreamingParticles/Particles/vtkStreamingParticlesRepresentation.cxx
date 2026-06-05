@@ -8,6 +8,7 @@
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositePolyDataMapper.h"
 #include "vtkFieldData.h"
+#include "vtkGeometryFilterDispatcher.h"
 #include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -15,7 +16,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
@@ -314,8 +314,8 @@ int vtkStreamingParticlesRepresentation::RequestData(
     // we don't complicate the logic with adding support for caching for
     // animation playback.
 
-    vtkNew<vtkPVGeometryFilter> geomFilter;
-    geomFilter->SetUseOutline(this->UseOutline ? 1 : 0);
+    vtkNew<vtkGeometryFilterDispatcher> geomFilter;
+    geomFilter->SetUseOutline(this->UseOutline);
     geomFilter->SetController(nullptr);
 
     vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
