@@ -135,20 +135,6 @@ int vtkPVThreshold::RequestData(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVThreshold::ProcessRequest(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  // this is needed since vtkUnstructuredGridAlgorithm does not have a
-  // `RequestDataObject`.
-  if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
-  {
-    return this->RequestDataObject(request, inputVector, outputVector);
-  }
-
-  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
-}
-
-//----------------------------------------------------------------------------
 int vtkPVThreshold::RequestDataObject(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
