@@ -47,6 +47,7 @@ int vtkPVGhostCellsGenerator::GhostCellsGeneratorUsingSuperclassInstance(
   instance->SetGenerateGlobalIds(this->GetGenerateGlobalIds());
   instance->SetGenerateProcessIds(this->GetGenerateProcessIds());
   instance->SetSynchronizeOnly(this->GetSynchronizeOnly());
+  instance->SetUseImplicitArrays(this->GetUseImplicitArrays());
   instance->SetInputDataObject(inputDO);
   const int result = instance->GetExecutive()->Update();
   if (result == 1)
