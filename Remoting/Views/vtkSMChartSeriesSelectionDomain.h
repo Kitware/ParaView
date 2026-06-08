@@ -95,6 +95,11 @@ protected:
   virtual bool GetDefaultSeriesVisibility(const char*);
 
   /**
+   * Returns the default legend for a series given its name.
+   */
+  std::string GetDefaultSeriesLegend(const char*);
+
+  /**
    * Get the default value that will be used for the series with the given name
    * by this domain.
    */
@@ -125,6 +130,15 @@ protected:
    */
   virtual void SetDefaultVisibilityOverrides(
     const std::map<std::string, bool>& arrayNames, bool visibility);
+
+  /**
+   * Call this method in PopulateAvailableArrays() to override a specific array's
+   * default legend. Used when the array selection mode is at "Individual Block", to exclude
+   * the block name of the legend in the table. The block name is then added to the legend with
+   * another option.
+   */
+  virtual void SetDefaultLegendOverrides(
+    const std::vector<std::string>& arrayNames, const std::vector<std::string>& labels);
 
   int DefaultMode;
 

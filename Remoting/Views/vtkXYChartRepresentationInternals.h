@@ -440,12 +440,16 @@ protected:
       return false;
     }
 
-    std::string default_label = self->GetDefaultSeriesLabel(tableName, columnName);
     std::string label =
-      this->GetSeriesParameter(self, tableName, columnName, role, this->Labels, default_label);
+      this->GetSeriesParameter(self, tableName, columnName, role, this->Labels, columnName);
     if (self->GetSeriesLabelPrefix())
     {
       label = std::string(self->GetSeriesLabelPrefix()) + label;
+    }
+    if (self->GetArraySelectionMode() == ArraySelectionModes::INDIVIDUAL_BLOCKS &&
+      self->GetShowBlockName())
+    {
+      label = label + " (" + tableName + ")";
     }
     plot->SetLabel(label);
 
