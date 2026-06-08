@@ -2875,13 +2875,14 @@
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="NamesFromArray"
+                                   property="UseNamesFromArray"
                                    value="1" />
         </Hints>
       </StringVectorProperty>
 
       <StringVectorProperty name="PartitionsValues"
         command="SetPartitionValuesArray"
+        panel_visibility="advanced"
         number_of_elements="1" >
 
         <ArrayListDomain name="array_list"
@@ -2893,13 +2894,15 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Choose the array containing the partition values.
+        <Documentation>Choose the array containing the partition values for
+          a custom mapping between values and PartitionNames.
+          If none, assume a linear ordering in PartitionNames.
         </Documentation>
 
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="NamesFromArray"
+                                   property="UseNamesFromArray"
                                    value="1" />
         </Hints>
       </StringVectorProperty>
