@@ -14,6 +14,7 @@
 #include "pqMultiBlockPropertiesStateWidget.h"
 #include "pqOutputPort.h"
 #include "pqPVApplicationCore.h"
+#include "pqProxyWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
@@ -34,6 +35,7 @@
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDataAssemblyDomain.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
@@ -56,6 +58,7 @@
 
 #include <algorithm>
 #include <set>
+#include <sstream>
 
 namespace detail
 {
@@ -862,8 +865,15 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   // Setup proxy model to add check-state support in the header.
   internals.ProxyModel = new pqDAPModel(iconSize, this);
   internals.ProxyModel->setSourceModel(internals.AssemblyTreeModel);
+  std::ostringstream headerText;
+  headerText << smgroup->GetXMLLabel();
+  const bool useDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smproxy);
+  if (useDocumentationForLabels && smgroup->GetDocumentation())
+  {
+    headerText << ": " << smgroup->GetDocumentation()->GetDescription();
+  }
   internals.ProxyModel->setHeaderText(
-    QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel()));
+    QCoreApplication::translate("ServerManagerXML", headerText.str().c_str()));
 
   int useInputNameAsHeader = 0;
   if (groupHints &&

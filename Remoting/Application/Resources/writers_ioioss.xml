@@ -39,12 +39,12 @@
                          number_of_elements="1">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Property to control whether to choose arrays to write.
+          Control whether to choose arrays to write.
         </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty name="EntityType"
-                         label="Choose the output blocks/arrays for the Exodus Entity Type"
+                         label="EntityType"
                          default_values="3"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -70,7 +70,7 @@
                  value="9"/>
         </EnumerationDomain>
         <Documentation>
-          This property allows the user to choose the output blocks/arrays for the selected Exodus Entity Type.
+          Choose the output blocks or sets for the selected Exodus Entity Type.
         </Documentation>
       </IntVectorProperty>
 
@@ -138,6 +138,9 @@
                                    property="EntityType"
                                    value="1"/>
         </Hints>
+        <Documentation>
+          Choose the input blocks or sets to be written in the output as Edge Blocks.
+        </Documentation>
       </PropertyGroup>
 
       <StringVectorProperty name="EdgeBlockArrays"
@@ -193,6 +196,9 @@
                                    property="EntityType"
                                    value="2"/>
         </Hints>
+        <Documentation>
+          Choose the input blocks or sets to be written in the output as Face Blocks.
+        </Documentation>
       </PropertyGroup>
 
       <StringVectorProperty name="FaceBlockArrays"
@@ -248,6 +254,9 @@
                                    property="EntityType"
                                    value="3"/>
         </Hints>
+        <Documentation>
+          Choose the input blocks or sets to be written in the output as Element Blocks.
+        </Documentation>
       </PropertyGroup>
 
       <StringVectorProperty name="ElementBlockArrays"
@@ -294,7 +303,7 @@
         </Documentation>
       </StringVectorProperty>
 
-      <PropertyGroup label="NodeSets" panel_widget="DataAssemblyEditor">
+      <PropertyGroup label="Node Sets" panel_widget="DataAssemblyEditor">
         <Property name="Assembly" function="ActiveAssembly"/>
         <Property name="NodeSetSelectors" function="Selectors"/>
         <Hints>
@@ -303,6 +312,9 @@
                                    property="EntityType"
                                    value="5"/>
         </Hints>
+        <Documentation>
+          Choose the input blocks or sets to be written in the output as Node Sets.
+        </Documentation>
       </PropertyGroup>
 
       <StringVectorProperty name="NodeSetArrays"
@@ -358,6 +370,9 @@
                                    property="EntityType"
                                    value="6"/>
         </Hints>
+        <Documentation>
+          Choose the input blocks or sets to be written in the output as Edge Sets.
+        </Documentation>
       </PropertyGroup>
 
       <StringVectorProperty name="EdgeSetArrays"
@@ -413,6 +428,9 @@
                                    property="EntityType"
                                    value="7"/>
         </Hints>
+        <Documentation>
+          Choose the input blocks or sets to be written in the output as Face Sets.
+        </Documentation>
       </PropertyGroup>
 
       <StringVectorProperty name="FaceSetArrays"
@@ -468,6 +486,9 @@
                                    property="EntityType"
                                    value="8"/>
         </Hints>
+        <Documentation>
+          Choose the input blocks or sets to be written in the output as Element Sets.
+        </Documentation>
       </PropertyGroup>
 
       <StringVectorProperty name="ElementSetArrays"
@@ -523,6 +544,9 @@
                                    property="EntityType"
                                    value="9"/>
         </Hints>
+        <Documentation>
+          Choose the input blocks or sets to be written in the output as Side Sets.
+        </Documentation>
       </PropertyGroup>
 
       <StringVectorProperty name="SideSetArrays"
@@ -559,7 +583,7 @@
                          panel_visibility="advanced">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Property to control whether to remove ghost cells from the input or not.
+          Control whether to remove ghost cells from the input or not.
         </Documentation>
       </IntVectorProperty>
 
@@ -641,6 +665,7 @@
 
       <Hints>
         <WriterFactory extensions="g e ex2 ex2v2 gen exoII exoii exo" file_description="IOSS Exodus File"/>
+        <UseDocumentationForLabels/>
       </Hints>
       <!-- End of IOSSWriter -->
     </PWriterProxy>

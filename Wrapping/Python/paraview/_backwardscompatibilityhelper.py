@@ -541,12 +541,14 @@ def setattr(proxy, pname, value):
                     proxy.GetProperty("ReflectionPlane").GetData().Normal = [0, 0, 1]
                 raise Continue()
             else:
-                raise NotSupportedException("'PlaneNormal' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
+                raise NotSupportedException(
+                    "'PlaneNormal' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
         if pname == "PlanePosition":
             if compatibility_version < (6, 0):
                 proxy.GetProperty("ReflectionPlane").GetData().Origin = [value, value, value]
             else:
-                raise NotSupportedException("'PlanePosition' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
+                raise NotSupportedException(
+                    "'PlanePosition' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
 
     # 5.13 -> 6.0 Reflect replaced by AxisAlignedReflect
     # Plane and Center have been replaced by a vtkPlane 'ReflectionPlane'
@@ -584,17 +586,20 @@ def setattr(proxy, pname, value):
                         proxy.GetProperty("ReflectionPlane").GetData().Normal = [0, 0, 1]
                 raise Continue()
             else:
-                raise NotSupportedException("'Plane' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
+                raise NotSupportedException(
+                    "'Plane' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
         if pname == "Center":
             if compatibility_version < (6, 0):
                 proxy.GetProperty("ReflectionPlane").GetData().Origin = [value, value, value]
             else:
-                raise NotSupportedException("'Center' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
+                raise NotSupportedException(
+                    "'Center' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
         if pname == "FlipAllInputArrays":
             if compatibility_version < (6, 0):
                 proxy.GetProperty("ReflectAllInputArrays").SetData(value)
             else:
-                raise NotSupportedException("'FlipAllInputArrays' was renamed in 'ReflectAllInputArrays' since ParaView 6.0")
+                raise NotSupportedException(
+                    "'FlipAllInputArrays' was renamed in 'ReflectAllInputArrays' since ParaView 6.0")
 
     # 6.0 -> 6.1 vtkParticleTracerBase have been reworked
     # Caching is now automated, DisableResetCache has been removed
@@ -695,6 +700,14 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                 "'InterpolatorType' is obsolete as of ParaView 6.2. "
                 "Please use the 'CellLocator' property to specify a locator proxy instead.")
+    # 6.1 -> 6.2: ChoosetheoutputblocksarraysfortheExodusEntityType replaced by EntityType
+    if pname == "ChoosetheoutputblocksarraysfortheExodusEntityType":
+        if compatibility_version < (6, 2):
+            return proxy.GetProperty("EntityType").SetData(value)
+        else:
+            raise NotSupportedException(
+                "'Chooseth outputblocksarraysfortheExodusEntityType' is obsolete as of ParaView 6.2. "
+                "Please use the 'EntityType' property to specify the Exodus entity type instead.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -1218,7 +1231,6 @@ def getattr(proxy, pname):
             else:
                 raise NotSupportedException("'Position' property has been removed in ParaView 5.13")
 
-
     # 5.13 -> 6.0 breaking change in PolarAxes representation
     # Properties Renaming
     if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "PolarAxesRepresentation":
@@ -1241,7 +1253,8 @@ def getattr(proxy, pname):
             if compatibility_version < (6, 0):
                 return proxy.GetProperty("RadialLabelVisibility").GetData()
             else:
-                raise NotSupportedException("'RadialTitleVisibility' was renamed in 'RadialLabelVisibility' since ParaView 6.0")
+                raise NotSupportedException(
+                    "'RadialTitleVisibility' was renamed in 'RadialLabelVisibility' since ParaView 6.0")
 
         # "RadialTitleFormat" -> "RadialLabelFormat"
         if pname == "RadialTitleFormat":
@@ -1255,7 +1268,8 @@ def getattr(proxy, pname):
             if compatibility_version < (6, 0):
                 return proxy.GetProperty("RadialLabelLocation").GetData()
             else:
-                raise NotSupportedException("'RadialTitleLocation' was renamed in 'RadialLabelLocation' since ParaView 6.0")
+                raise NotSupportedException(
+                    "'RadialTitleLocation' was renamed in 'RadialLabelLocation' since ParaView 6.0")
 
         # "RadialTitleOffset" -> "RadialLabelOffset"
         if pname == "RadialTitleOffset":
@@ -1269,7 +1283,8 @@ def getattr(proxy, pname):
             if compatibility_version < (6, 0):
                 return proxy.GetProperty("AllTicksVisibility").GetData()
             else:
-                raise NotSupportedException("'PolarTicksVisibility' was renamed in 'AllTicksVisibility' since ParaView 6.0")
+                raise NotSupportedException(
+                    "'PolarTicksVisibility' was renamed in 'AllTicksVisibility' since ParaView 6.0")
 
     # 5.13 -> 6.0 HyperTreeGridAxisReflection replaced by AxisAlignedReflect
     # PlaneNormal and PlanePosition have been replaced by a vtkPlane 'ReflectionPlane'
@@ -1284,7 +1299,8 @@ def getattr(proxy, pname):
                 if normal[2] == 1:
                     return 8
             else:
-                raise NotSupportedException("'PlaneNormal' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
+                raise NotSupportedException(
+                    "'PlaneNormal' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
         if pname == "PlanePosition":
             if compatibility_version < (6, 0):
                 normal = proxy.GetProperty("ReflectionPlane").GetData().Normal
@@ -1296,7 +1312,8 @@ def getattr(proxy, pname):
                 if normal[2] == 1:
                     return origin[2]
             else:
-                raise NotSupportedException("'PlanePosition' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
+                raise NotSupportedException(
+                    "'PlanePosition' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
 
     # 5.13 -> 6.0 Reflect replaced by AxisAlignedReflect
     # Plane and Center have been replaced by a vtkPlane 'ReflectionPlane'
@@ -1316,7 +1333,8 @@ def getattr(proxy, pname):
                 else:
                     return planeMode
             else:
-                raise NotSupportedException("'Plane' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
+                raise NotSupportedException(
+                    "'Plane' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
         if pname == "Center":
             if compatibility_version < (6, 0):
                 normal = proxy.GetProperty("ReflectionPlane").GetData().Normal
@@ -1328,12 +1346,14 @@ def getattr(proxy, pname):
                 if normal[2] == 1:
                     return origin[2]
             else:
-                raise NotSupportedException("'Center' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
+                raise NotSupportedException(
+                    "'Center' property has been removed in ParaView 6.0. Please use ReflectionPlane to define the plane instead.")
         if pname == "FlipAllInputArrays":
             if compatibility_version < (6, 0):
                 return proxy.GetProperty("ReflectAllInputArrays").GetData()
             else:
-                raise NotSupportedException("'FlipAllInputArrays' was renamed in 'ReflectAllInputArrays' since ParaView 6.0")
+                raise NotSupportedException(
+                    "'FlipAllInputArrays' was renamed in 'ReflectAllInputArrays' since ParaView 6.0")
 
     # 6.0 -> 6.1 onwards chart representations cannot provide a value for CompositeDataSetIndex
     chart_proxies = ["ImageChartRepresentation", "XYChartRepresentationBase", "XYChartRepresentation",
