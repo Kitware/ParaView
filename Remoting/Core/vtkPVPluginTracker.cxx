@@ -437,7 +437,9 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
         std::string filename = child->GetAttribute("filename");
         if (hint && !vtksys::SystemTools::FileIsFullPath(filename))
         {
-          std::string basedir = vtksys::SystemTools::GetFilenamePath(hint);
+          std::string basedir =
+            vtksys::SystemTools::CollapseFullPath(vtksys::SystemTools::GetFilenamePath(hint));
+
           plugin_filename = vtksys::SystemTools::CollapseFullPath(filename, basedir);
 
           // Ensure the path is under the base directory given.
