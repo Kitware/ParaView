@@ -41,253 +41,6 @@
 
 vtkStandardNewMacro(vtkPVClipDataSet);
 
-//----------------------------------------------------------------------------
-vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction* vtkNotUsed(cf))
-  : EdgesCache(std::make_unique<vtkEdgesCacheInternal>(
-      vtkTableBasedClipDataSet::GetPointTypesArrayName(), vtkTableBasedClipDataSet::InputPoint))
-{
-  // setting NumberOfOutputPorts to 1 because ParaView does not allow you to
-  // generate the clipped output
-  this->SetNumberOfOutputPorts(1);
-
-  this->UseAMRDualClipForAMR = true;
-  this->ExactBoxClip = false;
-  this->GenerateClipPointTypesOn(); // needed by cache
-  this->MeshCache->SetConsumer(this);
-  this->MeshCache->ForwardAttribute(vtkDataObject::CELL);
-  this->MeshCache->AddPreservedCachedArray(vtkTableBasedClipDataSet::GetPointTypesArrayName());
-  this->MeshCache->AddPreservedCachedArray(vtkDataObjectMeshCache::GetDefaultIdsName());
-}
-
-//----------------------------------------------------------------------------
-vtkPVClipDataSet::~vtkPVClipDataSet() = default;
-
-//----------------------------------------------------------------------------
-void vtkPVClipDataSet::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "UseAMRDualClipForAMR: " << this->UseAMRDualClipForAMR << endl;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVClipDataSet::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  vtkLogScopeFunction(INFO);
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-
-  if (!inInfo)
-  {
-    vtkErrorMacro(<< "Failed to get input information.");
-    return 0;
-  }
-
-  vtkDataObject* inDataObj = inInfo->Get(vtkDataObject::DATA_OBJECT());
-
-  if (!inDataObj)
-  {
-    vtkErrorMacro(<< "Failed to get input data object.");
-    return 0;
-  }
-
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  if (!outInfo)
-  {
-    vtkErrorMacro(<< "Failed to get output information.");
-  }
-
-  vtkDataObject* outDataObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
-  if (!outDataObj)
-  {
-    vtkErrorMacro(<< "Failed to get output data object.");
-  }
-
-  // when clip function is nullptr clip is based on scalars: static mesh cannot be ensured.
-  if (!this->GetClipFunction())
-  {
-    this->MeshCache->InvalidateCache();
-  }
-
-  vtkMeshCacheRunner runner{ this->MeshCache, inDataObj, outDataObj, true };
-  if (runner.GetCacheLoaded())
-  {
-    return this->EdgesCache->UpdateAttributes(inDataObj, outDataObj);
-  }
-
-  this->EdgesCache->InvalidateCache();
-
-  return this->ClipDataObject(request, inputVector, outputVector) ? 1 : 0;
-}
-
-bool vtkPVClipDataSet::ClipLeaf(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  vtkDataObject* inDataObj = vtkDataObject::GetData(inputVector[0]);
-  vtkDataObject* outDataObj = vtkDataObject::GetData(outputVector);
-
-  if (vtkDataSet::SafeDownCast(inDataObj)) // For vtkDataSet.
-  {
-    if (this->GetClipFunction())
-    {
-      return this->ClipUsingSuperclass(request, inputVector, outputVector);
-    }
-
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(inDataObj);
-    if (!ds)
-    {
-      return true;
-    }
-
-    int association = this->GetInputArrayAssociation(0, ds);
-    // If using point scalars.
-    if (association == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-      return this->ClipUsingSuperclass(request, inputVector, outputVector);
-    } // End if using point scalars.
-    else if (association == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-    {
-      // Use vtkPVThreshold here.
-      return this->ClipUsingThreshold(request, inputVector, outputVector);
-    }
-    else
-    {
-      vtkErrorMacro("Unhandled association: " << association);
-      return false;
-    }
-  } // End for vtkDataSet.
-  else if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
-  {
-    //  Using Scalar
-    if (!this->ClipFunction)
-    {
-      return this->ClipUsingThreshold(request, inputVector, outputVector);
-    }
-    vtkPlane* plane = vtkPlane::SafeDownCast(this->ClipFunction);
-    vtkPVBox* box = vtkPVBox::SafeDownCast(this->ClipFunction);
-    vtkSphere* sphere = vtkSphere::SafeDownCast(this->ClipFunction);
-    vtkQuadric* quadric = vtkQuadric::SafeDownCast(this->ClipFunction);
-    vtkPVCylinder* cylinder = vtkPVCylinder::SafeDownCast(this->ClipFunction);
-    vtkNew<vtkHyperTreeGridAxisClip> htgClip;
-    if (plane)
-    {
-      double* normal = plane->GetNormal();
-      if (!vtkMathUtilities::NearlyEqual(normal[0], 1.0) &&
-        !vtkMathUtilities::NearlyEqual(normal[1], 1.0) &&
-        !vtkMathUtilities::NearlyEqual(normal[2], 1.0))
-      {
-        htgClip->SetClipTypeToQuadric();
-        htgClip->SetQuadricCoefficients(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, normal[0], normal[1],
-          normal[2], plane->EvaluateFunction(0.0, 0.0, 0.0));
-      }
-      else
-      {
-        htgClip->SetClipTypeToPlane();
-        htgClip->SetPlanePosition(-plane->EvaluateFunction(0.0, 0.0, 0.0));
-        int planeNormalAxis = 0;
-        if (normal[1] > normal[0])
-        {
-          planeNormalAxis = 1;
-        }
-        if (normal[2] > normal[0])
-        {
-          planeNormalAxis = 2;
-        }
-        htgClip->SetPlanePosition(-plane->EvaluateFunction(0.0, 0.0, 0.0));
-        htgClip->SetPlaneNormalAxis(planeNormalAxis);
-      }
-    }
-    else if (box)
-    {
-      htgClip->SetClipTypeToBox();
-      double position[3], scale[3];
-      box->GetPosition(position);
-      box->GetScale(scale);
-      htgClip->SetBounds(box->GetBounds());
-      htgClip->SetBounds(position[0], position[0] + scale[0], position[1], position[1] + scale[1],
-        position[2], position[2] + scale[2]);
-    }
-    else if (sphere)
-    {
-      htgClip->SetClipTypeToQuadric();
-      double center[3], radius = sphere->GetRadius();
-      sphere->GetCenter(center);
-      htgClip->SetQuadricCoefficients(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, -2.0 * center[0],
-        -2.0 * center[1], -2.0 * center[2],
-        -radius * radius + center[0] * center[0] + center[1] * center[1] + center[2] * center[2]);
-    }
-    else if (cylinder)
-    {
-      htgClip->SetClipTypeToQuadric();
-      double* axis = cylinder->GetOrientedAxis();
-      double radius = cylinder->GetRadius();
-      double* center = cylinder->GetCenter();
-      htgClip->SetQuadricCoefficients(axis[1] * axis[1] + axis[2] * axis[2],
-        axis[0] * axis[0] + axis[2] * axis[2], axis[0] * axis[0] + axis[1] * axis[1],
-        -2.0 * axis[0] * axis[1], -2.0 * axis[1] * axis[2], -2.0 * axis[0] * axis[2],
-        -2.0 * center[0] * (axis[1] * axis[1] + axis[2] * axis[2]) +
-          2 * center[1] * axis[0] * axis[1] + 2 * center[2] * axis[0] * axis[2],
-        -2.0 * center[1] * (axis[0] * axis[0] + axis[2] * axis[2]) +
-          2 * center[0] * axis[0] * axis[1] + 2 * center[2] * axis[1] * axis[2],
-        -2.0 * center[2] * (axis[0] * axis[0] + axis[1] * axis[1]) +
-          2 * center[1] * axis[2] * axis[1] + 2 * center[0] * axis[0] * axis[2],
-        -radius * radius + center[0] * center[0] * (axis[1] * axis[1] + axis[2] * axis[2]) +
-          center[1] * center[1] * (axis[0] * axis[0] + axis[2] * axis[2]) +
-          center[2] * center[2] * (axis[0] * axis[0] + axis[1] * axis[1]) -
-          2.0 *
-            (axis[0] * axis[1] * center[0] * center[1] + axis[1] * axis[2] * center[1] * center[2] +
-              axis[0] * axis[2] * center[0] * center[2]));
-    }
-    else if (quadric)
-    {
-      htgClip->SetClipTypeToQuadric();
-      htgClip->SetQuadric(quadric);
-    }
-    else
-    {
-      vtkErrorMacro(<< "Clipping function not supported");
-      return false;
-    }
-    htgClip->SetInsideOut(this->GetInsideOut() != 0);
-    htgClip->SetInputData(0, vtkHyperTreeGrid::SafeDownCast(inDataObj));
-    htgClip->Update();
-    outDataObj->ShallowCopy(htgClip->GetOutput(0));
-    return true;
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVClipDataSet::ClipUsingThreshold(
-  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
-  vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
-
-  vtkNew<vtkPVThreshold> threshold;
-
-  vtkDataObject* inputClone = inputDO->NewInstance();
-  inputClone->ShallowCopy(inputDO);
-  threshold->SetInputData(inputClone);
-  inputClone->FastDelete();
-  threshold->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
-
-  if (this->GetInsideOut())
-  {
-    threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_LOWER);
-    threshold->SetLowerThreshold(this->GetValue());
-  }
-  else
-  {
-    threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
-    threshold->SetUpperThreshold(this->GetValue());
-  }
-
-  threshold->Update();
-  outputDO->ShallowCopy(threshold->GetOutputDataObject(0));
-  return 1;
-}
-
 namespace
 {
 //----------------------------------------------------------------------------
@@ -477,6 +230,254 @@ std::vector<vtkSmartPointer<vtkPlane>> CreateClippingPlanes(
   }
   return boxPlanes;
 }
+}
+
+//----------------------------------------------------------------------------
+vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction* vtkNotUsed(cf))
+  : EdgesCache(std::make_unique<vtkEdgesCacheInternal>(
+      vtkTableBasedClipDataSet::GetPointTypesArrayName(), vtkTableBasedClipDataSet::InputPoint))
+{
+  // setting NumberOfOutputPorts to 1 because ParaView does not allow you to
+  // generate the clipped output
+  this->SetNumberOfOutputPorts(1);
+
+  this->UseAMRDualClipForAMR = true;
+  this->ExactBoxClip = false;
+  this->GenerateClipPointTypesOn(); // needed by cache
+  this->MeshCache->SetConsumer(this);
+  this->MeshCache->ForwardAttribute(vtkDataObject::CELL);
+  this->MeshCache->AddPreservedCachedArray(vtkTableBasedClipDataSet::GetPointTypesArrayName());
+  this->MeshCache->AddPreservedCachedArray(vtkDataObjectMeshCache::GetDefaultIdsName());
+}
+
+//----------------------------------------------------------------------------
+vtkPVClipDataSet::~vtkPVClipDataSet() = default;
+
+//----------------------------------------------------------------------------
+void vtkPVClipDataSet::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "UseAMRDualClipForAMR: " << this->UseAMRDualClipForAMR << endl;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClipDataSet::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  vtkLogScopeFunction(INFO);
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+
+  if (!inInfo)
+  {
+    vtkErrorMacro(<< "Failed to get input information.");
+    return 0;
+  }
+
+  vtkDataObject* inDataObj = inInfo->Get(vtkDataObject::DATA_OBJECT());
+
+  if (!inDataObj)
+  {
+    vtkErrorMacro(<< "Failed to get input data object.");
+    return 0;
+  }
+
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  if (!outInfo)
+  {
+    vtkErrorMacro(<< "Failed to get output information.");
+  }
+
+  vtkDataObject* outDataObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
+  if (!outDataObj)
+  {
+    vtkErrorMacro(<< "Failed to get output data object.");
+  }
+
+  // when clip function is nullptr clip is based on scalars: static mesh cannot be ensured.
+  if (!this->GetClipFunction())
+  {
+    this->MeshCache->InvalidateCache();
+  }
+
+  vtkMeshCacheRunner runner{ this->MeshCache, inDataObj, outDataObj, true };
+  if (runner.GetCacheLoaded())
+  {
+    return this->EdgesCache->UpdateAttributes(inDataObj, outDataObj);
+  }
+
+  this->EdgesCache->InvalidateCache();
+
+  return this->ClipDataObject(request, inputVector, outputVector) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVClipDataSet::ClipLeaf(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  vtkDataObject* inDataObj = vtkDataObject::GetData(inputVector[0]);
+  vtkDataObject* outDataObj = vtkDataObject::GetData(outputVector);
+
+  if (vtkDataSet::SafeDownCast(inDataObj)) // For vtkDataSet.
+  {
+    if (this->GetClipFunction())
+    {
+      return this->ClipUsingSuperclass(request, inputVector, outputVector);
+    }
+
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(inDataObj);
+    if (!ds)
+    {
+      return true;
+    }
+
+    int association = this->GetInputArrayAssociation(0, ds);
+    // If using point scalars.
+    if (association == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+      return this->ClipUsingSuperclass(request, inputVector, outputVector);
+    } // End if using point scalars.
+    else if (association == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+    {
+      // Use vtkPVThreshold here.
+      return this->ClipUsingThreshold(request, inputVector, outputVector);
+    }
+    else
+    {
+      vtkErrorMacro("Unhandled association: " << association);
+      return false;
+    }
+  } // End for vtkDataSet.
+  else if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
+  {
+    //  Using Scalar
+    if (!this->ClipFunction)
+    {
+      return this->ClipUsingThreshold(request, inputVector, outputVector);
+    }
+    vtkPlane* plane = vtkPlane::SafeDownCast(this->ClipFunction);
+    vtkPVBox* box = vtkPVBox::SafeDownCast(this->ClipFunction);
+    vtkSphere* sphere = vtkSphere::SafeDownCast(this->ClipFunction);
+    vtkQuadric* quadric = vtkQuadric::SafeDownCast(this->ClipFunction);
+    vtkPVCylinder* cylinder = vtkPVCylinder::SafeDownCast(this->ClipFunction);
+    vtkNew<vtkHyperTreeGridAxisClip> htgClip;
+    if (plane)
+    {
+      double* normal = plane->GetNormal();
+      if (!vtkMathUtilities::NearlyEqual(normal[0], 1.0) &&
+        !vtkMathUtilities::NearlyEqual(normal[1], 1.0) &&
+        !vtkMathUtilities::NearlyEqual(normal[2], 1.0))
+      {
+        htgClip->SetClipTypeToQuadric();
+        htgClip->SetQuadricCoefficients(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, normal[0], normal[1],
+          normal[2], plane->EvaluateFunction(0.0, 0.0, 0.0));
+      }
+      else
+      {
+        htgClip->SetClipTypeToPlane();
+        htgClip->SetPlanePosition(-plane->EvaluateFunction(0.0, 0.0, 0.0));
+        int planeNormalAxis = 0;
+        if (normal[1] > normal[0])
+        {
+          planeNormalAxis = 1;
+        }
+        if (normal[2] > normal[0])
+        {
+          planeNormalAxis = 2;
+        }
+        htgClip->SetPlanePosition(-plane->EvaluateFunction(0.0, 0.0, 0.0));
+        htgClip->SetPlaneNormalAxis(planeNormalAxis);
+      }
+    }
+    else if (box)
+    {
+      htgClip->SetClipTypeToBox();
+      double position[3], scale[3];
+      box->GetPosition(position);
+      box->GetScale(scale);
+      htgClip->SetBounds(box->GetBounds());
+      htgClip->SetBounds(position[0], position[0] + scale[0], position[1], position[1] + scale[1],
+        position[2], position[2] + scale[2]);
+    }
+    else if (sphere)
+    {
+      htgClip->SetClipTypeToQuadric();
+      double center[3], radius = sphere->GetRadius();
+      sphere->GetCenter(center);
+      htgClip->SetQuadricCoefficients(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, -2.0 * center[0],
+        -2.0 * center[1], -2.0 * center[2],
+        -radius * radius + center[0] * center[0] + center[1] * center[1] + center[2] * center[2]);
+    }
+    else if (cylinder)
+    {
+      htgClip->SetClipTypeToQuadric();
+      double* axis = cylinder->GetOrientedAxis();
+      double radius = cylinder->GetRadius();
+      double* center = cylinder->GetCenter();
+      htgClip->SetQuadricCoefficients(axis[1] * axis[1] + axis[2] * axis[2],
+        axis[0] * axis[0] + axis[2] * axis[2], axis[0] * axis[0] + axis[1] * axis[1],
+        -2.0 * axis[0] * axis[1], -2.0 * axis[1] * axis[2], -2.0 * axis[0] * axis[2],
+        -2.0 * center[0] * (axis[1] * axis[1] + axis[2] * axis[2]) +
+          2 * center[1] * axis[0] * axis[1] + 2 * center[2] * axis[0] * axis[2],
+        -2.0 * center[1] * (axis[0] * axis[0] + axis[2] * axis[2]) +
+          2 * center[0] * axis[0] * axis[1] + 2 * center[2] * axis[1] * axis[2],
+        -2.0 * center[2] * (axis[0] * axis[0] + axis[1] * axis[1]) +
+          2 * center[1] * axis[2] * axis[1] + 2 * center[0] * axis[0] * axis[2],
+        -radius * radius + center[0] * center[0] * (axis[1] * axis[1] + axis[2] * axis[2]) +
+          center[1] * center[1] * (axis[0] * axis[0] + axis[2] * axis[2]) +
+          center[2] * center[2] * (axis[0] * axis[0] + axis[1] * axis[1]) -
+          2.0 *
+            (axis[0] * axis[1] * center[0] * center[1] + axis[1] * axis[2] * center[1] * center[2] +
+              axis[0] * axis[2] * center[0] * center[2]));
+    }
+    else if (quadric)
+    {
+      htgClip->SetClipTypeToQuadric();
+      htgClip->SetQuadric(quadric);
+    }
+    else
+    {
+      vtkErrorMacro(<< "Clipping function not supported");
+      return false;
+    }
+    htgClip->SetInsideOut(this->GetInsideOut() != 0);
+    htgClip->SetInputData(0, vtkHyperTreeGrid::SafeDownCast(inDataObj));
+    htgClip->Update();
+    outDataObj->ShallowCopy(htgClip->GetOutput(0));
+    return true;
+  }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClipDataSet::ClipUsingThreshold(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
+  vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
+
+  vtkNew<vtkPVThreshold> threshold;
+
+  vtkDataObject* inputClone = inputDO->NewInstance();
+  inputClone->ShallowCopy(inputDO);
+  threshold->SetInputData(inputClone);
+  inputClone->FastDelete();
+  threshold->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+
+  if (this->GetInsideOut())
+  {
+    threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_LOWER);
+    threshold->SetLowerThreshold(this->GetValue());
+  }
+  else
+  {
+    threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
+    threshold->SetUpperThreshold(this->GetValue());
+  }
+
+  threshold->Update();
+  outputDO->ShallowCopy(threshold->GetOutputDataObject(0));
+  return 1;
 }
 
 //----------------------------------------------------------------------------
