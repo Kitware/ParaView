@@ -2347,6 +2347,16 @@
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty animateable="0"
+                         command="SetAllowOverlappingLabels"
+                         name="AllowOverlappingLabels"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enable the display of possibly overlapping labels.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
                          command="SetTextPosition"
                          default_values="1"
                          name="TextPosition"

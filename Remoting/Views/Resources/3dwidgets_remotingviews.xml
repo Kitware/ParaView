@@ -866,6 +866,7 @@
             <Property name="DataRangeMin" />
             <Property name="DataRangeMax" />
             <Property name="RangeLabelFormat" panel_visibility="advanced" />
+            <Property name="AllowOverlappingLabels" panel_visibility="advanced" />
           </PropertyGroup>
 
           <PropertyGroup label="Visible Data Range">

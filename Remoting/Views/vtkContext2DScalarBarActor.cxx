@@ -154,6 +154,8 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
 
   this->DrawTickMarks = true;
 
+  this->AllowOverlappingLabels = false;
+
   // Create an array for the custom labels
   this->CustomLabels = vtkDoubleArray::New();
 
@@ -975,6 +977,7 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
   this->Axis->SetLabelsVisible(!indexedMode && this->DrawTickLabels == 1);
   this->Axis->SetTicksVisible(!indexedMode && this->DrawTickMarks);
   this->Axis->SetGridVisible(false);
+  this->Axis->SetOverlappingLabels(this->AllowOverlappingLabels);
 
   if (this->AutomaticLabelFormat)
   {
