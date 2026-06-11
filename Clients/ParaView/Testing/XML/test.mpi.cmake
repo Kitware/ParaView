@@ -135,7 +135,7 @@ paraview_add_client_server_tests(
   NUMSERVERS 4
   )
 paraview_add_client_server_tests(
-  TEST_SCRIPTS GhostCellsHTGMultiblock.xml
+  TEST_SCRIPTS GhostCellsHTGComposite.xml
   NUMSERVERS 2
 )
 
