@@ -27,11 +27,6 @@
  * vtkRenderWindowInteractor fires the vtkCommand::EndInteractionEvent. If
  * missing, or less than 0.01, the view will immediately render.
  *
- * \li \c WindowResizeNonInteractiveRenderDelay :- when present provides time in seconds to
- * delay the StillRender() call after the window has been resized, ie. the interactor
- * fires a vtkCommand::WindowResizeEvent. If missing or equals 0, the view will
- * immediately render.
- *
  * \li \c EnableRenderOnInteraction :- when present provides a flag whether the interactor
  * should trigger the render calls (either StillRender or InteractiveRender) as
  * a consequence of interaction. If missing, we treat EnableRender as ON.
