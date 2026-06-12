@@ -1210,6 +1210,10 @@
     <Proxy class="vtkXMLPHyperTreeGridReader"
                  label="XML Partitioned HyperTree Grid Reader"
                  name="XMLPHyperTreeGridReaderCore">
+      <Deprecated deprecated_in="6.2" to_remove_in="6.4">
+        This reader does not work properly.
+        Please consider using the VTKHDF format instead.
+      </Deprecated>
       <Documentation long_help="Reads the summary file and the associated VTK XML htg files."
                      short_help="Read partitioned VTK XML htg files.">
                      The XML HyperTree Grid reader reads the
@@ -2413,7 +2417,7 @@
                  label="XML Hierarchical Box Data reader"
                  name="XMLHierarchicalBoxDataReader"
                  si_class="vtkSIMetaReaderProxy">
-      <Deprecated deprecated_in="6.2" to_remove_in="6.4">
+      <Deprecated deprecated_in="6.3" to_remove_in="6.5">
         This reader has been replaced by 'XML UniformGrid AMR Reader'.
         Please consider using that instead.
       </Deprecated>
