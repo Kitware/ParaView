@@ -5416,6 +5416,24 @@
           separate series. The selected blocks can be changed within the MultiBlock Inspector.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetShowBlockName"
+                         default_values="1"
+                         name="ShowBlockName"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <!-- we want to show this property for composite dataset only if we are on Individual Blocks mode. -->
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   mode="visibility" name="vtkCompositeDataSet"/>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ArraySelectionMode"
+                                   value="1" />
+        </Hints>
+        <Documentation>
+          Specify if we want to display the block name next to the array name in the legend of the plot.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty name="Assembly"
                             command="SetActiveAssembly"
                             number_of_elements="1"
@@ -5681,6 +5699,24 @@
           aggregated array values from the selected arrays are plotted. In "Individual Blocks" mode, arrays in each
           selected block are listed separately as plottable series and array values from selected arrays are plotted as
           separate series. The selected blocks can be changed within the MultiBlock Inspector.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetShowBlockName"
+                         default_values="1"
+                         name="ShowBlockName"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <!-- we want to show this property for composite dataset only if we are on Individual Blocks mode. -->
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   mode="visibility" name="vtkCompositeDataSet"/>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ArraySelectionMode"
+                                   value="1" />
+        </Hints>
+        <Documentation>
+          Specify if we want to display the block name next to the array name in the legend of the plot.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty name="Assembly"

@@ -46,6 +46,7 @@ class vtkSMChartSeriesSelectionDomain::vtkInternals
 
 public:
   std::map<std::string, bool> VisibilityOverrides;
+  std::map<std::string, std::string> LegendOverrides;
 
   vtkInternals()
     : ColorCounter(0)
@@ -216,6 +217,7 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
 
   // clear old component names.
   this->Internals->VisibilityOverrides.clear();
+  this->Internals->LegendOverrides.clear();
 
   if (!activeAssembly || !selectors || !dataInfo->IsCompositeDataSet())
   {
@@ -228,57 +230,69 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
     this->SetStrings(GetKeys(columnNameOverrides));
     return;
   }
-
   assert(activeAssembly->GetNumberOfUncheckedElements() == 1);
 
   auto assembly = dataInfo->GetDataAssembly(activeAssembly->GetUncheckedElement(0));
-  const bool intersectColumnNames =
+  const bool blocksMerged =
     arraySelectionMode && arraySelectionMode->GetUncheckedElement(0) == 0 /*MERGED_BLOCKS*/;
-  std::vector<std::string> columnNames;
-  std::map<std::string, bool> intersectedColumnNameOverrides;
+  std::vector<std::string> serieNames;
+  std::vector<std::string> legendNames;
+  std::map<std::string, bool> intersectedVariableNameOverrides;
   const int fieldAssociation = fieldDataSelection->GetUncheckedElement(0);
   const unsigned int numElems = selectors->GetNumberOfUncheckedElements();
   for (unsigned int cc = 0; cc < numElems; cc++)
   {
-    std::string blockName;
-    if (selectors->GetRepeatCommand() && !intersectColumnNames)
-    {
-      const auto blockNames = dataInfo->GetBlockNames(
-        { selectors->GetUncheckedElement(cc) }, activeAssembly->GetUncheckedElement(0));
-      blockName = blockNames.empty() ? selectors->GetUncheckedElement(cc) : blockNames.front();
-    }
-    const bool skipPartialArrays = intersectColumnNames && assembly &&
+    const bool skipPartialArrays = blocksMerged && assembly &&
       assembly->GetFirstNodeByPath(selectors->GetUncheckedElement(cc)) == assembly->GetRootNode();
     auto childInfo = this->GetInputSubsetDataInformation(
       selectors->GetUncheckedElement(cc), activeAssembly->GetUncheckedElement(0), "Input");
-    auto blockColumnNameOverrides = this->CollectAvailableArrays(
-      blockName, childInfo, fieldAssociation, this->FlattenTable, skipPartialArrays);
-    if (!intersectColumnNames)
+
+    std::map<std::string, bool> arrayNamesWithoutBlock = this->CollectAvailableArrays(
+      std::string(), childInfo, fieldAssociation, this->FlattenTable, skipPartialArrays);
+
+    // If we display blocks individually, we need to override the legend
+    if (!blocksMerged)
     {
-      this->SetDefaultVisibilityOverrides(blockColumnNameOverrides, false);
-      auto block_column_names = GetKeys(blockColumnNameOverrides);
-      columnNames.insert(columnNames.end(), block_column_names.begin(), block_column_names.end());
+      std::string blockName;
+      if (selectors->GetRepeatCommand())
+      {
+        const auto blockNames = dataInfo->GetBlockNames(
+          { selectors->GetUncheckedElement(cc) }, activeAssembly->GetUncheckedElement(0));
+        blockName = blockNames.empty() ? selectors->GetUncheckedElement(cc) : blockNames.front();
+      }
+
+      std::map<std::string, bool> arrayNameWithBlock = this->CollectAvailableArrays(
+        blockName, childInfo, fieldAssociation, this->FlattenTable, skipPartialArrays);
+      this->SetDefaultVisibilityOverrides(arrayNameWithBlock, false);
+
+      std::vector<std::string> namesWithBlock = ::GetKeys(arrayNameWithBlock);
+      serieNames.insert(serieNames.end(), namesWithBlock.begin(), namesWithBlock.end());
+
+      std::vector<std::string> namesWithoutBlock = ::GetKeys(arrayNamesWithoutBlock);
+      legendNames.insert(legendNames.end(), namesWithoutBlock.begin(), namesWithoutBlock.end());
     }
-    else if (!blockColumnNameOverrides.empty())
+
+    if (!arrayNamesWithoutBlock.empty() && intersectedVariableNameOverrides.empty())
     {
-      if (intersectedColumnNameOverrides.empty())
-      {
-        // if this is the first selector, we simply copy all names.
-        intersectedColumnNameOverrides = blockColumnNameOverrides;
-      }
-      else
-      {
-        intersectedColumnNameOverrides =
-          GetIntersection(intersectedColumnNameOverrides, blockColumnNameOverrides);
-      }
+      // if this is the first selector, we simply copy all names.
+      intersectedVariableNameOverrides = arrayNamesWithoutBlock;
+    }
+    else
+    {
+      intersectedVariableNameOverrides =
+        ::GetIntersection(intersectedVariableNameOverrides, arrayNamesWithoutBlock);
     }
   }
-  if (intersectColumnNames)
+  if (!blocksMerged)
   {
-    this->SetDefaultVisibilityOverrides(intersectedColumnNameOverrides, false);
-    columnNames = GetKeys(intersectedColumnNameOverrides);
+    this->SetDefaultLegendOverrides(serieNames, legendNames);
   }
-  this->SetStrings(columnNames);
+  else
+  {
+    this->SetDefaultVisibilityOverrides(intersectedVariableNameOverrides, false);
+    serieNames = ::GetKeys(intersectedVariableNameOverrides);
+  }
+  this->SetStrings(serieNames);
 }
 
 //----------------------------------------------------------------------------
@@ -380,8 +394,7 @@ std::vector<std::string> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const 
   }
   else if (this->DefaultMode == LABEL)
   {
-    // by default, label is same as the name of the series.
-    values.emplace_back(series);
+    values.emplace_back(this->GetDefaultSeriesLegend(series));
   }
   else if (this->DefaultMode == COLOR)
   {
@@ -493,6 +506,13 @@ bool vtkSMChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* nam
 }
 
 //----------------------------------------------------------------------------
+std::string vtkSMChartSeriesSelectionDomain::GetDefaultSeriesLegend(const char* name)
+{
+  auto it = this->Internals->LegendOverrides.find(name);
+  return it != this->Internals->LegendOverrides.end() ? it->second : name;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMChartSeriesSelectionDomain::OnDomainModified()
 {
   vtkSMProperty* prop = this->GetProperty();
@@ -513,6 +533,16 @@ void vtkSMChartSeriesSelectionDomain::SetDefaultVisibilityOverrides(
     {
       this->Internals->VisibilityOverrides[pair.first] = visibility;
     }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartSeriesSelectionDomain::SetDefaultLegendOverrides(
+  const std::vector<std::string>& arrayNames, const std::vector<std::string>& legends)
+{
+  for (std::size_t i = 0; i < legends.size(); i++)
+  {
+    this->Internals->LegendOverrides[arrayNames[i]] = legends[i];
   }
 }
 

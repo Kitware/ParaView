@@ -194,6 +194,16 @@ public:
 
   ///@{
   /**
+   * ShowBlockName control if we want to display the block name next to the array name in the legend
+   * of the chart. Default is true.
+   */
+  vtkGetMacro(ShowBlockName, bool);
+  vtkSetMacro(ShowBlockName, bool);
+  vtkBooleanMacro(ShowBlockName, bool);
+  ///@}
+
+  ///@{
+  /**
    * Set/Get the placeholder data type.
    *
    * This value is set by the proxy and is needed to ensure that the client knows the type of the
@@ -291,23 +301,26 @@ protected:
    */
   bool GetLocalOutput(MapOfTables& tables);
 
-  int FieldAssociation;
   vtkWeakPointer<vtkPVContextView> ContextView;
+  vtkSmartPointer<vtkDataObjectTree> LocalOutput;
+
+  std::vector<std::string> BlockSelectors;
+  std::set<unsigned int> CompositeIndices; // the selected blocks
+
+private:
+  int FieldAssociation;
   int FlattenTable;
   int ArraySelectionMode = MERGED_BLOCKS;
 
   // This is used to be able to create the correct placeHolder in RequestData for the client
   int PlaceHolderDataType = VTK_PARTITIONED_DATA_SET_COLLECTION;
 
-  vtkSmartPointer<vtkDataObjectTree> LocalOutput;
-
   char* ActiveAssembly = nullptr;
-  std::vector<std::string> BlockSelectors;
-  std::set<unsigned int> CompositeIndices; // the selected blocks
 
   vtkWeakPointer<vtkChartSelectionRepresentation> SelectionRepresentation;
 
-private:
+  bool ShowBlockName = true;
+
   vtkChartRepresentation(const vtkChartRepresentation&) = delete;
   void operator=(const vtkChartRepresentation&) = delete;
 

@@ -125,8 +125,13 @@ public:
           // need to add two separate columns for these.
           const std::string& tableName = plotInfo.TableName;
           const std::string default_label = self->GetDefaultSeriesLabel(tableName, columnName);
-          const std::string label = this->GetSeriesParameter(
+          std::string label = this->GetSeriesParameter(
             self, tableName, columnName, role, this->Labels, default_label);
+          if (self->GetArraySelectionMode() == ArraySelectionModes::INDIVIDUAL_BLOCKS &&
+            self->GetShowBlockName())
+          {
+            label = label + " (" + tableName + ")";
+          }
 
           std::vector<std::pair<std::string, std::string>> yNames;
           if (role == "minmax")
