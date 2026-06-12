@@ -97,8 +97,6 @@ protected:
   bool Interacting;
   bool Interacted;
 
-  int EndWindowResizeTimerId = -1;
-
 private:
   vtkSMViewProxyInteractorHelper(const vtkSMViewProxyInteractorHelper&) = delete;
   void operator=(const vtkSMViewProxyInteractorHelper&) = delete;
