@@ -384,11 +384,6 @@ public:
   vtkTuple<double, 3> GetUpperRight(int index);
 
   /**
-   * Set whether the window is currently resizing.
-   */
-  vtkSetMacro(ResizingWindow, bool);
-
-  /**
    * @brief Get the optional name of the screen at the given index, or the
    * empty string, if no name was set.
    *
@@ -517,8 +512,6 @@ private:
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internal;
-
-  bool ResizingWindow = false;
 };
 
 #endif
