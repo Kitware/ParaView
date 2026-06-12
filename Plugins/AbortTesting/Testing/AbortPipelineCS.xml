@@ -7,6 +7,8 @@
   <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/localPlugins" command="setCurrent" arguments="AbortTesting" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/loadSelected_Local" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/PluginEULADialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/remoteGroup/remotePlugins" command="setCurrent" arguments="AbortTesting" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/remoteGroup/loadSelected_Remote" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
 
   <!-- Wavelet -> SlowFilter will invoke ProgressEvent > 0.25, which will trigger the abort in the plugin -->

@@ -19,6 +19,8 @@ paraview_add_plugin(AbortTesting
   VERSION "1.0"
   EULA    Disclaimer.txt
   UI_INTERFACES ${interfaces}
-  SOURCES ${sources})
+  SOURCES ${sources}
+  MODULES SlowFilter::SlowFilter
+  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filter/vtk.module")
 
 add_subdirectory(Testing)

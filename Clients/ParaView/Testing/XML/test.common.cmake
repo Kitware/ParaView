@@ -1093,6 +1093,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   AboutDialog.xml
   AddFieldArrays.xml
   AnimateProperty.xml
+  AppendImplicitArrays.xml
   ArrayBoundsScaleDomain.xml
   ArraySelectionWidget.xml
   AutoConvertSingleProperty.xml

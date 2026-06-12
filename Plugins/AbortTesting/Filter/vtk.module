@@ -1,0 +1,14 @@
+NAME
+  SlowFilter::SlowFilter
+LIBRARY_NAME
+  vtkSlowFilter
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Kitware Inc.
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::RemotingCore
+  VTK::CommonCore
+  VTK::CommonDataModel

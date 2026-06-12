@@ -23,8 +23,6 @@ public:
 
   static vtkPVClipDataSet* New();
 
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
   ///@{
   /**
    * This filter uses vtkAMRDualClip for clipping AMR datasets. To disable that
@@ -50,7 +48,7 @@ protected:
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   int FillInputPortInformation(int, vtkInformation* info) override;
   int FillOutputPortInformation(int, vtkInformation* info) override;

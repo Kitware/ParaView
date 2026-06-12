@@ -21,8 +21,6 @@ public:
   vtkTypeMacro(vtkPVThreshold, vtkThreshold);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
   ///@{
   /**
    * Property specific to `vtkHyperTreeGridThreshold`. See class doc for more info.
@@ -41,7 +39,7 @@ protected:
   int FillInputPortInformation(int, vtkInformation*) override;
   int FillOutputPortInformation(int, vtkInformation*) override;
 
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   int ThresholdUsingSuperclassInstance(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*);
