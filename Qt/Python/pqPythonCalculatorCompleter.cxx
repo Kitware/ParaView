@@ -1,15 +1,86 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <QRegularExpression>
-
 #include "pqPythonCalculatorCompleter.h"
 
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPython.h"
 #include "vtkPythonInterpreter.h"
 
+#include <QRegularExpression>
+
+QList<pqPythonCalculatorCompleter::FunctionInfo> pqPythonCalculatorCompleter::getFunctionInfos(
+  const QStringList& ignoredModules)
+{
+  vtkPythonInterpreter::Initialize();
+  vtkPythonScopeGilEnsurer gilEnsurer;
+
+  PyObject* calcModule = PyImport_ImportModule("paraview.detail.calculator");
+  if (!calcModule)
+  {
+    return {};
+  }
+
+  PyObject* dict = PyModule_GetDict(calcModule); // borrowed reference
+  QList<FunctionInfo> results;
+  PyObject* key;
+  PyObject* value;
+  Py_ssize_t pos = 0;
+  while (PyDict_Next(dict, &pos, &key, &value))
+  {
+    // skip not callable types values and object types
+    if (!PyCallable_Check(value) || PyType_Check(value))
+    {
+      continue;
+    }
+    const char* name = PyUnicode_AsUTF8(key);
+    // skip private functions
+    if (!name || name[0] == '_')
+    {
+      continue;
+    }
+    FunctionInfo info;
+    info.name = name;
+
+    PyObject* doc = PyObject_GetAttrString(value, "__doc__");
+    if (doc && doc != Py_None)
+    {
+      const char* docStr = PyUnicode_AsUTF8(doc);
+      if (docStr)
+      {
+        info.docstring = docStr;
+      }
+    }
+    Py_XDECREF(doc);
+    PyErr_Clear();
+
+    PyObject* mod = PyObject_GetAttrString(value, "__module__");
+    if (mod && mod != Py_None)
+    {
+      const char* modStr = PyUnicode_AsUTF8(mod);
+      if (modStr)
+      {
+        info.module = modStr;
+      }
+    }
+    Py_XDECREF(mod);
+    PyErr_Clear();
+
+    if (!ignoredModules.contains(info.module))
+    {
+      results << info;
+    }
+  }
+  Py_DECREF(calcModule);
+
+  std::sort(results.begin(), results.end(),
+    [](const FunctionInfo& a, const FunctionInfo& b) { return a.name < b.name; });
+  return results;
+}
+
+//-----------------------------------------------------------------------------
 QStringList pqPythonCalculatorCompleter::getPythonCompletions(
   const QString& pythonObjectName, bool call)
 {

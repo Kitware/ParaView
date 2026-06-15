@@ -58,6 +58,7 @@
 #include "pqPauseLiveSourcePropertyWidget.h"
 #include "pqPropertyCollectionWidget.h"
 #include "pqProxyEditorPropertyWidget.h"
+#include "pqPythonCalculatorWidget.h"
 #include "pqReaderSelectionPropertyWidget.h"
 #include "pqSelectionListPropertyWidget.h"
 #include "pqSelectionQueryPropertyWidget.h"
@@ -137,6 +138,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "calculator")
   {
     return new pqCalculatorWidget(smProxy, smProperty, parentWidget);
+  }
+  else if (name == "python_calculator")
+  {
+    return new pqPythonCalculatorWidget(smProxy, smProperty, parentWidget);
   }
   else if (name == "command_button")
   {

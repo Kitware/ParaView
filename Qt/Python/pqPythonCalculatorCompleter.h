@@ -3,10 +3,8 @@
 #ifndef pqPythonCalculatorCompleter_h
 #define pqPythonCalculatorCompleter_h
 
-#include <vtkPython.h>
-
 #include "pqPythonCompleter.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkSMSourceProxy.h" // For vtkSMSourceProxy
 
 /**
  * Completer to be used for the Python calculator expression field.
@@ -20,8 +18,22 @@ public:
     : pqPythonCompleter(parent)
     , Input(input)
   {
-    this->setCompleteEmptyPrompts(true); // Ovrerride pqPythonCompleter default
+    this->setCompleteEmptyPrompts(true); // Override pqPythonCompleter default
   }
+
+  struct FunctionInfo
+  {
+    QString name;
+    QString docstring;
+    QString module;
+  };
+
+  /**
+   * Return function info (name, docstring, module) for all callable, non-private symbols in the
+   * calculator's Python namespace (`paraview.detail.calculator`), sorted by module then name.
+   * Functions whose module is in @p ignoredModules are excluded.
+   */
+  static QList<FunctionInfo> getFunctionInfos(const QStringList& ignoredModules = {});
 
 protected:
   QStringList getPythonCompletions(const QString& pythonObjectName, bool call) override;

@@ -119,6 +119,7 @@ set(classes
   pqProxySelectionWidget
   pqProxyWidget
   pqProxyWidgetDialog
+  pqPythonCalculatorWidget
   pqRecentFilesMenu
   pqRemoteCommandDialog
   pqRemoteCommandTemplateDialog
@@ -224,6 +225,7 @@ set(ui_files
   Resources/UI/pqProxySelectionWidget.ui
   Resources/UI/pqProxyWidgetDialog.ui
   Resources/UI/pqPythonAnimationCue.ui
+  Resources/UI/pqPythonCalculatorWidget.ui
   Resources/UI/pqRemoteCommandDialogForm.ui
   Resources/UI/pqRemoteCommandTemplateDialogForm.ui
   Resources/UI/pqRescaleScalarRangeToCustomDialog.ui
