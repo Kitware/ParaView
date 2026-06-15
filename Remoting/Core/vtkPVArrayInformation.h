@@ -117,6 +117,15 @@ public:
   vtkGetMacro(IsPartial, bool);
   ///@}
 
+  ///@{
+  /**
+   * If IsGlobal is true, this array comes from the field data of the root node
+   * of a composite dataset (as opposed to per-leaf field data). By default,
+   * IsGlobal is false.
+   */
+  vtkGetMacro(IsGlobal, bool);
+  ///@}
+
   /**
    * Returns true if this array information was populated from a vtkCellAttribute
    * (i.e., the containing dataset is a vtkCellGrid).
@@ -176,6 +185,7 @@ protected:
   void DeepCopy(vtkPVArrayInformation* info);
   void AddInformation(vtkPVArrayInformation*, int fieldAssociation);
   vtkSetMacro(IsPartial, bool);
+  vtkSetMacro(IsGlobal, bool);
   ///@}
 
   vtkSetMacro(Name, std::string);
@@ -185,6 +195,7 @@ private:
   int DataType = -1;
   vtkTypeInt64 NumberOfTuples = 0;
   bool IsPartial = false;
+  bool IsGlobal = false;
   bool IsCellGrid = false;
   int PolynomialOrderRange[2] = { VTK_INT_MAX, -VTK_INT_MAX };
   vtkTypeInt64 DegreesOfFreedom = 0;

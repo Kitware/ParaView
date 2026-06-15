@@ -59,6 +59,7 @@ void vtkPVArrayInformation::Initialize()
   this->DataType = -1;
   this->NumberOfTuples = 0;
   this->IsPartial = false;
+  this->IsGlobal = false;
   this->IsCellGrid = false;
   this->PolynomialOrderRange[0] = VTK_INT_MAX;
   this->PolynomialOrderRange[1] = -VTK_INT_MAX;
@@ -79,6 +80,7 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfComponents: " << this->Components.size() << endl;
   os << indent << "NumberOfTuples: " << this->NumberOfTuples << endl;
   os << indent << "IsPartial: " << this->IsPartial << endl;
+  os << indent << "IsGlobal: " << this->IsGlobal << endl;
   os << indent << "IsCellGrid: " << this->IsCellGrid << endl;
   os << indent << "PolynomialOrderRange: " << this->PolynomialOrderRange[0] << ", "
      << this->PolynomialOrderRange[1] << endl;
@@ -255,6 +257,7 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation* other)
   this->DataType = other->DataType;
   this->NumberOfTuples = other->NumberOfTuples;
   this->IsPartial = other->IsPartial;
+  this->IsGlobal = other->IsGlobal;
   this->IsCellGrid = other->IsCellGrid;
   this->PolynomialOrderRange[0] = other->PolynomialOrderRange[0];
   this->PolynomialOrderRange[1] = other->PolynomialOrderRange[1];
@@ -458,6 +461,7 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css) const
   *css << this->DataType;
   *css << this->NumberOfTuples;
   *css << this->IsPartial;
+  *css << this->IsGlobal;
   *css << this->IsCellGrid;
   *css << vtkClientServerStream::InsertArray(this->PolynomialOrderRange, 2);
   *css << this->DegreesOfFreedom;
@@ -499,6 +503,7 @@ bool vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     !css->GetArgument(0, argument++, &this->DataType) ||
     !css->GetArgument(0, argument++, &this->NumberOfTuples) ||
     !css->GetArgument(0, argument++, &this->IsPartial) ||
+    !css->GetArgument(0, argument++, &this->IsGlobal) ||
     !css->GetArgument(0, argument++, &this->IsCellGrid) ||
     !css->GetArgument(0, argument++, this->PolynomialOrderRange, 2) ||
     !css->GetArgument(0, argument++, &this->DegreesOfFreedom))
@@ -594,6 +599,7 @@ void vtkPVArrayInformation::AddInformation(vtkPVArrayInformation* other, int fie
   // different types often; so this check is not reasonable.
   // Fixes pv.ColorOpacityTableEditorHistogram test.
   // assert(this->DataType == other->DataType);
+  this->IsGlobal = this->IsGlobal || other->IsGlobal;
   if (fieldAssociation == vtkDataObject::FIELD)
   {
     this->NumberOfTuples = std::max(this->NumberOfTuples, other->NumberOfTuples);

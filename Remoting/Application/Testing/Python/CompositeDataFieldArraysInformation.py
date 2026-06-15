@@ -17,7 +17,8 @@ mb.GetFieldData().AddArray(arr)
 
 di = vtkPVDataInformation()
 di.CopyFromObject(mb)
-assert di.GetFieldDataInformation().GetArrayInformation("Field1").GetIsPartial() == 0
+assert di.GetFieldDataInformation().GetArrayInformation("Field1").GetIsPartial() == 0 and \
+       di.GetFieldDataInformation().GetArrayInformation("Field1").GetIsGlobal() == 1
 
 mb2 = vtkMultiBlockDataSet()
 mb2.SetBlock(0, mb)
@@ -30,5 +31,5 @@ mb2.GetFieldData().AddArray(arr)
 
 di = vtkPVDataInformation()
 di.CopyFromObject(mb2)
-assert di.GetFieldDataInformation().GetArrayInformation("Field1").GetIsPartial() == 1 and\
-    di.GetFieldDataInformation().GetArrayInformation("Field2").GetIsPartial() == 1
+assert di.GetFieldDataInformation().GetArrayInformation("Field1") is None and \
+       di.GetFieldDataInformation().GetArrayInformation("Field2").GetIsGlobal() == 1

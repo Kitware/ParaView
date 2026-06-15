@@ -511,3 +511,12 @@ vtkPVArrayInformation* vtkPVDataSetAttributesInformation::AlphabeticalArrayInfor
   auto& infoStorage = this->Internals->DSAttributesInformation->Internals->ArrayInformations;
   return infoStorage[this->Internals->LookupMapIter->second];
 }
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::MarkArraysAsGlobal()
+{
+  for (auto& arrayInfo : this->Internals->ArrayInformations)
+  {
+    arrayInfo->SetIsGlobal(true);
+  }
+}
