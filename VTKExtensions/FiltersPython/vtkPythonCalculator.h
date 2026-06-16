@@ -71,6 +71,8 @@ public:
   ///@{
   /**
    * Set the name of the output array.
+   *
+   * The default is Result.
    */
   vtkSetStringMacro(ArrayName);
   vtkGetStringMacro(ArrayName);

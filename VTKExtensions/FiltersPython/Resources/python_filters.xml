@@ -69,7 +69,7 @@
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetArrayName"
-                            default_values="result"
+                            default_values="Result"
                             name="ArrayName"
                             number_of_elements="1">
         <Documentation>The name of the output array.</Documentation>
