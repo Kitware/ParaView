@@ -88,9 +88,14 @@ void vtkPVDReader::ReadXMLData()
       bool found = false;
       while (cnt2 < tsLength && !found)
       {
-        double val;
-        VTK_FROM_CHARS_IF_ERROR_RETURN(this->GetAttributeValue("timestep", cnt2), val, );
-        if (val == steps[cnt])
+        const char* attr = this->GetAttributeValue("timestep", cnt2);
+        auto result = vtk::scan_value<double>(std::string_view(attr));
+        if (!result)
+        {
+          vtkErrorMacro("Could not parse timestep string: " << attr);
+          return;
+        }
+        if (result->value() == steps[cnt])
         {
           found = true;
         }
@@ -168,16 +173,15 @@ int vtkPVDReader::RequestInformation(
   for (int i = 0; i < numTimeSteps; i++)
   {
     const char* attr = this->GetAttributeValue(index, i);
-    double val;
-    auto res = vtk::from_chars(attr, val);
-    if (res.ptr == attr)
+    auto result = vtk::scan_value<double>(std::string_view(attr));
+    if (!result)
     {
       vtkErrorMacro("Could not parse timestep string: " << attr << " Setting time value to 0");
       timeSteps[i] = 0.0;
     }
     else
     {
-      timeSteps[i] = val;
+      timeSteps[i] = result->value();
     }
   }
   std::sort(timeSteps.begin(), timeSteps.end());
