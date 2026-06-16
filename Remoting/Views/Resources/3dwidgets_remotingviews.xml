@@ -860,6 +860,7 @@
             <Property name="LabelFormat" panel_visibility="advanced" />
             <Property name="DrawTickMarks" panel_visibility="advanced" />
             <Property name="DrawTickLabels" panel_visibility="advanced" />
+            <Property name="VerticalLabels" />
             <Property name="UseCustomLabels" panel_visibility="advanced" />
             <Property name="CustomLabels" panel_visibility="advanced" />
             <Property name="AddRangeLabels" panel_visibility="advanced" />
