@@ -157,16 +157,18 @@ void @_paraview_build_plugin@Plugin::GetPythonSourceList(std::vector<std::string
 }
 #endif
 
+#if !_paraview_add_plugin_built_shared && _paraview_add_plugin_with_ui
+// For static builds, import the Qt plugin. Q_IMPORT_PLUGIN expands to
+// namespace-scope declarations and must appear at file scope.
+Q_IMPORT_PLUGIN(@_paraview_build_plugin@Plugin)
+#endif
+
 //-----------------------------------------------------------------------------
 static void initialize_@_paraview_build_plugin@_plugin_qt_resources()
 {
 #if !_paraview_add_plugin_built_shared && _paraview_add_plugin_with_resources
   // For static builds, initialize the Qt resources.
 @_paraview_add_plugin_resources_init@
-#endif
-#if !_paraview_add_plugin_built_shared && _paraview_add_plugin_with_ui
-  // For static builds, initialize the Qt plugin.
-  Q_IMPORT_PLUGIN(@_paraview_build_plugin@Plugin)
 #endif
 }
 
