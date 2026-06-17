@@ -104,16 +104,15 @@ int vtkPVContourFilter::RequestData(
   // Check if input is a vtkOverlappingAMR
   if (vtkOverlappingAMR::SafeDownCast(inDataObj))
   {
-    vtkNew<vtkAMRContourFilter> contourFilter;
-    contourFilter->SetInputData(inDataObj);
-    contourFilter->SetContourValues(this->GetContourValues());
-    contourFilter->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
-    contourFilter->SetComputeNormals(this->GetComputeNormals());
-    contourFilter->SetComputeScalars(this->GetComputeScalars());
-    contourFilter->SetGenerateTriangles(this->GetGenerateTriangles());
+    this->AMRContourFilter->SetInputData(inDataObj);
+    this->AMRContourFilter->SetContourValues(this->GetContourValues());
+    this->AMRContourFilter->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+    this->AMRContourFilter->SetComputeNormals(this->GetComputeNormals());
+    this->AMRContourFilter->SetComputeScalars(this->GetComputeScalars());
+    this->AMRContourFilter->SetGenerateTriangles(this->GetGenerateTriangles());
 
     vtkNew<vtkMergeBlocks> merger;
-    merger->SetInputConnection(contourFilter->GetOutputPort());
+    merger->SetInputConnection(this->AMRContourFilter->GetOutputPort());
     merger->MergePointsOn();
     merger->SetTolerance(1e-6);
     merger->ToleranceIsAbsoluteOn();

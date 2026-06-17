@@ -29,6 +29,7 @@
 #include "vtkHyperTreeGridContour.h"                // for vtkHyperTreeGridContour
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" // needed for exports
 
+class vtkAMRContourFilter;
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVContourFilter : public vtkContourFilter
 {
 public:
@@ -106,6 +107,9 @@ private:
 
   // Use implicit arrays to store contour values in case of HTG input
   bool UseImplicitArraysHTG = false;
+
+  // Keep this one around as it supports caching
+  vtkNew<vtkAMRContourFilter> AMRContourFilter;
 };
 
 #endif // vtkPVContourFilter_h
