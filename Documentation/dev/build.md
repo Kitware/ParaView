@@ -584,6 +584,12 @@ this using the `PARAVIEW_BUILD_EDITION` setting. Supported values for this setti
 * `CATALYST_RENDERING`: Same as `CATALYST` but with rendering supported added.
 * `CANONICAL` (default): Build modules necessary for standard ParaView build.
 
+
+For cases where a limited set of features is adequate, but the default VTK module rejections
+for the build edition are too strict, `PARAVIEW_BUILD_EDITION_STRICT` may be set to `OFF` in
+order to enable specialized IO or rendering modules regardless of the build edition. This is
+always the behavior when building with `PARAVIEW_USE_EXTERNAL_VTK`
+
 ## Debugging facilities
 
 ParaView's build is fairly complicated, so a few debugging facilities are
