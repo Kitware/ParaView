@@ -708,6 +708,12 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                 "'Chooseth outputblocksarraysfortheExodusEntityType' is obsolete as of ParaView 6.2. "
                 "Please use the 'EntityType' property to specify the Exodus entity type instead.")
+    if pname == "WindowResizeNonInteractiveRenderDelay":
+        if compatibility_version <= (6, 2):
+            raise Continue()
+        else:
+            raise NotSupportedException(
+                "'WindowResizeNonInteractiveRenderDelay' is obsolete. Simply remove it from your script.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -1430,6 +1436,12 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                 "'InterpolatorType' is obsolete as of ParaView 6.2. "
                 "Please access the 'CellLocator' property instead.")
+    if pname == "WindowResizeNonInteractiveRenderDelay":
+        if compatibility_version <= (6, 2):
+            raise Continue()
+        else:
+            raise NotSupportedException(
+                "'WindowResizeNonInteractiveRenderDelay' is obsolete. Simply remove it from your script.")
 
     raise Continue()
 
