@@ -255,7 +255,6 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
   Nv = hmp / (ss + PQ_SWATCH_PAD);
   Nd = Nh * Nv;
   int elideLf = (Nd < N ? Nd / 2 : N - 1);
-  int elideRt = (Nd < N ? N - Nd / 2 + 1 : N);
   Nd = Nd > N ? N : Nd;
 
   // IV. Clear to background.
@@ -293,8 +292,7 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
   ++swatch;
 
   // Now pick up and draw the remaining swatches, if any
-  int entry = elideRt;
-  for (; swatch < Nd; ++swatch, ++entry)
+  for (; swatch < Nd; ++swatch)
   {
     double drgba[4];
     dct->GetIndexedColorInFullSet(swatch, drgba);

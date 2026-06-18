@@ -755,7 +755,12 @@ QHelpEngine* pqApplicationCore::helpEngine()
   if (!this->HelpEngine)
   {
     QTemporaryFile tFile;
-    tFile.open();
+    if (!tFile.open())
+    {
+      qWarning() << "Failed to open temporary file.";
+      return nullptr;
+    }
+
     QString collectionFileName = tFile.fileName() + ".qhc";
     this->HelpEngine = new QHelpEngine(collectionFileName, this);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -803,6 +808,10 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
 {
 #ifdef PARAVIEW_USE_QTHELP
   QHelpEngine* engine = this->helpEngine();
+  if (!engine)
+  {
+    return;
+  }
 
   // QHelpEngine doesn't like files from resource space. So we create a local
   // file and use that.

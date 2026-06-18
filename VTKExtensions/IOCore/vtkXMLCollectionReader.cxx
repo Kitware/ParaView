@@ -253,32 +253,18 @@ int vtkXMLCollectionReader::ReadPrimaryElement(vtkXMLDataElement* ePrimary)
     return 0;
   }
 
-  // Count the number of data sets in the file.
-  int numNested = ePrimary->GetNumberOfNestedElements();
-  int numDataSets = 0;
-  int i;
-  for (i = 0; i < numNested; ++i)
-  {
-    vtkXMLDataElement* eNested = ePrimary->GetNestedElement(i);
-    if (strcmp(eNested->GetName(), "DataSet") == 0)
-    {
-      ++numDataSets;
-    }
-  }
-
-  // Now read each data set.  Build the list of data sets, their
+  // Read each data set.  Build the list of data sets, their
   // attributes, and the attribute values.
   this->Internal->AttributeNames.clear();
   this->Internal->AttributeValueSets.clear();
   this->Internal->DataSets.clear();
-  for (i = 0; i < numNested; ++i)
+  for (int i = 0; i < ePrimary->GetNumberOfNestedElements(); ++i)
   {
     vtkXMLDataElement* eNested = ePrimary->GetNestedElement(i);
     if (strcmp(eNested->GetName(), "DataSet") == 0)
     {
-      int j;
       this->Internal->DataSets.push_back(eNested);
-      for (j = 0; j < eNested->GetNumberOfAttributes(); ++j)
+      for (int j = 0; j < eNested->GetNumberOfAttributes(); ++j)
       {
         this->AddAttributeNameValue(eNested->GetAttributeName(j), eNested->GetAttributeValue(j));
       }
