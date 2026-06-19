@@ -8,12 +8,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPythonInterpreter.h"
-#include "vtkPythonUtil.h"
-#include "vtkSMMessage.h"
 #include "vtkSmartPyObject.h"
 #include "vtksys/SystemTools.hxx"
 
-#include <memory>
 #include <stdexcept>
 
 //============================================================================
