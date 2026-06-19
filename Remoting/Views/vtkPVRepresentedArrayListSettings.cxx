@@ -23,7 +23,7 @@ class vtkPVRepresentedArrayListSettings::vtkInternals
 {
 public:
   std::vector<std::string> FilterExpressions;
-  std::vector<std::string> FieldsToHideHover;
+  std::vector<std::string> AttributesToHideOnHover;
   std::vector<int> ArrayMagnitudeExceptions;
 
   std::vector<std::string> ChartsDefaultXAxis;
@@ -112,29 +112,30 @@ const char* vtkPVRepresentedArrayListSettings::GetFilterExpression(int i)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRepresentedArrayListSettings::SetNumberOfFieldsToHideHover(int n)
+void vtkPVRepresentedArrayListSettings::SetNumberOfAttributesToHideOnHover(int n)
 {
-  if (n != this->GetNumberOfFieldsToHideHover())
+  if (n != this->GetNumberOfAttributesToHideOnHover())
   {
-    this->Internals->FieldsToHideHover.resize(n);
+    this->Internals->AttributesToHideOnHover.resize(n);
     this->Modified();
   }
 }
 
 //----------------------------------------------------------------------------
-int vtkPVRepresentedArrayListSettings::GetNumberOfFieldsToHideHover()
+int vtkPVRepresentedArrayListSettings::GetNumberOfAttributesToHideOnHover()
 {
-  return static_cast<int>(this->Internals->FieldsToHideHover.size());
+  return static_cast<int>(this->Internals->AttributesToHideOnHover.size());
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRepresentedArrayListSettings::SetFieldToHideHover(int i, const std::string& expression)
+void vtkPVRepresentedArrayListSettings::SetAttributeToHideOnHover(
+  int i, const std::string& expression)
 {
-  if (i >= 0 && i < this->GetNumberOfFieldsToHideHover())
+  if (i >= 0 && i < this->GetNumberOfAttributesToHideOnHover())
   {
-    if (this->Internals->FieldsToHideHover[i] != expression)
+    if (this->Internals->AttributesToHideOnHover[i] != expression)
     {
-      this->Internals->FieldsToHideHover[i] = expression;
+      this->Internals->AttributesToHideOnHover[i] = expression;
       this->Modified();
     }
   }
@@ -145,11 +146,11 @@ void vtkPVRepresentedArrayListSettings::SetFieldToHideHover(int i, const std::st
 }
 
 //----------------------------------------------------------------------------
-std::string vtkPVRepresentedArrayListSettings::GetFieldToHideHover(int i)
+std::string vtkPVRepresentedArrayListSettings::GetAttributeToHideOnHover(int i)
 {
-  if (i >= 0 && i < this->GetNumberOfFieldsToHideHover())
+  if (i >= 0 && i < this->GetNumberOfAttributesToHideOnHover())
   {
-    return this->Internals->FieldsToHideHover[i];
+    return this->Internals->AttributesToHideOnHover[i];
   }
   else
   {

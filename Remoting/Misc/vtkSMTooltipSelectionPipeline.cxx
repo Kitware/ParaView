@@ -192,9 +192,9 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
   vtkPVRepresentedArrayListSettings* settings = vtkPVRepresentedArrayListSettings::GetInstance();
 
   std::unordered_set<std::string> fieldsToHide; // using unordered_set for fast search
-  for (int i = 0; i < settings->GetNumberOfFieldsToHideHover(); i++)
+  for (int i = 0; i < settings->GetNumberOfAttributesToHideOnHover(); i++)
   {
-    fieldsToHide.insert(settings->GetFieldToHideHover(i));
+    fieldsToHide.insert(settings->GetAttributeToHideOnHover(i));
   }
 
   auto isInFieldsToHide = [fieldsToHide](const std::string& field)
