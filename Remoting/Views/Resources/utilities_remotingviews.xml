@@ -977,7 +977,7 @@
 
       <StringVectorProperty command="SetFieldToHideHover"
                             name="FieldsToHideHover"
-                            label="Fields to hide (on hover)"
+                            label="Fields To Hide On Hover"
                             number_of_elements_per_command="1"
                             repeat_command="1"
                             set_number_command="SetNumberOfFieldsToHideHover"
