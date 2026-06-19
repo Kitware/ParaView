@@ -49,13 +49,6 @@ static vtkSmartPointer<vtkTable> vtkPVMergeTablesMultiBlockMerge(
   auto resultRowData = result->GetRowData();
   result->DeepCopy(inputs[0]);
 
-  // resize the table to avoid resize over and over again.
-  vtkIdType numrows = 0;
-  for (vtkTable* table : inputs)
-  {
-    numrows += table->GetNumberOfRows();
-  }
-
   for (size_t idx = 1; idx < inputs.size(); ++idx)
   {
     auto table = inputs[idx];

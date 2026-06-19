@@ -6567,12 +6567,6 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
 #endif
           // who has the pieces?
           vector<int> owners = f2pm.WhoHasAPiece(fragmentId);
-          // how much load will he add to the recipient?
-          vtkIdType loading = 0;
-          for (int i = 0; i < nSplitOver; ++i)
-          {
-            loading += loadingArrays[owners[i]][fragmentId];
-          }
           // who will do processing??
           int recipient = procRing.GetNextId();
 

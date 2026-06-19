@@ -284,8 +284,8 @@ void pqTimerLogDisplay::save(const QStringList& files)
 void pqTimerLogDisplay::save(const QString& filename)
 {
   QFile file(filename);
-  file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
-  if (file.error() != QFile::NoError)
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) ||
+    file.error() != QFile::NoError)
   {
     qWarning("Could not open %s for reading.", filename.toUtf8().data());
     return;

@@ -59,7 +59,11 @@ bool pqFileDialogTestUtility::playTests(const QStringList& filenames)
 static void CreateEmptyFile(const QString& f)
 {
   QFile file(f);
-  file.open(QIODevice::WriteOnly);
+  if (!file.open(QIODevice::WriteOnly))
+  {
+    qWarning("Could not create an empty file");
+    return;
+  }
   QString str = "can delete";
   file.write(str.toUtf8().data(), str.size());
   file.close();
