@@ -12,6 +12,7 @@
 #include "vtksys/SystemTools.hxx"
 
 #include <stdexcept>
+#include <vector>
 
 //============================================================================
 // variables used by the Initializer should be only primitive types
@@ -179,7 +180,7 @@ const char* vtkPVPythonAlgorithmPlugin::GetPluginVersionString()
 void vtkPVPythonAlgorithmPlugin::GetXMLs(std::vector<std::string>& xmls)
 {
   const vtkInternals& internals = (*this->Internals);
-  xmls = internals.XMLs;
+  xmls.insert(xmls.end(), internals.XMLs.begin(), internals.XMLs.end());
 }
 
 //----------------------------------------------------------------------------

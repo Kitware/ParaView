@@ -50,15 +50,22 @@ public:
   const char* GetEULA() override { return nullptr; }
   ///@}
 
-  ///@{
-  /// Implementation of the vtkPVServerManagerPluginInterface.
+  /**
+   * Implementation of the vtkPVServerManagerPluginInterface.
+   * If xmls already contains modules, this function will append the new imported one at the end of
+   * the vector.
+   */
   void GetXMLs(std::vector<std::string>& xmls) override;
+
+  /**
+   * Implementation of the vtkPVServerManagerPluginInterface.
+   */
   vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
   GetInitializeInterpreterCallback() override
   {
     return nullptr;
   }
-  ///@}
+
   /**
    * Creates the object from Python source code and gets the servermanager XMLs
    * from all the Python filters included in the 'moduleName'.
