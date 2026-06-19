@@ -984,7 +984,8 @@
                             use_index="1"
                             panel_visibility="advanced">
         <Documentation>
-          List of fields used to hide when using "Hover Points On" or "Hover Cells On" fetaures. The "special" fields can be hidden ("Id", "Block", "Type", "Coords") as well as any point/cell data array name.
+          List of fields that will not be shown when using the "Hover Points On" or "Hover Cells On" features.
+          Valid values include "special" field names "Id", "Block", "Type", and "Coords" as well as the names of any point or cell data array.
         </Documentation>
         <Hints>
           <ShowLabel/>
