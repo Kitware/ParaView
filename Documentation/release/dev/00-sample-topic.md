@@ -62,3 +62,6 @@ Tips for writing a good release note:
   * Source/Filter/Extractor names - **bold**, and thename should match the name presented in the UI, e.g., **Surface Normals**.
   * UI elements - _italicized_, e.g., _Python Shell_.
   * Plugins - no special formatting.
+  * C++ and Python class names or functions should be between backticks to make them render as code.
+
+* While most release notes should focus on changes noticable to ParaView end users, occasionally notable changes to ParaView's implementation -- especially regarding backwards compatibility issues -- or changes in build details should be mentioned as "Developer notes". If your release note includes such details, you may include it in the same markdown file as the user-facing release note, but it should stand on its own so that it can be placed in the "Developer notes" section of the release notes document.
