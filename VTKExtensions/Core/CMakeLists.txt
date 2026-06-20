@@ -30,7 +30,11 @@ set(headers
   vtkMemberFunctionCommand.h)
 
 set(private_headers
-  vtkUndoStackInternal.h)
+  vtkUndoStackInternal.h
+  Private/vtkPVPostFilterPrivateTools.h)
+
+set(sources
+  Private/vtkPVPostFilterPrivateTools.cxx)
 
 set(nowrap_classes
   vtkPVStringFormatter)
@@ -39,7 +43,8 @@ vtk_module_add_module(ParaView::VTKExtensionsCore
   CLASSES ${classes}
   NOWRAP_CLASSES ${nowrap_classes}
   HEADERS ${headers}
-  PRIVATE_HEADERS ${private_headers})
+  PRIVATE_HEADERS ${private_headers}
+  SOURCES ${sources})
 
 paraview_add_server_manager_xmls(
   XMLS  Resources/core_sources.xml)

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVPostFilterExecutive.h"
 
+#include "Private/vtkPVPostFilterPrivateTools.h"
 #include "vtkAlgorithm.h"
 #include "vtkCommand.h"
 #include "vtkDataObject.h"
@@ -27,9 +28,18 @@ vtkPVPostFilterExecutive::~vtkPVPostFilterExecutive() = default;
 int vtkPVPostFilterExecutive::NeedToExecuteData(
   int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec)
 {
+  vtkInformation* inInfo = inInfoVec[0]->GetInformationObject(0);
+  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+
   if (this->Algorithm->GetInformation()->Has(POST_ARRAYS_TO_PROCESS()))
   {
-    return true;
+    if (vtkPVPostFilterPrivateTools::DoAnyNeededConversions(
+          this->Algorithm->GetInformation(), POST_ARRAYS_TO_PROCESS(), input, true) &&
+      (this->GetMTime() > this->ExecutedTime.GetMTime() ||
+        input->GetMTime() > this->ExecutedTime.GetMTime()))
+    {
+      return true;
+    }
   }
   return this->Superclass::NeedToExecuteData(outputPort, inInfoVec, outInfoVec);
 }
@@ -64,6 +74,7 @@ void vtkPVPostFilterExecutive::SetPostArrayToProcessInformation(int idx, vtkInfo
   {
     info->Copy(inInfo, 1);
     info->Set(vtkPVPostFilterExecutive::POST_ARRAY_COMPONENT_KEY(), "_");
+    this->Modified();
   }
 }
 
@@ -87,4 +98,12 @@ bool vtkPVPostFilterExecutive::MatchingPropertyInformation(
 void vtkPVPostFilterExecutive::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPostFilterExecutive::ExecuteDataEnd(
+  vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec)
+{
+  this->Superclass::ExecuteDataEnd(request, inInfoVec, outInfoVec);
+  this->ExecutedTime.Modified();
 }

@@ -45,15 +45,25 @@ protected:
   vtkPVPostFilterExecutive();
   ~vtkPVPostFilterExecutive() override;
 
-  // Overridden to always return true
+  /**
+   * Return true when arrays needs to be converted by checking mtimes and required conversions
+   */
   int NeedToExecuteData(
     int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) override;
+
+  /**
+   * Calls superclass then flag ExecutedTime modified
+   */
+  void ExecuteDataEnd(vtkInformation* request, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) override;
 
   bool MatchingPropertyInformation(vtkInformation* inputArrayInfo, vtkInformation* postArrayInfo);
 
 private:
   vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&) = delete;
   void operator=(const vtkPVPostFilterExecutive&) = delete;
+
+  vtkTimeStamp ExecutedTime;
 };
 
 #endif
