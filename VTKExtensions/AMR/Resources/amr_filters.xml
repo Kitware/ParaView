@@ -593,5 +593,26 @@
       </IntVectorProperty>
       <!-- End AMR Fragments Filter -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAMRInterfaceFilter"
+                 name="AMRInterface">
+      <Documentation long_help="Converts Overlapping AMR to a composite data of cartesian grids and unstructured interfaces with no T cells."
+                    short_help="Converts Overlaping AMR to interface">This filters
+                    converts an overlapping AMR to a composite data containing the original cartesian grids and an interface layer
+                    in between grids to provide a perfect paving with no discontinuity. It also performs interpolation at the interface.
+                    </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkOverlappingAMR" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input for this
+        filter.</Documentation>
+      </InputProperty>
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

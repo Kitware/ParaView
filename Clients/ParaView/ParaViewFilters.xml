@@ -67,6 +67,7 @@
       <Proxy group="filters" name="AMRDualContour" />
       <Proxy group="filters" name="AMRFragmentIntegration" />
       <Proxy group="filters" name="AMRFragmentsFilter" />
+      <Proxy group="filters" name="AMRInterface" />
       <Proxy group="filters" name="CTHPart" />
       <Proxy group="filters" name="ExtractBlock" />
       <Proxy group="filters" name="ExtractHierarchicalDataSets" />
