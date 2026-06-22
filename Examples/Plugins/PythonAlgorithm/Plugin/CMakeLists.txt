@@ -12,4 +12,9 @@ if (PARAVIEW_USE_PYTHON)
     VERSION "1.0"
     PYTHON_MODULES ${python_plugins}
   )
+
+  option(BUILD_TESTING "Build Plugin Testing" OFF)
+  if (BUILD_TESTING AND BUILD_SHARED_LIBS)
+    add_subdirectory(Testing)
+  endif()
 endif()
