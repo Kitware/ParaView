@@ -8,11 +8,14 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
   <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ExportUSD.usd" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
   <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ExportUSD.usda" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
   <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ExportUSD.usdc" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
 
 </pqevents>
