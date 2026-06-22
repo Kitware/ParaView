@@ -48,28 +48,28 @@ int vtkPVContourFilter::RequestData(
   if (!inInfo)
   {
     vtkErrorMacro("Failed to get input information.");
-    return 1;
+    return 0;
   }
 
   vtkDataObject* inDataObj = inInfo->Get(vtkDataObject::DATA_OBJECT());
   if (!inDataObj)
   {
     vtkErrorMacro("Failed to get input data object.");
-    return 1;
+    return 0;
   }
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   if (!outInfo)
   {
     vtkErrorMacro("Failed to get output information.");
-    return 1;
+    return 0;
   }
 
   vtkDataObject* outDataObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
   if (!outDataObj)
   {
     vtkErrorMacro("Failed get output data object.");
-    return 1;
+    return 0;
   }
 
   // Check if input is hyper tree grid
