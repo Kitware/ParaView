@@ -1929,14 +1929,14 @@ void vtkAMRDualClip::DistributeLevelMasks()
                     this->Helper->QueueRegionRemoteCopy(rx, ry, rz, neighborBlock,
                       neighborLevelMaskArray, block, blockLevelMaskArray);
                   } // if pair in queue
-                }   // if one block is in our processes
-              }     // Loop over source levels.
-            }       // if the receiving block owns the region.
-          }         // loop over region x index
-        }           // loop over region y index
-      }             // loop over region z index
-    }               // loop over receiving blocks in level
-  }                 // loop over all levels
+                } // if one block is in our processes
+              } // Loop over source levels.
+            } // if the receiving block owns the region.
+          } // loop over region x index
+        } // loop over region y index
+      } // loop over region z index
+    } // loop over receiving blocks in level
+  } // loop over all levels
 
   this->Helper->ProcessRegionRemoteCopyQueue(true);
 }

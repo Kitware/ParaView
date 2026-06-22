@@ -31,7 +31,7 @@ public:
   /**
    * Provides empty handlers to simulate the vtkPVView API.
    */
-  void Initialize(unsigned int){};
+  void Initialize(unsigned int) {};
 
   /**
    * Call StillRender() on the root view.

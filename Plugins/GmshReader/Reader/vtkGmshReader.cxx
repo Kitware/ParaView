@@ -849,8 +849,8 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
             break;
 
           } // if view found
-        }   // Loop over the views
-      }     // Loop over interplation schemes
+        } // Loop over the views
+      } // Loop over interplation schemes
 
       // From here, the field (pressure, velocity, etc) should be complete
       // Add it now to the ParaView data structure

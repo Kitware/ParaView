@@ -285,8 +285,8 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
 
   if (!message->HasExtension(ProxyState::xml_group) || !message->HasExtension(ProxyState::xml_name))
   {
-    vtkErrorMacro("Incorrect message received. "
-      << "Missing xml_group and xml_name information." << endl
+    vtkErrorMacro("Incorrect message received. Missing xml_group and xml_name information."
+      << endl
       << message->DebugString().c_str() << endl);
     return false;
   }

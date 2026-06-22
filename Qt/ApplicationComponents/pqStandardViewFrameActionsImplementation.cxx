@@ -705,9 +705,8 @@ void pqStandardViewFrameActionsImplementation::aboutToShowConvertMenu()
       QAction* view_action = new QAction(type.Label, menu);
       menu->addAction(view_action);
       QObject::connect(
-        view_action, &QAction::triggered, this,
-        [viewframe, type, this](bool) { this->invoked(viewframe, type, tr("Convert To")); },
-        Qt::QueuedConnection);
+        view_action, &QAction::triggered, this, [viewframe, type, this](bool)
+        { this->invoked(viewframe, type, tr("Convert To")); }, Qt::QueuedConnection);
     }
   }
 }
@@ -727,9 +726,8 @@ void pqStandardViewFrameActionsImplementation::setupEmptyFrame(QWidget* frame)
     QPushButton* button = new QPushButton(type.Label, ui.ConvertActionsFrame);
     button->setObjectName(type.Name);
     QObject::connect(
-      button, &QPushButton::clicked, this,
-      [viewframe, type, this]() { this->invoked(viewframe, type, tr("Create")); },
-      Qt::QueuedConnection);
+      button, &QPushButton::clicked, this, [viewframe, type, this]()
+      { this->invoked(viewframe, type, tr("Create")); }, Qt::QueuedConnection);
     ui.ConvertActionsFrame->layout()->addWidget(button);
   }
 }

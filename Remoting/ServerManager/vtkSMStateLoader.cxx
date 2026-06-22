@@ -556,8 +556,8 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
     rootElement = rootElement->FindNestedElementByName("ServerManagerState");
     if (!rootElement)
     {
-      vtkErrorMacro("Failed to locate <ServerManagerState /> element."
-        << "Cannot load server manager state.");
+      vtkErrorMacro(
+        "Failed to locate <ServerManagerState /> element. Cannot load server manager state.");
       return 0;
     }
   }

@@ -327,7 +327,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
         }
       }
     } // end of for each array
-  }   // end of for each attribute type
+  } // end of for each attribute type
 }
 
 //---------------------------------------------------------------------------

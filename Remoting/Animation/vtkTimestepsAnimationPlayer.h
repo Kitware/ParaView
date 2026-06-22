@@ -74,7 +74,7 @@ protected:
    */
   // Initialize inner variables. Call it before any GetNextTime/GetPreviousTime call.
   void StartLoop(double, double, double, double* playbackWindow) override;
-  void EndLoop() override{};
+  void EndLoop() override {};
   // Get next time in loop. Take Count and Stride into account.
   double GetNextTime(double currentime) override;
   // Get previous time in loop. Take Count and Stride into account.

@@ -32,7 +32,7 @@ struct vtkPVMultiServerDataSource::vtkInternal
   vtkMTimeType LastUpdatedDataTimeStamp;
 
   vtkInternal()
-    : DataTypeToUse(VTK_DATA_OBJECT){};
+    : DataTypeToUse(VTK_DATA_OBJECT) {};
 
   void InitializeDataStructure(vtkSMSourceProxy* proxyFromAnotherServer, int portNumber)
   {

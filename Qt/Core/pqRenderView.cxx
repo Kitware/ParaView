@@ -1092,9 +1092,8 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
   if (!maxWidth)
   {
     maxWidth = 2985;
-    vtkLog(INFO,
-      "Bounds were not set but are needed. "
-        << "Using an arbitrary value for camera position.");
+    vtkLog(
+      INFO, "Bounds were not set but are needed. Using an arbitrary value for camera position.");
   }
 
   // Update camera infos

@@ -318,7 +318,7 @@ void vtkThreeSliceFilter::Process(
       vtkIdType originalId = locator->FindClosestPoint(xyz[0], xyz[1], xyz[2]);
       originalPointIds->SetValue(i, originalId);
     } // for
-  }   // if
+  } // if
 
   // Copy generated output to filter output
   outputs[0]->ShallowCopy(combinedData);

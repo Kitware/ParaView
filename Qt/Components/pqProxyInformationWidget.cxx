@@ -72,7 +72,7 @@ class pqArraysModel : public QAbstractTableModel
 
 public:
   pqArraysModel(QObject* parentObj = nullptr)
-    : Superclass(parentObj){};
+    : Superclass(parentObj) {};
 
   /**
    * Get/Set the vtkPVDataInformation instance.

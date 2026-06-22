@@ -32,7 +32,7 @@ protected:
    */
   // initialize inner variables. Call it before any GetNextTime/GetPreviousTime call.
   void StartLoop(double start, double end, double, double* playbackwindow) override;
-  void EndLoop() override{};
+  void EndLoop() override {};
   // Get next time in loop. Overriden to update FrameNo, and use StartTime, EndTime.
   double GetNextTime(double currentime) override;
   // Get previous time in loop. Overriden to update FrameNo, and use StartTime, EndTime.

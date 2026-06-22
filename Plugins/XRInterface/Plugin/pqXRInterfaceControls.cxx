@@ -183,8 +183,7 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   this->Internals->ViewUpGroup->addButton(this->Internals->Ui.viewPlusZ, 5);
 
   QObject::connect(this->Internals->ViewUpGroup,
-    QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked),
-    [this](QAbstractButton* button)
+    QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked), [this](QAbstractButton* button)
     { this->Internals->Helper->SetViewUp(viewUpNames[this->Internals->ViewUpGroup->id(button)]); });
 
   QObject::connect(this->Internals->Ui.showFloorButton, &QPushButton::toggled,

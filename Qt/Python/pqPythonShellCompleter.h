@@ -18,7 +18,7 @@ class PQPYTHON_EXPORT pqPythonShellCompleter : public pqPythonCompleter
 public:
   pqPythonShellCompleter(QWidget* parent, vtkPythonInteractiveInterpreter* interp)
     : pqPythonCompleter(parent)
-    , Interpreter(interp){};
+    , Interpreter(interp) {};
 
 protected:
   QStringList getPythonCompletions(const QString& pythonObjectName, bool call) override;

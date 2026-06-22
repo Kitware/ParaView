@@ -398,14 +398,12 @@ int pqNodeEditorWidget::attachServerManagerListeners()
   QObject::connect(smm,
     QOverload<pqPipelineSource*, pqPipelineSource*, int>::of(
       &pqServerManagerModel::connectionAdded),
-    this,
-    [this](pqPipelineSource* /*source*/, pqPipelineSource* consumer, int /*oPort*/)
+    this, [this](pqPipelineSource* /*source*/, pqPipelineSource* consumer, int /*oPort*/)
     { return this->updatePipelineEdges(qobject_cast<pqPipelineFilter*>(consumer)); });
   QObject::connect(smm,
     QOverload<pqPipelineSource*, pqPipelineSource*, int>::of(
       &pqServerManagerModel::connectionRemoved),
-    this,
-    [this](pqPipelineSource* /*source*/, pqPipelineSource* consumer, int /*oPort*/)
+    this, [this](pqPipelineSource* /*source*/, pqPipelineSource* consumer, int /*oPort*/)
     { return this->updatePipelineEdges(qobject_cast<pqPipelineFilter*>(consumer)); });
 
   auto* activeObjects = &pqActiveObjects::instance();
