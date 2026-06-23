@@ -280,10 +280,19 @@ more to be added as needed.
 Examples
 ========
 
-**PythonAlgorithmExamples.py** provides a working example that demonstrates how
+Python files below provides a working example that demonstrates how
 several of the decorators described here may be used.
 
-.. literalinclude:: ../PythonAlgorithmExamples.py
+.. literalinclude:: ../PythonFilters.py
+   :caption:
+
+.. literalinclude:: ../PythonReaders.py
+   :caption:
+
+.. literalinclude:: ../PythonSources.py
+   :caption:
+
+.. literalinclude:: ../PythonWriters.py
    :caption:
 
 """
