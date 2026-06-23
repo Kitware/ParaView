@@ -40,6 +40,15 @@ protected:
     {
       helper.Set(port->GetSourceProxy(), port->GetPortIndex());
     }
+    else if (use_unchecked)
+    {
+      // Explicitly set the unchecked proxy to null rather than clearing the unchecked list.
+      // Clearing the list causes vtkSMProxyPropertyInternals::GetUnchecked() to fall back to
+      // the checked value, which may be non-null after a previous apply(). Storing an explicit
+      // null keeps the unchecked list non-empty so callers can distinguish "user selected none"
+      // from "no pending unchecked change".
+      helper.Set(0u, static_cast<vtkSMProxy*>(nullptr), 0u);
+    }
     else
     {
       helper.SetNumberOfElements(0);
