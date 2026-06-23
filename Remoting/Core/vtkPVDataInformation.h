@@ -124,8 +124,9 @@ public:
 
   /**
    * Finds and returns array information associated with the chosen array.
-   * `attributeType` must be one of `vtkDataObject::FieldAssociations` or
-   * `vtkDataObject::AttributeTypes`.
+   * `attributeType` must be one of `vtkDataObject::AttributeTypes`,
+   * or one of CellGrid attribute types. Returns nullptr if no array is found matching the
+   * criteria.
    */
   vtkPVArrayInformation* GetArrayInformation(const char* arrayname, int attributeType) const;
 
@@ -237,8 +238,8 @@ public:
    * Returns number of elements of the chosen type in the data. For a composite dataset,
    * this is a sum of the element count across all leaf nodes.
    *
-   * `elementType` must be `vtkDataObject::AttributeTypes`. For `vtkDataObject::FIELD`,
-   * and `vtkDataObject::POINT_THEN_CELL` returns 0.
+   * `elementType` must be `vtkDataObject::AttributeTypes`. For
+   * `vtkDataObject::POINT_THEN_CELL` it returns 0.
    */
   vtkTypeInt64 GetNumberOfElements(int elementType) const;
 
@@ -321,9 +322,8 @@ public:
    * `vtkPVDataSetAttributesInformation` can be used to determine available arrays and get meta-data
    * about each of the available arrays.
    *
-   * `attributeType` must be `vtkDataObject::FieldAssociations` (or
-   * `vtkDataObject::AttributeTypes`). vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS (or
-   * vtkDataObject::POINT_THEN_CELL) is not supported.
+   * `attributeType` must be `vtkDataObject::AttributeTypes`.
+   * vtkDataObject::POINT_THEN_CELL is not supported.
    *
    * For vtkCellGrid, this can be the hash value of the string token of each dataset attribute.
    */
@@ -337,7 +337,7 @@ public:
   ///@{
   /**
    * Convenience methods to get vtkPVDataSetAttributesInformation for specific
-   * field type. Same as calling `GetAttributeInformation` with appropriate type.
+   * attribute type. Same as calling `GetAttributeInformation` with appropriate type.
    */
   vtkPVDataSetAttributesInformation* GetPointDataInformation() const
   {

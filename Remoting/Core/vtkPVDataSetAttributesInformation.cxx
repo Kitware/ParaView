@@ -81,7 +81,7 @@ vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
   : Internals(new vtkPVDataSetAttributesInformation::vtkInternals())
 {
-  this->FieldAssociation = vtkDataObject::NUMBER_OF_ASSOCIATIONS;
+  this->FieldAssociation = vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES;
   this->FieldName = nullptr;
 }
 

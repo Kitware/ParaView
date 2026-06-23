@@ -1028,24 +1028,24 @@ bool vtkPVDataInformation::IsAttributeValid(int attributeType) const
   {
     switch (attributeType)
     {
-      case vtkDataObject::FIELD_ASSOCIATION_NONE:
+      case vtkDataObject::FIELD:
         return true;
 
-      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+      case vtkDataObject::POINT:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_DATA_SET);
 
-      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+      case vtkDataObject::CELL:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_DATA_SET) ||
           vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID) ||
           vtkDataObjectTypes::TypeIdIsA(dtype, VTK_CELL_GRID);
 
-      case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+      case vtkDataObject::VERTEX:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
 
-      case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+      case vtkDataObject::EDGE:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
 
-      case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+      case vtkDataObject::ROW:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_TABLE);
 
       default:
