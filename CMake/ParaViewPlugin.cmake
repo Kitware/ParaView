@@ -1022,7 +1022,8 @@ paraview_add_plugin(<name>
     will be added to the given export set.
   * `UI_RESOURCES`: Qt resource files to include with the plugin.
   * `UI_FILES`: Qt `.ui` files to include with the plugin.
-  * `PYTHON_MODULES`: Python modules to embed into the plugin.
+  * `PYTHON_MODULES`: Python modules to embed into the plugin. Each entry should be a valid single-file Python plugin.
+    Relative import between them is not supported. Thus Python packages are not supported.
   * `INITIALIZERS`: An ordered list of free functions (declared in `EXTRA_INCLUDES`
     if needed) to be invoked when the plugin is loaded. Each function must be
     callable with no arguments.

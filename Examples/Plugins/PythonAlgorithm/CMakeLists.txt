@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 project(PythonAlgorithm)
+enable_testing()
 
 find_package(ParaView REQUIRED)
 

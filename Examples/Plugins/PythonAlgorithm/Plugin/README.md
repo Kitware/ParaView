@@ -1,7 +1,5 @@
 # PythonAlgorithm plugin
 
-A simple python plugin showing how to add
-a source, a filter and a writer using only python.
+A collection of python plugins showing how to add sources, filters, writers and readers using only python.
 
-The `PythonAlgorithmExamples.py` file can be loaded directly into ParaView
-as a plugin or compiled into a shared library if needed using the provided CMake logic.
+Each of the python file can be loaded directly into ParaView as a plugin or compiled into a single shared library if needed using the provided CMake logic.
