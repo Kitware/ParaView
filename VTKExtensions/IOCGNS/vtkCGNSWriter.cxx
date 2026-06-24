@@ -1295,7 +1295,8 @@ bool vtkCGNSWriter::WriteDataAndReturn()
       if (this->FileNameSuffix && SuffixValidation(this->FileNameSuffix))
       {
         char suffix[100];
-        auto result = vtk::format_to_n(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
+        auto result =
+          vtk::format_to_n(suffix, 100, vtk::runtime(this->FileNameSuffix), this->CurrentTimeIndex);
         *result.out = '\0';
         if (!fileNamePath.empty())
         {

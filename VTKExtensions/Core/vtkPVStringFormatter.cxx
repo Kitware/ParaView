@@ -51,7 +51,7 @@ std::string vtkPVStringFormatter::Format(const std::string& formattableString)
     }
     else
     {
-      result = fmt::format(formattableString);
+      result = fmt::format(vtk::runtime(formattableString));
     }
   }
   catch (std::runtime_error& error)

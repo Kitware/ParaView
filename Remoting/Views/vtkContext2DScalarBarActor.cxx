@@ -792,9 +792,9 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
             {
               annotatedValue = pow(10.0, annotatedValue);
             }
-            VTK_FORMAT_IF_ERROR_RETURN(
-              auto result = vtk::format_to_n(annotation, 1023, this->LabelFormat, annotatedValue);
-              *result.out = '\0', );
+            VTK_FORMAT_IF_ERROR_RETURN(auto result = vtk::format_to_n(annotation, 1023,
+                                         vtk::runtime(this->LabelFormat), annotatedValue);
+                                       *result.out = '\0', );
             annotationAnchors[barPosition] = annotation;
           }
         }
@@ -828,14 +828,14 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
     {
       char annotation[1024];
 
-      VTK_FORMAT_IF_ERROR_RETURN(
-        auto result = vtk::format_to_n(annotation, 1023, this->RangeLabelFormat, lutRange[0]);
-        *result.out = '\0', );
+      VTK_FORMAT_IF_ERROR_RETURN(auto result = vtk::format_to_n(annotation, 1023,
+                                   vtk::runtime(this->RangeLabelFormat), lutRange[0]);
+                                 *result.out = '\0', );
       annotationAnchors[low] = annotation;
 
-      VTK_FORMAT_IF_ERROR_RETURN(
-        auto result = vtk::format_to_n(annotation, 1023, this->RangeLabelFormat, lutRange[1]);
-        *result.out = '\0', );
+      VTK_FORMAT_IF_ERROR_RETURN(auto result = vtk::format_to_n(annotation, 1023,
+                                   vtk::runtime(this->RangeLabelFormat), lutRange[1]);
+                                 *result.out = '\0', );
       annotationAnchors[high] = annotation;
     }
 
@@ -1162,7 +1162,7 @@ void vtkContext2DScalarBarActor::PaintRange(vtkContext2D* painter, double size[2
       std::string("\nMin: ") + std::string(this->DataRangeLabelFormat);
     char rangeString[256];
 
-    VTK_FORMAT_IF_ERROR_RETURN(auto result = vtk::format_to_n(rangeString, 255, range.c_str(),
+    VTK_FORMAT_IF_ERROR_RETURN(auto result = vtk::format_to_n(rangeString, 255, vtk::runtime(range),
                                  this->DataRangeMax, this->DataRangeMin);
                                *result.out = '\0', );
 
@@ -1192,7 +1192,7 @@ void vtkContext2DScalarBarActor::PaintRange(vtkContext2D* painter, double size[2
 
     char rangeString[256];
 
-    VTK_FORMAT_IF_ERROR_RETURN(auto result = vtk::format_to_n(rangeString, 255, range.c_str(),
+    VTK_FORMAT_IF_ERROR_RETURN(auto result = vtk::format_to_n(rangeString, 255, vtk::runtime(range),
                                  this->DataRangeMin, this->DataRangeMax);
                                *result.out = '\0', );
 

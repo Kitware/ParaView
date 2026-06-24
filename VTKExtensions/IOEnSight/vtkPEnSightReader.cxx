@@ -2213,7 +2213,7 @@ void vtkPEnSightReader::ReplaceWildcards(char* filename, int num)
     auto result = vtk::format_to_n(pattern, sizeof(pattern), "{{:0{}d}}", numWildcards);
     *result.out = '\0';
   }
-  auto result = vtk::format_to_n(numStr, sizeof(numStr), std::string_view(pattern), num);
+  auto result = vtk::format_to_n(numStr, sizeof(numStr), vtk::runtime(pattern), num);
   *result.out = '\0';
   numStrLen = static_cast<int>(strlen(numStr));
   len = static_cast<int>(strlen(filename));

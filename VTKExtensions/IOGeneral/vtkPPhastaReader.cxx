@@ -213,19 +213,19 @@ int vtkPPhastaReader::RequestData(
   {
     if (geomHasTime && geomHasPiece)
     {
-      auto result = vtk::format_to_n(geom_name, geom_name_sz, geometryPatternFormat,
+      auto result = vtk::format_to_n(geom_name, geom_name_sz, vtk::runtime(geometryPatternFormat),
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, loadingPiece + 1);
       *result.out = '\0';
     }
     else if (geomHasPiece)
     {
-      auto result =
-        vtk::format_to_n(geom_name, geom_name_sz, geometryPatternFormat, loadingPiece + 1);
+      auto result = vtk::format_to_n(
+        geom_name, geom_name_sz, vtk::runtime(geometryPatternFormat), loadingPiece + 1);
       *result.out = '\0';
     }
     else if (geomHasTime)
     {
-      auto result = vtk::format_to_n(geom_name, geom_name_sz, geometryPatternFormat,
+      auto result = vtk::format_to_n(geom_name, geom_name_sz, vtk::runtime(geometryPatternFormat),
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
       *result.out = '\0';
     }
@@ -237,19 +237,19 @@ int vtkPPhastaReader::RequestData(
 
     if (fieldHasTime && fieldHasPiece)
     {
-      auto result = vtk::format_to_n(field_name, field_name_sz, fieldPatternFormat,
+      auto result = vtk::format_to_n(field_name, field_name_sz, vtk::runtime(fieldPatternFormat),
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex, loadingPiece + 1);
       *result.out = '\0';
     }
     else if (fieldHasPiece)
     {
-      auto result =
-        vtk::format_to_n(field_name, field_name_sz, fieldPatternFormat, loadingPiece + 1);
+      auto result = vtk::format_to_n(
+        field_name, field_name_sz, vtk::runtime(fieldPatternFormat), loadingPiece + 1);
       *result.out = '\0';
     }
     else if (fieldHasTime)
     {
-      auto result = vtk::format_to_n(field_name, field_name_sz, fieldPatternFormat,
+      auto result = vtk::format_to_n(field_name, field_name_sz, vtk::runtime(fieldPatternFormat),
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex);
       *result.out = '\0';
     }

@@ -299,7 +299,7 @@ protected:
 
     char buffer[1024];
     VTK_FORMAT_IF_ERROR_RETURN(
-      auto result = vtk::format_to_n(buffer, 1024, this->SuffixFormat, this->Counter);
+      auto result = vtk::format_to_n(buffer, 1024, vtk::runtime(this->SuffixFormat), this->Counter);
       *result.out = '\0', false);
 
     std::ostringstream str;
