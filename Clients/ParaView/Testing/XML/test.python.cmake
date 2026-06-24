@@ -197,6 +197,13 @@ if (TARGET VTK::IOUSD)
   set(ExportAnimatedUSD_FORCE_SERIAL TRUE) # since this uses popup-menu
 endif()
 
+if (TARGET VTK::IOAlembic)
+  list(APPEND paraview_python_verify_tests
+    ExportAnimatedAlembic
+  )
+  set(ExportAnimatedAlembic_FORCE_SERIAL TRUE) # since this uses popup-menu
+endif()
+
 if (PARAVIEW_ENABLE_WEB)
   list(APPEND paraview_python_verify_tests
     ExportToVTKJSWithTimeSteps
