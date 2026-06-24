@@ -548,7 +548,7 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
     {
       this->Halos->ExtractedHalos.push_back(halo);
     } // END if haloSize is within threshold
-  }   // END for all halos
+  } // END for all halos
 
   // STEP 6: Loop through the extracted halos and do the following:
   //          1. Compute the halo-centers

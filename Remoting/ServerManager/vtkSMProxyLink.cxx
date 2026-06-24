@@ -26,7 +26,7 @@ struct vtkSMProxyLinkInternals
     LinkedProxy(vtkSMProxy* proxy, int updateDir)
       : Proxy(proxy)
       , UpdateDirection(updateDir)
-      , Observer(nullptr){};
+      , Observer(nullptr) {};
     ~LinkedProxy()
     {
       if (this->Observer && this->Proxy.GetPointer())

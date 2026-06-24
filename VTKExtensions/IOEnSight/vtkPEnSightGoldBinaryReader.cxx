@@ -215,8 +215,7 @@ int vtkPEnSightGoldBinaryReader::InitializeFile(const char* fileName)
 
   if (subLine != "Binary" && subLine != "binary")
   {
-    vtkErrorMacro("This is not a binary data set. Try "
-      << "vtkEnSightGoldReader.");
+    vtkErrorMacro("This is not a binary data set. Try vtkEnSightGoldReader.");
     return 0;
   }
   return 1;
@@ -1136,8 +1135,7 @@ int vtkPEnSightGoldBinaryReader::ReadMeasuredGeometryFile(
   auto subLine = std::get<1>(resultSubLine->values());
   if (subLine != "Binary")
   {
-    vtkErrorMacro("This is not a binary data set. Try "
-      << "vtkEnSightGoldReader.");
+    vtkErrorMacro("This is not a binary data set. Try vtkEnSightGoldReader.");
     return 0;
   }
 
@@ -1976,7 +1974,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(const char* fileName,
               lineRead = this->ReadLine(line);
             }
           } // end else
-        }   // end if (numCells)
+        } // end if (numCells)
         else
         {
           lineRead = this->ReadLine(line);
@@ -2078,7 +2076,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(const char* fileName,
           }
           delete[] scalarsRead;
         } // end while
-      }   // end else
+      } // end else
       if (component == 0)
       {
         scalars->SetName(description);
@@ -2222,7 +2220,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerElement(const char* fileName,
               this->IFile->seekg(sizeof(float) * 3 * numCellsPerElement, ios::cur);
               lineRead = this->ReadLine(line);
             } // end while
-          }   // end else
+          } // end else
         }
         else
         {
@@ -2331,7 +2329,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerElement(const char* fileName,
           delete[] comp2;
           delete[] comp3;
         } // end while
-      }   // end else
+      } // end else
       vectors->SetName(description);
       output->GetCellData()->AddArray(vectors);
       if (!output->GetCellData()->GetVectors())
@@ -2468,8 +2466,8 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(const char* fileName,
               this->IFile->seekg(sizeof(float) * 6 * numCellsPerElement, ios::cur);
               lineRead = this->ReadLine(line);
             } // end while
-          }   // end else
-        }     // end if (numCells)
+          } // end else
+        } // end if (numCells)
         else
         {
           lineRead = this->ReadLine(line);
@@ -2602,7 +2600,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(const char* fileName,
           delete[] comp5;
           delete[] comp6;
         } // end while
-      }   // end else
+      } // end else
       tensors->SetName(description);
       output->GetCellData()->AddArray(tensors);
       tensors->Delete();

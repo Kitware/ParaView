@@ -139,9 +139,9 @@ public:
     vtkDataArray* xarray = nullptr) override;
 
   // CVS writer does not support adding the style yet;
-  void AddStyle(vtkPlot* vtkNotUsed(plot), const char* vtkNotUsed(plotName)) override{};
+  void AddStyle(vtkPlot* vtkNotUsed(plot), const char* vtkNotUsed(plotName)) override {};
 
-  void SetGlobalStyle(vtkChart* vtkNotUsed(chart)) override{};
+  void SetGlobalStyle(vtkChart* vtkNotUsed(chart)) override {};
   ///@}
 
   ///@{

@@ -42,8 +42,8 @@ public:
   /**
    * These are here for ParaView compatibility. Not used.
    */
-  virtual void SetSocketController(vtkSocketController*){};
-  virtual void SetPassThrough(int){};
+  virtual void SetSocketController(vtkSocketController*) {};
+  virtual void SetPassThrough(int) {};
   virtual int GetPassThrough() { return 0; };
   vtkBooleanMacro(PassThrough, int);
   ///@}

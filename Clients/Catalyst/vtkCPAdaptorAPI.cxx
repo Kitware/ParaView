@@ -86,8 +86,7 @@ void vtkCPAdaptorAPI::RequestDataDescription(
 {
   if (!vtkCPAdaptorAPI::CoProcessorData || !vtkCPAdaptorAPI::CoProcessor)
   {
-    vtkGenericWarningMacro("Problem in needtocoprocessthistimestep."
-      << "Probably need to initialize.");
+    vtkGenericWarningMacro("Problem in needtocoprocessthistimestep. Probably need to initialize.");
     *coprocessThisTimeStep = 0;
     return;
   }

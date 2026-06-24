@@ -120,7 +120,7 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
 
 // .app bundles
 #if defined(__APPLE__)
-    std::string("../Plugins/") + plugin,
+    std::string("../Plugins/") + plugin, //
     std::string("../Plugins/"),
 #endif
     std::string()

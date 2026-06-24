@@ -710,8 +710,8 @@ void vtkRedistributePolyData::OrderSchedule(vtkCommSched* localSched)
           order[i] = order[temporder];
           order[temporder] = temporder;
         } // end of while
-      }   // end of loop over cntSend
-    }     // end if outoforder
+      } // end of loop over cntSend
+    } // end if outoforder
     delete[] order;
   } // end of cntSend>0
 
@@ -761,8 +761,8 @@ void vtkRedistributePolyData::OrderSchedule(vtkCommSched* localSched)
           order[temporder] = temporder;
 
         } // end while
-      }   // end loop over cntRec
-    }     // end if outoforder
+      } // end loop over cntRec
+    } // end if outoforder
     delete[] order;
   } // end if cnrRec>0
 }
@@ -1046,8 +1046,8 @@ void vtkRedistributePolyData::CopyCells(
         }
         cellsOut->InsertNextCell(cell);
       } // end loop over cells
-    }   // end else statement for keepCellList
-  }     // end loop over type
+    } // end else statement for keepCellList
+  } // end loop over type
 
 #if VTK_REDIST_DO_TIMING
   ::timerInfo8.Timer->StopTimer();
@@ -1182,9 +1182,9 @@ void vtkRedistributePolyData::SendCellSizes(vtkIdType* startCell, vtkIdType* sto
             ptcntr[type]++;
           }
         } // end loop over cells
-      }   // end if sendCellList
-    }     // end if cellArrays
-  }       // end loop over type
+      } // end if sendCellList
+    } // end if cellArrays
+  } // end loop over type
 
   // ... send sizes first (must be in this order to allocate for
   //   receive)...
@@ -1277,7 +1277,7 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
             ptcntr[type]++;
           }
         } // end loop over npts
-      }   // end loop over cellId
+      } // end loop over cellId
     }
     else
     {
@@ -1311,8 +1311,8 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
             ptcntr[type]++;
           }
         } // end loop over npts
-      }   // end loop over numCells
-    }     // end else where sendCellList isn't nullptr
+      } // end loop over numCells
+    } // end else where sendCellList isn't nullptr
     // Sanity check:
     assert(ptcntr[type] == ptr - ptrsav[type]);
   } // end of type loop
@@ -1474,7 +1474,7 @@ void vtkRedistributePolyData::ReceiveCells(vtkIdType* startCell, vtkIdType* stop
       assert(outputCellArrays[type]->GetNumberOfCells() == stopCell[type] + 1);
 
     } // end if outputCellArrays[type]
-  }   // end loop over type
+  } // end loop over type
 
   // ... Receive points now ...
 

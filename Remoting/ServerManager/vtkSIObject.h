@@ -31,7 +31,7 @@ public:
    * a first pass on all SIObject with a AboutToDelete() we can simply delete the
    * remaining SIObjects.
    */
-  virtual void AboutToDelete(){};
+  virtual void AboutToDelete() {};
 
   /**
    * Initializes the instance. Session is the session to which this instance

@@ -541,7 +541,7 @@ protected:
   /**
    * Let the property read and set its content from the stream
    */
-  virtual void ReadFrom(const vtkSMMessage*, int vtkNotUsed(message_offset), vtkSMProxyLocator*){};
+  virtual void ReadFrom(const vtkSMMessage*, int vtkNotUsed(message_offset), vtkSMProxyLocator*) {};
 
   /**
    * Set the appropriate ivars from the xml element. Should
@@ -553,7 +553,7 @@ protected:
    * Update all proxies referred by this property (if any). Overwritten
    * by vtkSMProxyProperty and sub-classes.
    */
-  virtual void UpdateAllInputs(){};
+  virtual void UpdateAllInputs() {};
 
   ///@{
   /**

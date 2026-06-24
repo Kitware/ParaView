@@ -79,7 +79,7 @@ protected:
    * Remove any painting from the paint function, and let the owner of the port do the display.
    */
   void paint(QPainter* /*painter*/, const QStyleOptionGraphicsItem* /*option*/,
-    QWidget* /*widget*/) override{};
+    QWidget* /*widget*/) override {};
 
 private:
   QGraphicsEllipseItem* disc;

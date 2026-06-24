@@ -764,7 +764,7 @@ void vtkCFSReader::UpdateActiveRegions()
       newSet->GetMetaData(index)->Set(vtkCompositeDataSet::NAME(), names[i].c_str());
       index++;
     } // if block is active
-  }   // loop: all blocks (= regions, elem/node groups)
+  } // loop: all blocks (= regions, elem/node groups)
 
   // in the end, replace the active set by the current one
   this->MBActiveDataSet->ShallowCopy(newSet.GetPointer());
@@ -1068,7 +1068,7 @@ void vtkCFSReader::ReadNodeCellData(vtkMultiBlockDataSet* output, bool isNode)
             // vals5 = SaveToArray( modeShape, actInfo->dofNames, numEntities, writeName );
             vals.push_back(SaveToArray(modeShape, actInfo->dofNames, numEntities, writeName));
           } // harmonic data as mode shape
-        }   // if isComplex
+        } // if isComplex
 
         // save values to grid
         if (entType == H5CFS::NODE)
@@ -1091,7 +1091,7 @@ void vtkCFSReader::ReadNodeCellData(vtkMultiBlockDataSet* output, bool isNode)
           val->Delete();
         }
       } // loop over active blocks
-    }   // loop over result types
+    } // loop over result types
   }
   catch (const std::runtime_error& er)
   {

@@ -32,7 +32,7 @@ public:
   /**
    * Empty, needed for plugin
    */
-  void onShutdown(){};
+  void onShutdown() {}
 
 private:
   Q_DISABLE_COPY(pqAbortTesting)

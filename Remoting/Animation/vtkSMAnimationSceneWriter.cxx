@@ -109,8 +109,8 @@ bool vtkSMAnimationSceneWriter::Save()
   vtkLogScopeF(TRACE, "Save animation scene.");
   if (this->Saving)
   {
-    vtkErrorMacro("Already saving an animation. "
-      << "Wait till that is done before calling Save again.");
+    vtkErrorMacro(
+      "Already saving an animation. Wait until that is done before calling Save again.");
     return false;
   }
 

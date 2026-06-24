@@ -67,7 +67,7 @@ void pqLoadStateReaction::loadState(
     vtkSMPropertyHelper(proxy, "DataDirectory")
       .Set(vtksys::SystemTools::GetParentDirectory(filename.toUtf8().toStdString()).c_str());
 
-    Q_EMIT pqPVApplicationCore::instance()->aboutToReadState(filename);
+    Q_EMIT pqPVApplicationCore::instance() -> aboutToReadState(filename);
 
     if (proxy && proxy->PrepareToLoad(filename.toUtf8().data(), location))
     {

@@ -103,8 +103,7 @@ bool vtkSMFileUtilities::RenameDirectory(
                   "vtkSMFileUtilities::SetSession(...).");
     return false;
   }
-  return ::Call(pxm, location,
-    [&name, &newname](vtkSMDirectoryProxy* dirProxy)
+  return ::Call(pxm, location, [&name, &newname](vtkSMDirectoryProxy* dirProxy)
     { return dirProxy->Rename(name.c_str(), newname.c_str()); });
 }
 

@@ -63,7 +63,7 @@ public:
   /**
    * @brief Metadata constructor.
    */
-  vtkGenericIOMetaData(){};
+  vtkGenericIOMetaData() {};
 
   /**
    * @brief Destructor
@@ -728,7 +728,7 @@ void vtkPGenericIOReader::LoadData(
 
       PD->AddArray(dataArray);
     } // END if the array is enabled
-  }   // END for all arrays
+  } // END for all arrays
   if (this->AppendBlockCoordinates && this->Reader->IsSpatiallyDecomposed())
   {
     vtkSmartPointer<vtkTypeUInt64Array> dataArray = vtkSmartPointer<vtkTypeUInt64Array>::New();

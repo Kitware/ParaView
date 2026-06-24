@@ -224,7 +224,7 @@ public:
    * Empty method to be implemented by inheriting classes
    */
   virtual void SetArrayIdNames(
-    const char* vtkNotUsed(pointArray), const char* vtkNotUsed(cellArray)){};
+    const char* vtkNotUsed(pointArray), const char* vtkNotUsed(cellArray)) {};
 
 protected:
   vtkPVDataRepresentation();

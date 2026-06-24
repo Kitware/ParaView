@@ -244,7 +244,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
         types->InsertNextValue(cellType);
       }
     } // for each new cell
-  }   // for each cell
+  } // for each cell
 
   output->SetPoints(newPoints);
   output->SetCells(types, conn);

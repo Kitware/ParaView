@@ -2135,8 +2135,8 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
         }
 
       } // for each i
-    }   // for each j
-  }     // for each k
+    } // for each j
+  } // for each k
 
   // fill the output vtkPolyData
   plyHedra->SetPoints(surfPnts);
@@ -2415,7 +2415,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
             newFaces[newIndex++] = hashFace;
           }
         } // end if a new face is added to the hash
-      }   // end if the input face is valid
+      } // end if the input face is valid
 
       // process the next 2D polygon by updating the index of the face
       i++;
@@ -3098,7 +3098,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
             newFaces[newIndex++] = hashFace;
 
           } // end if a new face is added to the hash
-        }   // end if the input face is valid
+        } // end if the input face is valid
 
         // process the next 2D polygon by updating the index of the face
         i++;
@@ -3314,7 +3314,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess(
       }
 
     } // end if it is an exterior face
-  }   // end loop over faces in the hash
+  } // end loop over faces in the hash
 
   thisFace = nullptr;
   surfPnts = nullptr;
@@ -3769,7 +3769,7 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
             newFaces[newIndex++] = hashFace;
 
           } // end if a new face is added to the hash
-        }   // end if the input face is valid
+        } // end if the input face is valid
 
         // process the next 2D polygon by updating the index of the face
         i++;
@@ -3989,7 +3989,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromMultiProcesses(
       }
 
     } // end if it is an exterior face
-  }   // end loop over faces in the hash
+  } // end loop over faces in the hash
 
   thisFace = nullptr;
   surfPnts = nullptr;

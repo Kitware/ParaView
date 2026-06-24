@@ -1251,8 +1251,7 @@ std::string vtkPVFileInformation::GetParaViewSharedResourcesDirectory()
 #if defined(_WIN32) || defined(__APPLE__)
     ".."
 #else
-    "share/paraview-" PARAVIEW_VERSION,
-    "share/paraview-" PARAVIEW_VERSION_SHORT
+    "share/paraview-" PARAVIEW_VERSION, "share/paraview-" PARAVIEW_VERSION_SHORT
 #endif
   };
 

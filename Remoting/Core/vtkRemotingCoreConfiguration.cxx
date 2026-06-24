@@ -568,8 +568,7 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
     auto caveGroup = app->add_option_group("CAVE", "CAVE specific options");
     caveGroup
       ->add_option(
-        "--pvx",
-        [this](const CLI::results_t& args)
+        "--pvx", [this](const CLI::results_t& args)
         { return this->DisplayConfiguration->LoadPVX(args.front().c_str()); },
         "ParaView CAVE configuration file (typically a `.pvx` file) that "
         "provides the configuration for screens in a CAVE.")
@@ -578,8 +577,7 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
 #if CLI11_VERSION_MAJOR < 2 || (CLI11_VERSION_MAJOR == 2 && CLI11_VERSION_MINOR < 4)
     auto pvx = caveGroup
                  ->add_option(
-                   "'.pvx' file",
-                   [this](const CLI::results_t& args)
+                   "'.pvx' file", [this](const CLI::results_t& args)
                    { return this->DisplayConfiguration->LoadPVX(args.front().c_str()); },
                    "ParaView CAVE configuration file.")
                  ->excludes("--pvx")

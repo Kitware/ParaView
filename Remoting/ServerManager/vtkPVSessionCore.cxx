@@ -938,7 +938,7 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
       info->AddInformation(tempInfo);
       tempInfo->Delete();
     } // END for all remote ranks
-  }   // END if rank == 0
+  } // END if rank == 0
 
   // STEP 8: Barrier synchronization
   this->ParallelController->Barrier();

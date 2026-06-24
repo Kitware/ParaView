@@ -145,9 +145,7 @@ public:
   /**
    * Sends the message to all but the active client-session.
    */
-  void NotifyOtherClients(const vtkSMMessage*) override
-  { /* nothing to do. */
-  }
+  void NotifyOtherClients(const vtkSMMessage*) override { /* nothing to do. */ }
 
   //---------------------------------------------------------------------------
   // API for Collaboration management

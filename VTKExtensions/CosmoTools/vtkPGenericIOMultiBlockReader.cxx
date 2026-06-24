@@ -813,7 +813,7 @@ void vtkPGenericIOMultiBlockReader::LoadDataArraysForBlock(
 
       PD->AddArray(dataArray);
     } // END if the array is enabled
-  }   // END for all arrays
+  } // END for all arrays
 }
 
 //------------------------------------------------------------------------------

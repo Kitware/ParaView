@@ -59,9 +59,8 @@ MainPipelineWindow::MainPipelineWindow()
   this->InvertMatching->setText(tr("display matching sources"));
   this->InvertMatching->setChecked(true);
   QObject::connect(
-    this->InvertMatching, &QCheckBox::pqCheckBoxSignal, this,
-    [&](pqCheckState state) { this->invertFilterMatching(static_cast<Qt::CheckState>(state)); },
-    Qt::QueuedConnection);
+    this->InvertMatching, &QCheckBox::pqCheckBoxSignal, this, [&](pqCheckState state)
+    { this->invertFilterMatching(static_cast<Qt::CheckState>(state)); }, Qt::QueuedConnection);
 
   // Set Pipeline Widget
   this->PipelineWidget = new pqPipelineBrowserWidget(nullptr);

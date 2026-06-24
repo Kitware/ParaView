@@ -72,22 +72,22 @@ public:
     /**
      * Called to indicate that the data is about to be changed.
      */
-    virtual void dataAboutToChange(pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/){};
+    virtual void dataAboutToChange(pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/) {};
 
     /**
      * Called to indicate that the data is about to be changed.
      */
-    virtual void checkStateAboutToChange(pqTreeWidgetItem* /*item*/, int /*column*/){};
+    virtual void checkStateAboutToChange(pqTreeWidgetItem* /*item*/, int /*column*/) {};
 
     /**
      * Called to indicate that the check state for the item has been changed.
      */
-    virtual void checkStateChanged(pqTreeWidgetItem* /*item*/, int /*column*/){};
+    virtual void checkStateChanged(pqTreeWidgetItem* /*item*/, int /*column*/) {};
 
     /**
      * Called to indicate that the data has been changed.
      */
-    virtual void dataChanged(pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/){};
+    virtual void dataChanged(pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/) {};
 
     /**
      * Called to check if the change has to be accepted or rejected.

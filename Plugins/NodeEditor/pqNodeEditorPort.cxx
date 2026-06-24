@@ -31,7 +31,7 @@ class PortLabel : public pqNodeEditorLabel
 {
 public:
   PortLabel(QString label, QGraphicsItem* parent)
-    : pqNodeEditorLabel(label, parent, true){};
+    : pqNodeEditorLabel(label, parent, true) {};
 
   ~PortLabel() override = default;
 

@@ -282,7 +282,7 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
     aux->SetUseDepthBuffer(useDB);
   }
 #else
-  static_cast<void>(useDB);  // unused warning when MPI is off.
+  static_cast<void>(useDB); // unused warning when MPI is off.
 #endif
 }
 

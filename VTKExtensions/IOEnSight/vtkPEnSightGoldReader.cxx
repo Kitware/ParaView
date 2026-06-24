@@ -139,8 +139,7 @@ int vtkPEnSightGoldReader::ReadGeometryFile(
     auto subLine = std::get<1>(resultSubLine0->values());
     if (subLine == "Binary")
     {
-      vtkErrorMacro("This is a binary data set. Try "
-        << "vtkEnSightGoldBinaryReader.");
+      vtkErrorMacro("This is a binary data set. Try vtkEnSightGoldBinaryReader.");
       return 0;
     }
   }
@@ -353,8 +352,7 @@ int vtkPEnSightGoldReader::ReadMeasuredGeometryFile(
     auto subLine = std::get<1>(resultSubLine->values());
     if (subLine == "Binary")
     {
-      vtkErrorMacro("This is a binary data set. Try "
-        << "vtkEnSight6BinaryReader.");
+      vtkErrorMacro("This is a binary data set. Try vtkEnSight6BinaryReader.");
       return 0;
     }
   }
@@ -1153,7 +1151,7 @@ int vtkPEnSightGoldReader::ReadScalarsPerElement(const char* fileName, const cha
           }
           lineRead = this->ReadNextDataLine(line);
         } // end while
-      }   // end else
+      } // end else
       if (component == 0)
       {
         scalars->SetName(description);
@@ -1325,7 +1323,7 @@ int vtkPEnSightGoldReader::ReadVectorsPerElement(const char* fileName, const cha
           }
           lineRead = this->ReadNextDataLine(line);
         } // end while
-      }   // end else
+      } // end else
       vectors->SetName(description);
       output->GetCellData()->AddArray(vectors);
       if (!output->GetCellData()->GetVectors())
@@ -1492,7 +1490,7 @@ int vtkPEnSightGoldReader::ReadTensorsPerElement(const char* fileName, const cha
           }
           lineRead = this->ReadNextDataLine(line);
         } // end while
-      }   // end else
+      } // end else
       tensors->SetName(description);
       output->GetCellData()->AddArray(tensors);
       tensors->Delete();

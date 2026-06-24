@@ -55,7 +55,7 @@ struct vtkSMProxyInternals
   {
     ConnectionInfo(vtkSMProperty* prop, vtkSMProxy* prox)
       : Property(prop)
-      , Proxy(prox){};
+      , Proxy(prox) {};
     vtkWeakPointer<vtkSMProperty> Property;
     vtkWeakPointer<vtkSMProxy> Proxy;
   };

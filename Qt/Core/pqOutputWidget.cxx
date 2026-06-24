@@ -117,12 +117,12 @@ void MessageHandler::handler(QtMsgType type, const QMessageLogContext& cntxt, co
 {
   QString formattedMsg = qFormatLogMessage(type, cntxt, msg);
   formattedMsg += "\n";
-  Q_EMIT instance()->message(type, formattedMsg);
+  Q_EMIT instance() -> message(type, formattedMsg);
 }
 
 void MessageHandler::handlerVTK(QtMsgType type, const QString& msg)
 {
-  Q_EMIT instance()->showMessage(msg, type);
+  Q_EMIT instance() -> showMessage(msg, type);
 }
 
 MessageHandler* MessageHandler::instance()

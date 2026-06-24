@@ -16,7 +16,7 @@ class PQPYTHON_EXPORT pqPythonCompleter : public pqWidgetCompleter
 {
 public:
   pqPythonCompleter(QWidget* parent)
-    : pqWidgetCompleter(parent){};
+    : pqWidgetCompleter(parent) {};
 
 protected:
   QStringList getCompletions(const QString& prompt) override;

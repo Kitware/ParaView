@@ -203,7 +203,7 @@ vtkCartesianGrid* GetReferenceGrid(vtkNonOverlappingAMR* amrds)
         return (refGrid);
       }
     } // END for all datasets
-  }   // END for all number of levels
+  } // END for all number of levels
 
   // This process has no grids
   return nullptr;
@@ -8308,13 +8308,13 @@ void vtkMaterialInterfaceFilter::ShareGhostEquivalences(
             (ext[1] - ext[0] + 1) * (ext[3] - ext[2] + 1) * (ext[5] - ext[4] + 1), otherProc,
             722266);
         } // End if ghost  block owned by other process.
-      }   // End loop over all blocks.
+      } // End loop over all blocks.
       // Send the message that indicates we have nothing more to send.
       sendMsg[0] = myProcId;
       sendMsg[1] = -1;
       this->Controller->Send(sendMsg, 8, otherProc, 722265);
     } // End if we should send or receive.
-  }   // End loop over all processes.
+  } // End loop over all processes.
 }
 
 //----------------------------------------------------------------------------

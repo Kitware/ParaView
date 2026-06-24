@@ -406,8 +406,8 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
             tempSend[currSendCnt] = rsSendTo[type][id][i];
             currSendCnt++;
           } // end !already in list
-        }   // end loop over rsCntSend
-      }     // end loop over type
+        } // end loop over rsCntSend
+      } // end loop over type
       remoteSched[id].SendCount = currSendCnt;
       if (currSendCnt > 0)
       {
@@ -444,7 +444,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
             }
           }
         } // end loop over type
-      }   // end loop over number of processors processors sent to
+      } // end loop over number of processors processors sent to
 
       // ... clean up ...
       delete[] tempSend;

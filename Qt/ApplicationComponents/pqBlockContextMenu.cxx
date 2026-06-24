@@ -130,10 +130,9 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
             // check if val exists in the dictionary
             const bool foundPath = prevValuesDictionary.find(val) != prevValuesDictionary.end();
             // check if a parent path of val exists in the dictionary
-            const auto parentPath =
-              std::find_if(prevValuesDictionary.begin(), prevValuesDictionary.end(),
-                [&](const std::string& str)
-                { return assembly->GetFirstNodeByPath(str.c_str()) == parentValNodeId; });
+            const auto parentPath = std::find_if(prevValuesDictionary.begin(),
+              prevValuesDictionary.end(), [&](const std::string& str)
+              { return assembly->GetFirstNodeByPath(str.c_str()) == parentValNodeId; });
             const bool foundParentPath = parentPath != prevValuesDictionary.end();
             // check if a child path of val exists in the dictionary
             const auto childPath = std::find_if(prevValuesDictionary.begin(),

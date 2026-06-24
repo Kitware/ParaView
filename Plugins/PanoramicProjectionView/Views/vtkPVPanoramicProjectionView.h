@@ -49,7 +49,7 @@ public:
    * FXAA is not supported yet in this view
    * This method has no effect
    */
-  void SetUseFXAA(bool) override{};
+  void SetUseFXAA(bool) override {};
 
 protected:
   vtkPVPanoramicProjectionView();

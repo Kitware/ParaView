@@ -332,7 +332,7 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
           }
           iter->Delete();
         } // end sTT exists
-      }   // end using sTT
+      } // end using sTT
       else
       {
         tableSize = this->GlyphMapper->GetNumberOfInputConnections(1);

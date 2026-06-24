@@ -97,11 +97,11 @@ public:
   virtual void Initialize();
   void Initialize(int*, char***) override { this->Initialize(); };
   void Initialize(int*, char***, int) override { this->Initialize(); };
-  void Finalize() override{};              // Empty: Same as vtkSocketController
-  void Finalize(int) override{};           // Empty: Same as vtkSocketController
-  void SingleMethodExecute() override{};   // Empty: Same as vtkSocketController
-  void MultipleMethodExecute() override{}; // Empty: Same as vtkSocketController
-  void CreateOutputWindow() override{};    // Empty: Same as vtkSocketController
+  void Finalize() override {};              // Empty: Same as vtkSocketController
+  void Finalize(int) override {};           // Empty: Same as vtkSocketController
+  void SingleMethodExecute() override {};   // Empty: Same as vtkSocketController
+  void MultipleMethodExecute() override {}; // Empty: Same as vtkSocketController
+  void CreateOutputWindow() override {};    // Empty: Same as vtkSocketController
 
   vtkCommunicator* GetCommunicator() override;
 

@@ -102,8 +102,7 @@ void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
   }
   else
   {
-    vtkErrorMacro("Invalid SetUndoRedoState. "
-      << "At least one of the provided states is NULL.");
+    vtkErrorMacro("Invalid SetUndoRedoState. At least one of the provided states is NULL.");
   }
 }
 //-----------------------------------------------------------------------------

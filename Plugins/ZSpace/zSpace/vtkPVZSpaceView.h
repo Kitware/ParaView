@@ -101,7 +101,7 @@ protected:
    * Override ResetCameraClippingRange to disable automatic clipping range
    * calculations of the camera as it is done by the zSpace SDK.
    */
-  void ResetCameraClippingRange() override{};
+  void ResetCameraClippingRange() override {};
 
   /**
    * Overriden to set a vtkZSpaceRenderWindowInteractor instance as interactor.
