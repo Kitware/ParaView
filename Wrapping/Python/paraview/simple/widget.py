@@ -1,5 +1,6 @@
 from paraview import servermanager
 
+from paraview import _backwardscompatibilityhelper
 from paraview.simple.session import active_objects, GetActiveSource
 from paraview.simple.rendering import GetRepresentation
 
@@ -108,6 +109,7 @@ def GetScalarBar(ctf, view=None):
     sb = servermanager._getPyProxy(
         tfmgr.GetScalarBarRepresentation(ctf.SMProxy, view.SMProxy)
     )
+    _backwardscompatibilityhelper.handle_legacy_scalarbar_creation(sb)
     return sb
 
 

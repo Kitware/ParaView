@@ -2610,7 +2610,8 @@ struct Process_6_1_to_6_2
 {
   bool operator()(xml_document& document)
   {
-    return this->HandleRenamedProxies(document) && this->HandleInterpolatorType(document);
+    return this->HandleRenamedProxies(document) && this->HandleInterpolatorType(document) &&
+      this->HandleScalarBarOverlappingLabels(document);
   }
 
   bool HandleRenamedProxies(xml_document& document)
@@ -2735,6 +2736,31 @@ struct Process_6_1_to_6_2
           proxyNode.remove_child(interpolatorProp);
         }
       }
+    }
+    return true;
+  }
+
+  bool HandleScalarBarOverlappingLabels(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//Proxy[@group='representations' and @type='ScalarBarWidgetRepresentation']");
+    for (auto xpath_node : xpath_set)
+    {
+      pugi::xml_node proxyNode = xpath_node.node();
+      std::string proxyId = proxyNode.attribute("id").as_string();
+
+      pugi::xml_node propertyNode = proxyNode.append_child("Property");
+      propertyNode.append_attribute("name").set_value("AllowOverlappingLabels");
+      propertyNode.append_attribute("id").set_value((proxyId + ".AllowOverlappingLabels").c_str());
+      propertyNode.append_attribute("number_of_elements").set_value("1");
+
+      pugi::xml_node element = propertyNode.append_child("Element");
+      element.append_attribute("index").set_value(0);
+      element.append_attribute("value").set_value(1);
+
+      pugi::xml_node domain = propertyNode.append_child("Domain");
+      domain.append_attribute("name").set_value("bool");
+      domain.append_attribute("id").set_value((proxyId + ".AllowOverlappingLabels.bool").c_str());
     }
     return true;
   }

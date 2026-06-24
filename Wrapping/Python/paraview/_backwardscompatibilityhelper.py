@@ -1648,3 +1648,11 @@ def handle_legacy_view_creation(view_xml_name, view, controller):
             view.TopAxisTitleFontSize = 18
 
     return view
+
+def handle_legacy_scalarbar_creation(scalarbar):
+    """
+    Provide backwards compatibility for scalar bar creation
+    """
+    if paraview.compatibility.GetVersion() <= (6, 1):
+        # older versions allowed overlapping labels to be shown
+        scalarbar.AllowOverlappingLabels = True

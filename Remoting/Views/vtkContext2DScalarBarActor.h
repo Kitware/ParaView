@@ -199,6 +199,15 @@ public:
 
   ///@{
   /**
+   * Set/get whether possibly overlapping labels should be drawn. Default is false.
+   */
+  vtkSetMacro(AllowOverlappingLabels, bool);
+  vtkGetMacro(AllowOverlappingLabels, bool);
+  vtkBooleanMacro(AllowOverlappingLabels, int);
+  ///@}
+
+  ///@{
+  /**
    * std::format style format for range labels.
    */
   virtual void SetRangeLabelFormat(const char* format);
@@ -360,6 +369,11 @@ private:
   int AddRangeAnnotations;
   char* RangeLabelFormat;
   char* DataRangeLabelFormat;
+
+  /**
+   * Flag that controls if labels are allowed to overlap.
+   */
+  bool AllowOverlappingLabels;
 
   /**
    * Flag that controls whether an outline is drawn around the scalar bar.
