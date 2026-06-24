@@ -13,22 +13,15 @@
 #ifndef vtkPVStringFormatter_h
 #define vtkPVStringFormatter_h
 
-#include "vtkLogger.h"
+#include "vtkLogger.h" // Needed for vtkLog
 #include "vtkObject.h"
-#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
+#include "vtkPVVTKExtensionsCoreModule.h" // Needed for export macro
+#include "vtkStringFormatter.h"           // Needed for fmt
 
 #include <algorithm>
 #include <memory>
 #include <sstream>
 #include <stack>
-
-// clang-format off
-#include <vtk_fmt.h> // needed for `fmt`
-#include VTK_FMT(fmt/args.h)
-#include VTK_FMT(fmt/chrono.h)
-#include VTK_FMT(fmt/core.h)
-#include VTK_FMT(fmt/ranges.h)
-// clang-format on
 
 class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVStringFormatter : public vtkObject
 {
@@ -358,7 +351,11 @@ private:
      * If argument already exists, it's ignored.
      */
     template <typename T>
+#if FMT_VERSION >= 120200
+    void AddArg(const fmt::named_arg<T, char_type>& fmtArg)
+#else
     void AddArg(const fmt::detail::named_arg<char_type, T>& fmtArg)
+#endif
     {
       bool argNotFound = std::find_if(this->Arguments.begin(), this->Arguments.end(),
                            [&fmtArg](const vtkNamedArgument& arg)
