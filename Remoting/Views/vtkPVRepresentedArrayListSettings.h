@@ -123,16 +123,16 @@ public:
   /**
    * Set/get the number of fields to hide when hover on points or cells.
    */
-  virtual void SetNumberOfFieldsToHideHover(int n);
-  virtual int GetNumberOfFieldsToHideHover();
+  virtual void SetNumberOfAttributesToHideOnHover(int n);
+  virtual int GetNumberOfAttributesToHideOnHover();
   ///@}
 
   ///@{
   /**
    * Set/get the fields to hide when hover on points or cells at index i.
    */
-  virtual void SetFieldToHideHover(int i, const std::string& fields);
-  virtual std::string GetFieldToHideHover(int i);
+  virtual void SetAttributeToHideOnHover(int i, const std::string& fields);
+  virtual std::string GetAttributeToHideOnHover(int i);
   ///@}
 
 protected:

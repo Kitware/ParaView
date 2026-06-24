@@ -975,16 +975,17 @@
         </Hints>
       </IntVectorProperty>
 
-      <StringVectorProperty command="SetFieldToHideHover"
-                            name="FieldsToHideHover"
-                            label="Fields to hide (on hover)"
+      <StringVectorProperty command="SetAttributeToHideOnHover"
+                            name="AttributesToHideOnHover"
+                            label="Attributes To Hide On Hover"
                             number_of_elements_per_command="1"
                             repeat_command="1"
-                            set_number_command="SetNumberOfFieldsToHideHover"
+                            set_number_command="SetNumberOfAttributesToHideOnHover"
                             use_index="1"
                             panel_visibility="advanced">
         <Documentation>
-          List of fields used to hide when using "Hover Points On" or "Hover Cells On" fetaures. The "special" fields can be hidden ("Id", "Block", "Type", "Coords") as well as any point/cell data array name.
+          List of attributes that will not be shown when using the "Hover Points On" or "Hover Cells On" features.
+          Valid values include "special" attribute names "Id", "Block", "Type", and "Coords" as well as the names of any point or cell data array.
         </Documentation>
         <Hints>
           <ShowLabel/>
