@@ -1001,7 +1001,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
         higherResIndexX = static_cast<vtkIdType>((point[0] - this->Bounds[0]) /
           (this->Bounds[1] - this->Bounds[0]) * this->CellDims[0] * this->MaxResolutionPerTree);
         higherResIndexX =
-          std::min(higherResIndexX, this->MaxResolutionPerTree * this->CellDims[0] - 1);
+          std::min<vtkIdType>(higherResIndexX, this->MaxResolutionPerTree * this->CellDims[0] - 1);
       }
 
       vtkIdType higherResIndexY = 0;
@@ -1010,7 +1010,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
         higherResIndexY = static_cast<vtkIdType>((point[1] - this->Bounds[2]) /
           (this->Bounds[3] - this->Bounds[2]) * this->CellDims[1] * this->MaxResolutionPerTree);
         higherResIndexY =
-          std::min(higherResIndexY, this->MaxResolutionPerTree * this->CellDims[1] - 1);
+          std::min<vtkIdType>(higherResIndexY, this->MaxResolutionPerTree * this->CellDims[1] - 1);
       }
 
       vtkIdType higherResIndexZ = 0;
@@ -1019,7 +1019,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
         higherResIndexZ = static_cast<vtkIdType>((point[2] - this->Bounds[4]) /
           (this->Bounds[5] - this->Bounds[4]) * this->CellDims[2] * this->MaxResolutionPerTree);
         higherResIndexZ =
-          std::min(higherResIndexZ, this->MaxResolutionPerTree * this->CellDims[2] - 1);
+          std::min<vtkIdType>(higherResIndexZ, this->MaxResolutionPerTree * this->CellDims[2] - 1);
       }
 
       // We bijectively convert the local coordinates within a hyper tree grid to an integer to

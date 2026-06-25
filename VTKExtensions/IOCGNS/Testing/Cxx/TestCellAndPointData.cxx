@@ -120,7 +120,7 @@ int CellAndPointDataTest(vtkPointSet* target, vtkIdType N, const char* phase)
     phase, cellData->GetNumberOfArrays());
 
   const vtkIdType nPoints = N * N * N;
-  N = std::max(1LL, N - 1);
+  N = std::max<vtkIdType>(1LL, N - 1);
   const vtkIdType nCells = N * N * N;
 
   for (size_t i = 0; i < 2; ++i)
