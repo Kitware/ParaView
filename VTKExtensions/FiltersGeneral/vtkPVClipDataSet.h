@@ -12,8 +12,15 @@
 #ifndef vtkPVClipDataSet_h
 #define vtkPVClipDataSet_h
 
+#include "vtkNew.h"                                 // for vtkNew
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 #include "vtkTableBasedClipDataSet.h"
+
+#include <memory> // for unique_ptr
+
+class vtkEdgesCacheInternal;
+class vtkDataObjectMeshCache;
+class vtkDataObjectTree;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVClipDataSet : public vtkTableBasedClipDataSet
 {
@@ -53,17 +60,20 @@ protected:
   int FillInputPortInformation(int, vtkInformation* info) override;
   int FillOutputPortInformation(int, vtkInformation* info) override;
 
-  ///@{
   /**
-   * Uses superclass to clip the input. This also handles composite datasets
-   * (since superclass does not handle composite datasets). This method loops
-   * over the composite dataset calling superclass repeatedly.
+   * Here we instantiate a new filter instead of simply use polymorphism and call the parent
+   * RequestData to benefit from the override mechanism (like Viskores variant).
+   *
+   * @see vtkObjectFactory and  vtkObjectFactoryNewMacro.
    */
   int ClipUsingSuperclass(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
+
+  /**
+   * Delegate process to vtkPVThreshold.
+   */
   int ClipUsingThreshold(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
-  ///@}
 
   bool UseAMRDualClipForAMR;
   bool ExactBoxClip;
@@ -71,6 +81,13 @@ protected:
 private:
   vtkPVClipDataSet(const vtkPVClipDataSet&) = delete;
   void operator=(const vtkPVClipDataSet&) = delete;
+
+  bool ClipDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  bool ClipLeaf(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  void InitializeOutput(vtkDataObjectTree* input, vtkDataObjectTree* output);
+
+  std::unique_ptr<vtkEdgesCacheInternal> EdgesCache;
+  vtkNew<vtkDataObjectMeshCache> MeshCache;
 };
 
 #endif

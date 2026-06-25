@@ -132,6 +132,11 @@ if (numpy_found)
     PythonCalculatorFieldData.xml
     PythonCalculatorMultiline.xml
     SelectionAndAutoSaveState.xml
+    StaticMeshClip.xml # uses numpy in python calc
+    StaticMeshCompositeClip.xml # uses numpy in python calc
+    StaticMeshCompositeSlice.xml # uses numpy in python calc
+    StaticMeshSlice.xml # uses numpy in python calc
+    StaticMeshSliceWithPlane.xml # uses numpy in python calc
     )
 
   set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)

@@ -30,6 +30,7 @@ PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
   ParaView::VTKExtensionsFiltersRendering
   ParaView::VTKExtensionsMisc
+  VTK::CommonCache
   VTK::FiltersGeneral
   VTK::FiltersGeneric
   VTK::FiltersGeometry
@@ -43,6 +44,7 @@ OPTIONAL_DEPENDS
 TEST_DEPENDS
   VTK::CommonSystem
   VTK::TestingCore
+  VTK::FiltersTemporal
 TEST_OPTIONAL_DEPENDS
   VTK::IOCGNSReader
 TEST_LABELS

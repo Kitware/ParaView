@@ -14,6 +14,9 @@
 #include "vtkCutter.h"
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 
+class vtkDataObjectMeshCache;
+class vtkDataObjectTree;
+class vtkEdgesCacheInternal;
 class vtkPVPlaneCutter;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVCutter : public vtkCutter
@@ -43,6 +46,12 @@ protected:
   int FillInputPortInformation(int, vtkInformation* info) override;
   int FillOutputPortInformation(int, vtkInformation* info) override;
 
+  /**
+   * Here we instantiate a new filter instead of simply use polymorphism and call the parent
+   * RequestData to benefit from the override mechanism (like Viskores variant).
+   *
+   * @see vtkObjectFactory and  vtkObjectFactoryNewMacro.
+   */
   int CutUsingSuperclassInstance(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   bool Dual = false;
@@ -51,6 +60,29 @@ protected:
 private:
   vtkPVCutter(const vtkPVCutter&) = delete;
   void operator=(const vtkPVCutter&) = delete;
+
+  /**
+   * Update geometry and attributes.
+   */
+  ///@{
+  bool CutLeaf(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  bool CutDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  ///@}
+
+  void InitializeOutput(vtkDataObjectTree* input, vtkDataObjectTree* output);
+
+  /**
+   * Duplicate the vtkInformationVector but replace DATA_OBJECT
+   * with the given one in the first vtkInformation.
+   */
+  vtkSmartPointer<vtkInformationVector> DuplicateInfoForLeaf(
+    vtkInformationVector* inputInfo, vtkDataObject* leaf);
+
+  std::unique_ptr<vtkEdgesCacheInternal> EdgesCache;
+
+  vtkNew<vtkDataObjectMeshCache> MeshCache;
 };
 
 #endif

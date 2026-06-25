@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVMetaSliceDataSet.h"
 
+#include "vtkAMRDataObject.h"
 #include "vtkAlgorithm.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkExtractGeometry.h"
 #include "vtkHyperTreeGrid.h"
@@ -13,6 +15,7 @@
 #include "vtkNonMergingPointLocator.h"
 #include "vtkPVCutter.h"
 #include "vtkPlane.h"
+#include "vtkType.h"
 
 class vtkPVMetaSliceDataSet::vtkInternals
 {
@@ -99,14 +102,6 @@ void vtkPVMetaSliceDataSet::SetValue(int index, double value)
 }
 
 //----------------------------------------------------------------------------
-vtkAlgorithm* vtkPVMetaSliceDataSet::SetActiveFilter(int index)
-{
-  this->SetOutputType((index == 0) ? VTK_POLY_DATA : VTK_UNSTRUCTURED_GRID);
-  this->Modified();
-  return this->Superclass::SetActiveFilter(index);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVMetaSliceDataSet::SetDual(bool dual)
 {
   this->Internal->Cutter->SetDual(dual);
@@ -135,9 +130,9 @@ int vtkPVMetaSliceDataSet::RequestDataObject(
     return 0;
   }
 
-  vtkInformation* info = inputVector[0]->GetInformationObject(0);
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
 
-  if (info && vtkHyperTreeGrid::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT())))
+  if (vtkHyperTreeGrid::SafeDownCast(input))
   {
     this->Internal->Cutter->SetCutFunction(this->ImplicitFunctions[METASLICE_HYPERTREEGRID]);
     this->Internal->ExtractCells->SetImplicitFunction(
@@ -148,6 +143,18 @@ int vtkPVMetaSliceDataSet::RequestDataObject(
   {
     this->Internal->Cutter->SetCutFunction(this->ImplicitFunctions[METASLICE_DATASET]);
     this->Internal->ExtractCells->SetImplicitFunction(this->ImplicitFunctions[METASLICE_DATASET]);
+    int dataSetType = this->GetActiveFilter() == this->Internal->ExtractCells
+      ? VTK_UNSTRUCTURED_GRID
+      : VTK_POLY_DATA;
+    if (vtkAMRDataObject::SafeDownCast(input))
+    {
+      dataSetType = VTK_MULTIBLOCK_DATA_SET;
+    }
+    else if (vtkCompositeDataSet::SafeDownCast(input))
+    {
+      dataSetType = VTK_COMPOSITE_DATA_SET;
+    }
+    this->SetOutputType(dataSetType);
   }
 
   return this->Superclass::RequestDataObject(request, inputVector, outputVector);

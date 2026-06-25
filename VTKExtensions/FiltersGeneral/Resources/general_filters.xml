@@ -2415,6 +2415,7 @@ Every Nth Point.
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkHyperTreeGrid" />
+          <DataType value="vtkCompositeDataSet"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           number_of_components="1"
@@ -2612,10 +2613,10 @@ Every Nth Point.
     <SourceProxy class="vtkPVMetaSliceDataSet"
                  label="Slice"
                  name="Cut">
-      <Documentation long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces."
-                     short_help="Slice datasets with planes.">This filter
+      <Documentation long_help="This filter slices a data set with a surface. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces."
+                     short_help="Slice datasets with surfaces.">This filter
                      extracts the portion of the input dataset that lies along
-                     the specified plane. The Slice filter takes any type of
+                     the specified surface. The Slice filter takes any type of
                      dataset or hyper tree grid as input. The output of this filter is polygonal
                      data.</Documentation>
       <InputProperty command="SetInputConnection"
@@ -2627,6 +2628,7 @@ Every Nth Point.
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkHyperTreeGrid" />
+          <DataType value="vtkCompositeDataSet" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Slice
         filter.</Documentation>

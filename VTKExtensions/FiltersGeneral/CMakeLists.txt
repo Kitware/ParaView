@@ -45,8 +45,14 @@ set(classes
   vtkTimeStepProgressFilter
   vtkTimeToTextConvertor)
 
+set(private_classes
+"Private/vtkEdgeInternal"
+"Private/vtkEdgesCacheInternal"
+)
+
 vtk_module_add_module(ParaView::VTKExtensionsFiltersGeneral
-  CLASSES ${classes})
+  CLASSES ${classes}
+  PRIVATE_CLASSES ${private_classes})
 
 paraview_add_server_manager_xmls(
   XMLS  Resources/general_filters.xml

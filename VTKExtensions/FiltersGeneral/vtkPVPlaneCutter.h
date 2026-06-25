@@ -13,10 +13,11 @@
 
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 #include "vtkPlaneCutter.h"
+#include <memory>
 
+class vtkDataObjectMeshCache;
+class vtkEdgesCacheInternal;
 class vtkAMRCutPlane;
-class vtkAMRSliceFilter;
-class vtkHyperTreeGridAxisCut;
 class vtkHyperTreeGridPlaneCutter;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVPlaneCutter : public vtkPlaneCutter
@@ -26,8 +27,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkPVPlaneCutter* New();
-
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   ///@
   /**
@@ -74,21 +73,19 @@ protected:
 
   int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  int FillInputPortInformation(int, vtkInformation* info) override;
-  int FillOutputPortInformation(int, vtkInformation* info) override;
-
   bool Dual = false;
   int LevelOfResolution = 0;
   bool UseNativeCutter = true;
 
   vtkNew<vtkAMRCutPlane> AMRPlaneCutter;
-  vtkNew<vtkAMRSliceFilter> AMRAxisAlignedPlaneCutter;
   vtkNew<vtkHyperTreeGridPlaneCutter> HTGPlaneCutter;
-  vtkNew<vtkHyperTreeGridAxisCut> HTGAxisAlignedPlaneCutter;
 
 private:
   vtkPVPlaneCutter(const vtkPVPlaneCutter&) = delete;
   void operator=(const vtkPVPlaneCutter&) = delete;
+
+  vtkNew<vtkDataObjectMeshCache> MeshCache;
+  std::unique_ptr<vtkEdgesCacheInternal> EdgesCache;
 };
 
 #endif

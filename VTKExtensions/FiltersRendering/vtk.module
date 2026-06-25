@@ -29,12 +29,12 @@ DEPENDS
 PRIVATE_DEPENDS
   ParaView::RemotingCore
   ParaView::VTKExtensionsMisc
+  VTK::CommonCache
   VTK::CommonSystem
   VTK::FiltersGeneric
   VTK::FiltersHyperTree
   VTK::FiltersParallel
   VTK::FiltersParallelDIY2
-  VTK::FiltersTemporal
   VTK::IOLegacy
   VTK::lz4
   VTK::ParallelCore
