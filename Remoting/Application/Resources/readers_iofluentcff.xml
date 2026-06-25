@@ -47,6 +47,40 @@
           </Documentation>
         </IntVectorProperty>
 
+
+
+        <StringVectorProperty name="FacesInfo"
+          command="GetFaceSelection"
+          number_of_elements_per_command="2"
+          information_only="1"
+          si_class="vtkSIDataArraySelectionProperty">
+        </StringVectorProperty>
+
+        <StringVectorProperty name="Faces"
+          command="GetFaceSelection"
+          information_property="FacesInfo"
+          number_of_elements_per_command="2"
+          element_types="str int"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+
+          <ArraySelectionDomain name="array_list">
+            <RequiredProperties>
+              <Property function="ArrayList"
+                        name="FacesInfo" />
+            </RequiredProperties>
+          </ArraySelectionDomain>
+          <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator"
+                                    mode="visibility"
+                                    property="ReadFaces"
+                                    value="1" />
+          </Hints>
+          <Documentation>
+            Select the faces to read.
+          </Documentation>
+        </StringVectorProperty>
+
         <StringVectorProperty information_only="1"
                               name="FaceArrayInfo">
           <ArraySelectionInformationHelper attribute_name="Face" />
@@ -118,6 +152,7 @@
             <Property name="CellArrayStatus" />
             <Property name="RenameArrays" />
             <Property name="ReadFaces" />
+            <Property name="Faces" />
             <Property name="FaceArrayInfo" />
             <Property name="FaceArrayStatus" />
           </ExposedProperties>
