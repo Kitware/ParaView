@@ -19,5 +19,4 @@ KIT
 DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersParallelStatistics
-PRIVATE_DEPENDS
   VTK::ParallelCore
