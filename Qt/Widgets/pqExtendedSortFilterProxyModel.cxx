@@ -180,6 +180,12 @@ bool pqExtendedSortFilterProxyModel::lessThan(
 //-----------------------------------------------------------------------------
 void pqExtendedSortFilterProxyModel::update()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+  this->beginFilterChange();
+  this->endFilterChange();
+#else
   this->invalidateFilter();
+#endif
+
   this->sort(0);
 }

@@ -321,18 +321,38 @@ public:
   }
   ~pqPresetDialogProxyModel() override = default;
 
+  // handle invalidateFilter deprecation in Qt 6.11
+  void beginFilterChangeInternal()
+  {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    this->beginFilterChange();
+#endif
+  }
+
+  // handle invalidateFilter deprecation in Qt 6.11
+  void endFilterChangeInternal()
+  {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    this->endFilterChange();
+#else
+    this->invalidateFilter();
+#endif
+  }
+
   pqPresetDialog::Modes mode() { return this->Mode; }
   void setMode(pqPresetDialog::Modes m)
   {
+    this->beginFilterChangeInternal();
     this->Mode = m;
-    this->invalidateFilter();
+    this->endFilterChangeInternal();
   }
 
   int currentGroupColumn() const { return this->CurrentGroupColumn; }
   void setCurrentGroupColumn(int currentGroupCol)
   {
+    this->beginFilterChangeInternal();
     this->CurrentGroupColumn = currentGroupCol;
-    this->invalidateFilter();
+    this->endFilterChangeInternal();
     this->sort(currentGroupCol == 0 ? -1 : currentGroupCol);
   }
 
