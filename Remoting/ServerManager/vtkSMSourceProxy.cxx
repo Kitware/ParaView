@@ -215,6 +215,12 @@ vtkSMDocumentation* vtkSMSourceProxy::GetOutputPortDocumentation(const char* por
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::EnableAbortCheck()
 {
+  if (this->Location == vtkPVSession::NONE || this->Location == vtkPVSession::DATA_SERVER_ROOT ||
+    this->Location == vtkPVSession::RENDER_SERVER_ROOT)
+  {
+    return; // This object is a prototype or is not on all servers
+  }
+
   if (this->ObjectsCreated)
   {
     // Enable on the server
@@ -232,6 +238,12 @@ void vtkSMSourceProxy::EnableAbortCheck()
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::ClearAbortFlags()
 {
+  if (this->Location == vtkPVSession::NONE || this->Location == vtkPVSession::DATA_SERVER_ROOT ||
+    this->Location == vtkPVSession::RENDER_SERVER_ROOT)
+  {
+    return; // This object is a prototype or is not on all servers
+  }
+
   if (this->ObjectsCreated)
   {
     vtkClientServerStream stream;
