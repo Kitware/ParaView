@@ -187,6 +187,9 @@
         set or hyper tree grid and applies a transformation that is
         constrained to be axis-aligned. The output type is the same as the
         input.
+
+        Transforms are applied in the following order: scaling is done first,
+        then rotation, and then translation.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
