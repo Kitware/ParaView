@@ -782,8 +782,6 @@ void vtkPrismSESAMEReader::ReadVaporizationCurveTable(
     }
   }
 
-  // number of read values
-  int valuesRead = 0;
   // index of the scalar array to fill
   unsigned int scalarIndex = 0;
   // number of values read for the current scalar array
@@ -805,7 +803,6 @@ void vtkPrismSESAMEReader::ReadVaporizationCurveTable(
       {
         scalars[scalarIndex]->InsertNextValue(v[k]);
       }
-      ++valuesRead;
     }
     // for all the next lines, we need to read all the values
     kBegin = 0;

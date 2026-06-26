@@ -532,7 +532,6 @@ bool vtkResampleToHyperTreeGrid::IntersectedVolume(const double bboxBounds[6], v
   std::array<std::set<double>, 12> duplicates;
   double boxVolume = 0.0;
   double centroid[3] = { 0.0 };
-  double signedDistanceToCentroid = 0.0;
   std::vector<double> facePoints(cell3D->GetNumberOfPoints() * 3);
   double cellBounds[6];
   cell3D->GetBounds(cellBounds);
@@ -705,8 +704,6 @@ bool vtkResampleToHyperTreeGrid::IntersectedVolume(const double bboxBounds[6], v
       points->GetPoint(pts[faceSize - 1], facePoints.data() + (faceSize - 1) * 3);
       points->GetPoint(pts[0], facePoints.data());
       points->GetPoint(pts[1], facePoints.data() + 3);
-      signedDistanceToCentroid +=
-        vtkMath::Dot(normal, centroid) - vtkMath::Dot(normal, facePoints.data());
       for (vtkIdType idx1 = 0, idx2 = 1; idx1 < faceSize; ++idx1, idx2 = (idx2 + 1) % faceSize)
       {
         if (idx1 < faceSize - 3)
