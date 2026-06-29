@@ -1148,6 +1148,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ThresholdBackwardsCompatibility.xml
   TimeManagerPanel.xml
   TimeManagerSequence.xml
+  UndoSelection.xml
 )
 
 if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)

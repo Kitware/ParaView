@@ -900,6 +900,7 @@ void pqStandardViewFrameActionsImplementation::interactiveSelectionToggled(bool 
 {
   if (!checked)
   {
+    SCOPED_UNDO_EXCLUDE();
     vtkSMInteractiveSelectionPipeline::GetInstance()->Hide(
       vtkSMRenderViewProxy::SafeDownCast(pqActiveObjects::instance().activeView()->getViewProxy()));
     vtkSMTooltipSelectionPipeline::GetInstance()->Hide(

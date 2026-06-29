@@ -611,6 +611,8 @@ void pqRenderViewSelectionReaction::onMouseMove()
     return;
   }
 
+  SCOPED_UNDO_EXCLUDE();
+
   switch (this->Mode)
   {
     case SELECT_SURFACE_POINTS_TOOLTIP:
@@ -954,6 +956,8 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
     // the rest of the code hangs in that case.
     return;
   }
+
+  SCOPED_UNDO_EXCLUDE();
 
   int selectionModifier = this->getSelectionModifier();
   if (selectionModifier == pqView::PV_SELECTION_DEFAULT)
