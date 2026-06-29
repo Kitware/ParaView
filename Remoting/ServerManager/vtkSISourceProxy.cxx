@@ -273,11 +273,14 @@ void vtkSISourceProxy::EnableAbortCheck()
     return;
   }
 
-  vtkVLogScopeF(
-    PARAVIEW_LOG_PIPELINE_VERBOSITY(), "%s: enable CheckAbort", this->GetLogNameOrDefault());
-
-  // Enable CheckAbort in progress handler for underlying VTK object
+  // Enable CheckAbort in progress handler for underlying VTK object on first process only
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  const int processid = controller->GetLocalProcessId();
+  if (processid == 0 && this->GetVTKObject())
   {
+    vtkVLogScopeF(
+      PARAVIEW_LOG_PIPELINE_VERBOSITY(), "%s: enable CheckAbort", this->GetLogNameOrDefault());
+
     vtkClientServerStream substream;
     substream << vtkClientServerStream::Invoke << vtkClientServerID(1) << "GetActiveProgressHandler"
               << vtkClientServerStream::End;
@@ -296,11 +299,13 @@ void vtkSISourceProxy::ClearAbortFlags()
     return;
   }
 
-  vtkVLogScopeF(
-    PARAVIEW_LOG_PIPELINE_VERBOSITY(), "%s: clear  abort flags", this->GetLogNameOrDefault());
-
-  if (this->GetVTKObject())
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  const int processid = controller->GetLocalProcessId();
+  if (processid == 0 && this->GetVTKObject())
   {
+    vtkVLogScopeF(
+      PARAVIEW_LOG_PIPELINE_VERBOSITY(), "%s: clear  abort flags", this->GetLogNameOrDefault());
+
     vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
     if (algo)
     {
