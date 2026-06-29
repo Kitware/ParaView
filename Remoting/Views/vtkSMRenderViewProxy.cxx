@@ -451,9 +451,7 @@ const char* vtkSMRenderViewProxy::IsSelectVisiblePointsAvailable()
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::Update()
 {
-  // As resizing window updates the "ViewSize" property, we need to check whether or not we are in
-  // this case. If we are, we don"t need to compute the LOD again.
-  this->NeedsUpdateLOD |= this->NeedsUpdate && !this->ResizingWindow;
+  this->NeedsUpdateLOD |= this->NeedsUpdate;
   this->Superclass::Update();
 }
 
@@ -523,10 +521,10 @@ vtkTypeUInt32 vtkSMRenderViewProxy::PreRender(bool interactive)
 
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
   assert(rv != nullptr);
-  if (rv->GetUseLODForInteractiveRender())
+  if (interactive && rv->GetUseLODForInteractiveRender())
   {
-    // We trigger the update of the LOD data in non interactive render to catch the moment when the
-    // user updates the pipeline data.
+    // for interactive renders, we need to determine if we are going to use LOD.
+    // If so, we may need to update the LOD geometries.
     this->UpdateLOD();
   }
 

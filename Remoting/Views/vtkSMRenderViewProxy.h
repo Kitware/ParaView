@@ -13,6 +13,7 @@
 #define vtkSMRenderViewProxy_h
 
 #include "vtkNew.h"                 // needed for vtkInteractorObserver.
+#include "vtkParaViewDeprecation.h" // For PARAVIEW_DEPRECATED_IN_6_2_0
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMViewProxy.h"         // for base class
 #include "vtkTuple.h"               // for vtkTuple
@@ -386,6 +387,7 @@ public:
   /**
    * Set whether the window is currently resizing.
    */
+  PARAVIEW_DEPRECATED_IN_6_2_0("SetResizingWindow has been removed. Simply remove the function.")
   vtkSetMacro(ResizingWindow, bool);
 
   /**

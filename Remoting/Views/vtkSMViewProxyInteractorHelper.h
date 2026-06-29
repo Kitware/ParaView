@@ -27,11 +27,6 @@
  * vtkRenderWindowInteractor fires the vtkCommand::EndInteractionEvent. If
  * missing, or less than 0.01, the view will immediately render.
  *
- * \li \c WindowResizeNonInteractiveRenderDelay :- when present provides time in seconds to
- * delay the StillRender() call after the window has been resized, ie. the interactor
- * fires a vtkCommand::WindowResizeEvent. If missing or equals 0, the view will
- * immediately render.
- *
  * \li \c EnableRenderOnInteraction :- when present provides a flag whether the interactor
  * should trigger the render calls (either StillRender or InteractiveRender) as
  * a consequence of interaction. If missing, we treat EnableRender as ON.
@@ -90,20 +85,12 @@ protected:
   void Resize();
   ///@}
 
-  /**
-   * Forward to the render view proxy whether or not the window is being currently resized.
-   * If the proxy is not a render view proxy, it does nothing.
-   */
-  void SetResizingWindow(bool resizingWindow);
-
   vtkCommand* Observer;
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;
   vtkWeakPointer<vtkRenderWindowInteractor> Interactor;
   int DelayedRenderTimerId;
   bool Interacting;
   bool Interacted;
-
-  int EndWindowResizeTimerId = -1;
 
 private:
   vtkSMViewProxyInteractorHelper(const vtkSMViewProxyInteractorHelper&) = delete;

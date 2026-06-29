@@ -6,7 +6,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 
@@ -114,30 +113,8 @@ void vtkSMViewProxyInteractorHelper::Execute(vtkObject* caller, unsigned long ev
   switch (event)
   {
     case vtkCommand::ConfigureEvent:
-    {
-      this->SetResizingWindow(true);
-
       this->Resize();
-
-      // When we resize the window, we want to do an interactive render
-      // to avoid slowing down the application
-      // As there is no good way to catch an EndResizeEvent, we render
-      // interactively and we wait some time (stored in the
-      // WindowResizeNonInteractiveRenderDelay property) until a still render.
-      double delay = vtkSMPropertyHelper(
-        this->ViewProxy, "WindowResizeNonInteractiveRenderDelay", /*quiet*/ true)
-                       .GetAsDouble();
-      // While loading a state, make sure that no delay is performed that incurs an UpdateLOD.
-      // This seems to be detrimental when volume rendering is performed for the delivery manager.
-      if (!this->ViewProxy->GetSessionProxyManager()->GetInLoadXMLState() && delay > 0.0)
-      {
-        this->Interacting = true;
-        iren->DestroyTimer(this->EndWindowResizeTimerId);
-        this->EndWindowResizeTimerId = iren->CreateOneShotTimer(delay * 1000);
-      }
-
       break;
-    }
     case vtkCommand::RenderEvent:
       this->CleanupTimer();
       this->Render();
@@ -185,15 +162,6 @@ void vtkSMViewProxyInteractorHelper::Execute(vtkObject* caller, unsigned long ev
         this->DelayedRenderTimerId = -1;
         this->Render();
       }
-      else if (this->EndWindowResizeTimerId == timerId)
-      {
-        this->Interacting = false;
-        this->InvokeEvent(vtkCommand::TimerEvent, &this->EndWindowResizeTimerId);
-        this->EndWindowResizeTimerId = -1;
-        this->Render();
-        this->SetResizingWindow(false);
-      }
-      break;
     }
   }
 }
@@ -251,16 +219,6 @@ void vtkSMViewProxyInteractorHelper::Resize()
 
     vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(size, 2);
     this->ViewProxy->UpdateProperty("ViewSize");
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMViewProxyInteractorHelper::SetResizingWindow(bool resizingWindow)
-{
-  vtkSMRenderViewProxy* rView = vtkSMRenderViewProxy::SafeDownCast(this->ViewProxy);
-  if (rView)
-  {
-    rView->SetResizingWindow(resizingWindow);
   }
 }
 
