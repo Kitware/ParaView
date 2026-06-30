@@ -16,6 +16,7 @@
 #include "vtkPythonInterpreter.h"
 #include "vtkSmartPyObject.h"
 
+class QTextDocument;
 class QTextEdit;
 class QUndoStack;
 
@@ -69,6 +70,12 @@ public:
    * as we might want to defer the connection to another widget.
    */
   void ConnectHighligter() const;
+
+  /**
+   * Copy character formatting (syntax colors) from \p src into \p dst
+   * without modifying \p dst's text.
+   */
+  static void ApplySyntaxFormatting(QTextDocument* dst, const QTextDocument& src);
 
 protected:
   /**

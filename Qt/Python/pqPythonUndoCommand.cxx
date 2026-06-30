@@ -5,6 +5,8 @@
 #include "pqPythonUndoCommand.h"
 #include "pqPythonSyntaxHighlighter.h"
 
+#include <QTextDocument>
+
 //-----------------------------------------------------------------------------
 pqPythonUndoCommand::pqPythonUndoCommand(QTextEdit& text, pqPythonSyntaxHighlighter* highlighter,
   pqPythonTextHistoryEntry& lastHistoryEntry, const pqPythonTextHistoryEntry&& currentHistoryEntry)
@@ -23,18 +25,23 @@ void pqPythonUndoCommand::swapImpl(const pqPythonTextHistoryEntry& h)
   // the text in the undo stack)
   const bool oldState = this->Text.blockSignals(true);
 
+  // Skip setPlainText() during normal typing - only needed for undo/redo.
+  const bool contentChanged = (this->Text.toPlainText() != h.content);
+  if (contentChanged)
+  {
+    this->Text.setPlainText(h.content);
+  }
+
   const QString highlightedText = this->Highlighter->Highlight(h.content);
   if (!highlightedText.isEmpty())
   {
-    this->Text.setHtml(highlightedText);
-  }
-  else
-  {
-    this->Text.setText(h.content);
+    QTextDocument tempDoc;
+    tempDoc.setHtml(highlightedText);
+    pqPythonSyntaxHighlighter::ApplySyntaxFormatting(this->Text.document(), tempDoc);
   }
 
   // Move the cursor
-  if (!h.isEmpty())
+  if (contentChanged && !h.isEmpty())
   {
     QTextCursor cursor = this->Text.textCursor();
     cursor.setPosition(h.cursorPosition);

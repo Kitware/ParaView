@@ -12,8 +12,10 @@
 #include <QPointer>
 #include <QScrollBar>
 #include <QString>
+#include <QTextBlock>
 #include <QTextCursor>
 #include <QTextEdit>
+#include <QTimer>
 
 namespace globals
 {
@@ -185,29 +187,72 @@ QString pqPythonSyntaxHighlighter::Highlight(const QString& text) const
 //-----------------------------------------------------------------------------
 void pqPythonSyntaxHighlighter::ConnectHighligter() const
 {
-  connect(&this->TextEdit, &QTextEdit::textChanged,
+  // Use a zero-delay timer so the re-highlight runs after the key event
+  // is fully processed, and coalesces rapid keystrokes into one highlight.
+  auto* timer = new QTimer(&this->TextEdit);
+  timer->setSingleShot(true);
+  timer->setInterval(0);
+
+  connect(&this->TextEdit, &QTextEdit::textChanged, timer, [timer]() { timer->start(); });
+
+  connect(timer, &QTimer::timeout, &this->TextEdit,
     [this]()
     {
-      const QString text = this->TextEdit.toPlainText();
-      const int cursorPosition = this->TextEdit.textCursor().position();
-
-      const QString highlightedText = this->Highlight(text);
-      if (!highlightedText.isEmpty())
+      const QString highlightedText = this->Highlight(this->TextEdit.toPlainText());
+      if (highlightedText.isEmpty())
       {
-        const bool oldState = this->TextEdit.blockSignals(true);
-
-        this->TextEdit.setHtml(this->Highlight(text));
-        QTextCursor cursor = this->TextEdit.textCursor();
-        cursor.setPosition(cursorPosition);
-        this->TextEdit.setTextCursor(cursor);
-
-        const int vScrollBarValue = this->TextEdit.verticalScrollBar()->value();
-        this->TextEdit.verticalScrollBar()->setValue(vScrollBarValue);
-
-        const int hScrollBarValue = this->TextEdit.horizontalScrollBar()->value();
-        this->TextEdit.horizontalScrollBar()->setValue(hScrollBarValue);
-
-        this->TextEdit.blockSignals(oldState);
+        return;
       }
+
+      // Parse highlighted HTML into a temp document, then copy only the
+      // character formatting into the real document - never replace the text.
+      QTextDocument tempDoc;
+      tempDoc.setHtml(highlightedText);
+
+      const bool oldState = this->TextEdit.blockSignals(true);
+      pqPythonSyntaxHighlighter::ApplySyntaxFormatting(this->TextEdit.document(), tempDoc);
+      this->TextEdit.blockSignals(oldState);
     });
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonSyntaxHighlighter::ApplySyntaxFormatting(QTextDocument* dst, const QTextDocument& src)
+{
+  QTextCursor cursor(dst);
+  cursor.beginEditBlock();
+
+  QTextBlock dstBlock = dst->begin();
+  QTextBlock srcBlock = src.begin();
+
+  while (dstBlock.isValid() && srcBlock.isValid())
+  {
+    if (dstBlock.text() == srcBlock.text())
+    {
+      for (auto it = srcBlock.begin(); !it.atEnd(); ++it)
+      {
+        QTextFragment frag = it.fragment();
+        int start = dstBlock.position() + frag.position() - srcBlock.position();
+        cursor.setPosition(start);
+        cursor.setPosition(start + frag.length(), QTextCursor::KeepAnchor);
+        cursor.setCharFormat(frag.charFormat());
+      }
+      dstBlock = dstBlock.next();
+      srcBlock = srcBlock.next();
+    }
+    else if (dstBlock.text().isEmpty())
+    {
+      dstBlock = dstBlock.next();
+    }
+    else if (srcBlock.text().isEmpty())
+    {
+      srcBlock = srcBlock.next();
+    }
+    else
+    {
+      dstBlock = dstBlock.next();
+      srcBlock = srcBlock.next();
+    }
+  }
+
+  cursor.endEditBlock();
 }

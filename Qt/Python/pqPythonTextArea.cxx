@@ -56,12 +56,6 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
       // Save the last entry
       this->lastEntry = { text, cursorPosition };
 
-      const int vScrollBarValue = this->TextEdit->verticalScrollBar()->value();
-      this->TextEdit->verticalScrollBar()->setValue(vScrollBarValue);
-
-      const int hScrollBarValue = this->TextEdit->horizontalScrollBar()->value();
-      this->TextEdit->horizontalScrollBar()->setValue(hScrollBarValue);
-
       this->FileIO->contentChanged();
     });
 
