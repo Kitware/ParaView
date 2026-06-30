@@ -534,6 +534,19 @@
         <Documentation>Should the assessed values be signed deviations or
         unsigned?</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="GlobalModel" label="Global Model"
+        command="SetGlobalModel"
+        default_values="1"
+        number_of_elements="1">
+        <BooleanDomain name="single_model"/>
+        <Documentation
+          short_help="Produce a single, global model of the data?"
+          long_help="Produce either a global model of all data or a model per-partition.">
+          When enabled (the default), a single statistical model is computed across
+          all partitions with the necessary data. When disabled, then each assembly node
+          in the input (whose partitions have the necessary data) produces a model.
+        </Documentation>
+      </IntVectorProperty>
       <OutputPort index="0"
                   name="Statistical Model" />
       <OutputPort index="1"

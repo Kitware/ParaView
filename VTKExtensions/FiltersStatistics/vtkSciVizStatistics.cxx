@@ -14,6 +14,8 @@
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDemandDrivenPipeline.h"
+#include "vtkDescriptiveStatistics.h"
+#include "vtkExtractDescriptiveStatistics.h"
 #include "vtkExtractStatisticalModelTables.h"
 #include "vtkGenerateStatistics.h"
 #include "vtkInformation.h"
@@ -131,6 +133,7 @@ vtkSciVizStatistics::vtkSciVizStatistics()
   this->SetNumberOfOutputPorts(2); // model + assessed input
   this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
+  this->GlobalModel = true;
 }
 
 vtkSciVizStatistics::~vtkSciVizStatistics()
@@ -145,6 +148,7 @@ void vtkSciVizStatistics::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Task: " << this->Task << "\n";
   os << indent << "AttributeMode: " << this->AttributeMode << "\n";
   os << indent << "TrainingFraction: " << this->TrainingFraction << "\n";
+  os << indent << "GlobalModel: " << (this->GlobalModel ? "ON" : "OFF") << "\n";
 }
 
 int vtkSciVizStatistics::GetNumberOfAttributeArrays()
@@ -357,6 +361,7 @@ int vtkSciVizStatistics::RequestData(
   modelData->SetController(this->Controller);
   modelData->SetInputDataObject(0, inData);
   modelData->SetTrainingFraction(trainingFraction);
+  modelData->SetSingleModel(this->GlobalModel);
 
   // Ensure the same arrays+components are requested across all ranks, even
   // those with no data.
@@ -366,13 +371,38 @@ int vtkSciVizStatistics::RequestData(
   // inside it with a properly-configured algorithm.
   this->PrepareAlgorithm(modelData);
 
-  vtkNew<vtkExtractStatisticalModelTables> modelToTables;
-  modelToTables->SetInputConnection(0, modelData->GetOutputPort());
-  modelToTables->UpdatePiece(this->Controller ? this->Controller->GetLocalProcessId() : 0,
-    this->Controller ? this->Controller->GetNumberOfProcesses() : 1,
-    /* ghost levels */ 0);
-  ouModel->CompositeShallowCopy(
-    vtkCompositeDataSet::SafeDownCast(modelToTables->GetOutputDataObject(0)));
+  // TODO: Make this more elegant.
+  // For descriptive statistics (and perhaps others), we want a custom output
+  // table format. Just hardwire one in for now. In the future, this functionality
+  // should be added to vtkExtractStatisticalModelTables itself.
+  if (vtkDescriptiveStatistics::SafeDownCast(modelData->GetStatisticsAlgorithm()))
+  {
+    // TODO: Copy + modify vtkExtractStatisticalModelTables to output descriptive
+    // statistics tables with unique per-block names (so as to avoid problems when
+    // vtkPVDataInformation::CopyFromObject() calls
+    // vtkDataAssemblyUtilities::GenerateHierarchy() to construct a flat data-assembly).
+    //
+    // This should also combine the primary and derived statistics for each model into
+    // a single table (perhaps even omitting raw moments).
+    vtkNew<vtkExtractDescriptiveStatistics> modelToTables;
+    modelToTables->SetController(this->Controller);
+    modelToTables->SetInputConnection(0, modelData->GetOutputPort());
+    modelToTables->UpdatePiece(this->Controller ? this->Controller->GetLocalProcessId() : 0,
+      this->Controller ? this->Controller->GetNumberOfProcesses() : 1,
+      /* ghost levels */ 0);
+    ouModel->CompositeShallowCopy(
+      vtkCompositeDataSet::SafeDownCast(modelToTables->GetOutputDataObject(0)));
+  }
+  else
+  {
+    vtkNew<vtkExtractStatisticalModelTables> modelToTables;
+    modelToTables->SetInputConnection(0, modelData->GetOutputPort());
+    modelToTables->UpdatePiece(this->Controller ? this->Controller->GetLocalProcessId() : 0,
+      this->Controller ? this->Controller->GetNumberOfProcesses() : 1,
+      /* ghost levels */ 0);
+    ouModel->CompositeShallowCopy(
+      vtkCompositeDataSet::SafeDownCast(modelToTables->GetOutputDataObject(0)));
+  }
 
   // II. Create/update the output sci-viz data
   vtkDataObject* dataObjOu = vtkDataObject::GetData(output, 1);

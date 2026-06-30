@@ -1038,6 +1038,7 @@ list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
   ComputeArrayMagnitudeSetting.xml
   DefaultReadersSetting.xml
   DelimitedTextReader.xml
+  DescriptiveStatisticsByAssembly.xml
   DynamicFieldDataDomain.xml
   ExportFilteredColumnsSpreadsheet.xml
   ExportSpreadsheetFormatting.xml
