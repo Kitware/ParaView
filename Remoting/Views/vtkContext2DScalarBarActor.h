@@ -162,6 +162,15 @@ public:
 
   ///@{
   /**
+   * If this flag is on, the labels will be drawn vertically. Off by default.
+   */
+  vtkSetMacro(VerticalLabels, bool);
+  vtkGetMacro(VerticalLabels, bool);
+  vtkBooleanMacro(VerticalLabels, bool);
+  ///@}
+
+  ///@{
+  /**
    * Set/get whether to add range labels or not. These are labels that have
    * the minimum/maximum values of the scalar bar range.
    */
@@ -363,6 +372,8 @@ private:
   double ScalarBarLength;
 
   int AutomaticLabelFormat;
+
+  bool VerticalLabels;
 
   int AddRangeLabels;
   int AutomaticAnnotations;

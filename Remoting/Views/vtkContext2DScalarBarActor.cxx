@@ -122,6 +122,8 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->ScalarBarThickness = 16;
   this->ScalarBarLength = 0.33;
 
+  this->VerticalLabels = false;
+
   this->AutomaticLabelFormat = 1;
 
   this->DrawDataRange = false;
@@ -992,6 +994,7 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
   this->Axis->AutoScale();
   this->Axis->SetRangeLabelsVisible(!indexedMode && this->AddRangeLabels == 1);
   this->Axis->SetRangeLabelFormat(std::string(this->RangeLabelFormat));
+  this->Axis->SetVerticalLabels(this->VerticalLabels);
 
   if (this->UseCustomLabels)
   {
