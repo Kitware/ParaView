@@ -45,4 +45,4 @@ set(VTK_MODULE_ENABLE_VTK_RenderingOpenXR YES CACHE STRING "")
 # active.
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "")
 
-include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora42.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora44.cmake")

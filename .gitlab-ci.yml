@@ -110,9 +110,9 @@ el8-shared-icc-mpi-python:test:
     needs:
         - el8-shared-icc-mpi-python:build
 
-fedora42-shared-asserts-mpi-python-qt:build:
+fedora44-shared-asserts-mpi-python-qt:build:
     extends:
-        - .fedora42_shared_asserts_mpi_python_qt
+        - .fedora44_shared_asserts_mpi_python_qt
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
@@ -121,20 +121,20 @@ fedora42-shared-asserts-mpi-python-qt:build:
         PV_CI_RUN_MANUALLY: "true"
     timeout: 90 minutes
 
-fedora42-shared-asserts-mpi-python-qt:test:
+fedora44-shared-asserts-mpi-python-qt:test:
     extends:
-        - .fedora42_shared_asserts_mpi_python_qt
+        - .fedora44_shared_asserts_mpi_python_qt
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .rules
     needs:
-        - fedora42-shared-asserts-mpi-python-qt:build
+        - fedora44-shared-asserts-mpi-python-qt:build
     timeout: 240 minutes
 
-fedora42-shared-mpi-python-qt-viskoresoverride:build:
+fedora44-shared-mpi-python-qt-viskoresoverride:build:
     extends:
-        - .fedora42_shared_mpi_python_qt_viskoresoverride
+        - .fedora44_shared_mpi_python_qt_viskoresoverride
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
@@ -142,33 +142,33 @@ fedora42-shared-mpi-python-qt-viskoresoverride:build:
     variables:
         PV_CI_RUN_MANUALLY: "true"
 
-fedora42-shared-mpi-python-qt-viskoresoverride:test:
+fedora44-shared-mpi-python-qt-viskoresoverride:test:
     extends:
-        - .fedora42_shared_mpi_python_qt_viskoresoverride
+        - .fedora44_shared_mpi_python_qt_viskoresoverride
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .rules
     needs:
-        - fedora42-shared-mpi-python-qt-viskoresoverride:build
+        - fedora44-shared-mpi-python-qt-viskoresoverride:build
     timeout: 180 minutes
 
-fedora42-shared-mpi-offscreen-osmesa-python-qt-viskoresoverride:test:
+fedora44-shared-mpi-offscreen-osmesa-python-qt-viskoresoverride:test:
     extends:
-        - .fedora42_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride
+        - .fedora44_shared_mpi_offscreen_osmesa_python_qt_viskoresoverride
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .rules
     needs:
-        - fedora42-shared-mpi-python-qt-viskoresoverride:build
+        - fedora44-shared-mpi-python-qt-viskoresoverride:build
     timeout: 180 minutes
 
 # Translations
 
 translations:test:
     extends:
-        - .fedora42_shared_asserts_mpi_python_qt
+        - .fedora44_shared_asserts_mpi_python_qt
         - .cmake_translations_linux
         - .linux_tester_tags
         - .cmake_translations_artifacts
@@ -176,14 +176,14 @@ translations:test:
     variables:
         PV_CI_MERGED_ONLY: "true"
     needs:
-        - fedora42-shared-asserts-mpi-python-qt:build
+        - fedora44-shared-asserts-mpi-python-qt:build
     timeout: 15 minutes
 
 ## Catalyst editions
 
-fedora42-shared-mpi-core:build:
+fedora44-shared-mpi-core:build:
     extends:
-        - .fedora42_shared_mpi_core
+        - .fedora44_shared_mpi_core
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
@@ -191,19 +191,19 @@ fedora42-shared-mpi-core:build:
     variables:
         PV_CI_RUN_MANUALLY: "true"
 
-fedora42-shared-mpi-core:test:
+fedora44-shared-mpi-core:test:
     extends:
-        - .fedora42_shared_mpi_core
+        - .fedora44_shared_mpi_core
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .rules
     needs:
-        - fedora42-shared-mpi-core:build
+        - fedora44-shared-mpi-core:build
 
-fedora42-shared-mpi-python-core:build:
+fedora44-shared-mpi-python-core:build:
     extends:
-        - .fedora42_shared_mpi_python_core
+        - .fedora44_shared_mpi_python_core
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
@@ -211,21 +211,21 @@ fedora42-shared-mpi-python-core:build:
     variables:
         PV_CI_RUN_MANUALLY: "true"
 
-fedora42-shared-mpi-python-core:test:
+fedora44-shared-mpi-python-core:test:
     extends:
-        - .fedora42_shared_mpi_python_core
+        - .fedora44_shared_mpi_python_core
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .rules
     needs:
-        - fedora42-shared-mpi-python-core:build
+        - fedora44-shared-mpi-python-core:build
 
 ## Static analysis
 
-fedora42-tidy:build:
+fedora44-tidy:build:
     extends:
-        - .fedora42_tidy
+        - .fedora44_tidy
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_tidy_artifacts
@@ -335,7 +335,7 @@ windows-vs2022-qt:test:
 
 documentation:build:
     extends:
-        - .fedora42_documentation
+        - .fedora44_documentation
         - .doxygen_build_linux
         - .linux_builder_tags
         - .doxygen_log_artifacts
@@ -344,9 +344,9 @@ documentation:build:
         PV_CI_RUN_MANUALLY: "true"
         PV_CI_NIGHTLY_ONLY: "true"
 
-fedora42-doxygen:build:
+fedora44-doxygen:build:
     extends:
-        - .fedora42_doxygen
+        - .fedora44_doxygen
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_doxygen_artifacts
