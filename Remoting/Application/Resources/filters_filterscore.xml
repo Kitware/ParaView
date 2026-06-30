@@ -2034,6 +2034,31 @@ found and the point will be rejected.</Documentation>
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
+      <DoubleVectorProperty command="SetSnappingRadius"
+                            default_values="1.79769e+308"
+                            name="SnappingRadius"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="0.0" name="range" />
+        <Documentation>
+          Set the radius used to snap to the closest cell when **Snap To Cell With Closest Point**
+          is enabled. This value is ignored when **Compute Tolerance** is enabled, in which case the
+          snapping radius is automatically computed from the source bounds.
+        </Documentation>
+        <Hints>
+          <!-- Snapping radius only applies when snapping to the closest cell, so enable it only then. -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="SnapToCellWithClosestPoint"
+                                   value="1" />
+          <!-- The snapping radius is ignored (auto-computed) when Compute Tolerance is on, so disable it. -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="ComputeTolerance"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
       <IntVectorProperty command="SetUseImplicitArrays"
                          default_values="0"
                          name="UseImplicitArrays"
@@ -2078,6 +2103,7 @@ found and the point will be rejected.</Documentation>
       </PropertyGroup>
       <PropertyGroup label="Point Set Resample">
         <Property name="SnapToCellWithClosestPoint" />
+        <Property name="SnappingRadius" />
       </PropertyGroup>
       <PropertyGroup label="Hyper Tree Grid Resample">
         <Property name="UseImplicitArrays" />
