@@ -217,10 +217,22 @@ bool vtkInitializationHelper::InitializeGlobalOptions(
     const auto processType = static_cast<vtkProcessModule::ProcessTypes>(type);
     coreConfig->PopulateGlobalOptions(options, processType);
   }
-  bool previous = options->GetStopOnUnrecognizedArgument();
-  options->SetStopOnUnrecognizedArgument(false);
+  // This is only a partial parse: most options (e.g. those registered in
+  // InitializeOtherOptions) are not yet known to `options`. Force lenient parsing so
+  // that not-yet-registered arguments are skipped over individually -- rather than
+  // causing the rest of the command line arguments to be ignored (or raising a parse
+  // error) the moment an unrecognized argument is seen. This makes it so that
+  // the few options registered so far (e.g. `--dr`) are found regardless of where they
+  // appear relative to arguments that aren't registered yet. The caller's original
+  // settings are restored before returning so that the later, fully-populated parse in
+  // InitializeOtherOptions retains its intended strictness.
+  bool previousStop = options->GetStopOnUnrecognizedArgument();
+  bool previousAllowExtras = options->GetAllowExtras();
+  options->SetStopOnUnrecognizedArgument(true);
+  options->SetAllowExtras(true);
   bool status = vtkInitializationHelper::ParseOptions(argc, argv, options, coreConfig, false);
-  options->SetStopOnUnrecognizedArgument(previous);
+  options->SetAllowExtras(previousAllowExtras);
+  options->SetStopOnUnrecognizedArgument(previousStop);
   return status;
 }
 
