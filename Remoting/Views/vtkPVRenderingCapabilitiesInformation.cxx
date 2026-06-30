@@ -3,6 +3,7 @@
 #include "vtkPVRenderingCapabilitiesInformation.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
@@ -116,6 +117,13 @@ vtkTypeUInt32 vtkPVRenderingCapabilitiesInformation::GetLocalCapabilities()
 vtkSmartPointer<vtkRenderWindow> vtkPVRenderingCapabilitiesInformation::NewOffscreenRenderWindow()
 {
   auto window = vtk::TakeSmartPointer(vtkRenderWindow::New());
+  // vtkOpenGLRenderWindow::New() returns vtkGenericOpenGLRenderWindow when
+  // UseGenericOpenGLRenderWindow is set.  Ensure the capabilities probe
+  // succeeds even without a QVTK handler to answer the event.
+  if (auto gwin = vtkGenericOpenGLRenderWindow::SafeDownCast(window))
+  {
+    gwin->SetSupportsOpenGL(1);
+  }
 
 // if headless rendering is supported, let's create the headless render
 // window.
