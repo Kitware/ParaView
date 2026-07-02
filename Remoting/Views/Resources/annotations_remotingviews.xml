@@ -940,10 +940,10 @@
           <Property exposed_name="PolarAxisTitleOpacity" name="Opacity" />
           <Property exposed_name="PolarAxisTitleFontFamily" name="FontFamily" />
           <Property exposed_name="PolarAxisTitleFontFile" name="FontFile" />
-          <Property exposed_name="PolarAxisTitleBold" name="Bold" />
+          <Property exposed_name="PolarAxisTitleBold" name="Bold" default_values="1" />
           <Property exposed_name="PolarAxisTitleItalic" name="Italic" />
           <Property exposed_name="PolarAxisTitleShadow" name="Shadow" />
-          <Property exposed_name="PolarAxisTitleFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="PolarAxisTitleFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
       <PropertyGroup label="Polar Axis Title Font Properties" panel_widget="FontEditor">
@@ -964,10 +964,10 @@
           <Property exposed_name="PolarAxisLabelOpacity" name="Opacity" />
           <Property exposed_name="PolarAxisLabelFontFamily" name="FontFamily" />
           <Property exposed_name="PolarAxisLabelFontFile" name="FontFile" />
-          <Property exposed_name="PolarAxisLabelBold" name="Bold" />
+          <Property exposed_name="PolarAxisLabelBold" name="Bold" default_values="1" />
           <Property exposed_name="PolarAxisLabelItalic" name="Italic" />
           <Property exposed_name="PolarAxisLabelShadow" name="Shadow" />
-          <Property exposed_name="PolarAxisLabelFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="PolarAxisLabelFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
       <PropertyGroup label="Polar Axis Label Font Properties" panel_widget="FontEditor">
@@ -988,10 +988,10 @@
           <Property exposed_name="LastRadialAxisTextOpacity" name="Opacity" />
           <Property exposed_name="LastRadialAxisTextFontFamily" name="FontFamily" />
           <Property exposed_name="LastRadialAxisTextFontFile" name="FontFile" />
-          <Property exposed_name="LastRadialAxisTextBold" name="Bold" />
+          <Property exposed_name="LastRadialAxisTextBold" name="Bold" default_values="1" />
           <Property exposed_name="LastRadialAxisTextItalic" name="Italic" />
           <Property exposed_name="LastRadialAxisTextShadow" name="Shadow" />
-          <Property exposed_name="LastRadialAxisTextFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="LastRadialAxisTextFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
       <PropertyGroup label="Last Radial Axis Text Font Properties" panel_widget="FontEditor">
@@ -1012,10 +1012,10 @@
           <Property exposed_name="SecondaryRadialAxesTextOpacity" name="Opacity" />
           <Property exposed_name="SecondaryRadialAxesTextFontFamily" name="FontFamily" />
           <Property exposed_name="SecondaryRadialAxesTextFontFile" name="FontFile" />
-          <Property exposed_name="SecondaryRadialAxesTextBold" name="Bold" />
+          <Property exposed_name="SecondaryRadialAxesTextBold" name="Bold" default_values="1" />
           <Property exposed_name="SecondaryRadialAxesTextItalic" name="Italic" />
           <Property exposed_name="SecondaryRadialAxesTextShadow" name="Shadow" />
-          <Property exposed_name="SecondaryRadialAxesTextFontSize" name="FontSize" default_values="12"/>
+          <Property exposed_name="SecondaryRadialAxesTextFontSize" name="FontSize" default_values="14"/>
         </ExposedProperties>
       </SubProxy>
       <PropertyGroup label="Secondary Radial Axes Text Font Properties" panel_widget="FontEditor">

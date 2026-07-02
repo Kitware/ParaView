@@ -24,6 +24,11 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Origin/DoubleLineEdit0" command="set_string" arguments="0.4" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Origin/DoubleLineEdit1" command="set_string" arguments="0.8" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/AxesLength/DoubleLineEdit0" command="set_string" arguments="180" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/Bold" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/FontSize" command="set_int" arguments="12" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/widget/OKButton" command="activate" arguments="" />
   <!-- test EndAngle < StartAngle -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/EndAngle/DoubleLineEdit0" command="set_string" arguments="-120" />
 

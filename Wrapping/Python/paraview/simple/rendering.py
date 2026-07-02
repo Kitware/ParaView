@@ -10,6 +10,8 @@ from paraview.simple.session import (
 )
 from paraview.simple.view import GetViews
 
+from paraview import _backwardscompatibilityhelper as bc
+
 # -----------------------------------------------------------------------------
 
 
@@ -101,7 +103,7 @@ def GetRepresentation(proxy=None, view=None):
     rep = servermanager.GetRepresentation(proxy, view)
     if not rep:
         controller = servermanager.ParaViewPipelineController()
-        return controller.Show(proxy, proxy.Port, view)
+        return Show(proxy, view)
     return rep
 
 
@@ -148,8 +150,12 @@ def Show(proxy=None, view=None, representationType=None, **params):
             "Could not create a representation object for proxy %s"
             % proxy.GetXMLLabel()
         )
+
+    bc.handle_representation_creation(rep)
+
     for param in params.keys():
         setattr(rep, param, params[param])
+
     return rep
 
 
