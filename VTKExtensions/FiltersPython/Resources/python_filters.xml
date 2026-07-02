@@ -52,6 +52,28 @@
           </RequiredProperties>
         </RegistrationNamesDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetArrayAssociation"
+                         default_values="0"
+                         name="ArrayAssociation"
+                         number_of_elements="1">
+        <FieldDataDomain name="enum" enable_field_data="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          This property controls which input arrays are defined as variables.
+          This is also the default for output association.
+          Depending on the operation, output association may vary.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetArrayName"
+                            default_values="Result"
+                            name="ArrayName"
+                            number_of_elements="1">
+        <Documentation>The name of the output array.</Documentation>
+      </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetUseMultilineExpression"
                          default_values="0"
@@ -63,7 +85,8 @@
       </IntVectorProperty>
       <StringVectorProperty command="SetExpression"
                             name="Expression"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_widget="python_calculator">
         <Hints>
           <Widget type="one_liner_wrapped" syntax="python" autocomplete="python_calc"/>
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -82,6 +105,7 @@
       <StringVectorProperty command="SetMultilineExpression"
                             name="MultilineExpression"
                             number_of_elements="1"
+                            panel_widget="python_calculator"
                             default_values="outputArray=numpy.ones(1)&#xA;return outputArray">
         <Hints>
           <Widget type="multi_line" syntax="python" autocomplete="python_calc"/>
@@ -96,28 +120,6 @@
         </Documentation>
       </StringVectorProperty>
 
-      <IntVectorProperty command="SetArrayAssociation"
-                         default_values="0"
-                         name="ArrayAssociation"
-                         number_of_elements="1">
-        <FieldDataDomain name="enum" enable_field_data="1">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
-        <Documentation>
-        This property controls which input arrays are defined as variables.
-        This is also the default for output association.
-        Depending on the operation, output association may vary.
-        </Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetArrayName"
-                            default_values="result"
-                            name="ArrayName"
-                            number_of_elements="1">
-        <Documentation>The name of the output array.</Documentation>
-      </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetCopyArrays"
                          default_values="1"

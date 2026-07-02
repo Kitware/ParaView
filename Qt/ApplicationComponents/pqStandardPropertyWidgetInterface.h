@@ -28,6 +28,7 @@ public:
    * return nullptr without raising any errors (or messages).
    * Supported types are:
    * \li \c calculator : pqCalculatorWidget
+   * \li \c python_calculator : pqPythonCalculatorWidget
    * \li \c camera_manipulator : pqCameraManipulatorWidget
    * \li \c color_palette_selector : pqColorPaletteSelectorWidget
    * \li \c color_selector : pqColorSelectorPropertyWidget

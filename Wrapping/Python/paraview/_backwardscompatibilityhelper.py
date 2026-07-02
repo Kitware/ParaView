@@ -1535,6 +1535,12 @@ def GetProxy(module, key, **kwargs):
             if "SidesToShow" not in kwargs:
                 rep.SidesToShow = 37
             return rep
+        # In 6.2, the default ArrayName for PythonCalculator changed from "result" to "Result".
+        if key == "PythonCalculator":
+            calc = builtins.getattr(module, key)(**kwargs)
+            if "ArrayName" not in kwargs:
+                calc.ArrayName = "result"
+            return calc
 
     # deprecation case
     if type(key) == tuple and len(key) == 2:

@@ -35,7 +35,7 @@ vtkStandardNewMacro(vtkPythonCalculator);
 //----------------------------------------------------------------------------
 vtkPythonCalculator::vtkPythonCalculator()
 {
-  this->SetArrayName("result");
+  this->SetArrayName("Result");
   this->SetExecuteMethod(vtkPythonCalculator::ExecuteScript, this);
 }
 

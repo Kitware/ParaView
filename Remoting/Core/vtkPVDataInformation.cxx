@@ -70,14 +70,16 @@ public:
     return info;
   }
 
-  void AddFieldDataOnly(vtkPVDataInformation* info, vtkDataObject* dobj)
+  void AddGlobalData(vtkPVDataInformation* info, vtkDataObject* dobj)
   {
-    this->Current->Initialize();
-    auto fdi = this->Current->GetFieldDataInformation();
-    fdi->CopyFromDataObject(dobj);
-    if (fdi->GetNumberOfArrays() > 0)
+    vtkNew<vtkPVDataSetAttributesInformation> tempFdi;
+    tempFdi->Initialize();
+    tempFdi->SetFieldAssociation(vtkDataObject::FIELD);
+    tempFdi->CopyFromDataObject(dobj);
+    if (tempFdi->GetNumberOfArrays() > 0)
     {
-      info->GetFieldDataInformation()->AddInformation(fdi);
+      tempFdi->MarkArraysAsGlobal();
+      info->GetFieldDataInformation()->AddInformation(tempFdi);
     }
   }
 };
@@ -450,23 +452,9 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
       }
     }
 
-    // we miss the root node in the above iteration; the key is field data.
-    // just handle it separately.
-    accumulator.AddFieldDataOnly(this, subset);
-
-    // if cd is a data-object tree, the iteration also misses non-leaf nodes and their
-    // field data; so process that too.
-    if (auto dtree = vtkDataObjectTree::SafeDownCast(simpleCD))
-    {
-      using DTOpts = vtk::DataObjectTreeOptions;
-      for (const auto& item : vtk::Range(dtree, DTOpts::TraverseSubTree))
-      {
-        if (auto nonleaf = vtkCompositeDataSet::SafeDownCast(item))
-        {
-          accumulator.AddFieldDataOnly(this, nonleaf);
-        }
-      }
-    }
+    // The range above misses the root node; gather its field data separately
+    // and mark those arrays as global (root-level composite field data).
+    accumulator.AddGlobalData(this, subset);
 
     this->CompositeDataSetType = subset->GetDataObjectType();
     this->FirstLeafCompositeIndex = leaf_index;
@@ -1028,24 +1016,24 @@ bool vtkPVDataInformation::IsAttributeValid(int attributeType) const
   {
     switch (attributeType)
     {
-      case vtkDataObject::FIELD_ASSOCIATION_NONE:
+      case vtkDataObject::FIELD:
         return true;
 
-      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+      case vtkDataObject::POINT:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_DATA_SET);
 
-      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+      case vtkDataObject::CELL:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_DATA_SET) ||
           vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID) ||
           vtkDataObjectTypes::TypeIdIsA(dtype, VTK_CELL_GRID);
 
-      case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+      case vtkDataObject::VERTEX:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
 
-      case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+      case vtkDataObject::EDGE:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
 
-      case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+      case vtkDataObject::ROW:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_TABLE);
 
       default:

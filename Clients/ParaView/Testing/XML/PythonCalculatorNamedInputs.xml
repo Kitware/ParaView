@@ -33,5 +33,5 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Display the result array -->
-  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="result" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Result" />
 </pqevents>

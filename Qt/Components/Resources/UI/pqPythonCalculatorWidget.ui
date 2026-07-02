@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: Copyright (c) Kitware Inc. -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<ui version="4.0">
+ <class>PythonCalculatorWidget</class>
+ <widget class="QWidget" name="PythonCalculatorWidget">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>4</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="UseNamedInputs">
+     <property name="text">
+      <string>Use named inputs</string>
+     </property>
+     <property name="toolTip">
+      <string>When checked, array accessors use the dataset name (e.g. inputs["name"].PointData["arr"]) instead of numeric indexing (e.g. inputs[0].PointData["arr"]).</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="FilterByAssociation">
+     <property name="text">
+      <string>Show only arrays matching Array Association</string>
+     </property>
+     <property name="toolTip">
+      <string>When checked, only arrays matching the current Array Association are listed in the Array picker.</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="inputLayout">
+     <item>
+      <widget class="QLabel" name="InputLabel">
+       <property name="text">
+        <string>Input</string>
+       </property>
+       <property name="toolTip">
+        <string>Select which connected input to browse arrays from.</string>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="Input">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Select which connected input to browse arrays from.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="arrayLayout">
+     <item>
+      <widget class="QLabel" name="ArrayLabel">
+       <property name="text">
+        <string>Array</string>
+       </property>
+       <property name="toolTip">
+        <string>Select an array to insert its accessor expression at the cursor position.</string>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="Arrays">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Select an array to insert its accessor expression at the cursor position.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="functionSearchLayout">
+     <item>
+      <widget class="QLabel" name="FunctionLabel">
+       <property name="text">
+        <string>Function</string>
+       </property>
+       <property name="toolTip">
+        <string>Double-click a function to insert it at the cursor position. Hover for documentation.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="FunctionSearch">
+       <property name="placeholderText">
+        <string>Search functions...</string>
+       </property>
+       <property name="toolTip">
+        <string>Filter functions by name.</string>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="pqTreeWidget" name="FunctionTree">
+     <property name="toolTip">
+      <string>Double-click a function to insert it at the cursor position. Hover for full documentation.</string>
+     </property>
+     <property name="headerHidden">
+      <bool>false</bool>
+     </property>
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Description</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

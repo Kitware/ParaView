@@ -117,9 +117,9 @@ def test0 (query, types=[], noperands=1, associations=[], debug=1, testComposite
                 if debug > 1 :
                     output = servermanager.Fetch(filter)
                     if   'point' == association :
-                        print_array(output.GetPointData().GetArray("result"), debug>2)
+                        print_array(output.GetPointData().GetArray("Result"), debug>2)
                     elif 'cell'  == association :
-                        print_array(output.GetCellData().GetArray("result"), debug>2)
+                        print_array(output.GetCellData().GetArray("Result"), debug>2)
 
     # Programmable Filter test
     for association in associations :
@@ -170,9 +170,9 @@ def test0 (query, types=[], noperands=1, associations=[], debug=1, testComposite
                 if debug > 1 :
                     output = servermanager.Fetch(filter)
                     if   'point' == association :
-                        print_array(output.GetPointData().GetArray("result"), debug>2)
+                        print_array(output.GetPointData().GetArray("Result"), debug>2)
                     elif 'cell'  == association :
-                        print_array(output.GetCellData().GetArray("result"), debug>2)
+                        print_array(output.GetCellData().GetArray("Result"), debug>2)
 
 # test1 tests all python programmable filters that work with datasets directly.
 #
@@ -229,8 +229,8 @@ def test1 (query, types=[], associations=[], debug=1) :
 
             if debug > 1 :
                 if 'point' == association :
-                    array = servermanager.Fetch(filter).GetPointData().GetArray("result")
-                else : array = servermanager.Fetch(filter).GetCellData().GetArray("result")
+                    array = servermanager.Fetch(filter).GetPointData().GetArray("Result")
+                else : array = servermanager.Fetch(filter).GetCellData().GetArray("Result")
                 if array : print_array(array, debug>2)
 
     # Programmable Filter tests
@@ -261,8 +261,8 @@ def test1 (query, types=[], associations=[], debug=1) :
 
             if debug > 1 :
                 if 'point' == association :
-                    array = servermanager.Fetch(filter).GetPointData().GetArray("result")
-                else : array = servermanager.Fetch(filter).GetCellData().GetArray("result")
+                    array = servermanager.Fetch(filter).GetPointData().GetArray("Result")
+                else : array = servermanager.Fetch(filter).GetCellData().GetArray("Result")
                 if array : print_array(array, debug>2)
 
 def main () :

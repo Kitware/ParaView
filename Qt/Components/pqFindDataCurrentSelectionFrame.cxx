@@ -76,7 +76,7 @@ void populateSelectionTypeCombo(QComboBox* cbox, pqOutputPort* port)
           break;
 
         case vtkDataObject::VERTEX:
-          cbox->addItem(QIcon(":/pqWidgets/Icons/pqCellData.svg"), label, attributeType);
+          cbox->addItem(QIcon(":/pqWidgets/Icons/pqPointData.svg"), label, attributeType);
           break;
 
         case vtkDataObject::EDGE:

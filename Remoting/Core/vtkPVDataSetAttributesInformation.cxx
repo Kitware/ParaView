@@ -81,7 +81,7 @@ vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
   : Internals(new vtkPVDataSetAttributesInformation::vtkInternals())
 {
-  this->FieldAssociation = vtkDataObject::NUMBER_OF_ASSOCIATIONS;
+  this->FieldAssociation = vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES;
   this->FieldName = nullptr;
 }
 
@@ -510,4 +510,13 @@ vtkPVArrayInformation* vtkPVDataSetAttributesInformation::AlphabeticalArrayInfor
 {
   auto& infoStorage = this->Internals->DSAttributesInformation->Internals->ArrayInformations;
   return infoStorage[this->Internals->LookupMapIter->second];
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::MarkArraysAsGlobal()
+{
+  for (auto& arrayInfo : this->Internals->ArrayInformations)
+  {
+    arrayInfo->SetIsGlobal(true);
+  }
 }

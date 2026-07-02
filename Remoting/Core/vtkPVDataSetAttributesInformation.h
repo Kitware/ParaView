@@ -148,6 +148,12 @@ protected:
    */
   void CopyFromDataObject(vtkDataObject* dobj);
 
+  /**
+   * Marks all arrays in this instance as global (i.e., from the root node of
+   * a composite dataset). Must be called after CopyFromDataObject.
+   */
+  void MarkArraysAsGlobal();
+
 private:
   vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&) = delete;
   void operator=(const vtkPVDataSetAttributesInformation&) = delete;
