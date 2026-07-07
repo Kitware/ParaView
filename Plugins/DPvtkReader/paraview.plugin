@@ -1,0 +1,10 @@
+NAME
+  DPvtkReader
+DESCRIPTION
+  DPvtk Readers for vtk XML files stored inside DPvtk container
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::IOXML
+  VTK::zlib

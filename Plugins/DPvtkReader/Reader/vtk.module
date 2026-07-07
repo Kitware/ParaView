@@ -1,0 +1,27 @@
+NAME
+  DPvtkReader::vtkDPvtkReader
+LIBRARY_NAME
+  vtkDPvtkReader
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::IOXML
+  VTK::zlib
+OPTIONAL_DEPENDS
+  VTK::mpi
+  VTK::ParallelCore
+  VTK::ParallelMPI
+PRIVATE_DEPENDS
+  VTK::CommonDataModel
+TEST_DEPENDS
+  VTK::InteractionStyle
+  VTK::FiltersGeometry
+  VTK::RenderingOpenGL2
+  VTK::TestingCore
+  VTK::TestingRendering
+TEST_OPTIONAL_DEPENDS
+  VTK::ParallelMPI
