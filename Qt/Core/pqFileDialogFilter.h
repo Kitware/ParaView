@@ -32,6 +32,15 @@ protected:
   pqFileDialogModel* Model;
   QRegularExpression Wildcards;
   bool showHidden;
+
+private:
+  /**
+   * handle invalidateFilter deprecation in Qt 6.11
+   */
+  ///@{
+  void beginFilterChangeInternal();
+  void endFilterChangeInternal();
+  ///@}
 };
 
 #endif // !pqFileDialogFilter_h

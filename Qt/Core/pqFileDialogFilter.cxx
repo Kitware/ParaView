@@ -10,6 +10,7 @@
 
 #include "pqFileDialogModel.h"
 
+//-----------------------------------------------------------------------------
 pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent)
   : QSortFilterProxyModel(Parent)
   , Model(model)
@@ -20,8 +21,10 @@ pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent
   this->setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
+//-----------------------------------------------------------------------------
 pqFileDialogFilter::~pqFileDialogFilter() = default;
 
+//-----------------------------------------------------------------------------
 void pqFileDialogFilter::setFilter(const QString& filter)
 {
   QString f(filter);
@@ -87,19 +90,23 @@ void pqFileDialogFilter::setFilter(const QString& filter)
     }
   }
 
+  this->beginFilterChangeInternal();
   this->Wildcards.setPattern(pattern);
-  this->invalidateFilter();
+  this->endFilterChangeInternal();
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialogFilter::setShowHidden(const bool& hidden)
 {
   if (this->showHidden != hidden)
   {
+    this->beginFilterChangeInternal();
     this->showHidden = hidden;
-    this->invalidateFilter();
+    this->endFilterChangeInternal();
   }
 }
 
+//-----------------------------------------------------------------------------
 bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& source_parent) const
 {
   QModelIndex idx = this->Model->index(row_source, 0, source_parent);
@@ -138,6 +145,7 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
   }
 }
 
+//-----------------------------------------------------------------------------
 bool pqFileDialogFilter::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
   // Compare two index for sorting purposes
@@ -171,4 +179,22 @@ bool pqFileDialogFilter::lessThan(const QModelIndex& left, const QModelIndex& ri
   }
   // Other column (strings) are handled by the superclass
   return QSortFilterProxyModel::lessThan(left, right);
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialogFilter::beginFilterChangeInternal()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+  this->beginFilterChange();
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialogFilter::endFilterChangeInternal()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+  this->endFilterChange();
+#else
+  this->invalidateFilter();
+#endif
 }

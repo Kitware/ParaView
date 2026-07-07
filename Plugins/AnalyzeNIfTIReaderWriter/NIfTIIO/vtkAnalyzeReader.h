@@ -31,7 +31,11 @@ public:
   vtkTypeMacro(vtkAnalyzeReader, vtkImageReader);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  // Description: is the given file name a png file?
+  // unhide parent overload
+  using Superclass::CanReadFile;
+  /**
+   * Return 1 if the provided fname looks like a file that can be read, 0 otherwise.
+   */
   int CanReadFile(const char* fname) override;
 
   // Description:
