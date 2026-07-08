@@ -1,0 +1,73 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <Proxy class="vtkDPvtkMultiBlockDataReader"
+                 label="DPvtk MultiBlock Data Reader Core"
+                 name="DPvtkMultiBlockDataReaderCore"
+                 base_proxygroup="internal_sources"
+                 base_proxyname="XMLMultiBlockDataReaderCore">
+      <Documentation>Reads a multiblock dataset stored as .vtm in a DPvtk file.</Documentation>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="DPvtk MultiBlock Data Reader"
+                 name="DPvtkMultiBlockDataReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads serial and parallel DPvtk data files."
+                     short_help="Read DPvtk data files.">
+        Reads a multiblock dataset stored as .vtm in a DPvtk file.
+        </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="DPvtkMultiBlockDataReaderCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Array Selection"
+                         name="ArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="CellArrayInfo" />
+            <Property name="CellArrayStatus" />
+            <Property name="PointArrayInfo" />
+            <Property name="PointArrayStatus" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be in the DPvtk data format storing the same data type. The
+        standard extension is .dpvtk. If more than one file is specified, the
+        reader will switch to file series mode and provide one file per time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="dpvtk"
+                       file_description="DPvtk MultiBlock Data Files" />
+      </Hints>
+      <!-- DPvtkReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <!-- end of "sources" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

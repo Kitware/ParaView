@@ -1,0 +1,3 @@
+## Added a DPvtkReader plugin
+
+Distributed Parallel Visualization with Zlib compression ([DPvz](https://github.com/sandialabs/dpvz)) is a library and file format that lets you store data in a parallel, time-dependent format. DPvtk, a thin layer on top of DPvz, stores VTK files as data, with multiple files written per time step and per rank. ParaView now provides a DPvtkReader plugin with the DPvtk MultiBlock Data Reader, which reads a Multi-block Dataset XML file (.vtm) and the partition VTK XML files (.vti, .vtr, etc.) stored inside a DPvtk file. DPvtk files use the `.dpvtk` extension. Additional readers, for instance for Partitioned Dataset Collections, may be added in the future.

@@ -1,0 +1,11 @@
+// SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+// SPDX-License-Identifier: BSD-3-Clause
+#ifndef vtkDPvz_h
+#define vtkDPvz_h
+
+// These are defines used by the DPvz library to differentiate between
+// the MPI and the serial version.
+#cmakedefine DPVZ_MPI
+#cmakedefine DPVZ_SER
+
+#endif
