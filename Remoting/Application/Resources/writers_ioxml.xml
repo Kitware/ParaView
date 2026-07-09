@@ -263,6 +263,10 @@
                  base_proxyname="XMLDataObjectWriterCore"
                  class="vtkXMLPHyperTreeGridWriter"
                  name="XMLPHyperTreeGridWriterCore">
+      <Deprecated deprecated_in="6.3" to_remove_in="6.5">
+        This writer does not work properly.
+        Please consider using the VTKHDF format instead.
+      </Deprecated>
       <Documentation>Internal writer used to write XML hyper tree grid data in parallel</Documentation>
       <IntVectorProperty command="SetUseSubdirectory"
                          name="UseSubdirectory"
@@ -1210,6 +1214,10 @@
 
     <!-- ================================================================= -->
     <DataExtractWriterProxy name="HTG">
+      <Deprecated deprecated_in="6.3" to_remove_in="6.5">
+        This extract writer does not work properly.
+        Please consider using the VTKHDF format instead.
+      </Deprecated>
       <Documentation>
         Extract writer to write hypertree grid using the VTK XML file format
         (htg or phtg).

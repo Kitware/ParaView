@@ -264,7 +264,6 @@ void vtkPVClipDataSet::PrintSelf(ostream& os, vtkIndent indent)
 int vtkPVClipDataSet::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkLogScopeFunction(INFO);
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
   if (!inInfo)
