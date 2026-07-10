@@ -552,6 +552,10 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
   {
     // no additional verification at this time.
   }
+  else if (type == "fides_conduit")
+  {
+    // no additional verification at this time.
+  }
   else if (type == "amrmesh")
   {
     // no additional verification at this time.

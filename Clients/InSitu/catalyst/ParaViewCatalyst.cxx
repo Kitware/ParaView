@@ -23,6 +23,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkStringArray.h"
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
@@ -169,6 +170,106 @@ static bool update_producer_fides(
 #else
   (void)channel_name;
   (void)time;
+  return false;
+#endif
+}
+
+// Wire a "fides_conduit" channel: a per-channel Fides JSON schema (either a
+// path via channel_node["schema_file"] or an inline string via
+// channel_node["schema"]) together with a live conduit::Node tree handed to
+// Fides as the single data source. The conduit tree itself lives at
+// channel_node["data"] (same convention as the other channel types).
+//
+// Unlike "fides", there is no ADIOS step / SST stream involved: the producer
+// reads directly from the in-memory conduit tree each time the simulation
+// triggers a Catalyst execute. channel_time is forwarded to the reader so
+// the output's DATA_TIME_STEP is set and downstream extractors (notably the
+// Fides writer) can persist the per-step time alongside the data.
+static bool update_producer_fides_conduit(
+  const std::string& channel_name, const conduit_cpp::Node& channel_node, double channel_time)
+{
+#if VTK_MODULE_ENABLE_VTK_IOFides
+  auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
+  if (producer == nullptr)
+  {
+    auto pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    producer = vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "FidesJSONReader"));
+    if (!producer)
+    {
+      vtkLogF(
+        ERROR, "Failed to create 'FidesJSONReader' proxy for channel '%s'!", channel_name.c_str());
+      return false;
+    }
+    vtkInSituInitializationHelper::SetProducer(channel_name, producer);
+    producer->Delete();
+  }
+
+  // Configure the reader directly via the algorithm: the proxy property
+  // surface only carries SetFileName for the schema, but we also need to
+  // accept an inline JSON string and to bind a conduit::Node by pointer.
+  auto algo = vtkFidesReader::SafeDownCast(producer->GetClientSideObject());
+  if (!algo)
+  {
+    vtkLogF(ERROR, "Producer on channel '%s' is not a vtkFidesReader.", channel_name.c_str());
+    return false;
+  }
+
+  if (channel_node.has_path("schema_file"))
+  {
+    algo->SetFileName(channel_node["schema_file"].as_string());
+  }
+  else if (channel_node.has_path("schema"))
+  {
+    algo->SetSchema(channel_node["schema"].as_string());
+  }
+  else
+  {
+    vtkLogF(ERROR, "channel '%s' (type=fides_conduit) requires either 'schema_file' or 'schema'.",
+      channel_name.c_str());
+    return false;
+  }
+
+  // Parse the model now so we can discover the data source name. We require
+  // the schema to declare exactly one data source; the user does not pass a
+  // source name explicitly.
+  algo->ParseDataModel();
+  auto* names = algo->GetDataSourceNames();
+  if (!names || names->GetNumberOfValues() != 1)
+  {
+    vtkLogF(ERROR,
+      "channel '%s' (type=fides_conduit): the data model must declare exactly one data "
+      "source, found %d.",
+      channel_name.c_str(), names ? static_cast<int>(names->GetNumberOfValues()) : 0);
+    return false;
+  }
+  const std::string source_name = names->GetValue(0);
+
+  // Bind the channel's data node as the (single) source. The node is
+  // re-bound every step because the conduit node memory address can move
+  // between Catalyst executes; SetDataSourceNode replaces any prior binding
+  // for this source name. The reader does not take ownership of the memory,
+  // so the conduit tree must stay valid until the pipeline update completes
+  // -- it does, since the caller owns it for the duration of this execute.
+  const auto data_node = channel_node["data"];
+  conduit_node* c_data = conduit_cpp::c_node(const_cast<conduit_cpp::Node*>(&data_node));
+  if (!algo->SetDataSourceNode(source_name, c_data))
+  {
+    vtkLogF(ERROR, "channel '%s' (type=fides_conduit): failed to bind conduit data source '%s'.",
+      channel_name.c_str(), source_name.c_str());
+    return false;
+  }
+
+  // Forward the channel's current time to the reader so the output's
+  // DATA_TIME_STEP is set; VTK propagates that key downstream and the
+  // Fides writer will pick it up via vtkDataObject::DATA_TIME_STEP().
+  algo->SetTimeValue(channel_time);
+
+  vtkInSituInitializationHelper::MarkProducerModified(channel_name);
+  return true;
+#else
+  (void)channel_name;
+  (void)channel_node;
+  (void)channel_time;
   return false;
 #endif
 }
@@ -685,6 +786,18 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
         vtkLogF(ERROR, "Fides mesh is not supported by this build. Rebuild with Fides enabled.");
 #endif
       }
+      else if (type == "fides_conduit")
+      {
+#if VTK_MODULE_ENABLE_VTK_IOFides
+        is_valid = true;
+        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+          "Fides-via-conduit mesh detected for channel (%s); validation will be skipped for now",
+          channel_name.c_str());
+#else
+        vtkLogF(
+          ERROR, "fides_conduit mesh is not supported by this build. Rebuild with Fides enabled.");
+#endif
+      }
       else if (type == "amrmesh")
       {
         is_valid = true;
@@ -729,6 +842,10 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
       else if (type == "fides")
       {
         update_producer_fides(channel_name, cpp_params["catalyst/fides"], time);
+      }
+      else if (type == "fides_conduit")
+      {
+        update_producer_fides_conduit(channel_name, channel_node, channel_time);
       }
 
       // Set in situ mode. Temporal filters are notified that they don't have the whole time
