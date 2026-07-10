@@ -108,3 +108,9 @@ set(_vtk_build_VERSION "")
 set(_vtk_build_SOVERSION "")
 
 _vtk_module_apply_properties(catalyst-paraview)
+
+# Tests for the Catalyst 'fides_conduit' channel. They require the Fides reader
+# (with Conduit support) to be available.
+if (PARAVIEW_BUILD_TESTING AND _have_vtk_iofides AND TARGET VTK::conduit)
+  add_subdirectory(Testing/Python)
+endif ()

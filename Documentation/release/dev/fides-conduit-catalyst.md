@@ -35,3 +35,9 @@ data model.
 Developer notes: `vtkFidesReader` no longer exposes `SetConvertToVTK` (the
 Viskores-to-VTK conversion is now unconditional), and the stale `ConvertToVTK`
 property has been dropped from both Fides reader proxies.
+
+The `fides_conduit` channel relies on the Fides reader's in-memory Conduit
+data-source support, which is only compiled when the `VTK::conduit` module is
+enabled and Catalyst is built against the same external Conduit
+(`CATALYST_WITH_EXTERNAL_CONDUIT=ON`). Enable `VTK::conduit` in such builds to
+use the feature; its Catalyst tests are skipped otherwise.
