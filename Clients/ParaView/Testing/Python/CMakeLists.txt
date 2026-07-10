@@ -363,3 +363,12 @@ paraview_add_test_python(
   LogFileEnvVar.py
 )
 set_tests_properties("paraviewPython-LogFileEnvVar" PROPERTIES ENVIRONMENT "PARAVIEW_LOG_FILE=${CMAKE_BINARY_DIR}/Testing/Temporary/pv_envvar.log")
+
+#------------------------------------------------------------------------------
+# Verifies the AdiosConfigFile property on the FidesWriter proxy is respected.
+if (TARGET VTK::IOFides)
+  paraview_add_test_python(
+    NO_DATA NO_VALID
+    FidesWriterAdiosConfig.py
+  )
+endif ()
