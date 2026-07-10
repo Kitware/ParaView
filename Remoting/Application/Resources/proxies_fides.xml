@@ -512,4 +512,54 @@
       </Hints>
     </PWriterProxy>
   </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="extract_writers">
+    <!-- Catalyst V2 extractor wrapper around the Fides writer. Lets pipeline
+         scripts use CreateExtractor("Fides", source, ...) to persist data
+         that the standard VT* extractors can't handle (notably vtkCellGrid,
+         which the XML PartitionedDataSetCollectionWriter skips). -->
+    <DataExtractWriterProxy name="Fides">
+      <Documentation>
+        Extract writer that persists data using the Fides writer (ADIOS2 BP
+        output). Required for cell-grid datasets and useful for any
+        partitioned dataset / partitioned dataset collection that should be
+        written out via ADIOS2.
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="{prefix}_{timestep:06d}.bp">
+        <Documentation>
+          Specify the filename to use. The default pattern produces one
+          ADIOS2 BP directory per timestep under the extractor output
+          directory.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="FidesWriter" />
+        <ExposedProperties>
+          <Property name="Input" />
+
+          <PropertyGroup label="Data Selection">
+            <Property name="ChooseArraysToWrite" panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointArrays" panel_visibility="advanced"/>
+            <Property name="CellArrays" panel_visibility="advanced"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
+    </DataExtractWriterProxy>
+  </ProxyGroup>
 </ServerManagerConfiguration>
