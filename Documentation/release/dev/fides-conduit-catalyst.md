@@ -37,7 +37,10 @@ Viskores-to-VTK conversion is now unconditional), and the stale `ConvertToVTK`
 property has been dropped from both Fides reader proxies.
 
 The `fides_conduit` channel relies on the Fides reader's in-memory Conduit
-data-source support, which is only compiled when the `VTK::conduit` module is
-enabled and Catalyst is built against the same external Conduit
-(`CATALYST_WITH_EXTERNAL_CONDUIT=ON`). Enable `VTK::conduit` in such builds to
-use the feature; its Catalyst tests are skipped otherwise.
+data-source support. Enable it with the new `PARAVIEW_ENABLE_CATALYST_FIDES`
+option (available when `PARAVIEW_ENABLE_CATALYST` is on): it turns on the Fides
+reader and forces the `VTK::conduit` module on. It does not enable the ADIOS2
+reader (`PARAVIEW_ENABLE_ADIOS2`), though the adios2 library is still required
+to build Fides, and Catalyst must be built against the same external Conduit
+(`CATALYST_WITH_EXTERNAL_CONDUIT=ON`). The Catalyst `fides_conduit` tests are
+skipped when Fides or `VTK::conduit` is unavailable.
