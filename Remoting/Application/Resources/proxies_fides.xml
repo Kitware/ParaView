@@ -164,6 +164,27 @@
         <Documentation>This property lists which field arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellGridAttributeArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="CellGridAttribute" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellGridAttributeArrayStatus"
+                            element_types="2 0"
+                            information_property="CellGridAttributeArrayInfo"
+                            label="CellGrid Attributes"
+                            name="CellGridAttributeArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellGridAttributeArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-grid attributes to read.
+        Populated only when the data model produces a vtkCellGrid output.</Documentation>
+      </StringVectorProperty>
       <Hints>
         <ReaderFactory extensions="bp"
                        file_description="ADIOS2 BP3 File (using Fides)" />
@@ -346,6 +367,27 @@
         </ArraySelectionDomain>
         <Documentation>This property lists which field arrays to
         read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellGridAttributeArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="CellGridAttribute" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellGridAttributeArrayStatus"
+                            element_types="2 0"
+                            information_property="CellGridAttributeArrayInfo"
+                            label="CellGrid Attributes"
+                            name="CellGridAttributeArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellGridAttributeArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-grid attributes to read.
+        Populated only when the data model produces a vtkCellGrid output.</Documentation>
       </StringVectorProperty>
       <Hints>
         <ReaderFactory extensions="json"
