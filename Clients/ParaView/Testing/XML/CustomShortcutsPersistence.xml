@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Regression test for paraview/paraview#21133: a custom keyboard
+       shortcut already present in settings (see
+       CustomShortcutsPersistence.ini, which the test driver installs as
+       this run's ParaView.ini before launching) must be restored and made
+       active on startup, not just when set interactively in the running
+       session. The fixture assigns Ctrl+L to Tools > Customize
+       Shortcuts... -->
+
+  <!-- The action's own shortcut must reflect the value loaded from
+       settings. -->
+  <pqcheck object="pqClientMainWindow/menubar/menuTools/actionCustomize" property="shortcut" arguments="⌘L" />
+
+  <!-- Pressing the shortcut should also actually trigger the action. -->
+  <pqevent object="pqClientMainWindow" command="keyEvent" arguments="6,76,67108864,L,0,1" />
+  <pqevent object="pqClientMainWindow" command="keyEvent" arguments="7,76,67108864,L,0,1" />
+  <pqcheck object="pqClientMainWindow/pqCustomizeShortcutsDialog" property="visible" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqCustomizeShortcutsDialog" command="keyEvent" arguments="6,16777216,0,,0,1" />
+</pqevents>

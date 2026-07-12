@@ -53,7 +53,11 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings* settings, QWidget
       auto variant = settings->value(actionName, QVariant());
       if (variant.canConvert<QKeySequence>())
       {
-        pqKeySequences::instance().addModalShortcut(variant.value<QKeySequence>(), action, widget);
+        // Apply the shortcut directly to the action, the same way
+        // pqCustomizeShortcutsDialog does when a shortcut is changed
+        // interactively. This keeps the menu display and Qt's shortcut
+        // dispatch in sync with what was saved.
+        action->setShortcut(variant.value<QKeySequence>());
       }
     }
   }

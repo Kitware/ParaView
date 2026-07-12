@@ -2492,3 +2492,23 @@ paraview_add_client_tests(
 paraview_add_client_tests(
     ARGS --plugins=ReaderNamePlugin "--plugin-search-paths=${paraview_test_data_directory_output}/Testing/Data"
     TEST_SCRIPTS PluginCommandLine.xml)
+
+if (APPLE)
+  # Regression test for paraview/paraview#21133 (custom shortcuts not
+  # loaded on startup). Runs ParaView once with a settings file that
+  # already has a custom shortcut configured and verifies it is restored.
+  # Relies on QSettings(IniFormat, UserScope) honoring $HOME, which is only
+  # true on macOS/Linux. Because the Ctrl+L shortcut is platform-dependent,
+  # we test only on macOS which renders the shortcut as ⌘L in the UI.
+  add_test(NAME pv.CustomShortcutsPersistence
+    COMMAND ${CMAKE_COMMAND}
+    -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
+    -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/CustomShortcutsPersistence.xml
+    -DINI_FIXTURE:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/CustomShortcutsPersistence.ini
+    -DTEMPORARY_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CustomShortcutsPersistenceDriver.cmake
+  )
+  set_tests_properties(pv.CustomShortcutsPersistence PROPERTIES
+    LABELS ParaView
+    RUN_SERIAL ON)
+endif ()
