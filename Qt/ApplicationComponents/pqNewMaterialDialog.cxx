@@ -22,16 +22,6 @@ pqNewMaterialDialog::pqNewMaterialDialog(QWidget* parentObject, Qt::WindowFlags 
   : Superclass(parentObject, flags)
   , Internals(new pqNewMaterialDialog::pqInternals(this))
 {
-  // set the material type list
-  QStringList typesList;
-
-  for (auto& type : vtkOSPRayMaterialLibrary::GetParametersDictionary())
-  {
-    typesList << type.first.c_str();
-  }
-
-  this->Internals->Ui.MaterialType->insertItems(0, typesList);
-
   QObject::connect(
     this->Internals->Ui.ButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   QObject::connect(
@@ -78,4 +68,15 @@ pqNewMaterialDialog::~pqNewMaterialDialog()
 void pqNewMaterialDialog::setMaterialLibrary(vtkOSPRayMaterialLibrary* lib)
 {
   this->MaterialLibrary = lib;
+
+  this->Internals->Ui.MaterialType->clear();
+  if (lib)
+  {
+    QStringList typesList;
+    for (const auto& type : lib->GetParametersDictionary())
+    {
+      typesList << type.first.c_str();
+    }
+    this->Internals->Ui.MaterialType->insertItems(0, typesList);
+  }
 }
