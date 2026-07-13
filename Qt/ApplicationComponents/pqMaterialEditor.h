@@ -48,6 +48,11 @@ public:
   std::vector<std::string> availableParameters();
 
   /**
+   * Return the material library instance used by this editor.
+   */
+  vtkOSPRayMaterialLibrary* getMaterialLibrary() const;
+
+  /**
    * Strong type extension of the existing Qt::ItemDataRole.
    * This is used to store the QVariant value for the properties
    */
