@@ -12,6 +12,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSetGet.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
@@ -19,7 +20,6 @@
 #include "vtkXMLHyperTreeGridWriter.h"
 #include "vtkXMLImageDataWriter.h"
 #include "vtkXMLPDataWriter.h"
-#include "vtkXMLPHyperTreeGridWriter.h"
 #include "vtkXMLPImageDataWriter.h"
 #include "vtkXMLPMultiBlockDataWriter.h"
 #include "vtkXMLPPolyDataWriter.h"
@@ -570,13 +570,9 @@ void vtkXMLPVDWriter::CreateWriters()
       case VTK_HYPER_TREE_GRID:
         if (this->NumberOfPieces > 1)
         {
-          if (!this->Internal->Writers[i].GetPointer() ||
-            (this->Internal->Writers[i]->IsA("vtkXMLPHyperTreeGridWriter")))
-          {
-            vtkXMLPHyperTreeGridWriter* w = vtkXMLPHyperTreeGridWriter::New();
-            this->Internal->Writers[i] = w;
-            w->Delete();
-          }
+          vtkErrorMacro("Parallel HyperTreeGrid is not a supported datatype. Please use the VTKHDF "
+                        "format instead.");
+          return;
         }
         else
         {

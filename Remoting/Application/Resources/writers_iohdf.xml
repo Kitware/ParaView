@@ -18,11 +18,15 @@
                     name="Input">
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkUnstructuredGrid"/>
-          <DataType value="vtkPolyData"/>
           <DataType value="vtkHyperTreeGrid"/>
-          <DataType value="vtkPartitionedDataSetCollection"/>
+          <DataType value="vtkImageData"/>
           <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkPartitionedDataSetCollection"/>
+          <DataType value="vtkPolyData"/>
+          <DataType value="vtkRectilinearGrid"/>
+          <DataType value="vtkStructuredGrid"/>
+          <DataType value="vtkTable"/>
+          <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
         <Documentation>
           The input filter/source whose output dataset is written to the file.
