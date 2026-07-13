@@ -157,10 +157,10 @@ void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStri
 {
   // Check if we have a function from paraview.simple
   vtkSmartPyObject simpleModule;
-  simpleModule.TakeReference(PyImport_ImportModule("paraview.simple.session"));
+  simpleModule.TakeReference(PyImport_ImportModule("paraview.simple.autocomplete"));
   if (!simpleModule)
   {
-    qWarning() << "Failed to import 'paraview.simple.session'";
+    qWarning() << "Failed to import 'paraview.simple.autocomplete'";
     if (PyErr_Occurred())
     {
       PyErr_Print();
@@ -191,7 +191,8 @@ void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStri
     PyObject_CallMethodObjArgs(simpleModule.GetPointer(), getArguments, function, nullptr));
   if (!retList)
   {
-    qWarning() << "Could not invoke 'paraview.simple.'" << argumentExtractorUtility.c_str();
+    qWarning() << "Could not invoke 'paraview.simple.autocomplete.'"
+               << argumentExtractorUtility.c_str();
     if (PyErr_Occurred())
     {
       PyErr_Print();
