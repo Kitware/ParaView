@@ -4736,10 +4736,12 @@ Every Nth Point.
                  name="TableToStructuredGrid">
       <Documentation long_help="Converts a table to structured grid."
                      short_help="Converts a table to structured grid.">The
-                     TableToStructuredGrid filter converts a vtkTable to a
-                     vtkStructuredGrid. One must specify the columns in the
+                     TableToStructuredGrid filter converts a Table to a
+                     StructuredGrid. One must specify the columns in the
                      input table to use as the X, Y and Z coordinates for the
                      points in the output, and the dimensions of the data.
+                     The rows should be ordered so it increase X then Y then Z.
+                     Every point should be provided.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -4781,8 +4783,7 @@ Every Nth Point.
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>This property specifies which data array is going to be
-        used as the X coordinate in the generated polydata
-        dataset.</Documentation>
+        used as the X coordinate in the generated grid.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetYColumn"
                             name="YColumn"
@@ -4794,8 +4795,7 @@ Every Nth Point.
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>This property specifies which data array is going to be
-        used as the Y coordinate in the generated polydata
-        dataset.</Documentation>
+        used as the Y coordinate in the generated grid.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetZColumn"
                             name="ZColumn"
@@ -4807,8 +4807,7 @@ Every Nth Point.
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>This property specifies which data array is going to be
-        used as the Z coordinate in the generated polydata
-        dataset.</Documentation>
+        used as the Z coordinate in the generated grid.</Documentation>
       </StringVectorProperty>
     </SourceProxy>
     <!-- End vtkPVTableToStructuredGrid -->

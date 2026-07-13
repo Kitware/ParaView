@@ -2775,5 +2775,67 @@
       </StringVectorProperty>
 
     </SourceProxy>
+    <SourceProxy name="TableToRectilinearGrid"
+      class="vtkTableToRectilinearGrid">
+      <Documentation short_help="Transform a table in a RectilinearGrid">
+        TableToRectilinearGrid create a Rectilinear grid from a table.
+        Each unique value of the X-Y-Z provided arrays is used to define the grid.
+        An (x-y-z) point that does not exist in the input table is marked as blank,
+        as well as its surrounding cells.
+        The rows are not expected to follow any kind of order.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_array"
+                          number_of_components="1" />
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <StringVectorProperty command="SetXColumn"
+                            name="XColumn"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies which data array is going to be
+        used as the X coordinate in the generated grid.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetYColumn"
+                            name="YColumn"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies which data array is going to be
+        used as the Y coordinate in the generated grid.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetZColumn"
+                            name="ZColumn"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies which data array is going to be
+        used as the Z coordinate in the generated grid.</Documentation>
+      </StringVectorProperty>
+
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

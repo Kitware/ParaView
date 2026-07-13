@@ -520,6 +520,7 @@
   <Proxy group="filters" name="SynchronizeTime" />
   <Proxy group="filters" name="TableFFT" />
   <Proxy group="filters" name="TableToPolyData" />
+  <Proxy group="filters" name="TableToRectilinearGrid" />
   <Proxy group="filters" name="TableToStructuredGrid" />
   <Proxy group="filters" name="TemporalArrayOperator" />
   <Proxy group="filters" name="TemporalCache" />
