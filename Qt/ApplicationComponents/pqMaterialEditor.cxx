@@ -718,7 +718,7 @@ void pqMaterialEditor::addMaterial()
       ml->AddMaterial(matName, dialog->type().toUtf8().data());
 
       // Needed to update vtkSMMaterialDomain instances
-      ml->Fire();
+      ml->InvokeEvent(vtkCommand::UpdateDataEvent);
 
       this->Internals->Ui.SelectMaterial->setCurrentText(QString(matName.c_str()));
 
@@ -766,7 +766,7 @@ void pqMaterialEditor::removeMaterial()
     }
 
     // Needed to update vtkSMMaterialDomain instances
-    ml->Fire();
+    ml->InvokeEvent(vtkCommand::UpdateDataEvent);
     this->updateCurrentMaterial(this->currentMaterialName().toStdString());
     this->Internals->ShaderBall->Modified();
   }

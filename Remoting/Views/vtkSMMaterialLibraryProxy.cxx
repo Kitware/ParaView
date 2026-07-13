@@ -3,6 +3,7 @@
 #include "vtkSMMaterialLibraryProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLogger.h"
@@ -96,7 +97,7 @@ void vtkSMMaterialLibraryProxy::Synchronize(
 
   vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(
     vtkPVMaterialLibrary::SafeDownCast(this->GetClientSideObject())->GetMaterialLibrary());
-  ml->Fire();
+  ml->InvokeEvent(vtkCommand::UpdateDataEvent);
 #else
   (void)from;
   (void)to;
