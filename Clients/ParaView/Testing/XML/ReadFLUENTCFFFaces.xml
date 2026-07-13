@@ -7,10 +7,20 @@
 
   <!-- Read Faces data too -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ReadFaces/CheckBox" command="set_boolean" arguments="true" />
+
+  <!-- check face selection list -->
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" property="modelRowCount" arguments="7" />
+  <!-- check only the second one, "inlet" -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" command="setCheckState" arguments="0.0,0" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" property="modelItemData" arguments="1.0,inlet" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" command="setCheckState" arguments="1.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" command="setCheckState" arguments="2.0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" command="setCheckState" arguments="3.0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" command="setCheckState" arguments="4.0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" command="setCheckState" arguments="5.0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Faces/ArraySelectionWidget" command="setCheckState" arguments="6.0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
-  <!-- Select a specific data array available on each block -->
-  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="SV_P" />
-
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReadFLUENTCFFFaces.png" width="300" height="300" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.0.0,Block0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" property="modelItemData" arguments="0.0.1.0,inlet" />
 </pqevents>
