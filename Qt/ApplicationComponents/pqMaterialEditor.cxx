@@ -65,7 +65,7 @@ void AddDefaultValue(
   vtkOSPRayMaterialLibrary* ml, const std::string& matName, const std::string& variable)
 {
   const std::string& matType = ml->LookupImplName(matName);
-  const auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+  const auto& dic = ml->GetParametersDictionary();
   const auto varType = dic.at(matType).at(variable);
   switch (varType)
   {
@@ -281,7 +281,7 @@ QVariant pqMaterialProxyModel::getVariant(const std::string& name) const
 {
   vtkOSPRayMaterialLibrary* ml = this->MaterialLibrary;
   auto value = ml->GetDoubleShaderVariable(this->MaterialName, name);
-  const auto& paramDic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+  const auto& paramDic = ml->GetParametersDictionary();
 
   switch (paramDic.at(ml->LookupImplName(this->MaterialName)).at(name))
   {
@@ -346,7 +346,7 @@ QVariant pqMaterialProxyModel::data(const QModelIndex& index, int role) const
   else if (index.column() == static_cast<int>(Column::PROPERTY) &&
     this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
   {
-    const auto& paramDic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+    const auto& paramDic = this->MaterialLibrary->GetParametersDictionary();
     auto value = this->MaterialLibrary->GetDoubleShaderVariable(this->MaterialName, variableName);
     switch (paramDic.at(this->MaterialLibrary->LookupImplName(this->MaterialName)).at(variableName))
     {
@@ -694,6 +694,12 @@ QString pqMaterialEditor::currentMaterialName()
 }
 
 //-----------------------------------------------------------------------------
+vtkOSPRayMaterialLibrary* pqMaterialEditor::getMaterialLibrary() const
+{
+  return this->Internals->MaterialLibrary;
+}
+
+//-----------------------------------------------------------------------------
 void pqMaterialEditor::addMaterial()
 {
   vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
@@ -718,7 +724,7 @@ void pqMaterialEditor::addMaterial()
       ml->AddMaterial(matName, dialog->type().toUtf8().data());
 
       // Needed to update vtkSMMaterialDomain instances
-      ml->Fire();
+      ml->InvokeEvent(vtkCommand::UpdateDataEvent);
 
       this->Internals->Ui.SelectMaterial->setCurrentText(QString(matName.c_str()));
 
@@ -766,7 +772,7 @@ void pqMaterialEditor::removeMaterial()
     }
 
     // Needed to update vtkSMMaterialDomain instances
-    ml->Fire();
+    ml->InvokeEvent(vtkCommand::UpdateDataEvent);
     this->updateCurrentMaterial(this->currentMaterialName().toStdString());
     this->Internals->ShaderBall->Modified();
   }
@@ -856,7 +862,7 @@ std::vector<std::string> pqMaterialEditor::availableParameters()
     auto usedVariable = ml->GetDoubleShaderVariableList(matName);
     auto usedTexture = ml->GetTextureList(matName);
 
-    const auto& allParams = vtkOSPRayMaterialLibrary::GetParametersDictionary().at(matType);
+    const auto& allParams = ml->GetParametersDictionary().at(matType);
     // Filter all available parameters so only the relevant ones are left
     for (const auto& p : allParams)
     {
