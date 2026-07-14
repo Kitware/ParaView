@@ -222,7 +222,8 @@ void pqColorMapEditor::updateActive(bool forceUpdate)
 
   auto colorMapEditorHelper = this->Internals->ColorMapEditorHelper.Get();
   // Set the current LUT proxy to edit.
-  if (repr && colorMapEditorHelper->GetAnySelectedUsingScalarColoring(repr->getProxy()))
+  if (repr && colorMapEditorHelper &&
+    colorMapEditorHelper->GetAnySelectedUsingScalarColoring(repr->getProxy()))
   {
     auto luts = colorMapEditorHelper->GetSelectedLookupTables(repr->getProxy());
     for (vtkSMProxy* lutProxy : luts)
