@@ -202,7 +202,8 @@ bool vtkFileSeriesWriter::AppendFileNameForTimeStep(
   {
     // timeIndex to a string using this->FileNameSuffix as format
     char suffix[100];
-    auto result = vtk::format_to_n(suffix, sizeof(suffix), this->FileNameSuffix, timeIndex);
+    auto result =
+      vtk::format_to_n(suffix, sizeof(suffix), vtk::runtime(this->FileNameSuffix), timeIndex);
     *result.out = '\0';
     if (appendPath && !path.empty())
     {

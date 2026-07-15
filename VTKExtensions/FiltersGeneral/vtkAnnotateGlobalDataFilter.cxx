@@ -101,7 +101,7 @@ struct Printer
       if (numComps == 1)
       {
         auto data = vtk::DataArrayValueRange<1>(array);
-        auto result = vtk::format_to_n(buffer, sizeof(buffer), self->GetFormat(),
+        auto result = vtk::format_to_n(buffer, sizeof(buffer), vtk::runtime(self->GetFormat()),
           static_cast<ValueType>(data[this->ChosenTuple]));
         *result.out = '\0';
         stream << buffer;
@@ -112,7 +112,7 @@ struct Printer
         stream << "(";
         for (int cc = 0; cc < numComps; ++cc)
         {
-          auto result = vtk::format_to_n(buffer, sizeof(buffer), self->GetFormat(),
+          auto result = vtk::format_to_n(buffer, sizeof(buffer), vtk::runtime(self->GetFormat()),
             static_cast<ValueType>(data[this->ChosenTuple][cc]));
           *result.out = '\0';
           stream << (cc > 0 ? ", " : " ");
@@ -146,8 +146,8 @@ struct Printer
       const auto numComps = array->GetNumberOfComponents();
       if (numComps == 1)
       {
-        auto result = vtk::format_to_n(
-          buffer, sizeof(buffer), self->GetFormat(), array->GetValue(this->ChosenTuple));
+        auto result = vtk::format_to_n(buffer, sizeof(buffer), vtk::runtime(self->GetFormat()),
+          array->GetValue(this->ChosenTuple));
         *result.out = '\0';
         stream << buffer;
       }
@@ -156,7 +156,7 @@ struct Printer
         stream << "(";
         for (int cc = 0; cc < numComps; ++cc)
         {
-          auto result = vtk::format_to_n(buffer, sizeof(buffer), self->GetFormat(),
+          auto result = vtk::format_to_n(buffer, sizeof(buffer), vtk::runtime(self->GetFormat()),
             array->GetValue(this->ChosenTuple * numComps + cc));
           *result.out = '\0';
           stream << (cc > 0 ? ", " : " ");

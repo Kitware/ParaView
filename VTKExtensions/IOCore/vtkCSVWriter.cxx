@@ -583,8 +583,8 @@ bool vtkCSVWriter::WriteDataAndReturn()
     {
       // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
       char suffix[100];
-      auto result =
-        vtk::format_to_n(suffix, sizeof(suffix), this->FileNameSuffix, this->CurrentTimeIndex);
+      auto result = vtk::format_to_n(
+        suffix, sizeof(suffix), vtk::runtime(this->FileNameSuffix), this->CurrentTimeIndex);
       *result.out = '\0';
       if (!path.empty())
       {
