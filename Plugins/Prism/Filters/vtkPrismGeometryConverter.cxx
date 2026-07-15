@@ -6,11 +6,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-
-// clang-format off
-#include <vtk_fmt.h> // needed for `fmt`
-#include VTK_FMT(fmt/core.h)
-// clang-format on
+#include "vtkStringFormatter.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPrismGeometryConverter);
@@ -81,22 +77,22 @@ int vtkPrismGeometryConverter::RequestData(
   {
     coordsX = "(" + coordsX + " > 0 ? log(" + coordsX + ") : 0)";
   }
-  const auto functionXPart = "(" + coordsX + "-" + fmt::format("{}", prismBounds[0]) + ")/(" +
-    fmt::format("{}", prismBounds[1] - prismBounds[0]) + ")*" + fmt::format("{}", aspectRatio[0]);
+  const auto functionXPart = "(" + coordsX + "-" + vtk::format("{}", prismBounds[0]) + ")/(" +
+    vtk::format("{}", prismBounds[1] - prismBounds[0]) + ")*" + vtk::format("{}", aspectRatio[0]);
   std::string coordsY = "coordsY";
   if (this->LogScaleY)
   {
     coordsY = "(" + coordsY + " > 0 ? log(" + coordsY + ") : 0)";
   }
-  const auto functionYPart = "(" + coordsY + "-" + fmt::format("{}", prismBounds[2]) + ")/(" +
-    fmt::format("{}", prismBounds[3] - prismBounds[2]) + ")*" + fmt::format("{}", aspectRatio[1]);
+  const auto functionYPart = "(" + coordsY + "-" + vtk::format("{}", prismBounds[2]) + ")/(" +
+    vtk::format("{}", prismBounds[3] - prismBounds[2]) + ")*" + vtk::format("{}", aspectRatio[1]);
   std::string coordsZ = "coordsZ";
   if (this->LogScaleZ)
   {
     coordsZ = "(" + coordsZ + " > 0 ? log(" + coordsZ + ") : 0)";
   }
-  const auto functionZPart = "(" + coordsZ + "-" + fmt::format("{}", prismBounds[4]) + ")/(" +
-    fmt::format("{}", prismBounds[5] - prismBounds[4]) + ")*" + fmt::format("{}", aspectRatio[2]);
+  const auto functionZPart = "(" + coordsZ + "-" + vtk::format("{}", prismBounds[4]) + ")/(" +
+    vtk::format("{}", prismBounds[5] - prismBounds[4]) + ")*" + vtk::format("{}", aspectRatio[2]);
   const auto function =
     "iHat*(" + functionXPart + ")+jHat*(" + functionYPart + ")+kHat*(" + functionZPart + ")";
   this->Calculator->SetFunction(function.c_str());

@@ -371,8 +371,8 @@ void vtkParallelSerialWriter::WriteAFile(const std::string& filename_arg, vtkDat
     {
       // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
       char suffix[100];
-      auto result =
-        vtk::format_to_n(suffix, sizeof(suffix), this->FileNameSuffix, this->CurrentTimeIndex);
+      auto result = vtk::format_to_n(
+        suffix, sizeof(suffix), vtk::runtime(this->FileNameSuffix), this->CurrentTimeIndex);
       *result.out = '\0';
       filename = vtk::format("{0}/{1}{2}{3}", path, fnamenoext, std::string_view(suffix), ext);
     }

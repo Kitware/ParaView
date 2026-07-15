@@ -231,7 +231,7 @@ int vtkPVScalarBarActor::CreateLabel(
       char string2[1024];
       auto result = vtk::format_to_n(format, 511, "{{-0.{:d}g}}", i);
       *result.out = '\0';
-      result = vtk::format_to_n(string2, 1023, std::string_view(format), value);
+      result = vtk::format_to_n(string2, 1023, vtk::runtime(format), value);
       *result.out = '\0';
 
       // we want the reduced size used so that we can get better fitting
@@ -270,7 +270,7 @@ int vtkPVScalarBarActor::CreateLabel(
   {
     // Potential of buffer overrun (onto the stack) here.
     VTK_FORMAT_IF_ERROR_RETURN(
-      auto result = vtk::format_to_n(string, 1023, this->LabelFormat, value);
+      auto result = vtk::format_to_n(string, 1023, vtk::runtime(this->LabelFormat), value);
       *result.out = '\0', 0);
   }
 
@@ -1095,7 +1095,7 @@ void vtkPVScalarBarActor::AddValueLabelIfUnoccluded(double value, double pos, do
   char label[64], format[64];
   auto result = vtk::format_to_n(format, 63, "{{:.{:d}g}}", dig);
   *result.out = '\0';
-  result = vtk::format_to_n(label, 63, std::string_view(format), value);
+  result = vtk::format_to_n(label, 63, vtk::runtime(format), value);
   *result.out = '\0';
   vtkColor4d fltCol;
   vtkColor3ub col;

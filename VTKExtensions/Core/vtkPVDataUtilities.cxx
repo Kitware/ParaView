@@ -8,15 +8,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
+#include "vtkStringFormatter.h"
 #include "vtkUniformGrid.h"
 #include "vtkUniformGridAMR.h"
 
 #include <cmath>
-
-// clang-format off
-#include <vtk_fmt.h> // needed for `fmt`
-#include VTK_FMT(fmt/core.h)
-// clang-format on
 
 namespace
 {
@@ -31,12 +27,12 @@ void AssignNamesToBlocks(vtkUniformGridAMR* amr)
   const auto numLevels = amr->GetNumberOfLevels();
   for (unsigned int l = 0; l < numLevels; ++l)
   {
-    const std::string levelString = fmt::format("{:{}}", l, GetNumberOfDigits(l));
+    const std::string levelString = vtk::format("{:{}}", l, GetNumberOfDigits(l));
     const auto numDataSets = amr->GetNumberOfBlocks(l);
     for (unsigned idx = 0; idx < numDataSets; ++idx)
     {
       const std::string label =
-        fmt::format("amr_index {} {:{}}", levelString, idx, GetNumberOfDigits(idx));
+        vtk::format("amr_index {} {:{}}", levelString, idx, GetNumberOfDigits(idx));
       if (auto ds = amr->GetDataSetAsCartesianGrid(l, idx))
       {
         ds->GetInformation()->Set(vtkCompositeDataSet::NAME(), label.c_str());
@@ -64,7 +60,7 @@ void AssignNamesToBlocks(vtkMultiPieceDataSet* mp, const std::string& parentName
       else
       {
         const std::string pieceString =
-          fmt::format("unnamed_piece_{:{}}", piece, GetNumberOfDigits(piece));
+          vtk::format("unnamed_piece_{:{}}", piece, GetNumberOfDigits(piece));
         ds->GetInformation()->Set(vtkCompositeDataSet::NAME(), pieceString.c_str());
       }
     }
@@ -90,7 +86,7 @@ void AssignNamesToBlocks(vtkPartitionedDataSet* pds, const std::string& parentNa
       else
       {
         const std::string label =
-          fmt::format("unnamed_partition_{:{}}", idx, GetNumberOfDigits(idx));
+          vtk::format("unnamed_partition_{:{}}", idx, GetNumberOfDigits(idx));
         ds->GetInformation()->Set(vtkCompositeDataSet::NAME(), label.c_str());
       }
     }
@@ -105,7 +101,7 @@ void AssignNamesToBlocks(vtkPartitionedDataSetCollection* pdc)
     const std::string blockName =
       (pdc->HasMetaData(idx) && pdc->GetMetaData(idx)->Has(vtkCompositeDataSet::NAME()))
       ? std::string(pdc->GetMetaData(idx)->Get(vtkCompositeDataSet::NAME()))
-      : fmt::format("unnamed_block_{:{}}", idx, GetNumberOfDigits(idx));
+      : vtk::format("unnamed_block_{:{}}", idx, GetNumberOfDigits(idx));
     if (auto pds = pdc->GetPartitionedDataSet(idx))
     {
       ::AssignNamesToBlocks(pds, blockName);
@@ -121,7 +117,7 @@ void AssignNamesToBlocks(vtkMultiBlockDataSet* mb)
     const std::string blockName =
       (mb->HasMetaData(idx) && mb->GetMetaData(idx)->Has(vtkCompositeDataSet::NAME()))
       ? std::string(mb->GetMetaData(idx)->Get(vtkCompositeDataSet::NAME()))
-      : fmt::format("unnamed_block_{:{}}", idx, GetNumberOfDigits(idx));
+      : vtk::format("unnamed_block_{:{}}", idx, GetNumberOfDigits(idx));
 
     auto block = mb->GetBlock(idx);
     if (auto childMB = vtkMultiBlockDataSet::SafeDownCast(block))
