@@ -100,6 +100,8 @@ Please remove this comment.
     - [ ] `rsync -rptv $tarballs web:ParaView_Release/v@MAJOR@.@MINOR@/`
   - Software process updates (these can all be done independently)
     - [ ] Update kwrobot with the new `release` branch rules (`@utils/maintainers/ghostflow`)
+      - Use the first commit listed by the command:
+      - `git fetch origin; git log --first-parent --reverse origin/master '^origin/release'`
     - [ ] Run [this script][cdash-update-groups] to update the CDash groups
       - This must be done after a nightly run to ensure all builds are in the
         `release` group
