@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqSelectionQueryPropertyWidget.h"
 
+#include "pqAdjustToCurrentComboBox.h"
 #include "pqComboBoxDomain.h"
 #include "pqCoreUtilities.h"
 #include "pqDoubleLineEdit.h"
@@ -306,13 +307,10 @@ class pqSelectionQueryPropertyWidget::pqQueryWidget : public QWidget
 public:
   pqQueryWidget(pqSelectionQueryPropertyWidget* parentWdg)
     : Superclass(parentWdg)
-    , Term(new QComboBox(this))
-    , Operator(new QComboBox(this))
+    , Term(new pqAdjustToCurrentComboBox(this))
+    , Operator(new pqAdjustToCurrentComboBox(this))
     , Value(new pqValueWidget(this))
   {
-    this->Term->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    this->Operator->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-
     auto hbox = new QHBoxLayout(this);
     hbox->setContentsMargins(0, 0, 0, 0);
     hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
@@ -358,6 +356,12 @@ public:
     this->Operator->setEnabled(hasTerms);
 
     this->setExpression(expr);
+
+    // repopulating the combo-boxes happens inside a QSignalBlocker, so their
+    // currentIndexChanged signal (which normally triggers a size update) is
+    // suppressed; force an update here instead.
+    this->Term->updateGeometry();
+    this->Operator->updateGeometry();
   }
 
   void setExpression(const QString& expr)
