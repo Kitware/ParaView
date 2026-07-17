@@ -18,6 +18,7 @@
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 
+#include <memory> // for std::unique_ptr
 #include <string> // for std::string
 
 namespace vtksys
@@ -62,13 +63,13 @@ protected:
   vtkFileSequenceParser();
   ~vtkFileSequenceParser() override;
 
-  vtksys::RegularExpression* reg_ex;
-  vtksys::RegularExpression* reg_ex2;
-  vtksys::RegularExpression* reg_ex3;
-  vtksys::RegularExpression* reg_ex4;
-  vtksys::RegularExpression* reg_ex5;
-  vtksys::RegularExpression* reg_ex6;
-  vtksys::RegularExpression* reg_ex_last;
+  std::unique_ptr<vtksys::RegularExpression> reg_ex;
+  std::unique_ptr<vtksys::RegularExpression> reg_ex2;
+  std::unique_ptr<vtksys::RegularExpression> reg_ex3;
+  std::unique_ptr<vtksys::RegularExpression> reg_ex4;
+  std::unique_ptr<vtksys::RegularExpression> reg_ex5;
+  std::unique_ptr<vtksys::RegularExpression> reg_ex6;
+  std::unique_ptr<vtksys::RegularExpression> reg_ex_last;
 
   // Used internal so char * allocations are done automatically.
   vtkSetStringMacro(SequenceName);
