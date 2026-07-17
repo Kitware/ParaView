@@ -30,7 +30,9 @@ void BuildVTKGrid(vtkOverlappingAMR* grid)
 
   int numberOfLevels = 3;
   int blocksPerLevel[3] = { numRanks, numRanks, 2 * numRanks };
-  grid->Initialize(numberOfLevels, blocksPerLevel);
+  std::vector<unsigned int> vec;
+  vec.assign(blocksPerLevel, blocksPerLevel + numberOfLevels);
+  grid->Initialize(vec);
   grid->SetGridDescription(vtkStructuredData::VTK_STRUCTURED_XYZ_GRID);
   double globalOrigin[] = { 0, 0, 0 };
   double level0Spacing[] = { 4, 4, 4 };
@@ -52,18 +54,19 @@ void BuildVTKGrid(vtkOverlappingAMR* grid)
       11 }; // first and last cell in each direction
     vtkAMRBox level2Box_1(level2CellDims_1);
 
-    grid->GetAMRInfo()->SetSpacing(0, level0Spacing);
-    grid->GetAMRInfo()->SetRefinementRatio(0, 2);
-    grid->GetAMRInfo()->SetAMRBox(0, rank, level0Box);
+    auto amrInfo = grid->GetOverlappingAMRMetaData();
+    amrInfo->SetSpacing(0, level0Spacing);
+    amrInfo->SetRefinementRatio(0, 2);
+    amrInfo->SetAMRBox(0, rank, level0Box);
 
-    grid->GetAMRInfo()->SetSpacing(1, level1Spacing);
-    grid->GetAMRInfo()->SetRefinementRatio(1, 2);
-    grid->GetAMRInfo()->SetAMRBox(1, rank, level1Box);
+    amrInfo->SetSpacing(1, level1Spacing);
+    amrInfo->SetRefinementRatio(1, 2);
+    amrInfo->SetAMRBox(1, rank, level1Box);
 
-    grid->GetAMRInfo()->SetSpacing(2, level2Spacing);
-    grid->GetAMRInfo()->SetRefinementRatio(2, 2);
-    grid->GetAMRInfo()->SetAMRBox(2, 2 * rank, level2Box_0);
-    grid->GetAMRInfo()->SetAMRBox(2, 2 * rank + 1, level2Box_1);
+    amrInfo->SetSpacing(2, level2Spacing);
+    amrInfo->SetRefinementRatio(2, 2);
+    amrInfo->SetAMRBox(2, 2 * rank, level2Box_0);
+    amrInfo->SetAMRBox(2, 2 * rank + 1, level2Box_1);
   }
 
   grid->GenerateParentChildInformation();

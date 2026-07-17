@@ -35,7 +35,10 @@ void BuildVTKGrid()
   // extents and spacings as well.
   int numberOfLevels = 3;
   int blocksPerLevel[3] = { 1, 2, 1 };
-  VTKGrid->Initialize(numberOfLevels, blocksPerLevel);
+
+  std::vector<unsigned int> vec;
+  vec.assign(blocksPerLevel, blocksPerLevel + numberOfLevels);
+  VTKGrid->Initialize(vec);
 
   // the highest level grid
   vtkNew<vtkUniformGrid> level0Grid;
