@@ -34,11 +34,11 @@ public:
 
   ///@{
   /**
-   * Decided whether to generate color arrays or not.
+   * Decide whether to generate color arrays or not.
    */
-  vtkSetMacro(Color, int);
-  vtkGetMacro(Color, int);
-  vtkBooleanMacro(Color, int);
+  vtkSetMacro(Color, vtkTypeBool);
+  vtkGetMacro(Color, vtkTypeBool);
+  vtkBooleanMacro(Color, vtkTypeBool);
   ///@}
 
   ///@{
@@ -46,9 +46,9 @@ public:
    * This method allows all parts to be put into a single output.
    * By default this flag is on.
    */
-  vtkSetMacro(Append, int);
-  vtkGetMacro(Append, int);
-  vtkBooleanMacro(Append, int);
+  vtkSetMacro(Append, vtkTypeBool);
+  vtkGetMacro(Append, vtkTypeBool);
+  vtkBooleanMacro(Append, vtkTypeBool);
   ///@}
 
   static int CanReadFile(const char* filename);
@@ -64,8 +64,8 @@ protected:
 
   char* FileName;
   vtkNew<vtkVRMLImporter> Importer;
-  int Color;
-  int Append;
+  vtkTypeBool Color;
+  vtkTypeBool Append;
 
 private:
   vtkVRMLSource(const vtkVRMLSource&) = delete;
