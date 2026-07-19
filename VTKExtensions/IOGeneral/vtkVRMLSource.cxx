@@ -43,7 +43,9 @@ int vtkVRMLSource::CanReadFile(const char* filename)
 {
   FILE* fd = vtksys::SystemTools::Fopen(filename, "r");
   if (!fd)
+  {
     return 0;
+  }
 
   char header[128];
   if (fgets(header, 128, fd) == nullptr)
@@ -91,18 +93,6 @@ void vtkVRMLSource::InitializeImporter()
 //------------------------------------------------------------------------------
 void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
 {
-  vtkRenderer* ren;
-  vtkActorCollection* actors;
-  vtkActor* actor;
-  vtkPolyDataMapper* mapper;
-  vtkPolyData* input;
-  vtkPolyData* output;
-  int idx;
-  int numArrays, arrayIdx, numPoints, numCells;
-  vtkDataArray* array;
-  int arrayCount = 0;
-  char name[256];
-  int ptIdx;
   vtkAppendPolyData* append = nullptr;
 
   if (this->Append)
@@ -110,18 +100,20 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
     append = vtkAppendPolyData::New();
   }
 
-  ren = this->Importer->GetRenderer();
-  actors = ren->GetActors();
+  vtkRenderer* ren = this->Importer->GetRenderer();
+  vtkActorCollection* actors = ren->GetActors();
   actors->InitTraversal();
-  idx = 0;
+  int idx = 0;
+  int arrayCount = 0;
+  vtkActor* actor = nullptr;
   while ((actor = actors->GetNextActor()))
   {
-    mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+    vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
     if (mapper)
     {
       mapper->Update();
-      input = mapper->GetInput();
-      output = vtkPolyData::New();
+      vtkPolyData* input = mapper->GetInput();
+      vtkPolyData* output = vtkPolyData::New();
 
       if (!append)
       {
@@ -138,15 +130,16 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
 
       output->CopyStructure(input);
       // Only copy well formed arrays.
-      numPoints = input->GetNumberOfPoints();
-      numArrays = input->GetPointData()->GetNumberOfArrays();
-      for (arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
+      vtkIdType numPoints = input->GetNumberOfPoints();
+      int numArrays = input->GetPointData()->GetNumberOfArrays();
+      for (int arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
       {
-        array = input->GetPointData()->GetArray(arrayIdx);
+        vtkDataArray* array = input->GetPointData()->GetArray(arrayIdx);
         if (array->GetNumberOfTuples() == numPoints)
         {
           if (array->GetName() == nullptr)
           {
+            char name[256];
             auto result = vtk::format_to_n(name, sizeof(name), "VRMLArray{:d}", ++arrayCount);
             *result.out = '\0';
             array->SetName(name);
@@ -155,15 +148,16 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         }
       }
       // Only copy well formed arrays.
-      numCells = input->GetNumberOfCells();
+      vtkIdType numCells = input->GetNumberOfCells();
       numArrays = input->GetCellData()->GetNumberOfArrays();
-      for (arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
+      for (int arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
       {
-        array = input->GetCellData()->GetArray(arrayIdx);
+        vtkDataArray* array = input->GetCellData()->GetArray(arrayIdx);
         if (array->GetNumberOfTuples() == numCells)
         {
           if (array->GetName() == nullptr)
           {
+            char name[256];
             auto result = vtk::format_to_n(name, sizeof(name), "VRMLArray{:d}", ++arrayCount);
             *result.out = '\0';
             array->SetName(name);
@@ -174,16 +168,13 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
       if (this->Color)
       {
         vtkUnsignedCharArray* colorArray = vtkUnsignedCharArray::New();
-        unsigned char r, g, b;
-        double* actorColor;
-
-        actorColor = actor->GetProperty()->GetColor();
-        r = static_cast<unsigned char>(actorColor[0] * 255.0);
-        g = static_cast<unsigned char>(actorColor[1] * 255.0);
-        b = static_cast<unsigned char>(actorColor[2] * 255.0);
+        double* actorColor = actor->GetProperty()->GetColor();
+        unsigned char r = static_cast<unsigned char>(actorColor[0] * 255.0);
+        unsigned char g = static_cast<unsigned char>(actorColor[1] * 255.0);
+        unsigned char b = static_cast<unsigned char>(actorColor[2] * 255.0);
         colorArray->SetName("VRMLColor");
         colorArray->SetNumberOfComponents(3);
-        for (ptIdx = 0; ptIdx < numPoints; ++ptIdx)
+        for (vtkIdType ptIdx = 0; ptIdx < numPoints; ++ptIdx)
         {
           colorArray->InsertNextValue(r);
           colorArray->InsertNextValue(g);
