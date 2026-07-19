@@ -66,10 +66,11 @@ private:
   vtkVRMLSource(const vtkVRMLSource&) = delete;
   void operator=(const vtkVRMLSource&) = delete;
 
-  char* FileName;
+  char* FileName = nullptr;
+  vtkTypeBool Color = 1;
+  vtkTypeBool Append = 1;
+
   vtkNew<vtkVRMLImporter> Importer;
-  vtkTypeBool Color;
-  vtkTypeBool Append;
 };
 
 #endif

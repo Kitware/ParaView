@@ -29,10 +29,6 @@ vtkStandardNewMacro(vtkVRMLSource);
 //------------------------------------------------------------------------------
 vtkVRMLSource::vtkVRMLSource()
 {
-  this->FileName = nullptr;
-  this->Color = 1;
-  this->Append = 1;
-
   this->SetNumberOfInputPorts(0);
 }
 
