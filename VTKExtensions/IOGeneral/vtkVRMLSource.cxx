@@ -6,6 +6,7 @@
 #include "vtkActorCollection.h"
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
+#include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
@@ -16,6 +17,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
+#include "vtkScalarsToColors.h"
 #include "vtkStringFormatter.h"
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
@@ -23,6 +25,8 @@
 #include "vtkVRMLImporter.h"
 
 #include "vtksys/SystemTools.hxx"
+
+#include <iostream>
 
 vtkStandardNewMacro(vtkVRMLSource);
 
@@ -167,23 +171,44 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
       }
       if (this->Color)
       {
-        vtkUnsignedCharArray* colorArray = vtkUnsignedCharArray::New();
-        double* actorColor = actor->GetProperty()->GetColor();
-        unsigned char r = static_cast<unsigned char>(actorColor[0] * 255.0);
-        unsigned char g = static_cast<unsigned char>(actorColor[1] * 255.0);
-        unsigned char b = static_cast<unsigned char>(actorColor[2] * 255.0);
+        // Create an array that stores per-vertex colors for the VRML file.
+        vtkNew<vtkUnsignedCharArray> colorArray;
         colorArray->SetName("VRMLColor");
-        colorArray->SetNumberOfComponents(3);
-        for (vtkIdType ptIdx = 0; ptIdx < numPoints; ++ptIdx)
+        colorArray->SetNumberOfComponents(4);
+        colorArray->SetNumberOfTuples(numPoints);
+
+        // The lookup table from the vtkVRMLImport has the scalar range for mapping,
+        // not the mapper, so use it for mapping.
+        mapper->UseLookupTableScalarRangeOn();
+
+        // MapScalars() manages the pointer it returns (if any), so we don't need to delete it.
+        vtkUnsignedCharArray* rgbaArray = mapper->MapScalars(1.0);
+        if (rgbaArray)
         {
-          colorArray->InsertNextValue(r);
-          colorArray->InsertNextValue(g);
-          colorArray->InsertNextValue(b);
+          // vtkVRMLImporter may add an extra tuple to the active scalar array, so we copy up
+          // to the number of points in the polydata rather than simply DeepCopy the entire array.
+          colorArray->InsertTuples(0, numPoints, 0, rgbaArray);
+        }
+        else
+        {
+          // Mapping didn't succeed so copy the solid color of the actor to the VRMLColor array.
+          double* actorColor = actor->GetProperty()->GetColor();
+          unsigned char rgba[4];
+          rgba[0] = static_cast<unsigned char>(actorColor[0] * 255.0);
+          rgba[1] = static_cast<unsigned char>(actorColor[1] * 255.0);
+          rgba[2] = static_cast<unsigned char>(actorColor[2] * 255.0);
+          rgba[3] = 255;
+
+          colorArray->SetName("VRMLColor");
+          colorArray->SetNumberOfComponents(4);
+          for (vtkIdType ptIdx = 0; ptIdx < numPoints; ++ptIdx)
+          {
+            colorArray->SetTypedTuple(ptIdx, rgba);
+          }
         }
         output->GetPointData()->SetScalars(colorArray);
-        colorArray->Delete();
-        colorArray = nullptr;
       }
+
       if (append)
       {
         append->AddInputData(output);
