@@ -63,7 +63,7 @@ protected:
   void CopyImporterToOutputs(vtkMultiBlockDataSet*);
 
   char* FileName;
-  vtkVRMLImporter* Importer;
+  vtkNew<vtkVRMLImporter> Importer;
   int Color;
   int Append;
 

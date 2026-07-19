@@ -30,7 +30,6 @@ vtkStandardNewMacro(vtkVRMLSource);
 vtkVRMLSource::vtkVRMLSource()
 {
   this->FileName = nullptr;
-  this->Importer = nullptr;
   this->Color = 1;
   this->Append = 1;
 
@@ -41,11 +40,6 @@ vtkVRMLSource::vtkVRMLSource()
 vtkVRMLSource::~vtkVRMLSource()
 {
   this->SetFileName(nullptr);
-  if (this->Importer)
-  {
-    this->Importer->Delete();
-    this->Importer = nullptr;
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -85,10 +79,7 @@ int vtkVRMLSource::RequestData(
     return 0;
   }
 
-  if (this->Importer == nullptr)
-  {
-    this->InitializeImporter();
-  }
+  this->InitializeImporter();
   this->CopyImporterToOutputs(output);
 
   return 1;
@@ -97,12 +88,6 @@ int vtkVRMLSource::RequestData(
 //------------------------------------------------------------------------------
 void vtkVRMLSource::InitializeImporter()
 {
-  if (this->Importer)
-  {
-    this->Importer->Delete();
-    this->Importer = nullptr;
-  }
-  this->Importer = vtkVRMLImporter::New();
   this->Importer->SetFileName(this->FileName);
   this->Importer->Update();
 }
@@ -123,11 +108,6 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
   char name[256];
   int ptIdx;
   vtkAppendPolyData* append = nullptr;
-
-  if (this->Importer == nullptr)
-  {
-    return;
-  }
 
   if (this->Append)
   {
