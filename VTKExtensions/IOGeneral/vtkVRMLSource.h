@@ -62,14 +62,14 @@ protected:
   void InitializeImporter();
   void CopyImporterToOutputs(vtkMultiBlockDataSet*);
 
+private:
+  vtkVRMLSource(const vtkVRMLSource&) = delete;
+  void operator=(const vtkVRMLSource&) = delete;
+
   char* FileName;
   vtkNew<vtkVRMLImporter> Importer;
   vtkTypeBool Color;
   vtkTypeBool Append;
-
-private:
-  vtkVRMLSource(const vtkVRMLSource&) = delete;
-  void operator=(const vtkVRMLSource&) = delete;
 };
 
 #endif
