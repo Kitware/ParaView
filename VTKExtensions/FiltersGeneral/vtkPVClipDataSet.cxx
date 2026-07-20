@@ -301,6 +301,7 @@ int vtkPVClipDataSet::RequestData(
   vtkMeshCacheRunner runner{ this->MeshCache, inDataObj, outDataObj, true };
   if (runner.GetCacheLoaded())
   {
+    outDataObj->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEP());
     return this->EdgesCache->UpdateAttributes(inDataObj, outDataObj);
   }
 
