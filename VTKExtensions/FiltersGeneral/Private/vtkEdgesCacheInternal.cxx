@@ -50,17 +50,17 @@ bool vtkEdgesCacheInternal::UpdateAttributes(vtkDataObject* input, vtkDataObject
     inputIter.TakeReference(compositeInput->NewIterator());
     inputIter->SkipEmptyNodesOn();
     vtkSmartPointer<vtkCompositeDataIterator> outIter;
-    outIter.TakeReference(compositeInput->NewIterator());
+    outIter.TakeReference(compositeOutput->NewIterator());
     outIter->SkipEmptyNodesOn();
-    outIter->InitTraversal();
 
     bool ret = true;
-    for (inputIter->InitTraversal(); !inputIter->IsDoneWithTraversal(); inputIter->GoToNextItem())
+    for (inputIter->InitTraversal(), outIter->InitTraversal();
+         !inputIter->IsDoneWithTraversal() && !outIter->IsDoneWithTraversal();
+         inputIter->GoToNextItem(), outIter->GoToNextItem())
     {
       auto inputLeaf = vtkDataSet::SafeDownCast(inputIter->GetCurrentDataObject());
       auto outLeaf = vtkPointSet::SafeDownCast(outIter->GetCurrentDataObject());
       ret = ret && this->UpdateLeafAttributes(inputLeaf, outLeaf);
-      outIter->GoToNextItem();
     }
     return ret;
   }
