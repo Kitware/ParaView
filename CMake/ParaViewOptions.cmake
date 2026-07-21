@@ -242,6 +242,19 @@ option(PARAVIEW_ENABLE_ADIOS2 "Enable ADIOS 2.x support." OFF)
 
 option(PARAVIEW_ENABLE_FIDES "Enable Fides support." OFF)
 
+# Fides support inside the ParaView Catalyst implementation. This lets a
+# simulation hand ParaView data over a Catalyst "fides_conduit" channel: an
+# in-memory Conduit tree read directly by the Fides reader (no ADIOS2 file or
+# SST stream). It enables the Fides reader and forces the VTK::conduit module
+# on (required for Fides' in-memory Conduit data source). It does NOT enable
+# the ADIOS2 reader (PARAVIEW_ENABLE_ADIOS2); note, however, that the adios2
+# library is still required to build Fides itself, and that VTK::conduit
+# requires Catalyst to have been built against the same external Conduit
+# (CATALYST_WITH_EXTERNAL_CONDUIT=ON).
+cmake_dependent_option(PARAVIEW_ENABLE_CATALYST_FIDES
+  "Enable Fides (in-memory Conduit) support in the ParaView Catalyst implementation" OFF
+  "PARAVIEW_ENABLE_CATALYST" OFF)
+
 option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 
 option(PARAVIEW_ENABLE_OCCT "Enable OCCT Support." OFF)
@@ -496,9 +509,16 @@ paraview_require_module(
   EXCLUSIVE)
 
 paraview_require_module(
-  CONDITION PARAVIEW_ENABLE_FIDES
+  CONDITION PARAVIEW_ENABLE_FIDES OR PARAVIEW_ENABLE_CATALYST_FIDES
   MODULES   VTK::IOFides
   EXCLUSIVE)
+
+# The Catalyst "fides_conduit" channel needs the Fides reader's in-memory
+# Conduit data source, which is only compiled when VTK::conduit is enabled.
+# Not EXCLUSIVE: other features may legitimately enable VTK::conduit too.
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CATALYST_FIDES
+  MODULES   VTK::conduit)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_OPENVDB
