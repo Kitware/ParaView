@@ -49,6 +49,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/GenericIOReader/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/HeadMRVolume.mhd}"
   "DATA{${paraview_test_data_directory_input}/Data/HeadMRVolume.raw}"
+  "DATA{${paraview_test_data_directory_input}/Data/harmonics.vtkhdf}"
+  "DATA{${paraview_test_data_directory_input}/Data/harmonics_table.vtkhdf}"
   "DATA{${paraview_test_data_directory_input}/Data/hdf_fpm_simulation.erfh5}"
   "DATA{${paraview_test_data_directory_input}/Data/half_sphere_commented.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/Iron_Xdmf/,REGEX:.*}"
@@ -1063,8 +1065,8 @@ list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
   SpatioTemporalHarmonicsSource.xml
   SpreadSheetSelectedCellConnectivity.xml
   TensorPrincipalInvariants.xml
-  TestFileListPropertyWidget.xml
   TestCompositePropertyWidgetDecorator.xml
+  TestFileListPropertyWidget.xml
   ThresholdTable.xml
   TimeKeeper.xml
   WriteXMLTimeValue.xml
