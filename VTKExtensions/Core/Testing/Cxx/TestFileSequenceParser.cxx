@@ -49,6 +49,8 @@ extern int TestFileSequenceParser(int, char* argv[])
   check_group(seqParser.Get(), "prefix021suffix.ext", "prefix..suffix.ext");
   check_group(seqParser.Get(), "plt0001000", "plt..");
 
+  check_group(seqParser.Get(), "slice1_000_000015_+1.09687e-04.vtpc", "slice1_000..vtpc");
+
   check_no_group(seqParser.Get(), "foo.3dm");
   check_no_group(seqParser.Get(), "foo.2dm");
 
