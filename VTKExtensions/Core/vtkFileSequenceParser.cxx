@@ -16,21 +16,26 @@ vtkFileSequenceParser::vtkFileSequenceParser()
   : // sequence ending with numbers.
   reg_ex(new vtksys::RegularExpression("^(.*)\\.([0-9.]+)$"))
   ,
+  // sequence ending with extension, starting with a name, followed by a series number,
+  // followed by a time value expressed in scientific notation, followed by a "."
+  // and the extension.
+  reg_ex2(
+    new vtksys::RegularExpression("^(.*)_([0-9]+)_([-+][0-9]+\\.[0-9]+[eE][-+]?[0-9]+)\\.(.*)$"))
+  ,
   // sequence ending with extension.
-  reg_ex2(new vtksys::RegularExpression("^(.*)(\\.|_|-)([0-9.]+)\\.(.*)$"))
+  reg_ex3(new vtksys::RegularExpression("^(.*)(\\.|_|-)([0-9.]+)\\.(.*)$"))
   ,
   // sequence ending with extension, but with no ". or _" before
   // the series number.
-  reg_ex3(new vtksys::RegularExpression("^(.*)([a-zA-Z])([0-9.]+)\\.(.*)$"))
+  reg_ex4(new vtksys::RegularExpression("^(.*)([a-zA-Z])([0-9.]+)\\.(.*)$"))
   ,
   // sequence ending with extension, and starting with series number
   // followed by ". or _".
-  reg_ex4(new vtksys::RegularExpression("^([0-9.]+)(\\.|_|-)(.*)\\.(.*)$"))
+  reg_ex5(new vtksys::RegularExpression("^([0-9.]+)(\\.|_|-)(.*)\\.(.*)$"))
   ,
   // sequence ending with extension, and starting with series number,
   // but not followed by ". or _".
-  reg_ex5(new vtksys::RegularExpression("^([0-9.]+)([a-zA-Z])(.*)\\.(.*)$"))
-
+  reg_ex6(new vtksys::RegularExpression("^([0-9.]+)([a-zA-Z])(.*)\\.(.*)$"))
   ,
   // fallback: any sequence with a number in the middle (taking the last number
   // if multiple exist).
@@ -43,13 +48,6 @@ vtkFileSequenceParser::vtkFileSequenceParser()
 //-----------------------------------------------------------------------------
 vtkFileSequenceParser::~vtkFileSequenceParser()
 {
-  delete this->reg_ex;
-  delete this->reg_ex2;
-  delete this->reg_ex3;
-  delete this->reg_ex4;
-  delete this->reg_ex5;
-  delete this->reg_ex_last;
-
   this->SetSequenceName(nullptr);
 }
 
@@ -65,10 +63,9 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
   }
   else if (this->reg_ex2->find(file))
   {
-    this->SetSequenceName(std::string(
-      this->reg_ex2->match(1) + this->reg_ex2->match(2) + ".." + this->reg_ex2->match(4))
-                            .c_str());
-    this->SequenceIndexString = this->reg_ex2->match(3);
+    this->SetSequenceName(
+      std::string(this->reg_ex2->match(1) + ".." + this->reg_ex2->match(4)).c_str());
+    this->SequenceIndexString = this->reg_ex2->match(2);
     match = true;
   }
   else if (this->reg_ex3->find(file))
@@ -82,9 +79,9 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
   else if (this->reg_ex4->find(file))
   {
     this->SetSequenceName(std::string(
-      ".." + this->reg_ex4->match(2) + this->reg_ex4->match(3) + "." + this->reg_ex4->match(4))
+      this->reg_ex4->match(1) + this->reg_ex4->match(2) + ".." + this->reg_ex4->match(4))
                             .c_str());
-    this->SequenceIndexString = this->reg_ex4->match(1);
+    this->SequenceIndexString = this->reg_ex4->match(3);
     match = true;
   }
   else if (this->reg_ex5->find(file))
@@ -93,6 +90,14 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
       ".." + this->reg_ex5->match(2) + this->reg_ex5->match(3) + "." + this->reg_ex5->match(4))
                             .c_str());
     this->SequenceIndexString = this->reg_ex5->match(1);
+    match = true;
+  }
+  else if (this->reg_ex6->find(file))
+  {
+    this->SetSequenceName(std::string(
+      ".." + this->reg_ex6->match(2) + this->reg_ex6->match(3) + "." + this->reg_ex6->match(4))
+                            .c_str());
+    this->SequenceIndexString = this->reg_ex6->match(1);
     match = true;
   }
   else
