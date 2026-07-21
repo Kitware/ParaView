@@ -715,6 +715,14 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                 "'WindowResizeNonInteractiveRenderDelay' is obsolete. Simply remove it from your script.")
 
+    # 6.2 -> 6.3: "ConvertToVTK" property on "FidesFileReader" and "FidesJSONReader" has been removed
+    if pname == "ConvertToVTK" and proxy.SMProxy.GetXMLName() in ["FidesFileReader", "FidesJSONReader"]:
+        if compatibility_version <= (6, 2):
+            raise Continue()
+        else:
+            raise NotSupportedException(
+                "'ConvertToVTK' is obsolete. Simply remove it from your script.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -1443,8 +1451,15 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                 "'WindowResizeNonInteractiveRenderDelay' is obsolete. Simply remove it from your script.")
 
-    raise Continue()
+    # 6.2 -> 6.3: FidesFileReader ConvertToVTK property has been removed. Return False.
+    if pname == "ConvertToVTK" and proxy.SMProxy.GetXMLName() in ["FidesFileReader", "FidesJSONReader"]:
+        if compatibility_version < (6, 3):
+            return False
+        else:
+            raise NotSupportedException(
+                "'ConvertToVTK' is obsolete as of ParaView 6.3. Simply remove it from your script.")
 
+    raise Continue()
 
 # Depending on the compatibility version that has been set, older functionalities
 # are restored in this function. Note that the 'key' variable refers to a proxy
