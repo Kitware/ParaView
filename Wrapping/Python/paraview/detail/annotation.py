@@ -26,27 +26,14 @@ def _unwrap_scalar_value(value):
     """
     Unwrap a scalar value from an array or return the value as-is.
 
-    Converts array-like objects containing a single scalar element into
-    a native Python scalar. If the value is None, a NoneArray, or cannot
-    be converted to an array, returns the original value unchanged.
-
-    Args:
-        value: A scalar, array-like object, or None.
-
-    Returns:
-        A native Python scalar if the input is a single-element array,
-        otherwise the input value unchanged.
+    Converts a single-element numpy array into a native Python scalar.
+    Any other value, including None and NoneArray, is returned unchanged.
     """
     if value is None or value is dsa.NoneArray:
         return value
 
-    try:
-        array = np.asarray(value)
-    except (TypeError, ValueError):
-        return value
-
-    if array.ndim == 0 or array.size == 1:
-        return array.reshape(()).item()
+    if isinstance(value, np.ndarray) and (value.ndim == 0 or value.size == 1):
+        return value.reshape(()).item()
 
     return value
 
@@ -152,8 +139,8 @@ def execute_on_attribute_data(self, evaluate_locally):
         return True
 
     array = ns[array_name]
-    if array.IsA("vtkStringArray"):
-        chosen_element = array.GetValue(self.GetElementId())
+    if np.ndim(array) == 0:
+        chosen_element = array
     else:
         chosen_element = array[self.GetElementId()]
     expression = self.GetPrefix() if self.GetPrefix() else ""

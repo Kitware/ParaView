@@ -52,19 +52,6 @@
             number_of_elements_per_command="2"
             panel_visibility="advanced">
       </StringVectorProperty>
-      <IntVectorProperty
-            name="ConvertToVTK"
-            command="SetConvertToVTK"
-            label="Convert To VTK"
-            number_of_elements="1"
-            default_values="1"
-            panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          This property determines whether data should be converted to VTK
-          or stay in Viskores format.
-        </Documentation>
-      </IntVectorProperty>
       <StringVectorProperty
             name="DataSourceIO"
             command="SetDataSourceIO"
@@ -226,15 +213,6 @@
             number_of_elements_per_command="2"
             panel_visibility="advanced">
       </StringVectorProperty>
-      <IntVectorProperty
-            name="ConvertToVTK"
-            command="SetConvertToVTK"
-            label="Convert to VTK"
-            number_of_elements="1"
-            default_values="1"
-            panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
       <IntVectorProperty
             name="StreamSteps"
             command="SetStreamSteps"
