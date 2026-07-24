@@ -15,6 +15,7 @@ DEPENDS
   VTK::CommonColor
 PRIVATE_DEPENDS
   VTK::FiltersSources
+  VTK::IOCore
   VTK::IOImage
   VTK::RenderingCore
   VTK::RenderingOpenGL2

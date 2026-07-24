@@ -9,6 +9,7 @@
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkImageData.h"
 #include "vtkJPEGReader.h"
+#include "vtkMemoryResourceStream.h"
 #include "vtkNamedColors.h"
 #include "vtkOSPRayPass.h"
 #include "vtkOSPRayRendererNode.h"
@@ -75,9 +76,11 @@ void AddCurvedPlane(vtkRenderer* renderer)
   vtkNew<vtkActor> planeActor;
   planeActor->SetMapper(planeMapper);
 
+  vtkNew<vtkMemoryResourceStream> textureStream;
+  textureStream->SetBuffer(ShaderBallTexture, sizeof(ShaderBallTexture));
+
   vtkNew<vtkPNGReader> reader;
-  reader->SetMemoryBuffer(ShaderBallTexture);
-  reader->SetMemoryBufferLength(sizeof(ShaderBallTexture));
+  reader->SetStream(textureStream);
   reader->Update();
 
   vtkNew<vtkTexture> texture;
@@ -94,9 +97,11 @@ void AddCurvedPlane(vtkRenderer* renderer)
 
 void AddSkyBox(vtkRenderer* renderer)
 {
+  vtkNew<vtkMemoryResourceStream> skyboxStream;
+  skyboxStream->SetBuffer(ShaderBallSkybox, sizeof(ShaderBallSkybox));
+
   vtkNew<vtkJPEGReader> reader;
-  reader->SetMemoryBuffer(ShaderBallSkybox);
-  reader->SetMemoryBufferLength(sizeof(ShaderBallSkybox));
+  reader->SetStream(skyboxStream);
   reader->Update();
 
   vtkNew<vtkTexture> texture;
