@@ -52,7 +52,13 @@ void pqMaterialAttributesDelegate::paint(
         .data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
         .toString();
 
-    const auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+    pqMaterialEditor* materialEditor = qobject_cast<pqMaterialEditor*>(this->parent());
+    vtkOSPRayMaterialLibrary* ml = materialEditor ? materialEditor->getMaterialLibrary() : nullptr;
+    if (!ml)
+    {
+      return QStyledItemDelegate::paint(painter, option, index);
+    }
+    const auto& dic = ml->GetParametersDictionary();
 
     auto paramType = dic.at(matType.toStdString()).at(attrName.toStdString());
 
@@ -167,7 +173,13 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
       sibling.data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
         .toString();
 
-    auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+    pqMaterialEditor* materialEditor = qobject_cast<pqMaterialEditor*>(this->parent());
+    vtkOSPRayMaterialLibrary* ml = materialEditor ? materialEditor->getMaterialLibrary() : nullptr;
+    if (!ml)
+    {
+      return nullptr;
+    }
+    const auto& dic = ml->GetParametersDictionary();
     auto paramType = dic.at(matType.toStdString()).at(attrName.toStdString());
 
     QVariant variant =
@@ -266,7 +278,13 @@ void pqMaterialAttributesDelegate::setModelData(
       sibling.data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
         .toString();
 
-    const auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+    pqMaterialEditor* materialEditor = qobject_cast<pqMaterialEditor*>(this->parent());
+    vtkOSPRayMaterialLibrary* ml = materialEditor ? materialEditor->getMaterialLibrary() : nullptr;
+    if (!ml)
+    {
+      return;
+    }
+    const auto& dic = ml->GetParametersDictionary();
     auto paramType = dic.at(matType.toStdString()).at(attrName.toStdString());
 
     switch (paramType)
