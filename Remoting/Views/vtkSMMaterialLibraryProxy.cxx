@@ -96,7 +96,7 @@ void vtkSMMaterialLibraryProxy::Synchronize(
 
   vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(
     vtkPVMaterialLibrary::SafeDownCast(this->GetClientSideObject())->GetMaterialLibrary());
-  ml->Modified();
+  ml->Fire();
 #else
   (void)from;
   (void)to;
