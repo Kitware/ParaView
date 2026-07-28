@@ -274,9 +274,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "^pv\\.DecimatePolyline$"
     "^pvcrs\\.DecimatePolyline$"
     "^pvcs\\.DecimatePolyline$"
-    "^pv\\.TestExtrusionRepresentationCellData$"
-    "^pvcrs\\.GroupDataSetOutputType$"
-    "^pvcs\\.GroupDataSetOutputType$"
     "^pv\\.UndoRedo1$"
     "^pvcrs\\.UndoRedo1$"
     "^pvcs\\.UndoRedo1$"
@@ -357,9 +354,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21786
     "^pv\\.MultipleColorOnSelection"
     "^pvcs\\.MultipleColorOnSelection"
-    # https://gitlab.kitware.com/paraview/paraview/-/merge_requests/7083
-    "^pvcs\\.GroupDataSetOutputType$"
-    "^pvcrs\\.GroupDataSetOutputType$"
     )
 endif ()
 
