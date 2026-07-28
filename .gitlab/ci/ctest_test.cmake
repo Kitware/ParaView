@@ -294,18 +294,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "^pvcrs\\.AxisAlignedPDCNoHierarchy$"
     "^pvcs\\.AxisAlignedPDCNoHierarchy$"
 
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22825
-    # M4 geometry filter
-    "^pvcs-tile-display\\.LinkCameraFromView-1x1$"
-    "^pv\\.FeatureEdgesFilterHTG$"
-    "^pvcrs\\.FeatureEdgesFilterHTG$"
-    "^pvcs\\.FeatureEdgesFilterHTG$"
-    "^pv\\.FeatureEdgesRepresentationHTG$"
-    "^pvcrs\\.FeatureEdgesRepresentationHTG$"
-    "^pvcs\\.FeatureEdgesRepresentationHTG$"
-    "^pv\\.MultipleColorOnSelection$"
-    "^pvcs\\.MultipleColorOnSelection$"
-
     # macOS 15+ local network permission requests. New macOS requires
     # applications to get user permission to access localhost network
     # resources. There is no good way to automate answering these dialogs in CI
