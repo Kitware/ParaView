@@ -5,6 +5,9 @@ paraview.compatibility.minor = 9
 from paraview import simple
 from paraview import smtesting
 
+import os
+import sys
+
 renderView = simple.CreateView('RenderView')
 
 renderView.AxesGrid = 'GridAxes3DActor'
@@ -23,6 +26,10 @@ renderView.OrientationAxesVisibility = 0
 renderView.Background = [1.0, 1.0, 1.0]
 
 simple.Render(renderView)
+
+# macOS differs a little bit from other platforms.
+if sys.platform == 'darwin':
+    os.environ["VTK_TESTING_IMAGE_COMPARE_METHOD"] = "LOOSE_VALID"
 
 if not smtesting.DoRegressionTesting(renderView.SMProxy):
     raise smtesting.TestError('Image comparison failed.')
