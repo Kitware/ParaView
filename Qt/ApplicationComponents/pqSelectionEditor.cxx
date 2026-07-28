@@ -154,6 +154,7 @@ public:
     QColor color = index.model()->data(index, Qt::DisplayRole).value<QColor>();
 
     pqColorChooserButton* buttonColor = new pqColorChooserButton(parent);
+    buttonColor->setObjectName("pqColorChooserButton");
     buttonColor->setChosenColor(color);
     buttonColor->setText(
       QString("%1, %2, %3").arg(color.red()).arg(color.green()).arg(color.blue()));
