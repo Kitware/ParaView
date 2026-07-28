@@ -254,9 +254,6 @@ endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
-    "\\.PythonEditorRun$"
-
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22674
     "^paraviewPython-Batch-TestStereoSaveScreenshot$"
     "^paraviewPython-TestStereoSaveScreenshot$"
