@@ -317,8 +317,6 @@ endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
   list(APPEND test_exclusions
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20743
-    "^pv\\.TestExtrusionRepresentationCellData$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22353
     "\\.FeatureEdgesFilterHTG$"
     "\\.FeatureEdgesRepresentationHTG$"
