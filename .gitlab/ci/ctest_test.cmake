@@ -254,10 +254,6 @@ endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
-    # Unstructured grid volume rendering (paraview/paraview#19130)
-    "\\.MultiBlockVolumeRendering$"
-    "\\.UnstructuredVolumeRenderingVectorComponent$"
-
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
     "\\.PythonEditorRun$"
 
