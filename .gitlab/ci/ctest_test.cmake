@@ -283,19 +283,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "^pv\\.AnimateProperty$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22824
-    # Shading differences
-    "^pv\\.PointGaussianMultiBlockDataSet$"
-    "^pvcrs\\.PointGaussianMultiBlockDataSet$"
-    "^pvcs\\.PointGaussianMultiBlockDataSet$"
-    "^pv\\.PointGaussianNoScaleTransferFunction$"
-    "^pvcrs\\.PointGaussianNoScaleTransferFunction$"
-    "^pvcs\\.PointGaussianNoScaleTransferFunction$"
-    "^pv\\.UniformInverseTransformSamplingGlyph$"
-    "^pvcrs\\.UniformInverseTransformSamplingGlyph$"
-    "^pvcs\\.UniformInverseTransformSamplingGlyph$"
-    "^pv\\.CONVERGECFDReader$"
-    "^pvcrs\\.CONVERGECFDReader$"
-    "^pvcs\\.CONVERGECFDReader$"
     # The following tests seem to have some geometry differences too
     "^pv\\.AxisAlignedCutterMBHierarchy$"
     "^pvcrs\\.AxisAlignedCutterMBHierarchy$"
