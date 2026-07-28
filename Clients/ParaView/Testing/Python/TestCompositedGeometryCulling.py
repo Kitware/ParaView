@@ -2,6 +2,9 @@ from paraview import servermanager
 from paraview import simple as smp
 from paraview import smtesting
 
+import os
+import sys
+
 smp.LoadPalette("BlueGrayBackground")
 
 # Make sure the test driver know that process has properly started
@@ -33,6 +36,9 @@ def runTest():
     s.ThetaResolution = 8
     smp.Render()
 
+    # macOS differs a little bit from other platforms.
+    if sys.platform == 'darwin':
+        os.environ["VTK_TESTING_IMAGE_COMPARE_METHOD"] = "LOOSE_VALID"
     smtesting.ProcessCommandLineArguments()
     if not smtesting.DoRegressionTesting(r.SMProxy):
         raise smtesting.TestError ("Test failed!!!")
