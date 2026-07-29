@@ -43,6 +43,7 @@ set(python_files
   paraview/detail/pythonalgorithm.py
   paraview/detail/python_selector.py
   paraview/detail/catalyst_export.py
+  paraview/envs.py
   paraview/incubator/__init__.py.in
   paraview/incubator/pythoninteractorbase.py
   paraview/info/__init__.py
