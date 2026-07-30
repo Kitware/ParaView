@@ -63,11 +63,19 @@ PY_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
 CURRENT_OS = platform.system()
 IS_WINDOWS = CURRENT_OS == "Windows"
 
-BASE_PATH = Path(os.environ.get("APPDATA", "~/.config/ParaView")).expanduser()
+if IS_WINDOWS:
+    BASE_PATH = Path(os.environ.get("APPDATA")) / "ParaView"
+else:
+    BASE_PATH = Path("~/.config/ParaView").expanduser()
 
 UV_EXEC_CACHE = BASE_PATH / "uv-path"
 UV_VENV_PATH = BASE_PATH / "uv-venvs" / PY_VERSION
 UV_VENV_PATH.mkdir(parents=True, exist_ok=True)
+
+# Use System uv if available
+sys_uv = shutil.which('uv')
+if sys_uv:
+    UV_EXEC_CACHE.write_text(sys_uv)
 
 EXEC_EXTENSION = ".exe" if IS_WINDOWS else ""
 EXEC_UV = f"uv{EXEC_EXTENSION}"
@@ -330,7 +338,7 @@ def run(name, enable_ssl, cmd):
 
 def list_apps():
     """Print the names of all environments (install or create) on disk."""
-    print("Listing available applications:")
+    print(f"Available environments in ({UV_VENV_PATH})")
     for dir in UV_VENV_PATH.iterdir():
         if dir.is_dir():
             print(f"  - {dir.name}")
