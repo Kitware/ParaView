@@ -4,6 +4,7 @@
 
 #include "vtkPVContourFilter.h"
 
+#include "vtkAMRContourFilter.h"
 #include "vtkArrayDispatch.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayRange.h"
@@ -15,8 +16,10 @@
 #include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
 #include "vtkLogger.h"
+#include "vtkMergeBlocks.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
 
@@ -45,28 +48,28 @@ int vtkPVContourFilter::RequestData(
   if (!inInfo)
   {
     vtkErrorMacro("Failed to get input information.");
-    return 1;
+    return 0;
   }
 
   vtkDataObject* inDataObj = inInfo->Get(vtkDataObject::DATA_OBJECT());
   if (!inDataObj)
   {
     vtkErrorMacro("Failed to get input data object.");
-    return 1;
+    return 0;
   }
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   if (!outInfo)
   {
     vtkErrorMacro("Failed to get output information.");
-    return 1;
+    return 0;
   }
 
   vtkDataObject* outDataObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
   if (!outDataObj)
   {
     vtkErrorMacro("Failed get output data object.");
-    return 1;
+    return 0;
   }
 
   // Check if input is hyper tree grid
@@ -96,6 +99,29 @@ int vtkPVContourFilter::RequestData(
     vtkPolyData::SafeDownCast(outDataObj)->ShallowCopy(contourFilter->GetOutput(0));
 
     return 1;
+  }
+
+  // Check if input is a vtkOverlappingAMR
+  if (vtkOverlappingAMR::SafeDownCast(inDataObj))
+  {
+    this->AMRContourFilter->SetInputData(inDataObj);
+    this->AMRContourFilter->SetContourValues(this->GetContourValues());
+    this->AMRContourFilter->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+    this->AMRContourFilter->SetComputeNormals(this->GetComputeNormals());
+    this->AMRContourFilter->SetComputeScalars(this->GetComputeScalars());
+    this->AMRContourFilter->SetGenerateTriangles(this->GetGenerateTriangles());
+
+    vtkNew<vtkMergeBlocks> merger;
+    merger->SetInputConnection(this->AMRContourFilter->GetOutputPort());
+    merger->MergePointsOn();
+    merger->SetTolerance(1e-6);
+    merger->ToleranceIsAbsoluteOn();
+    merger->SetOutputDataSetType(VTK_POLY_DATA);
+
+    bool ret = merger->Update();
+
+    outDataObj->ShallowCopy(merger->GetOutput(0));
+    return ret;
   }
 
   vtkDataArray* array = this->GetInputArrayToProcess(0, inputVector);
@@ -149,9 +175,7 @@ int vtkPVContourFilter::ContourUsingSuperclass(
 int vtkPVContourFilter::FillInputPortInformation(int port, vtkInformation* info)
 {
   this->Superclass::FillInputPortInformation(port, info);
-
-  // According to the documentation this is the way to append additional
-  // input data set type since VTK 5.2.
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkOverlappingAMR");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkNonOverlappingAMR");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   return 1;
