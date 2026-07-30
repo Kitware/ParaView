@@ -255,5 +255,9 @@ void pqContextView::startInteraction()
 //-----------------------------------------------------------------------------
 void pqContextView::endInteraction()
 {
-  END_UNDO_SET();
+  pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
+  if (usStack && usStack->getInUndo())
+  {
+    END_UNDO_SET();
+  }
 }
