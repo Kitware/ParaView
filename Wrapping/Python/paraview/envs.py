@@ -58,16 +58,20 @@ import shutil
 import subprocess
 import importlib.util
 
-CURRENT_OS = platform.system()
 PY_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
-UV_EXEC_CACHE = Path.expanduser(Path("~/.config/ParaView/uv-path")).resolve()
-UV_VENV_PATH = Path.expanduser(
-    Path(f"~/.config/ParaView/uv-venvs/{PY_VERSION}")
-).resolve()
+
+CURRENT_OS = platform.system()
+IS_WINDOWS = CURRENT_OS == "Windows"
+
+BASE_PATH = Path(os.environ.get("APPDATA", "~/.config/ParaView")).expanduser()
+
+UV_EXEC_CACHE = BASE_PATH / "uv-path"
+UV_VENV_PATH = BASE_PATH / "uv-venvs" / PY_VERSION
 UV_VENV_PATH.mkdir(parents=True, exist_ok=True)
-EXEC_EXT = ".exe" if CURRENT_OS == "Windows" else ""
-UV_EXEC_NAME = f"uv{EXEC_EXT}"
-PYTHON_EXEC_NAME = f"python{EXEC_EXT}"
+
+EXEC_EXTENSION = ".exe" if IS_WINDOWS else ""
+EXEC_UV = f"uv{EXEC_EXTENSION}"
+EXEC_PYTHON = f"python{EXEC_EXTENSION}"
 
 USAGE = __doc__
 
@@ -113,7 +117,7 @@ def find_uv_exec():
 
     CURRENT_DIRECTORY = Path(sys.executable).parent
     for _ in range(3):
-        for file_path in CURRENT_DIRECTORY.rglob(UV_EXEC_NAME):
+        for file_path in CURRENT_DIRECTORY.rglob(EXEC_UV):
             UV_EXEC_CACHE.write_text(str(file_path.resolve()))
             return file_path.resolve()
 
@@ -182,6 +186,25 @@ def extract_arg(cmd, key, default=None, size=1, usage=None):
         return cmd.pop(idx)
     return default
 
+def _create_venv(venv_path):
+    """Create venv and return activate command as string"""
+    result = subprocess.run(
+        [str(UV_EXEC), "venv", str(venv_path.resolve()), "-p", PY_VERSION],
+        capture_output=True,
+        text=True,
+    )
+    lines = result.stderr.strip().splitlines()
+    commands = None
+    for line in lines:
+        if "Activate" in line:
+            cmd = line.split(":")[1].strip()
+            commands = cmd
+        else:
+            print(line)
+
+    return commands
+
+# -----------------------------------------------------------------------------
 
 def remove(name):
     """Delete the environment (venv + app/dependency files) named `name`."""
@@ -230,20 +253,8 @@ def install(app, name, replace):
     dst_dep.write_text("".join(comments))
 
     # Create venv
-    result = subprocess.run(
-        [str(UV_EXEC), "venv", str(venv_path.resolve()), "-p", PY_VERSION],
-        capture_output=True,
-        text=True,
-    )
-    lines = result.stderr.strip().splitlines()
-    commands = None
-    for line in lines:
-        if "Activate" in line:
-            cmd = line.split(":")[1].strip()
-            commands = f"{cmd} && uv run --active {dst_dep.resolve()}"
-        else:
-            print(line)
-
+    activate_cmd = _create_venv(venv_path)
+    commands = f"{activate_cmd} && uv run --active {dst_dep.resolve()}"
     print("Install dependencies:")
     install_dep = subprocess.run(commands, shell=True, capture_output=True, text=True)
     print(install_dep.stderr)
@@ -298,8 +309,9 @@ def run(name, enable_ssl, cmd):
         return
 
     if enable_ssl:
+        # Run venv as main Python interpreter
         cmd.pop(0)  # remove executable
-        python_exec = venv_base / "bin" / PYTHON_EXEC_NAME
+        python_exec = venv_base / "bin" / EXEC_PYTHON
         subprocess.run([str(python_exec), str(app_file), *cmd], env=paraview_env())
         return
     else:
@@ -349,20 +361,8 @@ def create(name, requirement):
     dst_req.write_text(requirement.read_text())
 
     # Create venv
-    result = subprocess.run(
-        [str(UV_EXEC), "venv", str(venv_path.resolve()), "-p", PY_VERSION],
-        capture_output=True,
-        text=True,
-    )
-    lines = result.stderr.strip().splitlines()
-    commands = None
-    for line in lines:
-        if "Activate" in line:
-            cmd = line.split(":")[1].strip()
-            commands = f"{cmd} && uv pip install -r {dst_req.resolve()}"
-        else:
-            print(line)
-
+    activate_cmd = _create_venv(venv_path)
+    commands = f"{activate_cmd} && uv pip install -r {dst_req.resolve()}"
     print("Install dependencies:")
     install_dep = subprocess.run(commands, shell=True, capture_output=True, text=True)
     print(install_dep.stderr)
