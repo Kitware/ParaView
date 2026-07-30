@@ -13,7 +13,7 @@ pythonCalculator1 = PythonCalculator(Input=unstructuredCellTypes1)
 pythonCalculator1.Expression = 'volume(inputs[0])'
 
 pythonCalculator1.UpdatePipeline()
-arrayRange = pythonCalculator1.CellData['result'].GetRange()
+arrayRange = pythonCalculator1.CellData['Result'].GetRange()
 if arrayRange[0] < .999 or arrayRange[0] > 1.001 or \
    arrayRange[1] < .999 or arrayRange[1] > 1.001:
     print("ERROR: incorrect volume computed for UnstructuredCellTypes source")
@@ -45,7 +45,7 @@ pythonCalculator2 = PythonCalculator(Input=canex2)
 pythonCalculator2.Expression = 'volume(inputs[0])'
 
 pythonCalculator2.UpdatePipeline(0.0)
-arrayRange = pythonCalculator2.CellData['result'].GetRange()
+arrayRange = pythonCalculator2.CellData['Result'].GetRange()
 if arrayRange[0] < .0098 or arrayRange[0] > .0099 or \
    arrayRange[1] < .13 or arrayRange[1] > .14:
     print("ERROR: incorrect volume computed for can.ex2")
@@ -61,7 +61,7 @@ pythonCalculator3 = PythonCalculator(Input=canex2)
 pythonCalculator3.Expression = '{timevalue}'
 
 pythonCalculator3.UpdatePipeline(time)
-arrayRange = pythonCalculator3.PointData['result'].GetRange()
+arrayRange = pythonCalculator3.PointData['Result'].GetRange()
 if arrayRange[0] < .00279 or arrayRange[0] > .0028:
     print("ERROR: incorrect {timevalue} computed for can.ex2")
     sys.exit(1)
