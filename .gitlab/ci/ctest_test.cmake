@@ -271,28 +271,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22827
     # Unclassified
     "^pv\\.BivariateNoiseRepresentation$"
-    "^pv\\.DecimatePolyline$"
-    "^pvcrs\\.DecimatePolyline$"
-    "^pvcs\\.DecimatePolyline$"
-    "^pv\\.UndoRedo1$"
-    "^pvcrs\\.UndoRedo1$"
-    "^pvcs\\.UndoRedo1$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22823
-    # Floating point subtleties
-    "^pv\\.AnimateProperty$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22824
-    # The following tests seem to have some geometry differences too
-    "^pv\\.AxisAlignedCutterMBHierarchy$"
-    "^pvcrs\\.AxisAlignedCutterMBHierarchy$"
-    "^pvcs\\.AxisAlignedCutterMBHierarchy$"
-    "^pv\\.AxisAlignedCutterPDCNoHierarchy$"
-    "^pvcrs\\.AxisAlignedCutterPDCNoHierarchy$"
-    "^pvcs\\.AxisAlignedCutterPDCNoHierarchy$"
-    "^pv\\.AxisAlignedPDCNoHierarchy$"
-    "^pvcrs\\.AxisAlignedPDCNoHierarchy$"
-    "^pvcs\\.AxisAlignedPDCNoHierarchy$"
 
     # macOS 15+ local network permission requests. New macOS requires
     # applications to get user permission to access localhost network
@@ -317,11 +295,32 @@ endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
   list(APPEND test_exclusions
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22827
+    # Unclassified
+    "^pv\\.DecimatePolyline$"
+    "^pvcrs\\.DecimatePolyline$"
+    "^pvcs\\.DecimatePolyline$"
+    "^pv\\.UndoRedo1$"
+    "^pvcrs\\.UndoRedo1$"
+    "^pvcs\\.UndoRedo1$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
     "\\.UndoRedo1"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21786
     "^pv\\.MultipleColorOnSelection"
     "^pvcs\\.MultipleColorOnSelection"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22823
+    # Floating point subtleties
+    "^pv\\.AnimateProperty$"
+    "^pvcrs\\.AnimateProperty$"
+    "^pvcs\\.AnimateProperty$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22824
+    # The following tests seem to have some geometry differences too
+    "^pv\\.AxisAlignedCutterMBHierarchy$"
+    "^pvcrs\\.AxisAlignedCutterMBHierarchy$"
+    "^pvcs\\.AxisAlignedCutterMBHierarchy$"
+    "^pv\\.AxisAlignedCutterPDCNoHierarchy$"
+    "^pvcrs\\.AxisAlignedCutterPDCNoHierarchy$"
+    "^pvcs\\.AxisAlignedCutterPDCNoHierarchy$"
     )
 endif ()
 
