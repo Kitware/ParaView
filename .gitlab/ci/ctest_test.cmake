@@ -290,6 +290,69 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # see https://gitlab.kitware.com/paraview/paraview/-/work_items/23247
     # Python libraries do not load properly for this test.
     "ParaViewExample-CustomApplications/ServerManagerRemoteConnection"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23349
+    # Selection issues
+    "^ParaView::RemotingApplicationPython-PythonSelection$"
+    "^pv\\.SelectionLinkScripting$"
+    "^pv\\.InteractiveSelection$"
+    "^pv\\.SelectionModifiersCells$"
+    "^pv\\.TestSelectionOnMultipiece$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23350
+    # HTG rendering issues.
+    "^pv\\.HyperTreeGridAxisClip$"
+    "^pv\\.HyperTreeGridAxisReflection$"
+    "^pv\\.HyperTreeGridCellCenters$"
+    "^pv\\.HyperTreeGridDepthLimiter$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23351
+    # Missing triangles in a sphere.
+    "^pv\\.AMRCutPlane$" # missing bits of circular widget
+    "^pv\\.AxisAlignedReflect$"
+    "^pv\\.FindDataPartialArrays$"
+    "^pv\\.GlyphUseCellCenters$"
+    "^pv\\.OrderedGroupDatasets$"
+    "^pv\\.PolygonCellSelection$"
+    "^pv\\.RegionIds$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23352
+    # Texture oddities.
+    "^pv\\.MultiBlockInspectorMultiBlock$"
+    "^pv\\.RandomAttributes$"
+    "^pv\\.ResetToVisibleRange$"
+    "^pv\\.TestBoundaryMeshQuality$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23353
+    # Miscellaneous failures
+    # Wrong colors and box axes are present.
+    "^pv\\.PropertyConversion2$"
+    # Points are squashed and stretched.
+    "^pv\\.PythonAlgorithmReadersAndWriters$"
+    # Times out on an `actionZoomToData` action.
+    "^pv\\.RectilinearVolumeRendering$"
+    # Shows a sphere on a gradient background; should be a solid color?
+    "^pv\\.RemoteRendering$"
+    # Angled text is bold.
+    "^pv\\.TestParallelProjectionAnnotations$"
+    # Times out activating the View menu.
+    "^pv\\.TestSkyboxRotation$"
+    # Animation playback is wrong?
+    "^ParaView::RemotingApplicationPython-PythonAnimationTrack$"
+    # Timeouts
+    "^pv\\.AdaptiveResampleToImage$"
+    "^pv\\.PBRSpheres$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21786
+    "^pv\\.MultipleColorOnSelection"
+    "^pvcs\\.MultipleColorOnSelection"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
+    "\\.UndoRedo1"
+
+    # Transfer function image corruption
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21428
+    "\\.TransferFunction2DYScalars$"
     )
 endif ()
 
@@ -303,11 +366,8 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     "^pv\\.UndoRedo1$"
     "^pvcrs\\.UndoRedo1$"
     "^pvcs\\.UndoRedo1$"
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
-    "\\.UndoRedo1"
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21786
-    "^pv\\.MultipleColorOnSelection"
-    "^pvcs\\.MultipleColorOnSelection"
+    # Uninvestigated segfault
+    "^pv\\.MoleculeBonds$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22823
     # Floating point subtleties
     "^pv\\.AnimateProperty$"
@@ -321,6 +381,29 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     "^pv\\.AxisAlignedCutterPDCNoHierarchy$"
     "^pvcrs\\.AxisAlignedCutterPDCNoHierarchy$"
     "^pvcs\\.AxisAlignedCutterPDCNoHierarchy$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23348
+    # Chart texture oddities.
+    "^Catalyst::Workflow::BatchExecute::Validate.WaveletHistogramExtracts$"
+    "^Catalyst::Workflow::ParaView::Validate.WaveletHistogramExtracts$"
+    "^Catalyst::Workflow::WaveletMiniApp::Validate\\.WaveletHistogramExtracts$"
+    "^ParaView::RemotingApplicationPython-SaveScreenshot$"
+    )
+endif ()
+
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_x86_64")
+  list(APPEND test_exclusions
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23353
+    # Timeouts
+    "\\.WaveletVolumeRenderWithCinema$"
+    "^pv\\.SaveStateAndScreenshot$"
+    "^pv\\.SelectionLinkConverted$"
+    "^pv\\.TransferFunctionResetOnVisibilityChange$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23351
+    # Missing triangles in a sphere.
+    "^pv\\.HyperTreeGridMultipleClip$"
+    "^ParaViewExample-Plugins/LiveSource$"
     )
 endif ()
 
