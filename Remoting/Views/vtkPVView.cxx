@@ -172,6 +172,7 @@ bool vtkPVView::UseGenericOpenGLRenderWindow = false;
 void vtkPVView::SetUseGenericOpenGLRenderWindow(bool val)
 {
   vtkPVView::UseGenericOpenGLRenderWindow = val;
+  vtkOpenGLRenderWindow::SetUseGenericOpenGLRenderWindow(val);
 }
 
 //----------------------------------------------------------------------------
