@@ -23,7 +23,7 @@ env = dict(os.environ)
 env["HOME"] = tmpdir
 env["APPDATA"] = tmpdir
 
-pvpython = sys.executable
+pvpython = shutil.which(sys.orig_argv[0])
 env_name = "pv-envs-test"
 
 
