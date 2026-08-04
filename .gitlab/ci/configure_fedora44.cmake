@@ -11,4 +11,9 @@ set(VTK_DISPATCH_CONSTANT_ARRAYS ON CACHE BOOL "")
 # vendored copy. Just use the system copy.
 set(VTK_MODULE_USE_EXTERNAL_ParaView_protobuf ON CACHE BOOL "")
 
+# fedora44 has Boost's own CMake config files installed. Without this,
+# find_package(Boost) calls (e.g. via OpenVDB's FindOpenVDB.cmake) emit
+# a CMP0167 dev warning; setting NEW here makes Config mode the default.
+set(CMAKE_POLICY_DEFAULT_CMP0167 NEW CACHE STRING "")
+
 include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora_common.cmake")

@@ -1,6 +1,6 @@
 # In this example, a custom bounds domain is created so that the low and high
 # point of the elevation filter can be initialized in the z-direction.
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 project(SMMyProxy)
 
 find_package(ParaView REQUIRED)
