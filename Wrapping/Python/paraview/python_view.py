@@ -77,7 +77,7 @@ def figure_to_data(figure):
     except:
         paraview.print_error("Error: Cannot import numpy")
 
-    buf = numpy.fromstring(figure.canvas.tostring_argb(), dtype=numpy.uint8)
+    buf = numpy.frombuffer(figure.canvas.tostring_argb(), dtype=numpy.uint8)
     buf.shape = (h, w, 4)
 
     # canvas.tostring_argb gives pixmap in ARGB mode. Roll the alpha channel to have it in RGBA mode
