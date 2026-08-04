@@ -22,7 +22,6 @@ vtkPVInteractorStyle::vtkPVInteractorStyle()
   this->UseTimers = 0;
   this->CameraManipulators = vtkCollection::New();
   this->CurrentManipulator = nullptr;
-  this->CenterOfRotation[0] = this->CenterOfRotation[1] = this->CenterOfRotation[2] = 0;
   this->RotationFactor = 1.0;
 }
 
@@ -86,7 +85,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
   {
     this->CurrentManipulator->Register(this);
     this->InvokeEvent(vtkCommand::StartInteractionEvent);
-    this->CurrentManipulator->SetCenter(this->CenterOfRotation);
+    this->CurrentManipulator->SetCenter(this->GetCenterOfRotation());
     this->CurrentManipulator->SetRotationFactor(this->RotationFactor);
     this->CurrentManipulator->StartInteraction();
     this->CurrentManipulator->OnButtonDown(this->Interactor->GetEventPosition()[0],
@@ -334,8 +333,6 @@ void vtkPVInteractorStyle::TranslateCamera(
 void vtkPVInteractorStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "CenterOfRotation: " << this->CenterOfRotation[0] << ", "
-     << this->CenterOfRotation[1] << ", " << this->CenterOfRotation[2] << endl;
   os << indent << "RotationFactor: " << this->RotationFactor << endl;
   os << indent << "CameraManipulators: " << this->CameraManipulators << endl;
 }
