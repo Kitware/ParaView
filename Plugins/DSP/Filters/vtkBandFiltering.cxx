@@ -267,8 +267,6 @@ struct DispatchInitializeAggregator
 
 };
 
-VTK_ABI_NAMESPACE_BEGIN
-
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkBandFiltering);
 

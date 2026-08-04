@@ -20,8 +20,6 @@
 #include <vtkDPvtkReaderModule.h> // for export macro
 #include <vtkXMLMultiBlockDataReader.h>
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class VTKDPVTKREADER_EXPORT vtkDPvtkMultiBlockDataReader : public vtkXMLMultiBlockDataReader
 {
 public:
@@ -66,5 +64,4 @@ protected:
   std::unique_ptr<vtkInternals> Internals;
 };
 
-VTK_ABI_NAMESPACE_END
 #endif // vtkDPvtkMultiBlockDataReader_h

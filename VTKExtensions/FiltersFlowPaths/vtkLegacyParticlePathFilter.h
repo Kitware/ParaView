@@ -17,8 +17,6 @@
 #include "vtkPVVTKExtensionsFiltersFlowPathsModule.h" // For export macro
 #include "vtkParticlePathFilter.h"
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class vtkExtractTimeSteps;
 class vtkParticlePathFilter;
 
@@ -49,7 +47,5 @@ private:
   vtkLegacyParticlePathFilter(const vtkLegacyParticlePathFilter&) = delete;
   void operator=(const vtkLegacyParticlePathFilter&) = delete;
 };
-
-VTK_ABI_NAMESPACE_END
 
 #endif

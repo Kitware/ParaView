@@ -249,7 +249,6 @@ void AddInverseMapping(
 }
 }
 
-VTK_ABI_NAMESPACE_BEGIN
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkGmshWriter);
 
@@ -718,4 +717,3 @@ void vtkGmshWriter::PrintSelf(std::ostream& os, vtkIndent indent)
      << ", WriteAllTimeSteps: " << this->WriteAllTimeSteps << indent
      << ", WriteGmshSpecificArray: " << this->WriteGmshSpecificArray << std::endl;
 }
-VTK_ABI_NAMESPACE_END

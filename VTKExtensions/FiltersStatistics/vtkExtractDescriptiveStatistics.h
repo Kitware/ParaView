@@ -20,7 +20,6 @@
 #include "vtkPVVTKExtensionsFiltersStatisticsModule.h" // For export macro
 #include "vtkPartitionedDataSetCollectionAlgorithm.h"
 
-VTK_ABI_NAMESPACE_BEGIN
 class vtkMultiProcessController;
 class vtkDataObjectCollection;
 class vtkStatisticalModel;
@@ -64,5 +63,4 @@ private:
   vtkMultiProcessController* Controller{ nullptr };
 };
 
-VTK_ABI_NAMESPACE_END
 #endif

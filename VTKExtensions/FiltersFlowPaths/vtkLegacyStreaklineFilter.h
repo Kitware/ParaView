@@ -17,8 +17,6 @@
 #include "vtkPVVTKExtensionsFiltersFlowPathsModule.h" // For export macro
 #include "vtkStreaklineFilter.h"
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class vtkExtractTimeSteps;
 class vtkStreaklineFilter;
 
@@ -49,7 +47,5 @@ private:
   vtkLegacyStreaklineFilter(const vtkLegacyStreaklineFilter&) = delete;
   void operator=(const vtkLegacyStreaklineFilter&) = delete;
 };
-
-VTK_ABI_NAMESPACE_END
 
 #endif

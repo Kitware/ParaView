@@ -32,8 +32,6 @@
 #include <cassert>
 #include <iterator>
 
-VTK_ABI_NAMESPACE_BEGIN
-
 namespace
 {
 struct RankDataType
@@ -488,4 +486,3 @@ void vtkDPvtkMultiBlockDataReader::PrintSelf(ostream& os, vtkIndent indent)
   os << "vtkDPvtkMultiBlockDataReader" << std::endl;
   Superclass::PrintSelf(os, indent);
 }
-VTK_ABI_NAMESPACE_END

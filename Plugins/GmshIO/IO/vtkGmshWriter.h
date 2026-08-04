@@ -19,7 +19,6 @@ struct GmshWriterInternal;
 class vtkUnstructuredGrid;
 class vtkDataSetAttributes;
 
-VTK_ABI_NAMESPACE_BEGIN
 class VTKGMSHIO_EXPORT vtkGmshWriter : public vtkWriter
 {
 public:
@@ -108,6 +107,5 @@ private:
   vtkGmshWriter(const vtkGmshWriter&) = delete;
   void operator=(const vtkGmshWriter&) = delete;
 };
-VTK_ABI_NAMESPACE_END
 
 #endif // vtkGmshWriter_h

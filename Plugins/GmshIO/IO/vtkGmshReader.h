@@ -22,7 +22,6 @@ struct PhysicalGroup;
 class vtkUnstructuredGrid;
 class vtkInformation;
 
-VTK_ABI_NAMESPACE_BEGIN
 class VTKGMSHIO_EXPORT vtkGmshReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
@@ -127,6 +126,5 @@ private:
   vtkGmshReader(const vtkGmshReader&) = delete;
   void operator=(const vtkGmshReader&) = delete;
 };
-VTK_ABI_NAMESPACE_END
 
 #endif // vtkGmshReader_h

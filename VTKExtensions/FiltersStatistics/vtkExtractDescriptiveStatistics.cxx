@@ -17,8 +17,6 @@
 
 #include "vtksys/SystemTools.hxx"
 
-VTK_ABI_NAMESPACE_BEGIN
-
 namespace
 {
 
@@ -195,5 +193,3 @@ int vtkExtractDescriptiveStatistics::RequestData(vtkInformation* vtkNotUsed(requ
 
   return 1;
 }
-
-VTK_ABI_NAMESPACE_END

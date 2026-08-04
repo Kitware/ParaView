@@ -13,7 +13,6 @@
 #include "vtkSlowFilterModule.h" // For export macro
 #include "vtkStructuredGridAlgorithm.h"
 
-VTK_ABI_NAMESPACE_BEGIN
 class VTKSLOWFILTER_EXPORT vtkSlowFilter : public vtkStructuredGridAlgorithm
 {
 public:
@@ -32,5 +31,4 @@ private:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 };
 
-VTK_ABI_NAMESPACE_END
 #endif

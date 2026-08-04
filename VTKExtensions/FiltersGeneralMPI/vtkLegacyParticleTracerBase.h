@@ -25,7 +25,6 @@
 #include <mutex>  // STL Header
 #include <vector> // STL Header
 
-VTK_ABI_NAMESPACE_BEGIN
 class vtkAbstractParticleWriter;
 class vtkCellArray;
 class vtkCompositeDataSet;
@@ -43,11 +42,9 @@ class vtkPoints;
 class vtkPolyData;
 class vtkSignedCharArray;
 class vtkTemporalInterpolatedVelocityField;
-VTK_ABI_NAMESPACE_END
 
 namespace vtkLegacyParticleTracerBaseNamespace
 {
-VTK_ABI_NAMESPACE_BEGIN
 struct Position_t
 {
   double x[4];
@@ -90,10 +87,8 @@ typedef ParticleVector::iterator ParticleIterator;
 typedef std::list<ParticleInformation> ParticleDataList;
 typedef ParticleDataList::iterator ParticleListIterator;
 struct ParticleTracerFunctor;
-VTK_ABI_NAMESPACE_END
 }
 
-VTK_ABI_NAMESPACE_BEGIN
 class VTKPVVTKEXTENSIONSFILTERSGENERALMPI_EXPORT vtkLegacyParticleTracerBase
   : public vtkPolyDataAlgorithm
 {
@@ -668,5 +663,4 @@ private:
   static const double Epsilon;
 };
 
-VTK_ABI_NAMESPACE_END
 #endif

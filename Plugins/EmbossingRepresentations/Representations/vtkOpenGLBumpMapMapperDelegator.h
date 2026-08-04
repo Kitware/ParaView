@@ -15,8 +15,6 @@
 
 #include "vtkEmbossingRepresentationsModule.h" // for export macro
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkOpenGLBumpMapMapperDelegator
   : public vtkOpenGLCompositePolyDataMapperDelegator
 {
@@ -40,5 +38,4 @@ private:
   void operator=(const vtkOpenGLBumpMapMapperDelegator&) = delete;
 };
 
-VTK_ABI_NAMESPACE_END
 #endif
