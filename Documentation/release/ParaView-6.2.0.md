@@ -239,7 +239,7 @@ ParaView can now write HyperTree Grid, Structured Grid, Rectilinear Grid and Ima
 
 The `.phtg` format had issues and inconsistent results in parallel. Consequently, the writer, reader and extractor are now deprecated.
 
-Use  the VTKHDF format instead, which supports parallel decomposition of HyperTreeGrid properly.
+Use the VTKHDF format instead, which supports parallel decomposition of HyperTreeGrid properly.
 
 # Interface improvements
 
@@ -285,7 +285,7 @@ It is now possible to create a list of arrays to hide on the tooltip info when u
 
 ## Added an out-of-date label to the _Information_ panel
 
-The _Information_ panel now displays a label if the information data on this panel is outdated.
+The _Information_ panel now displays a label if the information data on this panel is potentially outdated.
 
 > ![out_of_date_information](img/6.2.0/add-out-of-date-information-panel.png)
 >
