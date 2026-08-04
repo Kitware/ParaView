@@ -111,12 +111,8 @@ std::vector<std::string> GetUnixSystemDirectories()
 #endif
 };
 
-namespace vtkPVStandardPaths
-{
-VTK_ABI_NAMESPACE_BEGIN
-
 //----------------------------------------------------------------------------
-std::vector<std::string> GetSystemDirectories()
+std::vector<std::string> vtkPVStandardPaths::GetSystemDirectories()
 {
 #if defined(_WIN32)
   return os::GetWindowsSystemDirectories();
@@ -126,7 +122,7 @@ std::vector<std::string> GetSystemDirectories()
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> GetInstallDirectories()
+std::vector<std::string> vtkPVStandardPaths::GetInstallDirectories()
 {
   std::vector<std::string> installDirectories;
 
@@ -185,7 +181,7 @@ std::vector<std::string> GetInstallDirectories()
 }
 
 //----------------------------------------------------------------------------
-std::string GetUserSettingsDirectory()
+std::string vtkPVStandardPaths::GetUserSettingsDirectory()
 {
 #if defined(_WIN32)
   return os::GetWindowsUserSettingsDirectory();
@@ -195,7 +191,7 @@ std::string GetUserSettingsDirectory()
 }
 
 //----------------------------------------------------------------------------
-std::string GetUserSettingsFilePath()
+std::string vtkPVStandardPaths::GetUserSettingsFilePath()
 {
   std::string path = GetUserSettingsDirectory();
   path.append(vtkInitializationHelper::GetApplicationName());
@@ -203,6 +199,3 @@ std::string GetUserSettingsFilePath()
 
   return path;
 }
-
-VTK_ABI_NAMESPACE_END
-};
