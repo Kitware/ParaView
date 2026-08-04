@@ -45,7 +45,7 @@ Please run the command in a terminal to install the following dependencies depen
 
 ###### CMake
 Download and install [cmake][cmake-download]) as the packaged version is not enough considering that
-CMake 3.12 or higher is needed.
+CMake 3.13 or higher is needed.
 
 ###### Others
 `sudo yum install python3-devel openmpi-devel mesa-libGL-devel libX11-devel libXt-devel qt5-qtbase-devel qt5-qtx11extras-devel qt5-qttools-devel qt5-qtxmlpatterns-devel tbb-devel ninja-build git`
@@ -230,7 +230,7 @@ build configuration.
 Required:
 
   * [CMake][cmake]
-    - Version 3.12 or newer, however, the latest version is always recommended
+    - Version 3.13 or newer, however, the latest version is always recommended
   * Supported compiler
     - GCC 8.0 or newer
     - Intel 19 or newer
