@@ -72,6 +72,11 @@ if (NOT "$ENV{CI}" STREQUAL "")
       # instances is sad, but it's not clear what to do about it otherwise.
       "Wfree-nonheap-object"
       "note: returned from 'void\\* operator new\\(std::size_t\\)'"
+
+      # Same deal but for `operator delete` called with a nonzero offset from
+      # `new_allocator.h` (again likely `std::vector` destruction internals).
+      "Wfree-nonheap-object"
+      "'void operator delete\\(void\\*, std::size_t\\)'"
       )
   endif ()
 endif ()

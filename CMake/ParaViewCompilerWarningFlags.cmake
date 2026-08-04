@@ -37,9 +37,16 @@ if (PARAVIEW_ENABLE_EXTRA_BUILD_WARNINGS)
   # GCC and actual bugs fixed.
   paraview_add_flag(-Wno-array-bounds ${langs}) # VTK issue 19459
   paraview_add_flag(-Wno-catch-value ${langs}) # VTK issue 19458
+  paraview_add_flag(-Wno-free-nonheap-object ${langs}) # VTK issue 19309
   paraview_add_flag(-Wno-maybe-uninitialized ${langs}) # VTK issue 19457
   paraview_add_flag(-Wno-missing-field-initializers ${langs}) # VTK issue 19460
   paraview_add_flag(-Wno-nonnull ${langs}) # VTK issue 19462
+  # GCC's -Wsfinae-incomplete (new in GCC 16, also seen on GCC 15 trunk builds)
+  # fires on Qt's own MOC-generated code and forward-declared Qt/VTK types used
+  # in Qt property/signal contexts, a pattern Qt itself recommends. Reported upstream
+  # as likely a false positive: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=121244
+  # https://forum.qt.io/topic/164690/gcc-16-warnings-about-incomplete-types-in-an-sfinae-context
+  paraview_add_flag(-Wno-sfinae-incomplete ${langs})
   paraview_add_flag(-Wno-strict-aliasing ${langs}) # VTK issue 19463
   paraview_add_flag(-Wno-stringop-overflow ${langs}) # VTK issue 19306
   paraview_add_flag(-Wno-stringop-overread ${langs}) # VTK issue 19307
