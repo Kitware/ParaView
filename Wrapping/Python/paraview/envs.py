@@ -195,22 +195,20 @@ def extract_arg(cmd, key, default=None, size=1, usage=None):
     return default
 
 def _create_venv(venv_path):
-    """Create venv and return activate command as string"""
+    """Create a venv at `venv_path`, printing uv's own progress output."""
     result = subprocess.run(
         [str(UV_EXEC), "venv", str(venv_path.resolve()), "-p", PY_VERSION],
         capture_output=True,
         text=True,
     )
-    lines = result.stderr.strip().splitlines()
-    commands = None
-    for line in lines:
-        if "Activate" in line:
-            cmd = line.split(":")[1].strip()
-            commands = cmd
-        else:
-            print(line)
+    print(result.stderr)
 
-    return commands
+
+def _venv_env(venv_path):
+    """Environment for running `uv` against `venv_path` without needing to
+    `source`/activate it through a shell (which uv only offers a hint for
+    when it recognizes $SHELL, e.g. it is silent in most CI containers)."""
+    return {**os.environ, "VIRTUAL_ENV": str(venv_path.resolve())}
 
 # -----------------------------------------------------------------------------
 
@@ -261,10 +259,14 @@ def install(app, name, replace):
     dst_dep.write_text("".join(comments))
 
     # Create venv
-    activate_cmd = _create_venv(venv_path)
-    commands = f"{activate_cmd} && uv run --active {dst_dep.resolve()}"
+    _create_venv(venv_path)
     print("Install dependencies:")
-    install_dep = subprocess.run(commands, shell=True, capture_output=True, text=True)
+    install_dep = subprocess.run(
+        [str(UV_EXEC), "run", "--active", str(dst_dep.resolve())],
+        env=_venv_env(venv_path),
+        capture_output=True,
+        text=True,
+    )
     print(install_dep.stderr)
 
 
@@ -369,10 +371,14 @@ def create(name, requirement):
     dst_req.write_text(requirement.read_text())
 
     # Create venv
-    activate_cmd = _create_venv(venv_path)
-    commands = f"{activate_cmd} && uv pip install -r {dst_req.resolve()}"
+    _create_venv(venv_path)
     print("Install dependencies:")
-    install_dep = subprocess.run(commands, shell=True, capture_output=True, text=True)
+    install_dep = subprocess.run(
+        [str(UV_EXEC), "pip", "install", "-r", str(dst_req.resolve())],
+        env=_venv_env(venv_path),
+        capture_output=True,
+        text=True,
+    )
     print(install_dep.stderr)
 
 
