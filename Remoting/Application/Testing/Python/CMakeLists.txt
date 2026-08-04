@@ -69,6 +69,7 @@ set(PY_TESTS
   SliceBackwardsCompatibilityTest.py,NO_VALID
   StateWithHiddenRepresentations.py,NO_VALID
   TestFetchData.py,NO_VALID
+  TestPythonEnvs.py,NO_VALID
   TestSAVGReader.py
   TestVTKSeriesWithMeta.py
   ThresholdBackwardsCompatibilityTest.py,NO_VALID
