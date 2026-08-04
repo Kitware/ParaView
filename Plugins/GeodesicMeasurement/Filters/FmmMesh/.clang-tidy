@@ -5,6 +5,7 @@ Checks: "-*,\
 bugprone-*,\
 -bugprone-easily-swappable-parameters,\
 -bugprone-narrowing-conversions,\
+-bugprone-throwing-static-initialization,\
 -bugprone-unhandled-self-assignment,\
 "
 ...
