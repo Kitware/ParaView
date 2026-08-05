@@ -31,8 +31,8 @@ Commands
   --install: Install a script as a named, reusable application. Its dependencies are
     declared as PEP 723 inline metadata (lines starting with `#` at the top of
     the file, e.g. `# dependencies = [...]`) and installed via `uv run`.
-        --name defaults to the file's stem;
-        --replace overwrites an existing environment of the same name;
+    --name defaults to the file's stem;
+    --replace overwrites an existing environment of the same name;
 
     $ pvpython -m paraview.envs --install ./cone.py [--name cone] [--replace]
 
