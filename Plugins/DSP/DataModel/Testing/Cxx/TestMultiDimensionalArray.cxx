@@ -14,7 +14,7 @@
 
 namespace
 {
-using DataContainerInt = typename vtkMultiDimensionalImplicitBackend<int>::DataContainerT;
+using DataContainerInt = vtkMultiDimensionalImplicitBackend<int>::DataContainerT;
 
 /**
  * Generate a list of "nbOfArrays" std::vector<int>. Values are incremented along the
