@@ -21,6 +21,7 @@
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkUnsignedShortArray.h>
 
+#include <random>
 #include <sstream>
 
 namespace
@@ -277,9 +278,12 @@ void PillarGridGenerator(
 
   double coef_noise = 0.2;
 
+  std::mt19937 rng{ std::random_device{}() };
+  std::uniform_real_distribution<double> noiseDist(0.0, 1.0);
+
 #define GetZShift(_k, _shift)                                                                      \
   (shift_faille + (_shift) + (_k) +                                                                \
-    ((k == extent[4] || k >= extent[5] - 2) ? 0. : (coef_noise * rand() / RAND_MAX)))
+    ((k == extent[4] || k >= extent[5] - 2) ? 0. : (coef_noise * noiseDist(rng))))
 #define GetZShift1(_k) GetZShift(_k, shift_z1)
 #define GetZShift2(_k) GetZShift(_k, shift_z2)
 
@@ -338,7 +342,6 @@ void PillarGridGenerator(
 void DiscontinuousGridGenerator(
   int rank, int wholeExtent[6], int extent[6], vtkExplicitStructuredGrid* grid)
 {
-  srand(1);
   grid->SetExtent(extent);
 
   double nx = wholeExtent[1] - wholeExtent[0];
@@ -372,6 +375,9 @@ void DiscontinuousGridGenerator(
   }
 
   double coef_noise = 0.2;
+
+  std::mt19937 rng{ 1 };
+  std::uniform_real_distribution<double> noiseDist(0.0, 1.0);
 
   for (int i = extent[0]; i < extent[1]; i++)
   {
@@ -503,7 +509,6 @@ void StepsGridGenerator(
 {
   // Set the extent and use the generated cells
   grid->SetExtent(extent);
-  srand(1);
 
   double nx = wholeExtent[1] - wholeExtent[0];
   double nz = wholeExtent[5] - wholeExtent[4];
@@ -547,11 +552,14 @@ void StepsGridGenerator(
   double coef_noise = 0.1111;
   double coef_fault = 0.3333;
 
+  std::mt19937 rng{ 1 };
+  std::uniform_real_distribution<double> noiseDist(0.0, 1.0);
+
   int firstipmin = -1;
 
   for (int istep = 0; istep < nsteps; istep++)
   {
-    double shift_step = nz * coef_noise * rand() / RAND_MAX;
+    double shift_step = nz * coef_noise * noiseDist(rng);
     double shift_fault = 0.;
 
     if (istep > nsteps / 2)
