@@ -174,6 +174,7 @@ spec:
     - .gitlab/ci/cmake.sh
     - .gitlab/ci/cmake.sh mindeps
     - .gitlab/ci/ninja.sh
+    - .gitlab/ci/uv.sh
     - .gitlab/ci/doxygen.sh
     - .gitlab/ci/sccache.sh
     - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PWD/.gitlab/doxygen/bin:$PATH
@@ -183,6 +184,7 @@ spec:
     - export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$PWD/.gitlab/qt6:$PWD/.gitlab/onnxruntime
     - cmake --version
     - ninja --version
+    - uv --version
     - doxygen --version
     - "git submodule update --init --recursive || :"
     - git submodule foreach --recursive cmake -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
