@@ -382,6 +382,7 @@ void Hdf5Reader::GetResultTypes(unsigned int sequenceStep,
     // iterate over all entries and assemble the result info object
 
     // create new H5CFS::ResultInfo objects
+    // NOLINTNEXTLINE(modernize-make-shared)
     std::shared_ptr<H5CFS::ResultInfo> pi(new H5CFS::ResultInfo());
     pi->name = H5CFS::GetObjNameByIdx(resInfoGroup, i);
     hid_t resGroup = H5CFS::OpenGroup(resInfoGroup, pi->name);
@@ -414,6 +415,7 @@ void Hdf5Reader::GetResultTypes(unsigned int sequenceStep,
 
     for (const std::string& region : entities)
     {
+      // NOLINTNEXTLINE(modernize-make-shared)
       std::shared_ptr<H5CFS::ResultInfo> actInfo(new H5CFS::ResultInfo(*pi));
       actInfo->listName = region;
       infos.push_back(actInfo);
