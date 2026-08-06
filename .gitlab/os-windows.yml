@@ -81,10 +81,12 @@ spec:
     - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\cmake\bin;$env:PATH"
     - powershell -File ".gitlab/ci/ninja.ps1"
     - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab;$env:PATH"
+    - powershell -File ".gitlab/ci/uv.ps1"
     - powershell -File ".gitlab/ci/xsltproc.ps1"
     - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\xsltproc\bin;$env:PATH"
     - cmake --version
     - ninja --version
+    - uv --version
     # Support submodule references to the user's fork.
     - git submodule foreach --recursive cmake -P "$pwdpath/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
