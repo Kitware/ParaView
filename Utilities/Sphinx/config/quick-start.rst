@@ -83,8 +83,8 @@ Creating a Pipeline
 
 The simple module contains many functions to instantiate sources, filters, and
 other related objects. You can get a list of objects this module can create from
-ParaView's online help (from help menu or here:
-http://paraview.org/OnlineHelpCurrent/)
+ParaView's online help (from the Help menu or from here:
+https://www.paraview.org/paraview-docs/latest/python/paraview.servermanager_proxies.html)
 
 Start by creating a Cone object:
 

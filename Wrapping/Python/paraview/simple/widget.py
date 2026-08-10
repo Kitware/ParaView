@@ -97,7 +97,7 @@ def GetScalarBar(ctf, view=None):
     :param view: View from which the scalar bar proxy should be retrieved.
         Optional, defaults to the active view, if possible.
     :type view: View proxy.
-    :return: The scalar bar proxy for the color transfer function if found. his will
+    :return: The scalar bar proxy for the color transfer function if found. This will
         either return an existing scalar bar or create a new one.
     :rtype: Scalar bar proxy"""
     view = view if view else active_objects.view
