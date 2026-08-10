@@ -34,15 +34,15 @@ The following variables are provided by this module:
     location of the paraview.qch.
 #]==]
 
-if (CMAKE_VERSION VERSION_LESS "3.12")
+if (CMAKE_VERSION VERSION_LESS "3.13")
   set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" 0)
   set("${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE"
-    "ParaView requires CMake 3.12 in order to reliably be used.")
+    "ParaView requires CMake 3.13 in order to reliably be used.")
   return ()
 endif ()
 
 cmake_policy(PUSH)
-cmake_policy(VERSION 3.12)
+cmake_policy(VERSION 3.13)
 
 set(${CMAKE_FIND_PACKAGE_NAME}_CMAKE_MODULE_PATH_save "${CMAKE_MODULE_PATH}")
 list(INSERT CMAKE_MODULE_PATH 0
