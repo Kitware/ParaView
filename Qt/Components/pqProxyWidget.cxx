@@ -9,6 +9,7 @@
 #include "pqDoubleVectorPropertyWidget.h"
 #include "pqIntVectorPropertyWidget.h"
 #include "pqInterfaceTracker.h"
+#include "pqLabel.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidget.h"
 #include "pqPropertyWidgetDecorator.h"
@@ -42,7 +43,6 @@
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
-#include "vtkSMVectorProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 #include "vtkWeakPointer.h"
@@ -53,6 +53,7 @@
 #include <QMenu>
 #include <QPointer>
 #include <QShowEvent>
+#include <QToolButton>
 #include <QVBoxLayout>
 
 #include <cassert>
@@ -320,41 +321,85 @@ bool enableShortcutDecorator(pqPropertyWidget* propertyWidget, bool changeFocus)
   return false;
 }
 
+//-----------------------------------------------------------------------------------
+QHBoxLayout* newGroupLabelLayout(const QString& label, QWidget* parent,
+  pqLabel** titleLabel = nullptr, QToolButton** collapseButton = nullptr)
+{
+  auto collapseToolButton = new QToolButton(parent);
+  collapseToolButton->setArrowType(Qt::DownArrow);
+  collapseToolButton->setCheckable(true);
+  collapseToolButton->setChecked(true);
+  collapseToolButton->setStyleSheet("QToolButton { border: none; }");
+
+  auto groupLabel = new pqLabel(QString("<html><b>%1</b></html>").arg(label), parent);
+  groupLabel->setWordWrap(true);
+  groupLabel->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
+  groupLabel->setObjectName("GroupLabel");
+
+  if (titleLabel)
+  {
+    *titleLabel = groupLabel;
+  }
+
+  if (collapseButton)
+  {
+    *collapseButton = collapseToolButton;
+  }
+
+  auto titleLayout = new QHBoxLayout();
+  titleLayout->setContentsMargins(0, 0, 0, 0);
+  titleLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+  titleLayout->addWidget(collapseToolButton);
+  titleLayout->addWidget(groupLabel);
+
+  return titleLayout;
+}
+
 } // end of namespace {}
 
 //-----------------------------------------------------------------------------------
-// static
 QWidget* pqProxyWidget::newGroupLabelWidget(
-  const QString& labelText, QWidget* parent, const QList<QWidget*>& buttons)
+  const QString& label, QWidget* parentWidget, const QList<QWidget*>& buttons)
 {
-  QWidget* widget = new QWidget(parent);
+  auto widget = new QWidget(parentWidget);
+  widget->setObjectName("GroupWidget");
 
-  QVBoxLayout* vbox = new QVBoxLayout(widget);
+  auto vbox = new QVBoxLayout(widget);
   vbox->setContentsMargins(0, pqPropertiesPanel::suggestedVerticalSpacing(), 0, 0);
   vbox->setSpacing(0);
 
-  QLabel* label = new QLabel(QString("<html><b>%1</b></html>").arg(labelText), widget);
-  label->setWordWrap(true);
-  label->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
+  auto hbox = new QHBoxLayout();
+  hbox->setContentsMargins(0, 0, 0, 0);
+  hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
-  if (!buttons.empty())
-  {
-    auto hbox = new QHBoxLayout();
-    hbox->setContentsMargins(0, 0, 0, 0);
-    hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-    hbox->addWidget(label);
-    for (auto& button : buttons)
-    {
-      hbox->addWidget(button);
-    }
+  hbox->addLayout(newGroupLabelLayout(label, widget));
 
-    vbox->addLayout(hbox);
-  }
-  else
+  for (auto* button : buttons)
   {
-    vbox->addWidget(label);
+    hbox->addWidget(button);
   }
-  vbox->addWidget(pqProxyWidgetItem::newHLine(parent));
+
+  vbox->addLayout(hbox);
+  vbox->addWidget(pqProxyWidgetItem::newHLine(widget));
+
+  return widget;
+}
+
+//-----------------------------------------------------------------------------------
+QWidget* pqProxyWidget::newGroupLabelWidget(
+  const QString& label, QWidget* parentWidget, pqLabel** titleLabel, QToolButton** collapseButton)
+{
+  auto widget = new QWidget(parentWidget);
+  widget->setObjectName("GroupWidget");
+
+  auto vbox = new QVBoxLayout(widget);
+  vbox->setContentsMargins(0, pqPropertiesPanel::suggestedVerticalSpacing(), 0, 0);
+  vbox->setSpacing(0);
+
+  vbox->addLayout(newGroupLabelLayout(label, widget, titleLabel, collapseButton));
+
+  vbox->addWidget(pqProxyWidgetItem::newHLine(widget));
+
   return widget;
 }
 
@@ -738,6 +783,14 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
 {
   vtkSMProxy* smproxy = this->proxy();
 
+  auto updateSMPropertyGroup = [](vtkSMPropertyGroup* smgroup, pqProxyWidgetItem* item)
+  {
+    if (smgroup)
+    {
+      smgroup->SetCollapsed(item->getCollapsed());
+    }
+  };
+
   // step 1: iterate over all groups to populate `property_2_group_map`.
   //         this will make it easier to determine if a property belong to a
   //         group.
@@ -919,7 +972,11 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
 
             auto item = pqProxyWidgetItem::newGroupItem(gwidget,
               QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel()),
-              this->ShowHeadersFooters, advanced, searchTags, this);
+              this->ShowHeadersFooters, advanced, searchTags, this, smgroup->GetCollapsed());
+
+            QObject::connect(item, &pqProxyWidgetItem::collapse, this,
+              [&, smgroup, item]() { updateSMPropertyGroup(smgroup, item); });
+            QObject::connect(item, &pqProxyWidgetItem::collapse, this, &pqProxyWidget::updatePanel);
 
             this->Internals->appendToItems(item, this);
             ref_state = EnumState::Custom;
@@ -992,8 +1049,12 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
           pwidget, QString(itemLabel), advanced, informationOnly, searchTags, this)
       : pqProxyWidgetItem::newMultiItemGroupItem(
           QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel()), pwidget,
-          QString(itemLabel), this->ShowHeadersFooters, advanced, informationOnly, searchTags,
-          this);
+          QString(itemLabel), this->ShowHeadersFooters, advanced, informationOnly, searchTags, this,
+          smgroup->GetCollapsed());
+
+    QObject::connect(item, &pqProxyWidgetItem::collapse, this,
+      [&, smgroup, item]() { updateSMPropertyGroup(smgroup, item); });
+    QObject::connect(item, &pqProxyWidgetItem::collapse, this, &pqProxyWidget::updatePanel);
 
     if (smproperty->GetPanelVisibilityDefaultForRepresentation())
     {
@@ -1096,14 +1157,17 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
 }
 
 //-----------------------------------------------------------------------------
-bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
+bool pqProxyWidget::filterWidgets(bool showAdvanced, const QString& filterText)
 {
-  this->Internals->CachedShowAdvanced = show_advanced;
+  this->Internals->CachedShowAdvanced = showAdvanced;
   this->Internals->CachedFilterText = filterText;
+
+  bool forceUncollapsed = false;
 
   if (!filterText.isEmpty())
   {
-    show_advanced = true;
+    showAdvanced = true;
+    forceUncollapsed = true;
   }
 
   // disable updates to avoid flicker
@@ -1118,12 +1182,12 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
 
   const pqProxyWidgetItem* prevItem = nullptr;
   vtkSMProxy* smProxy = this->Internals->Proxy;
-  for (const pqProxyWidgetItem* item : this->Internals->Items)
+  for (pqProxyWidgetItem* item : this->Internals->Items)
   {
-    bool visible = item->canShowWidget(show_advanced, filterText, smProxy);
+    bool visible = item->canShowWidget(showAdvanced, filterText, smProxy);
     if (visible)
     {
-      item->show(prevItem, item->enableWidget(), show_advanced);
+      item->show(prevItem, item->enableWidget(), showAdvanced, forceUncollapsed);
       prevItem = item;
     }
     else

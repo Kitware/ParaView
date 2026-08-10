@@ -294,6 +294,21 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="CollapsePropertyGroups"
+        command="SetCollapsePropertyGroups"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          By default, all property groups are expanded. Filters can override this behavior by collapsing specific groups. The “Collapse All” and “Expand All” actions always take precedence over the filter settings.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Default" value="0" />
+          <Entry text="Expand all" value="1" />
+          <Entry text="Collapse all" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty name="LockPanels"
         command="SetLockPanels"
         number_of_elements="1"

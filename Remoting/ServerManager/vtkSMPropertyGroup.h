@@ -53,6 +53,19 @@ public:
   vtkGetStringMacro(PanelVisibility);
   ///@}
 
+  ///@{
+  /**
+   * Get/Sets the collapse state for the property group. This is needed to save
+   * the collapse state when switching back to a display/view. False by default.
+   * It can be modified with the XML attribute "collapse_panel" or with the user
+   * settings
+   * @sa vtkSMProperty::SetCollapsed()
+   */
+  vtkSetMacro(Collapsed, bool);
+  vtkGetMacro(Collapsed, bool);
+  vtkBooleanMacro(Collapsed, bool);
+  ///@}
+
   /**
    * Returns true if the property group contains zero properties.
    */
@@ -130,6 +143,7 @@ private:
   char* XMLLabel;
   char* PanelWidget;
   char* PanelVisibility;
+  bool Collapsed = true;
 
   vtkSMPropertyGroupInternals* const Internals;
 };

@@ -3,6 +3,7 @@
 #include "vtkSMPropertyGroup.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMProperty.h"
@@ -32,6 +33,9 @@ vtkSMPropertyGroup::vtkSMPropertyGroup()
   this->XMLLabel = nullptr;
   this->PanelWidget = nullptr;
   this->PanelVisibility = nullptr;
+
+  this->Collapsed = vtkPVGeneralSettings::GetInstance()->GetCollapsePropertyGroups() ==
+    vtkPVGeneralSettings::CollapseState::COLLAPSE_ALL;
 
   // by default, properties are set to always shown
   this->SetPanelVisibility("default");
@@ -168,6 +172,14 @@ int vtkSMPropertyGroup::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* gr
   if (panelVisibility)
   {
     this->SetPanelVisibility(panelVisibility);
+  }
+
+  int collapsePanel = 0;
+  if (groupElem->GetScalarAttribute("collapse_panel", &collapsePanel) &&
+    vtkPVGeneralSettings::GetInstance()->GetCollapsePropertyGroups() ==
+      vtkPVGeneralSettings::DEFAULT)
+  {
+    this->SetCollapsed(collapsePanel);
   }
 
   for (unsigned int k = 0; k < groupElem->GetNumberOfNestedElements(); k++)
