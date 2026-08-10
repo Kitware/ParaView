@@ -14,8 +14,6 @@
 
 #include "GeometryRepresentationsModule.h" // for export macro
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class GEOMETRYREPRESENTATIONS_EXPORT vtkOpenGLMySpecialPolyDataMapperDelegator
   : public vtkOpenGLCompositePolyDataMapperDelegator
 {
@@ -41,5 +39,4 @@ private:
   void operator=(const vtkOpenGLMySpecialPolyDataMapperDelegator&) = delete;
 };
 
-VTK_ABI_NAMESPACE_END
 #endif

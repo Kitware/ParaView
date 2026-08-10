@@ -25,8 +25,6 @@
 #include "vtkShaderProgram.h"
 #include "vtkTextureObject.h"
 
-VTK_ABI_NAMESPACE_BEGIN
-
 //----------------------------------------------------------------------------
 namespace
 {
@@ -602,5 +600,3 @@ void vtkOpenGLExtrusionMapperDelegator::SetNeedRebuild(bool value)
   auto glExtrusionMapper = vtkOpenGLBatchedExtrusionMapper::SafeDownCast(this->GLDelegate);
   glExtrusionMapper->SetNeedRebuild(value);
 }
-
-VTK_ABI_NAMESPACE_END

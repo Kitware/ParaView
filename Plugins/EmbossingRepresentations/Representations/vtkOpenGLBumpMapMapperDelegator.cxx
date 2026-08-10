@@ -13,8 +13,6 @@
 
 #include <chrono>
 
-VTK_ABI_NAMESPACE_BEGIN
-
 //----------------------------------------------------------------------------
 /**
  * The vtkOpenGLBatchedBumpMapMapper inherits indirectly from vtkOpenGLBatchedPolyDataMapper
@@ -165,5 +163,3 @@ void vtkOpenGLBumpMapMapperDelegator::ShallowCopy(vtkCompositePolyDataMapper* cp
   // copy input array to delegate
   this->GLDelegate->SetInputArrayToProcess(0, cpdm->GetInputArrayInformation(0));
 }
-
-VTK_ABI_NAMESPACE_END

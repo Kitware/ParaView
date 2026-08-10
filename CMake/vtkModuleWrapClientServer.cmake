@@ -218,7 +218,7 @@ function (_vtk_module_wrap_client_server_library name)
 #include \"vtkClientServerInterpreter.h\"
 
 ${_vtk_client_server_declarations}
-extern \"C\" VTK_ABI_EXPORT void ${name}_Initialize(vtkClientServerInterpreter* csi)
+extern \"C\" void ${name}_Initialize(vtkClientServerInterpreter* csi)
 {
   (void)csi;
 ${_vtk_client_server_calls}}\n")

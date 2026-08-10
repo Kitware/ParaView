@@ -22,7 +22,6 @@
 
 #include "vtkPVVTKExtensionsFiltersGeneralMPIModule.h" // For export macro
 
-VTK_ABI_NAMESPACE_BEGIN
 class VTKPVVTKEXTENSIONSFILTERSGENERALMPI_EXPORT vtkLegacyPParticleTracerBase
   : public vtkLegacyParticleTracerBase
 {
@@ -110,5 +109,4 @@ private:
   vtkLegacyPParticleTracerBase(const vtkLegacyPParticleTracerBase&) = delete;
   void operator=(const vtkLegacyPParticleTracerBase&) = delete;
 };
-VTK_ABI_NAMESPACE_END
 #endif

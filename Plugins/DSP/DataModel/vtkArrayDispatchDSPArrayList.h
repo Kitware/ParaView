@@ -8,7 +8,6 @@
 
 namespace vtkArrayDispatch
 {
-VTK_ABI_NAMESPACE_BEGIN
 
 typedef vtkTypeList::Unique<vtkTypeList::Create<vtkMultiDimensionalArray<char>,
   vtkMultiDimensionalArray<double>, vtkMultiDimensionalArray<float>, vtkMultiDimensionalArray<int>,
@@ -18,8 +17,6 @@ typedef vtkTypeList::Unique<vtkTypeList::Create<vtkMultiDimensionalArray<char>,
   vtkMultiDimensionalArray<unsigned long>, vtkMultiDimensionalArray<unsigned long long>,
   vtkMultiDimensionalArray<unsigned short>, vtkMultiDimensionalArray<vtkIdType>>>::Result
   MultiDimensionalArrays;
-
-VTK_ABI_NAMESPACE_END
 
 } // end namespace vtkArrayDispatch
 #endif // vtkArrayDispatchDSPArrayList_h

@@ -13,8 +13,6 @@
 
 #include <chrono>
 
-VTK_ABI_NAMESPACE_BEGIN
-
 //----------------------------------------------------------------------------
 /**
  * The vtkOpenGLBatchedBivariateNoiseMapper inherits indirectly from vtkOpenGLPolydataMapper
@@ -344,5 +342,3 @@ void vtkOpenGLBivariateNoiseMapperDelegator::ShallowCopy(vtkCompositePolyDataMap
   this->Superclass::ShallowCopy(cpdm);
   this->GLDelegate->SetInputArrayToProcess(1, cpdm->GetInputArrayInformation(1)); // Noise array
 }
-
-VTK_ABI_NAMESPACE_END

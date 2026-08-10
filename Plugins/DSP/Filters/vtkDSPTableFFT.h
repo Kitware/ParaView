@@ -16,8 +16,6 @@
 
 #include <memory> // for std::unique_ptr
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class vtkInformation;
 class vtkInformationVector;
 class VTKDSPFILTERSPLUGIN_EXPORT vtkDSPTableFFT : public vtkTableFFT
@@ -38,7 +36,5 @@ private:
   vtkDSPTableFFT(const vtkDSPTableFFT&) = delete;
   void operator=(const vtkDSPTableFFT&) = delete;
 };
-
-VTK_ABI_NAMESPACE_END
 
 #endif // vtkDSPTableFFT_h

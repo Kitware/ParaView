@@ -99,8 +99,6 @@ struct DispatchInitializeAggregator
 
 }
 
-VTK_ABI_NAMESPACE_BEGIN
-
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkDSPTableFFT);
 
@@ -203,5 +201,3 @@ int vtkDSPTableFFT::RequestData(
 
   return 1;
 }
-
-VTK_ABI_NAMESPACE_END
