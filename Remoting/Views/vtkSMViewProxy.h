@@ -109,11 +109,15 @@ public:
    * Captures a image from this view. Default implementation returns nullptr.
    * Subclasses should override CaptureWindowInternal() to do the actual image
    * capture.
+   * Return a NEW instance of vtkImageData for each call.
+   * The caller is responsible for calling Delete() on the returned object.
    */
+  VTK_NEWINSTANCE
   vtkImageData* CaptureWindow(int magnification)
   {
     return this->CaptureWindow(magnification, magnification);
   }
+  VTK_NEWINSTANCE
   vtkImageData* CaptureWindow(int magnificationX, int magnificationY);
   ///@}
   /**
