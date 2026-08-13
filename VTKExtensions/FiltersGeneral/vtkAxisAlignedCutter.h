@@ -45,7 +45,6 @@
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" // for export macro
 #include "vtkSmartPointer.h"                        // for vtkSmartPointer
 
-VTK_ABI_NAMESPACE_BEGIN
 class vtkDataAssembly;
 class vtkImplicitFunction;
 class vtkHyperTreeGridAxisCut;
@@ -161,7 +160,5 @@ private:
 
   vtkSmartPointer<vtkMultiProcessController> Controller;
 };
-
-VTK_ABI_NAMESPACE_END
 
 #endif

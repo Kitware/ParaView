@@ -262,8 +262,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "^paraviewPython-SaveTransparentImages$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22676
-    "^paraviewPython-TestHTGContourMonoHT$"
     "^paraviewPython-TestHTG3DContourPolyhedron$"
+    "^paraviewPython-TestHTGContourMonoHT$"
+    "^paraviewPython-TestHTGContourVoxelsPolyhedron$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22696
     "^pv\\.LagrangianSurfaceHelperComposite$"

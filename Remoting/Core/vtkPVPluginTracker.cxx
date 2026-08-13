@@ -20,7 +20,7 @@
 #include "vtkRemotingCoreConfiguration.h"
 
 #include "vtksys/FStream.hxx"
-#include "vtksys/String.hxx"
+#include "vtksys/String.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <cassert>

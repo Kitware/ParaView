@@ -15,7 +15,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include <cassert>
 
-VTK_ABI_NAMESPACE_BEGIN
 vtkStandardNewMacro(vtkLegacyPParticlePathFilter);
 
 void vtkLegacyPParticlePathFilter::ParticlePathFilterInternal::Initialize(
@@ -289,4 +288,3 @@ int vtkLegacyPParticlePathFilter::RequestInformation(
 
   return this->Superclass::RequestInformation(request, inputVector, outputVector);
 }
-VTK_ABI_NAMESPACE_END

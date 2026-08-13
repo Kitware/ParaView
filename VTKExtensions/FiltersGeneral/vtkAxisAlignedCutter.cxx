@@ -23,8 +23,6 @@
 
 #include <vector>
 
-VTK_ABI_NAMESPACE_BEGIN
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAxisAlignedCutter);
 
@@ -567,5 +565,3 @@ void vtkAxisAlignedCutter::CutAMRWithAAPlane(
 
   output->ShallowCopy(this->AMRCutter->GetOutput());
 }
-
-VTK_ABI_NAMESPACE_END

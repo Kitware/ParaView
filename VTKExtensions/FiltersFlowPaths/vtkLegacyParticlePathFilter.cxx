@@ -8,8 +8,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-VTK_ABI_NAMESPACE_BEGIN
-
 vtkObjectFactoryNewMacro(vtkLegacyParticlePathFilter);
 
 //------------------------------------------------------------------------------
@@ -37,5 +35,3 @@ int vtkLegacyParticlePathFilter::RequestInformation(
 
   return retVal;
 }
-
-VTK_ABI_NAMESPACE_END

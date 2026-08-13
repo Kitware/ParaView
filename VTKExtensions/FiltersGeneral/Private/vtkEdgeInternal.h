@@ -12,7 +12,6 @@
 #include "vtkABINamespace.h"
 #include "vtkType.h"
 
-VTK_ABI_NAMESPACE_BEGIN
 class vtkCell;
 
 struct vtkEdgeInternal
@@ -23,7 +22,5 @@ struct vtkEdgeInternal
   vtkEdgeInternal() = default;
   vtkEdgeInternal(vtkIdType outId, double weight, vtkCell* edge);
 };
-
-VTK_ABI_NAMESPACE_END
 
 #endif

@@ -17,8 +17,6 @@
 #include "vtkLegacyPParticleTracerBase.h"
 #include "vtkPVVTKExtensionsFiltersGeneralMPIModule.h" // For export macro
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class vtkPolyData;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERALMPI_EXPORT vtkLegacyPParticlePathFilter
@@ -79,5 +77,4 @@ private:
   vtkLegacyPParticlePathFilter(const vtkLegacyPParticlePathFilter&) = delete;
   void operator=(const vtkLegacyPParticlePathFilter&) = delete;
 };
-VTK_ABI_NAMESPACE_END
 #endif

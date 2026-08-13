@@ -12,7 +12,6 @@
 #include <vtksys/SystemInformation.hxx>
 
 //------------------------------------------------------------------------------
-VTK_ABI_NAMESPACE_BEGIN
 
 class vtkPVCAVEConfigInformation::vtkInternals
 {

@@ -18,8 +18,6 @@
 #include <string>
 #include <vector>
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class vtkDataObject;
 class vtkDataSet;
 class vtkIdList;
@@ -72,7 +70,5 @@ private:
   std::string PointFlagArray;
   double InputPointFlag;
 };
-
-VTK_ABI_NAMESPACE_END
 
 #endif

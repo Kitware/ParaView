@@ -53,7 +53,6 @@
  * @sa vtkMultiDimensionalImplicitBackend vtkImplicitArray
  */
 
-VTK_ABI_NAMESPACE_BEGIN
 template <typename ValueType>
 class vtkMultiDimensionalArray
   : public vtkImplicitArray<vtkMultiDimensionalImplicitBackend<ValueType>>
@@ -126,6 +125,5 @@ private:
   vtkMultiDimensionalArray(const vtkMultiDimensionalArray&) = delete;
   void operator=(const vtkMultiDimensionalArray&) = delete;
 };
-VTK_ABI_NAMESPACE_END
 
 #endif // vtkMultiDimensionalArray_h

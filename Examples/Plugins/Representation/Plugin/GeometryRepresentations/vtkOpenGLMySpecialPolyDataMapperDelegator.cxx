@@ -7,8 +7,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLBatchedPolyDataMapper.h"
 
-VTK_ABI_NAMESPACE_BEGIN
-
 //----------------------------------------------------------------------------
 /**
  * The vtkOpenGLBatchedMySpecialPolyDataMapper inherits indirectly from vtkOpenGLPolydataMapper
@@ -101,5 +99,3 @@ void vtkOpenGLMySpecialPolyDataMapperDelegator::ShallowCopy(vtkCompositePolyData
   // Example: Send the input array to the delegate.
   this->GLDelegate->SetInputArrayToProcess(0, cpdm->GetInputArrayInformation(0));
 }
-
-VTK_ABI_NAMESPACE_END

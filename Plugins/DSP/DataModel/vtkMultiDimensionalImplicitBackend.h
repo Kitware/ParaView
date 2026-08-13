@@ -20,7 +20,6 @@
  * @sa vtkMultiDimensionalArray vtkImplicitArray
  */
 
-VTK_ABI_NAMESPACE_BEGIN
 template <typename ValueType>
 class vtkMultiDimensionalImplicitBackend final
 {
@@ -132,6 +131,5 @@ private:
   vtkIdType NumberOfTuples = 0;
   vtkIdType NumberOfArrays = 0;
 };
-VTK_ABI_NAMESPACE_END
 
 #endif // vtkMultiDimensionalImplicitBackend_h
