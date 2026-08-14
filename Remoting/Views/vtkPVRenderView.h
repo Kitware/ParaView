@@ -1202,6 +1202,18 @@ public:
    */
   void SetHardwareSelector(vtkPVHardwareSelector* selector);
 
+  /**
+   * Enable/Disable the skybox blur.
+   * Directly forwards `value` to the renderer.
+   */
+  void SetSkyboxBlur(bool value);
+
+  /**
+   * Control the blur amount. This has an effect only if the blur is enabled.
+   * Directly forwards the `radius` value to the renderer.
+   */
+  void SetSkyboxBlurRadius(double radius);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView() override;

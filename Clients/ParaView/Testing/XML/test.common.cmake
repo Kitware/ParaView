@@ -1367,6 +1367,7 @@ list(APPEND TESTS_WITH_BASELINES
   SeriesPreset.xml
   SeriesPresetRegexp.xml
   ShowMultiPieceFieldData.xml
+  SkyboxBlur.xml
   TemporalParticleKeepDeadTrails.xml
   TestHiddenLineRemoval.xml
   TestOpenFOAMWeighByCell.xml
