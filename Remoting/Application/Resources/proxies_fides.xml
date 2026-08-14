@@ -411,6 +411,18 @@
           The name of the file to be written.
         </Documentation>
       </StringVectorProperty>
+      <StringVectorProperty command="SetAdiosConfigFile"
+                            name="AdiosConfigFile"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <FileListDomain name="files"/>
+        <Documentation>
+          Optional path to an ADIOS2 xml config file. If provided, the IO object
+          in the file must be named "fides-write-io", and then allows configuring
+          the writer in any way the ADIOS2 build supports (e.g. compression,
+          encryption, etc).
+        </Documentation>
+      </StringVectorProperty>
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
