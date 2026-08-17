@@ -282,6 +282,7 @@ macos-x86_64-python-qt:test:
         PV_CI_NIGHTLY_ONLY: "true"
     needs:
         - macos-x86_64-python-qt:build
+    timeout: 180 minutes
 
 # Windows
 

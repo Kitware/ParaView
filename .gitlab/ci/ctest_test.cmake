@@ -254,16 +254,6 @@ endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
-    # Known-bad
-    "\\.PreviewFontScaling$"
-
-    # Unstructured grid volume rendering (paraview/paraview#19130)
-    "\\.MultiBlockVolumeRendering$"
-    "\\.UnstructuredVolumeRenderingVectorComponent$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
-    "\\.PythonEditorRun$"
-
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22674
     "^paraviewPython-Batch-TestStereoSaveScreenshot$"
     "^paraviewPython-TestStereoSaveScreenshot$"
@@ -274,6 +264,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22676
     "^paraviewPython-TestHTGContourMonoHT$"
     "^paraviewPython-TestHTG3DContourPolyhedron$"
+    "^paraviewPython-TestHTGContourVoxelsPolyhedron$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22696
     "^pv\\.LagrangianSurfaceHelperComposite$"
@@ -281,56 +272,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22827
     # Unclassified
     "^pv\\.BivariateNoiseRepresentation$"
-    "^pv\\.DecimatePolyline$"
-    "^pvcrs\\.DecimatePolyline$"
-    "^pvcs\\.DecimatePolyline$"
-    "^pv\\.TestExtrusionRepresentationCellData$"
-    "^pvcrs\\.GroupDataSetOutputType$"
-    "^pvcs\\.GroupDataSetOutputType$"
-    "^pv\\.UndoRedo1$"
-    "^pvcrs\\.UndoRedo1$"
-    "^pvcs\\.UndoRedo1$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22823
-    # Floating point subtleties
-    "^pv\\.AnimateProperty$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22824
-    # Shading differences
-    "^pv\\.PointGaussianMultiBlockDataSet$"
-    "^pvcrs\\.PointGaussianMultiBlockDataSet$"
-    "^pvcs\\.PointGaussianMultiBlockDataSet$"
-    "^pv\\.PointGaussianNoScaleTransferFunction$"
-    "^pvcrs\\.PointGaussianNoScaleTransferFunction$"
-    "^pvcs\\.PointGaussianNoScaleTransferFunction$"
-    "^pv\\.UniformInverseTransformSamplingGlyph$"
-    "^pvcrs\\.UniformInverseTransformSamplingGlyph$"
-    "^pvcs\\.UniformInverseTransformSamplingGlyph$"
-    "^pv\\.CONVERGECFDReader$"
-    "^pvcrs\\.CONVERGECFDReader$"
-    "^pvcs\\.CONVERGECFDReader$"
-    # The following tests seem to have some geometry differences too
-    "^pv\\.AxisAlignedCutterMBHierarchy$"
-    "^pvcrs\\.AxisAlignedCutterMBHierarchy$"
-    "^pvcs\\.AxisAlignedCutterMBHierarchy$"
-    "^pv\\.AxisAlignedCutterPDCNoHierarchy$"
-    "^pvcrs\\.AxisAlignedCutterPDCNoHierarchy$"
-    "^pvcs\\.AxisAlignedCutterPDCNoHierarchy$"
-    "^pv\\.AxisAlignedPDCNoHierarchy$"
-    "^pvcrs\\.AxisAlignedPDCNoHierarchy$"
-    "^pvcs\\.AxisAlignedPDCNoHierarchy$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22825
-    # M4 geometry filter
-    "^pvcs-tile-display\\.LinkCameraFromView-1x1$"
-    "^pv\\.FeatureEdgesFilterHTG$"
-    "^pvcrs\\.FeatureEdgesFilterHTG$"
-    "^pvcs\\.FeatureEdgesFilterHTG$"
-    "^pv\\.FeatureEdgesRepresentationHTG$"
-    "^pvcrs\\.FeatureEdgesRepresentationHTG$"
-    "^pvcs\\.FeatureEdgesRepresentationHTG$"
-    "^pv\\.MultipleColorOnSelection$"
-    "^pvcs\\.MultipleColorOnSelection$"
 
     # macOS 15+ local network permission requests. New macOS requires
     # applications to get user permission to access localhost network
@@ -350,26 +291,126 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # see https://gitlab.kitware.com/paraview/paraview/-/work_items/23247
     # Python libraries do not load properly for this test.
     "ParaViewExample-CustomApplications/ServerManagerRemoteConnection"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23349
+    # Selection issues
+    "^ParaView::RemotingApplicationPython-PythonSelection$"
+    "^pv\\.SelectionLinkScripting$"
+    "^pv\\.InteractiveSelection$"
+    "^pv\\.SelectionModifiersCells$"
+    "^pv\\.TestSelectionOnMultipiece$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23350
+    # HTG rendering issues.
+    "^pv\\.HyperTreeGridAxisClip$"
+    "^pv\\.HyperTreeGridAxisReflection$"
+    "^pv\\.HyperTreeGridCellCenters$"
+    "^pv\\.HyperTreeGridDepthLimiter$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/work_items/23361
+    "^pv\\.HyperTreeGridSurfaceMultiBlockSelection$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23351
+    # Missing triangles in a sphere.
+    "^pv\\.AMRCutPlane$" # missing bits of circular widget
+    "^pv\\.AxisAlignedReflect$"
+    "^pv\\.FindDataPartialArrays$"
+    "^pv\\.GlyphUseCellCenters$"
+    "^pv\\.OrderedGroupDatasets$"
+    "^pv\\.PolygonCellSelection$"
+    "^pv\\.RegionIds$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23352
+    # Texture oddities.
+    "^pv\\.MultiBlockInspectorMultiBlock$"
+    "^pv\\.RandomAttributes$"
+    "^pv\\.ResetToVisibleRange$"
+    "^pv\\.TestBoundaryMeshQuality$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23353
+    # Miscellaneous failures
+    # Wrong colors and box axes are present.
+    "^pv\\.PropertyConversion2$"
+    # Points are squashed and stretched.
+    "^pv\\.PythonAlgorithmReadersAndWriters$"
+    # Times out on an `actionZoomToData` action.
+    "^pv\\.RectilinearVolumeRendering$"
+    # Shows a sphere on a gradient background; should be a solid color?
+    "^pv\\.RemoteRendering$"
+    # Angled text is bold.
+    "^pv\\.TestParallelProjectionAnnotations$"
+    # Times out activating the View menu.
+    "^pv\\.TestSkyboxRotation$"
+    # Animation playback is wrong?
+    "^ParaView::RemotingApplicationPython-PythonAnimationTrack$"
+    # Timeouts
+    "^pv\\.AdaptiveResampleToImage$"
+    "^pv\\.PBRSpheres$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21786
+    "^pv\\.MultipleColorOnSelection"
+    "^pvcs\\.MultipleColorOnSelection"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
+    "\\.UndoRedo1"
+
+    # Transfer function image corruption
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21428
+    "\\.TransferFunction2DYScalars$"
     )
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
   list(APPEND test_exclusions
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20743
-    "^pv\\.TestExtrusionRepresentationCellData$"
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22353
-    "\\.FeatureEdgesFilterHTG$"
-    "\\.FeatureEdgesRepresentationHTG$"
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
-    "\\.UndoRedo1"
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21768
-    "^pv\\.ServerConnectConfigured$"
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21786
-    "^pv\\.MultipleColorOnSelection"
-    "^pvcs\\.MultipleColorOnSelection"
-    # https://gitlab.kitware.com/paraview/paraview/-/merge_requests/7083
-    "^pvcs\\.GroupDataSetOutputType$"
-    "^pvcrs\\.GroupDataSetOutputType$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22827
+    # Unclassified
+    "^pv\\.DecimatePolyline$"
+    "^pvcrs\\.DecimatePolyline$"
+    "^pvcs\\.DecimatePolyline$"
+    "^pv\\.UndoRedo1$"
+    "^pvcrs\\.UndoRedo1$"
+    "^pvcs\\.UndoRedo1$"
+    # Uninvestigated segfault
+    "^pv\\.MoleculeBonds$"
+    # Background and animation off-by-one? Floating point differences?
+    "^ParaViewExample-Plugins/LiveSource$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22823
+    # Floating point subtleties
+    "^pv\\.AnimateProperty$"
+    "^pvcrs\\.AnimateProperty$"
+    "^pvcs\\.AnimateProperty$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22824
+    # The following tests seem to have some geometry differences too
+    "^pv\\.AxisAlignedCutterMBHierarchy$"
+    "^pvcrs\\.AxisAlignedCutterMBHierarchy$"
+    "^pvcs\\.AxisAlignedCutterMBHierarchy$"
+    "^pv\\.AxisAlignedCutterPDCNoHierarchy$"
+    "^pvcrs\\.AxisAlignedCutterPDCNoHierarchy$"
+    "^pvcs\\.AxisAlignedCutterPDCNoHierarchy$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23348
+    # Chart texture oddities.
+    "^Catalyst::Workflow::BatchExecute::Validate.WaveletHistogramExtracts$"
+    "^Catalyst::Workflow::ParaView::Validate.WaveletHistogramExtracts$"
+    "^Catalyst::Workflow::WaveletMiniApp::Validate\\.WaveletHistogramExtracts$"
+    "^ParaView::RemotingApplicationPython-SaveScreenshot$"
+    )
+endif ()
+
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_x86_64")
+  list(APPEND test_exclusions
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23353
+    # Timeouts
+    "\\.WaveletVolumeRenderWithCinema$"
+    "^pv\\.SaveStateAndScreenshot$"
+    "^pv\\.SelectionLinkConverted$"
+    "^pv\\.TransferFunctionResetOnVisibilityChange$"
+    "^pv\\.ExplicitStructuredGridSmooth$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/23351
+    # Missing triangles in a sphere.
+    "^pv\\.HyperTreeGridMultipleClip$"
+    "^ParaViewExample-Plugins/LiveSource$"
     )
 endif ()
 
