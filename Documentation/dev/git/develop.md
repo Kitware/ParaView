@@ -49,7 +49,7 @@ This is a quick start guide so that you can start contributing to ParaView easil
 To understand the process more deeply, you can jump to the [workflow](#workflow)
 section.
 
-### Developement
+### Development
 
 Create a local branch for your changes:
 

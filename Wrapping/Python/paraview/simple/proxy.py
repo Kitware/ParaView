@@ -116,7 +116,7 @@ def GetActiveViewOrCreate(viewtype):
 
 def FindViewOrCreate(name, viewtype):
     """Returns the view if a view with the given name exists and is of the
-    the given `viewtype`, otherwise creates a new view of the requested type.
+    given `viewtype`, otherwise creates a new view of the requested type.
     Note, if a new view is created, it will be assigned to a layout
     by calling `AssignViewToLayout`.
 
