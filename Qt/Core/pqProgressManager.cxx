@@ -20,6 +20,8 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkTimerLog.h"
 
+#include <QMainWindow>
+
 //-----------------------------------------------------------------------------
 pqProgressManager::pqProgressManager(QObject* _parent)
   : QObject(_parent)
@@ -118,7 +120,7 @@ void pqProgressManager::setProgress(
   vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "setProgress %d", progress_val);
   this->InUpdate = true;
   Q_EMIT this->progress(message, progress_val);
-  if (processEvents)
+  if (processEvents && this->AbortEnabled)
   {
     pqCoreUtilities::processEvents();
   }
@@ -133,7 +135,37 @@ void pqProgressManager::setEnableAbort(bool enable)
     // When locked, ignore all other senders.
     return;
   }
+
+  if (enable)
+  {
+    // Disable everything that is enabled, except non blockable objects (progress bar and abort)
+    QMainWindow* win = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+    QList<QWidget*> widgets = win->findChildren<QWidget*>(Qt::FindDirectChildrenOnly);
+    this->EnabledWidgetsForAbort.clear();
+    for (QWidget* widget : widgets)
+    {
+      if (widget->isEnabled() && this->NonBlockableObjects.contains(widget) == false)
+      {
+        this->EnabledWidgetsForAbort.push_front(widget);
+      }
+    }
+    for (QWidget* widget : this->EnabledWidgetsForAbort)
+    {
+      widget->setDisabled(true);
+    }
+  }
+  else
+  {
+    // Reenable everything that was disabled
+    for (QWidget* widget : this->EnabledWidgetsForAbort)
+    {
+      widget->setEnabled(true);
+    }
+    this->EnabledWidgetsForAbort.clear();
+  }
+
   Q_EMIT this->enableAbort(enable);
+  this->AbortEnabled = enable;
 }
 
 //-----------------------------------------------------------------------------

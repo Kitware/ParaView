@@ -28,6 +28,7 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
 
   // Progress bar/button management
   pqProgressWidget* const progress_bar = new pqProgressWidget(this);
+  progress_manager->addNonBlockableObject(this);
   progress_manager->addNonBlockableObject(progress_bar);
   progress_manager->addNonBlockableObject(progress_bar->abortButton());
 
