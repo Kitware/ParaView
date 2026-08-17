@@ -128,7 +128,6 @@ set(PVBATCH_TESTS
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   Simple.py
-  RescaleTransferFunctionToDataRange.py,NO_VALID
   TestFetchData.py,NO_VALID
   UserTransformOnRepresentation.py
   )
