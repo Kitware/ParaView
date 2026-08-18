@@ -1263,6 +1263,7 @@ function (paraview_add_plugin name)
     vtk_module_wrap_client_server(
       MODULES ${_paraview_add_plugin_MODULES}
       TARGET  "${_paraview_build_plugin}_client_server"
+      DESTINATION "${_paraview_build_LIBRARY_DESTINATION}"
       ${_paraview_add_plugin_install_export_args})
 
     if (NOT DEFINED _paraview_add_plugin_TRANSLATIONS_DIRECTORY)
