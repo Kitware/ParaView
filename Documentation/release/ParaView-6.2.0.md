@@ -307,6 +307,8 @@ ParaView used to have two similar menu items: `File -> Export Scene` and `File -
 
 ParaView's _Abort_ button is now only enabled after apply is pressed instead of whenever a progress event is received, improving stability. In addition, the _Abort_ button now works in client/server and client/server/render mode.
 
+ParaView UI is also now disabled when abort button is enabled.
+
 Please note that the abort function is not available when connected to a remote server running on multiple ranks.
 
 ## More descriptive display names for _Time Manager_ camera animations
