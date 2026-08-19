@@ -91,11 +91,7 @@ void pqSearchBox::setText(const QString& text)
 //-----------------------------------------------------------------------------
 bool pqSearchBox::isAdvancedSearchActive() const
 {
-  if (this->isAdvancedSearchEnabled())
-  {
-    return this->Internals->AdvancedButton->isChecked();
-  }
-  return false;
+  return this->Internals->AdvancedButton->isChecked();
 }
 
 //-----------------------------------------------------------------------------

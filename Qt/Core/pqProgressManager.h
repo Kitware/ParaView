@@ -87,7 +87,6 @@ public Q_SLOTS:
   /**
    * This is called when the user clicks on the "Abort" button.
    * It is used to abort the current operation on a vtkAlgorithm object.
-   * @warning This method does not work in distributed client/server mode.
    */
   void triggerAbort();
 
@@ -139,6 +138,9 @@ protected: // NOLINT(readability-redundant-access-specifiers)
 
 private:
   Q_DISABLE_COPY(pqProgressManager)
+
+  QList<QWidget*> EnabledWidgetsForAbort;
+  bool AbortEnabled = false;
 };
 
 #endif

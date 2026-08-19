@@ -609,7 +609,7 @@ int pqDisplayColorWidget::componentNumber() const
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::setComponentNumber(int val)
 {
-  if (this->Components->isEnabled())
+  if (this->Components->count() > 0)
   {
     int index = this->Components->findData(val);
     if (index == -1)
