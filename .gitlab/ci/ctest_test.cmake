@@ -337,7 +337,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # Angled text is bold.
     "^pv\\.TestParallelProjectionAnnotations$"
     # Times out activating the View menu.
-    "^pv\\.TestSkyboxRotation$"
     # Animation playback is wrong?
     "^ParaView::RemotingApplicationPython-PythonAnimationTrack$"
     # Timeouts
@@ -354,6 +353,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # Transfer function image corruption
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21428
     "\\.TransferFunction2DYScalars$"
+
+    # Timeout when loading hdri
+    # https://gitlab.kitware.com/paraview/paraview/-/work_items/23364
+    "^pv\\.SkyboxBlur$"
+    "^pv\\.TestSkyboxRotation$"
     )
 endif ()
 
