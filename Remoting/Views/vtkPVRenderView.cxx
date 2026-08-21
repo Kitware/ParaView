@@ -165,6 +165,7 @@ public:
   bool OSPRayDenoise;
   int OSPRayCount;
   bool Hide2DOverlays;
+  bool HideOrientationWidget;
 
   bool IsInAnari = false;
   vtkNew<vtkStringArray> ANARIRendererNames;
@@ -474,6 +475,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   // The default is to always draw the NonCompositedRenderer
   this->Internals->Hide2DOverlays = false;
+  this->Internals->HideOrientationWidget = false;
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   int procId = controller->GetLocalProcessId();
   vtkProcessModule::ProcessTypes procType = vtkProcessModule::GetProcessType();
@@ -488,6 +490,10 @@ vtkPVRenderView::vtkPVRenderView()
       if (displayConfig != nullptr)
       {
         this->Internals->Hide2DOverlays = !displayConfig->GetShow2DOverlays(procId);
+        if (displayConfig->GetUseOffAxisProjection())
+        {
+          this->Internals->HideOrientationWidget = true;
+        }
       }
     }
   }
@@ -1867,8 +1873,18 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
       this->GridAxes3DActor->SetForceOpaque(true);
     }
   }
-  this->OrientationWidget->GetRenderer()->SetUseFXAA(use_fxaa);
-  this->OrientationWidget->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
+
+  if (this->Internals->HideOrientationWidget)
+  {
+    this->OrientationWidget->SetEnabled(false);
+    this->OrientationWidget->SetVisibility(false);
+  }
+  else
+  {
+    this->OrientationWidget->GetRenderer()->SetUseFXAA(use_fxaa);
+    this->OrientationWidget->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
+  }
+
   this->CameraOrientationWidget->GetDefaultRenderer()->SetUseFXAA(use_fxaa);
   this->CameraOrientationWidget->GetDefaultRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
 

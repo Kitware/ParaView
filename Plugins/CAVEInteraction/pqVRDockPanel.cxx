@@ -29,6 +29,7 @@
 #endif
 
 #include "vtkCamera.h"
+#include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -86,14 +87,16 @@ private:
 class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
 public:
-  QString createName(vtkSMVRInteractorStyleProxy*);
+  QString GetOrCreateName(vtkSMVRInteractorStyleProxy*);
+  QString MakeNameUnique(const QString& name);
 
   bool IsRunning;
 
+  std::map<vtkSMVRInteractorStyleProxy*, QString> StylesToNamesMap;
   vtkNew<vtkNavigationObserver> NavigationObserver;
   pqVRCollaborationWidget* CollaborationWidget;
   vtkWeakPointer<vtkCamera> Camera;
-  QMap<QString, vtkSMVRInteractorStyleProxy*> StyleNameMap;
+  QMap<QString, vtkSMVRInteractorStyleProxy*> NamesToStylesMap;
   std::shared_ptr<StringMapMap> valuatorLookupTable;
 };
 
@@ -181,6 +184,8 @@ void pqVRDockPanel::constructor()
   this->Internals->scaleValue->setValidator(new QDoubleValidator(this));
   connect(this->Internals->scaleValue, SIGNAL(editingFinished()), this, SLOT(scaleEdited()));
   this->Internals->NavigationObserver->SetScaleEdit(this->Internals->scaleValue);
+
+  connect(this->Internals->resetNavButton, SIGNAL(clicked()), SLOT(resetNavigation()));
 
   // Using size metrics about the font and margins, try to set the height
   // of the VR Connections list widget to accomodate 2.5 entries. If more
@@ -452,7 +457,7 @@ void pqVRDockPanel::addStyle()
     &pqVRDockPanel::configureStyle);
 
   pqVRAddStyleDialog dialog(this);
-  QString name = this->Internals->createName(style);
+  QString name = this->Internals->GetOrCreateName(style);
   dialog.setInteractorStyle(style, name);
   if (!dialog.isConfigurable() || dialog.exec() == QDialog::Accepted)
   {
@@ -471,7 +476,7 @@ void pqVRDockPanel::configureStyle(vtkObject* caller, unsigned long, void*)
   vtkSMVRInteractorStyleProxy* styleProxy = vtkSMVRInteractorStyleProxy::SafeDownCast(caller);
 
   pqVRAddStyleDialog dialog(this);
-  QString name = this->Internals->createName(styleProxy);
+  QString name = this->Internals->GetOrCreateName(styleProxy);
   dialog.setInteractorStyle(styleProxy, name);
   if (!dialog.isConfigurable() || dialog.exec() == QDialog::Accepted)
   {
@@ -489,7 +494,7 @@ void pqVRDockPanel::removeStyle()
   }
   QString name = item->text();
 
-  vtkSMVRInteractorStyleProxy* style = this->Internals->StyleNameMap.value(name, nullptr);
+  vtkSMVRInteractorStyleProxy* style = this->Internals->NamesToStylesMap.value(name, nullptr);
   if (!style)
   {
     return;
@@ -501,7 +506,7 @@ void pqVRDockPanel::removeStyle()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::updateStyles()
 {
-  this->Internals->StyleNameMap.clear();
+  this->Internals->NamesToStylesMap.clear();
   this->Internals->stylesTable->clear();
 
   Q_FOREACH (vtkSMVRInteractorStyleProxy* style, pqVRQueueHandler::instance()->styles())
@@ -513,8 +518,18 @@ void pqVRDockPanel::updateStyles()
       continue;
     }
 
-    QString name = this->Internals->createName(style);
-    this->Internals->StyleNameMap.insert(name, style);
+    QString name;
+
+    if (this->Internals->StylesToNamesMap.count(style) > 0)
+    {
+      name = this->Internals->StylesToNamesMap[style];
+    }
+    else
+    {
+      name = this->Internals->GetOrCreateName(style);
+    }
+
+    this->Internals->NamesToStylesMap.insert(name, style);
     this->Internals->stylesTable->addItem(name);
 
     if (!style->HasObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_REQUEST_CONFIGURE))
@@ -522,6 +537,14 @@ void pqVRDockPanel::updateStyles()
       style->AddObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_REQUEST_CONFIGURE, this,
         &pqVRDockPanel::configureStyle);
     }
+  }
+
+  auto& nameMap = this->Internals->NamesToStylesMap;
+  auto& styleMap = this->Internals->StylesToNamesMap;
+  styleMap.clear();
+  for (auto it = nameMap.keyValueBegin(); it != nameMap.keyValueEnd(); ++it)
+  {
+    styleMap[it->second] = it->first;
   }
 }
 
@@ -562,6 +585,15 @@ void pqVRDockPanel::scaleEdited()
 }
 
 //-----------------------------------------------------------------------------
+void pqVRDockPanel::resetNavigation()
+{
+  vtkSMRenderViewProxy* viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+  vtkNew<vtkMatrix4x4> newMatrix;
+  newMatrix->Identity();
+  vtkSMVRInteractorStyleProxy::SetNavigationMatrix(newMatrix, viewProxy);
+}
+
+//-----------------------------------------------------------------------------
 void pqVRDockPanel::editStyle(QListWidgetItem* item)
 {
   if (!item)
@@ -576,7 +608,7 @@ void pqVRDockPanel::editStyle(QListWidgetItem* item)
 
   pqVRAddStyleDialog dialog(this);
   QString name = item->text();
-  vtkSMVRInteractorStyleProxy* style = this->Internals->StyleNameMap.value(name, nullptr);
+  vtkSMVRInteractorStyleProxy* style = this->Internals->NamesToStylesMap.value(name, nullptr);
   if (!style)
   {
     return;
@@ -611,7 +643,7 @@ void pqVRDockPanel::updateStyleButtons(int row)
   {
     QListWidgetItem* item = this->Internals->stylesTable->currentItem();
     QString name = item->text();
-    vtkSMVRInteractorStyleProxy* style = this->Internals->StyleNameMap.value(name, nullptr);
+    vtkSMVRInteractorStyleProxy* style = this->Internals->NamesToStylesMap.value(name, nullptr);
 
     QString propertiesLabelText = "Properties (";
     propertiesLabelText.append(name);
@@ -909,10 +941,15 @@ void pqVRDockPanel::stop()
 }
 
 //-----------------------------------------------------------------------------
-// createName() -- this method returns the string that will appear in the
+// GetOrCreateName() -- this method returns the string that will appear in the
 //   "Interactions:" list in the Qt VR Panel for the individual given "*style".
-QString pqVRDockPanel::pqInternals::createName(vtkSMVRInteractorStyleProxy* style)
+QString pqVRDockPanel::pqInternals::GetOrCreateName(vtkSMVRInteractorStyleProxy* style)
 {
+  if (this->StylesToNamesMap.count(style) > 0)
+  {
+    return this->StylesToNamesMap[style];
+  }
+
   QString description;  // A one-line description of the interaction (style, object, property)
   QString className;    // The name of the style's VTK class (e.g. vtkVRTrackStyle)
   QString styleName;    // A human readable version of the style
@@ -947,5 +984,23 @@ QString pqVRDockPanel::pqInternals::createName(vtkSMVRInteractorStyleProxy* styl
     description = QString("%1 on %2's %3").arg(styleName).arg(objectName).arg(propertyName);
   }
 
-  return description;
+  QString retVal = this->MakeNameUnique(description);
+  this->StylesToNamesMap[style] = retVal;
+
+  return retVal;
+}
+
+//-----------------------------------------------------------------------------
+QString pqVRDockPanel::pqInternals::MakeNameUnique(const QString& name)
+{
+  QString newName(name);
+  size_t count = 0;
+  vtkSMVRInteractorStyleProxy* existingStyle = this->NamesToStylesMap.value(newName, nullptr);
+  while (existingStyle)
+  {
+    count += 1;
+    newName = newName.append(QString(" (%1)").arg(count));
+    existingStyle = this->NamesToStylesMap.value(newName, nullptr);
+  }
+  return newName;
 }
