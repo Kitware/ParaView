@@ -2837,5 +2837,116 @@
       </StringVectorProperty>
 
     </SourceProxy>
+
+    <SourceProxy name="ShortestPath"
+                 class="vtkDijkstraGraphGeodesicPath"
+                 label="Shortest Path">
+      <Documentation short_help="Compute the shortest path between two mesh elements.">
+        Computes the shortest path on the input mesh. The output is a
+        polyline representing the geodesic path between the selected start
+        and end point (or cell). The path can depend on a given scalar field.
+        On distributed data, the path will be computed independently on each node.
+      </Documentation>
+
+      <InputProperty name="Input"
+                    command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+
+        <Documentation>
+          Input mesh on which the shortest path is computed.
+        </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty command="SetStartPoint"
+                            default_values="-0.5 0.0 0.0"
+                            name="Start Point"
+                            number_of_elements="3">
+        <Documentation>
+          This property controls the coordinates of the start point.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEndPoint"
+                            default_values="0.5 0.0 0.0"
+                            name="End Point"
+                            number_of_elements="3">
+        <Documentation>
+          This property controls the coordinates of the end point.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetGraphType"
+                         default_values="0"
+                         name="GraphMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Points"
+                 value="0"/>
+          <Entry text="Cells"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          Set whether the shortest path computation is done on the points or the cells.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseScalarWeights"
+                         command="SetUseScalarWeights"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use scalar values as edge weight.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ProcessedFieldArrayName"
+                            command="SetProcessedFieldArrayName"
+                            number_of_elements="1"
+                            animateable="0">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The scalar field used to compute the edge weight.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseScalarWeights"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetUseNodeIndices"
+                         default_values="0"
+                         name="UseNodeIndices"
+                         number_of_elements="1"
+                         panel_visibility="never">
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetStopWhenEndReached"
+                         default_values="1"
+                         name="StopWhenEndReached"
+                         number_of_elements="1"
+                         panel_visibility="never">
+      </IntVectorProperty>
+
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="Start Point" />
+        <Property function="Point2WorldPosition" name="End Point" />
+      </PropertyGroup>
+
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

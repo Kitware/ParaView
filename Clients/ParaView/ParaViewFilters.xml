@@ -201,6 +201,7 @@
       <Proxy group="filters" name="CountCellVertices" />
       <Proxy group="filters" name="Curvatures" />
       <Proxy group="filters" name="ElevationFilter" />
+      <Proxy group="filters" name="ShortestPath" />
       <Proxy group="filters" name="MeshQuality" />
       <Proxy group="filters" name="PVConnectivityFilter" />
       <Proxy group="filters" name="PolylineLength" />
@@ -393,6 +394,7 @@
   <Proxy group="filters" name="GenericCut" />
   <Proxy group="filters" name="GenericGeometryFilter" />
   <Proxy group="filters" name="GenericStreamTracer" />
+  <Proxy group="filters" name="ShortestPath" />
   <Proxy group="filters" name="GhostCells" icon=":/pqWidgets/Icons/pqGhostCellsGenerator.svg" />
   <Proxy group="filters" name="GlobalPointAndCellIds" />
   <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph.svg" />
