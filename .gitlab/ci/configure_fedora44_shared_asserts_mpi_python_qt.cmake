@@ -12,6 +12,13 @@ set(PARAVIEW_ENABLE_PDAL ON CACHE BOOL "")
 set(PARAVIEW_ENABLE_VISITBRIDGE ON CACHE BOOL "")
 set(PARAVIEW_ENABLE_XDMF3 ON CACHE BOOL "")
 
+# Exercise the Catalyst "fides_conduit" channel. It enables VTK::conduit, which
+# requires a Catalyst built against the same external Conduit. The docker image
+# provides pairs of catalyst/conduit for each MPI variant under /opt, and here
+# We pick the set built with mpich.
+set(PARAVIEW_ENABLE_CATALYST_FIDES ON CACHE BOOL "")
+set(CMAKE_PREFIX_PATH "/opt/catalyst-ext/mpich;/opt/conduit/mpich" CACHE STRING "")
+
 set(PARAVIEW_PLUGINS_DEFAULT ON CACHE BOOL "")
 
 set(PARAVIEW_PLUGIN_ENABLE_pvNVIDIAIndeX ON CACHE BOOL "")

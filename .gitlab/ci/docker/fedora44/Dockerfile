@@ -19,6 +19,9 @@ RUN sh /root/install_index.sh
 COPY install_cdi.sh /root/install_cdi.sh
 RUN sh /root/install_cdi.sh
 
+COPY install_conduit.sh /root/install_conduit.sh
+RUN sh /root/install_conduit.sh
+
 COPY install_catalyst.sh /root/install_catalyst.sh
 RUN sh /root/install_catalyst.sh
 

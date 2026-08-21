@@ -46,4 +46,24 @@ foreach (_case IN ITEMS unstructured cellgrid)
     ENVIRONMENT_MODIFICATION
       "PYTHONPATH=path_list_append:${_fides_catalyst_py_dir}"
       "PYTHONPATH=path_list_append:${_fides_conduit_py_dir}")
+
+  # The CI image has multiple libcatalyst with the same soname (one per MPI
+  # flavor under /usr and /usr/lib64/<mpi> using Catalyst's mangled Conduit,
+  # plus one per MPI flavor under /opt/catalyst-ext using the external Conduit
+  # installs. Make sure these tests load the one that matches the how ParaView
+  # was built.
+  if (UNIX AND NOT APPLE)
+    set_property(TEST "${_test_name}" APPEND PROPERTY
+      ENVIRONMENT_MODIFICATION
+        "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:catalyst::catalyst>")
+
+    # Print a warning for older cmake versions
+    if (CMAKE_VERSION VERSION_LESS "3.22")
+      message(WARNING
+        "CMake 3.22+ is required to reliably set up the environment for tests "
+        "needing to load a specific Catalyst. ${_test_name} may fail to load "
+        "the correct catalyst and fail as a result.")
+    endif ()
+  endif ()
+
 endforeach ()
