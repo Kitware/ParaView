@@ -140,7 +140,7 @@ void pqProgressManager::setEnableAbort(bool enable)
   {
     // Disable everything that is enabled, except non blockable objects (progress bar and abort)
     QMainWindow* win = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
-    QList<QWidget*> widgets = win->findChildren<QWidget*>(Qt::FindDirectChildrenOnly);
+    QList<QWidget*> widgets = win->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
     this->EnabledWidgetsForAbort.clear();
     for (QWidget* widget : widgets)
     {
