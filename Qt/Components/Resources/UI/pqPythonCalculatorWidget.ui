@@ -14,7 +14,7 @@
    <item>
     <widget class="QCheckBox" name="UseNamedInputs">
      <property name="text">
-      <string>Use named inputs</string>
+      <string>Use Named Inputs</string>
      </property>
      <property name="toolTip">
       <string>When checked, array accessors use the dataset name (e.g. inputs["name"].PointData["arr"]) instead of numeric indexing (e.g. inputs[0].PointData["arr"]).</string>
@@ -27,7 +27,7 @@
    <item>
     <widget class="QCheckBox" name="FilterByAssociation">
      <property name="text">
-      <string>Show only arrays matching Array Association</string>
+      <string>Show Only Arrays Matching Array Association</string>
      </property>
      <property name="toolTip">
       <string>When checked, only arrays matching the current Array Association are listed in the Array picker.</string>
