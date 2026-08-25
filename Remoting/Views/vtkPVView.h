@@ -334,6 +334,16 @@ protected:
   vtkInformationVector* ReplyInformationVector;
   ///@}
 
+  /**
+   * Guards against reentrant calls to CallProcessViewRequest(). Since
+   * RequestInformation/ReplyInformationVector are shared across all request
+   * passes on this view, a nested call (e.g. an interactive widget's
+   * Render() routing back into Update() while a representation's update is
+   * still being processed) would clear() that shared state out from under
+   * the outer, still-in-progress pass.
+   */
+  bool InProcessViewRequest = false;
+
   ///@{
   /**
    * Subclasses can use this method to trigger a pass on all representations.
