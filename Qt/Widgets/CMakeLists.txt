@@ -96,7 +96,6 @@ vtk_module_find_package(
 ## Add *.ui files to be uic processed.
 set(ui_files
   Resources/UI/pqExpanderButton.ui
-  Resources/UI/pqQuickLaunchDialog.ui
   Resources/UI/pqSeriesGeneratorDialog.ui)
 
 ##########################################################################
