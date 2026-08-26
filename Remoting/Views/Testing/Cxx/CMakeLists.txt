@@ -4,6 +4,7 @@ vtk_add_test_cxx(vtkRemotingViewsCxxTests tests
   TestImageScaleFactors.cxx
   TestParaViewPipelineControllerWithRendering.cxx
   TestProxyManagerUtilities.cxx
+  TestPVViewReentrantProcessViewRequest.cxx
   TestScalarBarPlacement.cxx
   TestSystemCaps.cxx
   TestTransferFunctionManager.cxx)
