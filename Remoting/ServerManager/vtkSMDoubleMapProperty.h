@@ -10,13 +10,16 @@
 #ifndef vtkSMDoubleMapProperty_h
 #define vtkSMDoubleMapProperty_h
 
+#include "vtkParaViewDeprecation.h"         // for deprec macro
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMMapProperty.h"
 
 class vtkSMDoubleMapPropertyPrivate;
 class vtkSMDoubleMapPropertyIterator;
 
-class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMDoubleMapProperty : public vtkSMMapProperty
+class PARAVIEW_DEPRECATED_IN_6_3_0(
+  "No property uses this class anymore.") VTKREMOTINGSERVERMANAGER_EXPORT vtkSMDoubleMapProperty
+  : public vtkSMMapProperty
 {
 public:
   static vtkSMDoubleMapProperty* New();

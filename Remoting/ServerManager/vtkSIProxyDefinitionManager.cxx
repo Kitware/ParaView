@@ -130,7 +130,6 @@ public:
     std::map<std::string, vtkSmartPointer<vtkPVXMLElement>>& propertyMap)
   {
     std::set<std::string> propertyTypeName;
-    propertyTypeName.insert("DoubleMapProperty");
     propertyTypeName.insert("DoubleVectorProperty");
     propertyTypeName.insert("IdTypeVectorProperty");
     propertyTypeName.insert("InputProperty");
