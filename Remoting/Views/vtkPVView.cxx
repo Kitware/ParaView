@@ -563,6 +563,21 @@ void vtkPVView::SynchronizeRepresentationTemporalPipelineStates()
 int vtkPVView::CallProcessViewRequest(
   vtkInformationRequestKey* type, vtkInformation* inInfo, vtkInformationVector* outVec)
 {
+  if (this->InProcessViewRequest)
+  {
+    // RequestInformation/ReplyInformationVector are shared across all request
+    // passes on this view. Letting a nested call (e.g. an interactive
+    // widget's Render() routing back into Update() while a representation's
+    // update is still in progress) run to completion would Clear() that
+    // shared state out from under this, still-in-progress, outer pass -
+    // producing spurious "Missing VIEW()." warnings for every representation
+    // processed afterward. Refuse the nested request instead, the same way
+    // vtkExecutive::CheckAlgorithm refuses a reentrant pipeline request.
+    return 0;
+  }
+
+  this->InProcessViewRequest = true;
+
   int count = 0;
   int num_reprs = this->GetNumberOfRepresentations();
   outVec->SetNumberOfInformationObjects(num_reprs);
@@ -597,6 +612,7 @@ int vtkPVView::CallProcessViewRequest(
   // Clear input information since we are done with the pass. This avoids any
   // need for garbage collection.
   inInfo->Clear();
+  this->InProcessViewRequest = false;
   return count;
 }
 
