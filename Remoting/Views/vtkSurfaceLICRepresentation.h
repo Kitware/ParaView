@@ -46,6 +46,12 @@ public:
 
   void SetEnhancedLIC(int val);
 
+  // Description:
+  // When enabled, uses the vector field's sign to orient the LIC pattern,
+  // producing a directional (arrow-like) appearance instead of a symmetric
+  // streak pattern.
+  void SetOrientedLIC(bool val);
+
   void SetEnhanceContrast(int val);
   void SetLowLICContrastEnhancementFactor(double val);
   void SetHighLICContrastEnhancementFactor(double val);
