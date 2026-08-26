@@ -233,6 +233,7 @@ set(headers
 
 set(ui_files
   Resources/UI/pqAnnulusPropertyWidget.ui
+  Resources/UI/pqAnglePropertyWidget.ui
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqBackgroundEditorWidget.ui
   Resources/UI/pqBoxPropertyWidget.ui
@@ -245,12 +246,14 @@ set(ui_files
   Resources/UI/pqColorToolbar.ui
   Resources/UI/pqConePropertyWidget.ui
   Resources/UI/pqConfigureCategoriesDialog.ui
+  Resources/UI/pqCoordinateFramePropertyWidget.ui
   Resources/UI/pqCustomResolutionDialog.ui
   Resources/UI/pqCylinderPropertyWidget.ui
   Resources/UI/pqCustomizeShortcutsDialog.ui
   Resources/UI/pqDataAssemblyPropertyWidget.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
+  Resources/UI/pqDisplaySizedImplicitPlanePropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExampleVisualizationsDialog.ui
@@ -275,6 +278,7 @@ set(ui_files
   Resources/UI/pqPropertyCollectionWidget.ui
   Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSelectionEditor.ui
+  Resources/UI/pqSelectionQueryPropertyWidget.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui
   Resources/UI/pqSpherePropertyWidget.ui
   Resources/UI/pqSplinePropertyWidget.ui
@@ -282,6 +286,7 @@ set(ui_files
   Resources/UI/pqTextLocationWidget.ui
   Resources/UI/pqTimeManagerWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyDialog.ui
+  Resources/UI/pqTransferFunctionWidgetPropertyWidget.ui
   Resources/UI/pqVCRToolbar.ui
   Resources/UI/pqViewResolutionPropertyWidget.ui
   Resources/UI/pqWelcomeDialog.ui

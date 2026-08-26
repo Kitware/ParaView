@@ -240,7 +240,8 @@ set(ui_files
   Resources/UI/pqSetBreakpointDialog.ui
   Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqTimerLogDisplay.ui
-  Resources/UI/pqViewFrame.ui)
+  Resources/UI/pqViewFrame.ui
+  Resources/UI/pqXYChartViewBoundsPropertyWidget.ui)
 
 set(resource_files
   Resources/pqComponents.qrc)
