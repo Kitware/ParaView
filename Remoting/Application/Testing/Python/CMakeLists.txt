@@ -125,6 +125,7 @@ set(PVBATCH_TESTS
   ParallelSerialWriter.py
   ParallelSerialWriterWithIOSS.py
   PotentialMismatchedDataDelivery.py,NO_VALID
+  PythonCalculator.py,NO_VALID
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   Simple.py
