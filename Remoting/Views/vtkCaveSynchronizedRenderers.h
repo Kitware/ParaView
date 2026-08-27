@@ -18,7 +18,6 @@
 #ifndef vtkCaveSynchronizedRenderers_h
 #define vtkCaveSynchronizedRenderers_h
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_6_1_0
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSynchronizedRenderers.h"
 
@@ -74,12 +73,6 @@ protected:
    * Return true on success, false otherwise.
    */
   bool DefineDisplay(int idx, double origin[3], double x[3], double y[3]);
-
-  /**
-   * Method to update the camera.
-   */
-  PARAVIEW_DEPRECATED_IN_6_1_0("Use InitializeCamera instead")
-  void ComputeCamera(vtkCamera* cam);
 
   /**
    * Initialize the camera for CAVE mode using display information.

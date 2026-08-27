@@ -219,7 +219,7 @@ public:
   /**
    * std::format style format for range labels.
    */
-  virtual void SetRangeLabelFormat(const char* format);
+  vtkSetStringMacro(RangeLabelFormat);
   vtkGetStringMacro(RangeLabelFormat);
   ///@}
 
@@ -227,7 +227,7 @@ public:
   /**
    * std::format style format for range labels.
    */
-  virtual void SetDataRangeLabelFormat(const char* format);
+  vtkSetStringMacro(DataRangeLabelFormat);
   vtkGetStringMacro(DataRangeLabelFormat);
   ///@}
 

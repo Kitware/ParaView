@@ -2350,9 +2350,6 @@ endif()
 paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRight.pvx"
   TEST_SCRIPTS TestCAVE.xml TestCAVEVolumeRendering.xml)
 
-paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRightDeprecated.pvx"
-  TEST_SCRIPTS TestCAVE.xml)
-
 paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRightHide2DOverlay.pvx"
   TEST_SCRIPTS TestCAVE2DAnnotations.xml)
 

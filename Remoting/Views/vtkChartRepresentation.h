@@ -17,9 +17,8 @@
 #define vtkChartRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
-#include "vtkParaViewDeprecation.h" // for deprecation
-#include "vtkSmartPointer.h"        // needed for vtkSmartPointer
-#include "vtkWeakPointer.h"         // needed for vtkWeakPointer
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkWeakPointer.h"  // needed for vtkWeakPointer
 
 #include <map>    // needed for std::map
 #include <set>    // needed for std::set
@@ -87,22 +86,6 @@ public:
    */
   void AddBlockSelector(const char* selector);
   void RemoveAllBlockSelectors();
-  ///@}
-
-  ///@{
-  /**
-   * Methods to control block selection.
-   * When changed, this will call MarkModified().
-   */
-  PARAVIEW_DEPRECATED_IN_6_1_0("Use AddBlockSelector() with SetActiveAssembly instead. "
-                               "CompositeDataSetIndex is no longer used.")
-  void SetCompositeDataSetIndex(unsigned int); // only used for single block selection
-  PARAVIEW_DEPRECATED_IN_6_1_0("Use AddBlockSelector() with SetActiveAssembly instead. "
-                               "CompositeDataSetIndex is no longer used.")
-  void AddCompositeDataSetIndex(unsigned int);
-  PARAVIEW_DEPRECATED_IN_6_1_0("Use RemoveAllBlockSelectors() with SetActiveAssembly instead. "
-                               "CompositeDataSetIndex is no longer used.")
-  void ResetCompositeDataSetIndices();
   ///@}
 
   /**
@@ -283,7 +266,7 @@ protected:
    * then passed on the rendering nodes. This method may be overridden to
    * customize the reduction. The default implementation uses
    * vtkBlockDeliveryPreprocessor to convert to tables and then use
-   * vtkPVMergeTablesMultiBlock as the reduction algorithm.
+   * vtkPVMergeTablesComposite as the reduction algorithm.
    */
   virtual vtkSmartPointer<vtkDataObject> ReduceDataToRoot(vtkDataObject* data);
 

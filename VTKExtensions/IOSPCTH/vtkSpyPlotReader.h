@@ -43,7 +43,6 @@
 
 #include "vtkCompositeDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsIOSPCTHModule.h" //needed for exports
-#include "vtkParaViewDeprecation.h"          // for deprecation
 
 class vtkBoundingBox;
 class vtkCallbackCommand;
@@ -67,12 +66,6 @@ public:
   static vtkSpyPlotReader* New();
   vtkTypeMacro(vtkSpyPlotReader, vtkCompositeDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  /**
-   * Noop, do not use.
-   */
-  PARAVIEW_DEPRECATED_IN_6_1_0("Noop, do not use.")
-  void PrintBlockList(vtkNonOverlappingAMR* hbds, int myProcId);
 
   ///@{
   /**

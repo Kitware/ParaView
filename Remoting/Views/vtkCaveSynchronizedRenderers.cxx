@@ -139,12 +139,6 @@ bool vtkCaveSynchronizedRenderers::DefineDisplay(
 }
 
 //-------------------------------------------------------------------------
-void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)
-{
-  this->InitializeCamera(cam);
-}
-
-//-------------------------------------------------------------------------
 void vtkCaveSynchronizedRenderers::InitializeCamera(vtkCamera* camera)
 {
   if (!this->CameraInitialized)

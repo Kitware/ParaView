@@ -1031,34 +1031,6 @@ bool vtkSMParaViewPipelineController::RegisterTextureProxyFromFile(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::RegisterTextureProxy(vtkSMProxy* proxy, const char* filename)
-{
-  if (!proxy)
-  {
-    return false;
-  }
-
-  SM_SCOPED_TRACE(RegisterTextureProxy).arg("proxy", proxy).arg("filename", filename);
-
-  // Register proxies created for proxy list domains.
-  this->RegisterProxiesForProxyListDomains(proxy);
-
-  // Register the proxy itself.
-  if (filename)
-  {
-    auto regName = vtksys::SystemTools::GetFilenameName(filename);
-    proxy->GetSessionProxyManager()->RegisterProxy("textures", regName.c_str(), proxy);
-    vtkSMPropertyHelper(proxy, "FileName").Set(filename);
-    vtkSMPropertyHelper(proxy, "Mode").Set(0);
-  }
-  else
-  {
-    proxy->GetSessionProxyManager()->RegisterProxy("textures", nullptr, proxy);
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::RegisterTextureProxy(
   vtkSMProxy* proxy, const char* trivialProducerKey, const char* registrationName)
 {

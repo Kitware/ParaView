@@ -184,14 +184,6 @@ unsigned int vtkSMProxyLink::GetNumberOfLinkedObjects()
   return static_cast<unsigned int>(this->Internals->LinkedProxies.size());
 }
 
-//-----------------------------------------------------------------------------
-// PARAVIEW_DEPRECATED_IN_6_1_0: GetNumerOfLinkedProxies is deprectated, please use
-// GetNumberOfLinkedObjects instead.
-unsigned int vtkSMProxyLink::GetNumberOfLinkedProxies()
-{
-  return this->GetNumberOfLinkedObjects();
-}
-
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyLink::GetLinkedProxy(int index)
 {

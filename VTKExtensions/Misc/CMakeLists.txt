@@ -17,7 +17,6 @@ set(classes
   vtkPVFrustum
   vtkPVMergeTables
   vtkPVMergeTablesComposite
-  vtkPVMergeTablesMultiBlock
   vtkPVTransform
   vtkPVRotateAroundOriginTransform
   vtkReductionFilter

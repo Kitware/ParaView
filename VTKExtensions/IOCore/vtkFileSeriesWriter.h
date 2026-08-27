@@ -88,7 +88,7 @@ public:
    * Default is nullptr.
    */
   vtkGetStringMacro(FileNameSuffix);
-  virtual void SetFileNameSuffix(const char* suffix);
+  vtkSetStringMacro(FileNameSuffix);
   ///@}
 
   ///@{

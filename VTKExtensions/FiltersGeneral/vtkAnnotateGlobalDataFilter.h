@@ -55,7 +55,7 @@ public:
   /**
    * Set the std::format style format to use when displaying the field value
    */
-  virtual void SetFormat(const char* format);
+  vtkSetStringMacro(Format);
   vtkGetStringMacro(Format);
   ///@}
 

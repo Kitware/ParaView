@@ -60,15 +60,10 @@ public:
    */
   virtual void RemoveLinkedProxy(vtkSMProxy* proxy);
 
-  ///@{
   /**
    * Get the number of proxies that are involved in this link.
    */
   unsigned int GetNumberOfLinkedObjects() override;
-  PARAVIEW_DEPRECATED_IN_6_1_0(
-    "GetNumerOfLinkedProxies is deprectated, please use GetNumberOfLinkedObjects instead.")
-  unsigned int GetNumberOfLinkedProxies();
-  ///@}
 
   /**
    * Get a proxy involved in this link.

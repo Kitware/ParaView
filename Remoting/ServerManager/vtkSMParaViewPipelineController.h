@@ -29,7 +29,6 @@
 #ifndef vtkSMParaViewPipelineController_h
 #define vtkSMParaViewPipelineController_h
 
-#include "vtkParaViewDeprecation.h" // PARAVIEW_DEPRECATED_IN_6_1_0
 #include "vtkSMObject.h"
 
 #include <string> // for std::string
@@ -226,8 +225,6 @@ public:
    */
   virtual bool RegisterTextureProxyFromFile(
     vtkSMProxy* proxy, const char* filename, const char* registrationName);
-  PARAVIEW_DEPRECATED_IN_6_1_0("Use RegisterTextureProxyFromFile instead.")
-  virtual bool RegisterTextureProxy(vtkSMProxy* proxy, const char* filename);
   virtual bool RegisterTextureProxy(
     vtkSMProxy* proxy, const char* trivialProducerKeyName, const char* registrationName);
   ///@}

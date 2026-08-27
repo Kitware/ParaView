@@ -380,7 +380,6 @@ vtkSmartPointer<vtkDataObject> vtkPVBagChartRepresentation::ReduceDataToRoot(vtk
 {
   vtkNew<vtkReductionFilter> reductionFilter;
   // For now we do not support parallel servers
-  // vtkNew<vtkPVMergeTablesMultiBlock> algo;
   // reductionFilter->SetPostGatherHelper(algo.GetPointer());
   reductionFilter->SetInputData(data);
   reductionFilter->Update();
