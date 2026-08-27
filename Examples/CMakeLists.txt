@@ -49,6 +49,11 @@ if (ParaView_BINARY_DIR)
     set(_vtk_test_python_suffix "ParaViewExample-${dir}")
     add_subdirectory("${dir}/Testing")
   endfunction()
+
+  function(add_xml_example dir)
+    set(_vtk_test_python_suffix "ParaViewExample-${dir}")
+    add_subdirectory("${dir}")
+  endfunction()
 else ()
   if (NOT BUILD_SHARED_LIBS)
     set(CMAKE_JOB_POOL_LINK static_exe_link)
@@ -70,6 +75,9 @@ else ()
   function (add_python_example dir)
   # pass
   endfunction()
+  function(add_xml_example dir)
+  # pass
+  endfunction()
 endif ()
 
 
@@ -88,6 +96,10 @@ if (TARGET ParaView::RemotingMisc)
   add_example(Plugins/ElevationFilter)
 endif ()
 add_example(Plugins/GUIMyToolBar)
+if (PARAVIEW_USE_PYTHON)
+  # requires programmable filter
+  add_xml_example(Plugins/HelixSource)
+endif()
 add_example(Plugins/LagrangianIntegrationModel)
 add_example(Plugins/LiveSource)
 add_example(Plugins/MyPNGReader)
