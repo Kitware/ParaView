@@ -13,7 +13,7 @@
 #include "vtkPVSessionIterator.h"
 #include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED
 
-PARAVIEW_DEPRECATED_IN_6_1_0("Please use the `vtkPVSessionIterator` class instead.")
+PARAVIEW_DEPRECATED_IN_6_2_0("Please use the `vtkPVSessionIterator` class instead.")
 typedef vtkPVSessionIterator vtkSessionIterator;
 
 #endif

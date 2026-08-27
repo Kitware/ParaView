@@ -76,6 +76,7 @@ public:
    * (see vtkSMLink::UpdateDirections)
    */
   int GetLinkedObjectDirection(int index) override;
+  PARAVIEW_DEPRECATED_IN_6_3_0("Please use GetLinkedObjectDirection(int index) instead")
   int GetLinkedProxyDirection(int index);
   ///@}
 

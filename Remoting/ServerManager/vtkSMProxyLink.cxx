@@ -219,8 +219,6 @@ int vtkSMProxyLink::GetLinkedObjectDirection(int index)
 //-----------------------------------------------------------------------------
 int vtkSMProxyLink::GetLinkedProxyDirection(int index)
 {
-  vtkWarningMacro("GetLinkedProxyDirection(int index) is deprecated, "
-                  "please use GetLinkedObjectDirection(int index) instead");
   return this->GetLinkedObjectDirection(index);
 }
 
