@@ -73,7 +73,7 @@ It is now possible to use the names from the _Pipeline Browser_ (aka "Registered
 
 The **Python Calculator** panel now provides helpers to build expressions so you don't need to memorize the syntax.
 
-- **Input**: selects which connected input to browse arrays from. Disabled when only one input is connected. When **Use named inputs** is checked, generated accessors use the dataset name (e.g. `inputs["Sphere"].PointData["Velocity"]`) instead of numeric indexing (e.g. `inputs[0].PointData["Velocity"]`).
+- **Input**: selects which connected input to browse arrays from. Disabled when only one input is connected. When **Use Named Inputs** is checked, generated accessors use the dataset name (e.g. `inputs["Sphere"].PointData["Velocity"]`) instead of numeric indexing (e.g. `inputs[0].PointData["Velocity"]`).
 - **Array**: lists arrays from the selected input, optionally filtered to the current **Array Association**. Clicking
   inserts the appropriate accessor at the cursor.
 - **Function**: searchable list of Python functions available in the calculator's namespace, with a one-line summary
