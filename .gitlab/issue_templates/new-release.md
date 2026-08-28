@@ -108,6 +108,12 @@ Please remove this comment.
       - See the script itself for usage documentation
     - [ ] Add (or update if `@BASEBRANCH@` is `release`) version selection entry
           in paraview-superbuild
+    - Deprecation updates (if `$(BASEBRANCH)` is `master`)
+      - This should be done as soon as possible after merging to not block future deprecations.
+      - [ ] Update deprecation macros for the next release, use `PARAVIEW_VERSION_CHECK($(MAJOR), $(MINOR), SPLIT_DATE)`
+      - [ ] Update `PARAVIEW_EPOCH_VERSION` to the day *after* the SPLIT_DATE
+      - [ ] Remove deprecated symbols from before the *prior* release
+      - [ ] Update `PARAVIEW_MINIMUM_DEPRECATION_LEVEL` to be that of the *prior* release
 
 [backport-mrs]: https://gitlab.kitware.com/utils/release-utils/-/blob/master/backport-mrs.py
 [release-mr]: https://gitlab.kitware.com/utils/release-utils/-/blob/master/release-mr.py
