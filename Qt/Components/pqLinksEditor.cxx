@@ -692,14 +692,20 @@ void pqLinksEditor::updatePropertyList(QListWidget* tw, vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 void pqLinksEditor::currentProperty1Changed(QListWidgetItem* item)
 {
-  this->SelectedProperty1 = item->data(Qt::UserRole).toString();
+  if (item)
+  {
+    this->SelectedProperty1 = item->data(Qt::UserRole).toString();
+  }
   this->updateEnabledState();
 }
 
 //-----------------------------------------------------------------------------
 void pqLinksEditor::currentProperty2Changed(QListWidgetItem* item)
 {
-  this->SelectedProperty2 = item->data(Qt::UserRole).toString();
+  if (item)
+  {
+    this->SelectedProperty2 = item->data(Qt::UserRole).toString();
+  }
   this->updateEnabledState();
 }
 

@@ -49,6 +49,13 @@
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_2/Property1List" command="setCheckState" arguments="55.0,0" />
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_2/Property2List" command="setCurrent" arguments="55.0" />
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_2/Property2List" command="setCheckState" arguments="55.0,0" />
+
+  <!-- Check changing the proxy is not causing issues -->
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_2/ObjectTreeProperty2" command="setCurrent" arguments="1.0.0.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_2/ObjectTreeProperty2" command="setCurrent" arguments="1.0.1.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_2/Property2List" command="setCurrent" arguments="55.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_2/Property2List" command="setCheckState" arguments="55.0,0" />
+
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLinksManager/buttonBox/1QPushButton0" command="activate" arguments="" />
 
