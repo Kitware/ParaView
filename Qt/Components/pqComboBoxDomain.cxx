@@ -303,14 +303,16 @@ void pqComboBoxDomain::internalDomainChanged()
       }
     }
     combo->setCurrentIndex(-1);
-    combo->blockSignals(prev);
     int foundOld = combo->findData(old);
     if (foundOld >= 0)
     {
       combo->setCurrentIndex(foundOld);
+      // do not emit signal if the old entry is still there.
+      combo->blockSignals(prev);
     }
     else
     {
+      combo->blockSignals(prev);
       // Old value was not present, reset to domain default and recover new default
       this->Internal->Property->ResetToDomainDefaults();
       switch (type)
