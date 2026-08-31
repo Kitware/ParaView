@@ -58,6 +58,8 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
     this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(handleIndexClicked(const QModelIndex&)));
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(setActiveView(pqView*)));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
+    SLOT(onActiveSourceChanged(pqPipelineSource*)));
 
   new pqPipelineModelSelectionAdaptor(this->getSelectionModel());
 }
@@ -496,6 +498,34 @@ const pqPipelineModel* pqPipelineBrowserWidget::getPipelineModel(const QModelInd
 void pqPipelineBrowserWidget::expandWithModelIndexTranslation(const QModelIndex& index)
 {
   this->expand(this->FilteredPipelineModel->mapFromSource(index));
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::onActiveSourceChanged(pqPipelineSource* source)
+{
+  if (!source)
+  {
+    return;
+  }
+
+  QModelIndex sourceIndex = this->PipelineModel->getIndexFor(source);
+  if (!sourceIndex.isValid())
+  {
+    return;
+  }
+
+  QModelIndex viewIndex = this->FilteredPipelineModel->mapFromSource(sourceIndex);
+  if (!viewIndex.isValid())
+  {
+    return;
+  }
+
+  for (QModelIndex parent = viewIndex.parent(); parent.isValid(); parent = parent.parent())
+  {
+    this->expand(parent);
+  }
+
+  this->scrollTo(viewIndex);
 }
 
 //-----------------------------------------------------------------------------
