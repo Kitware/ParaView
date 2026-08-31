@@ -151,6 +151,7 @@ vtkSurfaceLICRepresentationPassParameterWithLODMacro(HighColorContrastEnhancemen
 vtkSurfaceLICRepresentationPassParameterWithLODMacro(AntiAlias, int);
 #endif
 vtkSurfaceLICRepresentationPassParameterWithLODMacro(NormalizeVectors, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(OrientedLIC, bool);
 vtkSurfaceLICRepresentationPassParameterWithLODMacro(ColorMode, int);
 vtkSurfaceLICRepresentationPassParameterWithLODMacro(MapModeBias, double);
 vtkSurfaceLICRepresentationPassParameterWithLODMacro(LICIntensity, double);

@@ -9,4 +9,9 @@ r = Show(Representation = "Surface LIC")
 # check for existence of certain representation properties from LIC
 print ("LICIntensity", r.LICIntensity)
 print ("SelectInputVectors", r.SelectInputVectors)
+print ("OrientedLIC", r.OrientedLIC)
+Render()
+
+# exercise the OrientedLIC code path as well
+r.OrientedLIC = 1
 Render()
