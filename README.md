@@ -48,7 +48,7 @@ Building
 
 There are two ways to build ParaView:
 
-* The easiest method for begginners to build ParaView from source is
+* The easiest method for beginners to build ParaView from source is
 by using our [Getting Started compilation guide][build] which includes
 commands to install the needed dependencies for most operating systems.
 
