@@ -144,6 +144,8 @@ def Show(proxy=None, view=None, representationType=None, **params):
         # if possible.
         view = GetActiveView()
     controller = servermanager.ParaViewPipelineController()
+    # ensure "step-by-step" update of the pipeline
+    proxy.UpdatePipeline()
     rep = controller.Show(proxy, proxy.Port, view, representationType)
     if rep == None:
         raise RuntimeError(

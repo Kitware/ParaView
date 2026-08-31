@@ -13,103 +13,33 @@ Note, this cannot be called when Python tracing is active.
 from paraview import servermanager as sm
 from paraview import smtrace
 from paraview import simple
+from paraview.util import proxy as proxy_util
 
 RECORD_MODIFIED_PROPERTIES = sm.vtkSMTrace.RECORD_MODIFIED_PROPERTIES
 RECORD_ALL_PROPERTIES = sm.vtkSMTrace.RECORD_ALL_PROPERTIES
 RECORD_ACTIVE_MODIFIED_PROPERTIES = sm.vtkSMTrace.RECORD_ACTIVE_MODIFIED_PROPERTIES
 
 
-class supported_proxies(object):
-    """filter object used to hide proxies that are currently not supported by
-    the state saving mechanism or those that are generally skipped in state.
-    There is none currently but keeping the method for backward compatibility
-    and future proofing."""
-
-    def __call__(self, proxy):
-        return proxy
-
-
 class visible_representations(object):
     """filter object to skip hidden representations from being saved in state file"""
 
     def __call__(self, proxy):
-        if not supported_proxies()(proxy): return False
+        if not proxy_util.supported_proxies()(proxy): return False
         try:
             return proxy.Visibility
         except AttributeError:
             pass
         return True
 
-
-def __toposort(input_set):
-    """implementation of Tarjan topological sort to sort proxies using consumer
-    dependencies as graph edges."""
-    result = []
-    marked_set = set()
-    while marked_set != input_set:
-        unmarked_node = (input_set - marked_set).pop()
-        __toposort_visit(result, unmarked_node, input_set, marked_set)
-    result.reverse()
-    return result
-
-
-def __toposort_visit(result, proxy, input_set, marked_set, t_marked_set=None):
-    if t_marked_set is None:
-        temporarily_marked_set = set()
-    else:
-        temporarily_marked_set = t_marked_set
-    if proxy in temporarily_marked_set:
-        raise RuntimeError("Cycle detected in pipeline! %r" % proxy)
-    if not proxy in marked_set:
-        temporarily_marked_set.add(proxy)
-        consumers = set()
-        get_consumers(proxy, lambda x: x in input_set, consumer_set=consumers, recursive=False)
-        for x in consumers:
-            __toposort_visit(result, x, input_set, marked_set, temporarily_marked_set)
-        marked_set.add(proxy)
-        temporarily_marked_set.discard(proxy)
-        result.append(proxy)
-
-
 def get_consumers(proxy, filter, consumer_set, recursive=True):
     """Returns the consumers for a proxy iteratively. If filter is non-None,
     filter is used to cull consumers."""
-    for i in range(proxy.GetNumberOfConsumers()):
-        consumer = proxy.GetConsumerProxy(i)
-        consumer = consumer.GetTrueParentProxy() if consumer else None
-        consumer = sm._getPyProxy(consumer)
-        if not consumer or consumer.IsPrototype() or consumer in consumer_set:
-            continue
-        if filter(consumer):
-            consumer_set.add(consumer)
-            if recursive: get_consumers(consumer, filter, consumer_set)
-
+    return proxy_util.get_consumers(proxy, filter, consumer_set, recursive)
 
 def get_producers(proxy, filter, producer_set):
     """Returns the producers for a proxy iteratively. If filter is non-None,
     filter is used to cull producers."""
-    for i in range(proxy.GetNumberOfProducers()):
-        producer = proxy.GetProducerProxy(i)
-        producer = producer.GetTrueParentProxy() if producer else None
-        producer = sm._getPyProxy(producer)
-        if not producer or producer.IsPrototype() or producer in producer_set:
-            continue
-        if filter(producer):
-            producer_set.add(producer)
-            get_producers(producer, filter, producer_set)
-    # FIXME: LookupTable is missed :/, darn subproxies!
-    try:
-        if proxy.LookupTable and filter(proxy.LookupTable):
-            producer_set.add(proxy.LookupTable)
-            get_producers(proxy.LookupTable, filter, producer_set)
-    except AttributeError:
-        pass
-    try:
-        if proxy.ScalarOpacityFunction and filter(proxy.ScalarOpacityFunction):
-            producer_set.add(proxy.ScalarOpacityFunction)
-            get_producers(proxy.ScalarOpacityFunction, filter, producer_set)
-    except AttributeError:
-        pass
+    return proxy_util.get_producers(proxy, filter, producer_set)
 
 
 def get_state(options=None, source_set=[], filter=None, raw=False,
@@ -141,7 +71,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         raise RuntimeError("Cannot generate Python state when tracing is active.")
 
     if filter is None:
-        filter = visible_representations() if skipHiddenRepresentations else supported_proxies()
+        filter = visible_representations() if skipHiddenRepresentations else proxy_util.supported_proxies()
 
     # build a set of proxies of interest
     if source_set:
@@ -243,7 +173,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
 
         # --------------------------------------------------------------------------
         # Next, trace selection sources.
-        sorted_proxies_of_interest = __toposort(proxies_of_interest)
+        sorted_proxies_of_interest = proxy_util.toposort(proxies_of_interest)
         sorted_selection_sources = [x for x in sorted_proxies_of_interest \
                              if smtrace.Trace.get_registered_name(x, "selection_sources")]
 
