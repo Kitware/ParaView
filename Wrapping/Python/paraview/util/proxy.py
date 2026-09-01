@@ -99,20 +99,6 @@ def get_producers(proxy, filter, producer_set):
         if filter(producer):
             producer_set.add(producer)
             get_producers(producer, filter, producer_set)
-    # FIXME: LookupTable is missed :/, darn subproxies!
-    try:
-        if proxy.LookupTable and filter(proxy.LookupTable):
-            producer_set.add(proxy.LookupTable)
-            get_producers(proxy.LookupTable, filter, producer_set)
-    except AttributeError:
-        pass
-    try:
-        if proxy.ScalarOpacityFunction and filter(proxy.ScalarOpacityFunction):
-            producer_set.add(proxy.ScalarOpacityFunction)
-            get_producers(proxy.ScalarOpacityFunction, filter, producer_set)
-    except AttributeError:
-        pass
-
 
 
 def toposort(input_set):
