@@ -110,7 +110,7 @@
 #include "vtkOSPRayPass.h"
 #include "vtkOSPRayRendererNode.h"
 #endif
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
 #include "vtkAnariDevice.h"
 #include "vtkAnariLightNode.h"
 #include "vtkAnariPass.h"
@@ -133,7 +133,7 @@ struct ValuePassStateT
   bool AnnotationVisibility;
   bool CenterAxesVisibility;
 };
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
 const char* LIBRARY_KEY = "library";
 const char* RENDERER_KEY = "renderer";
 #endif
@@ -147,7 +147,7 @@ public:
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkSmartPointer<vtkOSPRayPass> OSPRayPass = nullptr;
 #endif
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   vtkSmartPointer<vtkAnariPass> AnariPass = nullptr;
 #endif
 
@@ -3724,7 +3724,7 @@ bool vtkPVRenderView::GetEnableSynchronizableActors()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetEnableANARI(bool v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   vtkRenderer* ren = this->GetRenderer();
   if (v && !this->Internals->AnariPass)
   {
@@ -3791,7 +3791,7 @@ bool vtkPVRenderView::GetEnableANARI()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   if (this->Internals->AnariPass)
   {
     vtkDebugMacro("SetANARILibrary: " << l);
@@ -3811,7 +3811,7 @@ void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
 //----------------------------------------------------------------------------
 const char* vtkPVRenderView::GetANARILibrary()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   return this->Internals->AnariPass->GetAnariDevice()->GetAnariLibraryName().c_str();
 #else
   return nullptr;
@@ -3821,7 +3821,7 @@ const char* vtkPVRenderView::GetANARILibrary()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetANARIRenderer(std::string r [[maybe_unused]])
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   if (this->Internals->AnariPass)
   {
     vtkDebugMacro("SetANARIRenderer: " << r);
@@ -3833,7 +3833,7 @@ void vtkPVRenderView::SetANARIRenderer(std::string r [[maybe_unused]])
 //----------------------------------------------------------------------------
 const char* vtkPVRenderView::GetANARIRenderer()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   if (this->Internals->AnariPass)
   {
     return this->Internals->AnariPass->GetAnariRenderer()->GetSubtype();
@@ -3847,7 +3847,7 @@ const char* vtkPVRenderView::GetANARIRenderer()
 //----------------------------------------------------------------------------
 vtkStringArray* vtkPVRenderView::GetANARIRendererNames()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   if (!this->Internals->AnariPass)
   {
     this->Internals->ANARIRendererNames->Resize(0);
@@ -3868,7 +3868,7 @@ vtkStringArray* vtkPVRenderView::GetANARIRendererNames()
 void vtkPVRenderView::SetANARIRendererParameter(const std::string& key [[maybe_unused]],
   int type [[maybe_unused]], const std::string& stringValue [[maybe_unused]])
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   if (this->Internals->AnariPass)
   {
     switch (type)
@@ -3919,7 +3919,7 @@ void vtkPVRenderView::SetANARIRendererParameter(const std::string& key [[maybe_u
 //----------------------------------------------------------------------------
 std::string vtkPVRenderView::GetANARIRendererParameters()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   if (!this->Internals->AnariPass)
   {
     return "{}";
@@ -4211,12 +4211,12 @@ int vtkPVRenderView::GetSamplesPerPixel()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetMaxFrames(int v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   vtkRenderer* ren = this->GetRenderer();
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
 #endif
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   if (this->Internals->AnariPass)
   {
     this->Internals->AnariPass->GetSceneGraph()->SetAccumulationCount(ren, v);
