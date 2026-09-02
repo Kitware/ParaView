@@ -295,34 +295,6 @@ void vtkChartRepresentation::RemoveAllBlockSelectors()
 }
 
 //----------------------------------------------------------------------------
-void vtkChartRepresentation::SetCompositeDataSetIndex(unsigned int v)
-{
-  this->CompositeIndices.clear();
-  this->CompositeIndices.insert(v);
-  this->MarkModified();
-}
-
-//----------------------------------------------------------------------------
-void vtkChartRepresentation::AddCompositeDataSetIndex(unsigned int v)
-{
-  if (this->CompositeIndices.find(v) == this->CompositeIndices.end())
-  {
-    this->CompositeIndices.insert(v);
-    this->MarkModified();
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkChartRepresentation::ResetCompositeDataSetIndices()
-{
-  if (!this->CompositeIndices.empty())
-  {
-    this->CompositeIndices.clear();
-    this->MarkModified();
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkChartRepresentation::SetArraySelectionMode(int mode)
 {
   if (this->ArraySelectionMode !=

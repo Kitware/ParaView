@@ -1348,12 +1348,6 @@ void vtkSpyPlotReader::SetMergeXYZComponents(int merge)
   this->MergeXYZComponents = merge;
   this->Modified();
 }
-//-----------------------------------------------------------------------------
-// PARAVIEW_DEPRECATED_IN_6_1_0
-void vtkSpyPlotReader::PrintBlockList(
-  vtkNonOverlappingAMR* vtkNotUsed(hbds), int vtkNotUsed(myProcId))
-{
-}
 
 //-----------------------------------------------------------------------------
 void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)

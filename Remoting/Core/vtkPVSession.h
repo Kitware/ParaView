@@ -161,7 +161,7 @@ private:
   bool InCleanupPendingProgress;
 };
 
-PARAVIEW_DEPRECATED_IN_6_1_0("Please use the `vtkPVSession` class instead.")
+PARAVIEW_DEPRECATED_IN_6_2_0("Please use the `vtkPVSession` class instead.")
 typedef vtkPVSession vtkSession;
 
 #endif
