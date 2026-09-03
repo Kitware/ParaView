@@ -155,13 +155,14 @@ If so, be sure to use the respective Qt Version (e.g. for VS 2022, use msvc2022_
 #### Dependencies
  * Download and install [git bash for windows][gitforwindows]
  * Download and install [cmake][cmake-download]
- * Download and install [Visual Studio 2019 Community Edition][visual-studio]
+ * Download and install [Visual Studio 2022 Community Edition][visual-studio]
  * Download [ninja-build][ninja] and drop `ninja.exe` in `C:\Windows\`
  * Download and install both `msmpisetup.exe` and `msmpisdk.msi` from [Microsoft MPI][msmpi]
  * Download and install [Python for Windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environnement variable.
- * Download and install [Qt 5.15.3][qt-download-5.15.3] for Windows, make sure to check the MSVC 2019 64-bit component during installation.
-    * Make sure to add `C:\Qt\Qt5.15.3\5.15.3\msvc2019_64\bin` to your `PATH` environment variable.
-    * You may also need to add an environment variable `QT_QPA_PLATFORM_PLUGIN_PATH`: `C:\Qt\Qt5.15.3\5.15.3\msvc2019_64\plugins\platforms`.
+ * Download and install **xlstproc** (a prebuilt version is available at [chocolatey][choco-xsltproc], source at [libxlst][source-xslt])
+ * Download and install [Qt 6.11.2][qt-installer] for Windows. More recent versions should work as well.
+    * Make sure to add `C:\Qt\6.11.2\msvc2022_64\bin` to your `PATH` environment variable.
+    * You may also need to add an environment variable `QT_QPA_PLATFORM_PLUGIN_PATH`: `C:\Qt\6.11.2\msvc2022_64\plugins\platforms`.
 
 #### Recover the source
  * Open git bash
@@ -192,10 +193,10 @@ git submodule update --init --recursive
 
 #### Build
 
- * Open VS2019 x64 Native Tools Command Prompt and run the following commands
+ * Open VS2022 x64 Native Tools Command Prompt and run the following commands
 ```sh
 cd C:\pv\pvb
-cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread -DCMAKE_BUILD_TYPE=Release ..\pv
+cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread -DCMAKE_BUILD_TYPE=Release -DPARAVIEW_QT_VERSION=6 -DPARAVIEW_USE_QT=ON -DQt6_DIR=C:\Qt\6.11.2\msvc2022_64\lib\cmake\Qt6 ..\pv
 ninja
 ```
 
@@ -313,7 +314,7 @@ please file a new [issue][paraview-issues].
 
 #### Windows
 
-  * [Visual Studio 2019 Community Edition][visual-studio]
+  * [Visual Studio 2022 Community Edition][visual-studio]
   * Use "x64 Native Tools Command Prompt" for the installed Visual Studio
     version to configure with CMake and to build with ninja.
   * Get [ninja][ninja]. Unzip the binary and put it in `PATH`.
@@ -712,8 +713,10 @@ steps:
 [pythonwindows]: https://www.python.org/downloads/windows/
 [qt-download]: https://download.qt.io/official_releases/qt
 [qt]: https://qt.io
-[qt-download-5.15.3]: https://download.qt.io/archive/qt/5.15/5.15.3/
+[qt-installer]: https://www.qt.io/development/download-qt-installer-oss
 [tbb]: https://github.com/intel/tbb/releases
-[visual-studio]: https://visualstudio.microsoft.com/vs/older-downloads
+[visual-studio]: https://visualstudio.microsoft.com/vs/older-downloads/
 [spack]: https://spack.io/
 [spack-docs]: https://spack.readthedocs.io/en/latest/
+[choco-xsltproc]: https://community.chocolatey.org/packages/xsltproc
+[source-xslt]: https://gitlab.gnome.org/GNOME/libxslt
