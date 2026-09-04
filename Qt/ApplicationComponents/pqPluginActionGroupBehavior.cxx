@@ -80,10 +80,19 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
 
   if (splitName.size() == 2 && splitName[0] == "ToolBar")
   {
-    QToolBar* tb = new QToolBar(splitName[1], mainWindow);
-    tb->setObjectName(splitName[1]);
-    tb->addActions(agi->actionGroup()->actions());
-    mainWindow->addToolBar(tb);
+    QToolBar* retrievedToolBar = mainWindow->findChild<QToolBar*>(splitName[1]);
+    if (retrievedToolBar)
+    {
+      retrievedToolBar->addSeparator();
+      retrievedToolBar->addActions(agi->actionGroup(retrievedToolBar)->actions());
+    }
+    else
+    {
+      QToolBar* tb = new QToolBar(splitName[1], mainWindow);
+      tb->setObjectName(splitName[1]);
+      tb->addActions(agi->actionGroup(tb)->actions());
+      mainWindow->addToolBar(tb);
+    }
   }
   else if (splitName.size() == 2 && splitName[0] == "MenuBar")
   {
@@ -109,7 +118,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
       {
         menu->addSeparator();
       }
-      Q_FOREACH (a, agi->actionGroup()->actions())
+      Q_FOREACH (a, agi->actionGroup(menu)->actions())
       {
         menu->insertAction(exitAction, a);
       }
@@ -123,7 +132,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
       // Create new menu.
       menu = new QMenu(splitName[1], mainWindow);
       menu->setObjectName(splitName[1]);
-      menu->addActions(agi->actionGroup()->actions());
+      menu->addActions(agi->actionGroup(menu)->actions());
       // insert new menus before the Help menu is possible.
       mainWindow->menuBar()->insertMenu(::findHelpMenuAction(mainWindow->menuBar()), menu);
     }

@@ -10,8 +10,10 @@
 #include "pqActionGroupInterface.h"
 #include <QObject>
 
-/// interface class for plugins that create QActionGroups
-/// for adding actions to menus and toolbars
+/**
+ * interface class for plugins that create QActionGroups
+ * for adding actions to menus and toolbars
+ */
 class @_paraview_action_group_CLASS_NAME@Implementation : public QObject, public pqActionGroupInterface
 {
   Q_OBJECT
@@ -20,15 +22,17 @@ public:
   @_paraview_action_group_CLASS_NAME@Implementation(QObject* p);
   ~@_paraview_action_group_CLASS_NAME@Implementation() override;
 
-  /// the identifier for this action group
-  ///  return "ToolBar/MyTools to put them in a toolbar called MyTools
-  ///  return "MenuBar/MyMenu to put the actions under MyMenu
+  /**
+   * the identifier for this action group
+   *  return "ToolBar/MyTools to put them in a toolbar called MyTools
+   *  return "MenuBar/MyMenu to put the actions under MyMenu
+   */
   QString groupName() override;
 
-  /// the instance of the QActionGroup that defines the actions
-  QActionGroup* actionGroup() override;
-protected:
-  QActionGroup* ActionGroup;
+  /**
+   * Create a new instance of the QActionGroup that defines the actions
+   */
+  QActionGroup* actionGroup(QObject* parentWdg) override;
 };
 
 #endif
