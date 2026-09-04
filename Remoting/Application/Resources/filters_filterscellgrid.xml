@@ -331,6 +331,15 @@
         <Documentation>An input cell grid.</Documentation>
       </InputProperty>
 
+      <IntVectorProperty command="SetSubdivisionLevel"
+                         default_values="0" name="SubdivisionLevel"
+                         number_of_elements="1">
+        <IntRangeDomain min="0" name="range" />
+        <Documentation>
+          Set how many times each input cell is halved along every parametric axis.
+        </Documentation>
+      </IntVectorProperty>
+
       <!-- End of CellGridToUnstructuredGrid -->
     </SourceProxy>
 
