@@ -106,6 +106,7 @@ public Q_SLOTS:
 protected Q_SLOTS:
   void handleIndexClicked(const QModelIndex& index);
   void expandWithModelIndexTranslation(const QModelIndex&);
+  void onActiveSourceChanged(pqPipelineSource* source);
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**
