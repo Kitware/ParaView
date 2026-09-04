@@ -196,7 +196,7 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
       QString file = file_dialog.getSelectedFiles()[0];
 
       // Save screenshot
-      int offRen = rw->GetOffScreenRendering();
+      int offRen = rw->GetShowWindow();
       rw->SetOffScreenRendering(1);
       pqCoreTestUtility::SaveScreenshot(rw, file);
       rw->SetOffScreenRendering(offRen);
