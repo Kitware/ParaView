@@ -124,6 +124,7 @@ def _wrap_property(proxy, smproperty):
         property = InputProperty(proxy, smproperty)
     elif smproperty.IsA("vtkSMProxyProperty"):
         property = ProxyProperty(proxy, smproperty)
+    # PARAVIEW_DEPRECATED_IN_6_3_0
     elif smproperty.IsA("vtkSMDoubleMapProperty"):
         property = DoubleMapProperty(proxy, smproperty)
     else:
@@ -1222,6 +1223,7 @@ class VectorProperty(Property):
         self._UpdateProperty()
 
 
+# PARAVIEW_DEPRECATED_IN_6_3_0
 class DoubleMapProperty(Property):
     """A DoubleMapProperty provides access to a map of double vector values."""
 

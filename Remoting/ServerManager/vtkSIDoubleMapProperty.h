@@ -10,10 +10,13 @@
 #ifndef vtkSIDoubleMapProperty_h
 #define vtkSIDoubleMapProperty_h
 
+#include "vtkParaViewDeprecation.h"         // for deprec macro
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTKREMOTINGSERVERMANAGER_EXPORT vtkSIDoubleMapProperty : public vtkSIProperty
+class PARAVIEW_DEPRECATED_IN_6_3_0(
+  "No property uses this class anymore.") VTKREMOTINGSERVERMANAGER_EXPORT vtkSIDoubleMapProperty
+  : public vtkSIProperty
 {
 public:
   static vtkSIDoubleMapProperty* New();

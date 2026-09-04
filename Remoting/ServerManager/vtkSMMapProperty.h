@@ -11,10 +11,13 @@
 #ifndef vtkSMMapProperty_h
 #define vtkSMMapProperty_h
 
+#include "vtkParaViewDeprecation.h"         // for deprec macro
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMProperty.h"
 
-class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMMapProperty : public vtkSMProperty
+class PARAVIEW_DEPRECATED_IN_6_3_0(
+  "No property uses this class anymore.") VTKREMOTINGSERVERMANAGER_EXPORT vtkSMMapProperty
+  : public vtkSMProperty
 {
 public:
   vtkTypeMacro(vtkSMMapProperty, vtkSMProperty);
