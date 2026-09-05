@@ -38,6 +38,7 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSpinBox>
+#include <QTextDocument>
 #include <QTimer>
 #include <QtDebug>
 
@@ -223,6 +224,14 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     QCoreApplication::translate("pqServerLauncher", "Connection Options for \"%1\"")
       .arg(configuration.name()));
 
+  if (const char* help = optionsXML->GetAttribute("help"))
+  {
+    QLabel* helpLabel = new QLabel(QString(help), &dialog);
+    helpLabel->setTextFormat(Qt::MarkdownText);
+    helpLabel->setWordWrap(true);
+    formLayout->addRow(helpLabel);
+  }
+
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
   // Process the <Options/> to create dialog with widgets.
@@ -248,6 +257,7 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
 
       const char* name = node->GetAttribute("name");
       const char* label = node->GetAttributeOrDefault("label", name);
+      const char* help = node->GetAttribute("help");
       bool readonly = strcmp(node->GetAttributeOrDefault("readonly", "false"), "true") == 0;
       bool save = strcmp(node->GetAttributeOrDefault("save", "true"), "true") == 0;
 
@@ -369,6 +379,16 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
       widgets[name]->set(default_value);
       widgets[name]->Widget->setEnabled(!readonly);
       widgets[name]->Widget->setObjectName(name);
+      if (help)
+      {
+        // QWidget::setToolTip() does not have a text-format property like
+        // QLabel does, so the Markdown text is converted to HTML explicitly;
+        // the tooltip is then displayed as rich text since it now starts
+        // with an HTML tag.
+        QTextDocument helpDoc;
+        helpDoc.setMarkdown(QString(help));
+        widgets[name]->Widget->setToolTip(helpDoc.toHtml());
+      }
       formLayout->addRow(label, widgets[name]->Widget);
     } // end of <Option />
     else if (strcmp(node->GetName(), "Switch") == 0)
