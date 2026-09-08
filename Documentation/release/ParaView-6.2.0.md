@@ -1,7 +1,6 @@
 # ParaView 6.2.0 Release Notes
 
 * [Notable additions](#notable-additions)
-* [Rendering improvements](#rendering-improvements)
 * [Plugin updates](#plugin-updates)
 * [Filter changes](#filter-changes)
 * [Changes in readers and writers](#changes-in-readers-and-writers)
@@ -86,12 +85,6 @@ The default **Array Name** is now `Result` (capitalized), consistent with the re
 >
 > The _Properties_ panel for the **Python Calculator** showing the **Input**, **Array**, and **Function** pickers.
 
-# Rendering improvements
-
-## Point data read from VRML files is now mapped to RGBA values
-
-The VRML Reader now produces a "VRMLColor" point data array with raw RGBA values if the imported VRML file has an active scalar variable and lookup table. Previously, the VRML reader always assigned the solid color assigned to the object to every point, limiting the coloring of imported geometry to solid colors only.
-
 # Plugin updates
 
 ## New DPvtkReader plugin
@@ -100,7 +93,7 @@ Distributed Parallel Visualization with Zlib compression ([DPvz](https://github.
 
 ## OpenStreetMap support in the GeographicalMap plugin
 
-You can now fetch OpenStreetMap (OSM) basemaps with the GeographicalMap plugin. In **Bounding Box** mode, the filter assembles a tile mosaic covering the requested latitude/longitude extent and georeferences the result using exact OSM tile edges, producing correct origin and spacing in degrees. The **Zoom** and **Center** mode preserves the previous single-tile behavior, and an attribution overlay is added to comply with OSM usage policy.
+You can now fetch OpenStreetMap (OSM) basemaps with the GeographicalMap plugin by setting the **Fetching Method** property. In "Bounding Box" mode, the filter assembles a tile mosaic covering the requested latitude/longitude extent and georeferences the result using exact OSM tile edges, producing correct origin and spacing in degrees. The "Center and Zoom" mode preserves the previous single-tile behavior, and an attribution overlay is added to comply with OSM usage policy.
 
 ## zSpace macro button mapping
 
@@ -227,7 +220,7 @@ A couple improvements have been made to the VTKHDF Reader
 
 You can now select which field data arrays to read in the _Properties_ panel. This used to be possible only for point and cell arrays.
 
-### Piece distribution selection for distributed reads
+### **Piece Distribution** selection for distributed reads
 
 When reading partitioned VTKHDF data in parallel, you can now choose how blocks are allocated to processes. The _Block_ mode will allocate partitions by block to each `pvserver` process, and _Interleave_ will allocate using a round-robin algorithm.
 
@@ -240,6 +233,10 @@ ParaView can now write HyperTree Grid, Structured Grid, Rectilinear Grid and Ima
 The `.phtg` format had issues and inconsistent results in parallel. Consequently, the writer, reader and extractor are now deprecated.
 
 Use the VTKHDF format instead, which supports parallel decomposition of HyperTreeGrid properly.
+
+## Point data read from VRML files is now mapped to RGBA values
+
+The VRML Reader now produces a "VRMLColor" point data array with raw RGBA values if the imported VRML file has an active scalar variable and lookup table. Previously, the VRML reader always assigned the solid color assigned to the object to every point, limiting the coloring of imported geometry to solid colors only.
 
 # Interface improvements
 
@@ -301,7 +298,7 @@ ParaView shows different properties as a table, like **Isosurfaces** property in
 
 ## `File -> Export Scene` menu entries have been merged
 
-ParaView used to have two similar menu items: `File -> Export Scene` and `File -> Export Animated Scene`. They are now merged into the single `File -> Export Scene` entry. To write an animated scene, please enable the new **Write timesteps as file-series** option if available in the exporter you have selected.
+ParaView used to have two similar menu items: `File -> Export Scene` and `File -> Export Animated Scene`. They are now merged into the single `File -> Export Scene` entry. To write an animated scene, please enable the new **Write Timesteps as File-Series** option if available in the exporter you have selected.
 
 ## Improved abort mechanism
 
