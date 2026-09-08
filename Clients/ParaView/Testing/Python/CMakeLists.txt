@@ -372,3 +372,10 @@ if (TARGET VTK::IOFides)
     FidesWriterAdiosConfig.py
   )
 endif ()
+
+if (TARGET VTK::IOUSD)
+  paraview_add_test_python(
+    NO_DATA NO_VALID
+    ExportUSD.py
+  )
+endif()

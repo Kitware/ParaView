@@ -22,7 +22,8 @@ void vtkSMAnimationSceneSeriesWriter::PrintSelf(ostream& os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneSeriesWriter::SaveInitialize(int vtkNotUsed(startCount))
 {
-  if (!this->GetFrameExporterDelegate())
+  auto delegate = this->GetFrameExporterDelegate();
+  if (!delegate)
   {
     return false;
   }
@@ -31,18 +32,33 @@ bool vtkSMAnimationSceneSeriesWriter::SaveInitialize(int vtkNotUsed(startCount))
   {
     this->GetAnimationScene()->SetOverrideStillRender(true);
   }
+  if (this->SingleFile)
+  {
+    // All frames share the same filename, and are combined into a single
+    // file by the delegate exporter as it receives each frame.
+    vtkSMPropertyHelper(delegate, "FileName").Set(this->GetFileName());
+    delegate->UpdateVTKObjects();
+    delegate->InvokeCommand("Start");
+  }
   return true;
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMAnimationSceneSeriesWriter::SaveFrame(double vtkNotUsed(time))
+bool vtkSMAnimationSceneSeriesWriter::SaveFrame(double time)
 {
-  auto fileNameProp = vtkSMPropertyHelper(this->GetFrameExporterDelegate(), "FileName");
-  fileNameProp.Set(this->BuildCurrentFilePath().c_str());
+  auto delegate = this->GetFrameExporterDelegate();
+  if (this->SingleFile)
+  {
+    vtkSMPropertyHelper(delegate, "TimeValue").Set(time);
+  }
+  else
+  {
+    vtkSMPropertyHelper(delegate, "FileName").Set(this->BuildCurrentFilePath().c_str());
+  }
 
-  this->GetFrameExporterDelegate()->UpdateVTKObjects();
-  this->GetFrameExporterDelegate()->GetView()->Update();
-  this->GetFrameExporterDelegate()->Write();
+  delegate->UpdateVTKObjects();
+  delegate->GetView()->Update();
+  delegate->Write();
   this->FrameCounter += this->Stride;
   return true;
 }
@@ -53,6 +69,10 @@ bool vtkSMAnimationSceneSeriesWriter::SaveFinalize()
   if (this->AnimationEnabled())
   {
     this->GetAnimationScene()->SetOverrideStillRender(false);
+  }
+  if (this->SingleFile)
+  {
+    this->GetFrameExporterDelegate()->InvokeCommand("Finish");
   }
   return true;
 }

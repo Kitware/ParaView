@@ -26,6 +26,21 @@ public:
   vtkTypeMacro(vtkSMAnimationSceneSeriesWriter, vtkSMAnimationSceneWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
+  /**
+   * When true, the delegate exporter is expected to support writing all
+   * animation frames into a single file as time samples: "Start" and
+   * "Finish" commands bracket the frame sequence and a "TimeValue"
+   * property is set before each frame, instead of generating a new
+   * filename per frame. Default is false, and means that each frame
+   * will be exported to one file. Only exporters whose proxy XML declares
+   * these commands should enable this.
+   */
+  vtkSetMacro(SingleFile, bool);
+  vtkGetMacro(SingleFile, bool);
+  vtkBooleanMacro(SingleFile, bool);
+  ///@}
+
 protected:
   vtkSMAnimationSceneSeriesWriter() = default;
   ~vtkSMAnimationSceneSeriesWriter() override = default;
@@ -61,6 +76,7 @@ private:
   std::string BuildCurrentFilePath();
 
   int FrameCounter = 0;
+  bool SingleFile = false;
 };
 
 #endif
