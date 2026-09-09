@@ -3850,13 +3850,13 @@ vtkStringArray* vtkPVRenderView::GetANARIRendererNames()
 #if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   if (!this->Internals->AnariPass)
   {
-    this->Internals->ANARIRendererNames->Resize(0);
+    this->Internals->ANARIRendererNames->ReserveTuples(0);
     return this->Internals->ANARIRendererNames;
   }
   std::vector<std::string> rendererNames =
     this->Internals->AnariPass->GetAnariDevice()->GetAnariRendererSubTypes();
   this->Internals->ANARIRendererNames->SetNumberOfValues(rendererNames.size());
-  for (int i = 0; i < rendererNames.size(); ++i)
+  for (std::size_t i = 0; i < rendererNames.size(); ++i)
   {
     this->Internals->ANARIRendererNames->SetValue(i, rendererNames[i]);
   }
@@ -3920,10 +3920,11 @@ void vtkPVRenderView::SetANARIRendererParameter(const std::string& key [[maybe_u
 std::string vtkPVRenderView::GetANARIRendererParameters()
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
-  if (!this->Internals->AnariPass)
+  if (!this->Internals->AnariPass || !this->Internals->AnariPass->GetAnariRenderer())
   {
     return "{}";
   }
+
   auto* ren = this->Internals->AnariPass->GetAnariRenderer();
   const char* libraryName = this->GetANARILibrary();
   Json::Value jsonAllParameters;
@@ -3938,102 +3939,101 @@ std::string vtkPVRenderView::GetANARIRendererParameters()
     { ANARI_FLOAT32_VEC4, vtkDynamicProperties::INVALID_TYPE },
     { ANARI_ARRAY2D, vtkDynamicProperties::INVALID_TYPE },
   };
-  if (auto* ren = this->Internals->AnariPass->GetAnariRenderer())
+
+  auto rendererParameters = ren->GetRendererParameters();
+  for (auto pIter = rendererParameters.cbegin(); pIter != rendererParameters.cend(); ++pIter)
   {
-    auto rendererParameters = ren->GetRendererParameters();
-    for (auto pIter = rendererParameters.cbegin(); pIter != rendererParameters.cend(); ++pIter)
+    Json::Value jsonRendererParameters;
+    std::string description = ren->GetRendererParameterDescription(*pIter);
+    std::string name = pIter->first;
+    int type = pIter->second;
+    if (anariToParameterType.count(type) > 0)
     {
-      Json::Value jsonRendererParameters;
-      std::string description = ren->GetRendererParameterDescription(*pIter);
-      std::string name = pIter->first;
-      int type = pIter->second;
-      if (anariToParameterType.count(type) > 0)
-      {
-        jsonRendererParameters[vtkDynamicProperties::TYPE_KEY] = anariToParameterType[type];
-      }
-      else
-      {
-        vtkWarningMacro("There is not vtkDynamicParamters::Type association with: " << type);
-      }
-      const void* pDefault = ren->GetRendererParameterDefault(*pIter);
-      const void* pMin = ren->GetRendererParameterMinimum(*pIter);
-      const void* pMax = ren->GetRendererParameterMaximum(*pIter);
-      const void* pValue = ren->GetRendererParameterDefault(*pIter);
-      jsonRendererParameters[vtkDynamicProperties::NAME_KEY] = name;
-      jsonRendererParameters[vtkDynamicProperties::DESCRIPTION_KEY] = description;
-      switch (type)
-      {
-        case ANARI_INT32:
-        {
-          if (pMin)
-          {
-            int minVal = *(reinterpret_cast<const vtkTypeInt32*>(pMin));
-            jsonRendererParameters[vtkDynamicProperties::MIN_KEY] = minVal;
-          }
-          if (pMax)
-          {
-            int maxVal = *(reinterpret_cast<const vtkTypeInt32*>(pMax));
-            jsonRendererParameters[vtkDynamicProperties::MAX_KEY] = maxVal;
-          }
-          if (pDefault)
-          {
-            int defaultValue = *(reinterpret_cast<const vtkTypeInt32*>(pDefault));
-            jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
-          }
-          if (pValue)
-          {
-            int value = *(reinterpret_cast<const vtkTypeInt32*>(pValue));
-            jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
-          }
-          break;
-        }
-        case ANARI_BOOL:
-        {
-          if (pDefault)
-          {
-            bool defaultValue = *(reinterpret_cast<const bool*>(pDefault));
-            jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
-          }
-          if (pValue)
-          {
-            int value = *(reinterpret_cast<const bool*>(pValue));
-            jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
-          }
-          break;
-        }
-        case ANARI_FLOAT32:
-        {
-          if (pDefault)
-          {
-            double defaultValue = *(reinterpret_cast<const vtkTypeFloat32*>(pDefault));
-            jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
-          }
-          if (pValue)
-          {
-            int value = *(reinterpret_cast<const vtkTypeFloat32*>(pValue));
-            jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
-          }
-          if (pMin)
-          {
-            double minVal = *(reinterpret_cast<const vtkTypeFloat32*>(pMin));
-            jsonRendererParameters[vtkDynamicProperties::MIN_KEY] = minVal;
-          }
-          if (pMax)
-          {
-            double maxVal = *(reinterpret_cast<const vtkTypeFloat32*>(pMax));
-            jsonRendererParameters[vtkDynamicProperties::MAX_KEY] = maxVal;
-          }
-          break;
-        }
-      }
-      jsonParameters.append(jsonRendererParameters);
+      jsonRendererParameters[vtkDynamicProperties::TYPE_KEY] = anariToParameterType[type];
     }
-    jsonAllParameters[LIBRARY_KEY] = libraryName;
-    jsonAllParameters[RENDERER_KEY] = rendererName;
-    jsonAllParameters[vtkDynamicProperties::VERSION_KEY] =
-      VTK_DYNAMIC_PROPERTIES_VERSION_NUMBER_QUICK;
-    jsonAllParameters[vtkDynamicProperties::PROPERTIES_KEY] = jsonParameters;
+    else
+    {
+      vtkWarningMacro("There is not vtkDynamicParamters::Type association with: " << type);
+    }
+    const void* pDefault = ren->GetRendererParameterDefault(*pIter);
+    const void* pMin = ren->GetRendererParameterMinimum(*pIter);
+    const void* pMax = ren->GetRendererParameterMaximum(*pIter);
+    const void* pValue = ren->GetRendererParameterDefault(*pIter);
+    jsonRendererParameters[vtkDynamicProperties::NAME_KEY] = name;
+    jsonRendererParameters[vtkDynamicProperties::DESCRIPTION_KEY] = description;
+    switch (type)
+    {
+      case ANARI_INT32:
+      {
+        if (pMin)
+        {
+          int minVal = *(reinterpret_cast<const vtkTypeInt32*>(pMin));
+          jsonRendererParameters[vtkDynamicProperties::MIN_KEY] = minVal;
+        }
+        if (pMax)
+        {
+          int maxVal = *(reinterpret_cast<const vtkTypeInt32*>(pMax));
+          jsonRendererParameters[vtkDynamicProperties::MAX_KEY] = maxVal;
+        }
+        if (pDefault)
+        {
+          int defaultValue = *(reinterpret_cast<const vtkTypeInt32*>(pDefault));
+          jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
+        }
+        if (pValue)
+        {
+          int value = *(reinterpret_cast<const vtkTypeInt32*>(pValue));
+          jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
+        }
+        break;
+      }
+      case ANARI_BOOL:
+      {
+        if (pDefault)
+        {
+          bool defaultValue = *(reinterpret_cast<const bool*>(pDefault));
+          jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
+        }
+        if (pValue)
+        {
+          int value = *(reinterpret_cast<const bool*>(pValue));
+          jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
+        }
+        break;
+      }
+      case ANARI_FLOAT32:
+      {
+        if (pDefault)
+        {
+          double defaultValue = *(reinterpret_cast<const vtkTypeFloat32*>(pDefault));
+          jsonRendererParameters[vtkDynamicProperties::DEFAULT_KEY] = defaultValue;
+        }
+        if (pValue)
+        {
+          int value = *(reinterpret_cast<const vtkTypeFloat32*>(pValue));
+          jsonRendererParameters[vtkDynamicProperties::VALUE_KEY] = value;
+        }
+        if (pMin)
+        {
+          double minVal = *(reinterpret_cast<const vtkTypeFloat32*>(pMin));
+          jsonRendererParameters[vtkDynamicProperties::MIN_KEY] = minVal;
+        }
+        if (pMax)
+        {
+          double maxVal = *(reinterpret_cast<const vtkTypeFloat32*>(pMax));
+          jsonRendererParameters[vtkDynamicProperties::MAX_KEY] = maxVal;
+        }
+        break;
+      }
+    }
+    jsonParameters.append(jsonRendererParameters);
   }
+  jsonAllParameters[LIBRARY_KEY] = libraryName;
+  jsonAllParameters[RENDERER_KEY] = rendererName;
+  jsonAllParameters[vtkDynamicProperties::VERSION_KEY] =
+    VTK_DYNAMIC_PROPERTIES_VERSION_NUMBER_QUICK;
+  jsonAllParameters[vtkDynamicProperties::PROPERTIES_KEY] = jsonParameters;
+
   Json::StreamWriterBuilder builder;
   std::string jsonString = Json::writeString(builder, jsonAllParameters);
   return jsonString;
