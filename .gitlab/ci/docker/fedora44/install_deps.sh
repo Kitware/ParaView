@@ -25,7 +25,7 @@ dnf install -y --setopt=install_weak_deps=False \
 
 # RPMFusion
 dnf install -y --setopt=install_weak_deps=False \
-    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-42.noarch.rpm
+    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm
 
 # RPMFusion external dependencies
 dnf install -y --setopt=install_weak_deps=False \
@@ -71,7 +71,7 @@ dnf install -y --setopt=install_weak_deps=False \
 
 # Openturns dependencies
 dnf config-manager addrepo \
-    --from-repofile=https://download.opensuse.org/repositories/science:/openturns/Fedora_42/science:openturns.repo
+    --from-repofile=https://download.opensuse.org/repositories/science:/openturns/Fedora_44/science:openturns.repo
 dnf install -y --setopt=install_weak_deps=False \
     openturns-libs openturns-devel
 

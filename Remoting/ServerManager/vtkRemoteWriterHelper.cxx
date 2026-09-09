@@ -54,7 +54,7 @@ struct FutureWorker
   void operator()(vtkImageWriter* writer)
   {
     writer->Write();
-    std::lock_guard<std::mutex> lock(FutureMutex);
+    std::scoped_lock<std::mutex> lock(FutureMutex);
     auto it = SharedFutures.find(vtksys::SystemTools::CollapseFullPath(this->FileName));
     if (it->second.first == this->TimeStamp)
     {
@@ -130,7 +130,7 @@ int vtkRemoteWriterHelper::RequestData(
         ::FutureWorker worker{ imageWriter->GetFileName() };
         // We need to lock guard modifying SharedFutures because the function
         // we are pushing removes its futures from it in an asynchronous way
-        std::lock_guard<std::mutex> lock(::FutureMutex);
+        std::scoped_lock<std::mutex> lock(::FutureMutex);
         auto future = callbackQueue->Push(worker, imageWriter);
         worker.FileName = imageWriter->GetFileName();
         ::SharedFutures.emplace(vtksys::SystemTools::CollapseFullPath(imageWriter->GetFileName()),

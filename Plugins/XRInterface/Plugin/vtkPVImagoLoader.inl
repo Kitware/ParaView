@@ -51,7 +51,7 @@ public:
     this->UserName = uname;
     this->Password = pw;
     // clear structures
-    std::lock_guard<std::mutex> lock(this->Mutex);
+    std::scoped_lock<std::mutex> lock(this->Mutex);
     this->APIToken.clear();
     this->CollectionMap.clear();
     this->ImageryMap.clear();
@@ -766,7 +766,7 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
 
       // force these async calls to be serial, eg they are asyn to the main thread but serial
       // when multiple invocations
-      std::lock_guard<std::mutex> lock(this->Mutex);
+      std::scoped_lock<std::mutex> lock(this->Mutex);
 
       // search for a matching collection
       Json::Value collectionJSON;

@@ -482,8 +482,8 @@ double vtkPlotEdges::Node::ComputeConnectionScore(Segment* segment1, Segment* se
   double penaltyScore = 1.;
   // prevent small loops
 
-  double start1[3], end1[3];
-  double start2[3], end2[3];
+  double start1[3], finish1[3];
+  double start2[3], finish2[3];
   if (segment1->GetCountPointIds() <= 3 &&
     ((segment1->GetStartId() == segment2->GetStartId() &&
        segment1->GetEndId() == segment2->GetEndId()) ||
@@ -495,14 +495,14 @@ double vtkPlotEdges::Node::ComputeConnectionScore(Segment* segment1, Segment* se
   else
   {
     segment1->GetStartPoint(start1);
-    segment1->GetEndPoint(end1);
+    segment1->GetEndPoint(finish1);
     segment2->GetStartPoint(start2);
-    segment2->GetEndPoint(end2);
+    segment2->GetEndPoint(finish2);
     if (segment1->GetCountPointIds() <= 3 &&
       ((vtkMath::Distance2BetweenPoints(start1, start2) < 0.00001 &&
-         vtkMath::Distance2BetweenPoints(end1, end2) < 0.00001) ||
-        (vtkMath::Distance2BetweenPoints(start1, end2) < 0.00001 &&
-          vtkMath::Distance2BetweenPoints(end1, start2) < 0.00001)))
+         vtkMath::Distance2BetweenPoints(finish1, finish2) < 0.00001) ||
+        (vtkMath::Distance2BetweenPoints(start1, finish2) < 0.00001 &&
+          vtkMath::Distance2BetweenPoints(finish1, start2) < 0.00001)))
     {
       penaltyScore = 0.45;
     }

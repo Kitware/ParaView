@@ -659,7 +659,7 @@ const mi::Uint8* vtknvindex_host_properties::get_subset_data_buffer(
     return nullptr;
   }
 
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::scoped_lock<std::mutex> lock(m_mutex);
 
   if (shm_info->m_subset_ptr)
   {

@@ -1024,7 +1024,6 @@ void vtkHierarchicalFractal::AddTestArray(vtkCompositeDataSet* output)
     {
       --ext[1];
     }
-    int debugcounter = 0;
     for (z = ext[4]; z <= ext[5]; ++z)
     {
       for (y = ext[2]; y <= ext[3]; ++y)
@@ -1033,11 +1032,9 @@ void vtkHierarchicalFractal::AddTestArray(vtkCompositeDataSet* output)
         {
           *arrayPtr++ = origin[0] + spacing[0] * (static_cast<double>(x) + 0.5) + origin[1] +
             spacing[1] * (static_cast<double>(y) + 0.5);
-          ++debugcounter;
         }
       }
     }
-    assert("check: valid_debugcounter" && debugcounter == numCells);
     array->SetName("TestX");
     grid->GetCellData()->AddArray(array);
     array->Delete();

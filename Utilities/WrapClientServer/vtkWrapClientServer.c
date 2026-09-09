@@ -1103,7 +1103,7 @@ int extractOtherClassesUsed(NewClassInfo* data, const char* classes[])
  */
 void output_DummyInitFunction(FILE* fp, const char* filename)
 {
-  char* basename = strrchr(filename, '/');
+  const char* basename = strrchr(filename, '/');
   char* basename_dup = strdup(basename + 1);
   *strchr(basename_dup, '.') = '\0';
   fprintf(fp,

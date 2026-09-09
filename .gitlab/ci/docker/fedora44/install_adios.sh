@@ -3,14 +3,13 @@
 set -e
 
 readonly adios_repo="https://github.com/ornladios/ADIOS2"
-readonly adios_commit="v2.10.2"
+readonly adios_commit="v2.12.1"
 
 readonly adios_root="$HOME/adios"
 readonly adios_src="$adios_root/src"
 readonly adios_build_root="$adios_root/build"
 
 git clone -b "$adios_commit" "$adios_repo" "$adios_src"
-sed -i '/#include <sstream>/a #include <cstdint>' "${adios_src}/thirdparty/yaml-cpp/yaml-cpp/src/emitterutils.cpp"
 
 adios_build () {
     local subdir="$1"

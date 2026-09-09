@@ -583,8 +583,7 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
   this->connect(ui.apply, SIGNAL(clicked()), SLOT(triggerApply()));
   this->connect(ui.importPresets, SIGNAL(clicked()), SLOT(importPresets()));
   this->connect(ui.exportPresets, SIGNAL(clicked()), SLOT(exportPresets()));
-  this->connect(ui.groupChooser,
-    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+  this->connect(ui.groupChooser, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
     [&](int index)
     {
       this->Internals->ProxyModel->setCurrentGroupColumn(index);

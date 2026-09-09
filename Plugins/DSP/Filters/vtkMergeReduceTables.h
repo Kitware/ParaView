@@ -33,7 +33,7 @@ public:
   vtkTypeMacro(vtkMergeReduceTables, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  using RangeType = typename vtk::detail::ValueRange<vtkDataArray, vtk::detail::DynamicTupleSize>;
+  using RangeType = vtk::detail::ValueRange<vtkDataArray, vtk::detail::DynamicTupleSize>;
 
   /**
    * Get the current selection of columns to reduce.

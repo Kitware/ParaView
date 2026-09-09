@@ -18,7 +18,7 @@ vtkVRQueue::~vtkVRQueue() = default;
 void vtkVRQueue::Enqueue(const vtkVREvent& event)
 {
   {
-    std::lock_guard<std::mutex> lock(this->Mutex);
+    std::scoped_lock<std::mutex> lock(this->Mutex);
     (void)lock;
     this->Queue.push(event);
   }
@@ -30,7 +30,7 @@ bool vtkVRQueue::IsEmpty() const
 {
   bool result;
   {
-    std::lock_guard<std::mutex> lock(this->Mutex);
+    std::scoped_lock<std::mutex> lock(this->Mutex);
     (void)lock;
     result = this->Queue.empty();
   }
@@ -42,7 +42,7 @@ bool vtkVRQueue::TryDequeue(vtkVREvent& event)
 {
   bool result;
   {
-    std::lock_guard<std::mutex> lock(this->Mutex);
+    std::scoped_lock<std::mutex> lock(this->Mutex);
     (void)lock;
     result = false;
     if (!this->Queue.empty())
@@ -60,7 +60,7 @@ bool vtkVRQueue::TryDequeue(vtkVREvent& event)
 void vtkVRQueue::Dequeue(vtkVREvent& event)
 {
   {
-    std::lock_guard<std::mutex> lock(this->Mutex);
+    std::scoped_lock<std::mutex> lock(this->Mutex);
     (void)lock;
     while (this->Queue.empty())
     {
@@ -76,7 +76,7 @@ void vtkVRQueue::Dequeue(vtkVREvent& event)
 bool vtkVRQueue::TryDequeue(std::queue<vtkVREvent>& event)
 {
   {
-    std::lock_guard<std::mutex> lock(this->Mutex);
+    std::scoped_lock<std::mutex> lock(this->Mutex);
     (void)lock;
     if (!this->Queue.empty())
     {

@@ -20,7 +20,7 @@
 
 namespace
 {
-using DataContainerDouble = typename vtkMultiDimensionalImplicitBackend<double>::DataContainerT;
+using DataContainerDouble = vtkMultiDimensionalImplicitBackend<double>::DataContainerT;
 }
 
 extern int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])

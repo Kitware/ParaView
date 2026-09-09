@@ -5,6 +5,7 @@ Checks: "-*,\
 bugprone-*,\
 -bugprone-assignment-in-if-condition,\
 -bugprone-branch-clone,\
+-bugprone-derived-method-shadowing-base-method,\
 -bugprone-easily-swappable-parameters,\
 -bugprone-implicit-widening-of-multiplication-result,\
 -bugprone-multi-level-implicit-pointer-conversion,\
@@ -14,6 +15,8 @@ bugprone-*,\
 -bugprone-signed-char-misuse,\
 -bugprone-suspicious-realloc-usage,\
 -bugprone-switch-missing-default-case,\
+-bugprone-throwing-static-initialization,\
+-bugprone-unchecked-string-to-number-conversion,\
 -bugprone-unsafe-functions,\
 "
 ...
