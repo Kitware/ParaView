@@ -373,6 +373,17 @@ if (TARGET VTK::IOFides)
   )
 endif ()
 
+#------------------------------------------------------------------------------
+# Tests Alembic exporter
+if (TARGET VTK::IOAlembic)
+  paraview_add_test_python(
+    NO_DATA NO_VALID
+    ExportAlembic.py
+  )
+endif()
+
+#------------------------------------------------------------------------------
+# Tests USD exporter
 if (TARGET VTK::IOUSD)
   paraview_add_test_python(
     NO_DATA NO_VALID
