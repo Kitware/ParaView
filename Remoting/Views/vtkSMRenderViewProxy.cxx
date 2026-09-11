@@ -1344,6 +1344,7 @@ void vtkSMRenderViewProxy::UpdateAnariProperties()
 {
   bool updateANARIRendererNames = false;
   bool updateANARIRendererParameters = false;
+  bool updateANARIEnvironmentVariable = false;
   auto itEnableANARI = this->Internals->Properties.find("EnableANARI");
   auto* propEnableANARI = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("EnableANARI"));
   auto itANARILibrary = this->Internals->Properties.find("ANARILibrary");
@@ -1358,11 +1359,15 @@ void vtkSMRenderViewProxy::UpdateAnariProperties()
   {
     updateANARIRendererParameters = true;
   }
+  if (itEnableANARI->second.ModifiedFlag || itANARILibrary->second.ModifiedFlag)
+  {
+    updateANARIEnvironmentVariable = true;
+  }
 
   // update ANARI properties in the correct order
   this->UpdateProperty("EnableANARI");
   this->UpdateProperty("ANARILibrary");
-  if (itANARILibrary->second.ModifiedFlag || itEnableANARI->second.ModifiedFlag)
+  if (updateANARIEnvironmentVariable)
   {
     vtkSMStringVectorProperty* propEnvVar =
       vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARIEnvironmentVariable"));
