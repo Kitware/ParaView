@@ -3796,8 +3796,10 @@ void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
       vtkRenderer* ren = this->GetRenderer();
       if (this->Internals->AnariPass)
       {
-        this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
-        this->SynchronizedRenderers->SetRenderPass(nullptr);
+        if (this->SynchronizedRenderers->GetRenderPass() == this->Internals->AnariPass)
+        {
+          this->SynchronizedRenderers->SetRenderPass(nullptr);
+        }
         this->Internals->AnariPass = nullptr;
       }
       this->Internals->AnariPass = vtkSmartPointer<vtkAnariPass>::New();
