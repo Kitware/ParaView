@@ -3742,23 +3742,6 @@ void vtkPVRenderView::SetEnableANARI(bool v)
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->SynchronizedRenderers->SetRenderPass(this->Internals->AnariPass);
     this->SynchronizedRenderers->SetEnableRayTracing(true);
-    // Proxy properties defaults
-    // These defaults are set before ANARI is enabled and then they are not
-    // set again, so we need to set them here.
-    if (std::string(this->GetANARILibrary()).empty())
-    {
-      // TODO: When switching ANARI libraries works, we should set visrtx as
-      // the default.
-      auto* envLibraryName = std::getenv("ANARI_LIBRARY");
-      if (envLibraryName)
-      {
-        this->SetANARILibrary("environment");
-      }
-      else
-      {
-        this->SetANARILibrary("helide");
-      }
-    }
   }
   else
   {
@@ -3826,6 +3809,10 @@ void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
 const char* vtkPVRenderView::GetANARILibrary()
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
+  if (!this->Internals->AnariPass)
+  {
+    return "";
+  }
   return this->Internals->AnariPass->GetAnariDevice()->GetAnariLibraryName().c_str();
 #else
   return nullptr;

@@ -59,6 +59,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 
 namespace
 {
@@ -841,6 +842,28 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     this->UpdatePropertyInformation(propEnvVar);
   }
 
+  // Choose the initial ANARI library here rather than inside
+  // vtkPVRenderView::SetEnableANARI(): the property is what the Properties
+  // panel shows, so anything the view picks on its own would leave the
+  // combo-box disagreeing with the library actually in use (and selecting the
+  // value the property already holds would then be a no-op).
+  if (auto* propLibrary =
+        vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARILibrary")))
+  {
+    if (std::getenv("ANARI_LIBRARY"))
+    {
+      // Honor the environment variable, and say so in the panel.
+      propLibrary->SetElement(0, "environment");
+    }
+#if defined(__APPLE__)
+    else
+    {
+      // VisRTX requires CUDA, so fall back to the reference device.
+      propLibrary->SetElement(0, "helide");
+    }
+#endif
+  }
+
   if (this->GetIsInCAVE())
   {
     // Update the local proxy property from the remote cave configuration
@@ -1365,8 +1388,10 @@ void vtkSMRenderViewProxy::UpdateAnariProperties()
   }
 
   // update ANARI properties in the correct order
+  const bool forceANARILibrary =
+    itEnableANARI->second.ModifiedFlag && propEnableANARI->GetElement(0);
   this->UpdateProperty("EnableANARI");
-  this->UpdateProperty("ANARILibrary");
+  this->UpdateProperty("ANARILibrary", forceANARILibrary ? 1 : 0);
   if (updateANARIEnvironmentVariable)
   {
     vtkSMStringVectorProperty* propEnvVar =

@@ -1515,6 +1515,10 @@
           the library specified by the ANARI_LIBRARY environment variable.
         </Documentation>
         <Hints>
+          <!-- vtkSMRenderViewProxy::CreateVTKObjects() may pick the initial
+               library, which runs before the pipeline controller resets
+               properties to their defaults; keep it from being undone. -->
+          <NoDefault />
           <PropertyWidgetDecorator type="ANARIHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
