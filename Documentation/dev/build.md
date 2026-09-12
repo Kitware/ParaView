@@ -5,7 +5,7 @@ development, on both Linux and Windows. Please Note that Linux (x86_64), Windows
 and macOS (x86_64 and arm64) version are built and tested by our continuous
 integration system and are considered supported environments.
 
-Any other environnements and architecture (including Cygwin, MingGW, PowerPC) are considered
+Any other environments and architecture (including Cygwin, MinGW, PowerPC) are considered
 non-officially supported, however, patches to fix problems with these platforms will
 be considered for inclusion.
 
@@ -44,7 +44,7 @@ Please run the command in a terminal to install the following dependencies depen
 ##### Centos 7
 
 ###### CMake
-Download and install [cmake][cmake-download]) as the packaged version is not enough considering that
+Download and install [cmake][cmake-download] as the packaged version is not enough considering that
 CMake 3.13 or higher is needed.
 
 ###### Others
@@ -65,7 +65,7 @@ Feel free to then provide it so we can integrate it in this guide by creating an
 
 #### Build
 
-To build ParaView development version (usually refered as "master"), please run the following commands in a terminal:
+To build ParaView development version (usually referred as "master"), please run the following commands in a terminal:
 ```sh
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
 mkdir paraview_build
@@ -158,8 +158,8 @@ If so, be sure to use the respective Qt Version (e.g. for VS 2022, use msvc2022_
  * Download and install [Visual Studio 2022 Community Edition][visual-studio]
  * Download [ninja-build][ninja] and drop `ninja.exe` in `C:\Windows\`
  * Download and install both `msmpisetup.exe` and `msmpisdk.msi` from [Microsoft MPI][msmpi]
- * Download and install [Python for Windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environnement variable.
- * Download and install **xlstproc** (a prebuilt version is available at [chocolatey][choco-xsltproc], source at [libxlst][source-xslt])
+ * Download and install [Python for Windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environment variable.
+ * Download and install **xsltproc** (a prebuilt version is available at [chocolatey][choco-xsltproc], source at [libxslt][source-xslt])
  * Download and install [Qt 6.11.2][qt-installer] for Windows. More recent versions should work as well.
     * Make sure to add `C:\Qt\6.11.2\msvc2022_64\bin` to your `PATH` environment variable.
     * You may also need to add an environment variable `QT_QPA_PLATFORM_PLUGIN_PATH`: `C:\Qt\6.11.2\msvc2022_64\plugins\platforms`.
@@ -403,7 +403,7 @@ More advanced build options are:
 
 #### Capability settings
 
-These settings control capabitities of the build. These begin with the prefix
+These settings control capabilities of the build. These begin with the prefix
 `PARAVIEW_USE_`. The common variables to modify include:
 
   * `PARAVIEW_USE_QT` (default `ON`): Builds the `paraview` GUI application.
@@ -582,7 +582,7 @@ this using the `PARAVIEW_BUILD_EDITION` setting. Supported values for this setti
 * `CATALYST`: Build all modules necessary for in situ use cases without
   rendering and optional components like NetCDF- and HDF5-based readers and
   writers.
-* `CATALYST_RENDERING`: Same as `CATALYST` but with rendering supported added.
+* `CATALYST_RENDERING`: Same as `CATALYST` but with rendering support added.
 * `CANONICAL` (default): Build modules necessary for standard ParaView build.
 
 

@@ -1,6 +1,6 @@
 Guidelines
 ==========
-This document shows guidelines for code contributers, mainly focused on C++ code.
+This document shows guidelines for code contributors, mainly focused on C++ code.
 
 Licensing
 ---------
@@ -41,7 +41,7 @@ C++ Preprocessor
 C++ Language
 ------------
 * Preferably use C++11.
-* Use RAII, e.g. `std::array<char, 5> dat` but not `char* dat = new[5]`.
+* Use RAII, e.g. `std::array<char, 5> dat` but not `char* dat = new char[5]`.
 * Avoid `using` and write the full namespaces (e.g. `std::string`).
 * Exceptions can be thrown, but should not leave the function as VTK (and therefore ParaView) is not exception-safe in general.
 * You might run clang-tidy for hints, however clang-tidy is by default stricter than necessary. VTK and ParaView have their own `.clang-tidy` configuration files.
