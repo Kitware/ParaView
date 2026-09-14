@@ -7,6 +7,7 @@
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqExpanderButton.h"
 #include "pqFileChooserWidget.h"
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
@@ -37,9 +38,11 @@
 #include <QProcessEnvironment>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QSet>
 #include <QSpinBox>
 #include <QTextDocument>
 #include <QTimer>
+#include <QVector>
 #include <QtDebug>
 
 #include <cassert>
@@ -208,6 +211,53 @@ QProcessEnvironment getDefaultEnvironment(const pqServerConfiguration& configura
   return options;
 }
 
+/// Describes an <OptionGroup/> parsed from the <Options/> XML: a label for the
+/// collapsible group and the (ordered) names of the <Option/>s it references.
+struct OptionGroup
+{
+  QString Label;
+  QStringList OptionNames;
+};
+
+/// Adds an expandable/collapsible section titled \c group.Label to \c
+/// formLayout, using the same pqExpanderButton-based accordion style used
+/// elsewhere in ParaView (e.g. the Properties panel), containing the widgets
+/// (in order) for the options named in \c group.OptionNames.
+///
+/// Options found in \c group are added to \c groupedNames so that the
+/// caller can determine which options were not claimed by any group.
+///
+void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget*>& widgets,
+  const QMap<QString, QString>& optionLabels, QSet<QString>& groupedNames, QDialog& dialog,
+  QFormLayout* formLayout)
+{
+  pqExpanderButton* expander = new pqExpanderButton(&dialog);
+  expander->setLook(pqExpanderButton::H2);
+  expander->setText(group.Label);
+  expander->setChecked(true);
+  formLayout->addRow(expander);
+
+  QWidget* content = new QWidget(&dialog);
+  QFormLayout* contentLayout = new QFormLayout(content);
+  contentLayout->setContentsMargins(0, 0, 0, 0);
+  formLayout->addRow(content);
+
+  // Collapse/expand the group's contents when the expander is toggled.
+  QObject::connect(expander, &pqExpanderButton::toggled, content, &QWidget::setVisible);
+
+  for (const QString& name : group.OptionNames)
+  {
+    if (!widgets.contains(name))
+    {
+      qWarning() << "OptionGroup '" << group.Label << "' references unknown option '" << name
+                 << "'.";
+      continue;
+    }
+    contentLayout->addRow(optionLabels.value(name), widgets[name]->Widget);
+    groupedNames.insert(name);
+  }
+}
+
 /// Processes the <Options /> XML defined in the server configuration to
 /// update the dialog with widgets of right type with correct default values.
 /// It uses application settings to obtain the default values, whenever
@@ -233,6 +283,14 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   }
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
+
+  // Records the order in which <Option/> elements were encountered, and their
+  // labels, so that widgets can be added to the dialog after <OptionGroup/>
+  // elements have been processed (options may be grouped out of their
+  // document order, and ungrouped options are added last).
+  QStringList optionOrder;
+  QMap<QString, QString> optionLabels; // option name -> label map
+  QVector<OptionGroup> optionGroups;
 
   // Process the <Options/> to create dialog with widgets.
   for (unsigned int cc = 0; cc < optionsXML->GetNumberOfNestedElements(); cc++)
@@ -389,16 +447,51 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
         helpDoc.setMarkdown(QString(help));
         widgets[name]->Widget->setToolTip(helpDoc.toHtml());
       }
-      formLayout->addRow(label, widgets[name]->Widget);
+      optionOrder.push_back(name);
+      optionLabels[name] = label;
     } // end of <Option />
     else if (strcmp(node->GetName(), "Switch") == 0)
     {
       continue; // Switch's are handled afterwords
     }
+    else if (strcmp(node->GetName(), "OptionGroup") == 0)
+    {
+      OptionGroup group;
+      group.Label = node->GetAttributeOrDefault("label", "");
+      for (unsigned int kk = 0; kk < node->GetNumberOfNestedElements(); kk++)
+      {
+        vtkPVXMLElement* child = node->GetNestedElement(kk);
+        if (child->GetName() && strcmp(child->GetName(), "Option") == 0 &&
+          child->GetAttribute("name"))
+        {
+          group.OptionNames.push_back(child->GetAttribute("name"));
+        }
+      }
+      optionGroups.push_back(group);
+    } // end of <OptionGroup />
     else
     {
       qWarning() << "Ignoring unknown element '<" << node->GetName()
                  << "/>' discovered under <Options/> element.";
+    }
+  }
+
+  // Add the <OptionGroup/>s, in document order, each as an expandable section
+  // containing the widgets for the options it references, in the order
+  // listed within the group.
+  QSet<QString> groupedOptionNames;
+  for (const OptionGroup& group : optionGroups)
+  {
+    addOptionGroupWidget(group, widgets, optionLabels, groupedOptionNames, dialog, formLayout);
+  }
+
+  // Finally, add the options that were not claimed by any <OptionGroup/>, in
+  // the order they were declared.
+  for (const QString& name : optionOrder)
+  {
+    if (!groupedOptionNames.contains(name))
+    {
+      formLayout->addRow(optionLabels.value(name), widgets[name]->Widget);
     }
   }
 
