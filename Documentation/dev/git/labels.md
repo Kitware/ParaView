@@ -6,7 +6,7 @@ organize and provide information about their state in the development
 workflow.
 
 Labels are named using the form `[category]:[name]`. Labels in the same category
-has the same color.
+have the same color.
 
 `area:...`
 ------------
@@ -74,7 +74,7 @@ at a time.
 
 | label | issues | merge requests | description |
 | ----- | -------| -------------- | ----------- |
-| `workflow:active-developement` | x | | added to an open issue that is under development |
+| `workflow:active-development` | x | | added to an open issue that is under development |
 | `workflow:customer-review` | x | | added to a closed issue that is ready for review by the customer/reporter |
 
 [Labels]: https://gitlab.kitware.com/paraview/paraview/-/labels

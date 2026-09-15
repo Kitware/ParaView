@@ -58,7 +58,7 @@ git checkout -b your_branch
 ```
 
 Make the needed changes in ParaView and use git locally to create logically separated commits.
-There is no strict requirements regarding git commit messages syntax but a good rule of
+There are no strict requirements regarding git commit messages syntax but a good rule of
 thumb to follow is: `General domain: reason for change`, General domain being a class, a module
 , a specific system like build or CI.
 
@@ -66,7 +66,7 @@ thumb to follow is: `General domain: reason for change`, General domain being a 
 git commit -m "General domain: Short yet informative reason for the change"
 ```
 
-Build ParaView following the [guide](Documentation/dev/build.md#) and fix any build warnings or issues that arise and seems related to your changes.
+Build ParaView following the [guide](Documentation/dev/build.md#) and fix any build warnings or issues that arise and seem related to your changes.
 
 ### Bringing in VTK changes
 
@@ -76,11 +76,11 @@ starting at the usage of `SetupForDevelopment.sh` script.
 
 You can then develop in the VTK directory as if it was any VTK repository, where you can make changes, commit and push to your VTK fork.
 
-If you want to test the integration of your VTK changes in ParaView [continuous integration](continuous-integration), commit and push your changes
+If you want to test the integration of your VTK changes in ParaView [continuous integration](#continuous-integration), commit and push your changes
 to your VTK fork, then commit the VTK submodule update with your changes in a separate commit in your ParaView branch. Your VTK commit will be found without issue.
 
-Once your VTK changes are merged into VTK master, you can cleanup your history and commit the submodule update cleanly like this
-(this will remove local non commited changes and also rebase your branch on the last master):
+Once your VTK changes are merged into VTK master, you can clean up your history and commit the submodule update cleanly like this
+(this will remove local non-committed changes and also rebase your branch on the last master):
 
 ```
 cd VTK
@@ -96,18 +96,18 @@ git bump VTK master
 
 ### Testing
 
-Every change and new features needs to be tested. In ParaView, there are mainly two types of tests.
+Every change and new feature needs to be tested. In ParaView, there are mainly two types of tests.
 Python tests and XML tests. While both types of tests are as valid to add, XML tests should be preferred for standard
 feature tests when possible as they exercise the ParaView user interface as well as core features.
 
 #### XML Tests
 
-First, as XML tests are impacted by ParaView's user settings, it is recommanded to always run `paraview` in dry run (option `--dr`).
+First, as XML tests are impacted by ParaView's user settings, it is recommended to always run `paraview` in dry run (option `--dr`).
 
-To add a XML test, use the `Tools -> Record Test` menu in ParaView. After specifying name for the XML test, a new window named
-`Recording User Input` will pop up. This one will record every action you will perfom in ParaView to test his feature.
+To add an XML test, use the `Tools -> Record Test` menu in ParaView. After specifying name for the XML test, a new window named
+`Recording User Input` will pop up. This one will record every action you will perform in ParaView to test this feature.
 
-It is also recommanded to lock the view size when we want to create a baseline, choose `Tools -> Lock View Size Custom...`
+It is also recommended to lock the view size when we want to create a baseline, choose `Tools -> Lock View Size Custom...`
 and set it to a 400x400 window as it works well.
 
 On top of recording actions, the most important feature in this window is the check mark button which allows you to:
@@ -235,7 +235,7 @@ Review comments can be resolved, please resolve a comment once you've taken it i
 or once you've reached an agreement with the commenter that nothing should be changed.
 
 Once a reviewer is happy with your changes, they will add a `+X` comment. You need at least one `+2` or higher to consider
-merging the MR. Two `+1`s do not equal a `+2`. If a reviewer leave a `-1` comment, please discuss with them to understand what is the issue and how it could be fixed.
+merging the MR. Two `+1`s do not equal a `+2`. If a reviewer leaves a `-1` comment, please discuss with them to understand what is the issue and how it could be fixed.
 
 Once you have pushed new changes, please tag reviewers again so that they can take a look.
 If you do not tag reviewers, they may not know to revisit your changes. _Do not hesitate to tag them and ask for help_.
@@ -333,7 +333,7 @@ Name topics like you might name functions: concise but precise.
 A reader should have a general idea of the feature or fix to be developed given
 just the branch name. Additionally, it is preferred to have an issue associated with
 every topic. The issue can document the bug or feature to be developed. In such
-cases, being your topic name with the issue number.
+cases, begin your topic name with the issue number.
 
 1.  To start a new topic branch:
 
@@ -352,7 +352,7 @@ cases, being your topic name with the issue number.
 
         $ git checkout -b release-my-topic origin/release
 
-    If subdmodules may have changed, the  run:
+    If subdmodules may have changed, then run:
 
         $ git submodule update
 
@@ -385,7 +385,7 @@ cases, being your topic name with the issue number.
     `my-submodule` being the submodule folder (eg: VTK), `my-hash-or-branch` being either a hash or a branch provided
     by any of your remote or your local repository, typically, `origin/master`.
 
-    This will add a new commit which update the submodule and prefill the commit message with information about
+    This will add a new commit which updates the submodule and prefills the commit message with information about
     the different commits in the submodule. Make sure to still add some information about the reason for the bump.
 
     Please note you can run CI on a submodule commit in another remote, see [continuous integration] for more info.
@@ -395,8 +395,8 @@ cases, being your topic name with the issue number.
     Every changes and new features need to be tested in ParaView. Depending on what you implement, you can perform
     an image comparison with a baseline of expected result or checking a property at anytime.
 
-    They are mainly 2 types of test in ParaView, python and XML testing. Generally we use a XML test, for more details
-    regarding this topic, it's highly recommanded to check this [section](#testing).
+    They are mainly 2 types of test in ParaView, python and XML testing. Generally we use an XML test, for more details
+    regarding this topic, it's highly recommended to check this [section](#testing).
 
 5. Add release notes
 
@@ -523,7 +523,7 @@ like merge requests and commits in other repositories.
 
 When a merge request is ready for review, developers can use the
 `triage:ready-for-review` to indicate the same to the reviewers. If reviewers
-deems that it needs more work, they can add the `triage:needswork` label.
+deem that it needs more work, they can add the `triage:needswork` label.
 This can be repeated as many times as needed adding/removing labels as
 appropriate.
 
@@ -548,7 +548,7 @@ will indicate that the relevant code has changed.
 It shall be a common goal for reviewers and contributors to limit the amount of generated emails.
 Therefore reviewers are encouraged to comment systematic issues (e.g. missing `this->`)
 only once but to indicate the general application. Contributors do not need to comment on trivial
-fixes (e.g. typos in comments) but may simply solved the threads after fixing.
+fixes (e.g. typos in comments) but may simply solve the threads after fixing.
 
 To raise the attention of individuals, e.g. a reviewer for another round of review, this person
 can be pinged by addressing via `@` in a comment.
@@ -617,7 +617,7 @@ The "Kitware Robot" automatically performs basic checks including clang-format o
 and adds a comment acknowledging or rejecting the topic.  This will be
 repeated automatically whenever the topic is pushed to your fork again.
 
-Automatic formatting can be triggered  by adding a comment with a single line.
+Automatic formatting can be triggered by adding a comment with a single line.
 
     Do: reformat
 
@@ -710,7 +710,7 @@ Both should be checked and considered clean before merging.
 To read GitLab CI result, click on the Pipelines tab then on the last pipeline.
 It is expected to be fully green. If there is a yellow warning job, please consult CDash.
 If there is a red failed job, click on it to see the reason for the failure.
-It should clearly appears on the bottom of the log.
+It should clearly appear on the bottom of the log.
 Possible failures are:
  - Timeouts: please rerun the job and report to CI maintainers
  - Memory related errors: please rerun the job and report to CI maintainers
@@ -728,7 +728,7 @@ It is expected to be green *except* for the "NoRun" and "Test Timings" categorie
  - Build Errors: there **must** not be any; to fix before the merge. If unrelated to your code, report to CI maintainers.
  - NotRun test: ignore; these tests have self-diagnosed that they are not relevant on the testing machine.
  - Testing failure: there **should** not be any, ideally, to fix before the merge. If unrelated to your code, check the test history to see if it is a flaky test and report to CI maintainers.
- - Testing success: if your MR creates or modifies tests, please check that your test are listed there.
+ - Testing success: if your MR creates or modifies tests, please check that your tests are listed there.
  - Test timings errors: can be ignored, but if it is all red, you may want to report it to CI maintainers.
 
 To check the history of a failing test, on the test page, click on the "Summary" link to see a summary of the test for the day,
@@ -779,7 +779,7 @@ review comments have not been resolved and superseded by at least
 Developers are encouraged to merge their own merge requests on review. However,
 please do not merge unless you are available to address any dashboard issues that may
 arise. Developers who repeatedly ignore dashboard issues following their merges may
-loose developer privileges to the repository temporarily (or permanently)!
+lose developer privileges to the repository temporarily (or permanently)!
 
 ### Merge Success ###
 
