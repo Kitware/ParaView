@@ -65,7 +65,7 @@ Feel free to then provide it so we can integrate it in this guide by creating an
 
 #### Build
 
-To build ParaView development version (usually referred as "master"), please run the following commands in a terminal:
+To build ParaView development version (usually referred to as "master"), please run the following commands in a terminal:
 ```sh
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
 mkdir paraview_build

@@ -385,7 +385,7 @@ cases, begin your topic name with the issue number.
     `my-submodule` being the submodule folder (eg: VTK), `my-hash-or-branch` being either a hash or a branch provided
     by any of your remote or your local repository, typically, `origin/master`.
 
-    This will add a new commit which updates the submodule and prefill the commit message with information about
+    This will add a new commit which updates the submodule and prefills the commit message with information about
     the different commits in the submodule. Make sure to still add some information about the reason for the bump.
 
     Please note you can run CI on a submodule commit in another remote, see [continuous integration] for more info.
