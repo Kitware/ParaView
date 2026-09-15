@@ -429,7 +429,7 @@ paraview_require_module(
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_RENDERING AND PARAVIEW_ENABLE_ANARI
-  MODULES   VTK::RenderingAnari
+  MODULES   VTK::RenderingAnariOpenGL
   EXCLUSIVE)
 
 paraview_require_module(

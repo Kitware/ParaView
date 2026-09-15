@@ -15,7 +15,7 @@ void vtkANARIHidingDecorator::PrintSelf(ostream& os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 bool vtkANARIHidingDecorator::CanShow([[maybe_unused]] bool showAdvanced) const
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+#if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
   return this->Superclass::CanShow(showAdvanced);
 #else
   return false;

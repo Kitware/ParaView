@@ -1440,6 +1440,11 @@ if(PARAVIEW_ENABLE_RAYTRACING)
     OSPRay.xml)
 endif()
 
+if (PARAVIEW_ENABLE_ANARI)
+  list(APPEND TESTS_WITH_BASELINES
+    AnariFrameRender.xml)
+endif()
+
 if(PARAVIEW_ENABLE_OPENTURNS)
   list(APPEND TESTS_WITH_BASELINES
     HistogramKernelSmoothing.xml)
