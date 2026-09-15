@@ -16,7 +16,7 @@
 #include "vtkPolyDataAlgorithm.h"
 
 class PARAVIEW_DEPRECATED_IN_6_2_0(
-  "Use vtkGeometryFilterDispatcher instead") VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVFeatureEdges
+  "Use vtkFeatureEdgesDispatcher instead") VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVFeatureEdges
   : public vtkPolyDataAlgorithm
 {
 
