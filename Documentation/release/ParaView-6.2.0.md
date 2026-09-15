@@ -420,6 +420,10 @@ The `Track` interactor style proxy now works with any number of independent view
 
 Furthermore, when you select the `Track` style proxy, you should see a new `EyeSeparation` property, allowing you to adjust the default (i.e. from `.pvx` or state file) eye separations for each viewer.
 
+## Unused `Process` element removal from .pvx files
+
+* In `.pvx` files, the `Process` elements are not used. A message warning about their presence has been removed and now `.pvx` files that contain those elements will no longer work.
+
 ## Save **First Person Camera** controller parameters in VR state files
 
 The parameters of the **First Person Camera** controller (such as **Mouse Sensitivity X/Y**, **Invert X/Y**, **Move Speed Forward/Right** and **Up Axis**) are now saved in the `.pvvr` file when saving and restoring a VR State.
@@ -600,3 +604,51 @@ The `AMRAxisAlignedPlaneCutter` and `HTGAxisAlignedPlaneCutter` protected member
 ## `paraview.envs` CLI implementation details
 
 `paraview.envs`'s CLI is implemented with `argparse` subparsers. `use`/`run` load the target script/app in-process rather than as a subprocess, so if that script does its own argument parsing it must not see `paraview.envs`'s own flags mixed into `sys.argv` - the module explicitly rewrites `sys.argv` to `[script_path, *script_args]` before executing it, the same clean hand-off a normal `python script.py args...` invocation would give it.
+
+## Source code deprecations and removals
+
+### New deprecations in ParaView 6.2
+
+The following deprecated functions are new in ParaView 6.2 and will be removed after the ParaView 6.3 release.
+
+* `vtkArrayIterator* vtkCTHArray::NewIterator() override`; use `vtkArrayDispatch` instead.
+* `void vtkCTHArray::ExportToVoidPointer(void* out_ptr) override`; use `DeepCopy()` with an `vtkAOSDataArrayTemplate` array instead.
+* `int vtkCTHArray::Allocate(vtkIdType sz, vtkIdType ext = 1000) override`; use `ReserveValues/Tuples()` to allocate or `Initialize() to deallocate` instead.
+* `void* vtkCTHArray::WriteVoidPointer(vtkIdType i, vtkIdType j) override`; use `vtkAOSDataArrayTemplate::WritePointer(valueIdx, numValues)` or `vtkAbstractArray::SetNumberOf[Values/Tuples]()` instead.
+* `int vtkCTHArray::Resize(vtkIdType numTuples) override`; use Use `ReserveTuples()`, `Squeeze()`, or `Initialize()` instead.
+* `void vtkSMRenderViewProxy::SetResizingWindow(bool)` has been removed; no substitution.
+
+The following classes have been deprecated in ParaView 6.2 and will be fully removed after the ParaView 6.3 release:
+
+* Class `pqTemporalExportReaction`; this class was meant to parallelize data export over different timesteps, but has been unused for a long time. Use other data export mechanisms in ParaView.
+* Class `vtkPVGeometryFilter`; use `vtkGeometryFilterDispatcher` in VTK instead.
+* Class `vtkPVFeatureEdges`; use `vtkFeatureEdgesDispatcher` in VTK instead.
+* Class `vtkFlashContour`; no longer needed.
+
+### Removals in ParaView 6.2
+
+* Auto-conversion of `printf` formatting strings to `std::format` formatting strings, deprecated in ParaView 6.1, has been removed from the following class member functions:
+
+    * `void vtkParticlePipeline::SetFilename(const char* filename)`
+    * `void vtkSMSaveAnimationProxy::SetSuffixFormat(const char* suffix)`
+    * `void vtkContext2DScalarBarActor::SetRangeLabelFormat(const char* format)`
+    * `void vtkContext2DScalarBarActor::SetDataRangeLabelFormat(const char* format)`
+    * `void vtkStringList::AddFormattedString(const char* EventString, T&&... args)`
+    * `void vtkAnnotateGlobalDataFilter::SetFormat(const char* formatArg)`
+    * `void vtkCGNSWriter::SetFileNameSuffix(const char* suffix)`
+    * `void vtkCSVWriter::SetFileNameSuffix(const char* suffix)`
+    * `void vtkFileSeriesWriter::SetFileNameSuffix(const char* suffix)`
+    * `void vtkParallelSerialWriter::SetFileNameSuffix(const char* suffix)`
+
+The following member functions have been removed in ParaView 6.2:
+
+* `virtual bool vtkSMParaViewPipelineController::RegisterTextureProxy(vtkSMProxy* proxy, const char* filename)`; use `virtual bool RegisterTextureProxyFromFile(vtkSMProxy* proxy, const char* filename, const char* registrationName)` instead.
+* `unsigned int vtkSMProxyLink::GetNumberOfLinkedProxies()`; use `unsigned int GetNumberOfLinkedObjects()`.
+* `void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)`; use `void InitializeCamera(vtkCamera* cam)` instead.
+* `void vtkChartRepresentation::SetCompositeDataSetIndex(unsigned int)` and `void vtkChartRepresentation::AddCompositeDataSetIndex(unsigned int)`; use` AddBlockSelector()` with `SetActiveAssembly()` instead
+* `void vtkChartRepresentation::AddCompositeDataSetIndex(unsigned int)`; use `RemoveAllBlockSelectors()` with `SetActiveAssembly()` instead.
+* `void vtkSpyPlotReader::PrintBlockList(vtkNonOverlappingAMR* hbds, int myProcId)`; it was a noop, no substitution recommended.
+
+This class has been removed in ParaView 6.2:
+
+* Class `vtkPVMergeTablesMultiBlock` has been completely removed; use `vtkPVMergeTablesComposite` instead.
