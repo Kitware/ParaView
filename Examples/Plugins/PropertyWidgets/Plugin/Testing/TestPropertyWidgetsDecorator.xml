@@ -7,6 +7,10 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyPropertyWidgets" />
 
+  <!-- Unroll the property group -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1QWidget0/1pqLabel0" command="mousePress" arguments="1,1,0,59,9" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1QWidget0/1pqLabel0" command="mouseRelease" arguments="1,0,0,59,9" />
+
   <!-- Case 1: ShrinkFactor = 0.0, button checked => should be visible -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ShrinkFactor/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DemonstratePropertyWidget/Checkbox" command="set_boolean" arguments="true" />
