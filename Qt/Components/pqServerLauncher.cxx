@@ -258,6 +258,32 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
   }
 }
 
+/// Returns the <Help/> element nested in \c parent (an <Options/> or
+/// <Option/> element), if any. A <Help/> element is only recognized when it
+/// is the first child of \c parent; if one is found in any other position, a
+/// warning is issued and it is ignored.
+vtkPVXMLElement* getHelpElement(vtkPVXMLElement* parent)
+{
+  vtkPVXMLElement* helpXML = nullptr;
+  for (unsigned int kk = 0; kk < parent->GetNumberOfNestedElements(); kk++)
+  {
+    vtkPVXMLElement* child = parent->GetNestedElement(kk);
+    if (child->GetName() && strcmp(child->GetName(), "Help") == 0)
+    {
+      if (kk == 0)
+      {
+        helpXML = child;
+      }
+      else
+      {
+        qWarning() << "'<Help/>' must be the first child of '<" << parent->GetName()
+                   << "/>'; ignoring.";
+      }
+    }
+  }
+  return helpXML;
+}
+
 /// Processes the <Options /> XML defined in the server configuration to
 /// update the dialog with widgets of right type with correct default values.
 /// It uses application settings to obtain the default values, whenever
@@ -274,12 +300,15 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     QCoreApplication::translate("pqServerLauncher", "Connection Options for \"%1\"")
       .arg(configuration.name()));
 
-  if (const char* help = optionsXML->GetAttribute("help"))
+  if (vtkPVXMLElement* helpXML = getHelpElement(optionsXML))
   {
-    QLabel* helpLabel = new QLabel(QString(help), &dialog);
-    helpLabel->setTextFormat(Qt::MarkdownText);
-    helpLabel->setWordWrap(true);
-    formLayout->addRow(helpLabel);
+    if (const char* help = helpXML->GetCharacterData())
+    {
+      QLabel* helpLabel = new QLabel(QString(help).trimmed(), &dialog);
+      helpLabel->setTextFormat(Qt::MarkdownText);
+      helpLabel->setWordWrap(true);
+      formLayout->addRow(helpLabel);
+    }
   }
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -307,7 +336,18 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     }
     else if (strcmp(node->GetName(), "Option") == 0)
     {
-      vtkPVXMLElement* typeNode = node->GetNestedElement(0);
+      // The type tag (<Range/>, <String/>, etc.) is the first nested element
+      // that isn't the optional <Help/> tag.
+      vtkPVXMLElement* typeNode = nullptr;
+      for (unsigned int kk = 0; kk < node->GetNumberOfNestedElements(); kk++)
+      {
+        vtkPVXMLElement* child = node->GetNestedElement(kk);
+        if (child->GetName() && strcmp(child->GetName(), "Help") != 0)
+        {
+          typeNode = child;
+          break;
+        }
+      }
       if (typeNode == nullptr || typeNode->GetName() == nullptr)
       {
         continue;
@@ -315,7 +355,8 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
 
       const char* name = node->GetAttribute("name");
       const char* label = node->GetAttributeOrDefault("label", name);
-      const char* help = node->GetAttribute("help");
+      vtkPVXMLElement* helpXML = getHelpElement(node);
+      const char* help = helpXML ? helpXML->GetCharacterData() : nullptr;
       bool readonly = strcmp(node->GetAttributeOrDefault("readonly", "false"), "true") == 0;
       bool save = strcmp(node->GetAttributeOrDefault("save", "true"), "true") == 0;
 
@@ -444,7 +485,7 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
         // the tooltip is then displayed as rich text since it now starts
         // with an HTML tag.
         QTextDocument helpDoc;
-        helpDoc.setMarkdown(QString(help));
+        helpDoc.setMarkdown(QString(help).trimmed());
         widgets[name]->Widget->setToolTip(helpDoc.toHtml());
       }
       optionOrder.push_back(name);
@@ -453,6 +494,10 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     else if (strcmp(node->GetName(), "Switch") == 0)
     {
       continue; // Switch's are handled afterwords
+    }
+    else if (strcmp(node->GetName(), "Help") == 0)
+    {
+      continue; // <Help/> was already processed above.
     }
     else if (strcmp(node->GetName(), "OptionGroup") == 0)
     {
