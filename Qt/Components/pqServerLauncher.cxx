@@ -30,6 +30,7 @@
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
+#include <QGuiApplication>
 #include <QHostInfo>
 #include <QLabel>
 #include <QLineEdit>
@@ -38,13 +39,17 @@
 #include <QProcessEnvironment>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QScreen>
+#include <QScrollArea>
 #include <QSet>
 #include <QSpinBox>
 #include <QTextDocument>
 #include <QTimer>
+#include <QVBoxLayout>
 #include <QVector>
 #include <QtDebug>
 
+#include <algorithm>
 #include <cassert>
 
 //----------------------------------------------------------------------------
@@ -307,11 +312,20 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   vtkPVXMLElement* optionsXML = configuration.optionsXML();
   assert(optionsXML != nullptr);
 
-  QFormLayout* formLayout = new QFormLayout();
-  dialog.setLayout(formLayout);
   dialog.setWindowTitle(
     QCoreApplication::translate("pqServerLauncher", "Connection Options for \"%1\"")
       .arg(configuration.name()));
+
+  QVBoxLayout* dialogLayout = new QVBoxLayout(&dialog);
+
+  QWidget* scrollWidget = new QWidget(&dialog);
+  QFormLayout* formLayout = new QFormLayout(scrollWidget);
+
+  QScrollArea* scrollArea = new QScrollArea(&dialog);
+  scrollArea->setWidget(scrollWidget);
+  scrollArea->setWidgetResizable(true);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  dialogLayout->addWidget(scrollArea);
 
   if (vtkPVXMLElement* textXML = getTextElement(optionsXML))
   {
@@ -565,7 +579,21 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
   QObject::connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
   QObject::connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-  formLayout->addRow(buttonBox);
+  // Kept outside the scroll area so it always sticks to the bottom of the
+  // dialog instead of scrolling along with the rest of the content.
+  dialogLayout->addWidget(buttonBox);
+
+  const int contentHeight = scrollWidget->sizeHint().height();
+  const QMargins margins = dialogLayout->contentsMargins();
+  // everything else besides the content
+  const int chromeHeight =
+    margins.top() + margins.bottom() + dialogLayout->spacing() + buttonBox->sizeHint().height();
+  const QRect availableGeometry = QGuiApplication::primaryScreen()->availableGeometry();
+  const int maxDialogHeight = static_cast<int>(availableGeometry.height() * 0.8);
+  const int desiredDialogHeight = std::min(chromeHeight + contentHeight, maxDialogHeight);
+
+  dialog.adjustSize(); // pick a reasonable initial width
+  dialog.resize(dialog.width(), desiredDialogHeight);
   return true;
 }
 
