@@ -886,7 +886,7 @@ bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
   std::vector<vtkIdType> rcvcounts(nranks);
   std::vector<vtkIdType> offSet(nranks);
   std::vector<unsigned char> rcvbuffer;
-  int rbufsize = 0;
+  size_t rbufsize = 0;
 
   // STEP 2: Serialize the vtkPVInformation object
   vtkClientServerStream stream;
