@@ -12,6 +12,18 @@ set(PARAVIEW_ENABLE_PDAL ON CACHE BOOL "")
 set(PARAVIEW_ENABLE_VISITBRIDGE ON CACHE BOOL "")
 set(PARAVIEW_ENABLE_XDMF3 ON CACHE BOOL "")
 
+# Exercise the Catalyst "fides_conduit" channel. It enables VTK::conduit, which
+# requires a Catalyst built against the same external Conduit. The docker image
+# provides pairs of catalyst/conduit for each MPI variant under /opt, and here
+# We pick the set built with mpich.
+set(PARAVIEW_ENABLE_CATALYST_FIDES ON CACHE BOOL "")
+set(CMAKE_PREFIX_PATH "/opt/catalyst-ext/mpich;/opt/conduit/mpich" CACHE STRING "")
+
+# Conduit's installed config declares `cmake_minimum_required(VERSION 3.8)`,
+# which CMake 3.31+ warns about. Treat any minimum below 3.13 as 3.13.
+# https://github.com/llnl/conduit/issues/1697
+set(CMAKE_POLICY_VERSION_MINIMUM "3.13" CACHE STRING "")
+
 set(PARAVIEW_PLUGINS_DEFAULT ON CACHE BOOL "")
 
 set(PARAVIEW_PLUGIN_ENABLE_pvNVIDIAIndeX ON CACHE BOOL "")

@@ -61,7 +61,8 @@ dnf install -y --setopt=install_weak_deps=False \
 dnf install -y --setopt=install_weak_deps=False \
     python3-twisted python3-autobahn python3 python3-devel python3-numpy \
     python3-pandas python3-pandas-datareader python3-sphinx python3-pip \
-    python3-mpi4py-mpich python3-mpi4py-openmpi python3-matplotlib
+    python3-mpi4py-mpich python3-mpi4py-openmpi python3-matplotlib \
+    python3-setuptools
 
 python3 -m pip install wslink cftime openPMD-api
 
