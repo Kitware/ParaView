@@ -213,11 +213,13 @@ QProcessEnvironment getDefaultEnvironment(const pqServerConfiguration& configura
 
 /// Describes an <OptionGroup/> parsed from the <Options/> XML: a label for the
 /// collapsible group, optional Markdown text to display just below the label,
-/// and the (ordered) names of the <Option/>s it references.
+/// whether the group starts collapsed, and the (ordered) names of the
+/// <Option/>s it references.
 struct OptionGroup
 {
   QString Label;
   QString Text;
+  bool Collapsed = false;
   QStringList OptionNames;
 };
 
@@ -236,12 +238,13 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
   pqExpanderButton* expander = new pqExpanderButton(&dialog);
   expander->setLook(pqExpanderButton::H2);
   expander->setText(group.Label);
-  expander->setChecked(true);
+  expander->setChecked(!group.Collapsed);
   formLayout->addRow(expander);
 
   QWidget* content = new QWidget(&dialog);
   QFormLayout* contentLayout = new QFormLayout(content);
   contentLayout->setContentsMargins(0, 0, 0, 0);
+  content->setVisible(!group.Collapsed);
   formLayout->addRow(content);
 
   // Collapse/expand the group's contents when the expander is toggled.
@@ -513,6 +516,7 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     {
       OptionGroup group;
       group.Label = node->GetAttributeOrDefault("label", "");
+      group.Collapsed = strcmp(node->GetAttributeOrDefault("collapsed", "false"), "true") == 0;
       if (vtkPVXMLElement* textXML = getTextElement(node))
       {
         if (const char* text = textXML->GetCharacterData())
