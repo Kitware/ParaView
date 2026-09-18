@@ -212,10 +212,12 @@ QProcessEnvironment getDefaultEnvironment(const pqServerConfiguration& configura
 }
 
 /// Describes an <OptionGroup/> parsed from the <Options/> XML: a label for the
-/// collapsible group and the (ordered) names of the <Option/>s it references.
+/// collapsible group, optional Markdown text to display just below the label,
+/// and the (ordered) names of the <Option/>s it references.
 struct OptionGroup
 {
   QString Label;
+  QString Text;
   QStringList OptionNames;
 };
 
@@ -244,6 +246,14 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
 
   // Collapse/expand the group's contents when the expander is toggled.
   QObject::connect(expander, &pqExpanderButton::toggled, content, &QWidget::setVisible);
+
+  if (!group.Text.isEmpty())
+  {
+    QLabel* textLabel = new QLabel(group.Text, &dialog);
+    textLabel->setTextFormat(Qt::MarkdownText);
+    textLabel->setWordWrap(true);
+    contentLayout->addRow(textLabel);
+  }
 
   for (const QString& name : group.OptionNames)
   {
@@ -503,6 +513,13 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     {
       OptionGroup group;
       group.Label = node->GetAttributeOrDefault("label", "");
+      if (vtkPVXMLElement* textXML = getTextElement(node))
+      {
+        if (const char* text = textXML->GetCharacterData())
+        {
+          group.Text = QString(text).trimmed();
+        }
+      }
       for (unsigned int kk = 0; kk < node->GetNumberOfNestedElements(); kk++)
       {
         vtkPVXMLElement* child = node->GetNestedElement(kk);
