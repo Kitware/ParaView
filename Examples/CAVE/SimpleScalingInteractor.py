@@ -1,9 +1,6 @@
 from paraview.simple import *
 from vtkmodules.vtkCommonMath import vtkMatrix4x4
 from vtkmodules.vtkCommonTransforms import vtkTransform
-# The import below is needed so that references to vtkSelf in this
-# module are recognized as instances of vtkSMVRInteratorStyleProxy.
-from paraview.incubator import vtkPVIncubatorCAVEInteractionStyles
 from paraview.incubator.pythoninteractorbase import PythonInteractorBase
 
 
