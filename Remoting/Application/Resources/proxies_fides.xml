@@ -423,6 +423,22 @@
           encryption, etc).
         </Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetEngine"
+                         default_values="0"
+                         name="Engine"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <EnumerationDomain name="enum">
+          <Entry text="BPFile" value="0"/>
+          <Entry text="SST" value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          The ADIOS2 engine used to write the data. BPFile writes a file, while
+          SST streams the data to a reader, such as the Fides reader in another
+          ParaView process, which opens the same name. Ignored when an
+          AdiosConfigFile is given, since the config file then selects the engine.
+        </Documentation>
+      </IntVectorProperty>
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
@@ -544,13 +560,20 @@
         <Documentation>
           Specify the filename to use. The default pattern produces one
           ADIOS2 BP directory per timestep under the extractor output
-          directory.
+          directory. A name without timestep substitution (e.g. "data.bp")
+          appends every timestep to a single BP file or, with the SST engine,
+          to a single stream. Readers find an SST stream by this name.
         </Documentation>
       </StringVectorProperty>
       <SubProxy>
         <Proxy name="Writer" proxygroup="writers" proxyname="FidesWriter" />
         <ExposedProperties>
           <Property name="Input" />
+
+          <PropertyGroup label="ADIOS2">
+            <Property name="Engine" panel_visibility="default" />
+            <Property name="AdiosConfigFile" panel_visibility="advanced" />
+          </PropertyGroup>
 
           <PropertyGroup label="Data Selection">
             <Property name="ChooseArraysToWrite" panel_visibility="advanced"/>
