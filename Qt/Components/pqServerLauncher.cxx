@@ -223,7 +223,7 @@ QProcessEnvironment getDefaultEnvironment(const pqServerConfiguration& configura
 struct OptionGroup
 {
   QString Label;
-  QString Text;
+  QString Documentation;
   bool Collapsed = false;
   QStringList OptionNames;
 };
@@ -255,9 +255,9 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
   // Collapse/expand the group's contents when the expander is toggled.
   QObject::connect(expander, &pqExpanderButton::toggled, content, &QWidget::setVisible);
 
-  if (!group.Text.isEmpty())
+  if (!group.Documentation.isEmpty())
   {
-    QLabel* textLabel = new QLabel(group.Text, &dialog);
+    QLabel* textLabel = new QLabel(group.Documentation, &dialog);
     textLabel->setTextFormat(Qt::MarkdownText);
     textLabel->setWordWrap(true);
     contentLayout->addRow(textLabel);
@@ -276,30 +276,30 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
   }
 }
 
-/// Returns the <Text/> element nested in \c parent (an <Options/> or
-/// <Option/> element), if any. A <Text/> element is only recognized when it
+/// Returns the <Documentation/> element nested in \c parent (an <Options/> or
+/// <Option/> element), if any. A <Documentation/> element is only recognized when it
 /// is the first child of \c parent; if one is found in any other position, a
 /// warning is issued and it is ignored.
-vtkPVXMLElement* getTextElement(vtkPVXMLElement* parent)
+vtkPVXMLElement* getDocumentationElement(vtkPVXMLElement* parent)
 {
-  vtkPVXMLElement* textXML = nullptr;
+  vtkPVXMLElement* documentationXML = nullptr;
   for (unsigned int kk = 0; kk < parent->GetNumberOfNestedElements(); kk++)
   {
     vtkPVXMLElement* child = parent->GetNestedElement(kk);
-    if (child->GetName() && strcmp(child->GetName(), "Text") == 0)
+    if (child->GetName() && strcmp(child->GetName(), "Documentation") == 0)
     {
       if (kk == 0)
       {
-        textXML = child;
+        documentationXML = child;
       }
       else
       {
-        qWarning() << "'<Text/>' must be the first child of '<" << parent->GetName()
+        qWarning() << "'<Documentation/>' must be the first child of '<" << parent->GetName()
                    << "/>'; ignoring.";
       }
     }
   }
-  return textXML;
+  return documentationXML;
 }
 
 /// Processes the <Options /> XML defined in the server configuration to
@@ -327,9 +327,9 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   scrollArea->setFrameShape(QFrame::NoFrame);
   dialogLayout->addWidget(scrollArea);
 
-  if (vtkPVXMLElement* textXML = getTextElement(optionsXML))
+  if (vtkPVXMLElement* documentationXML = getDocumentationElement(optionsXML))
   {
-    if (const char* help = textXML->GetCharacterData())
+    if (const char* help = documentationXML->GetCharacterData())
     {
       QLabel* helpLabel = new QLabel(QString(help).trimmed(), &dialog);
       helpLabel->setTextFormat(Qt::MarkdownText);
@@ -364,12 +364,12 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     else if (strcmp(node->GetName(), "Option") == 0)
     {
       // The type tag (<Range/>, <String/>, etc.) is the first nested element
-      // that isn't the optional <Text/> tag.
+      // that isn't the optional <Documentation/> tag.
       vtkPVXMLElement* typeNode = nullptr;
       for (unsigned int kk = 0; kk < node->GetNumberOfNestedElements(); kk++)
       {
         vtkPVXMLElement* child = node->GetNestedElement(kk);
-        if (child->GetName() && strcmp(child->GetName(), "Text") != 0)
+        if (child->GetName() && strcmp(child->GetName(), "Documentation") != 0)
         {
           typeNode = child;
           break;
@@ -382,8 +382,8 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
 
       const char* name = node->GetAttribute("name");
       const char* label = node->GetAttributeOrDefault("label", name);
-      vtkPVXMLElement* textXML = getTextElement(node);
-      const char* help = textXML ? textXML->GetCharacterData() : nullptr;
+      vtkPVXMLElement* documentationXML = getDocumentationElement(node);
+      const char* help = documentationXML ? documentationXML->GetCharacterData() : nullptr;
       bool readonly = strcmp(node->GetAttributeOrDefault("readonly", "false"), "true") == 0;
       bool save = strcmp(node->GetAttributeOrDefault("save", "true"), "true") == 0;
 
@@ -522,20 +522,20 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     {
       continue; // Switch's are handled afterwords
     }
-    else if (strcmp(node->GetName(), "Text") == 0)
+    else if (strcmp(node->GetName(), "Documentation") == 0)
     {
-      continue; // <Text/> was already processed above.
+      continue; // <Documentation/> was already processed above.
     }
     else if (strcmp(node->GetName(), "OptionGroup") == 0)
     {
       OptionGroup group;
       group.Label = node->GetAttributeOrDefault("label", "");
       group.Collapsed = strcmp(node->GetAttributeOrDefault("collapsed", "false"), "true") == 0;
-      if (vtkPVXMLElement* textXML = getTextElement(node))
+      if (vtkPVXMLElement* documentationXML = getDocumentationElement(node))
       {
-        if (const char* text = textXML->GetCharacterData())
+        if (const char* text = documentationXML->GetCharacterData())
         {
-          group.Text = QString(text).trimmed();
+          group.Documentation = QString(text).trimmed();
         }
       }
       for (unsigned int kk = 0; kk < node->GetNumberOfNestedElements(); kk++)
