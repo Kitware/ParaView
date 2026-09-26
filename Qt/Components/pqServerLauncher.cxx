@@ -319,9 +319,11 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   QVBoxLayout* dialogLayout = new QVBoxLayout(&dialog);
 
   QWidget* scrollWidget = new QWidget(&dialog);
+  scrollWidget->setObjectName("OptionsWidget");
   QFormLayout* formLayout = new QFormLayout(scrollWidget);
 
   QScrollArea* scrollArea = new QScrollArea(&dialog);
+  scrollArea->setObjectName("OptionsScrollArea");
   scrollArea->setWidget(scrollWidget);
   scrollArea->setWidgetResizable(true);
   scrollArea->setFrameShape(QFrame::NoFrame);
