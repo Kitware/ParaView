@@ -1139,8 +1139,22 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
 
   if (this->CompositeDataSetType != -1)
   {
-    *css << this->DataAssembly->SerializeToXML(vtkIndent());
-    *css << this->Hierarchy->SerializeToXML(vtkIndent());
+    // When information is gathered from all ranks, only rank 0's assembly and hierarchy are
+    // used, so satellites send empty strings (which CopyFromStream() accepts) to reduce the amount
+    // of information transferred. When information is requested for a specific rank, that rank
+    // has to send its own assembly and hierarchy.
+    auto pm = vtkProcessModule::GetProcessModule();
+    if (!pm || pm->GetPartitionId() == 0 || this->Rank != -1)
+    {
+      *css << this->DataAssembly->SerializeToXML(vtkIndent());
+      *css << this->Hierarchy->SerializeToXML(vtkIndent());
+    }
+    else
+    {
+      // Add two empty strings in place of assembly and hierarchy strings
+      // so that the number of messages doesn't change.
+      *css << std::string() << std::string();
+    }
   }
 
   if (!this->AMRNumberOfDataSets.empty())
