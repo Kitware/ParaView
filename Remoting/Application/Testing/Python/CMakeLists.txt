@@ -119,6 +119,7 @@ vtk_module_test_data(
 
 set(PVBATCH_TESTS
   AnnotationVisibility.py
+  GatherCompositeDataInformation.py,NO_VALID
   LinePlotInScripts.py,NO_VALID
   MultiView.py
   ParallelImageWriter.py,NO_VALID
