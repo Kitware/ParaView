@@ -14,6 +14,7 @@
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkMinimalStandardRandomSequence.h"
 #include "vtkNetworkAccessManager.h"
@@ -43,7 +44,6 @@
 #include <QScrollArea>
 #include <QSet>
 #include <QSpinBox>
-#include <QTextDocument>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QVector>
@@ -513,9 +513,7 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
         // QLabel does, so the Markdown text is converted to HTML explicitly;
         // the tooltip is then displayed as rich text since it now starts
         // with an HTML tag.
-        QTextDocument helpDoc;
-        helpDoc.setMarkdown(QString(help).trimmed());
-        widgets[name]->Widget->setToolTip(helpDoc.toHtml());
+        widgets[name]->Widget->setToolTip(pqWidgetUtilities::formatMarkdownTooltip(QString(help)));
       }
       optionOrder.push_back(name);
       optionLabels[name] = label;

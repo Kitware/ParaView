@@ -10,6 +10,10 @@
 #include <QString>
 #include <QWidget>
 
+/**
+ * Set of utility functions designed to create wider tooltips, since Qt does
+ * allow us to set this directly.
+ */
 class PQWIDGETS_EXPORT pqWidgetUtilities
 {
 public:
@@ -17,6 +21,12 @@ public:
    * Convert a rich-text QString into an HTML, formatted with wrapping if necessary
    */
   static QString formatTooltip(const QString& rawText);
+
+  /**
+   * Convert a Markdown QString into an HTML, formatted with wrapping if
+   * necessary, the same way formatTooltip() does for rich-text.
+   */
+  static QString formatMarkdownTooltip(const QString& markdown);
 
   ///@{
   /**
