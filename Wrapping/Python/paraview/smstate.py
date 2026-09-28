@@ -112,6 +112,23 @@ def get_producers(proxy, filter, producer_set):
         pass
 
 
+def _get_layout_for_saving_all_views(proxy):
+    """Returns the layout whose views are all saved in a single image by the
+    proxy, if it is an image extractor with 'SaveAllViews' enabled. Otherwise,
+    returns None."""
+    if proxy.GetXMLGroup() != "extractors":
+        return None
+    try:
+        if not proxy.Writer.SaveAllViews:
+            return None
+        view = proxy.Producer
+    except AttributeError:
+        return None
+    if not view:
+        return None
+    return sm._getPyProxy(sm.vtkSMViewLayoutProxy.FindLayout(view.SMProxy))
+
+
 def get_state(options=None, source_set=[], filter=None, raw=False,
               preamble=None, postamble=None):
     """Returns the state string"""
@@ -163,6 +180,18 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
     producers = set()
     for proxy in consumers:
         get_producers(proxy, filter, producers)
+
+    # image extractors that save all views need the layout and all the views in
+    # it, which are not dependencies tracked by the proxy manager.
+    for proxy in list(consumers.union(producers)):
+        layout = _get_layout_for_saving_all_views(proxy)
+        if layout is None or layout in producers or not filter(layout):
+            continue
+        producers.add(layout)
+        for view in simple.GetViewsInLayout(layout):
+            if view not in producers and filter(view):
+                producers.add(view)
+                get_producers(view, filter, producers)
 
     # proxies_of_interest is set of all proxies that we should trace.
     proxies_of_interest = producers.union(consumers)
@@ -219,8 +248,12 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
             if l:
                 layouts.add(simple.GetLayout(aview))
 
+        if skipLayoutComponents:
+            # still trace layouts needed by image extractors that save all views.
+            layouts = set([x for x in layouts if x in proxies_of_interest])
+
         # trace create of layouts
-        if layouts and not skipLayoutComponents:
+        if layouts:
             layouts = sorted(layouts, key=lambda x: \
                 smtrace.Trace.get_registered_name(x, "layouts"))
             trace.append_separated([ \

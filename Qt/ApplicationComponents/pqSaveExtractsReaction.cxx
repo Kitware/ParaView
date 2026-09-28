@@ -60,6 +60,9 @@ bool pqSaveExtractsReaction::generateExtracts()
       const auto prev = pgm->unblockEvents(true);
       const auto status = exporter->SaveExtracts();
       pgm->unblockEvents(prev);
+      // image extractors may resize views temporarily (e.g. for the separator
+      // width when saving all views), leaving them blank until rendered again.
+      appcore->render();
       return status;
     }
   }

@@ -55,6 +55,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
   void resetButtonClicked();
+  void saveAllViewsModified();
   void scale(double factor);
   void applyPreset();
   void applyRecent();

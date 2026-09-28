@@ -63,6 +63,7 @@ set(PY_TESTS
   RecolorableImageExtractor.py
   ReflectBackwardsCompatibilityTest.py,NO_VALID
   RepresentationTypeHint.py,NO_VALID
+  SaveAllViewsCatalystState.py,NO_VALID
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   ScalarBarActorBackwardsCompatibility.py,NO_VALID

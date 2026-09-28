@@ -8,7 +8,9 @@
  * results from views. Default implementation uses a vtkSMSaveScreenshotProxy
  * provided as a subproxy named "Writer" to handle the image capture.
  *
- * This can generate images only from vtkSMViewProxy and subclasses.
+ * This can generate images only from vtkSMViewProxy and subclasses. When the
+ * "SaveAllViews" property on the "Writer" is enabled, the generated image
+ * combines all views in the layout containing the view.
  */
 
 #ifndef vtkSMImageExtractWriterProxy_h
@@ -17,6 +19,10 @@
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMExtractWriterProxy.h"
 #include "vtkSMExtractsController.h" // for SummaryParametersT type
+
+#include <vector> // for std::vector
+
+class vtkSMViewProxy;
 
 class VTKREMOTINGVIEWS_EXPORT vtkSMImageExtractWriterProxy : public vtkSMExtractWriterProxy
 {
@@ -70,6 +76,13 @@ protected:
    * shorter version suitable for use in filename.
    */
   virtual const char* GetShortName(const std::string& key) const;
+
+  /**
+   * Returns the views rendered to generate the image. This is the view set on
+   * the "Writer" or, when "SaveAllViews" is enabled, all views in the layout
+   * containing that view. Returns an empty vector on error.
+   */
+  std::vector<vtkSMViewProxy*> GetViewsToCapture();
 
 private:
   vtkSMImageExtractWriterProxy(const vtkSMImageExtractWriterProxy&) = delete;
