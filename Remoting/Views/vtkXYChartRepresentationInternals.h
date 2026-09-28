@@ -12,6 +12,8 @@
 #include "vtkCSVExporter.h"           // for vtkCSVExporter
 #include "vtkChartXY.h"               // for vtkChartXY
 #include "vtkDataArray.h"             // for vtkDataArray
+#include "vtkIdTypeArray.h"           // for vtkIdTypeArray
+#include "vtkNew.h"                   // for vtkNew
 #include "vtkPen.h"                   // for vtkPen enums
 #include "vtkPlotBar.h"               // for vtkPlotBar
 #include "vtkPlotFunctionalBag.h"     // for vtkPlotFunctionalBag
@@ -305,6 +307,10 @@ public:
       }
     }
 
+    // tables with an index column, used when the index is plotted along the
+    // vertical axis.
+    std::map<vtkTable*, vtkSmartPointer<vtkTable>> indexedTables;
+
     // for each ordered column
     for (auto it = orderMap.begin(); it != orderMap.end(); ++it)
     {
@@ -322,11 +328,34 @@ public:
           continue;
         }
       }
-      plot->SetInputData(table);
-      plot->SetUseIndexForXSeries(self->GetUseIndexForXAxis());
-      plot->SetInputArray(0, self->GetXAxisSeriesName());
-      plot->SetInputArray(
-        this->GetInputArrayIndex(info.TableName, info.ColumnName, info.Role), info.ColumnName);
+      const int arrayIndex = this->GetInputArrayIndex(info.TableName, info.ColumnName, info.Role);
+      if (self->GetSwapXYAxes() && arrayIndex == 1 && vtkPlotPoints::SafeDownCast(plot))
+      {
+        // Plot the series along the horizontal axis and the X array (or the
+        // index) along the vertical one. Since plots only support using the
+        // index for the X series, add the index as a column instead.
+        const bool useIndex = self->GetUseIndexForXAxis();
+        if (useIndex)
+        {
+          auto& indexedTable = indexedTables[table];
+          if (!indexedTable)
+          {
+            indexedTable = AddIndexColumn(table);
+          }
+          table = indexedTable;
+        }
+        plot->SetInputData(table);
+        plot->SetUseIndexForXSeries(false);
+        plot->SetInputArray(0, info.ColumnName);
+        plot->SetInputArray(1, useIndex ? IndexColumnName() : self->GetXAxisSeriesName());
+      }
+      else
+      {
+        plot->SetInputData(table);
+        plot->SetUseIndexForXSeries(self->GetUseIndexForXAxis());
+        plot->SetInputArray(0, self->GetXAxisSeriesName());
+        plot->SetInputArray(arrayIndex, info.ColumnName);
+      }
       this->SeriesPlots.AddPlot(self, info.TableName, info.ColumnName, info.Role, plot);
       newPlots.AddPlot(self, info.TableName, info.ColumnName, info.Role, plot);
     }
@@ -423,6 +452,34 @@ public:
   }
 
 protected:
+  //---------------------------------------------------------------------------
+  /**
+   * Name of the index column added by AddIndexColumn().
+   */
+  static const char* IndexColumnName() { return "vtkXYChartRepresentationIndex"; }
+
+  //---------------------------------------------------------------------------
+  /**
+   * Returns a shallow copy of the table with an additional column, named
+   * IndexColumnName(), holding the row indices.
+   */
+  static vtkSmartPointer<vtkTable> AddIndexColumn(vtkTable* table)
+  {
+    auto result = vtkSmartPointer<vtkTable>::New();
+    result->ShallowCopy(table);
+
+    const vtkIdType numRows = table->GetNumberOfRows();
+    vtkNew<vtkIdTypeArray> indices;
+    indices->SetName(IndexColumnName());
+    indices->SetNumberOfTuples(numRows);
+    for (vtkIdType cc = 0; cc < numRows; ++cc)
+    {
+      indices->SetTypedComponent(cc, 0, cc);
+    }
+    result->AddColumn(indices);
+    return result;
+  }
+
   //---------------------------------------------------------------------------
   /**
    * Returns false for in-visible plots.

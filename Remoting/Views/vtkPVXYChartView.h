@@ -479,6 +479,17 @@ public:
   vtkSetMacro(SortByXAxis, bool);
   ///@}
 
+  ///@{
+  /**
+   * Set whether to swap the X and Y axes. When set, the X array (or the index)
+   * of each representation, i.e. the independent variable, is plotted along the
+   * vertical axis, and the series along the horizontal axis. This is only
+   * supported for line and point plots. Default is false.
+   */
+  vtkGetMacro(SwapXYAxes, bool);
+  vtkSetMacro(SwapXYAxes, bool);
+  ///@}
+
   /**
    * Provides access to the chart view.
    */
@@ -528,6 +539,7 @@ protected:
 
   bool HideTimeMarker;
   bool SortByXAxis;
+  bool SwapXYAxes;
 
 private:
   vtkPVXYChartView(const vtkPVXYChartView&) = delete;
