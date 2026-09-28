@@ -1456,9 +1456,10 @@
           command="SetEnableANARI"
           default_values="0"
           animateable="0"
+          panel_visibility="advanced"
           number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Enables rendering with ANARI.</Documentation>
+        <Documentation>Enables rendering with ANARI. This is an experimental feature.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="ANARIHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
