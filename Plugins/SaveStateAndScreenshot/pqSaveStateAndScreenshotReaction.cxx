@@ -55,29 +55,43 @@ pqSaveStateAndScreenshotReaction::pqSaveStateAndScreenshotReaction(
 //-----------------------------------------------------------------------------
 void pqSaveStateAndScreenshotReaction::onViewChanged(pqView* view)
 {
-  if (this->Proxy)
+  vtkSMSaveScreenshotProxy* shProxy = vtkSMSaveScreenshotProxy::SafeDownCast(this->Proxy);
+  if (shProxy)
   {
-    vtkSMViewProxy* viewProxyNull = nullptr;
-    vtkSMSaveScreenshotProxy* shProxy = vtkSMSaveScreenshotProxy::SafeDownCast(this->Proxy);
-    if (view)
-    {
-
-      vtkSMProxy* viewSaved =
-        vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(shProxy, "View").GetAsProxy());
-      vtkSMViewProxy* viewProxy = view->getViewProxy();
-      if (viewSaved != viewProxy)
-      {
-        // force going through settings
-        vtkSMPropertyHelper(shProxy, "View").Set(viewProxyNull);
-      }
-    }
-    else
-    {
-      // force going through settings
-      vtkSMPropertyHelper(shProxy, "View").Set(viewProxyNull);
-    }
+    this->ResetView(shProxy, view ? view->getViewProxy() : nullptr);
     this->updateEnableState();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqSaveStateAndScreenshotReaction::ResetView(
+  vtkSMSaveScreenshotProxy* shProxy, vtkSMViewProxy* viewProxy)
+{
+  vtkSMProxy* viewSaved = vtkSMPropertyHelper(shProxy, "View").GetAsProxy();
+  if (viewSaved == viewProxy)
+  {
+    return;
+  }
+  vtkSMViewProxy* viewProxyNull = nullptr;
+  vtkSMViewLayoutProxy* layout = viewProxy ? vtkSMViewLayoutProxy::FindLayout(viewProxy) : nullptr;
+  if (!layout)
+  {
+    // nothing we can capture, disable save until a view in a layout becomes active
+    vtkSMPropertyHelper(shProxy, "View").Set(viewProxyNull);
+    return;
+  }
+  vtkSMProxy* layoutSaved = vtkSMPropertyHelper(shProxy, "Layout").GetAsProxy();
+  vtkSMPropertyHelper(shProxy, "View").Set(viewProxy);
+  if (vtkSMPropertyHelper(shProxy, "SaveAllViews").GetAsInt() != 0 && layout == layoutSaved)
+  {
+    // we capture the same layout, so we keep the configured resolution
+    shProxy->UpdateVTKObjects();
+    return;
+  }
+  vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
+  // the capture target changed, so use the size of the new view or layout
+  shProxy->GetProperty("ImageResolution")->ResetToDomainDefaults();
+  shProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -131,7 +145,7 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
     vtkSmartPointer<vtkPVXMLElement> stateXMLRoot;
     if (embedStateProp && vtkSMPropertyHelper(embedStateProp).GetAsInt() == 1)
     {
-      Q_EMIT pqApplicationCore::instance()->aboutToWriteState(screenshotFile);
+      Q_EMIT pqApplicationCore::instance() -> aboutToWriteState(screenshotFile);
       vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
       stateXMLRoot = vtkSmartPointer<vtkPVXMLElement>::Take(pxm->SaveXMLState());
     }

@@ -12,6 +12,7 @@
 
 class vtkSMProxy;
 class vtkSMSaveScreenshotProxy;
+class vtkSMViewProxy;
 class pqView;
 
 /**
@@ -39,8 +40,9 @@ protected Q_SLOTS:
    */
   void onTriggered() override;
   /**
-   * Called on the active view changed to check if the layout changed.
-   * If that happens, we deactivate the save button to force the user to save settings
+   * Called when the active view changes. Points the saved screenshot settings
+   * to the new view and its layout, so that the user does not have to configure
+   * them again.
    */
   void onViewChanged(pqView*);
 
@@ -50,6 +52,12 @@ protected Q_SLOTS:
   void onSettings();
 
 private:
+  /**
+   * Sets the View and Layout of shProxy to viewProxy and its layout. If the
+   * captured view or layout changes, ImageResolution is reset to its size.
+   * If viewProxy is not in a layout, View is set to nullptr which disables save.
+   */
+  void ResetView(vtkSMSaveScreenshotProxy* shProxy, vtkSMViewProxy* viewProxy);
   void CopyProperties(vtkSMSaveScreenshotProxy* shProxySaved, vtkSMSaveScreenshotProxy* shProxy);
 
   Q_DISABLE_COPY(pqSaveStateAndScreenshotReaction);

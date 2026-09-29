@@ -1,0 +1,3 @@
+## Save State and Screenshot follows the active view
+
+The SaveStateAndScreenshot plugin no longer disables the _Save State and Screenshot_ button when you change the active view. Previously, you had to click _Configure Save_ again every time a different view became active. Now the saved settings follow the active view. If the image covers the same layout (**Save All Views** is on and the new view is in the same layout), all your settings, including **Image Resolution**, are kept. Otherwise, **Image Resolution** is reset to the size of the new view or layout, and the other settings are kept. The button is still disabled when there is no active view, or when the active view is not in a layout.
