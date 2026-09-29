@@ -37,7 +37,7 @@
 #endif
 
 #ifdef _WIN32
-#include "vtkDynamicLoader.h"
+#include "vtkWindows.h"
 #else
 #include <csignal>
 #endif
@@ -265,18 +265,12 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
   HandleDisplay(argc, argv);
 
 #ifdef _WIN32
-  // Avoid Ghost windows on windows XP
-  typedef void (*VOID_FUN)();
-  vtkLibHandle lib = vtkDynamicLoader::OpenLibrary("user32.dll");
-  if (lib)
-  {
-    VOID_FUN func =
-      (VOID_FUN)vtkDynamicLoader::GetSymbolAddress(lib, "DisableProcessWindowsGhosting");
-    if (func)
-    {
-      (*func)();
-    }
-  }
+  // Windows replaces any window whose thread has not serviced its message
+  // queue for 5 seconds with a "ghost" showing a stale snapshot. Server and
+  // batch processes that render into on-screen windows (e.g. tile display,
+  // CAVE) don't run a message loop, and without this disable call, their
+  // windows show up black or freeze on the last frame.
+  DisableProcessWindowsGhosting();
 #endif // _WIN32
 
 #ifdef PARAVIEW_ENABLE_FPE
