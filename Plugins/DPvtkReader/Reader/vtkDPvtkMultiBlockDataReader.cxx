@@ -359,14 +359,13 @@ bool vtkDPvtkMultiBlockDataReader::vtkInternals::ReaderSetData(
     int requestedIndex = it->second.second;
     if (this->RankData.Rank != requestedRank)
     {
-      this->RankData.Rank = requestedRank;
       // RankData is not cached, read it
+      this->RankData.Clear();
       if (requestedRank >= this->StepToc.size())
       {
         throw std::runtime_error(
           fmt::format("Requested rank {} greater or equal with number of ranks {}", requestedRank,
             this->StepToc.size()));
-        return false;
       }
       this->RankData.RawData.resize(this->StepToc[requestedRank].inflated_size);
       vtkDebugWithObjectMacro(
@@ -378,6 +377,7 @@ bool vtkDPvtkMultiBlockDataReader::vtkInternals::ReaderSetData(
       {
         throw std::runtime_error("DPvzVtkData::extract failed");
       }
+      this->RankData.Rank = requestedRank;
     }
     if (requestedIndex >= this->RankData.VtkDataCount)
     {
