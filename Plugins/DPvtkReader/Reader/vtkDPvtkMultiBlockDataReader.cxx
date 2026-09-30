@@ -500,7 +500,10 @@ int vtkDPvtkMultiBlockDataReader::RequestInformation(
       this->ReadMTime = vtkTimeStamp();
     }
 
-    this->Superclass::RequestInformation(request, inputVector, outputVector);
+    if (!this->Superclass::RequestInformation(request, inputVector, outputVector))
+    {
+      throw std::runtime_error("Cannot read the .vtm information");
+    }
     // set TIME_STEPS and TIME_RANGE
     outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), this->Internals->Times.data(),
