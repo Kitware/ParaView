@@ -62,6 +62,10 @@ protected:
    * data is cached at each node.
    */
   int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  /**
+   * Loads the requested time step, re-parses its .vtm, and then reads the data.
+   */
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
 };

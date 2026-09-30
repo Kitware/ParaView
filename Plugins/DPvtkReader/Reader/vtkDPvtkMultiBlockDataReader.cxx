@@ -29,8 +29,10 @@
 #include <DPvzVtk.h>
 #include <DPvzVtkData.h>
 
+#include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <map>
 
 VTK_ABI_NAMESPACE_BEGIN
 
@@ -75,36 +77,49 @@ public:
   std::unique_ptr<DPvzVtk> File;
   // Table of contents for the whole file. One entry for each time step.
   std::vector<DPvzTocEntry> Toc;
-  // all time values
+  // All time values
   std::vector<double> Times;
 
-  // Table of contents for one time step. One entry for each rank.
+  // Table of contents for the current time step. One entry for each rank.
   std::vector<DPvzRankToc> StepToc;
-  // current time value
+  // Current time value
   double Time = 0;
-  // current time step
+  // Current time step
   size_t Step = 0;
+  // true if StepToc, VtmData, FileNameToRankIndex and RankData are loaded for Step
+  bool StepLoaded = false;
   // .vtm for current time step
   std::string VtmData;
-  // map (file name -> (rank, index inside of rank data))
+  // map (file name -> (rank, index inside of rank data)) for current time step
   std::map<std::string, std::pair<int, int>> FileNameToRankIndex;
+  // Rank data for current time step
   RankDataType RankData;
 
-  /**
-   * Opens the DPvtk file, reads Toc
-   */
   vtkInternals(vtkDPvtkMultiBlockDataReader* object)
     : Object(object)
   {
   }
+  /**
+   * Opens the DPvtk file, reads Toc
+   */
   void Open(const char* filename);
   void Close();
   bool IsOpen() { return File && !this->File->failed(); }
   /**
-   * Reads the requested time step from outInfo and
-   * reads StepToc from the file, sets Time, Step
+   * Returns the time step index for the UPDATE_TIME_STEP in outInfo
+   * or 0 if there is no UPDATE_TIME_STEP.
    */
-  void ReadTimeStepInformation(vtkInformation* outInfo);
+  size_t GetRequestedStep(vtkInformation* outInfo);
+  /**
+   * Reads StepToc, VtmData and FileNameToRankIndex for 'step' if that step is not
+   * already loaded. Sets Time and Step. Returns true if a new step was loaded.
+   * This is a collective operation.
+   */
+  bool LoadStep(size_t step);
+  /**
+   * Reads StepToc for this->Step from the file.
+   */
+  void ReadStepToc();
   /**
    * Reads all RankData on all nodes, and builds FileNameToRankIndex
    */
@@ -167,39 +182,45 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::Close()
   this->Times.clear();
   this->StepToc.clear();
   this->VtmData.clear();
+  this->FileNameToRankIndex.clear();
   this->RankData.Clear();
+  this->StepLoaded = false;
 }
 
-void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadTimeStepInformation(vtkInformation* outInfo)
+size_t vtkDPvtkMultiBlockDataReader::vtkInternals::GetRequestedStep(vtkInformation* outInfo)
 {
-  vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
-  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+  if (this->Times.empty())
   {
-    double requestedValue = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    if (this->Times.empty())
-    {
-      // we already checked for this
-      throw std::runtime_error("No times information has been read from the DPvtkFile");
-    }
-    this->Step = std::distance(this->Times.begin(),
-                   std::upper_bound(this->Times.begin(), this->Times.end(), requestedValue)) -
-      1;
-    this->Step = std::min(std::max(this->Step, std::size_t{ 0 }), this->Times.size() - 1);
-    this->Time = this->Times[this->Step];
+    // we already checked for this
+    throw std::runtime_error("No times information has been read from the DPvtkFile");
   }
-  else
+  if (!outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
   {
-    this->Step = 0;
-    if (this->Step < this->Times.size())
-    {
-      this->Time = this->Times[this->Step];
-    }
-    else
-    {
-      throw std::runtime_error("DPvtk does not have a time entry");
-    }
+    return 0;
   }
-  output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), this->Time);
+  double requestedValue = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+  // last time step with time <= requestedValue, clamped to the first step
+  auto it = std::upper_bound(this->Times.begin(), this->Times.end(), requestedValue);
+  return it == this->Times.begin() ? 0 : std::distance(this->Times.begin(), it) - 1;
+}
+
+bool vtkDPvtkMultiBlockDataReader::vtkInternals::LoadStep(size_t step)
+{
+  if (this->StepLoaded && this->Step == step)
+  {
+    return false;
+  }
+  this->StepLoaded = false;
+  this->Step = step;
+  this->Time = this->Times[this->Step];
+  this->ReadStepToc();
+  this->ReadPartitionInformation();
+  this->StepLoaded = true;
+  return true;
+}
+
+void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadStepToc()
+{
   int32_t ranks = this->Toc[this->Step].ranks;
   vtkDebugWithObjectMacro(
     this->Object, << fmt::format("Number of ranks for time step {}: {} ", this->Step, ranks));
@@ -208,7 +229,6 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadTimeStepInformation(vtkInfo
   {
     throw std::runtime_error("DPvtkFile::get_time_toc failed");
   }
-  output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), this->Time);
 }
 
 void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
@@ -218,6 +238,10 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
     throw std::runtime_error("Cannot read partition information without time step information");
   }
   assert(this->Controller);
+  // discard data from the previously loaded time step
+  this->VtmData.clear();
+  this->FileNameToRankIndex.clear();
+  this->RankData.Clear();
   int numRanks = this->Controller->GetNumberOfProcesses();
   int rank = this->Controller->GetLocalProcessId();
 
@@ -443,8 +467,13 @@ int vtkDPvtkMultiBlockDataReader::RequestInformation(
     {
       this->Internals->Open(this->FileName);
     }
-    this->Internals->ReadTimeStepInformation(outInfo);
-    this->Internals->ReadPartitionInformation();
+    // UPDATE_TIME_STEP is not yet set for this request, so we load a time step
+    // only to provide the .vtm structure. RequestData loads the requested time step.
+    if (this->Internals->LoadStep(this->Internals->GetRequestedStep(outInfo)))
+    {
+      // make sure the .vtm for the loaded step is parsed
+      this->ReadMTime = vtkTimeStamp();
+    }
 
     this->Superclass::RequestInformation(request, inputVector, outputVector);
     // set TIME_STEPS and TIME_RANGE
@@ -465,11 +494,48 @@ int vtkDPvtkMultiBlockDataReader::RequestInformation(
 }
 
 //------------------------------------------------------------------------------
+int vtkDPvtkMultiBlockDataReader::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  vtkDebugMacro("vtkDPvtkMultiBlockDataReader::RequestData");
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  try
+  {
+    if (this->Internals->LoadStep(this->Internals->GetRequestedStep(outInfo)))
+    {
+      // A different time step than the one used in RequestInformation was loaded.
+      // Force parsing of the new .vtm. We do not call Modified() as that
+      // would re-execute the pipeline.
+      this->ReadMTime = vtkTimeStamp();
+      if (!this->ReadXMLInformation())
+      {
+        throw std::runtime_error("Cannot parse the .vtm file");
+      }
+      this->PrepareToCreateMetaData(this->GetPrimaryElement());
+      this->CreateMetaData(this->GetPrimaryElement());
+    }
+  }
+  catch (std::exception& e)
+  {
+    vtkErrorMacro("Error: " << e.what());
+    return 0;
+  }
+  int ret = this->Superclass::RequestData(request, inputVector, outputVector);
+  // the superclass sets the time to the first time step, as it does not know about DPvtk
+  // time steps.
+  vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
+  output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), this->Internals->Time);
+  return ret;
+}
+
+//------------------------------------------------------------------------------
 int vtkDPvtkMultiBlockDataReader::ReadXMLInformation()
 {
   vtkDebugMacro("vtkDPvtkMultiBlockDataReader::ReadXMLInformation");
-  this->ReadFromInputStringOn();
-  this->SetInputString(this->Internals->VtmData);
+  // Set the members directly: SetInputString() and ReadFromInputStringOn()
+  // call Modified(), which would re-execute the pipeline.
+  this->ReadFromInputString = 1;
+  this->InputString = this->Internals->VtmData;
   return this->Superclass::ReadXMLInformation();
 }
 
