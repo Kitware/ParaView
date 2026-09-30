@@ -278,7 +278,10 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
       this->RankData.RawData.resize(this->StepToc[i].inflated_size);
       vtkDebugWithObjectMacro(
         this->Object, << fmt::format("ReadPartitionInformation, DPvtkFile::get_data rank={}", i));
-      this->File->get_data(this->StepToc[i], this->RankData.RawData.data());
+      if (this->File->get_data(this->StepToc[i], this->RankData.RawData.data()))
+      {
+        throw std::runtime_error(fmt::format("DPvtkFile::get_data failed for rank {}", i));
+      }
       if (DPvzVtkData::extract(this->RankData.RawData.data(), this->StepToc[i].inflated_size,
             this->RankData.VtkDataCount, this->RankData.VtkData))
       {
@@ -388,7 +391,11 @@ bool vtkDPvtkMultiBlockDataReader::vtkInternals::ReaderSetData(
       this->RankData.RawData.resize(this->StepToc[requestedRank].inflated_size);
       vtkDebugWithObjectMacro(
         this->Object, << fmt::format("ReaderSetData, DPvtkFile::get_data rank={}", requestedRank));
-      this->File->get_data(this->StepToc[requestedRank], this->RankData.RawData.data());
+      if (this->File->get_data(this->StepToc[requestedRank], this->RankData.RawData.data()))
+      {
+        throw std::runtime_error(
+          fmt::format("DPvtkFile::get_data failed for rank {}", requestedRank));
+      }
       if (DPvzVtkData::extract(this->RankData.RawData.data(),
             this->StepToc[requestedRank].inflated_size, this->RankData.VtkDataCount,
             this->RankData.VtkData))
