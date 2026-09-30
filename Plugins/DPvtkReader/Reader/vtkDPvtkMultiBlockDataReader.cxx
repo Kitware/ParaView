@@ -136,10 +136,13 @@ public:
   bool LoadStep(size_t step);
   /**
    * Reads StepToc for this->Step from the file.
+   * This is a local operation, called by ReadPartitionInformation.
    */
   void ReadStepToc();
   /**
-   * Reads all RankData on all nodes, and builds FileNameToRankIndex
+   * Reads StepToc and all RankData on all nodes, and builds FileNameToRankIndex.
+   * All ranks agree on success before communicating, so an error on one rank
+   * is reported on all ranks. This is a collective operation.
    */
   void ReadPartitionInformation();
   bool ReaderSetData(vtkXMLReader* reader, const char* fileName);
@@ -231,7 +234,6 @@ bool vtkDPvtkMultiBlockDataReader::vtkInternals::LoadStep(size_t step)
   this->StepLoaded = false;
   this->Step = step;
   this->Time = this->Times[this->Step];
-  this->ReadStepToc();
   this->ReadPartitionInformation();
   this->StepLoaded = true;
   return true;
@@ -251,12 +253,9 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadStepToc()
 
 void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
 {
-  if (this->StepToc.empty())
-  {
-    throw std::runtime_error("Cannot read partition information without time step information");
-  }
   assert(this->Controller);
   // discard data from the previously loaded time step
+  this->StepToc.clear();
   this->VtmData.clear();
   this->FileNameToRankIndex.clear();
   this->RankData.Clear();
@@ -274,6 +273,11 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
   std::string localError;
   try
   {
+    this->ReadStepToc();
+    if (this->StepToc.empty())
+    {
+      throw std::runtime_error("Cannot read partition information without time step information");
+    }
     for (int i = this->StepToc.size() - 1; i >= 0; --i)
     {
       if (i % numRanks == rank)
@@ -327,6 +331,7 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
   {
     localError = e.what();
     // do not keep partially read data
+    this->StepToc.clear();
     this->RankData.Clear();
   }
   int localFailed = localError.empty() ? 0 : 1;
