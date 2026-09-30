@@ -34,6 +34,7 @@
 #include <cassert>
 #include <iterator>
 #include <map>
+#include <utility>
 
 VTK_ABI_NAMESPACE_BEGIN
 
@@ -381,7 +382,16 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
       streams[i] >> fileName;
       streams[i] >> fileNameRank;
       streams[i] >> fileNameIndex;
-      this->FileNameToRankIndex[fileName] = { fileNameRank, fileNameIndex };
+      // All ranks build the same map, so all ranks throw together.
+      auto inserted =
+        this->FileNameToRankIndex.emplace(fileName, std::make_pair(fileNameRank, fileNameIndex));
+      if (!inserted.second)
+      {
+        throw std::runtime_error(
+          fmt::format("Duplicate file name {} stored at rank {} index {} and at rank {} index {}",
+            fileName, inserted.first->second.first, inserted.first->second.second, fileNameRank,
+            fileNameIndex));
+      }
     }
   }
   vtkDebugWithObjectMacro(this->Object, << fmt::format("Number of partitions for time step {}: {} ",
