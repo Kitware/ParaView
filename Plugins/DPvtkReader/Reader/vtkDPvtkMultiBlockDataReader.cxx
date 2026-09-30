@@ -57,12 +57,29 @@ struct RankDataType
    * How many VTK files are in VtkData.
    */
   int VtkDataCount = 0;
-  void Clear()
+
+  RankDataType() = default;
+  RankDataType(const RankDataType&) = delete;
+  RankDataType& operator=(const RankDataType&) = delete;
+  ~RankDataType() { this->FreeVtkData(); }
+
+  /**
+   * Releases the VtkData array allocated by DPvzVtkData::extract.
+   */
+  void FreeVtkData()
   {
-    this->Rank = -1;
-    this->RawData.clear();
+    if (this->VtkData)
+    {
+      DPvzVtkData::free(this->VtkDataCount, this->VtkData);
+    }
     this->VtkData = nullptr;
     this->VtkDataCount = 0;
+  }
+  void Clear()
+  {
+    this->FreeVtkData();
+    this->Rank = -1;
+    this->RawData.clear();
   }
 };
 }
@@ -256,6 +273,7 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
   {
     if (i % numRanks == rank)
     {
+      this->RankData.FreeVtkData();
       this->RankData.Rank = i;
       this->RankData.RawData.resize(this->StepToc[i].inflated_size);
       vtkDebugWithObjectMacro(
