@@ -3,6 +3,7 @@
 
 #include "vtkDPvtkMultiBlockDataReader.h"
 
+#include "vtkCommunicator.h"
 #include "vtkDPvz.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
@@ -268,50 +269,74 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
   std::vector<std::string> localFileName;
   std::vector<int> localRank;
   std::vector<int> localIndex;
-  int index = 0;
-  for (int i = this->StepToc.size() - 1; i >= 0; --i)
+  // Errors are not thrown right away: all ranks must agree on success
+  // before the collective operations below, otherwise the other ranks would hang.
+  std::string localError;
+  try
   {
-    if (i % numRanks == rank)
+    for (int i = this->StepToc.size() - 1; i >= 0; --i)
     {
-      this->RankData.FreeVtkData();
-      this->RankData.Rank = i;
-      this->RankData.RawData.resize(this->StepToc[i].inflated_size);
-      vtkDebugWithObjectMacro(
-        this->Object, << fmt::format("ReadPartitionInformation, DPvtkFile::get_data rank={}", i));
-      if (this->File->get_data(this->StepToc[i], this->RankData.RawData.data()))
+      if (i % numRanks == rank)
       {
-        throw std::runtime_error(fmt::format("DPvtkFile::get_data failed for rank {}", i));
-      }
-      if (DPvzVtkData::extract(this->RankData.RawData.data(), this->StepToc[i].inflated_size,
-            this->RankData.VtkDataCount, this->RankData.VtkData))
-      {
-        throw std::runtime_error("DPvzVtkData::extract failed");
-      }
-
-      for (int j = 0; j < this->RankData.VtkDataCount; ++j)
-      {
-        std::string fileName = this->RankData.VtkData[j].file;
-        if (i == 0)
+        this->RankData.FreeVtkData();
+        this->RankData.Rank = i;
+        this->RankData.RawData.resize(this->StepToc[i].inflated_size);
+        vtkDebugWithObjectMacro(
+          this->Object, << fmt::format("ReadPartitionInformation, DPvtkFile::get_data rank={}", i));
+        if (this->File->get_data(this->StepToc[i], this->RankData.RawData.data()))
         {
-          std::string ext = vtksys::SystemTools::GetFilenameExtension(fileName);
-          if (ext == ".pvd")
-          {
-            continue;
-          }
-          else if (ext == ".vtm")
-          {
-            this->VtmData.resize(this->RankData.VtkData[j].size);
-            std::copy(this->RankData.VtkData[j].data,
-              this->RankData.VtkData[j].data + this->RankData.VtkData[j].size,
-              this->VtmData.data());
-            continue;
-          }
+          throw std::runtime_error(fmt::format("DPvtkFile::get_data failed for rank {}", i));
         }
-        localFileName.emplace_back(fileName);
-        localRank.emplace_back(i);
-        localIndex.emplace_back(j);
+        if (DPvzVtkData::extract(this->RankData.RawData.data(), this->StepToc[i].inflated_size,
+              this->RankData.VtkDataCount, this->RankData.VtkData))
+        {
+          throw std::runtime_error("DPvzVtkData::extract failed");
+        }
+
+        for (int j = 0; j < this->RankData.VtkDataCount; ++j)
+        {
+          std::string fileName = this->RankData.VtkData[j].file;
+          if (i == 0)
+          {
+            std::string ext = vtksys::SystemTools::GetFilenameExtension(fileName);
+            if (ext == ".pvd")
+            {
+              continue;
+            }
+            else if (ext == ".vtm")
+            {
+              this->VtmData.resize(this->RankData.VtkData[j].size);
+              std::copy(this->RankData.VtkData[j].data,
+                this->RankData.VtkData[j].data + this->RankData.VtkData[j].size,
+                this->VtmData.data());
+              continue;
+            }
+          }
+          localFileName.emplace_back(fileName);
+          localRank.emplace_back(i);
+          localIndex.emplace_back(j);
+        }
       }
     }
+    if (rank == 0 && this->VtmData.empty())
+    {
+      throw std::runtime_error("Cannot find a .vtm file");
+    }
+  }
+  catch (std::exception& e)
+  {
+    localError = e.what();
+    // do not keep partially read data
+    this->RankData.Clear();
+  }
+  int localFailed = localError.empty() ? 0 : 1;
+  int anyFailed = 0;
+  this->Controller->AllReduce(&localFailed, &anyFailed, 1, vtkCommunicator::MAX_OP);
+  if (anyFailed)
+  {
+    throw std::runtime_error(localFailed
+        ? localError
+        : std::string("Reading partition information failed on another rank"));
   }
 
   // build a stream because strings can have different sizes
@@ -331,10 +356,6 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
   stream.Reset();
   if (rank == 0)
   {
-    if (this->VtmData.empty())
-    {
-      throw std::runtime_error("Cannot find a .vtm file");
-    }
     stream << this->VtmData;
   }
   this->Controller->Broadcast(stream, 0);
