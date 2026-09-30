@@ -677,7 +677,9 @@ void pqConfigureCategoriesDialog::onSetIconPressed()
 //----------------------------------------------------------------------------
 void pqConfigureCategoriesDialog::onAccepted()
 {
-  this->Internal->SettingsCategory->writeSettings(this->ResourceTag);
+  // only the differences with the application categories are saved.
+  this->Internal->SettingsCategory->writeSettings(
+    this->ResourceTag, this->Internal->MenuManager->getApplicationCategory());
 }
 
 //----------------------------------------------------------------------------

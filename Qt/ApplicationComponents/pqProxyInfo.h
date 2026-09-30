@@ -17,7 +17,7 @@ class vtkPVXMLElement;
 /**
  * Proxy meta data structure for the User Interface.
  */
-class pqProxyInfo : public QObject
+class PQAPPLICATIONCOMPONENTS_EXPORT pqProxyInfo : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
@@ -50,6 +50,11 @@ public:
   void setIcon(const QString& iconPath);
 
   /**
+   * Set whether the item is omitted from the toolbar of the given category.
+   */
+  void setOmitFromToolbar(const QString& categoryName, bool omit);
+
+  /**
    * Merge pqProxyInfo meta data into self.
    * Append OmitFromToolbar values.
    * For other properties, keep those from self if non empty, else copy other.
@@ -80,6 +85,13 @@ public:
   QStringList omitFromToolbar() { return this->OmitFromToolbar; }
   bool hideFromMenu();
   ///@}
+
+  /**
+   * Returns true if the attributes that can be customized by users, i.e. icon
+   * and visibility in menus and toolbars, are the same for both items. For the
+   * toolbar visibility, only the parent categories are considered.
+   */
+  bool hasSameCustomizableAttributes(pqProxyInfo* other);
 
 private:
   /// XML Name

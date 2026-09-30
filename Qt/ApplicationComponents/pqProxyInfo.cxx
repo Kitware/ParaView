@@ -104,6 +104,16 @@ void pqProxyInfo::setHideFromMenu(bool hide)
 }
 
 //-----------------------------------------------------------------------------
+void pqProxyInfo::setOmitFromToolbar(const QString& categoryName, bool omit)
+{
+  this->OmitFromToolbar.removeAll(categoryName);
+  if (omit)
+  {
+    this->OmitFromToolbar << categoryName;
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqProxyInfo::setIcon(const QString& iconPath)
 {
   this->Icon = iconPath;
@@ -142,4 +152,17 @@ void pqProxyInfo::merge(pqProxyInfo* other)
 bool pqProxyInfo::hideFromMenu()
 {
   return this->HideFromMenu;
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyInfo::hasSameCustomizableAttributes(pqProxyInfo* other)
+{
+  auto parentName = [](pqProxyInfo* info)
+  {
+    auto category = dynamic_cast<pqProxyCategory*>(info->parent());
+    return category ? category->name() : QString();
+  };
+  return this->Icon == other->Icon && this->HideFromMenu == other->HideFromMenu &&
+    this->OmitFromToolbar.contains(parentName(this)) ==
+    other->OmitFromToolbar.contains(parentName(other));
 }

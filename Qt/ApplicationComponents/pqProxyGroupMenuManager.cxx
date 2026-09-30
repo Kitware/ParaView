@@ -51,25 +51,11 @@ struct pqProxyGroupMenuManager::pqInternal
   }
 
   //-----------------------------------------------------------------------------
-  pqProxyCategory* menuCategory()
-  {
-    if (this->SettingsCategory->isEmpty())
-    {
-      return this->ApplicationCategory.get();
-    }
-
-    return this->SettingsCategory.get();
-  }
-
   /**
-   * Return true if new proxies/categories definition should be added to the settings tree.
-   * If settings are present we do not want to add application-defined proxies (loaded at startup).
-   * Once client is set up, new proxies comes from plugins and should be added.
+   * Return the categories used for the menus: the application categories with
+   * the user customizations applied.
    */
-  bool allowSettingsUpdate()
-  {
-    return this->ClientEnvironmentDone && !this->SettingsCategory->isEmpty();
-  }
+  pqProxyCategory* menuCategory() { return this->SettingsCategory.get(); }
 
   /**
    * Proxy action update.
@@ -165,13 +151,15 @@ struct pqProxyGroupMenuManager::pqInternal
   }
 
   /**
-   * Loads settings and force existence of Favorites if enabled.
+   * Rebuild the categories used for the menus: the application categories with
+   * the user customizations from the settings applied. Force existence of
+   * Favorites if enabled.
    */
   void loadSettings(const QString& resourceTagName, bool enableFavorites)
   {
-    this->SettingsCategory->loadSettings(resourceTagName);
-    if (enableFavorites && !this->SettingsCategory->isEmpty() &&
-      !this->hasFavorites(this->SettingsCategory.get()))
+    this->SettingsCategory.reset(new pqProxyCategory());
+    this->SettingsCategory->loadSettings(resourceTagName, this->ApplicationCategory.get());
+    if (enableFavorites && !this->hasFavorites(this->SettingsCategory.get()))
     {
       this->createFavorites(this->SettingsCategory.get());
     }
@@ -197,10 +185,11 @@ struct pqProxyGroupMenuManager::pqInternal
 
   std::unique_ptr<pqProxyCategory> ApplicationCategory;
   std::unique_ptr<pqProxyCategory> SettingsCategory;
+  // the customizations saved in settings that SettingsCategory reflects.
+  QString LoadedCustomizations;
 
   QMap<QString, QPointer<QAction>> CachedActions;
 
-  bool ClientEnvironmentDone = false;
   bool IsWritingSettings = false;
 
   QTimer NewDefinitionsTimer;
@@ -222,10 +211,17 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
 
   this->loadCategorySettings();
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QObject::connect(settings, &pqSettings::modified, [&]() { this->loadCategorySettings(); });
-
-  QObject::connect(pqApplicationCore::instance(), &pqApplicationCore::clientEnvironmentDone, this,
-    [&]() { this->Internal->ClientEnvironmentDone = true; });
+  QObject::connect(settings, &pqSettings::modified, this,
+    [this]()
+    {
+      // settings are modified often, e.g. whenever any setting is applied: only
+      // rebuild the categories when their customizations changed.
+      if (pqProxyCategory::savedCustomizations(this->ResourceTagName) !=
+        this->Internal->LoadedCustomizations)
+      {
+        this->loadCategorySettings();
+      }
+    });
 
   QObject::connect(pqApplicationCore::instance(), SIGNAL(loadXML(vtkPVXMLElement*)), this,
     SLOT(loadConfiguration(vtkPVXMLElement*)));
@@ -282,6 +278,7 @@ void pqProxyGroupMenuManager::addProxy(const QString& xmlgroup, const QString& x
     auto proxy =
       new pqProxyInfo(this->Internal->ApplicationCategory.get(), xmlname, xmlgroup, xmlname);
     this->Internal->ApplicationCategory->addProxy(proxy);
+    this->loadCategorySettings();
   }
 }
 
@@ -291,6 +288,7 @@ void pqProxyGroupMenuManager::removeProxy(const QString& xmlgroup, const QString
   if (!xmlname.isEmpty() && !xmlgroup.isEmpty())
   {
     this->Internal->ApplicationCategory->removeProxy(xmlname);
+    this->loadCategorySettings();
   }
 }
 
@@ -310,16 +308,10 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
   // Convert legacy xml to new style.
   pqProxyCategory::convertLegacyXML(root);
 
-  bool modified = this->Internal->ApplicationCategory->parseXML(root);
-  // do not re-add application defined categories inside settings.
-
-  if (modified && this->Internal->allowSettingsUpdate())
+  if (this->Internal->ApplicationCategory->parseXML(root))
   {
-    modified = this->Internal->SettingsCategory->parseXML(root);
-    if (modified)
-    {
-      this->writeCategoryToSettings();
-    }
+    // apply the user customizations to the updated application categories.
+    this->loadCategorySettings();
   }
 
   this->populateMenu();
@@ -992,6 +984,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
   }
 
   // Loop over proxy that should be inserted inside the UI
+  bool modified = false;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     const char* group = iter->GetGroupName();
@@ -1003,18 +996,15 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
       continue;
     }
 
-    bool modified = this->Internal->ApplicationCategory->parseXMLHintsTag(group, name, hints);
-    // do not re-add application defined categories inside settings.
-    if (modified && this->Internal->allowSettingsUpdate())
-    {
-      modified = this->Internal->SettingsCategory->parseXMLHintsTag(group, name, hints);
-      if (modified)
-      {
-        this->writeCategoryToSettings();
-      }
-    }
+    modified =
+      this->Internal->ApplicationCategory->parseXMLHintsTag(group, name, hints) || modified;
   }
 
+  if (modified)
+  {
+    // apply the user customizations to the updated application categories.
+    this->loadCategorySettings();
+  }
   this->populateMenu();
 }
 
@@ -1076,6 +1066,8 @@ void pqProxyGroupMenuManager::loadCategorySettings()
     return;
   }
 
+  this->Internal->LoadedCustomizations =
+    pqProxyCategory::savedCustomizations(this->ResourceTagName);
   this->Internal->loadSettings(this->ResourceTagName, this->EnableFavorites);
 
   Q_EMIT this->categoriesUpdated();
@@ -1086,6 +1078,10 @@ void pqProxyGroupMenuManager::writeCategoryToSettings()
 {
   bool prev = this->Internal->IsWritingSettings;
   this->Internal->IsWritingSettings = true;
-  this->getMenuCategory()->writeSettings(this->ResourceTagName);
+  this->getMenuCategory()->writeSettings(
+    this->ResourceTagName, this->Internal->ApplicationCategory.get());
+  // the categories already reflect the customizations written.
+  this->Internal->LoadedCustomizations =
+    pqProxyCategory::savedCustomizations(this->ResourceTagName);
   this->Internal->IsWritingSettings = prev;
 }

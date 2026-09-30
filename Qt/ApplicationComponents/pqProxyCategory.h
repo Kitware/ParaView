@@ -5,9 +5,11 @@
 
 #include "pqApplicationComponentsModule.h"
 
-#include "pqProxyInfo.h" // for pqProxyInfoMap
-#include <QMap>          // for QMap
-#include <QString>       // for QString
+#include "pqProxyInfo.h"            // for pqProxyInfoMap
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_6_3_0
+#include "vtkSmartPointer.h"        // for vtkSmartPointer
+#include <QMap>                     // for QMap
+#include <QString>                  // for QString
 
 class vtkPVXMLElement;
 
@@ -99,9 +101,37 @@ public:
    * Settings methods.
    */
   ///@{
+  /**
+   * Write the user customizations in ParaView settings, i.e. the differences
+   * between this category and `base`, typically the categories defined by the
+   * application and plugins. Customizations are applied over the base when
+   * loaded, so categories and items added, modified or removed later on in the
+   * base, e.g. by plugins, are reflected, unless customized by the user.
+   * Customizations that could not be applied when loaded, e.g. of categories
+   * and items defined by plugins that are not loaded, are kept.
+   */
+  void writeSettings(const QString& resourceTag, pqProxyCategory* base);
+
+  /**
+   * Set this category to a copy of `base` with the user customizations from
+   * ParaView settings applied, if any.
+   * Categories saved in settings by previous versions, as a copy of the
+   * complete category, are merged into the copy of `base` instead.
+   */
+  void loadSettings(const QString& resourceTag, pqProxyCategory* base);
+
+  /**
+   * Returns the customizations saved in ParaView settings for the given
+   * resource tag, as read by loadSettings(), e.g. to find out whether they
+   * changed.
+   */
+  static QString savedCustomizations(const QString& resourceTag);
+
   /// Write categories into ParaView settings.
+  PARAVIEW_DEPRECATED_IN_6_3_0("Use writeSettings(resourceTag, base) instead.")
   void writeSettings(const QString& resourceTag);
   /// Load categories from ParaView settings.
+  PARAVIEW_DEPRECATED_IN_6_3_0("Use loadSettings(resourceTag, base) instead.")
   void loadSettings(const QString& resourceTag);
   ///@}
 
@@ -225,6 +255,30 @@ private:
    */
   void convertToXML(pqProxyCategory* parent, vtkPVXMLElement* root);
 
+  /**
+   * Recursively add to `xml` the differences between `customized` and `base`,
+   * which may be nullptr: added, removed and modified categories and items.
+   */
+  static void diff(pqProxyCategory* base, pqProxyCategory* customized, vtkPVXMLElement* xml);
+
+  /**
+   * Recursively apply the differences described by `xml` (see diff()). The
+   * differences that cannot be applied, e.g. for categories and items defined
+   * by plugins that are not loaded, are kept so that diff() adds them back.
+   */
+  void applyCustomizations(vtkPVXMLElement* xml);
+
+  /**
+   * Keep a difference that could not be applied to the direct children of this
+   * category (see applyCustomizations()).
+   */
+  void keepUnappliedCustomization(vtkPVXMLElement* element);
+
+  /**
+   * Remove and delete the direct child item with the given name.
+   */
+  void deleteProxy(const QString& name);
+
   QString Name;
   QString Label;
 
@@ -234,6 +288,9 @@ private:
   pqProxyInfoMap Proxies;
   QMap<QString, pqProxyCategory*> SubCategories;
   QStringList OrderedProxies;
+
+  /// Differences that could not be applied to the direct children, as nested elements.
+  vtkSmartPointer<vtkPVXMLElement> UnappliedCustomizations;
 };
 
 /// map a category name to its pqProxyCategory
