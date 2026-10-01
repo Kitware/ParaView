@@ -153,26 +153,17 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::Open(const char* filename)
 {
   this->Controller = vtkMultiProcessController::GetGlobalController();
 #ifdef DPVZ_MPI
+  // DPvz must use the same processes as this->Controller, which is used to
+  // distribute the reading.
   auto* controller = vtkMPIController::SafeDownCast(this->Controller);
-  MPI_Comm rawComm = MPI_COMM_WORLD;
-  if (controller)
-  {
-    auto* communicator = vtkMPICommunicator::SafeDownCast(controller->GetCommunicator());
-    if (communicator)
-    {
-      rawComm = *(communicator->GetMPIComm()->GetHandle());
-    }
-    else
-    {
-      throw std::runtime_error("DPvtk needs that vtkMultiProcessController::GetGlobalController() "
-                               "returns a vtkMPIController.");
-    }
-  }
-  else
+  auto* communicator =
+    controller ? vtkMPICommunicator::SafeDownCast(controller->GetCommunicator()) : nullptr;
+  if (!communicator)
   {
     throw std::runtime_error("DPvtk needs that vtkMultiProcessController::GetGlobalController() "
                              "returns a vtkMPIController.");
   }
+  MPI_Comm rawComm = *(communicator->GetMPIComm()->GetHandle());
   this->File = std::make_unique<DPvzVtk>(filename, DPvzMode::DPvzReadOnly, rawComm);
 #else
   this->File = std::make_unique<DPvzVtk>(filename, DPvzMode::DPvzReadOnly);
