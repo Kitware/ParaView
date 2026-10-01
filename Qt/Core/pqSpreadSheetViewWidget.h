@@ -58,6 +58,13 @@ protected: // NOLINT(readability-redundant-access-specifiers)
    */
   void paintEvent(QPaintEvent* event) override;
 
+  /**
+   * resize columns by content, taking into account multi component columns
+   * note that this is basically a function that exists in QtTableView, but there it
+   * does not respect the case of multi component columns
+   */
+  void resizeColumnsToContentsRespectingComponents();
+
 private:
   Q_DISABLE_COPY(pqSpreadSheetViewWidget)
 
