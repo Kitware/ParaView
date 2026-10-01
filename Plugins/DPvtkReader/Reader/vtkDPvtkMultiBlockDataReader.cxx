@@ -265,7 +265,6 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
 
   // read the file names on all ranks
   // unfortunately we also read the file data in the same time.
-  // we traverse backward so that rank 0 is cached.
   std::vector<std::string> localFileName;
   std::vector<int> localRank;
   std::vector<int> localIndex;
@@ -279,7 +278,9 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
     {
       throw std::runtime_error("Cannot read partition information without time step information");
     }
-    for (int i = this->StepToc.size() - 1; i >= 0; --i)
+    // Process 'rank' reads the writer ranks i with i % numRanks == rank.
+    // We traverse backward so that the data of writer rank 'rank' stays cached.
+    for (int i = static_cast<int>(this->StepToc.size()) - 1; i >= 0; --i)
     {
       if (i % numRanks == rank)
       {
@@ -348,7 +349,7 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
   // build a stream because strings can have different sizes
   vtkMultiProcessStream stream;
   stream << static_cast<int>(localFileName.size());
-  for (int i = 0; i < localFileName.size(); ++i)
+  for (size_t i = 0; i < localFileName.size(); ++i)
   {
     stream << localFileName[i];
     stream << localRank[i];
@@ -418,10 +419,10 @@ bool vtkDPvtkMultiBlockDataReader::vtkInternals::ReaderSetData(
     {
       // RankData is not cached, read it
       this->RankData.Clear();
-      if (requestedRank >= this->StepToc.size())
+      if (requestedRank < 0 || static_cast<size_t>(requestedRank) >= this->StepToc.size())
       {
         throw std::runtime_error(
-          fmt::format("Requested rank {} greater or equal with number of ranks {}", requestedRank,
+          fmt::format("Requested rank {} outside of the range of ranks [0, {})", requestedRank,
             this->StepToc.size()));
       }
       this->RankData.RawData.resize(this->StepToc[requestedRank].inflated_size);
@@ -501,7 +502,7 @@ int vtkDPvtkMultiBlockDataReader::CanReadFile(const char* name)
     return 1;
 #endif
   }
-  catch (std::exception& e)
+  catch (std::exception&)
   {
     return 0;
   }
