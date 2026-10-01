@@ -125,8 +125,9 @@ public:
   void Close();
   bool IsOpen() { return File && !this->File->failed(); }
   /**
-   * Returns the time step index for the UPDATE_TIME_STEP in outInfo
-   * or 0 if there is no UPDATE_TIME_STEP.
+   * Returns the index of the first time step with a time greater than or equal
+   * to the UPDATE_TIME_STEP in outInfo, or of the last time step if there is none,
+   * as in vtkPVDReader. Returns 0 if there is no UPDATE_TIME_STEP.
    */
   size_t GetRequestedStep(vtkInformation* outInfo);
   /**
@@ -212,9 +213,14 @@ size_t vtkDPvtkMultiBlockDataReader::vtkInternals::GetRequestedStep(vtkInformati
     return 0;
   }
   double requestedValue = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-  // last time step with time <= requestedValue, clamped to the first step
-  auto it = std::upper_bound(this->Times.begin(), this->Times.end(), requestedValue);
-  return it == this->Times.begin() ? 0 : std::distance(this->Times.begin(), it) - 1;
+  // first time step with time >= requestedValue, clamped to the last time step,
+  // as in vtkPVDReader
+  auto it = std::lower_bound(this->Times.begin(), this->Times.end(), requestedValue);
+  if (it == this->Times.end())
+  {
+    return this->Times.size() - 1;
+  }
+  return std::distance(this->Times.begin(), it);
 }
 
 bool vtkDPvtkMultiBlockDataReader::vtkInternals::LoadStep(size_t step)

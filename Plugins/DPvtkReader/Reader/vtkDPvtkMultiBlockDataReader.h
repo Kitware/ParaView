@@ -16,8 +16,8 @@
  * and `ReaderSetFileNameOrData` supplies the partition files.
  *
  * Time steps are read from the DPvtk table of contents. For a requested
- * time, the reader loads the last time step with a time less than or equal
- * to it, or the first time step.
+ * time, the reader loads the first time step with a time greater than or
+ * equal to it, or the last time step, as `vtkPVDReader` does.
  *
  * In parallel, the number of reader processes does not need to match
  * the number of ranks used for writing. The file lists are then
