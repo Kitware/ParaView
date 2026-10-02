@@ -12,6 +12,15 @@ if (PARAVIEW_USE_MPI)
     LOAD_PLUGIN "DPvtkReader"
     BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
     TEST_SCRIPTS TestDPvtkMultiBlockDataReader.xml TestDPvtkMultiBlockDataReaderTime.xml)
+
+  # More server processes than the 2 ranks used to write the data:
+  # one process reads no rank data when reading partition information.
+  paraview_add_client_server_tests(
+    PREFIX "pvcs3"
+    NUMSERVERS 3
+    LOAD_PLUGIN "DPvtkReader"
+    BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+    TEST_SCRIPTS TestDPvtkMultiBlockDataReader.xml TestDPvtkMultiBlockDataReaderTime.xml)
 endif ()
 
 ExternalData_add_target("${_paraview_add_tests_default_test_data_target}")
