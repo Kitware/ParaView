@@ -7,7 +7,6 @@
 #include <QObject>
 
 class pqSpaceMouseImpl;
-class pqView;
 
 class pqSpaceMouseAutoStart : public QObject
 {
@@ -20,9 +19,6 @@ public:
 
   void startup();
   void shutdown();
-
-  // public Q_SLOTS:
-  // void setActiveView(pqView* view);
 
 private:
   Q_DISABLE_COPY(pqSpaceMouseAutoStart)

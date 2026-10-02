@@ -1,7 +1,7 @@
 NAME
   SpaceMouseInteractor
 DESCRIPTION
-  SpaceMouse from 3Dconnexion
+  SpaceMouse navigation via 3Dconnexion or spacenavd
 CONDITION
   PARAVIEW_USE_QT
 REQUIRES_MODULES

@@ -1,16 +1,57 @@
 ## SpaceMouseInteractor
 
-This plugin allows navigation in ParaView using [3Dconnexion](https://3dconnexion.com) SpaceMouse devices. It was developed with the SpaceMouse Compact, but will function with any SpaceMouse.
+This plugin allows navigation in ParaView using
+[3Dconnexion](https://3dconnexion.com) SpaceMouse devices. It was developed
+with the SpaceMouse Compact but supports other SpaceMouse devices.
 
-It uses the official 3DxWare 10 SDK provided by 3Dconnexion. The license for the SDK requires each developer/company to register with 3Dconnexion to obtain the SDK: https://3dconnexion.com/us/software-developer-program/ . For the offical ParaView binaries and Kitware developers, the SDK is available through the ParaView superbuild when the build machine is on the internal Kitware network.
+On Windows and macOS, the plugin uses the official 3DxWare 10 SDK. The SDK
+license requires developers and companies to
+[register with 3Dconnexion](https://3dconnexion.com/us/software-developer-program/)
+to obtain it. For official ParaView binaries and Kitware developers, the SDK
+is available through the ParaView superbuild when the build machine is on the
+internal Kitware network.
 
-To build the plugin on Windows, unzip the SDK, and in CMake, check `PARAVIEW_PLUGIN_ENABLE_SpaceMouseInteractor`, and set `3DxWareSDK_ROOT` to point to the SDK, for example: `-D3DxWareSDK_DIR="C:/projects/3DxWare_SDK_v4-0-2_r17624"`. The plugin uses a header-only library from an example, so one directory must be copied: `3DxWare_SDK_v4-0-2_r17624/samples/navlib_viewer/src/SpaceMouse` should be copied to `3DxWare_SDK_v4-0-2_r17624/include/SpaceMouse`.
+### Windows
 
-On MacOS, the SDK is installed with the 3DxWare 10 drivers, and is located at `/Library/frameworks/3DconnexionNavlib.framework`. Unfortunately headers need to be rearranged to match the Windows SDK, and requires the `SpaceMouse` directory from the Windows SDK as well. (3Dconnexion support indicated this may change soon.) You will need administrator access to copy files in this directory.
-* Inside the `/Library/frameworks/3DconnexionNavlib.framework` directory:
-   * Create the `Headers/navlib` directory.
-   * Copy all `*.h` except `siappcmd_types.h` from `Headers` to `Headers/navlib/`
-   * Copy a directory from the Windows SDK, `3DxWare_SDK_v4-0-2_r17624/samples/navlib_viewer/src/SpaceMouse` to `Headers/SpaceMouse`
-* Now in CMake for ParaView, check `PARAVIEW_PLUGIN_ENABLE_SpaceMouseInteractor`, and it should find the framework and set the `3DxWareSDK_INCLUDE_DIR` and `3DxWareSDK_LIBRARY` variables. If not, set `3DxWareSDK_ROOT` to point to the `/Library/frameworks` directory.
+Unzip the SDK, enable `PARAVIEW_PLUGIN_ENABLE_SpaceMouseInteractor` in CMake,
+and set `3DxWareSDK_ROOT` to the SDK directory (for example,
+`C:/projects/3DxWare_SDK_v4-0-2_r17624`). Copy the header-only example
+directory `samples/navlib_viewer/src/SpaceMouse` into the SDK's
+`include/SpaceMouse` directory.
 
-On Linux, a do-nothing implementation is provided. 3Dconnexion support indicated no plans for an equivalent SDK for Linux. The open-source driver at http://spacenav.sourceforge.net may be worth exploring in the future.
+### macOS
+
+The SDK is installed with the 3DxWare 10 drivers at
+`/Library/frameworks/3DconnexionNavlib.framework`. The headers need to be
+arranged to match the Windows SDK, including the `SpaceMouse` directory from
+the Windows SDK. This requires administrator access:
+
+1. Inside the framework, create `Headers/navlib` and copy all `*.h` files from
+   `Headers` into it, except `siappcmd_types.h`.
+2. Copy the Windows SDK directory `samples/navlib_viewer/src/SpaceMouse` into
+   `Headers/SpaceMouse`.
+3. Enable `PARAVIEW_PLUGIN_ENABLE_SpaceMouseInteractor` in CMake. It should
+   find the framework and set `3DxWareSDK_INCLUDE_DIR` and
+   `3DxWareSDK_LIBRARY`. If needed, set `3DxWareSDK_ROOT` to
+   `/Library/frameworks`.
+
+### Linux
+
+Install and run [spacenavd](https://spacenav.sourceforge.net/) and build the
+plugin against libspnav and its development headers. Enable
+`PARAVIEW_PLUGIN_ENABLE_SpaceMouseInteractor` in CMake. For a locally built,
+uninstalled libspnav, pass `-DSPNAV_ROOT=/path/to/libspnav` (or set
+`Spnav_INCLUDE_DIR` and `Spnav_LIBRARY` explicitly).
+
+An uninstalled libspnav source build may contain only `libspnav.so.0.5`, whose
+SONAME is `libspnav.so.0`. In this case, create a `libspnav.so.0` symlink
+pointing to the built library in a directory on the runtime library search
+path, such as `build/lib`.
+
+The Linux implementation uses libspnav's native socket connection, which
+does not require X11 and works under Wayland. The puck navigates the active
+Render View around its center of rotation. In 2D mode, lateral motion pans,
+depth motion zooms, and rotation is limited to roll around the viewing
+direction. Input is discarded while the server is busy, and the plugin
+reconnects if the daemon is unavailable or restarts. Axis mapping, dead
+zones, and sensitivity can be adjusted using spacenavd's configuration tools.

@@ -1,4 +1,4 @@
-# so we can use our local Find3DxWareSDK.cmake
+# Use the plugin's local find modules for 3DxWareSDK and libspnav.
 list(INSERT CMAKE_MODULE_PATH 0
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(interfaces)
@@ -22,13 +22,18 @@ if (WIN32 OR APPLE)
     pqSpaceMouseImpl.h)
   find_package(3DxWareSDK REQUIRED)
 else ()
-  # this is a do-nothing implementation until 3DConnexion releases support.
+  cmake_policy(PUSH)
+  if (POLICY CMP0144)
+    cmake_policy(SET CMP0144 NEW)
+  endif ()
+  find_package(Spnav REQUIRED)
+  cmake_policy(POP)
   list(APPEND sources
     pqSpaceMouseImplLinux.cxx
     pqSpaceMouseImplLinux.h)
 endif ()
 
-# support std::make_unique
+# Support std::make_unique.
 set(CMAKE_CXX_STANDARD 14)
 
 paraview_add_plugin(SpaceMouseInteractor
@@ -39,7 +44,7 @@ paraview_add_plugin(SpaceMouseInteractor
   UI_INTERFACES ${interfaces}
   SOURCES       ${sources})
 
-# support __declspec(property) on Mac
+# Support __declspec(property) on macOS.
 target_compile_options(SpaceMouseInteractor
   PRIVATE
     "$<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang>:-fdeclspec>")
@@ -55,5 +60,9 @@ if (WIN32 OR APPLE)
   target_link_libraries(SpaceMouseInteractor
     PRIVATE
       3Dconnexion::3DxWareSDK)
+else ()
+  target_link_libraries(SpaceMouseInteractor
+    PRIVATE
+      Spnav::Spnav)
 endif ()
 target_compile_definitions(SpaceMouseInteractor PRIVATE QT_NO_KEYWORDS)

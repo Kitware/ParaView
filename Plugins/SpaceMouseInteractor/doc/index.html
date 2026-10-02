@@ -5,12 +5,21 @@
   <body>
     <h1>SpaceMouse Interactor Plugin</h1>
 
-    <div>
-    This plugin adds support for <i>3Dconnexion SpaceMouse</i> to
-    <b>ParaView</b>. On Windows or MacOS, if you have a SpaceMouse enabled, the camera in the 3D renderview can be controlled with the puck.
-    </div>
-    <div>
-      3D input device development tools and related technology are provided under license from 3Dconnexion. © 3Dconnexion 1992 - 2020. All rights reserved.
-    </div>
+    <p>
+      This plugin adds support for <i>3Dconnexion SpaceMouse</i> to
+      <b>ParaView</b>. On Windows and macOS, it uses the 3Dconnexion driver;
+      on Linux, it uses libspnav and a running spacenavd daemon. The puck
+      controls the camera in the active Render View.
+    </p>
+    <p>
+      On Linux, 3D mode supports translation and rotation around the view's
+      center of rotation. In 2D mode, lateral motion pans, depth motion zooms,
+      and rotation is limited to the viewing direction. Input is discarded
+      while the server is busy.
+    </p>
+    <p>
+      3D input device development tools and related technology are provided under
+      license from 3Dconnexion. © 3Dconnexion 1992 - 2020. All rights reserved.
+    </p>
   </body>
 </html>
