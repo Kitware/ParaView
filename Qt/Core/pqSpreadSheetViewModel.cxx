@@ -453,9 +453,13 @@ QVariant pqSpreadSheetViewModel::headerData(
           int tempStringLength = -1;
           auto it = this->Internal->TempSectionHeader.find(section);
           if (it != this->Internal->TempSectionHeader.end())
+          {
             tempStringLength = it.value();
+          }
           if (0 <= tempStringLength)
+          {
             return QString(tempStringLength, QChar('a'));
+          }
 
           return QString(view->GetColumnLabel(section).c_str());
         }
@@ -488,16 +492,24 @@ bool pqSpreadSheetViewModel::setHeaderData(
   auto it = this->Internal->TempSectionHeader.find(section);
   int currentValue = -1;
   if (it != this->Internal->TempSectionHeader.end())
+  {
     currentValue = it.value();
+  }
   int newValue = value.toInt();
   if (currentValue == newValue)
+  {
     return false;
+  }
 
   // Apply the value
   if (0 > newValue)
+  {
     this->Internal->TempSectionHeader.erase(it);
+  }
   else
+  {
     this->Internal->TempSectionHeader[section] = newValue;
+  }
   return true;
 }
 

@@ -155,11 +155,8 @@ void pqSpreadSheetViewWidget::paintEvent(QPaintEvent* pevent)
 }
 
 //-----------------------------------------------------------------------------
-// For single component columns, this simply calls QtTableView::resizeColumnsToContents,
-// but for multi component columns some extra handling is required
 void pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents()
 {
-  // We need view and model for all the following jobs
   QHeaderView* hdrView = this->horizontalHeader();
   pqSpreadSheetViewModel* smodel = qobject_cast<pqSpreadSheetViewModel*>(this->model());
 
@@ -173,7 +170,9 @@ void pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents()
   for (int c = 0; c < smodel->columnCount(); ++c)
   {
     if (hdrView->isSectionHidden(c))
+    {
       continue;
+    }
 
     QString hdrLabel = smodel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString();
     std::vector<int>& hdrInxVec =
@@ -181,7 +180,9 @@ void pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents()
     hdrInxVec.push_back(c);
 
     if (1 < hdrInxVec.size())
+    {
       hasMultiCompCols = true;
+    }
   }
 
   // First calculate all column widths ignoring multi-component columns and remember
@@ -189,16 +190,22 @@ void pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents()
   // If we do not have multi-component columns at all, we are already done here
   this->resizeColumnsToContents();
   if (!hasMultiCompCols)
+  {
     return;
+  }
 
   // Remember the current initial column widths
   std::vector<int> visHdrWidths0;
   for (int c = 0; c < smodel->columnCount(); ++c)
   {
     if (hdrView->isSectionHidden(c))
+    {
       visHdrWidths0.push_back(-1);
+    }
     else
+    {
       visHdrWidths0.push_back(hdrView->sectionSize(c));
+    }
   }
 
   // For the rest of this function we want to stop signalling from the model because we are
@@ -210,7 +217,9 @@ void pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents()
   for (auto it = visHdrNameInx.begin(); it != visHdrNameInx.end(); ++it)
   {
     if (1 >= it->second.size())
+    {
       continue;
+    }
 
     for (auto ith = it->second.begin(); ith != it->second.end(); ++ith)
     {
@@ -225,9 +234,13 @@ void pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents()
   for (int c = 0; c < smodel->columnCount(); ++c)
   {
     if (hdrView->isSectionHidden(c))
+    {
       visHdrWidthsEmpty.push_back(-1);
+    }
     else
+    {
       visHdrWidthsEmpty.push_back(hdrView->sectionSize(c));
+    }
   }
 
   // Since we have no way to directly set the section width in a header view, we will again
@@ -242,17 +255,21 @@ void pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents()
   for (auto it = visHdrNameInx.begin(); it != visHdrNameInx.end(); ++it)
   {
     if (1 >= it->second.size())
+    {
       continue;
+    }
 
     for (auto ith = it->second.begin(); ith != it->second.end(); ++ith)
     {
       // We divide the "original" column width by the number of components, and then we
       // see whether this value is larger or the column width that is calculated by
       // considering data only (and give it a little bit "extra")
-      int compWidth = visHdrWidths0[*ith] / it->second.size();
+      int compWidth = visHdrWidths0[*ith] / static_cast<int>(it->second.size());
       if (visHdrWidthsEmpty[*ith] < compWidth)
+      {
         smodel->setHeaderData(
           *ith, Qt::Horizontal, compWidth / aWidth + 1, pqSpreadSheetViewModel::SectionHeaderTemp);
+      }
     }
   }
 
@@ -264,7 +281,9 @@ void pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents()
   for (auto it = visHdrNameInx.begin(); it != visHdrNameInx.end(); ++it)
   {
     if (1 >= it->second.size())
+    {
       continue;
+    }
 
     for (auto ith = visHdrNameInx[it->first].begin(); ith != visHdrNameInx[it->first].end(); ++ith)
     {
