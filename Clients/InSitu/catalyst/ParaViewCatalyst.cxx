@@ -25,6 +25,8 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkStringArray.h"
 
+#include <exception>
+
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
 #endif
@@ -339,11 +341,35 @@ enum paraview_catalyst_status
   paraview_catalyst_status_invalid_node = 100,
   paraview_catalyst_status_results = 101,
   paraview_catalyst_status_pipeline_execute_failed = 102,
+  paraview_catalyst_status_exception = 103,
 };
 #define pvcatalyst_err(name) static_cast<enum catalyst_status>(paraview_catalyst_status_##name)
 
+namespace
+{
+// Exceptions must not cross the C interface, so each entry point reports one as an error.
+template <typename Call>
+enum catalyst_status catch_exceptions(const char* function, Call&& call)
+{
+  try
+  {
+    return call();
+  }
+  catch (const std::exception& e)
+  {
+    vtkLogF(ERROR, "'%s' threw: %s", function, e.what());
+  }
+  catch (...)
+  {
+    vtkLogF(ERROR, "'%s' threw an unknown exception", function);
+  }
+  // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
+  return pvcatalyst_err(exception);
+}
+}
+
 //-----------------------------------------------------------------------------
-enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
+static enum catalyst_status initialize_paraview(const conduit_node* params)
 {
   vtkLogger::Init();
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
@@ -508,7 +534,7 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
 }
 
 //-----------------------------------------------------------------------------
-enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
+static enum catalyst_status execute_paraview(const conduit_node* params)
 {
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
@@ -873,7 +899,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
 }
 
 //-----------------------------------------------------------------------------
-enum catalyst_status catalyst_finalize_paraview(const conduit_node* params)
+static enum catalyst_status finalize_paraview(const conduit_node* params)
 {
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
@@ -890,7 +916,7 @@ enum catalyst_status catalyst_finalize_paraview(const conduit_node* params)
 }
 
 //-----------------------------------------------------------------------------
-enum catalyst_status catalyst_about_paraview(conduit_node* params)
+static enum catalyst_status about_paraview(conduit_node* params)
 {
   catalyst_stub_about(params);
   conduit_cpp::Node cpp_params = conduit_cpp::cpp_node(params);
@@ -905,7 +931,7 @@ enum catalyst_status catalyst_about_paraview(conduit_node* params)
 }
 
 //-----------------------------------------------------------------------------
-enum catalyst_status catalyst_results_paraview(conduit_node* params)
+static enum catalyst_status results_paraview(conduit_node* params)
 {
   auto stub_error_status = catalyst_stub_results(params);
 
@@ -929,4 +955,34 @@ enum catalyst_status catalyst_results_paraview(conduit_node* params)
 
   // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
   return is_success ? catalyst_status_ok : pvcatalyst_err(results);
+}
+
+//-----------------------------------------------------------------------------
+enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
+{
+  return catch_exceptions("catalyst_initialize", [&] { return initialize_paraview(params); });
+}
+
+//-----------------------------------------------------------------------------
+enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
+{
+  return catch_exceptions("catalyst_execute", [&] { return execute_paraview(params); });
+}
+
+//-----------------------------------------------------------------------------
+enum catalyst_status catalyst_finalize_paraview(const conduit_node* params)
+{
+  return catch_exceptions("catalyst_finalize", [&] { return finalize_paraview(params); });
+}
+
+//-----------------------------------------------------------------------------
+enum catalyst_status catalyst_about_paraview(conduit_node* params)
+{
+  return catch_exceptions("catalyst_about", [&] { return about_paraview(params); });
+}
+
+//-----------------------------------------------------------------------------
+enum catalyst_status catalyst_results_paraview(conduit_node* params)
+{
+  return catch_exceptions("catalyst_results", [&] { return results_paraview(params); });
 }
