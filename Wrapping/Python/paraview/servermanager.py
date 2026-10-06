@@ -700,7 +700,7 @@ class SourceProxy(Proxy):
         sorted_producers = proxy_util.toposort(producers)
 
         for prod in sorted_producers:
-            # only SourceProxy have an UpdatePipeline method
+            # only SourceProxy has an UpdatePipeline method
             if not prod.SMProxy.IsA("vtkSMSourceProxy"):
                 continue
 
@@ -1350,7 +1350,7 @@ class EnumerationProperty(VectorProperty):
                     raise ValueError("%s is not a valid value." % value)
         return VectorProperty.ConvertValue(self, value)
 
-    def _deferedSetData(self, caller, obj):
+    def _deferredSetData(self, caller, obj):
         if self._observerTag > -1:
             self.SMProperty.RemoveObserver(self._observerTag)
             self._observerTag = -1
@@ -1372,8 +1372,8 @@ class EnumerationProperty(VectorProperty):
                     VectorProperty.SetData(self, numeric)
                 else:
                     if self._observerTag > -1:
-                        self.SMProperty.RemoveObserver(self._deferedSetData)
-                    self._observerTag = self.SMProperty.AddObserver("DomainModifiedEvent", self._deferedSetData)
+                        self.SMProperty.RemoveObserver(self._deferredSetData)
+                    self._observerTag = self.SMProperty.AddObserver("DomainModifiedEvent", self._deferredSetData)
                     self.storedValue = value
         else:
             VectorProperty.SetData(self, value)

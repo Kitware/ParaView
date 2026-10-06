@@ -62,14 +62,13 @@ def unregister(proxy):
 
 
 class supported_proxies(object):
-    """filter object used to hide proxies that are currently not supported by
+    """Filter object used to hide proxies that are currently not supported by
     the state saving mechanism or those that are generally skipped in state.
     There is none currently but keeping the method for backward compatibility
     and future proofing."""
 
     def __call__(self, proxy):
         return proxy
-
 
 
 def get_consumers(proxy, filter, consumer_set, recursive=True):
@@ -84,7 +83,6 @@ def get_consumers(proxy, filter, consumer_set, recursive=True):
         if filter(consumer):
             consumer_set.add(consumer)
             if recursive: get_consumers(consumer, filter, consumer_set)
-
 
 
 def get_producers(proxy, filter, producer_set):
@@ -112,7 +110,6 @@ def toposort(input_set):
         __toposort_visit(result, unmarked_node, input_set, marked_set)
     result.reverse()
     return result
-
 
 
 def __toposort_visit(result, proxy, input_set, marked_set, t_marked_set=None):
