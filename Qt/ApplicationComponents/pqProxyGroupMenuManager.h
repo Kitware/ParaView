@@ -84,7 +84,9 @@ public:
    */
   QStringList getToolbarCategories() const;
   /**
-   * Return a name for the toolbar. This is based on category name and proxy group.
+   * Return a name for the toolbar. This is based on category name and on the
+   * proxy group this manager is for, e.g. "filters.Common", so that it does not
+   * change as items are added to the category.
    */
   QString getToolbarName(pqProxyCategory* category);
   /**
@@ -113,6 +115,23 @@ public:
    * Returns this list of actions that appear in toolbars
    */
   QList<QAction*> actionsInToolbars();
+
+  /**
+   * Add to `menu` the actions for the items of `category` (see categoryActions),
+   * followed by sub-menus, children of `menu`, for its non-empty sub-categories,
+   * recursively. Used to show categories in the menu bar and in toolbars.
+   */
+  void populateMenuFromCategory(QMenu* menu, pqProxyCategory* category);
+
+  /**
+   * Set whether the top-level categories marked with `show_in_menubar` are
+   * shown in the menu bar, e.g. by pqCategoryMenuBarBehavior, in which case
+   * they are not shown in the menu of this manager. Default is false, so that
+   * these categories are shown in the menu when nothing shows them in the menu
+   * bar, e.g. for context menus.
+   */
+  void setShowCategoriesInMenuBar(bool show);
+  bool showCategoriesInMenuBar() const;
   /**
    * Return the action for a given proxy.
    */
@@ -260,6 +279,11 @@ private: // NOLINT(readability-redundant-access-specifiers)
    * Return nullptr if its prototype is not known by the proxy manager.
    */
   QAction* createAction(pqProxyInfo* proxy);
+
+  /**
+   * Run the Python code of a script item, or the Python file if given.
+   */
+  void runScript(const QString& code, const QString& fileName);
 
   /**
    * Create the action and the reaction to add to favorites under given category.

@@ -482,6 +482,117 @@ class smproxy(object):
         return decorator
 
 
+class smmenu(object):
+    """
+    Provides decorators to add functions, and proxies such as filters, to menus
+    and toolbars in the ParaView GUI. These are categories of the filters menu
+    (see `ParaViewFilters` in the plugin documentation) shown as menus of the
+    menu bar.
+
+    `menu` is the name of the menu to add the item to, created if needed. Use
+    `/` to separate the names of nested sub-menus, e.g. `"My Tools/Advanced"`.
+    Plugins, including XML ones, can add items to the same menus.
+
+    When `toolbar` is True, the item is also added to a toolbar for the
+    top-level menu, where sub-menus are shown as drop-down buttons.
+
+    When `menubar` is False, the top-level menu is added to the Filters menu
+    instead of the menu bar, and its toolbar only has its own items.
+    """
+
+    @staticmethod
+    def _element(tag, attrs, nested=""):
+        from xml.sax.saxutils import quoteattr
+        attrs = "".join([" %s=%s" % (k, quoteattr(str(v))) for k, v in attrs.items() if v is not None])
+        return "<%s%s>%s</%s>" % (tag, attrs, nested, tag)
+
+    @staticmethod
+    def _generate_xml(item_attrs, item_tag, item_code, menu, toolbar, menubar):
+        from xml.sax.saxutils import escape
+        names = [name.strip() for name in menu.split("/") if name.strip()]
+        if not names:
+            raise ValueError("`menu` must not be empty.")
+
+        # items are omitted from the toolbar unless requested.
+        if len(names) == 1 and not toolbar:
+            item_attrs["omit_from_toolbar"] = 1
+        xml = smmenu._element(item_tag, item_attrs, escape(item_code))
+        for name in reversed(names[1:]):
+            xml = smmenu._element("Category", {"name": name, "preserve_order": 1}, xml)
+        xml = smmenu._element("Category", {"name": names[0],
+                                           "show_in_menubar": 1 if menubar else None,
+                                           "show_in_toolbar": 1 if toolbar else None,
+                                           "preserve_order": 1}, xml)
+        return smmenu._element("ServerManagerConfiguration", {},
+                               smmenu._element("ParaViewFilters", {}, xml))
+
+    @staticmethod
+    def action(menu, label=None, icon=None, tooltip=None, toolbar=False, menubar=True):
+        """
+        Decorates a function to add it as an action to a menu (and optionally a
+        toolbar). The function is called without arguments, using the GUI's
+        Python interpreter, when the action is triggered; after which, all views
+        are rendered. The function must be defined at the module level of the
+        plugin.
+
+        `label` defaults to the function's name, and `tooltip` to the first line
+        of its docstring. `icon` can be a Qt resource path, e.g.
+        `":/pqWidgets/Icons/pqCalculator.svg"`, or a file path.
+        """
+        def decorator(func):
+            doc = (func.__doc__ or "").strip()
+            attrs = {"name": "%s.%s" % (func.__module__, func.__name__),
+                     "label": label if label else func.__name__,
+                     "icon": icon,
+                     "tooltip": tooltip if tooltip else (doc.splitlines()[0] if doc else None)}
+            code = "import sys\nsys.modules[%r].%s()\n" % (func.__module__, func.__name__)
+            xmls = getattr(func, "_pvsm_menu_xmls", [])
+            xmls.append(smmenu._generate_xml(attrs, "Script", code, menu, toolbar, menubar))
+            setattr(func, "_pvsm_menu_xmls", xmls)
+            return func
+        return decorator
+
+    @staticmethod
+    def proxy(menu, icon=None, toolbar=False, menubar=True):
+        """
+        Decorates a class, also decorated using `smproxy.filter` or
+        `smproxy.source`, to add it to a menu (and optionally a toolbar).
+        Triggering the item creates the filter, for the selected pipeline
+        objects, or the source.
+
+        `icon` defaults to the icon from the proxy's `ShowInMenu` hint, if any.
+        """
+        def decorator(obj):
+            # `smproxy` decorators return wrappers; the requests are saved on
+            # the class itself, which supports either order for the decorators.
+            classobj = _undecorate(obj)
+            requests = list(classobj.__dict__.get("_pvsm_menu_requests", []))
+            requests.append({"menu": menu, "icon": icon, "toolbar": toolbar, "menubar": menubar})
+            setattr(classobj, "_pvsm_menu_requests", requests)
+            return obj
+        return decorator
+
+    @staticmethod
+    def _get_proxy_xmls(classobj):
+        """internal: returns the XMLs for the menu items requested using
+        `smmenu.proxy` for a class decorated using `smproxy`."""
+        requests = classobj.__dict__.get("_pvsm_menu_requests", [])
+        if not requests:
+            return []
+        if not hasattr(classobj, "_pvsm_proxy_xml"):
+            raise RuntimeError("`smmenu.proxy` requires `%s` to be decorated using `smproxy`." % classobj.__name__)
+        group = parseString(classobj._pvsm_proxy_xml).getElementsByTagName("ProxyGroup")[0]
+        proxy = [n for n in group.childNodes if n.nodeType == n.ELEMENT_NODE][0]
+        xmls = []
+        for request in requests:
+            attrs = {"group": group.getAttribute("name"),
+                     "name": proxy.getAttribute("name"),
+                     "icon": request["icon"]}
+            xmls.append(smmenu._generate_xml(attrs, "Proxy", "", request["menu"],
+                                             request["toolbar"], request["menubar"]))
+        return xmls
+
+
 def get_plugin_xmls(module_or_package):
     """helper function called by vtkPVPythonAlgorithmPlugin to discover
     all "proxy" decorated classes in the module or package. We don't recurse
@@ -499,6 +610,10 @@ def get_plugin_xmls(module_or_package):
         v = _undecorate(v)
         if hasattr(v, "_pvsm_proxy_xml"):
             xmls.append(getattr(v, "_pvsm_proxy_xml"))
+        if isclass(v):
+            xmls += smmenu._get_proxy_xmls(v)
+        elif hasattr(v, "_pvsm_menu_xmls"):
+            xmls += getattr(v, "_pvsm_menu_xmls")
     return xmls
 
 

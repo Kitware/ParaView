@@ -21,6 +21,10 @@ class QTreeWidgetItem;
 /**
  * pqConfigureCategoriesDialog is the Configure Categories dialog used by ParaView.
  * It allows to create and remove categories and organize filters in them.
+ *
+ * The tree of categories mirrors the menu bar: the top-level categories are
+ * under a "Filters" item, as they are sub-menus of the Filters menu, unless
+ * they are shown as menus of the menu bar, in which case they are beside it.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqConfigureCategoriesDialog : public QDialog
 {
@@ -79,12 +83,19 @@ protected Q_SLOTS:
    */
   void updateToolbarState();
 
+  /**
+   * Update the "show in menu bar" state of the selected category from the
+   * checkbox state, and move its item beside the "Filters" item, or under it.
+   */
+  void updateMenuBarState();
+
 private:
   /**
    * Update trees.
    */
   ///@{
-  /// Populate the custom tree from the categories settings.
+  /// Populate the custom tree from the categories settings: the item of the menu, containing the
+  /// top-level categories, and the ones shown in the menu bar beside it.
   void populateCurrentCategoriesTree();
   /// Populate the filters tree from the default configuration.
   void populateAvailableProxiesTree();
@@ -140,7 +151,7 @@ private:
   /**
    * Return the current category item (from first selected item)
    * This can be:
-   * - the invisible root item if nothing is selected
+   * - the item of the menu, containing the top-level categories, if nothing is selected
    * - the parent category if a proxy item is selected
    * - the selected item itself otherwise
    */

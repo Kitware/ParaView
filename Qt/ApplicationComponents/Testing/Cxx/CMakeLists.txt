@@ -7,7 +7,14 @@ endif()
 
 find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" REQUIRED COMPONENTS Core Widgets)
 set(tests_sources
-  TestCategoryCustomizations.cxx)
+  TestCategoryCustomizations.cxx
+  TestCategoryMenus.cxx
+  TestCategoryMenusExistingMenus.cxx
+  TestConfigureCategoriesDialog.cxx)
+if (TARGET ParaView::pqPython)
+  list(APPEND tests_sources
+    TestCategoryMenusExamplePlugins.cxx)
+endif ()
 create_test_sourcelist(tests pqApplicationComponentsTest.cxx ${tests_sources})
 vtk_module_test_executable(pqApplicationComponentsTest ${tests})
 target_link_libraries(pqApplicationComponentsTest
@@ -21,3 +28,9 @@ foreach (test_file IN LISTS tests_sources)
     NAME "pqApplicationComponents${test}"
     COMMAND pqApplicationComponentsTest ${test} --dr)
 endforeach ()
+
+if (TARGET ParaView::pqPython)
+  set_tests_properties(pqApplicationComponentsTestCategoryMenusExamplePlugins
+    PROPERTIES
+      ENVIRONMENT "CUSTOM_MENUS_EXAMPLE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/../../../../Examples/Plugins/CustomMenus")
+endif ()

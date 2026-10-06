@@ -25,6 +25,10 @@ class QAction;
  * categories request that the be added as a toolbar, new toolbars for those
  * are added and also if new items get added to a category already shown as a
  * toolbar, then the toolbar is updated.
+ *
+ * Toolbars list the items of the category. Toolbars of categories also shown in
+ * the menu bar (see pqCategoryMenuBarBehavior) mirror their menu: their
+ * sub-categories are shown as drop-down buttons.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCategoryToolbarsBehavior : public QObject
 {

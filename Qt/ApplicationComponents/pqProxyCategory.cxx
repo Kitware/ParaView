@@ -16,6 +16,8 @@
 #include "pqSettings.h"
 
 #include <QCoreApplication>
+#include <QSet>
+#include <QtDebug>
 
 #include <cstring>
 #include <sstream>
@@ -25,6 +27,18 @@ namespace
 {
 QString SETTINGS_CATEGORY_KEY = QStringLiteral("categories.%1/");
 QString SETTINGS_CUSTOMIZATIONS_KEY = QStringLiteral("categoryCustomizations.%1/");
+
+const char* itemElementName(pqProxyInfo* item)
+{
+  return item->isScript() ? "Script" : (item->isSeparator() ? "Separator" : "Proxy");
+}
+
+bool isItemElement(vtkPVXMLElement* element)
+{
+  const char* name = element->GetName();
+  return name &&
+    (strcmp(name, "Proxy") == 0 || strcmp(name, "Script") == 0 || strcmp(name, "Separator") == 0);
+}
 
 bool isCategoryElement(vtkPVXMLElement* element)
 {
@@ -49,6 +63,14 @@ bool hasElementFor(vtkPVXMLElement* xml, vtkPVXMLElement* element)
     }
   }
   return false;
+}
+
+/**
+ * Returns the label of categories without one, derived from their name.
+ */
+QString defaultLabel(const QString& name)
+{
+  return QString::fromStdString(vtkSMObject::CreatePrettyLabel(name.toStdString()));
 }
 
 /**
@@ -133,7 +155,7 @@ void pqProxyCategory::updateLabel(const QString& label)
 
   if (this->Label.isEmpty())
   {
-    this->Label = QString(vtkSMObject::CreatePrettyLabel(this->Name.toStdString()).c_str());
+    this->Label = ::defaultLabel(this->Name);
   }
 }
 
@@ -144,6 +166,7 @@ void pqProxyCategory::copyAttributes(pqProxyCategory* other)
   this->updateLabel(other->Label);
   this->PreserveOrder = other->PreserveOrder;
   this->ShowInToolbar = other->ShowInToolbar;
+  this->ShowInMenuBar = other->ShowInMenuBar;
 }
 
 //-----------------------------------------------------------------------------
@@ -228,12 +251,17 @@ void pqProxyCategory::convertToXML(pqProxyCategory* mainCategory, vtkPVXMLElemen
     {
       categoryXML->SetAttribute("preserve_order", "1");
     }
+    if (subCategory->ShowInMenuBar)
+    {
+      categoryXML->SetAttribute("show_in_menubar", "1");
+    }
 
     root->AddNestedElement(categoryXML);
     pqProxyCategory::convertToXML(subCategory, categoryXML);
   }
-  for (auto proxyInfo : mainCategory->Proxies)
+  for (const auto& proxyName : mainCategory->OrderedProxies)
   {
+    auto proxyInfo = mainCategory->Proxies.value(proxyName);
     if (!proxyInfo)
     {
       continue;
@@ -279,22 +307,30 @@ void pqProxyCategory::convertLegacyXML(vtkPVXMLElement* root)
 //-----------------------------------------------------------------------------
 pqProxyCategory* pqProxyCategory::addCategory(const QString& categoryName, vtkPVXMLElement* node)
 {
-  pqCategoryMap allCategories = this->getSubCategories();
-
-  if (allCategories.contains(categoryName))
-  {
-    return allCategories[categoryName];
-  }
-
-  QString categoryLabel = node->GetAttribute("menu_label");
   int preserve_order = 0;
   node->GetScalarAttribute("preserve_order", &preserve_order);
   int show_in_toolbar = 0;
   node->GetScalarAttribute("show_in_toolbar", &show_in_toolbar);
+  int show_in_menubar = 0;
+  node->GetScalarAttribute("show_in_menubar", &show_in_menubar);
 
-  pqProxyCategory* category = new pqProxyCategory(this, categoryName, categoryLabel);
+  // several configurations, e.g. from plugins, can add items to the same
+  // category. Flags are enabled if any of them requests it.
+  pqProxyCategory* category = this->findSubCategory(categoryName);
+  if (!category)
+  {
+    category = new pqProxyCategory(this, categoryName, node->GetAttribute("menu_label"));
+  }
+  else if (node->GetAttribute("menu_label") && category->Label == ::defaultLabel(categoryName))
+  {
+    // the category was created without a label, e.g. by a configuration only
+    // adding items to it: use the one given, so that the label does not depend
+    // on the order configurations are loaded in.
+    category->updateLabel(node->GetAttribute("menu_label"));
+  }
   category->PreserveOrder = category->PreserveOrder || (preserve_order == 1);
   category->ShowInToolbar = category->ShowInToolbar || (show_in_toolbar == 1);
+  category->ShowInMenuBar = category->ShowInMenuBar || (show_in_menubar == 1);
 
   return category;
 }
@@ -315,7 +351,7 @@ void pqProxyCategory::removeProxy(const QString& name)
 //-----------------------------------------------------------------------------
 void pqProxyCategory::addProxy(pqProxyInfo* proxyInfo)
 {
-  if (!proxyInfo || proxyInfo->name().isEmpty() || proxyInfo->group().isEmpty())
+  if (!proxyInfo || !proxyInfo->isValid())
   {
     return;
   }
@@ -323,20 +359,17 @@ void pqProxyCategory::addProxy(pqProxyInfo* proxyInfo)
   const QString& proxyName = proxyInfo->name();
   const QString& proxyGroup = proxyInfo->group();
 
-  QString label = proxyInfo->label();
   vtkSMSessionProxyManager* proxyManager =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  if (proxyManager)
+  if (proxyInfo->isProxy() && proxyManager)
   {
     vtkSMProxy* prototype =
       proxyManager->GetPrototypeProxy(proxyGroup.toUtf8().data(), proxyName.toUtf8().data());
     if (prototype)
     {
-      label = prototype->GetXMLLabel();
+      proxyInfo->setLabel(prototype->GetXMLLabel());
     }
   }
-
-  proxyInfo->setLabel(label);
 
   if (this->Proxies.contains(proxyName))
   {
@@ -381,15 +414,28 @@ bool pqProxyCategory::parseXML(pqProxyCategory* categoryRoot, vtkPVXMLElement* x
       pqProxyCategory::parseXML(category, curElem);
       modified = true;
     }
-    else if (strcmp(curElem->GetName(), "Proxy") == 0)
+    else if (strcmp(curElem->GetName(), "Proxy") == 0 ||
+      strcmp(curElem->GetName(), "Script") == 0 || strcmp(curElem->GetName(), "Separator") == 0)
     {
       auto proxyInfo = new pqProxyInfo(categoryRoot, curElem);
-      if (proxyInfo->name().isEmpty() || proxyInfo->group().isEmpty())
+      if (proxyInfo->isSeparator() && proxyInfo->name().isEmpty())
+      {
+        // separators are identified by their position among the separators of
+        // the category, unique even when merging several configurations.
+        proxyInfo->setName(
+          ::makeUniqueString(QStringLiteral("Separator%1").arg(categoryRoot->separatorCount() + 1),
+            categoryRoot->OrderedProxies));
+      }
+      if (!proxyInfo->isValid())
       {
         proxyInfo->deleteLater();
       }
       else
       {
+        if (proxyInfo->isScript())
+        {
+          pqProxyCategory::warnIfScriptNameIsUsed(categoryRoot, proxyInfo);
+        }
         categoryRoot->addProxy(proxyInfo);
         modified = true;
       }
@@ -423,8 +469,10 @@ bool pqProxyCategory::parseXMLHintsTag(
     pqProxyCategory* category = this;
     if (const char* categoryName = showInMenu->GetAttribute("category"))
     {
-      auto attributes = [](pqProxyCategory* cat)
-      { return std::make_tuple(cat->Label, cat->PreserveOrder, cat->ShowInToolbar); };
+      auto attributes = [](pqProxyCategory* cat) {
+        return std::make_tuple(
+          cat->Label, cat->PreserveOrder, cat->ShowInToolbar, cat->ShowInMenuBar);
+      };
       pqProxyCategory* existing = this->findSubCategory(categoryName);
       const auto previousAttributes =
         existing ? attributes(existing) : decltype(attributes(this))();
@@ -434,7 +482,7 @@ bool pqProxyCategory::parseXMLHintsTag(
 
     const QString icon = showInMenu->GetAttribute("icon");
     pqProxyInfo* existingProxy = category->findProxy(name);
-    if (existingProxy && existingProxy->group() == group &&
+    if (existingProxy && existingProxy->isProxy() && existingProxy->group() == group &&
       (icon.isEmpty() || existingProxy->icon() == icon))
     {
       continue;
@@ -444,6 +492,35 @@ bool pqProxyCategory::parseXMLHintsTag(
   }
 
   return modified;
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyCategory::warnIfScriptNameIsUsed(pqProxyCategory* category, pqProxyInfo* script)
+{
+  // several menu managers parse the same configurations: warn once per name.
+  static QSet<QString> warnedNames;
+  if (warnedNames.contains(script->name()))
+  {
+    return;
+  }
+  pqProxyCategory* root = category;
+  while (root->parentCategory())
+  {
+    root = root->parentCategory();
+  }
+  for (auto item : root->getProxiesRecursive())
+  {
+    if (item && item->isScript() && item->name() == script->name() &&
+      (item->script() != script->script() || item->fileName() != script->fileName()))
+    {
+      warnedNames.insert(script->name());
+      qWarning() << "Script" << script->name() << "of category" << category->name()
+                 << "has the same name as another script. Script names identify scripts in the "
+                    "categories customized by users, so they should be unique, e.g. prefixed "
+                    "by the name of the plugin.";
+      return;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -582,8 +659,11 @@ void pqProxyCategory::diff(pqProxyCategory* base, pqProxyCategory* customized, v
   auto newItemElement = [](pqProxyInfo* item)
   {
     auto element = vtkSmartPointer<vtkPVXMLElement>::New();
-    element->SetName("Proxy");
-    element->SetAttribute("group", item->group().toUtf8().data());
+    element->SetName(::itemElementName(item));
+    if (item->isProxy())
+    {
+      element->SetAttribute("group", item->group().toUtf8().data());
+    }
     element->SetAttribute("name", item->name().toUtf8().data());
     return element;
   };
@@ -655,6 +735,8 @@ void pqProxyCategory::diff(pqProxyCategory* base, pqProxyCategory* customized, v
     };
     addFlag(
       "show_in_toolbar", category->ShowInToolbar, baseCategory && baseCategory->ShowInToolbar);
+    addFlag(
+      "show_in_menubar", category->ShowInMenuBar, baseCategory && baseCategory->ShowInMenuBar);
     addFlag("preserve_order", category->PreserveOrder, baseCategory && baseCategory->PreserveOrder);
 
     pqProxyCategory::diff(baseCategory, category, element);
@@ -699,7 +781,7 @@ void pqProxyCategory::diff(pqProxyCategory* base, pqProxyCategory* customized, v
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyCategory::applyCustomizations(vtkPVXMLElement* xml)
+void pqProxyCategory::applyCustomizations(vtkPVXMLElement* xml, pqProxyCategory* base)
 {
   for (unsigned int cc = 0; cc < xml->GetNumberOfNestedElements(); ++cc)
   {
@@ -751,13 +833,17 @@ void pqProxyCategory::applyCustomizations(vtkPVXMLElement* xml)
       {
         category->ShowInToolbar = (flag == 1);
       }
+      if (element->GetScalarAttribute("show_in_menubar", &flag))
+      {
+        category->ShowInMenuBar = (flag == 1);
+      }
       if (element->GetScalarAttribute("preserve_order", &flag))
       {
         category->PreserveOrder = (flag == 1);
       }
-      category->applyCustomizations(element);
+      category->applyCustomizations(element, base);
     }
-    else if (strcmp(element->GetName(), "Proxy") == 0)
+    else if (::isItemElement(element))
     {
       pqProxyInfo* item = this->Proxies.value(name);
       if (removed == 1)
@@ -782,9 +868,17 @@ void pqProxyCategory::applyCustomizations(vtkPVXMLElement* xml)
           continue;
         }
         item = new pqProxyInfo(this, element);
-        if (item->name().isEmpty() || item->group().isEmpty())
+        // scripts are identified by name, their definition comes from the base.
+        pqProxyInfo* definition = base ? base->findProxy(name, true) : nullptr;
+        if (item->isScript() && definition && definition->isScript())
         {
+          item->merge(definition);
+        }
+        if (!item->isValid())
+        {
+          // e.g. a script defined by a plugin that is not loaded.
           delete item;
+          this->keepUnappliedCustomization(element);
           continue;
         }
         this->addProxy(item);
@@ -859,7 +953,7 @@ void pqProxyCategory::loadSettings(const QString& resourceTag, pqProxyCategory* 
 
   if (auto customizations = ::parseSettings(::SETTINGS_CUSTOMIZATIONS_KEY.arg(resourceTag)))
   {
-    this->applyCustomizations(customizations);
+    this->applyCustomizations(customizations, base);
     vtkLogF(TRACE, "Category customizations loaded from settings.");
   }
   else if (auto legacy = ::parseSettings(::SETTINGS_CATEGORY_KEY.arg(resourceTag)))
@@ -957,4 +1051,24 @@ QString pqProxyCategory::makeUniqueCategoryLabel(const QString& suggestedName)
 void pqProxyCategory::setShowInToolbar(bool show)
 {
   this->ShowInToolbar = show;
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyCategory::setShowInMenuBar(bool show)
+{
+  this->ShowInMenuBar = show;
+}
+
+//-----------------------------------------------------------------------------
+int pqProxyCategory::separatorCount()
+{
+  int count = 0;
+  for (auto proxy : this->Proxies)
+  {
+    if (proxy && proxy->isSeparator())
+    {
+      ++count;
+    }
+  }
+  return count;
 }

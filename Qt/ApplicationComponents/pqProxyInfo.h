@@ -15,7 +15,20 @@ class pqProxyCategory;
 class vtkPVXMLElement;
 
 /**
- * Proxy meta data structure for the User Interface.
+ * Meta data structure for the User Interface, describing an item of a
+ * pqProxyCategory. Items are mostly proxies i.e. sources or filters, but can
+ * also be Python scripts and separators. In XML, they are respectively
+ * described using the `Proxy`, `Script` and `Separator` elements:
+ *
+ * ```xml
+ * <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg" />
+ * <Script name="Hello" label="Say Hello" tooltip="Prints a greeting.">
+ *   print("Hello!")
+ * </Script>
+ * <Separator />
+ * ```
+ *
+ * A `Script` can also provide its code using a `filename` attribute instead.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqProxyInfo : public QObject
 {
@@ -28,6 +41,16 @@ public:
     const QStringList& omitFromToolbar = QStringList(), bool hideFromMenu = false);
 
   /**
+   * Type of item.
+   */
+  enum class ItemType
+  {
+    Proxy,
+    Script,
+    Separator
+  };
+
+  /**
    * create a pqProxyInfo with same attributes as other.
    */
   pqProxyInfo(pqProxyCategory* parent, pqProxyInfo* other);
@@ -38,6 +61,11 @@ public:
    * Set label.
    */
   void setLabel(const QString& label);
+
+  /**
+   * Set the name. Must be done before adding it to a category.
+   */
+  void setName(const QString& name) { this->Name = name; }
 
   /**
    * Set HideFromMenu.
@@ -84,7 +112,24 @@ public:
   QString icon() { return this->Icon; }
   QStringList omitFromToolbar() { return this->OmitFromToolbar; }
   bool hideFromMenu();
+  ItemType type() const { return this->Type; }
+  bool isProxy() const { return this->Type == ItemType::Proxy; }
+  bool isScript() const { return this->Type == ItemType::Script; }
+  bool isSeparator() const { return this->Type == ItemType::Separator; }
+  /// for scripts: the Python code, if provided inline.
+  QString script() const { return this->Script; }
+  /// for scripts: the file containing the Python code, if provided.
+  QString fileName() const { return this->FileName; }
+  /// for scripts: the tooltip.
+  QString toolTip() const { return this->ToolTip; }
   ///@}
+
+  /**
+   * Returns true if the item has the required information, which depends on
+   * its type: a name and group for proxies, a name and either code or a file
+   * name for scripts.
+   */
+  bool isValid() const;
 
   /**
    * Returns true if the attributes that can be customized by users, i.e. icon
@@ -94,6 +139,7 @@ public:
   bool hasSameCustomizableAttributes(pqProxyInfo* other);
 
 private:
+  ItemType Type = ItemType::Proxy;
   /// XML Name
   QString Name;
   /// XML Group
@@ -106,6 +152,10 @@ private:
   QStringList OmitFromToolbar;
   /// Flag to hide proxy in menus
   bool HideFromMenu = false;
+  /// For scripts: inline Python code, file containing the code and tooltip.
+  QString Script;
+  QString FileName;
+  QString ToolTip;
 };
 
 /// map a proxy name to its pqProxyInfo

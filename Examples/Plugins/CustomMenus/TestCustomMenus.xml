@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Uses the "Analysis Tools" menu, added by both AnalysisTools.xml and
+       AnalysisToolsPython.py, to create a source and filters, and to run Python
+       scripts. -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="Analysis Tools" />
+  <pqevent object="pqClientMainWindow/menubar/Analysis Tools" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- a filter from the Python plugin, and a Python function using its output. -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="Analysis Tools" />
+  <pqevent object="pqClientMainWindow/menubar/Analysis Tools" command="activate" arguments="NormalizedHeight" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="Analysis Tools" />
+  <pqevent object="pqClientMainWindow/menubar/Analysis Tools" command="activate" arguments="AnalysisToolsPython.color_by_normalized_height" />
+
+  <!-- a pipeline of filters exposed as a single filter by the XML plugin, and
+       inline Python scripts, including one from a sub-menu. -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="Analysis Tools" />
+  <pqevent object="pqClientMainWindow/menubar/Analysis Tools" command="activate" arguments="SurfaceWithNormals" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="Analysis Tools" />
+  <pqevent object="pqClientMainWindow/menubar/Analysis Tools" command="activate" arguments="PrintDataSummary" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="Analysis Tools" />
+  <pqevent object="pqClientMainWindow/menubar/Analysis Tools/Display" command="activate" arguments="ShowEdges" />
+</pqevents>

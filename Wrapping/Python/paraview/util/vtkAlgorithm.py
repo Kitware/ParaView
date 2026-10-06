@@ -69,15 +69,17 @@ to build the ParaView-specific XML via decorators.
 Decorator Basics
 ================
 
-There are four main classes currently available: `smproxy`,
-`smproperty`, `smdomain`, and `smhint`. Each provides a set of decorators to
-declare a proxy, property, domain or a hint, respectively.
+There are five main classes currently available: `smproxy`,
+`smproperty`, `smdomain`, `smhint`, and `smmenu`. Each provides a set of
+decorators to declare a proxy, property, domain, a hint or a menu item,
+respectively.
 
 All available decorators exhibit the following characteristics:
 
-#. With the exception of decorators defined in `smproxy`, all decorators are
-   intended for decorating classes or their methods. `smproxy` decorators are
-   only intended for classes.
+#. With the exception of decorators defined in `smproxy` and `smmenu`, all
+   decorators are intended for decorating classes or their methods. `smproxy`
+   decorators are only intended for classes. `smmenu.action` is intended for
+   module-level functions and `smmenu.proxy` for classes.
 #. Decorators take keyword arguments (positional arguments are discouraged).
    While there may be exceptions, the general pattern is that a decorator
    corresponds to an XML node in the ParaView XML configuration. Any attributes
@@ -276,6 +278,41 @@ These add elements under `<Hints/>` for `smproxy` and/or `smproperty` elements.
 Currently `smhint.filechooser` and the generic `smhint.xml` are provided with
 more to be added as needed.
 
+`smmenu` Decorators
+===================
+
+These add items to menus and toolbars in the ParaView GUI, created as needed.
+Menus are categories of the Filters menu shown as menus of the menu bar (see
+*Adding Categories to the Filters Menu* in the plugin documentation), so that
+plugins, including XML ones, can add items to the same menus.
+
+* `smmenu.action` adds a function, called without arguments when the item is
+  triggered, to a menu. Use it to expose Python scripts, e.g. setting up a
+  visualization using `paraview.simple`, next to related filters.
+
+* `smmenu.proxy` adds a class decorated using `smproxy.filter` or
+  `smproxy.source` to a menu. Triggering the item creates the filter, for the
+  selected pipeline objects, or the source.
+
+.. code-block:: python
+
+    @smmenu.proxy(menu="My Tools", toolbar=True)
+    @smproxy.filter(label="My Filter")
+    ...
+    class MyFilter(VTKPythonAlgorithmBase):
+        ...
+
+    @smmenu.action(menu="My Tools/Advanced", label="Show Edges", toolbar=True)
+    def show_edges():
+        # shows the edges of the active source.
+        from paraview.simple import GetDisplayProperties
+        GetDisplayProperties().SetRepresentationType("Surface With Edges")
+
+Use `/` in `menu` to specify nested sub-menus. Items with `toolbar=True` are
+also added to a toolbar for the top-level menu, where sub-menus are shown as
+drop-down buttons. Use `menubar=False` to add the menu to the Filters menu
+instead of the menu bar; its toolbar then only has the items of the top-level
+menu.
 
 Examples
 ========
@@ -302,7 +339,8 @@ from ..detail.pythonalgorithm import \
     smproxy, \
     smproperty, \
     smdomain, \
-    smhint
+    smhint, \
+    smmenu
 
 # import VTKPythonAlgorithmBase from vtkmodules, just to make it easier for
 # importers of this module.

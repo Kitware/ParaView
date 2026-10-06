@@ -43,12 +43,10 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
 protected Q_SLOTS:
   /**
-   * Called when the action is triggered.
+   * Called when the action is triggered. Creates a source, or a filter, as
+   * categories of sources can also contain filters.
    */
-  virtual void onTriggered(const QString& group, const QString& name)
-  {
-    pqSourcesMenuReaction::createSource(group, name);
-  }
+  virtual void onTriggered(const QString& group, const QString& name);
 
 private:
   Q_DISABLE_COPY(pqSourcesMenuReaction)

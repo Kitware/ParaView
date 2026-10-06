@@ -41,6 +41,7 @@ set(classes
   pqCatalystPauseSimulationReaction
   pqCatalystRemoveBreakpointReaction
   pqCatalystSetBreakpointReaction
+  pqCategoryMenuBarBehavior
   pqCategoryToolbarsBehavior
   pqChangeFileNameReaction
   pqChangePipelineInputReaction

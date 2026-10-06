@@ -99,6 +99,8 @@ add_example(Plugins/GUIMyToolBar)
 if (PARAVIEW_USE_PYTHON)
   # requires programmable filter
   add_xml_example(Plugins/HelixSource)
+  # requires Python plugins and scripts
+  add_xml_example(Plugins/CustomMenus)
 endif()
 add_example(Plugins/LagrangianIntegrationModel)
 add_example(Plugins/LiveSource)

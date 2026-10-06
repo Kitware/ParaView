@@ -1,0 +1,74 @@
+<!--
+  An XML-only plugin, loadable using Tools > Manage Plugins > Load New, that
+  adds an "Analysis Tools" menu and toolbar exposing a source, standard
+  filters, a pipeline of filters combined as a single filter and Python
+  scripts.
+-->
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- A pipeline of standard filters, exposed as a single filter. -->
+    <CompoundSourceProxy name="SurfaceWithNormals" label="Surface With Normals">
+      <Documentation short_help="Extracts the surface of the input and computes its normals.">
+        Extracts the surface of the input, then computes the normals of the
+        surface for smooth shading.
+      </Documentation>
+      <Proxy compound_name="ExtractSurface1" group="filters" type="DataSetSurfaceFilter" id="1" />
+      <Proxy compound_name="SurfaceNormals1" group="filters" type="SurfaceNormals" id="2">
+        <Property name="Input" id="2.Input" number_of_elements="1">
+          <Proxy value="1" output_port="0" />
+        </Property>
+      </Proxy>
+      <ExposedProperties>
+        <Property name="Input" proxy_name="ExtractSurface1" exposed_name="Input" />
+        <Property name="FeatureAngle" proxy_name="SurfaceNormals1" exposed_name="FeatureAngle" />
+      </ExposedProperties>
+      <OutputPort name="Output" proxy="SurfaceNormals1" port_index="0" />
+    </CompoundSourceProxy>
+  </ProxyGroup>
+
+  <ParaViewFilters>
+    <!-- Adds an "Analysis Tools" menu to the menu bar, and a toolbar with the
+         same items, in the given order. -->
+    <Category name="Analysis Tools" menu_label="&amp;Analysis Tools"
+              show_in_menubar="1" show_in_toolbar="1" preserve_order="1">
+      <Proxy group="sources" name="RTAnalyticSource" />
+      <Separator />
+      <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice.svg" />
+      <Proxy group="filters" name="SurfaceWithNormals" />
+      <Separator />
+      <Script name="PrintDataSummary"
+              label="Print Data Summary"
+              icon=":/pqWidgets/Icons/pqSpreadsheet.svg"
+              tooltip="Prints the number of points and cells of the active source.">
+        <![CDATA[
+        from paraview.simple import GetActiveSource
+
+        source = GetActiveSource()
+        if source is None:
+            print("No active source.")
+        else:
+            info = source.GetDataInformation()
+            print("%d points, %d cells" % (info.GetNumberOfPoints(), info.GetNumberOfCells()))
+        ]]>
+      </Script>
+      <!-- Sub-categories are shown as sub-menus, and as drop-down buttons in
+           toolbars. -->
+      <Category name="Display" preserve_order="1">
+        <Script name="ShowEdges" label="Show Edges"
+                tooltip="Shows the edges of the active source's surface.">
+          <![CDATA[
+          from paraview.simple import GetDisplayProperties
+          GetDisplayProperties().SetRepresentationType("Surface With Edges")
+          ]]>
+        </Script>
+        <Script name="ResetCamera" label="Reset Camera"
+                tooltip="Resets the camera of the active view.">
+          <![CDATA[
+          from paraview.simple import ResetCamera
+          ResetCamera()
+          ]]>
+        </Script>
+      </Category>
+    </Category>
+  </ParaViewFilters>
+</ServerManagerConfiguration>

@@ -9,6 +9,57 @@
 
 #include <QCoreApplication>
 
+#include <algorithm>
+#include <cstring>
+
+namespace
+{
+/**
+ * Removes leading and trailing blank lines and the indentation common to all
+ * lines, so that Python code can be indented to match the XML it's part of.
+ */
+QString dedent(const QString& text)
+{
+  QStringList lines = text.split('\n');
+  while (!lines.isEmpty() && lines.front().trimmed().isEmpty())
+  {
+    lines.pop_front();
+  }
+  while (!lines.isEmpty() && lines.back().trimmed().isEmpty())
+  {
+    lines.pop_back();
+  }
+  if (lines.isEmpty())
+  {
+    return QString();
+  }
+
+  auto indentation = [](const QString& line)
+  {
+    int count = 0;
+    while (count < line.size() && (line[count] == ' ' || line[count] == '\t'))
+    {
+      ++count;
+    }
+    return count;
+  };
+
+  int common = -1;
+  for (const QString& line : lines)
+  {
+    if (!line.trimmed().isEmpty())
+    {
+      common = common < 0 ? indentation(line) : std::min(common, indentation(line));
+    }
+  }
+  for (QString& line : lines)
+  {
+    line.remove(0, std::min(std::max(common, 0), indentation(line)));
+  }
+  return lines.join('\n') + '\n';
+}
+}
+
 //-----------------------------------------------------------------------------
 pqProxyInfo::pqProxyInfo(pqProxyCategory* parent, const QString& name, const QString& group,
   const QString& label, const QString& icon, const QStringList& omitFromToolbar, bool hide)
@@ -26,10 +77,30 @@ pqProxyInfo::pqProxyInfo(pqProxyCategory* parent, const QString& name, const QSt
 pqProxyInfo::pqProxyInfo(pqProxyCategory* parent, vtkPVXMLElement* xmlElement)
   : Superclass(parent)
 {
+  const char* elementName = xmlElement->GetName() ? xmlElement->GetName() : "";
+  if (strcmp(elementName, "Script") == 0)
+  {
+    this->Type = ItemType::Script;
+  }
+  else if (strcmp(elementName, "Separator") == 0)
+  {
+    this->Type = ItemType::Separator;
+  }
+
   this->Name = xmlElement->GetAttribute("name");
   this->Label = xmlElement->GetAttribute("label");
   this->Group = xmlElement->GetAttribute("group");
   this->Icon = xmlElement->GetAttribute("icon");
+  if (this->isScript())
+  {
+    this->Script = ::dedent(QString::fromUtf8(xmlElement->GetCharacterData()));
+    this->FileName = xmlElement->GetAttribute("filename");
+    this->ToolTip = xmlElement->GetAttribute("tooltip");
+    if (this->Name.isEmpty())
+    {
+      this->Name = QString(this->Label).remove('&');
+    }
+  }
 
   int omit = 0;
   xmlElement->GetScalarAttribute("omit_from_toolbar", &omit);
@@ -46,24 +117,44 @@ pqProxyInfo::pqProxyInfo(pqProxyCategory* parent, vtkPVXMLElement* xmlElement)
 //-----------------------------------------------------------------------------
 pqProxyInfo::pqProxyInfo(pqProxyCategory* parent, pqProxyInfo* other)
   : Superclass(parent)
+  , Type(other->Type)
   , Name(other->Name)
   , Group(other->Group)
   , Label(other->Label)
   , Icon(other->Icon)
   , OmitFromToolbar(other->OmitFromToolbar)
   , HideFromMenu(other->HideFromMenu)
+  , Script(other->Script)
+  , FileName(other->FileName)
+  , ToolTip(other->ToolTip)
 {
 }
 
 //-----------------------------------------------------------------------------
 void pqProxyInfo::convertToXML(vtkPVXMLElement* root)
 {
+  // Note: the code of inline scripts is not saved, scripts are expected to be
+  // identified by their name.
   vtkNew<vtkPVXMLElement> proxyXML;
-  proxyXML->SetName("Proxy");
-  proxyXML->SetAttribute("group", this->group().toStdString().c_str());
+  proxyXML->SetName(this->isScript() ? "Script" : (this->isSeparator() ? "Separator" : "Proxy"));
+  if (this->isProxy())
+  {
+    proxyXML->SetAttribute("group", this->group().toStdString().c_str());
+  }
   proxyXML->SetAttribute("name", this->name().toStdString().c_str());
-  proxyXML->SetAttribute("label", this->label().toStdString().c_str());
-  proxyXML->SetAttribute("icon", this->icon().toStdString().c_str());
+  if (!this->isSeparator())
+  {
+    proxyXML->SetAttribute("label", this->label().toStdString().c_str());
+    proxyXML->SetAttribute("icon", this->icon().toStdString().c_str());
+  }
+  if (!this->FileName.isEmpty())
+  {
+    proxyXML->SetAttribute("filename", this->FileName.toStdString().c_str());
+  }
+  if (!this->ToolTip.isEmpty())
+  {
+    proxyXML->SetAttribute("tooltip", this->ToolTip.toStdString().c_str());
+  }
   if (this->hideFromMenu())
   {
     proxyXML->SetAttribute("hide_from_menu", "1");
@@ -81,6 +172,11 @@ void pqProxyInfo::convertToXML(vtkPVXMLElement* root)
 //-----------------------------------------------------------------------------
 QString pqProxyInfo::label()
 {
+  if (this->isSeparator())
+  {
+    return QString();
+  }
+
   QString label = this->Label;
   if (label.isEmpty())
   {
@@ -138,6 +234,15 @@ void pqProxyInfo::merge(pqProxyInfo* other)
   {
     this->Icon = other->Icon;
   }
+  if (this->Script.isEmpty() && this->FileName.isEmpty())
+  {
+    this->Script = other->Script;
+    this->FileName = other->FileName;
+  }
+  if (this->ToolTip.isEmpty())
+  {
+    this->ToolTip = other->ToolTip;
+  }
 
   for (const auto& toolbar : other->OmitFromToolbar)
   {
@@ -152,6 +257,21 @@ void pqProxyInfo::merge(pqProxyInfo* other)
 bool pqProxyInfo::hideFromMenu()
 {
   return this->HideFromMenu;
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyInfo::isValid() const
+{
+  switch (this->Type)
+  {
+    case ItemType::Proxy:
+      return !this->Name.isEmpty() && !this->Group.isEmpty();
+    case ItemType::Script:
+      return !this->Name.isEmpty() && (!this->Script.isEmpty() || !this->FileName.isEmpty());
+    case ItemType::Separator:
+      return !this->Name.isEmpty();
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------------------

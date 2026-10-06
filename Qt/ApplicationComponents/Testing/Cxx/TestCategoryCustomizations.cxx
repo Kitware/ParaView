@@ -45,6 +45,7 @@ const char* PluginXML = R"(
   </Category>
   <Category name="P" menu_label="Plugin">
     <Proxy group="filters" name="DataSetSurfaceFilter" />
+    <Script name="PluginScript">print("From the plugin")</Script>
   </Category>
 </ParaViewFilters>)";
 
@@ -138,6 +139,9 @@ bool doTest()
   // favorite or using the Configure Categories dialog, which edits a copy.
   categories = manager3->getMenuCategory();
   categories->findSubCategory("A")->findProxy("Threshold")->setHideFromMenu(true);
+  pqProxyCategory* mineCategory = categories->findSubCategory("Mine");
+  mineCategory->addProxy(new pqProxyInfo(
+    mineCategory, manager3->getApplicationCategory()->findProxy("PluginScript", true)));
   manager3->writeCategoryToSettings();
 
   QMenu menu4;
@@ -146,12 +150,14 @@ bool doTest()
   categories = manager4->getMenuCategory();
   CHECK(checkCustomized(categories));
   CHECK(categories->findSubCategory("P") == nullptr);
+  CHECK(!categories->findSubCategory("Mine")->hasProxy("PluginScript"));
   manager4->writeCategoryToSettings();
   pqProxyCategory copy;
   copy.deepCopy(categories);
   copy.writeSettings("ParaViewFilters", manager4->getApplicationCategory());
   const QString kept = settings->value(CustomizationsKey).toString();
-  CHECK(kept.contains(R"(name="P")") && kept.contains("Threshold"));
+  CHECK(
+    kept.contains(R"(name="P")") && kept.contains("Threshold") && kept.contains("PluginScript"));
 
   core->loadConfigurationXML(PluginXML);
   categories = manager4->getMenuCategory();
@@ -159,6 +165,8 @@ bool doTest()
   CHECK(categories->findSubCategory("P") && categories->findSubCategory("P")->showInToolbar());
   pqProxyInfo* threshold = categories->findSubCategory("A")->findProxy("Threshold");
   CHECK(threshold && threshold->hideFromMenu());
+  pqProxyInfo* script = categories->findSubCategory("Mine")->findProxy("PluginScript");
+  CHECK(script && script->isScript() && script->script().contains("From the plugin"));
 
   // categories are only rebuilt when their customizations or definitions
   // change, not whenever settings are modified or definitions looked for.

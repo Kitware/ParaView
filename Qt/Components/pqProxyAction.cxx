@@ -56,6 +56,11 @@ QIcon pqProxyAction::GetIcon()
 QString pqProxyAction::GetProxyDocumentation(QAction* action)
 {
   auto prototype = pqProxyAction::GetProxyPrototype(action);
+  if (!prototype)
+  {
+    // not a proxy action, e.g. a Python script.
+    return action ? action->statusTip() : QString();
+  }
   QString help = prototype->GetDocumentation()->GetShortHelp();
 
   if (prototype->IsDeprecated())
@@ -133,6 +138,10 @@ vtkSMProxy* pqProxyAction::GetProxyPrototype(QAction* action)
 
   auto group = pqProxyAction::GetProxyGroup(action);
   auto name = pqProxyAction::GetProxyName(action);
+  if (group.isEmpty() || name.isEmpty())
+  {
+    return nullptr;
+  }
 
   return pxm->GetPrototypeProxy(group.toUtf8().data(), name.toUtf8().data());
 }
@@ -177,6 +186,8 @@ void pqProxyAction::updateActionsState(QList<QAction*> actions)
   pqServer* server = activeObjects->activeServer();
   bool enabled = (server != nullptr);
   enabled = enabled ? server->isMaster() : enabled;
+  // sources do not depend on the selected output ports.
+  const bool sourcesEnabled = enabled;
 
   // Make sure we already have a selection model
   vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
@@ -209,6 +220,17 @@ void pqProxyAction::updateActionsState(QList<QAction*> actions)
 
   for (QAction* action : actions)
   {
+    const QString group = pqProxyAction::GetProxyGroup(action);
+    if (group.isEmpty())
+    {
+      // not a proxy action, e.g. a Python script.
+      continue;
+    }
+    if (group == "sources")
+    {
+      action->setEnabled(sourcesEnabled && pqProxyAction::GetProxyPrototype(action) != nullptr);
+      continue;
+    }
     pqProxyAction::updateActionStatus(action, enabled, outputPorts);
   }
 }

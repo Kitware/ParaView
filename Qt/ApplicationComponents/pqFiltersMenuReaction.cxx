@@ -65,6 +65,19 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
 }
 
 //-----------------------------------------------------------------------------
+void pqFiltersMenuReaction::onTriggered(const QString& group, const QString& name)
+{
+  if (group == "sources")
+  {
+    pqSourcesMenuReaction::createSource(group, name);
+  }
+  else
+  {
+    pqFiltersMenuReaction::createFilter(group, name);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqFiltersMenuReaction::setEnableStateDirty()
 {
   this->IsDirty = true;
