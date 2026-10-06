@@ -49,6 +49,25 @@ public:
   vtkBooleanMacro(ExactBoxClip, bool);
   ///@}
 
+  ///@{
+  /**
+   * Enable / Disable the use of the MeshCache optimization.
+   * True by default.
+   *
+   * @note This optimization occurs only with StaticMesh data.
+   *
+   * @note This comes at the cost of an internal structure initialization
+   * the first time the Cache should be used, more likely at the 2nd execution
+   * of the filter if unmodified. Actual speed up may be seen only after several
+   * updates.
+   *
+   * @see vtkDataObjectMeshCache
+   */
+  vtkSetMacro(UseMeshCache, bool);
+  vtkGetMacro(UseMeshCache, bool);
+  vtkBooleanMacro(UseMeshCache, bool);
+  ///@}
+
 protected:
   vtkPVClipDataSet(vtkImplicitFunction* cf = nullptr);
   ~vtkPVClipDataSet() override;
@@ -86,6 +105,7 @@ private:
   bool ClipLeaf(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   void InitializeOutput(vtkDataObjectTree* input, vtkDataObjectTree* output);
 
+  bool UseMeshCache = true;
   std::unique_ptr<vtkEdgesCacheInternal> EdgesCache;
   vtkNew<vtkDataObjectMeshCache> MeshCache;
 };

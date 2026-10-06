@@ -244,3 +244,9 @@ vtkMTimeType vtkPVMetaClipDataSet::GetMTime()
 
   return mTime;
 }
+
+//------------------------------------------------------------------------------
+void vtkPVMetaClipDataSet::SetUseCache(bool use)
+{
+  this->Internal->Clip->SetUseMeshCache(use);
+}
