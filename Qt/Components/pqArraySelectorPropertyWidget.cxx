@@ -310,10 +310,13 @@ void pqArraySelectorPropertyWidget::setArray(int assoc, const QString& val)
   int index = internals.findData(assoc, val);
   if (index == -1)
   {
+    // "addItem" triggers "currentIndexChanged" before we have a chance to set the itemData we need.
+    // Then "internals.updateArrayToCurrent" cannot work properly and stores an empty array as the
+    // current. So block the signal during addition and reset current index later.
+    const QSignalBlocker blocker(internals.ComboBox);
     index = internals.addItem(assoc, val, /*unknown=*/true);
   }
   internals.ComboBox->setCurrentIndex(index);
-  internals.pruneUnusedUnknownItems();
 }
 
 //-----------------------------------------------------------------------------

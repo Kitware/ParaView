@@ -18,6 +18,10 @@ list(APPEND TESTS_WITHOUT_BASELINES
   TraceIntegrateVariables.xml
   )
 
+list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
+  TestInputArrayWidget.xml
+  )
+
 # This test rely on copy being Ctrl-C
 if(NOT APPLE)
   list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY

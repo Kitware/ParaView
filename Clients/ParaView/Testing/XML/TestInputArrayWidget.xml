@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Python Shell" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="FastUniformGrid()" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="t=Threshold()" />
+
+  <!-- Cut on Swirl Y component above 10 -->
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="t.Set(&#xA;    Scalars=[&apos;POINTS&apos;, &apos;Swirl&apos;],&#xA;    SelectedComponent=&apos;Y&apos;,&#xA;    UpperThreshold=10,&#xA;)&#xA;" />
+
+  <!-- The selected Swirl array is unknwon at this point -->
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SelectInputScalars/ComboBox" property="currentText" arguments="Swirl (?)" />
+
+  <!-- Component property internally expects a numerical value that cannot be known before first apply. So this list is updated only during the Update process -->
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SelectedComponent/ComboBox" property="currentText" arguments="" />
+  <!-- update the pipeline -->
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="UpdatePipeline()" />
+
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+
+  <!-- widgets should now be up to date with the Python defined values -->
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SelectInputScalars/ComboBox" property="currentText" arguments="Swirl" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SelectedComponent/ComboBox" property="currentText" arguments="Y" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="assert t.SelectedComponent is &apos;Y&apos;" />
+
+  <!-- The pipeline was properly executed: Apply is greyed out and Threshold output Swirl has Y component in range [0, 10], 0 being the default min -->
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" property="enabled" arguments="false" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.0,Swirl" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[-10, 10], [0, 10], [-10, 10]" />
+</pqevents>

@@ -691,10 +691,33 @@ class SourceProxy(Proxy):
         """This method updates the server-side VTK pipeline and the associated
         data information. Make sure to update a source to validate the output
         meta-data."""
+
+        # manually browse the pipeline tree
+        # force a "step by step" update, so we can react to domains update.
+
+        producers = set()
+        proxy_util.get_producers(self.SMProxy, proxy_util.supported_proxies(), producers)
+        sorted_producers = proxy_util.toposort(producers)
+
+        for prod in sorted_producers:
+            # only SourceProxy have an UpdatePipeline method
+            if not prod.SMProxy.IsA("vtkSMSourceProxy"):
+                continue
+
+            # let the pipeline handle the input selection proxies
+            if prod.SMProxy.GetXMLName() == "AppendSelections":
+                continue
+
+            if time != None:
+                prod.UpdatePipeline(time)
+            else:
+                prod.UpdatePipeline()
+
         if time != None:
             self.SMProxy.UpdatePipeline(time)
         else:
             self.SMProxy.UpdatePipeline()
+
         # This is here to cause a receive
         # on the client side so that progress works properly.
         if ActiveConnection and ActiveConnection.IsRemote():
@@ -1301,6 +1324,10 @@ class EnumerationProperty(VectorProperty):
     """Subclass of VectorProperty that is applicable for enumeration type
     properties."""
 
+    def __init__(self, proxy, smproperty):
+        VectorProperty.__init__(self, proxy, smproperty)
+        self._observerTag = -1
+
     def GetElement(self, index):
         """Returns the text for the given element if available. Returns
         the numerical values otherwise."""
@@ -1322,6 +1349,34 @@ class EnumerationProperty(VectorProperty):
                 else:
                     raise ValueError("%s is not a valid value." % value)
         return VectorProperty.ConvertValue(self, value)
+
+    def _deferedSetData(self, caller, obj):
+        if self._observerTag > -1:
+            self.SMProperty.RemoveObserver(self._observerTag)
+            self._observerTag = -1
+
+        if type(self.storedValue) == str:
+            domain = self.SMProperty.FindDomain("vtkSMEnumerationDomain")
+            if domain:
+                if not domain.HasEntryText(self.storedValue):
+                    raise ValueError("%s is not a valid value." % self.storedValue)
+
+        self.SetData(self.storedValue)
+
+    def SetData(self, value):
+        if type(value) == str:
+            domain = self.SMProperty.FindDomain("vtkSMEnumerationDomain")
+            if domain:
+                if domain.HasEntryText(value):
+                    numeric = domain.GetEntryValueForText(value)
+                    VectorProperty.SetData(self, numeric)
+                else:
+                    if self._observerTag > -1:
+                        self.SMProperty.RemoveObserver(self._deferedSetData)
+                    self._observerTag = self.SMProperty.AddObserver("DomainModifiedEvent", self._deferedSetData)
+                    self.storedValue = value
+        else:
+            VectorProperty.SetData(self, value)
 
     def GetAvailable(self):
         "Returns the list of available values for the property, if an enumeration domain is available."
@@ -2826,7 +2881,7 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
         reducer.PostGatherHelper = arg2
 
     # reduce
-    reducer.UpdatePipeline()
+    reducer.SMProxy.UpdatePipeline()
     dataInfo = reducer.GetDataInformation(0)
     dataType = dataInfo.GetDataSetType()
     if dataInfo.GetCompositeDataSetType() > 0:
