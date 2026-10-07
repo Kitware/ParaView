@@ -735,6 +735,14 @@
         <Documentation>This property specifies the file name to read. It should
         be an MPAS format NetCDF file ending in .nc.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetHistoryFileName"
+                            name="HistoryFileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify an optional MPAS history file from which to read field data.
+          When unset, both field and grid data are read from the same file.</Documentation>
+      </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetUseDimensionedArrayNames"
                          name="UseDimensionedArrayNames"
