@@ -63,6 +63,7 @@ vtkPVXYChartView::vtkPVXYChartView()
   this->PlotTime = vtkPVPlotTime::New();
   this->HideTimeMarker = false;
   this->SortByXAxis = false;
+  this->SwapXYAxes = false;
 
   // Use the buffer id - performance issues are fixed.
   this->ContextView->GetScene()->SetUseBufferId(true);
@@ -827,13 +828,14 @@ void vtkPVXYChartView::Render(bool interactive)
     {
       if (repr->GetXAxisSeriesName() && strcmp(repr->GetXAxisSeriesName(), "Time") == 0)
       {
-        this->PlotTime->SetTimeAxisMode(vtkPVPlotTime::X_AXIS);
+        // when axes are swapped, the X array is plotted along the vertical axis.
+        this->PlotTime->SetTimeAxisMode(
+          this->SwapXYAxes ? vtkPVPlotTime::Y_AXIS : vtkPVPlotTime::X_AXIS);
         break;
       }
     }
   }
 
-  // For now we only handle X-axis time. If needed we can add support for Y-axis.
   this->Superclass::Render(interactive);
 }
 
@@ -922,4 +924,5 @@ void vtkPVXYChartView::Update()
 void vtkPVXYChartView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SwapXYAxes: " << this->SwapXYAxes << endl;
 }

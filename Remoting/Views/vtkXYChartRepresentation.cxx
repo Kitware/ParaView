@@ -71,6 +71,7 @@ vtkXYChartRepresentation::vtkXYChartRepresentation()
   , XAxisSeriesName(nullptr)
   , UseIndexForXAxis(true)
   , SortDataByXAxis(false)
+  , SwapXYAxes(false)
   , PlotDataHasChanged(false)
   , SeriesLabelPrefix(nullptr)
 {
@@ -316,6 +317,7 @@ int vtkXYChartRepresentation::ProcessViewRequest(
     if (view)
     {
       this->SetSortDataByXAxis(view->GetSortByXAxis());
+      this->SetSwapXYAxes(view->GetSwapXYAxes());
     }
   }
   return Superclass::ProcessViewRequest(request_type, inInfo, outInfo);

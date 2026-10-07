@@ -93,6 +93,17 @@ public:
 
   ///@{
   /**
+   * Get/set whether the X and Y axes are swapped i.e. whether the X array (or
+   * the index) is plotted along the vertical axis and the series along the
+   * horizontal axis. This only affects line and point plots. This is set
+   * from vtkPVXYChartView::GetSwapXYAxes() when the view is updated.
+   */
+  vtkSetMacro(SwapXYAxes, bool);
+  vtkGetMacro(SwapXYAxes, bool);
+  ///@}
+
+  ///@{
+  /**
    * Set/Clear the properties for Y series/columns.
    */
   void SetSeriesVisibility(const char* seriesname, bool visible);
@@ -171,6 +182,7 @@ private:
   char* XAxisSeriesName;
   bool UseIndexForXAxis;
   bool SortDataByXAxis;
+  bool SwapXYAxes;
   bool PlotDataHasChanged;
   double SelectionColor[3];
   char* SeriesLabelPrefix;

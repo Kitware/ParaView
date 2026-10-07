@@ -2175,6 +2175,20 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                       post_creation="SetChartTypeToLine" >
       <Documentation>This is the proxy for the XY line chart
       view.</Documentation>
+      <IntVectorProperty command="SetSwapXYAxes"
+                         default_values="0"
+                         name="SwapXYAxes"
+                         label="Swap X/Y Axes"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the X array (or the index, when **Use Index For X Axis**
+          is checked) of each displayed dataset is plotted along the vertical
+          axis and the series are plotted along the horizontal axis. This makes it
+          possible to plot several dependent variables with the independent variable
+          along the vertical axis e.g. profiles over depth or altitude.
+        </Documentation>
+      </IntVectorProperty>
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
@@ -2187,6 +2201,20 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                       post_creation="SetChartTypeToPoint" >
       <Documentation>This is the proxy for the XY point chart
       view.</Documentation>
+      <IntVectorProperty command="SetSwapXYAxes"
+                         default_values="0"
+                         name="SwapXYAxes"
+                         label="Swap X/Y Axes"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the X array (or the index, when **Use Index For X Axis**
+          is checked) of each displayed dataset is plotted along the vertical
+          axis and the series are plotted along the horizontal axis. This makes it
+          possible to plot several dependent variables with the independent variable
+          along the vertical axis e.g. profiles over depth or altitude.
+        </Documentation>
+      </IntVectorProperty>
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
