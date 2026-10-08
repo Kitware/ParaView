@@ -1,6 +1,8 @@
 ## Connection dialog improvements
 
-Server configuration files (.pvsc) can now group related options together in the connection options dialog using an `<OptionGroup>` tag. Each group appears as a collapsible section, with a label and an expand/collapse arrow icon, containing the `<Option>`s listed in the group; options not listed in any group are shown below the groups. An `<OptionGroup>`'s optional `collapsed` attribute controls whether the group starts collapsed or expanded (the default).
+Server configuration files (.pvsc) can now group related options together in the connection options dialog using an `<OptionGroup>` tag. Each group appears as a collapsible section, with a label and an expand/collapse arrow icon. An `<OptionGroup>`'s optional `collapsed` attribute controls whether the group starts collapsed or expanded (the default).
+
+An `<OptionGroup>` does not define options. `<Option>` elements are still defined directly under `<Options>`, outside any `<OptionGroup>`. An `<Option>` element inside an `<OptionGroup>` only has a `name` attribute, which refers to one of those options and places it in the group. Options not referred to by any group are shown below the groups.
 
 Server configuration files can also include descriptive Markdown text in the connection options dialog using a `<Documentation>` tag:
 
