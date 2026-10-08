@@ -1131,6 +1131,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   SettingsProxyProperty.xml
   SettingsRestoreProxyAppDefault.xml
   SettingsSubProxy.xml
+  ShortestPath.xml
   SliceBackwardsCompatibility.xml
   SpreadSheetFieldData.xml
   STLReaderMergePoints.xml
@@ -2272,6 +2273,10 @@ set (RegionIds_DISABLE_CRS TRUE)
 # AxisAlignedTransform is not implemented for Distributed context yet : issue (https://gitlab.kitware.com/paraview/paraview/-/issues/22949)
 set (AxisAlignedTransform_DISABLE_CS TRUE)
 set (AxisAlignedTransform_DISABLE_CRS TRUE)
+
+# ShortestPath computation is a global operation not trivially adaptable to distributed data
+set (ShortestPath_DISABLE_CS TRUE)
+set (ShortestPath_DISABLE_CRS TRUE)
 
 # Add image method overrides for tests.
 
