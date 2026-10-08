@@ -23,8 +23,10 @@ public:
   static QString formatTooltip(const QString& rawText);
 
   /**
-   * Convert a Markdown QString into an HTML, formatted with wrapping if
-   * necessary, the same way formatTooltip() does for rich-text.
+   * Convert a Markdown QString into HTML suitable for a tooltip. A short
+   * tooltip stays on one line and a long one is wrapped at a maximum
+   * width, the same way formatTooltip() does for rich-text. Returns an
+   * empty string if the Markdown is empty.
    */
   static QString formatMarkdownTooltip(const QString& markdown);
 
