@@ -271,6 +271,12 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
                  << "'.";
       continue;
     }
+    if (groupedNames.contains(name))
+    {
+      qWarning() << "OptionGroup '" << group.Label << "' references option '" << name
+                 << "', which is already in a group. Ignoring it.";
+      continue;
+    }
     contentLayout->addRow(optionLabels.value(name), widgets[name]->Widget);
     groupedNames.insert(name);
   }
