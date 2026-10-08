@@ -32,7 +32,7 @@ pqExpanderButton::pqExpanderButton(QWidget* parentObject)
   : Superclass(parentObject)
   , Internals(new pqExpanderButton::pqInternals())
   , Checked(false)
-  , CurrentLook(H1)
+  , CurrentHeadingLevel(H1)
 {
   this->Internals->setupUi(this);
   this->updateIcon();
@@ -80,17 +80,17 @@ QString pqExpanderButton::text() const
 }
 
 //-----------------------------------------------------------------------------
-void pqExpanderButton::setLook(Look newLook)
+void pqExpanderButton::setHeadingLevel(HeadingLevel newLevel)
 {
-  if (this->CurrentLook == newLook)
+  if (this->CurrentHeadingLevel == newLevel)
   {
     return;
   }
 
-  this->CurrentLook = newLook;
+  this->CurrentHeadingLevel = newLevel;
   this->updateIcon();
 
-  if (this->CurrentLook == H2)
+  if (this->CurrentHeadingLevel == H2)
   {
     this->setFrameShape(QFrame::NoFrame);
   }
@@ -104,7 +104,7 @@ void pqExpanderButton::setLook(Look newLook)
 //-----------------------------------------------------------------------------
 void pqExpanderButton::updateIcon()
 {
-  if (this->CurrentLook == H2)
+  if (this->CurrentHeadingLevel == H2)
   {
     this->Internals->icon->setPixmap(
       this->Checked ? this->Internals->CollapsePixmap : this->Internals->ExpandPixmap);

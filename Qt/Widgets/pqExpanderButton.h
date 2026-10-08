@@ -19,22 +19,20 @@ class PQWIDGETS_EXPORT pqExpanderButton : public QFrame
 
   Q_PROPERTY(QString text READ text WRITE setText)
   Q_PROPERTY(bool checked READ checked WRITE setChecked)
-  Q_PROPERTY(Look look READ look WRITE setLook)
-  Q_ENUMS(Look)
+  Q_PROPERTY(HeadingLevel headingLevel READ headingLevel WRITE setHeadingLevel)
+  Q_ENUMS(HeadingLevel)
 public:
   pqExpanderButton(QWidget* parent = nullptr);
   ~pqExpanderButton() override;
 
   /**
-   * This enum specifies the look of the button.
-   *
-   * H1 (the default) uses plus/minus icons and draws a full
-   * border around the button.
-   *
-   * H2 uses expand/collapse icons and does not draw a
-   * border around the button.
+   * This enum specifies the level of the button in a hierarchy of
+   * expanders, similar to heading levels in a document. H1 (the
+   * default) is for top level sections such as Properties/Display/View
+   * (plus/minus icons, border), H2 is for nested groups such as
+   * property groups (subtler arrow icons, no border).
    */
-  enum Look
+  enum HeadingLevel
   {
     H1 = 0,
     H2
@@ -62,11 +60,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   QString text() const;
 
   /**
-   * This property holds the look of the button. By default, the look
-   * is H1.
+   * This property holds the heading level of the button, which
+   * determines its look. By default, the heading level is H1.
    */
-  void setLook(Look look);
-  Look look() const { return this->CurrentLook; }
+  void setHeadingLevel(HeadingLevel level);
+  HeadingLevel headingLevel() const { return this->CurrentHeadingLevel; }
 
 Q_SIGNALS:
   /**
@@ -84,14 +82,14 @@ private:
   Q_DISABLE_COPY(pqExpanderButton)
 
   /**
-   * Updates the icon shown based on the current checked state and look.
+   * Updates the icon shown based on the current checked state and heading level.
    */
   void updateIcon();
 
   class pqInternals;
   pqInternals* Internals;
   bool Checked;
-  Look CurrentLook;
+  HeadingLevel CurrentHeadingLevel;
 };
 
 #endif

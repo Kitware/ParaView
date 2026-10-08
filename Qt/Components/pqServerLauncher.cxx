@@ -241,7 +241,7 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
   QFormLayout* formLayout)
 {
   pqExpanderButton* expander = new pqExpanderButton(&dialog);
-  expander->setLook(pqExpanderButton::H2);
+  expander->setHeadingLevel(pqExpanderButton::H2);
   expander->setText(group.Label);
   expander->setChecked(!group.Collapsed);
   formLayout->addRow(expander);
