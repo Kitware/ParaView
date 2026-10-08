@@ -12,7 +12,7 @@
 
 /**
  * Set of utility functions designed to create wider tooltips, since Qt does
- * allow us to set this directly.
+ * not allow us to set this directly.
  */
 class PQWIDGETS_EXPORT pqWidgetUtilities
 {
