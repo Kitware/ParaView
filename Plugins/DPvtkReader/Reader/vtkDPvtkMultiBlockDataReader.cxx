@@ -16,15 +16,9 @@
 #endif
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringFormatter.h"
 
-#include "vtk_fmt.h"
 #include <vtksys/SystemTools.hxx>
-// Keep clang-format from adding spaces around the '/' path separator:
-// clang-format off
-#include VTK_FMT(fmt/args.h)
-#include VTK_FMT(fmt/format.h)
-#include VTK_FMT(fmt/ostream.h)
-// clang-format on
 
 #include <DPvzTocEntry.h>
 #include <DPvzVtk.h>
@@ -241,7 +235,7 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadStepToc()
 {
   int32_t ranks = this->Toc[this->Step].ranks;
   vtkDebugWithObjectMacro(
-    this->Object, << fmt::format("Number of ranks for time step {}: {} ", this->Step, ranks));
+    this->Object, << vtk::format("Number of ranks for time step {}: {} ", this->Step, ranks));
   this->StepToc.resize(ranks);
   if (this->File->get_step_toc(this->Toc[this->Step], this->StepToc.data()))
   {
@@ -285,10 +279,10 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
         this->RankData.Rank = i;
         this->RankData.RawData.resize(this->StepToc[i].inflated_size);
         vtkDebugWithObjectMacro(
-          this->Object, << fmt::format("ReadPartitionInformation, DPvtkFile::get_data rank={}", i));
+          this->Object, << vtk::format("ReadPartitionInformation, DPvtkFile::get_data rank={}", i));
         if (this->File->get_data(this->StepToc[i], this->RankData.RawData.data()))
         {
-          throw std::runtime_error(fmt::format("DPvtkFile::get_data failed for rank {}", i));
+          throw std::runtime_error(vtk::format("DPvtkFile::get_data failed for rank {}", i));
         }
         if (DPvzVtkData::extract(this->RankData.RawData.data(), this->StepToc[i].inflated_size,
               this->RankData.VtkDataCount, this->RankData.VtkData))
@@ -386,13 +380,13 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
       if (!inserted.second)
       {
         throw std::runtime_error(
-          fmt::format("Duplicate file name {} stored at rank {} index {} and at rank {} index {}",
+          vtk::format("Duplicate file name {} stored at rank {} index {} and at rank {} index {}",
             fileName, inserted.first->second.first, inserted.first->second.second, fileNameRank,
             fileNameIndex));
       }
     }
   }
-  vtkDebugWithObjectMacro(this->Object, << fmt::format("Number of partitions for time step {}: {} ",
+  vtkDebugWithObjectMacro(this->Object, << vtk::format("Number of partitions for time step {}: {} ",
                                           this->Step, this->FileNameToRankIndex.size()));
 }
 
@@ -408,7 +402,7 @@ bool vtkDPvtkMultiBlockDataReader::vtkInternals::ReaderSetData(
     auto it = this->FileNameToRankIndex.find(fileName);
     if (it == this->FileNameToRankIndex.end())
     {
-      throw std::runtime_error(fmt::format("Cannot find {}", fileName));
+      throw std::runtime_error(vtk::format("Cannot find {}", fileName));
     }
     int requestedRank = it->second.first;
     int requestedIndex = it->second.second;
@@ -419,16 +413,16 @@ bool vtkDPvtkMultiBlockDataReader::vtkInternals::ReaderSetData(
       if (requestedRank < 0 || static_cast<size_t>(requestedRank) >= this->StepToc.size())
       {
         throw std::runtime_error(
-          fmt::format("Requested rank {} outside of the range of ranks [0, {})", requestedRank,
+          vtk::format("Requested rank {} outside of the range of ranks [0, {})", requestedRank,
             this->StepToc.size()));
       }
       this->RankData.RawData.resize(this->StepToc[requestedRank].inflated_size);
       vtkDebugWithObjectMacro(
-        this->Object, << fmt::format("ReaderSetData, DPvtkFile::get_data rank={}", requestedRank));
+        this->Object, << vtk::format("ReaderSetData, DPvtkFile::get_data rank={}", requestedRank));
       if (this->File->get_data(this->StepToc[requestedRank], this->RankData.RawData.data()))
       {
         throw std::runtime_error(
-          fmt::format("DPvtkFile::get_data failed for rank {}", requestedRank));
+          vtk::format("DPvtkFile::get_data failed for rank {}", requestedRank));
       }
       if (DPvzVtkData::extract(this->RankData.RawData.data(),
             this->StepToc[requestedRank].inflated_size, this->RankData.VtkDataCount,
@@ -441,7 +435,7 @@ bool vtkDPvtkMultiBlockDataReader::vtkInternals::ReaderSetData(
     if (requestedIndex >= this->RankData.VtkDataCount)
     {
       throw std::runtime_error(
-        fmt::format("Requested index {} greater or equal with number of VTK datasets {}",
+        vtk::format("Requested index {} greater or equal with number of VTK datasets {}",
           requestedIndex, this->RankData.VtkDataCount));
     }
     reader->ReadFromInputStringOn();
