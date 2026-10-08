@@ -72,6 +72,13 @@ public:
     int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   /**
+   * Allow to hide header label data using the SectionHeaderTemp role
+   * note: all other calls are passed to the parent class
+   */
+  bool setHeaderData(
+    int section, Qt::Orientation orientation, const QVariant& value, int role) override;
+
+  /**
    * Make a server request to sort based on a given column with a given order
    */
   void sortSection(int section, Qt::SortOrder order);
@@ -126,6 +133,13 @@ public:
   {
     SectionInternal = Qt::UserRole + 1,
     SectionVisible,
+    // This value can be temporarily set by a caller, and if it is set, the header display
+    // string will be returned as being the number of 'a' characters that is returned as
+    // an int value.
+    // The default value is -1, which will return the real header string
+    // note: The purpose of this is the proper calculation of display width of columns for
+    // a multi-component column
+    SectionHeaderTemp
   };
 
   /**

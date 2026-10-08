@@ -81,6 +81,15 @@ public:
   vtkWeakPointer<vtkSMProxy> ActiveRepresentationProxy;
   vtkSpreadSheetView* VTKView;
   bool Dirty;
+
+  // This value can be temporarily set by a caller, using the SectionHeaderTemp role.
+  // If it is set to 0 or a positive int value, the returned header string will be the
+  // number of 'a' characters given by the value. The default is -1, meaning: we want
+  // the real header label
+  // note: The purpose of this is the proper calculation of display width of columns for
+  // a multi-component column. The map should always be empty except during a call to
+  // the pqSpreadSheetViewWidget::resizeColumnsToContentsRespectingComponents() function
+  QMap<int, int> TempSectionHeader;
 };
 
 //-----------------------------------------------------------------------------
@@ -438,7 +447,22 @@ QVariant pqSpreadSheetViewModel::headerData(
       switch (role)
       {
         case Qt::DisplayRole:
+        {
+          // note: The purpose of this is the proper calculation of display width of columns for
+          // a multi-component column
+          int tempStringLength = -1;
+          auto it = this->Internal->TempSectionHeader.find(section);
+          if (it != this->Internal->TempSectionHeader.end())
+          {
+            tempStringLength = it.value();
+          }
+          if (0 <= tempStringLength)
+          {
+            return QString(tempStringLength, QChar('a'));
+          }
+
           return QString(view->GetColumnLabel(section).c_str());
+        }
         case SectionInternal:
           return view->IsColumnInternal(section);
         case SectionVisible:
@@ -454,6 +478,39 @@ QVariant pqSpreadSheetViewModel::headerData(
     return QVariant(rowNo.toUInt() - 1);
   }
   return this->Superclass::headerData(section, orientation, role);
+}
+
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewModel::setHeaderData(
+  int section, Qt::Orientation orientation, const QVariant& value, int role)
+{
+  // Only for this role (SectionHeaderTemp) and orientation (Horizontal)
+  if ((SectionHeaderTemp != role) || (Qt::Horizontal != orientation))
+    return Superclass::setHeaderData(section, orientation, value, role);
+
+  // Do nothing if no real change
+  auto it = this->Internal->TempSectionHeader.find(section);
+  int currentValue = -1;
+  if (it != this->Internal->TempSectionHeader.end())
+  {
+    currentValue = it.value();
+  }
+  int newValue = value.toInt();
+  if (currentValue == newValue)
+  {
+    return false;
+  }
+
+  // Apply the value
+  if (0 > newValue)
+  {
+    this->Internal->TempSectionHeader.erase(it);
+  }
+  else
+  {
+    this->Internal->TempSectionHeader[section] = newValue;
+  }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
