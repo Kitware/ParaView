@@ -588,12 +588,19 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   // everything else besides the content
   const int chromeHeight =
     margins.top() + margins.bottom() + dialogLayout->spacing() + buttonBox->sizeHint().height();
-  const QRect availableGeometry = QGuiApplication::primaryScreen()->availableGeometry();
-  const int maxDialogHeight = static_cast<int>(availableGeometry.height() * 0.8);
-  const int desiredDialogHeight = std::min(chromeHeight + contentHeight, maxDialogHeight);
-
   dialog.adjustSize(); // pick a reasonable initial width
-  dialog.resize(dialog.width(), desiredDialogHeight);
+  QScreen* screen = dialog.screen();
+  if (screen)
+  {
+    const QRect availableGeometry = screen->availableGeometry();
+    const int maxDialogHeight = static_cast<int>(availableGeometry.height() * 0.8);
+    const int desiredDialogHeight = std::min(chromeHeight + contentHeight, maxDialogHeight);
+    dialog.resize(dialog.width(), desiredDialogHeight);
+  }
+  else
+  {
+    qWarning("Cannot get the screen the dialog is on");
+  }
   return true;
 }
 
