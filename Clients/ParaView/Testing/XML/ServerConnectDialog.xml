@@ -40,8 +40,8 @@
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,64,12,/0:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseDblClick" arguments="1,1,0,64,12,/0:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/connect" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QDialog0/OptionsScrollArea/qt_scrollarea_viewport/OptionsWidget/MPITYPE" command="set_string" arguments="MPICH Ver 2.0" />
-  <pqevent object="pqClientMainWindow/1QDialog0/OptionsScrollArea/qt_scrollarea_viewport/OptionsWidget/OFFSCREEN" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/1QDialog0/OptionsScrollArea/qt_scrollarea_viewport/OptionsWidget/UngroupedOptions/MPITYPE" command="set_string" arguments="MPICH Ver 2.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/OptionsScrollArea/qt_scrollarea_viewport/OptionsWidget/UngroupedOptions/OFFSCREEN" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton1" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mousePress" arguments="1,1,0,0,0,0" />
@@ -49,7 +49,7 @@
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,77,14,/1:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,77,14,/1:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseDblClick" arguments="1,1,0,77,14,/1:0" />
-  <pqevent object="pqClientMainWindow/1QDialog0/OptionsScrollArea/qt_scrollarea_viewport/OptionsWidget/PARALLELISM" command="set_string" arguments="Some Parallelism" />
+  <pqevent object="pqClientMainWindow/1QDialog0/OptionsScrollArea/qt_scrollarea_viewport/OptionsWidget/UngroupedOptions/PARALLELISM" command="set_string" arguments="Some Parallelism" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton1" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
@@ -80,6 +80,6 @@
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,66,15,/1:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,66,15,/1:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseDblClick" arguments="1,1,0,66,15,/1:0" />
-  <pqevent object="pqClientMainWindow/1QDialog0/OptionsScrollArea/qt_scrollarea_viewport/OptionsWidget/PARALLELISM" command="set_string" arguments="Some Parallelism" />
+  <pqevent object="pqClientMainWindow/1QDialog0/OptionsScrollArea/qt_scrollarea_viewport/OptionsWidget/UngroupedOptions/PARALLELISM" command="set_string" arguments="Some Parallelism" />
   <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton1" command="activate" arguments="" />
 </pqevents>

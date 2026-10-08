@@ -566,13 +566,24 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   }
 
   // Finally, add the options that were not claimed by any <OptionGroup/>, in
-  // the order they were declared.
+  // the order they were declared. They get their own form layout, like the
+  // options in a group, so that both are aligned the same way on macOS.
+  QFormLayout* ungroupedLayout = nullptr;
   for (const QString& name : optionOrder)
   {
-    if (!groupedOptionNames.contains(name))
+    if (groupedOptionNames.contains(name))
     {
-      formLayout->addRow(optionLabels.value(name), widgets[name]->Widget);
+      continue;
     }
+    if (!ungroupedLayout)
+    {
+      QWidget* ungrouped = new QWidget(&dialog);
+      ungrouped->setObjectName("UngroupedOptions");
+      ungroupedLayout = new QFormLayout(ungrouped);
+      ungroupedLayout->setContentsMargins(0, 0, 0, 0);
+      formLayout->addRow(ungrouped);
+    }
+    ungroupedLayout->addRow(optionLabels.value(name), widgets[name]->Widget);
   }
 
   QDialogButtonBox* buttonBox =
