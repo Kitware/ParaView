@@ -247,8 +247,8 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
   formLayout->addRow(expander);
 
   QWidget* content = new QWidget(&dialog);
-  QFormLayout* contentLayout = new QFormLayout(content);
-  contentLayout->setContentsMargins(0, 0, 0, 0);
+  QVBoxLayout* contentVLayout = new QVBoxLayout(content);
+  contentVLayout->setContentsMargins(0, 0, 0, 0);
   content->setVisible(!group.Collapsed);
   formLayout->addRow(content);
 
@@ -260,8 +260,12 @@ void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget
     QLabel* textLabel = new QLabel(group.Documentation, &dialog);
     textLabel->setTextFormat(Qt::MarkdownText);
     textLabel->setWordWrap(true);
-    contentLayout->addRow(textLabel);
+    // Kept out of the form layout, where it would offset the centered options.
+    contentVLayout->addWidget(textLabel);
   }
+
+  QFormLayout* contentLayout = new QFormLayout();
+  contentVLayout->addLayout(contentLayout);
 
   for (const QString& name : group.OptionNames)
   {
