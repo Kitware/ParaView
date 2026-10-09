@@ -145,10 +145,6 @@ public:
    */
   void DisableAbortCheck(vtkTypeUInt32 objectId);
 
-protected:
-  vtkPVProgressHandler();
-  ~vtkPVProgressHandler() override;
-
   enum TAGS
   {
     ABORT_TAG = 188968,
@@ -156,6 +152,10 @@ protected:
     PROGRESS_EVENT_TAG = 188970,
     MESSAGE_EVENT_TAG = 188971
   };
+
+protected:
+  vtkPVProgressHandler();
+  ~vtkPVProgressHandler() override;
 
   enum RMI_TAGS
   {
