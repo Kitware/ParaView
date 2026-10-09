@@ -156,6 +156,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/23192
     "\\IndeXRepresentation$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/work_items/23425
+    "^pvcs.TabbedViews$"
+    "^pvcrs.TabbedViews$"
+    "^pvcs-tile-display.TileDisplaySplitView-2x2$"
   )
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_asserts")
