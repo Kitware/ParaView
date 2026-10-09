@@ -16,11 +16,13 @@ list(APPEND sources
 
 paraview_add_plugin(AbortTesting
   REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.0"
   EULA    Disclaimer.txt
   UI_INTERFACES ${interfaces}
   SOURCES ${sources}
   MODULES SlowFilter::SlowFilter
-  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filter/vtk.module")
+  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filter/vtk.module"
+  SERVER_MANAGER_XML  AbortTesting.xml)
 
 add_subdirectory(Testing)

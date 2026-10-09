@@ -1,0 +1,65 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="settings">
+    <SettingsProxy name="AbortTestingSettings" label="AbortTesting"
+      processes="client|dataserver|renderserver">
+      <Documentation>
+        Settings for the AbortTesting plugin.
+      </Documentation>
+
+      <IntVectorProperty name="AutoAbort"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          If the plugin should auto abort
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="AutoAbortValue"
+        number_of_elements="1"
+        default_values="50">
+        <Documentation>
+          Value in percentage at which auto abort should occur
+        </Documentation>
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+  </ProxyGroup>
+  <ProxyGroup name="filters">
+    <SourceProxy
+      name="SlowFilter"
+      class="vtkSlowFilter">
+      <Documentation
+         short_help="A slow filter to invoke ProgressEvent">
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty
+        name="SleepTime"
+        command="SetSleepTime"
+        number_of_elements="1"
+        animateable="0"
+        default_values="2">
+        <Documentation>
+          Sleep time between loops in ms
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
