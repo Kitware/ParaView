@@ -5,6 +5,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
+#include "pqFiltersMenuReaction.h"
 #include "pqObjectBuilder.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
@@ -40,6 +41,19 @@ pqSourcesMenuReaction::pqSourcesMenuReaction(pqProxyGroupMenuManager* menuManage
   QObject::connect(pqApplicationCore::instance(), SIGNAL(updateMasterEnableState(bool)), this,
     SLOT(updateEnableState()));
   this->updateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+void pqSourcesMenuReaction::onTriggered(const QString& group, const QString& name)
+{
+  if (group == "filters")
+  {
+    pqFiltersMenuReaction::createFilter(group, name);
+  }
+  else
+  {
+    pqSourcesMenuReaction::createSource(group, name);
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -629,6 +629,60 @@ In this case, the `Hints` element of the XML file can contain:
 </Hints>
 ```
 
+### Adding Menus and Toolbars for Categories
+
+Categories can also be shown as toolbars, and top-level categories as menus of
+the menu bar instead of sub-menus of the *Filters* menu. This lets plugins,
+including XML-only and Python plugins, gather their tools, i.e. sources,
+filters and Python scripts, in menus and toolbars of their own:
+
+```xml
+<ParaViewFilters>
+  <Category name="MyTools" menu_label="My Tools"
+            show_in_menubar="1" show_in_toolbar="1" preserve_order="1">
+    <Proxy group="sources" name="SphereSource" />
+    <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice.svg" />
+    <Separator />
+    <Script name="SayHello" label="Say Hello" tooltip="Prints a greeting.">
+      print("Hello!")
+    </Script>
+    <Category name="MoreTools" menu_label="More Tools">
+      <Proxy group="filters" name="Contour" />
+    </Category>
+  </Category>
+</ParaViewFilters>
+```
+
+* `show_in_menubar="1"` shows a top-level category as a menu of the menu bar.
+  If the menu bar already has a menu with this title, e.g. *View*, the items of
+  the category are added at the end of this menu, after a separator, instead.
+* `show_in_toolbar="1"` adds a toolbar with the items of the category. For
+  categories shown in the menu bar, their sub-categories are shown as drop-down
+  buttons in the toolbar.
+* `preserve_order="1"` keeps the items in the given order instead of sorting
+  them alphabetically, which is needed for separators to be meaningful.
+
+When several plugins define the same category, their items are merged, and the
+category is shown in the menu bar or as a toolbar if any of them requests it.
+Besides filters, categories can contain:
+
+* sources, using `group="sources"`,
+* Python scripts, using a `Script` element with the code either inline or in the
+  file given by the `filename` attribute. `name` identifies the script, e.g.
+  when users customize categories, so it should be unique, e.g. prefixed by the
+  name of the plugin. `label`, `icon` and `tooltip` are optional.
+  Use a `<![CDATA[ ... ]]>` section for code containing `<` or `&`,
+* separators, using a `Separator` element.
+
+`icon` can be a Qt resource path, such as `:/pqWidgets/Icons/pqCalculator.svg`,
+or a file path. Python plugins can use the `smmenu` decorators from
+`paraview.util.vtkAlgorithm` instead. See `Examples/Plugins/CustomMenus` for
+complete examples.
+
+Users can customize categories using *Tools > Configure Filter Categories*. Only
+their changes are saved, and applied over the categories defined by ParaView and
+plugins, so that categories added or modified by plugins later on are shown.
+
 ### Adding Icons
 
 You can see that some filters in the *Filters* menu (e.g., *Clip*) have icons

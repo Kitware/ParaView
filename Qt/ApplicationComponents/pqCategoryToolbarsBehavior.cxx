@@ -11,10 +11,18 @@
 
 #include <QList>
 #include <QMainWindow>
+#include <QMenu>
 #include <QPointer>
 #include <QToolBar>
+#include <QToolButton>
 
 #include <cassert>
+
+namespace
+{
+// marks the menus created for the sub-categories shown in toolbars.
+const char* SUBCATEGORY_MENU_PROPERTY = "pqCategoryToolbarsBehavior_SubCategoryMenu";
+}
 
 class pqCategoryToolbarsBehavior::pqInternal
 {
@@ -81,6 +89,18 @@ public:
     const QString& categoryName = category->name();
     QList<QAction*> toolbarActions = this->MenuManager->categoryActions(category);
     toolbar->clear();
+    // delete the menus of the previous drop-down buttons, once control returns
+    // to the event loop as one may be in use, e.g. when one of its items loads
+    // a plugin. Their name is cleared so that they are not found meanwhile.
+    for (QMenu* menu : toolbar->findChildren<QMenu*>(QString(), Qt::FindDirectChildrenOnly))
+    {
+      if (menu->property(SUBCATEGORY_MENU_PROPERTY).toBool())
+      {
+        menu->setProperty(SUBCATEGORY_MENU_PROPERTY, false);
+        menu->setObjectName(QString());
+        menu->deleteLater();
+      }
+    }
     for (int cc = 0; cc < toolbarActions.size(); cc++)
     {
       QVariant omitList = toolbarActions[cc]->property("OmitFromToolbar");
@@ -89,6 +109,30 @@ public:
         continue;
       }
       toolbar->addAction(toolbarActions[cc]);
+    }
+
+    // toolbars of categories shown in the menu bar mirror their menu:
+    // sub-categories are shown as drop-down buttons.
+    if (!category->showInMenuBar())
+    {
+      return;
+    }
+    for (auto subCategory : category->getCategoriesAlphabetically())
+    {
+      if (subCategory->isEmpty())
+      {
+        continue;
+      }
+      auto menu = new QMenu(subCategory->label(), toolbar);
+      menu->setObjectName(subCategory->name());
+      menu->menuAction()->setMenuRole(QAction::NoRole);
+      menu->setProperty(SUBCATEGORY_MENU_PROPERTY, true);
+      this->MenuManager->populateMenuFromCategory(menu, subCategory);
+      toolbar->addAction(menu->menuAction());
+      if (auto button = qobject_cast<QToolButton*>(toolbar->widgetForAction(menu->menuAction())))
+      {
+        button->setPopupMode(QToolButton::InstantPopup);
+      }
     }
   }
 

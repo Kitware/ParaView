@@ -128,7 +128,7 @@ struct pqConfigureCategoriesDialog::pqInternal
     }
 
     auto category = getCategory(item);
-    if (!category)
+    if (!category || !category->parentCategory())
     {
       return;
     }
@@ -199,6 +199,9 @@ struct pqConfigureCategoriesDialog::pqInternal
 
   bool BlockEdition = false;
   pqProxyGroupMenuManager* MenuManager;
+  // the item of the menu, parent of the items of the top-level categories,
+  // unless shown in the menu bar: their items are top-level ones, beside it.
+  QTreeWidgetItem* MenuItem = nullptr;
   QScopedPointer<Ui::pqConfigureCategoriesDialog> Ui;
   std::unique_ptr<pqProxyCategory> SettingsCategory;
 };
@@ -224,7 +227,7 @@ pqConfigureCategoriesDialog::pqConfigureCategoriesDialog(
   QObject::connect(this->Internal->Ui->addCategory, &QToolButton::released, this,
     [&]()
     {
-      auto parentItem = this->Internal->Ui->customCategoriesTree->invisibleRootItem();
+      auto parentItem = this->Internal->MenuItem;
       auto precedingItem = parentItem;
       this->createCategory(::DEFAULT_NAME, parentItem, precedingItem);
     });
@@ -254,6 +257,8 @@ pqConfigureCategoriesDialog::pqConfigureCategoriesDialog(
     &pqConfigureCategoriesDialog::onSearchTextChanged);
   QObject::connect(this->Internal->Ui->useAsToolbar, &QCheckBox::clicked, this,
     &pqConfigureCategoriesDialog::updateToolbarState);
+  QObject::connect(this->Internal->Ui->useAsMenuBarMenu, &QCheckBox::clicked, this,
+    &pqConfigureCategoriesDialog::updateMenuBarState);
 
   this->connect(this, &QDialog::accepted, this, &pqConfigureCategoriesDialog::onAccepted);
 
@@ -308,7 +313,8 @@ bool pqConfigureCategoriesDialog::eventFilter(QObject* object, QEvent* event)
     }
 
     auto parentCategoryItem = getDestinationParentItem(dropEvent);
-    if (!parentCategoryItem)
+    if (!parentCategoryItem ||
+      (parentCategoryItem == this->Internal->MenuItem && !::isCategory(sourceItem)))
     {
       return true;
     }
@@ -364,20 +370,33 @@ void pqConfigureCategoriesDialog::keyPressEvent(QKeyEvent* keyEvent)
 //----------------------------------------------------------------------------
 void pqConfigureCategoriesDialog::populateCurrentCategoriesTree()
 {
+  this->Internal->MenuItem = nullptr;
   this->Internal->Ui->customCategoriesTree->clear();
   auto treeRoot = this->Internal->Ui->customCategoriesTree->invisibleRootItem();
   auto mainCategory = this->Internal->SettingsCategory.get();
 
   treeRoot->setData(0, ::CATEGORY_ROLE, QVariant::fromValue<pqProxyCategory*>(mainCategory));
+
+  // mirror the menu bar: top-level categories are sub-menus of the menu, e.g.
+  // "Filters", unless shown as menus of the menu bar.
+  auto menuItem = this->createItem(treeRoot, tr("Filters"));
+  menuItem->setData(0, ::CATEGORY_ROLE, QVariant::fromValue<pqProxyCategory*>(mainCategory));
+  menuItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
+  menuItem->setToolTip(0,
+    pqWidgetUtilities::formatTooltip(tr("Categories shown as sub-menus of the Filters menu. "
+                                        "Categories beside this item are shown in the menu bar.")));
+  this->Internal->MenuItem = menuItem;
+
   for (auto subCat : mainCategory->getCategoriesAlphabetically())
   {
-    auto catItem = this->createCategoryItem(treeRoot, subCat);
+    auto catItem = this->createCategoryItem(subCat->showInMenuBar() ? treeRoot : menuItem, subCat);
     this->populateTree(catItem);
   }
 
   this->Internal->Ui->customCategoriesTree->resizeColumnToContents(0);
   this->Internal->Ui->customCategoriesTree->setCurrentItem(nullptr);
   this->Internal->Ui->customCategoriesTree->collapseAll();
+  menuItem->setExpanded(true);
 }
 
 //----------------------------------------------------------------------------
@@ -388,7 +407,10 @@ void pqConfigureCategoriesDialog::populateAvailableProxiesTree()
   pqProxyCategory* applicationCategory = this->Internal->MenuManager->getApplicationCategory();
   for (auto proxy : applicationCategory->getProxiesRecursive())
   {
-    this->createProxyItem(this->Internal->Ui->defaultCategoriesTree->invisibleRootItem(), proxy);
+    if (!proxy->isSeparator())
+    {
+      this->createProxyItem(this->Internal->Ui->defaultCategoriesTree->invisibleRootItem(), proxy);
+    }
   }
 
   this->Internal->Ui->defaultCategoriesTree->sortByColumn(0, Qt::AscendingOrder);
@@ -405,7 +427,8 @@ void pqConfigureCategoriesDialog::populateTree(QTreeWidgetItem* treeRoot)
 
   for (auto proxy : parentCategory->getRootProxies())
   {
-    if (!proxy->hideFromMenu())
+    // separators are kept as is, but not shown.
+    if (!proxy->hideFromMenu() && !proxy->isSeparator())
     {
       this->createProxyItem(treeRoot, proxy);
     }
@@ -472,6 +495,12 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::getSelectedCategoryItem()
     item = ::getParent(item);
   }
 
+  // categories are created in the menu, not in the menu bar.
+  if (item == this->Internal->Ui->customCategoriesTree->invisibleRootItem())
+  {
+    item = this->Internal->MenuItem;
+  }
+
   return item;
 }
 
@@ -527,6 +556,8 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::createCategory(
 
   this->Internal->Ui->customCategoriesTree->scrollToItem(newItem);
   this->Internal->Ui->customCategoriesTree->setCurrentItem(newItem);
+  // the item was selected as soon as created, before being set up as a category.
+  this->updateUIState();
   this->Internal->Ui->customCategoriesTree->editItem(newItem, 0);
 
   return newItem;
@@ -596,6 +627,7 @@ void pqConfigureCategoriesDialog::resetToApplicationCategories()
 void pqConfigureCategoriesDialog::onRemovePressed()
 {
   QList<QTreeWidgetItem*> selected = this->Internal->Ui->customCategoriesTree->selectedItems();
+  selected.removeAll(this->Internal->MenuItem);
   if (selected.empty())
   {
     return;
@@ -616,6 +648,33 @@ void pqConfigureCategoriesDialog::updateToolbarState()
 }
 
 //----------------------------------------------------------------------------
+void pqConfigureCategoriesDialog::updateMenuBarState()
+{
+  QTreeWidgetItem* categoryItem = this->getSelectedItem();
+  if (!::isCategory(categoryItem) || categoryItem == this->Internal->MenuItem)
+  {
+    return;
+  }
+
+  const bool show = this->Internal->Ui->useAsMenuBarMenu->isChecked();
+  ::getCategory(categoryItem)->setShowInMenuBar(show);
+
+  // move the item beside the item of the menu, or back into it.
+  auto tree = this->Internal->Ui->customCategoriesTree;
+  QTreeWidgetItem* parentItem = ::getParent(categoryItem);
+  QTreeWidgetItem* newParentItem = show ? tree->invisibleRootItem() : this->Internal->MenuItem;
+  if (parentItem != newParentItem)
+  {
+    const bool expanded = categoryItem->isExpanded();
+    parentItem->removeChild(categoryItem);
+    newParentItem->addChild(categoryItem);
+    categoryItem->setExpanded(expanded);
+    tree->setCurrentItem(categoryItem);
+    tree->scrollToItem(categoryItem);
+  }
+}
+
+//----------------------------------------------------------------------------
 bool pqConfigureCategoriesDialog::insertCategoryFromItem(
   QTreeWidgetItem* sourceItem, QTreeWidgetItem* parentCategoryItem, QTreeWidgetItem* precedingItem)
 {
@@ -623,6 +682,8 @@ bool pqConfigureCategoriesDialog::insertCategoryFromItem(
   auto newItem = this->createCategory(category->name(), parentCategoryItem, precedingItem);
   auto newCategory = ::getCategory(newItem);
   newCategory->deepCopy(category);
+  // categories are dropped in the menu, or in other categories.
+  newCategory->setShowInMenuBar(false);
   this->populateTree(newItem);
   return true;
 }
@@ -677,7 +738,9 @@ void pqConfigureCategoriesDialog::onSetIconPressed()
 //----------------------------------------------------------------------------
 void pqConfigureCategoriesDialog::onAccepted()
 {
-  this->Internal->SettingsCategory->writeSettings(this->ResourceTag);
+  // only the differences with the application categories are saved.
+  this->Internal->SettingsCategory->writeSettings(
+    this->ResourceTag, this->Internal->MenuManager->getApplicationCategory());
 }
 
 //----------------------------------------------------------------------------
@@ -761,17 +824,27 @@ void pqConfigureCategoriesDialog::updateUIState()
 {
   bool hasCustomItemSelection = this->customTreeHasSelection();
   bool hasApplicationItemSelection = this->applicationTreeHasSelection();
-  this->Internal->Ui->addFilter->setEnabled(hasApplicationItemSelection && hasCustomItemSelection);
+  auto selectedItem = this->getSelectedItem();
+  // the item of the menu only contains categories, and cannot be modified.
+  const bool isMenu = selectedItem == this->Internal->MenuItem;
+  this->Internal->Ui->addFilter->setEnabled(
+    hasApplicationItemSelection && hasCustomItemSelection && !isMenu);
   this->Internal->Ui->addSubCategory->setEnabled(hasCustomItemSelection);
 
-  auto selectedItem = this->getSelectedItem();
   auto category = ::getCategory(selectedItem);
-  bool isCategory = ::isCategory(selectedItem);
+  bool isCategory = ::isCategory(selectedItem) && !isMenu;
   this->Internal->Ui->useAsToolbar->setEnabled(hasCustomItemSelection && isCategory && category);
   this->Internal->Ui->useAsToolbar->setChecked(category && category->showInToolbar());
+  // only top-level categories, except Favorites, can be shown in the menu bar.
+  const bool isTopLevel = category && category->parentCategory() &&
+    !category->parentCategory()->parentCategory() && !this->Internal->isFavorites(category);
+  this->Internal->Ui->useAsMenuBarMenu->setEnabled(
+    hasCustomItemSelection && isCategory && isTopLevel);
+  this->Internal->Ui->useAsMenuBarMenu->setChecked(isTopLevel && category->showInMenuBar());
 
   bool isFavoritesMainCategory = this->Internal->isFavorites(category);
-  this->Internal->Ui->remove->setEnabled(hasCustomItemSelection && !isFavoritesMainCategory);
+  this->Internal->Ui->remove->setEnabled(
+    hasCustomItemSelection && !isFavoritesMainCategory && !isMenu);
 
   auto proxyInfo = ::getProxy(selectedItem);
   bool isAvailable = proxyInfo && this->Internal->isAvailable(proxyInfo);
@@ -813,7 +886,7 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::getDestinationParentItem(QDropEven
 
   if (!destItem && sourceIsCategory)
   {
-    return this->Internal->Ui->customCategoriesTree->invisibleRootItem();
+    return this->Internal->MenuItem;
   }
 
   bool destIsCategory = ::isCategory(destItem);

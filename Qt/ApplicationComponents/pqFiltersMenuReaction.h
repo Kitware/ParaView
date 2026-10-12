@@ -41,12 +41,10 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
 protected Q_SLOTS:
   /**
-   * Called when the action is triggered.
+   * Called when the action is triggered. Creates a filter, or a source, as
+   * categories of filters can also contain sources.
    */
-  virtual void onTriggered(const QString& group, const QString& name)
-  {
-    pqFiltersMenuReaction::createFilter(group, name);
-  }
+  virtual void onTriggered(const QString& group, const QString& name);
   virtual void setEnableStateDirty();
 
 private:

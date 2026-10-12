@@ -25,6 +25,7 @@
 #include "pqCatalystPauseSimulationReaction.h"
 #include "pqCatalystRemoveBreakpointReaction.h"
 #include "pqCatalystSetBreakpointReaction.h"
+#include "pqCategoryMenuBarBehavior.h"
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangeFileNameReaction.h"
 #include "pqChangePipelineInputReaction.h"
@@ -255,8 +256,9 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu& menu, QMainWindow* mainWind
   new pqSourcesMenuReaction(mgr);
   if (mainWindow)
   {
-    // create toolbars for categories as needed.
+    // create toolbars and menus in the menu bar for categories as needed.
     new pqCategoryToolbarsBehavior(mgr, mainWindow);
+    new pqCategoryMenuBarBehavior(mgr, mainWindow);
   }
 }
 
@@ -288,8 +290,9 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
 
   if (mainWindow)
   {
-    // create toolbars for categories as needed.
+    // create toolbars and menus in the menu bar for categories as needed.
     new pqCategoryToolbarsBehavior(mgr, mainWindow);
+    new pqCategoryMenuBarBehavior(mgr, mainWindow);
   }
 }
 
