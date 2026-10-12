@@ -4,6 +4,7 @@
 
 #include "pqApplicationCore.h"
 #include "pqProgressManager.h"
+#include "pqSettings.h"
 
 //-----------------------------------------------------------------------------
 pqAbortTesting::pqAbortTesting(QObject* parent)
@@ -24,7 +25,10 @@ void pqAbortTesting::onStartup()
 //-----------------------------------------------------------------------------
 void pqAbortTesting::onProgress(const QString&, int progress)
 {
-  if (progress > 25)
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  bool autoAbort = settings->value("AbortTestingSettings.AutoAbort", true).toBool();
+  int autoAbortValue = settings->value("AbortTestingSettings.AutoAbortValue", 50).toInt();
+  if (autoAbort && progress > autoAbortValue)
   {
     pqProgressManager* pmManager = pqApplicationCore::instance()->getProgressManager();
     pmManager->triggerAbort();

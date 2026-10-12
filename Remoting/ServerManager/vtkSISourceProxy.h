@@ -8,6 +8,12 @@
  * coming from the client. vtkSISourceProxy also inserts post-processing filters
  * for each output port from the vtkAlgorithm. These post-processing filters
  * deal with things like parallelizing the data etc.
+ *
+ * It is also responsible to handle the communication of abort flag accross ranks
+ * Everytime an algorithm emit the CheckAbort event, this class will (manually) reduce
+ * the abort status of the main rank to satellite ranks using MPI.
+ * When an algorithm emit the CleanupCheckAbort even, all remaining MPI messages and reduce the
+ * abort status from main rank to ensure all ranks are properly aborted if they should be.
  */
 
 #ifndef vtkSISourceProxy_h
@@ -69,6 +75,17 @@ public:
    * the underlying VTK object.
    */
   void EnableAbortCheck();
+
+  /**
+   * Recover the AbortExecute state of the underlying vtk object
+   * and send it from rank 0 to all other ranks (not a true reduction).
+   */
+  void ReduceAbort();
+
+  /**
+   * Cleanup all remaining send/receive requests related to ReduceAbort
+   */
+  void CleanupAbortRequests();
 
 protected:
   vtkSISourceProxy();

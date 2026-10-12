@@ -10,15 +10,22 @@
 #ifndef vtkSlowFilter_h
 #define vtkSlowFilter_h
 
+#include "vtkPassInputTypeAlgorithm.h"
 #include "vtkSlowFilterModule.h" // For export macro
-#include "vtkStructuredGridAlgorithm.h"
 
-class VTKSLOWFILTER_EXPORT vtkSlowFilter : public vtkStructuredGridAlgorithm
+class VTKSLOWFILTER_EXPORT vtkSlowFilter : public vtkPassInputTypeAlgorithm
 {
 public:
   static vtkSlowFilter* New();
-  vtkTypeMacro(vtkSlowFilter, vtkStructuredGridAlgorithm);
+  vtkTypeMacro(vtkSlowFilter, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  /*
+   * Time to sleep between loops in ms
+   * Default is 2
+   */
+  vtkSetMacro(SleepTime, int);
+  vtkGetMacro(SleepTime, int);
 
 private:
   vtkSlowFilter() = default;
@@ -29,6 +36,8 @@ private:
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+
+  int SleepTime = 2;
 };
 
 #endif

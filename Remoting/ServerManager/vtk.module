@@ -26,6 +26,7 @@ PRIVATE_DEPENDS
   VTK::fmt
 OPTIONAL_DEPENDS
   VTK::IOIOSS
+  VTK::ParallelMPI
   VTK::Python
   VTK::PythonInterpreter
   VTK::RenderingRayTracing
