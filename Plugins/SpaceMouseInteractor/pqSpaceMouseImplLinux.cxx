@@ -37,15 +37,15 @@ pqSpaceMouseImpl::pqSpaceMouseImpl()
 {
   this->ReconnectTimer.setInterval(2000);
   QObject::connect(
-    &this->ReconnectTimer, &QTimer::timeout, this, [this]() { this->connectToDaemon(); });
+    &this->ReconnectTimer, &pqTimer::timeout, this, [this]() { this->connectToDaemon(); });
 
   this->FrameTimer.setSingleShot(true);
   this->FrameTimer.setInterval(16);
-  QObject::connect(&this->FrameTimer, &QTimer::timeout, this, [this]() { this->flushMotion(); });
+  QObject::connect(&this->FrameTimer, &pqTimer::timeout, this, [this]() { this->flushMotion(); });
 
   this->IdleTimer.setSingleShot(true);
   this->IdleTimer.setInterval(100);
-  QObject::connect(&this->IdleTimer, &QTimer::timeout, this,
+  QObject::connect(&this->IdleTimer, &pqTimer::timeout, this,
     [this]()
     {
       this->FrameTimer.stop();
@@ -54,7 +54,7 @@ pqSpaceMouseImpl::pqSpaceMouseImpl()
     });
 
   this->EndTimer.setInterval(BusyRetryIntervalMs);
-  QObject::connect(&this->EndTimer, &QTimer::timeout, this, [this]() { this->endInteraction(); });
+  QObject::connect(&this->EndTimer, &pqTimer::timeout, this, [this]() { this->endInteraction(); });
 }
 
 pqSpaceMouseImpl::~pqSpaceMouseImpl()

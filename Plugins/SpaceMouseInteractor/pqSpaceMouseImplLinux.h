@@ -4,9 +4,9 @@
 #ifndef pqSpaceMouseImplLinux_h
 #define pqSpaceMouseImplLinux_h
 
+#include "pqTimer.h"
 #include <QObject>
 #include <QPointer>
-#include <QTimer>
 
 #include <array>
 
@@ -45,10 +45,10 @@ private:
   // The interaction may still need to end after its view stops being active.
   QPointer<pqRenderView> InteractionView;
   QSocketNotifier* Notifier = nullptr;
-  QTimer ReconnectTimer;
-  QTimer FrameTimer;
-  QTimer IdleTimer;
-  QTimer EndTimer;
+  pqTimer ReconnectTimer;
+  pqTimer FrameTimer;
+  pqTimer IdleTimer;
+  pqTimer EndTimer;
   std::array<double, 6> PendingMotion = {};
   unsigned int PendingDurationMs = 0;
   bool HasPendingMotion = false;
