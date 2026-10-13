@@ -6,20 +6,25 @@
 
 #include <QIcon>
 #include <QMouseEvent>
+#include <QStyle>
 
 class pqExpanderButton::pqInternals : public Ui::pqExpanderButton
 {
 public:
   pqInternals()
     : Pressed(false)
-    , CheckedPixmap(QIcon(":/QtWidgets/Icons/pqMinus.svg").pixmap(QSize(16, 16)))
-    , UncheckedPixmap(QIcon(":/QtWidgets/Icons/pqPlus.svg").pixmap(QSize(16, 16)))
+    , MinusPixmap(QIcon(":/QtWidgets/Icons/pqMinus.svg").pixmap(QSize(16, 16)))
+    , PlusPixmap(QIcon(":/QtWidgets/Icons/pqPlus.svg").pixmap(QSize(16, 16)))
+    , CollapsePixmap(QIcon(":/QtWidgets/Icons/pqCollapse.svg").pixmap(QSize(8, 8)))
+    , ExpandPixmap(QIcon(":/QtWidgets/Icons/pqExpand.svg").pixmap(QSize(8, 8)))
   {
   }
 
   bool Pressed;
-  QPixmap CheckedPixmap;
-  QPixmap UncheckedPixmap;
+  QPixmap MinusPixmap;
+  QPixmap PlusPixmap;
+  QPixmap CollapsePixmap;
+  QPixmap ExpandPixmap;
 };
 
 //-----------------------------------------------------------------------------
@@ -27,9 +32,10 @@ pqExpanderButton::pqExpanderButton(QWidget* parentObject)
   : Superclass(parentObject)
   , Internals(new pqExpanderButton::pqInternals())
   , Checked(false)
+  , CurrentHeadingLevel(H1)
 {
   this->Internals->setupUi(this);
-  this->Internals->icon->setPixmap(this->Internals->UncheckedPixmap);
+  this->updateIcon();
 
 #if defined(Q_WS_WIN) || defined(Q_OS_WIN)
   this->setFrameShadow(QFrame::Sunken);
@@ -57,14 +63,7 @@ void pqExpanderButton::setChecked(bool val)
   }
 
   this->Checked = val;
-  if (this->Checked)
-  {
-    this->Internals->icon->setPixmap(this->Internals->CheckedPixmap);
-  }
-  else
-  {
-    this->Internals->icon->setPixmap(this->Internals->UncheckedPixmap);
-  }
+  this->updateIcon();
   Q_EMIT this->toggled(this->Checked);
 }
 
@@ -78,6 +77,43 @@ void pqExpanderButton::setText(const QString& txt)
 QString pqExpanderButton::text() const
 {
   return this->Internals->label->text();
+}
+
+//-----------------------------------------------------------------------------
+void pqExpanderButton::setHeadingLevel(HeadingLevel newLevel)
+{
+  if (this->CurrentHeadingLevel == newLevel)
+  {
+    return;
+  }
+
+  this->CurrentHeadingLevel = newLevel;
+  this->updateIcon();
+
+  if (this->CurrentHeadingLevel == H2)
+  {
+    this->setFrameShape(QFrame::NoFrame);
+  }
+  else
+  {
+    this->setFrameShape(QFrame::StyledPanel);
+  }
+  this->update();
+}
+
+//-----------------------------------------------------------------------------
+void pqExpanderButton::updateIcon()
+{
+  if (this->CurrentHeadingLevel == H2)
+  {
+    this->Internals->icon->setPixmap(
+      this->Checked ? this->Internals->CollapsePixmap : this->Internals->ExpandPixmap);
+  }
+  else
+  {
+    this->Internals->icon->setPixmap(
+      this->Checked ? this->Internals->MinusPixmap : this->Internals->PlusPixmap);
+  }
 }
 
 //-----------------------------------------------------------------------------

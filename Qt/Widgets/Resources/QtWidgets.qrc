@@ -2,7 +2,9 @@
 <!-- SPDX-License-Identifier: BSD-3-Clause -->
 <RCC>
     <qresource prefix="/QtWidgets" >
+        <file>Icons/pqCollapse.svg</file>
         <file>Icons/pqDelete.svg</file>
+        <file>Icons/pqExpand.svg</file>
         <file>Icons/pqMinus.svg</file>
         <file>Icons/pqMultiply@2x.png</file>
         <file>Icons/pqMultiply.png</file>

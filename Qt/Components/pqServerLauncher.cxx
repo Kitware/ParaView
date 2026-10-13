@@ -7,12 +7,14 @@
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqExpanderButton.h"
 #include "pqFileChooserWidget.h"
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
+#include "pqWidgetUtilities.h"
 #include "vtkCommand.h"
 #include "vtkMinimalStandardRandomSequence.h"
 #include "vtkNetworkAccessManager.h"
@@ -29,6 +31,7 @@
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
+#include <QGuiApplication>
 #include <QHostInfo>
 #include <QLabel>
 #include <QLineEdit>
@@ -37,10 +40,16 @@
 #include <QProcessEnvironment>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QScreen>
+#include <QScrollArea>
+#include <QSet>
 #include <QSpinBox>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QVector>
 #include <QtDebug>
 
+#include <algorithm>
 #include <cassert>
 
 //----------------------------------------------------------------------------
@@ -207,6 +216,102 @@ QProcessEnvironment getDefaultEnvironment(const pqServerConfiguration& configura
   return options;
 }
 
+/// Describes an <OptionGroup/> parsed from the <Options/> XML: a label for the
+/// collapsible group, optional Markdown text to display just below the label,
+/// whether the group starts collapsed, and the (ordered) names of the
+/// <Option/>s it references.
+struct OptionGroup
+{
+  QString Label;
+  QString Documentation;
+  bool Collapsed = false;
+  QStringList OptionNames;
+};
+
+/// Adds an expandable/collapsible section titled \c group.Label to \c
+/// formLayout, using the same pqExpanderButton-based accordion style used
+/// elsewhere in ParaView (e.g. the Properties panel), containing the widgets
+/// (in order) for the options named in \c group.OptionNames.
+///
+/// Options found in \c group are added to \c groupedNames so that the
+/// caller can determine which options were not claimed by any group.
+///
+void addOptionGroupWidget(const OptionGroup& group, const QMap<QString, pqWidget*>& widgets,
+  const QMap<QString, QString>& optionLabels, QSet<QString>& groupedNames, QDialog& dialog,
+  QFormLayout* formLayout)
+{
+  pqExpanderButton* expander = new pqExpanderButton(&dialog);
+  expander->setHeadingLevel(pqExpanderButton::H2);
+  expander->setText(group.Label);
+  expander->setChecked(!group.Collapsed);
+  formLayout->addRow(expander);
+
+  QWidget* content = new QWidget(&dialog);
+  QVBoxLayout* contentVLayout = new QVBoxLayout(content);
+  contentVLayout->setContentsMargins(0, 0, 0, 0);
+  content->setVisible(!group.Collapsed);
+  formLayout->addRow(content);
+
+  // Collapse/expand the group's contents when the expander is toggled.
+  QObject::connect(expander, &pqExpanderButton::toggled, content, &QWidget::setVisible);
+
+  if (!group.Documentation.isEmpty())
+  {
+    QLabel* textLabel = new QLabel(group.Documentation, &dialog);
+    textLabel->setTextFormat(Qt::MarkdownText);
+    textLabel->setWordWrap(true);
+    // Kept out of the form layout, where it would offset the centered options.
+    contentVLayout->addWidget(textLabel);
+  }
+
+  QFormLayout* contentLayout = new QFormLayout();
+  contentVLayout->addLayout(contentLayout);
+
+  for (const QString& name : group.OptionNames)
+  {
+    if (!widgets.contains(name))
+    {
+      qWarning() << "OptionGroup '" << group.Label << "' references unknown option '" << name
+                 << "'.";
+      continue;
+    }
+    if (groupedNames.contains(name))
+    {
+      qWarning() << "OptionGroup '" << group.Label << "' references option '" << name
+                 << "', which is already in a group. Ignoring it.";
+      continue;
+    }
+    contentLayout->addRow(optionLabels.value(name), widgets[name]->Widget);
+    groupedNames.insert(name);
+  }
+}
+
+/// Returns the <Documentation/> element nested in \c parent (an <Options/> or
+/// <Option/> element), if any. A <Documentation/> element is only recognized when it
+/// is the first child of \c parent; if one is found in any other position, a
+/// warning is issued and it is ignored.
+vtkPVXMLElement* getDocumentationElement(vtkPVXMLElement* parent)
+{
+  vtkPVXMLElement* documentationXML = nullptr;
+  for (unsigned int kk = 0; kk < parent->GetNumberOfNestedElements(); kk++)
+  {
+    vtkPVXMLElement* child = parent->GetNestedElement(kk);
+    if (child->GetName() && strcmp(child->GetName(), "Documentation") == 0)
+    {
+      if (kk == 0)
+      {
+        documentationXML = child;
+      }
+      else
+      {
+        qWarning() << "'<Documentation/>' must be the first child of '<" << parent->GetName()
+                   << "/>'; ignoring.";
+      }
+    }
+  }
+  return documentationXML;
+}
+
 /// Processes the <Options /> XML defined in the server configuration to
 /// update the dialog with widgets of right type with correct default values.
 /// It uses application settings to obtain the default values, whenever
@@ -217,13 +322,43 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   vtkPVXMLElement* optionsXML = configuration.optionsXML();
   assert(optionsXML != nullptr);
 
-  QFormLayout* formLayout = new QFormLayout();
-  dialog.setLayout(formLayout);
   dialog.setWindowTitle(
     QCoreApplication::translate("pqServerLauncher", "Connection Options for \"%1\"")
       .arg(configuration.name()));
 
+  QVBoxLayout* dialogLayout = new QVBoxLayout(&dialog);
+
+  QWidget* scrollWidget = new QWidget(&dialog);
+  scrollWidget->setObjectName("OptionsWidget");
+  QFormLayout* formLayout = new QFormLayout(scrollWidget);
+
+  QScrollArea* scrollArea = new QScrollArea(&dialog);
+  scrollArea->setObjectName("OptionsScrollArea");
+  scrollArea->setWidget(scrollWidget);
+  scrollArea->setWidgetResizable(true);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  dialogLayout->addWidget(scrollArea);
+
+  if (vtkPVXMLElement* documentationXML = getDocumentationElement(optionsXML))
+  {
+    if (const char* help = documentationXML->GetCharacterData())
+    {
+      QLabel* helpLabel = new QLabel(QString(help).trimmed(), &dialog);
+      helpLabel->setTextFormat(Qt::MarkdownText);
+      helpLabel->setWordWrap(true);
+      formLayout->addRow(helpLabel);
+    }
+  }
+
   pqSettings* settings = pqApplicationCore::instance()->settings();
+
+  // Records the order in which <Option/> elements were encountered, and their
+  // labels, so that widgets can be added to the dialog after <OptionGroup/>
+  // elements have been processed (options may be grouped out of their
+  // document order, and ungrouped options are added last).
+  QStringList optionOrder;
+  QMap<QString, QString> optionLabels; // option name -> label map
+  QVector<OptionGroup> optionGroups;
 
   // Process the <Options/> to create dialog with widgets.
   for (unsigned int cc = 0; cc < optionsXML->GetNumberOfNestedElements(); cc++)
@@ -240,7 +375,18 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     }
     else if (strcmp(node->GetName(), "Option") == 0)
     {
-      vtkPVXMLElement* typeNode = node->GetNestedElement(0);
+      // The type tag (<Range/>, <String/>, etc.) is the first nested element
+      // that isn't the optional <Documentation/> tag.
+      vtkPVXMLElement* typeNode = nullptr;
+      for (unsigned int kk = 0; kk < node->GetNumberOfNestedElements(); kk++)
+      {
+        vtkPVXMLElement* child = node->GetNestedElement(kk);
+        if (child->GetName() && strcmp(child->GetName(), "Documentation") != 0)
+        {
+          typeNode = child;
+          break;
+        }
+      }
       if (typeNode == nullptr || typeNode->GetName() == nullptr)
       {
         continue;
@@ -248,6 +394,8 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
 
       const char* name = node->GetAttribute("name");
       const char* label = node->GetAttributeOrDefault("label", name);
+      vtkPVXMLElement* documentationXML = getDocumentationElement(node);
+      const char* help = documentationXML ? documentationXML->GetCharacterData() : nullptr;
       bool readonly = strcmp(node->GetAttributeOrDefault("readonly", "false"), "true") == 0;
       bool save = strcmp(node->GetAttributeOrDefault("save", "true"), "true") == 0;
 
@@ -369,12 +517,48 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
       widgets[name]->set(default_value);
       widgets[name]->Widget->setEnabled(!readonly);
       widgets[name]->Widget->setObjectName(name);
-      formLayout->addRow(label, widgets[name]->Widget);
+      if (help)
+      {
+        // QWidget::setToolTip() does not have a text-format property like
+        // QLabel does, so the Markdown text is converted to HTML explicitly;
+        // the tooltip is then displayed as rich text since it now starts
+        // with an HTML tag.
+        widgets[name]->Widget->setToolTip(pqWidgetUtilities::formatMarkdownTooltip(QString(help)));
+      }
+      optionOrder.push_back(name);
+      optionLabels[name] = label;
     } // end of <Option />
     else if (strcmp(node->GetName(), "Switch") == 0)
     {
       continue; // Switch's are handled afterwords
     }
+    else if (strcmp(node->GetName(), "Documentation") == 0)
+    {
+      continue; // <Documentation/> was already processed above.
+    }
+    else if (strcmp(node->GetName(), "OptionGroup") == 0)
+    {
+      OptionGroup group;
+      group.Label = node->GetAttributeOrDefault("label", "");
+      group.Collapsed = strcmp(node->GetAttributeOrDefault("collapsed", "false"), "true") == 0;
+      if (vtkPVXMLElement* documentationXML = getDocumentationElement(node))
+      {
+        if (const char* text = documentationXML->GetCharacterData())
+        {
+          group.Documentation = QString(text).trimmed();
+        }
+      }
+      for (unsigned int kk = 0; kk < node->GetNumberOfNestedElements(); kk++)
+      {
+        vtkPVXMLElement* child = node->GetNestedElement(kk);
+        if (child->GetName() && strcmp(child->GetName(), "Option") == 0 &&
+          child->GetAttribute("name"))
+        {
+          group.OptionNames.push_back(child->GetAttribute("name"));
+        }
+      }
+      optionGroups.push_back(group);
+    } // end of <OptionGroup />
     else
     {
       qWarning() << "Ignoring unknown element '<" << node->GetName()
@@ -382,11 +566,62 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     }
   }
 
+  // Add the <OptionGroup/>s, in document order, each as an expandable section
+  // containing the widgets for the options it references, in the order
+  // listed within the group.
+  QSet<QString> groupedOptionNames;
+  for (const OptionGroup& group : optionGroups)
+  {
+    addOptionGroupWidget(group, widgets, optionLabels, groupedOptionNames, dialog, formLayout);
+  }
+
+  // Finally, add the options that were not claimed by any <OptionGroup/>, in
+  // the order they were declared. They get their own form layout, like the
+  // options in a group, so that both are aligned the same way on macOS.
+  QFormLayout* ungroupedLayout = nullptr;
+  for (const QString& name : optionOrder)
+  {
+    if (groupedOptionNames.contains(name))
+    {
+      continue;
+    }
+    if (!ungroupedLayout)
+    {
+      QWidget* ungrouped = new QWidget(&dialog);
+      ungrouped->setObjectName("UngroupedOptions");
+      ungroupedLayout = new QFormLayout(ungrouped);
+      ungroupedLayout->setContentsMargins(0, 0, 0, 0);
+      formLayout->addRow(ungrouped);
+    }
+    ungroupedLayout->addRow(optionLabels.value(name), widgets[name]->Widget);
+  }
+
   QDialogButtonBox* buttonBox =
     new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
   QObject::connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
   QObject::connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-  formLayout->addRow(buttonBox);
+  // Kept outside the scroll area so it always sticks to the bottom of the
+  // dialog instead of scrolling along with the rest of the content.
+  dialogLayout->addWidget(buttonBox);
+
+  const int contentHeight = scrollWidget->sizeHint().height();
+  const QMargins margins = dialogLayout->contentsMargins();
+  // everything else besides the content
+  const int chromeHeight =
+    margins.top() + margins.bottom() + dialogLayout->spacing() + buttonBox->sizeHint().height();
+  dialog.adjustSize(); // pick a reasonable initial width
+  QScreen* screen = dialog.screen();
+  if (screen)
+  {
+    const QRect availableGeometry = screen->availableGeometry();
+    const int maxDialogHeight = static_cast<int>(availableGeometry.height() * 0.8);
+    const int desiredDialogHeight = std::min(chromeHeight + contentHeight, maxDialogHeight);
+    dialog.resize(dialog.width(), desiredDialogHeight);
+  }
+  else
+  {
+    qWarning("Cannot get the screen the dialog is on");
+  }
   return true;
 }
 

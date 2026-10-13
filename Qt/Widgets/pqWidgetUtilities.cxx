@@ -6,6 +6,22 @@
 #include "vtksys/RegularExpression.hxx"
 
 #include <QRegularExpression>
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QTextDocumentFragment>
+#include <QTextTable>
+#include <QToolTip>
+
+#include <algorithm>
+#include <cmath>
+
+namespace
+{
+// imperfect way to generate rich-text with wrapping such that the rendered
+// tooltip isn't too narrow, since Qt doesn't let us set the width explicitly
+const int wrapLength = 70;
+const int wrapWidth = 500;
+}
 
 //-----------------------------------------------------------------------------
 QString pqWidgetUtilities::formatTooltip(const QString& rawText)
@@ -18,10 +34,6 @@ QString pqWidgetUtilities::formatTooltip(const QString& rawText)
   QString doc = rstToHtml(rawText);
   doc = doc.trimmed();
   doc = doc.replace(QRegularExpression("\\s+"), " ");
-  // imperfect way to generate rich-text with wrapping such that the rendered
-  // tooltip isn't too narrow, since Qt doesn't let us set the width explicitly
-  int wrapLength = 70;
-  int wrapWidth = 500;
   if (doc.size() < wrapLength)
   {
     // entire text is formatted without wrapping
@@ -35,6 +47,43 @@ QString pqWidgetUtilities::formatTooltip(const QString& rawText)
       .arg(doc)
       .arg(wrapWidth);
   }
+}
+
+//-----------------------------------------------------------------------------
+// Markdown -> QTextDocument -> HTML
+// the markdown text is placed in a table with fixed width inside QTextDocument
+QString pqWidgetUtilities::formatMarkdownTooltip(const QString& markdown)
+{
+  const QString md = markdown.trimmed();
+  if (md.isEmpty())
+  {
+    return QString();
+  }
+
+  // parse the Markdown into a scratch document so it can be measured and
+  // inserted anywhere
+  QTextDocument source;
+  source.setDefaultFont(QToolTip::font());
+  source.setMarkdown(md);
+  const QTextDocumentFragment content(&source);
+
+  // The text is placed in a table whose width is the unwrapped text width,
+  // capped at wrapWidth. Short text stays on one line and long text is
+  // wrapped at wrapWidth. (Non-breakable blocks are exported as <pre>, which
+  // the tooltip ignores, so they cannot be used to prevent wrapping.)
+  QTextDocument doc;
+  // toHtml() writes the default font into the body style
+  doc.setDefaultFont(QToolTip::font());
+  QTextCursor cursor(&doc);
+  QTextTableFormat tableFormat;
+  tableFormat.setWidth(QTextLength(
+    QTextLength::FixedLength, std::ceil(std::min(source.idealWidth(), qreal(wrapWidth)))));
+  tableFormat.setBorder(0);
+  tableFormat.setCellPadding(0);
+  tableFormat.setCellSpacing(0);
+  QTextTable* table = cursor.insertTable(1, 1, tableFormat);
+  table->cellAt(0, 0).firstCursorPosition().insertFragment(content);
+  return doc.toHtml();
 }
 
 //-----------------------------------------------------------------------------

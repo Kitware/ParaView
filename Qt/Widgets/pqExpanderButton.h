@@ -19,9 +19,24 @@ class PQWIDGETS_EXPORT pqExpanderButton : public QFrame
 
   Q_PROPERTY(QString text READ text WRITE setText)
   Q_PROPERTY(bool checked READ checked WRITE setChecked)
+  Q_PROPERTY(HeadingLevel headingLevel READ headingLevel WRITE setHeadingLevel)
+  Q_ENUMS(HeadingLevel)
 public:
   pqExpanderButton(QWidget* parent = nullptr);
   ~pqExpanderButton() override;
+
+  /**
+   * This enum specifies the level of the button in a hierarchy of
+   * expanders, similar to heading levels in a document. H1 (the
+   * default) is for top level sections such as Properties/Display/View
+   * (plus/minus icons, border), H2 is for nested groups such as
+   * property groups (subtler arrow icons, no border).
+   */
+  enum HeadingLevel
+  {
+    H1 = 0,
+    H2
+  };
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -30,8 +45,10 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void toggle();
 
   /**
-   * This property holds whether the button is checked. By default, the button
-   * is unchecked.
+   * This property holds whether the button is checked (minus,
+   * collapse) which means the content is shown. By default, the
+   * button is unchecked (plus, expand) which means the content is not
+   * shown.
    */
   void setChecked(bool);
   bool checked() const { return this->Checked; }
@@ -41,6 +58,13 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void setText(const QString& text);
   QString text() const;
+
+  /**
+   * This property holds the heading level of the button, which
+   * determines its look. By default, the heading level is H1.
+   */
+  void setHeadingLevel(HeadingLevel level);
+  HeadingLevel headingLevel() const { return this->CurrentHeadingLevel; }
 
 Q_SIGNALS:
   /**
@@ -57,9 +81,15 @@ protected:
 private:
   Q_DISABLE_COPY(pqExpanderButton)
 
+  /**
+   * Updates the icon shown based on the current checked state and heading level.
+   */
+  void updateIcon();
+
   class pqInternals;
   pqInternals* Internals;
   bool Checked;
+  HeadingLevel CurrentHeadingLevel;
 };
 
 #endif
