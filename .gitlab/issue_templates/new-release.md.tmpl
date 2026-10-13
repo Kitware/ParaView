@@ -1,74 +1,83 @@
-<!--
-This template is for tracking a release of ParaView. Please replace the
-following strings with the associated values:
-
-  - `@VERSION@` - replace with base version, e.g., 5.7.0
-  - `@RC@` - for release candidates, replace with "-RC?". For final, replace with "".
-  - `@MAJOR@` - replace with major version number
-  - `@MINOR@` - replace with minor version number
-  - `@PATCH@` - replace with patch version number
-  - `@BASEBRANCH@`: The branch to create the release on (for `x.y.0-RC1`,
-    `master`, otherwise `release`)
-  - `@BRANCHPOINT@`: The ParaView commit where the release should be started
-
-Please remove this comment.
--->
+$# This template is for tracking a release of ParaView.
+$#
+$# Process this file with the pyexpander script specifying the desired `version`
+$# (e.g., `5.7.0-RC1` or `5.7.0`) and, optionally, `branchpoint` (the ParaView
+$# commit where the release should be started, defaults to `HEAD`):
+$#
+$# expander.py --eval 'version="5.7.0-RC1"; previous_version="5.6"' .gitlab/issue_templates/new-release.md.tmpl | xclip -selection c
+$# expander.py --eval 'version="5.7.0-RC1"; previous_version="5.6"; branchpoint="abc123"' .gitlab/issue_templates/new-release.md.tmpl | xclip -selection c
+$#
+$# For `X.Y.0-RC1` releases, `previous_version` (e.g., `previous_version="6.2"`),
+$# the last minor release, is required.
+$py(base, _, rc = version.partition("-"))\
+$py(parts = base.split("."))\
+$py(MAJOR=int(parts[0]))\
+$py(MINOR=int(parts[1]))\
+$py(PATCH=int(parts[2]))\
+$py(RC = "-" + rc if rc else "")\
+$py(VERSION=f"{MAJOR}.{MINOR}.{PATCH}")\
+$py(BASEBRANCH="master" if (PATCH == 0 and RC == "-RC1") else "release")\
+$py(BRANCHPOINT = globals().get("branchpoint", "HEAD"))\
+$py(
+if PATCH == 0 and RC == "-RC1":
+  PREVIOUS_VERSION = previous_version
+)\
 
 # Preparatory steps
 
-<!-- if RC1 and patch == 0 -->
+$if(PATCH == 0 and RC == "-RC1")\
   - Finalize previous release branch
     - [ ] Update the local copy of `release`
-    - [ ] Create unannotated tag: `git tag vX.Y-final` where vX.Y is the last minor release of ParaView
-    - [ ] Push the tag: `git push origin vX.Y-final`.
-<!-- endif -->
+    - [ ] Create unannotated tag: `git tag v$(PREVIOUS_VERSION)-final` where v$(PREVIOUS_VERSION) is the last minor release of ParaView
+    - [ ] Push the tag: `git push origin v$(PREVIOUS_VERSION)-final`.
+$endif\
   - Getting Started Guide
     - [ ] Update if needed: repository is [here][getting-started-ref]
-    - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
-    - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
+    - [ ] Rename to ParaViewGettingStarted-$(VERSION).pdf
+    - [ ] Upload to www.paraview.org/files/v$(MAJOR).$(MINOR)
   - Signing machines
     - [ ] Check that the Kitware macOS signing machine is reachable. If not, request it to be switched on.
     - [ ] Check that the Kitware Windows signing machine is reachable. If not, request it to be switched on.
 
 # Update ParaView
 
-  - Update the local copy of `@BASEBRANCH@`.
-    - [ ] If `@PATCH@@RC@` is `0-RC1`, update `master`
-    - [ ] Otherwise, update `release`
+  - [ ] Update the local copy of `$(BASEBRANCH)`.
       ```
       git fetch origin
-      git checkout @BASEBRANCH@
-      git merge --ff-only origin/@BASEBRANCH@ # if this fails, there are local commits that need to be removed
+      git checkout $(BASEBRANCH)
+      git merge --ff-only origin/$(BASEBRANCH) # if this fails, there are local commits that need to be removed
       git submodule update --recursive --init
       ```
-    - [ ] If `@BASEBRANCH@` is not `master`, ensure merge requests which should be
-      in the release have been merged. The [`backport-mrs.py`][backport-mrs]
-      script can be used to find and ensure that merge requests assigned to the
-      associated milestone are available on the `release` branch.
+$if(BASEBRANCH != "master")\
+    - [ ] Ensure merge requests which should be in the release have been
+      merged. The [`backport-mrs.py`][backport-mrs] script can be used to find
+      and ensure that merge requests assigned to the associated milestone are
+      available on the `release` branch.
+$endif\
 
   - Integrate changes.
     - Make a commit for each of these `release` changes on a single topic
-      (suggested branch name: `update-to-v@VERSION@`):
+      (suggested branch name: `update-to-v$(VERSION)`):
       - [ ] Move individual release notes from `Documentation/release/dev` to
-        `Documentation/release/@MAJOR@.@MINOR@/`, but leave `sample-topic.md` in place.
-      - [ ] Integrate individual release notes into `Documentation/release/ParaView-@VERSION@.md`.
-<!-- if not RC -->
-      - [ ] Remove `Documentation/release/@MAJOR@.@MINOR@/`
-<!-- endif -->
-<!-- if RC1 and patch == 0 -->
+        `Documentation/release/$(MAJOR).$(MINOR)/`, but leave `sample-topic.md` in place.
+      - [ ] Integrate individual release notes into `Documentation/release/ParaView-$(VERSION).md`.
+$if(RC == "")\
+      - [ ] Remove `Documentation/release/$(MAJOR).$(MINOR)/`
+$endif\
+$if(PATCH == 0 and RC == "-RC1")\
       - [ ] Update `version.txt` to bump the minor version number.
-<!-- endif -->
+$endif\
     - Make a commit for each of these `release`-only changes
-<!-- if RC1 and patch == 0 -->
+$if(PATCH == 0 and RC == "-RC1")\
       - [ ] `.gitmodules` to track the `release` branch of VTK
-<!-- endif -->
+$endif\
       - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
             groups
       - [ ] Update `version.txt` and tag the commit (tag this commit below)
         ```
-        git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@
-        echo @VERSION@@RC@ > version.txt
-        git commit -m 'Update version number to @VERSION@@RC@' version.txt
+        git checkout -b update-to-v$(VERSION)$(RC) $(BRANCHPOINT)
+        echo $(VERSION)$(RC) > version.txt
+        git commit -m 'Update version number to $(VERSION)$(RC)' version.txt
         ```
     - Create a merge request targeting `release`
       - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
@@ -80,24 +89,24 @@ Please remove this comment.
         - [ ] Pull the script for each release; it may have been updated since it
           was last used
         - [ ] Add your development fork as a remote named `gitlab`
-        - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
+        - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m $(BRANCHPOINT)`
         - [ ] The script outputs the information it will be using to create the
           merge request. Please verify that it is all correct before creating
           the merge request. See usage at the top of the script to provide
           information that is either missing or incorrect (e.g., if its data
           extraction heuristics fail).
     - [ ] Run the test with `Do: test` and get a green dashboard.
-<!-- if not RC1 and patch == 0 -->
+$if(PATCH == 0 and RC != "-RC1")\
     - [ ] Remove fixup commit: `git reset --hard @^`
-<!-- endif -->
+$endif\
     - [ ] Get positive review
     - [ ] `Do: merge`
-    - [ ] Create tag: `git tag -a -m '@VERSION@@RC@' v@VERSION@@RC@ commit-that-updated-version.txt`
+    - [ ] Create tag: `git tag -a -m '$(VERSION)$(RC)' v$(VERSION)$(RC) commit-that-updated-version.txt`
   - Create tarballs
-    - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v v@VERSION@@RC@`)
+    - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v v$(VERSION)$(RC)`)
   - Upload tarballs to `paraview.org`
     - [ ] Setup your `~/.ssh/config` and add the web host (@vbolea).
-    - [ ] `rsync -rptv $tarballs web:ParaView_Release/v@MAJOR@.@MINOR@/`
+    - [ ] `rsync -rptv $("$")tarballs web:ParaView_Release/v$(MAJOR).$(MINOR)/`
   - Software process updates (these can all be done independently)
     - [ ] Update kwrobot with the new `release` branch rules (`@utils/maintainers/ghostflow`)
       - Use the first commit listed by the command:
@@ -106,14 +115,19 @@ Please remove this comment.
       - This must be done after a nightly run to ensure all builds are in the
         `release` group
       - See the script itself for usage documentation
-    - [ ] Add (or update if `@BASEBRANCH@` is `release`) version selection entry
-          in paraview-superbuild
-    - Deprecation updates (if `$(BASEBRANCH)` is `master`)
+$if(BASEBRANCH == "release")\
+    - [ ] Update version selection entry in paraview-superbuild
+$else\
+    - [ ] Add version selection entry in paraview-superbuild
+$endif\
+$if(BASEBRANCH == "master")\
+    - Deprecation updates
       - This should be done as soon as possible after merging to not block future deprecations.
       - [ ] Update deprecation macros for the next release, use `PARAVIEW_VERSION_CHECK($(MAJOR), $(MINOR), SPLIT_DATE)`
       - [ ] Update `PARAVIEW_EPOCH_VERSION` to the day *after* the SPLIT_DATE
       - [ ] Remove deprecated symbols from before the *prior* release
       - [ ] Update `PARAVIEW_MINIMUM_DEPRECATION_LEVEL` to be that of the *prior* release
+$endif\
 
 [backport-mrs]: https://gitlab.kitware.com/utils/release-utils/-/blob/master/backport-mrs.py
 [release-mr]: https://gitlab.kitware.com/utils/release-utils/-/blob/master/release-mr.py
@@ -121,43 +135,45 @@ Please remove this comment.
 
 # Update ParaView-Superbuild
 
-  - [ ] Update @BASEBRANCH@ branch for **paraview-superbuild**
+  - [ ] Update $(BASEBRANCH) branch for **paraview-superbuild**
 ```
 git fetch origin
-git checkout @BASEBRANCH@
-git merge --ff-only origin/@BASEBRANCH@
+git checkout $(BASEBRANCH)
+git merge --ff-only origin/$(BASEBRANCH)
 git submodule update --recursive --init
 ```
-  - [ ] Create new branch `git checkout -b update-to-v@VERSION@@RC@ @BASEBRANCH@`
+  - [ ] Create new branch `git checkout -b update-to-v$(VERSION)$(RC) $(BASEBRANCH)`
 
   - Integrate changes.
     - Update versions
-<!-- if not RC -->
+$if(RC == "")\
       - [ ] Update the version in the `Buliding a specific version` section
             example in `README.md`
-<!-- endif -->
+$endif\
       - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
       - [ ] `PARAVIEW_VERSION_DEFAULT` in  CMakeLists.txt
       - [ ] `paraview_doc_ver_series` and `paraview_doc_ver` in versions.cmake
-      - [ ] Update default version to @VERSION@ in `superbuild_set_selectable_source(paraview)` in versions.cmake
+      - [ ] Update default version to $(VERSION) in `superbuild_set_selectable_source(paraview)` in versions.cmake
       - [ ] Commit changes
         - [ ] `git add README.md versions.cmake CMakeLists.txt`
-        - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
+        - [ ] `git commit -m "Update the default version to $(VERSION)$(RC)"`
     - Make a commit for each of these `release`-only changes
+$if(BASEBRANCH == "master")\
       - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
-            groups (if `@BASEBRANCH@` is `master`)
-<!-- if RC1 and patch == 0 -->
+            groups
+$endif\
+$if(PATCH == 0 and RC == "-RC1")\
       - [ ] Create a commit that changes the paraview _DEFAULT_ source to the git
             url source in the `versions.cmake` file.
-<!-- endif -->
+$endif\
       - [ ] Create a commit which will be tagged:
-        - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
-        - [ ] Create tag: `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
-      - [ ] Force `@VERSION@@RC@` in CMakeLists.txt
+        - [ ] `git commit --allow-empty -m "paraview: add release $(VERSION)"`
+        - [ ] Create tag: `git tag -a -m 'ParaView superbuild $(VERSION)$(RC)' v$(VERSION)$(RC) HEAD`
+      - [ ] Force `$(VERSION)$(RC)` in CMakeLists.txt
         - [ ] Append to the top of CMakeLists.txt (After project...) The following
             ```
             # Force source selection setting here.
-            set(paraview_SOURCE_SELECTION "@VERSION@@RC@" CACHE STRING "Force version to @VERSION@@RC@" FORCE)
+            set(paraview_SOURCE_SELECTION "$(VERSION)$(RC)" CACHE STRING "Force version to $(VERSION)$(RC)" FORCE)
             set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
             ```
         - [ ] Create fixup commit with the above changes `git commit -a --fixup=@`. The fixup commit will prevent merging of the temporary code above; it will be removed in a future step.
@@ -170,11 +186,11 @@ git submodule update --recursive --init
           Merge Request (see script for usage)
       - [ ] Pull the script for each release; it may have been updated since it
         was last used
-      - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BASEBRANCH@`
-<!-- if not RC and patch == 0-->
+      - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m $(BASEBRANCH)`
+$if(PATCH == 0 and RC == "")\
       - [ ] Make sure that the backporting directive in the merge-request
             description skips the last commit such as: `Backport: master:HEAD~`
-<!-- endif -->
+$endif\
   - Build binaries
     - [ ] Build binaries (start all pipelines)
     - [ ] Download the binaries that have been generated from the Pipeline
@@ -190,8 +206,11 @@ git submodule update --recursive --init
       - This must be done after a nightly run to ensure all builds are in the
         `release` group
       - See the script itself for usage documentation
-    - [ ] Add (or update if `@BASEBRANCH@` is `release`) version selection entry
-          in paraview-superbuild
+$if(BASEBRANCH == "release")\
+    - [ ] Update version selection entry in paraview-superbuild
+$else\
+    - [ ] Add version selection entry in paraview-superbuild
+$endif\
 
 # Sign Windows binaries
   -  [ ] Request Windows binary signings (only .msi archives) on the Package
@@ -199,10 +218,10 @@ git submodule update --recursive --init
 
 # Sign macOS binaries
   - [ ] Upload to signing server, run script, download resulting .pkg and .dmg files
-  - [ ] Install on x86\_64 from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
-  - [ ] Install on x86\_64 from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
-  - [ ] Install on arm64 from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
-  - [ ] Install on arm64 from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
+  - [ ] Install on x86\_64 from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-$(VERSION)$(RC).app/`
+  - [ ] Install on x86\_64 from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-$(VERSION)$(RC).app/`
+  - [ ] Install on arm64 from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-$(VERSION)$(RC).app/`
+  - [ ] Install on arm64 from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-$(VERSION)$(RC).app/`
 
 # Validating binaries
 
@@ -228,7 +247,7 @@ Open ParaView's _Python Shell_ and run the following:
 import numpy
 s = Show(Sphere())
 ColorBy(s, ('POINTS', 'Normals', 'X'))
-Show(Text(Text="$A^2$"))
+Show(Text(Text="$("$")A^2$("$")"))
 ```
 
 Check that
@@ -265,11 +284,11 @@ Binary checklist
 
 # Upload binaries
 
-  - [ ] Upload binaries to `paraview.org` (`rsync -rptv $binaries paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`)
+  - [ ] Upload binaries to `paraview.org` (`rsync -rptv $("$")binaries paraview.release:ParaView_Release/v$(MAJOR).$(MINOR)/`)
   - [ ] Ask @cory.quammen to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website from within the directory corresponding to www.paraview.org/files/
 
 ```
-bash updateMD5.sh v@MAJOR@.@MINOR@
+bash updateMD5.sh v$(MAJOR).$(MINOR)
 bash buildListing.sh
 ```
 
@@ -277,23 +296,22 @@ bash buildListing.sh
 
 # Push tags
 
- - [ ] In the `paraview` repository, run `git push origin v@VERSION@@RC@`.
- - [ ] In the `paraview-superbuild` repository, run `git push origin v@VERSION@@RC@`.
+ - [ ] In the `paraview` repository, run `git push origin v$(VERSION)$(RC)`.
+ - [ ] In the `paraview-superbuild` repository, run `git push origin v$(VERSION)$(RC)`.
 
 # Spack
 
  - [ ] Update Spack package: https://github.com/spack/spack/blob/develop/var/spack/repos/builtin/packages/paraview/package.py
 
-<!--
-If making a non-RC release:
+$if(RC == "")\
 
 # Update documentation
-  - [ ] Submit a Merge Request for release that updates the version to @VERSION@ in https://gitlab.kitware.com/paraview/paraview-docs/-/blob/master/doc/source/conf.py` for `paraview-docs`
-  - [ ] Tag the HEAD of `release-v@MAJOR@.@MINOR@` in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
+  - [ ] Submit a Merge Request for release that updates the version to $(VERSION) in https://gitlab.kitware.com/paraview/paraview-docs/-/blob/master/doc/source/conf.py` for `paraview-docs`
+  - [ ] Tag the HEAD of `release-v$(MAJOR).$(MINOR)` in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v$(VERSION).
   - [ ] Activate the tag on [readthedocs](https://readthedocs.org/projects/paraview/versions/) and build it [here](https://readthedocs.org/projects/paraview/)
   - [ ] Go to readthedocs.org and activate
   - [ ] Write and publish blog post with release notes.
--->
+$endif\
 
 # Post-release
 
@@ -301,12 +319,11 @@ If making a non-RC release:
         [discourse.paraview.org](https://discourse.paraview.org/).
   - [ ] Request an XRInterface plugin validation using [TESTING.md](https://gitlab.kitware.com/paraview/paraview/-/blob/master/Plugins/XRInterface/TESTING.md) protocol from KEU
 
-<!--
-If making a non-RC release:
+$if(RC == "")\
 
   - [ ] Move unclosed issues in GitLab to the next minor release milestone in GitLab
-  - [ ] Create the `v@VERSION@` label
--->
+  - [ ] Create the `v$(VERSION)` label
+$endif\
 
 /cc @ben.boeckel
 
