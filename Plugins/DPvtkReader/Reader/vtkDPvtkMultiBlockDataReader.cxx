@@ -99,8 +99,8 @@ public:
   double Time = 0;
   // Current time step
   size_t Step = 0;
-  // true if StepToc, VtmData, FileNameToRankIndex and RankData are loaded for Step
-  bool StepLoaded = false;
+  // true if StepToc, VtmData, FileNameToRankIndex and RankData are read for Step
+  bool StepSelected = false;
   // .vtm for current time step
   std::string VtmData;
   // map (file name -> (rank, index inside of rank data)) for current time step
@@ -126,10 +126,10 @@ public:
   size_t GetRequestedStep(vtkInformation* outInfo);
   /**
    * Reads StepToc, VtmData and FileNameToRankIndex for 'step' if that step is not
-   * already loaded. Sets Time and Step. Returns true if a new step was loaded.
+   * already selected. Sets Time and Step. Returns true if a new step was selected.
    * This is a collective operation.
    */
-  bool LoadStep(size_t step);
+  bool SelectStep(size_t step);
   /**
    * Reads StepToc for this->Step from the file.
    * This is a local operation, called by ReadPartitionInformation.
@@ -192,7 +192,7 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::Close()
   this->VtmData.clear();
   this->FileNameToRankIndex.clear();
   this->RankData.Clear();
-  this->StepLoaded = false;
+  this->StepSelected = false;
 }
 
 size_t vtkDPvtkMultiBlockDataReader::vtkInternals::GetRequestedStep(vtkInformation* outInfo)
@@ -217,17 +217,17 @@ size_t vtkDPvtkMultiBlockDataReader::vtkInternals::GetRequestedStep(vtkInformati
   return std::distance(this->Times.begin(), it);
 }
 
-bool vtkDPvtkMultiBlockDataReader::vtkInternals::LoadStep(size_t step)
+bool vtkDPvtkMultiBlockDataReader::vtkInternals::SelectStep(size_t step)
 {
-  if (this->StepLoaded && this->Step == step)
+  if (this->StepSelected && this->Step == step)
   {
     return false;
   }
-  this->StepLoaded = false;
+  this->StepSelected = false;
   this->Step = step;
   this->Time = this->Times[this->Step];
   this->ReadPartitionInformation();
-  this->StepLoaded = true;
+  this->StepSelected = true;
   return true;
 }
 
@@ -246,7 +246,7 @@ void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadStepToc()
 void vtkDPvtkMultiBlockDataReader::vtkInternals::ReadPartitionInformation()
 {
   assert(this->Controller);
-  // discard data from the previously loaded time step
+  // discard data from the previously selected time step
   this->StepToc.clear();
   this->VtmData.clear();
   this->FileNameToRankIndex.clear();
@@ -520,11 +520,11 @@ int vtkDPvtkMultiBlockDataReader::RequestInformation(
     {
       this->Internals->Open(this->FileName);
     }
-    // UPDATE_TIME_STEP is not yet set for this request, so we load a time step
-    // only to provide the .vtm structure. RequestData loads the requested time step.
-    if (this->Internals->LoadStep(this->Internals->GetRequestedStep(outInfo)))
+    // UPDATE_TIME_STEP is not yet set for this request, so we select a time step
+    // only to provide the .vtm structure. RequestData selects the requested time step.
+    if (this->Internals->SelectStep(this->Internals->GetRequestedStep(outInfo)))
     {
-      // make sure the .vtm for the loaded step is parsed
+      // make sure the .vtm for the selected step is parsed
       this->ReadMTime = vtkTimeStamp();
     }
 
@@ -557,9 +557,9 @@ int vtkDPvtkMultiBlockDataReader::RequestData(
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   try
   {
-    if (this->Internals->LoadStep(this->Internals->GetRequestedStep(outInfo)))
+    if (this->Internals->SelectStep(this->Internals->GetRequestedStep(outInfo)))
     {
-      // A different time step than the one used in RequestInformation was loaded.
+      // A different time step than the one used in RequestInformation was selected.
       // Force parsing of the new .vtm. We do not call Modified() as that
       // would re-execute the pipeline.
       this->ReadMTime = vtkTimeStamp();
