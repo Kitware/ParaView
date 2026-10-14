@@ -60,8 +60,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   /**
    * Returns 1 if `name` can be opened as a DPvtk file.
-   * With MPI, this is called only on process 0, so the file is opened with
-   * `MPI_COMM_SELF`.
    */
   int CanReadFile(VTK_FILEPATH const char* name) override;
 
