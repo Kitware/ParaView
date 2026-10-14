@@ -3,7 +3,7 @@ FindSpnav
 ---------
 
 Find libspnav, the client library for spacenavd. Set ``SPNAV_ROOT`` to an
-installation prefix or a built libspnav source tree (without installing it).
+installation prefix
 
 Provides the imported target ``Spnav::Spnav``.
 #]=======================================================================]
@@ -14,18 +14,10 @@ find_path(Spnav_INCLUDE_DIR
   PATH_SUFFIXES include src)
 
 # A source build has a versioned shared object but no linker symlink until installation.
-if (SPNAV_ROOT OR DEFINED ENV{SPNAV_ROOT})
-  find_file(Spnav_LIBRARY
-    NAMES libspnav.so.0.5
-    HINTS ${SPNAV_ROOT} ENV SPNAV_ROOT
-    PATH_SUFFIXES lib lib64 "")
-endif ()
-if (NOT Spnav_LIBRARY)
-  find_library(Spnav_LIBRARY
-    NAMES spnav
-    HINTS ${SPNAV_ROOT} ENV SPNAV_ROOT
-    PATH_SUFFIXES lib lib64 "")
-endif ()
+find_library(Spnav_LIBRARY
+ NAMES spnav
+ HINTS ${SPNAV_ROOT} ENV SPNAV_ROOT
+ PATH_SUFFIXES lib lib64 "")
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Spnav
