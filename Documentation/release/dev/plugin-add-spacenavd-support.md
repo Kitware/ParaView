@@ -1,7 +1,7 @@
 ## Added spacenavd support for 3D connexion spacemouse on Linux
 
 The SpaceMouseInteractor Plugin now works on Linux with the Open Source drivers
-and libraries [FreeSpacenav](https://github.com/FreeSpacenav). :wqOn Linux a user
+and libraries [FreeSpacenav](https://github.com/FreeSpacenav). On Linux a user
 can now just use the space mouse.
 
 To build the Plugin for Linux [libspnav](https://github.com/FreeSpacenav/libspnav)
