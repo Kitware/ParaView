@@ -26,6 +26,9 @@ else ()
   if (POLICY CMP0144)
     cmake_policy(SET CMP0144 NEW)
   endif ()
+
+  # The minumum tested version for libspnav is git release version 1.2 (installs
+  # as libspnav.so.0.4)
   find_package(Spnav REQUIRED)
   cmake_policy(POP)
   list(APPEND sources
