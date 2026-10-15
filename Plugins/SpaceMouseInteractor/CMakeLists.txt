@@ -36,6 +36,7 @@ endif ()
 # Support std::make_unique.
 set(CMAKE_CXX_STANDARD 14)
 
+if (WIN32 OR APPLE)
 paraview_add_plugin(SpaceMouseInteractor
   REQUIRED_ON_CLIENT
   VERSION       "1.0"
@@ -43,6 +44,14 @@ paraview_add_plugin(SpaceMouseInteractor
   DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
   UI_INTERFACES ${interfaces}
   SOURCES       ${sources})
+else ()
+paraview_add_plugin(SpaceMouseInteractor
+  REQUIRED_ON_CLIENT
+  VERSION       "1.0"
+  DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
+  UI_INTERFACES ${interfaces}
+  SOURCES       ${sources})
+endif()
 
 # Support __declspec(property) on macOS.
 target_compile_options(SpaceMouseInteractor
