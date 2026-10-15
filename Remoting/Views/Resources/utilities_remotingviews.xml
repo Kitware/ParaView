@@ -3652,6 +3652,14 @@
           The input from which the selection is extracted.
         </Documentation>
       </ProxyProperty>
+      <IntVectorProperty command="SetInputPort"
+                         default_values="0"
+                         name="InputPort"
+                         number_of_elements="1">
+        <Documentation>
+          The port of the input on which the selection is extracted.
+        </Documentation>
+      </IntVectorProperty>
       <ProxyProperty command="SetSelection"
                      name="Selection">
         <Documentation>
