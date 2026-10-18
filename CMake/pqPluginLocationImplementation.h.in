@@ -21,7 +21,7 @@ public:
 
   /// Called once after the ParaView starts. If ParaView is already running when
   /// the plugin is loaded, this method will be called when the plugin is loaded.
-  void StoreLocation(const char* location) override;
+  void StoreLocation(const char* location);
 protected:
   @_paraview_location_CLASS_NAME@ *UserImplementation;
 };
