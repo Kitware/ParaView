@@ -121,6 +121,11 @@ void pqSaveStateAndScreenshotReaction::CopyProperties(
     vtkSMProperty* target = shProxy->GetProperty(property);
     target->Copy(src);
   }
+  // both formats are PNG, so this keeps compression, metadata and embedded state
+  vtkSMProxy* formatSaved = vtkSMPropertyHelper(shProxySaved, "Format").GetAsProxy();
+  vtkSMProxy* format = vtkSMPropertyHelper(shProxy, "Format").GetAsProxy();
+  format->Copy(formatSaved);
+  format->UpdateVTKObjects();
   shProxy->UpdateVTKObjects();
 }
 
