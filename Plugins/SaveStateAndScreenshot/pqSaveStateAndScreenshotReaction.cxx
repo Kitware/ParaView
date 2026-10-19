@@ -173,16 +173,17 @@ void pqSaveStateAndScreenshotReaction::onSettings()
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
-  if (fileDialog.exec() == QDialog::Accepted)
+  if (fileDialog.exec() != QDialog::Accepted)
   {
-    QString selectedFile = fileDialog.getSelectedFiles()[0];
-    this->Location = fileDialog.getSelectedLocation();
-    QFileInfo info(selectedFile);
-    this->Directory = info.dir().absolutePath();
-    this->Name = info.completeBaseName();
-    QRegularExpression re("-\\d{8}-\\d{6}$");
-    this->Name.remove(re);
+    return;
   }
+  QString selectedFile = fileDialog.getSelectedFiles()[0];
+  this->Location = fileDialog.getSelectedLocation();
+  QFileInfo info(selectedFile);
+  this->Directory = info.dir().absolutePath();
+  this->Name = info.completeBaseName();
+  QRegularExpression re("-\\d{8}-\\d{6}$");
+  this->Name.remove(re);
 
   // Configure Screenshot options
   pqView* view = pqActiveObjects::instance().activeView();
