@@ -14,7 +14,6 @@ class vtkSMProxy;
 class vtkSMSaveScreenshotProxy;
 class vtkSMViewProxy;
 class pqServer;
-class pqView;
 
 /**
  * @ingroup Reactions
@@ -43,9 +42,10 @@ protected Q_SLOTS:
   /**
    * Called when the active view changes. Points the saved screenshot settings
    * to the new view and its layout, so that the user does not have to configure
-   * them again.
+   * them again. This is done after control returns to the event loop, because
+   * a newly created view becomes active before it is assigned to a layout.
    */
-  void onViewChanged(pqView*);
+  void onViewChanged();
 
   /**
    * Called before a server is removed. Clears the saved screenshot settings
@@ -61,7 +61,7 @@ protected Q_SLOTS:
 private:
   /**
    * Sets the View and Layout of shProxy to viewProxy and its layout. If the
-   * captured view or layout changes, ImageResolution is reset to its size.
+   * captured view or layout changes, Save resets ImageResolution to its size.
    * If viewProxy is not in a layout, View is set to nullptr which disables save.
    */
   void ResetView(vtkSMSaveScreenshotProxy* shProxy, vtkSMViewProxy* viewProxy);
@@ -75,6 +75,8 @@ private:
   bool FromCTest;
   // vtkSaveScreenshotProxy
   vtkSmartPointer<vtkSMProxy> Proxy;
+  // ImageResolution is reset to the size of the captured view or layout on Save
+  bool ResolutionFromTarget = false;
   QPointer<QAction> SettingsAction;
 };
 

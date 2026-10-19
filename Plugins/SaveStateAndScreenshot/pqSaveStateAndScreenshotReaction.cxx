@@ -30,12 +30,14 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSMViewResolutionDomain.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <QDateTime>
 #include <QDebug>
 #include <QFileInfo>
 #include <QRegularExpression>
+#include <QTimer>
 
 #include <array>
 
@@ -48,7 +50,7 @@ pqSaveStateAndScreenshotReaction::pqSaveStateAndScreenshotReaction(
   QObject::connect(settingsAction, SIGNAL(triggered()), this, SLOT(onSettings()));
   QObject::connect(settingsAction, SIGNAL(triggered()), this, SLOT(updateEnableState()));
   QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(onViewChanged(pqView*)));
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(onViewChanged()));
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(aboutToRemoveServer(pqServer*)), this, SLOT(onAboutToRemoveServer(pqServer*)));
   this->updateEnableState();
@@ -56,14 +58,20 @@ pqSaveStateAndScreenshotReaction::pqSaveStateAndScreenshotReaction(
 }
 
 //-----------------------------------------------------------------------------
-void pqSaveStateAndScreenshotReaction::onViewChanged(pqView* view)
+void pqSaveStateAndScreenshotReaction::onViewChanged()
 {
-  vtkSMSaveScreenshotProxy* shProxy = vtkSMSaveScreenshotProxy::SafeDownCast(this->Proxy);
-  if (shProxy)
-  {
-    this->ResetView(shProxy, view ? view->getViewProxy() : nullptr);
-    this->updateEnableState();
-  }
+  // a new view becomes active before it is assigned to a layout
+  QTimer::singleShot(0, this,
+    [this]()
+    {
+      vtkSMSaveScreenshotProxy* shProxy = vtkSMSaveScreenshotProxy::SafeDownCast(this->Proxy);
+      if (shProxy)
+      {
+        pqView* view = pqActiveObjects::instance().activeView();
+        this->ResetView(shProxy, view ? view->getViewProxy() : nullptr);
+        this->updateEnableState();
+      }
+    });
 }
 
 //-----------------------------------------------------------------------------
@@ -102,8 +110,8 @@ void pqSaveStateAndScreenshotReaction::ResetView(
     return;
   }
   vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
-  // the capture target changed, so use the size of the new view or layout
-  shProxy->GetProperty("ImageResolution")->ResetToDomainDefaults();
+  // the capture target changed, so Save uses the size of the new view or layout
+  this->ResolutionFromTarget = true;
   shProxy->UpdateVTKObjects();
 }
 
@@ -149,6 +157,14 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
   pqView* view = pqActiveObjects::instance().activeView();
   if (shProxy && view)
   {
+    if (this->ResolutionFromTarget)
+    {
+      // a new view has its real size only after it is shown, so read it now
+      vtkSMProperty* resolution = shProxy->GetProperty("ImageResolution");
+      resolution->FindDomain<vtkSMViewResolutionDomain>()->Update(nullptr);
+      resolution->ResetToDomainDefaults();
+      shProxy->UpdateVTKObjects();
+    }
     // save the file
     QDateTime dateTime = QDateTime::currentDateTime();
     QString dateTimeString = dateTime.toString("-yyyyMMdd-hhmmss");
@@ -282,6 +298,7 @@ void pqSaveStateAndScreenshotReaction::onSettings()
   if (dialog.exec() == QDialog::Accepted)
   {
     this->Proxy = proxy;
+    this->ResolutionFromTarget = false;
   }
 
   if (layout)
