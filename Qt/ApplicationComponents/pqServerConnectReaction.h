@@ -30,6 +30,8 @@ public:
    * having to create a reaction instance.
    */
   static void connectToServerWithWarning();
+  static void connectToServerWithWarning(
+    const pqServerConfiguration& config, bool showConnectionDialog = true);
   static void connectToServer();
 
   /**
@@ -65,6 +67,11 @@ private Q_SLOTS:
 
 private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqServerConnectReaction)
+
+  /**
+   * Display a warning if we are currently connected to another server
+   */
+  static bool canProceedWithConnection();
 };
 
 #endif
