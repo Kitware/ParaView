@@ -14,6 +14,7 @@
 #include "pqRenderView.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 
@@ -48,6 +49,8 @@ pqSaveStateAndScreenshotReaction::pqSaveStateAndScreenshotReaction(
   QObject::connect(settingsAction, SIGNAL(triggered()), this, SLOT(updateEnableState()));
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(onViewChanged(pqView*)));
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(aboutToRemoveServer(pqServer*)), this, SLOT(onAboutToRemoveServer(pqServer*)));
   this->updateEnableState();
   this->FromCTest = (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") != nullptr);
 }
@@ -59,6 +62,16 @@ void pqSaveStateAndScreenshotReaction::onViewChanged(pqView* view)
   if (shProxy)
   {
     this->ResetView(shProxy, view ? view->getViewProxy() : nullptr);
+    this->updateEnableState();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqSaveStateAndScreenshotReaction::onAboutToRemoveServer(pqServer* server)
+{
+  if (this->Proxy && this->Proxy->GetSession() == server->session())
+  {
+    this->Proxy = nullptr;
     this->updateEnableState();
   }
 }

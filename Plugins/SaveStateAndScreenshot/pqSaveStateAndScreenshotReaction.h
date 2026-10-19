@@ -13,6 +13,7 @@
 class vtkSMProxy;
 class vtkSMSaveScreenshotProxy;
 class vtkSMViewProxy;
+class pqServer;
 class pqView;
 
 /**
@@ -45,6 +46,12 @@ protected Q_SLOTS:
    * them again.
    */
   void onViewChanged(pqView*);
+
+  /**
+   * Called before a server is removed. Clears the saved screenshot settings
+   * if they belong to that server's session.
+   */
+  void onAboutToRemoveServer(pqServer*);
 
   /**
    * Called when the Settings action is triggered
