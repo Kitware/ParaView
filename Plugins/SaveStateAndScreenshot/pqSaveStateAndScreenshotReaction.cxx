@@ -179,7 +179,7 @@ void pqSaveStateAndScreenshotReaction::onSettings()
     this->Location = fileDialog.getSelectedLocation();
     QFileInfo info(selectedFile);
     this->Directory = info.dir().absolutePath();
-    this->Name = info.baseName();
+    this->Name = info.completeBaseName();
     QRegularExpression re("-\\d+-\\d+");
     this->Name.remove(re);
   }
