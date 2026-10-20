@@ -3,7 +3,7 @@ if (NOT VTK_MODULE_USE_EXTERNAL_VTK_zlib)
       "DPvz requires VTK_MODULE_USE_EXTERNAL_VTK_zlib")
 endif()
 
-if (TARGET VTK::mpi)
+if (TARGET VTK::ParallelMPI)
   # find the MPI version of DPvz
   set(DPVZ_MPI 1)
 else()
