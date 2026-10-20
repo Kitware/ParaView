@@ -30,6 +30,15 @@ public:
    */
   void SetInput(vtkAlgorithm*);
 
+  ///@{
+  /**
+   * Set the port of the input on which the selection apply.
+   * Default is 0.
+   */
+  vtkSetClampMacro(InputPort, int, 0, VTK_INT_MAX);
+  vtkGetMacro(InputPort, int);
+  ///@}
+
   /**
    * Set the selection that extract the cell that intersect the ray
    */
@@ -96,6 +105,8 @@ protected:
 private:
   vtkPVRayCastPickingHelper(const vtkPVRayCastPickingHelper&) = delete;
   void operator=(const vtkPVRayCastPickingHelper&) = delete;
+
+  int InputPort = 0;
 };
 
 #endif

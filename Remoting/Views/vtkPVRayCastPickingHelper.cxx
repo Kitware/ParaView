@@ -88,7 +88,7 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
   int numberOfProcesses = controller->GetNumberOfProcesses();
 
   vtkNew<vtkPVExtractSelection> extractSelectionFilter;
-  extractSelectionFilter->SetInputConnection(0, this->Input->GetOutputPort(0));
+  extractSelectionFilter->SetInputConnection(0, this->Input->GetOutputPort(this->InputPort));
   extractSelectionFilter->SetInputConnection(1, this->Selection->GetOutputPort(0));
   extractSelectionFilter->UpdatePiece(pid, numberOfProcesses, 0);
   vtkDataSet* ds = vtkDataSet::SafeDownCast(extractSelectionFilter->GetOutput());

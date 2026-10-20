@@ -1395,6 +1395,7 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(const int display_posi
     vtkSMRepresentationProxy* rep =
       vtkSMRepresentationProxy::SafeDownCast(representations->GetItemAsObject(0));
     vtkSMProxy* input = vtkSMPropertyHelper(rep, "Input").GetAsProxy(0);
+    int inputPort = vtkSMPropertyHelper(rep, "Input").GetOutputPort(0);
     vtkSMSourceProxy* selection = vtkSMSourceProxy::SafeDownCast(sources->GetItemAsObject(0));
 
     // Picking info
@@ -1428,6 +1429,7 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(const int display_posi
     // Compute the  intersection...
     vtkSMProxy* pickingHelper = spxm->NewProxy("misc", "PickingHelper");
     vtkSMPropertyHelper(pickingHelper, "Input").Set(input);
+    vtkSMPropertyHelper(pickingHelper, "InputPort").Set(inputPort);
     vtkSMPropertyHelper(pickingHelper, "Selection").Set(selection);
     vtkSMPropertyHelper(pickingHelper, "PointA").Set(nearLinePoint, 3);
     vtkSMPropertyHelper(pickingHelper, "PointB").Set(farLinePoint, 3);
