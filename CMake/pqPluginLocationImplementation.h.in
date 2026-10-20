@@ -19,6 +19,7 @@ public:
   @_paraview_location_CLASS_NAME@Implementation(QObject* p = nullptr);
   ~@_paraview_location_CLASS_NAME@Implementation() override;
 
+private:
   /// Called once after the ParaView starts. If ParaView is already running when
   /// the plugin is loaded, this method will be called when the plugin is loaded.
   void StoreLocation(const char* location);
