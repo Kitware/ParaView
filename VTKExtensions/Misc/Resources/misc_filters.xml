@@ -510,6 +510,9 @@
     <!-- ==================================================================== -->
     <SourceProxy class="vtkReductionFilter"
                  name="ReductionFilter">
+      <Documentation long_help="Move any data over processors. For meshes (vtkDataSet subclasses), prefer AppendReduce filter."
+                     short_help="Move data over processors">
+                     </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -539,19 +542,23 @@
 
       <StringVectorProperty command="SetPreGatherHelperName"
                             name="PreGatherHelperName"
+                            panel_visibility="advanced"
                             number_of_elements="1">
         <Documentation>Set the algorithm that runs on each node in
         parallel.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetPostGatherHelperName"
                             name="PostGatherHelperName"
+                            panel_visibility="advanced"
                             number_of_elements="1">
         <Documentation>Set the algorithm that takes multiple inputs and
         produces a single reduced output.</Documentation>
       </StringVectorProperty>
       <ProxyProperty command="SetPostGatherHelper"
+                     panel_visibility="advanced"
                      name="PostGatherHelper" />
       <ProxyProperty command="SetPreGatherHelper"
+                     panel_visibility="advanced"
                      name="PreGatherHelper" />
       <IntVectorProperty command="SetPassThrough"
                          default_values="-1"
