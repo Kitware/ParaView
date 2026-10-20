@@ -16,7 +16,7 @@ class @_paraview_location_CLASS_NAME@Implementation : public QObject, public pqP
   Q_OBJECT
   Q_INTERFACES(pqPluginLocationInterface)
 public:
-  @_paraview_location_CLASS_NAME@Implementation(QObject* p=0);
+  @_paraview_location_CLASS_NAME@Implementation(QObject* p = nullptr);
   ~@_paraview_location_CLASS_NAME@Implementation() override;
 
   /// Called once after the ParaView starts. If ParaView is already running when
