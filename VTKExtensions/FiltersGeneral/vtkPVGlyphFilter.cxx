@@ -37,6 +37,7 @@
 // C/C++ includes
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <map>
 #include <numeric>
 #include <random>
@@ -682,7 +683,14 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
 
     this->Internals->SynchronizeGlobalInformation(this);
 
+    std::size_t numberOfDS = 0;
+    std::size_t currentDSNumber = 0;
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      numberOfDS += 1;
+    }
+
+    for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkDataSet* currentDS = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (currentDS)
@@ -691,6 +699,9 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
         {
           continue;
         }
+
+        this->SetProgressShiftScale(
+          static_cast<double>(currentDSNumber) / numberOfDS, 1.0 / numberOfDS);
 
         bool res;
         vtkNew<vtkPolyData> outputPD;
@@ -703,6 +714,7 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
           return 0;
         }
         outputDT->SetDataSet(iter, outputPD.GetPointer());
+        currentDSNumber += 1;
       }
     }
   }
@@ -939,7 +951,7 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
     if (!(inPtId % 10000))
     {
       this->UpdateProgress(static_cast<double>(inPtId) / numPts);
-      if (this->GetAbortExecute())
+      if (this->CheckAbortAndInvoke())
       {
         break;
       }
