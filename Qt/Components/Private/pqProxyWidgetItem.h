@@ -4,12 +4,16 @@
 
 #include <QPointer> // for QPointer members
 
+#include "vtkParaViewDeprecation.h" // For PARAVIEW_DEPRECATED_IN_6_3_0
+
 class pqPropertyWidget;
 class pqProxyWidget;
 class vtkSMProxy;
 
+class pqLabel;
 class QFrame;
 class QGridLayout;
+class QToolButton;
 
 /**
  * @brief pqProxyWidgetItem represents a single widget for a property/properties.
@@ -22,6 +26,8 @@ class QGridLayout;
  */
 class pqProxyWidgetItem : public QObject
 {
+  Q_OBJECT
+
   typedef QObject Superclass;
 
 public:
@@ -33,21 +39,37 @@ public:
   static pqProxyWidgetItem* newItem(pqPropertyWidget* widget, const QString& label, bool advanced,
     bool informationOnly, const QStringList& searchTags, pqProxyWidget* parentObj);
 
+  ///@{
   /**
    * Creates a new item for a property group. Use this overload when creating
    * an item for a group where there's a single widget for all the properties
    * in that group.
    */
+  PARAVIEW_DEPRECATED_IN_6_3_0(
+    "Use newGroupItem with the new 'collapse' argument at the end instead.")
   static pqProxyWidgetItem* newGroupItem(pqPropertyWidget* widget, const QString& label,
     bool showSeparators, bool advanced, const QStringList& searchTags, pqProxyWidget* parentObj);
 
+  static pqProxyWidgetItem* newGroupItem(pqPropertyWidget* widget, const QString& label,
+    bool showSeparators, bool advanced, const QStringList& searchTags, pqProxyWidget* parentObj,
+    bool collapse);
+  ///@}
+
+  ///@{
   /**
    * Creates a new item for a property group with several widgets (for
    * individual properties in the group).
    */
+  PARAVIEW_DEPRECATED_IN_6_3_0(
+    "Use newMultiItemGroupItem with the new 'collapse' argument at the end instead.")
   static pqProxyWidgetItem* newMultiItemGroupItem(const QString& group_label,
     pqPropertyWidget* widget, const QString& widget_label, bool showSeparators, bool advanced,
     bool informationOnly, const QStringList& searchTags, pqProxyWidget* parentObj);
+
+  static pqProxyWidgetItem* newMultiItemGroupItem(const QString& group_label,
+    pqPropertyWidget* widget, const QString& widget_label, bool showSeparators, bool advanced,
+    bool informationOnly, const QStringList& searchTags, pqProxyWidget* parentObj, bool collapse);
+  ///@}
 
   /**
    * Create a simple horizontal line. Useful to add a visible but light separation.
@@ -103,7 +125,7 @@ public:
    * Separators are shown only when needed (i.e. if another item is around).
    */
   void show(const pqProxyWidgetItem* prevVisibleItem, bool enabled = true,
-    bool show_advanced = false) const;
+    bool show_advanced = false, bool forceUncollapsed = false);
 
   /**
    * Hide the underlying widgets.
@@ -117,6 +139,21 @@ public:
    */
   void appendToLayout(QGridLayout* glayout, bool singleColumn);
 
+  ///@{
+  /**
+   * Set/get the collapse state. False by default. It can be modified in the
+   * General Settings of ParaView.
+   */
+  bool getCollapsed() const { return this->Collapsed; }
+  void setCollapsed(bool collapsed);
+  ///@}
+
+Q_SIGNALS:
+  /**
+   * Hide the underlying widgets.
+   */
+  void collapse();
+
 private:
   Q_DISABLE_COPY(pqProxyWidgetItem);
 
@@ -124,8 +161,10 @@ private:
   QStringList SearchTags;
   bool Advanced = false;
   bool InformationOnly = false;
+  bool Collapsed = false;
 
   QPointer<QWidget> GroupHeader;
+  QPointer<QToolButton> CollapseButton;
   QPointer<QWidget> GroupFooter;
   QPointer<QWidget> LabelWidget;
   QPointer<pqPropertyWidget> PropertyWidget;

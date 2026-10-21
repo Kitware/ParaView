@@ -1092,6 +1092,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ArraySelectionWidget.xml
   AutoConvertSingleProperty.xml
   CellGridInformationPanel.xml
+  CollapsePropertyGroup.xml
   CSVPreview.xml
   ChangeFileNameReaction.xml
   CustomOutputFormat.xml
@@ -2016,6 +2017,7 @@ set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better 
 set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
+set (CollapsePropertyGroup_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ColorAnnotationsVisibilitiesAndOpacities_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqProxyWidgetItem.h"
 
+#include "pqLabel.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqProxyPropertyWidget.h"
@@ -12,6 +13,36 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QString>
+#include <QToolButton>
+
+namespace
+{
+//-----------------------------------------------------------------------------
+void SetupCollapseButton(
+  QToolButton* collapseButton, pqLabel* groupLabel, pqProxyWidgetItem* item, bool collapseByDefault)
+{
+  auto updateCollapseState = [item, collapseButton](bool collapsed)
+  {
+    item->setCollapsed(collapsed);
+    collapseButton->setArrowType(collapsed ? Qt::RightArrow : Qt::DownArrow);
+    item->collapse();
+  };
+
+  if (collapseButton)
+  {
+    QObject::connect(collapseButton, &QToolButton::toggled, item, updateCollapseState);
+    collapseButton->setChecked(collapseByDefault);
+    updateCollapseState(collapseByDefault);
+  }
+
+  // Make the label also clickable
+  if (groupLabel && collapseButton)
+  {
+    QObject::connect(
+      groupLabel, &pqLabel::clicked, item, [collapseButton]() { collapseButton->toggle(); });
+  }
+}
+};
 
 //-----------------------------------------------------------------------------
 pqProxyWidgetItem::pqProxyWidgetItem(
@@ -76,6 +107,14 @@ pqProxyWidgetItem* pqProxyWidgetItem::newItem(pqPropertyWidget* widget, const QS
 pqProxyWidgetItem* pqProxyWidgetItem::newGroupItem(pqPropertyWidget* widget, const QString& label,
   bool showSeparators, bool advanced, const QStringList& searchTags, pqProxyWidget* parentObj)
 {
+  return newGroupItem(widget, label, showSeparators, advanced, searchTags, parentObj, false);
+}
+
+//-----------------------------------------------------------------------------
+pqProxyWidgetItem* pqProxyWidgetItem::newGroupItem(pqPropertyWidget* widget, const QString& label,
+  bool showSeparators, bool advanced, const QStringList& searchTags, pqProxyWidget* parentObj,
+  bool collapsedByDefault)
+{
   if (widget->isSingleRowItem())
   {
     pqProxyWidgetItem* item = newItem(widget, label, advanced, false, searchTags, parentObj);
@@ -85,27 +124,51 @@ pqProxyWidgetItem* pqProxyWidgetItem::newGroupItem(pqPropertyWidget* widget, con
 
   pqProxyWidgetItem* item = newItem(widget, QString(), advanced, false, searchTags, parentObj);
   item->Group = true;
+  item->GroupTag = label;
+
+  QToolButton* collapseButton = nullptr;
+  pqLabel* titleLabel = nullptr;
+
   if (!label.isEmpty() && widget->showLabel() && showSeparators)
   {
-    item->GroupHeader = pqProxyWidget::newGroupLabelWidget(label, widget->parentWidget());
+    item->GroupHeader = pqProxyWidget::newGroupLabelWidget(
+      label, widget->parentWidget(), &titleLabel, &collapseButton);
+
+    item->CollapseButton = collapseButton;
+    ::SetupCollapseButton(collapseButton, titleLabel, item, collapsedByDefault);
     item->GroupFooter = newGroupSeparator(widget->parentWidget());
   }
   return item;
 }
 
 //-----------------------------------------------------------------------------
-pqProxyWidgetItem* pqProxyWidgetItem::newMultiItemGroupItem(const QString& group_label,
-  pqPropertyWidget* widget, const QString& widget_label, bool showSeparators, bool advanced,
+pqProxyWidgetItem* pqProxyWidgetItem::newMultiItemGroupItem(const QString& groupLabel,
+  pqPropertyWidget* widget, const QString& widgetLabel, bool showSeparators, bool advanced,
   bool informationOnly, const QStringList& searchTags, pqProxyWidget* parentObj)
 {
+  return newMultiItemGroupItem(groupLabel, widget, widgetLabel, showSeparators, advanced,
+    informationOnly, searchTags, parentObj, false);
+}
+
+//-----------------------------------------------------------------------------
+pqProxyWidgetItem* pqProxyWidgetItem::newMultiItemGroupItem(const QString& groupLabel,
+  pqPropertyWidget* widget, const QString& widgetLabel, bool showSeparators, bool advanced,
+  bool informationOnly, const QStringList& searchTags, pqProxyWidget* parentObj, bool collapse)
+{
   pqProxyWidgetItem* item =
-    newItem(widget, widget_label, advanced, informationOnly, searchTags, parentObj);
+    newItem(widget, widgetLabel, advanced, informationOnly, searchTags, parentObj);
   item->Group = true;
   // ensure GroupTag is not nullptr for multi-property groups.
-  item->GroupTag = group_label.isNull() ? QString("") : group_label;
-  if (!group_label.isEmpty() && showSeparators)
+  item->GroupTag = groupLabel.isNull() ? QString("") : groupLabel;
+  if (!groupLabel.isEmpty() && showSeparators)
   {
-    item->GroupHeader = pqProxyWidget::newGroupLabelWidget(group_label, widget->parentWidget());
+    QToolButton* collapseButton = nullptr;
+    pqLabel* titleLabel = nullptr;
+    item->GroupHeader = pqProxyWidget::newGroupLabelWidget(
+      groupLabel, widget->parentWidget(), &titleLabel, &collapseButton);
+
+    item->CollapseButton = collapseButton;
+    ::SetupCollapseButton(collapseButton, titleLabel, item, collapse);
     item->GroupFooter = newGroupSeparator(widget->parentWidget());
   }
   return item;
@@ -163,10 +226,16 @@ void pqProxyWidgetItem::deselect() const
 }
 
 //-----------------------------------------------------------------------------
-bool pqProxyWidgetItem::canShowWidget(
-  bool show_advanced, const QString& filterText, vtkSMProxy* proxy) const
+void pqProxyWidgetItem::setCollapsed(bool collapsed)
 {
-  if (show_advanced == false && this->isAdvanced(proxy) == true)
+  this->Collapsed = collapsed;
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetItem::canShowWidget(
+  bool showAdvanced, const QString& filterText, vtkSMProxy* proxy) const
+{
+  if (showAdvanced == false && this->isAdvanced(proxy) == true)
   {
     // skip advanced properties.
     return false;
@@ -180,7 +249,7 @@ bool pqProxyWidgetItem::canShowWidget(
 
   Q_FOREACH (const pqPropertyWidgetDecorator* decorator, this->PropertyWidget->decorators())
   {
-    if (decorator && !decorator->canShowWidget(show_advanced))
+    if (decorator && !decorator->canShowWidget(showAdvanced))
     {
       return false;
     }
@@ -222,11 +291,12 @@ bool pqProxyWidgetItem::isAdvanced(vtkSMProxy* proxy) const
 
 //-----------------------------------------------------------------------------
 void pqProxyWidgetItem::show(
-  const pqProxyWidgetItem* prevVisibleItem, bool enabled, bool show_advanced) const
+  const pqProxyWidgetItem* prevVisibleItem, bool enabled, bool showAdvanced, bool forceUncollapsed)
 {
-  // If `this` is not a group, but previous item was, we need to ensure the
+  // If `this` is not a group, but previous item was and is not collapsed, we need to ensure the
   // previous items group footer is visible.
-  if (!this->Group && prevVisibleItem && prevVisibleItem->Group && prevVisibleItem->GroupFooter)
+  if (!this->Group && prevVisibleItem && prevVisibleItem->Group && prevVisibleItem->GroupFooter &&
+    (!prevVisibleItem->Collapsed || forceUncollapsed))
   {
     prevVisibleItem->GroupFooter->show();
   }
@@ -237,14 +307,15 @@ void pqProxyWidgetItem::show(
   {
     this->GroupHeader->setVisible(this->GroupTag.isNull() || prevVisibleItem == nullptr ||
       this->GroupTag != prevVisibleItem->GroupTag);
+
+    // If the previous item is part of the same group, we must copy its collapse state
+    if (prevVisibleItem != nullptr && this->GroupTag == prevVisibleItem->GroupTag)
+    {
+      this->Collapsed = prevVisibleItem->Collapsed;
+    }
   }
 
-  if (this->LabelWidget)
-  {
-    this->LabelWidget->show();
-  }
-
-  this->PropertyWidget->updateWidget(show_advanced);
+  this->PropertyWidget->updateWidget(showAdvanced);
   this->PropertyWidget->setReadOnly(!enabled);
 
   if (this->InformationOnly)
@@ -256,7 +327,20 @@ void pqProxyWidgetItem::show(
         .arg(palette.color(QPalette::Active, QPalette::Base).name(QColor::HexArgb));
     this->PropertyWidget->setStyleSheet(styleSheet);
   }
-  this->PropertyWidget->show();
+
+  if (this->CollapseButton)
+  {
+    this->CollapseButton->setArrowType(
+      this->Collapsed && !forceUncollapsed ? Qt::RightArrow : Qt::DownArrow);
+  }
+
+  // Hide collapse elements that belong to a group
+  bool visible = !this->GroupHeader || !this->Collapsed || forceUncollapsed;
+  this->PropertyWidget->setVisible(visible);
+  if (this->LabelWidget)
+  {
+    this->LabelWidget->setVisible(visible);
+  }
 
   if (this->GroupFooter)
   {

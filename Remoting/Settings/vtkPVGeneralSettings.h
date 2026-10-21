@@ -278,6 +278,21 @@ public:
   vtkGetMacro(PropertiesPanelMode, int);
   ///@}
 
+  enum CollapseState
+  {
+    DEFAULT = 0,
+    EXPAND_ALL = 1,
+    COLLAPSE_ALL = 2
+  };
+  ///@{
+  /**
+   * Set whether the property groups are collapsed. By default, property groups are collapsed but
+   * it can be expanded in some specific filters.
+   */
+  vtkSetMacro(CollapsePropertyGroups, int);
+  vtkGetMacro(CollapsePropertyGroups, int);
+  ///@}
+
   ///@{
   /**
    * Set whether to dock widgets into place.
@@ -403,6 +418,7 @@ private:
   bool ResetDisplayEmptyViews = false;
   int PropertiesPanelMode = ALL_IN_ONE;
   bool LockPanels = false;
+  int CollapsePropertyGroups = CollapseState::DEFAULT;
   int GUIFontSize = 0;
   bool GUIOverrideFont = false;
   bool ColorByBlockColorsOnApply = true;

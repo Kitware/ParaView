@@ -8,11 +8,13 @@
 #include <QSet>
 #include <QWidget>
 
+class pqLabel;
 class pqPropertyWidget;
 class pqView;
 class vtkSMProperty;
 class vtkSMProxy;
 class QPoint;
+class QToolButton;
 
 /**
  * pqProxyWidget represents a panel for a vtkSMProxy. pqProxyWidget creates
@@ -70,13 +72,17 @@ public:
    */
   bool useDocumentationForLabels() const { return this->UseDocumentationForLabels; }
 
+  ///@{
   /**
    * Returns a new widget that has the label and a h-line separator. This is
    * used on the pqProxyWidget to separate groups. Other widgets can use it for
    * the same purpose, as needed.
    */
+  static QWidget* newGroupLabelWidget(
+    const QString& label, QWidget* parentWidget, const QList<QWidget*>& buttons);
   static QWidget* newGroupLabelWidget(const QString& label, QWidget* parentWidget,
-    const QList<QWidget*>& buttons = QList<QWidget*>());
+    pqLabel** titleLabel = nullptr, QToolButton** collapseButton = nullptr);
+  ///@}
 
   /**
    * Returns true of the proxy provided has XML hints indicating that labels

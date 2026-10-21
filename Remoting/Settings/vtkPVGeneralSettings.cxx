@@ -122,5 +122,6 @@ void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LockPanels: " << this->LockPanels << "\n";
   os << indent << "PreservePropertyValues: " << this->PreservePropertyValues << "\n";
   os << indent << "PropertiesPanelMode: " << this->PropertiesPanelMode << "\n";
+  os << indent << "CollapsePropertyGroups: " << this->CollapsePropertyGroups << "\n";
   os << indent << "ScalarBarMode: " << this->ScalarBarMode << "\n";
 }

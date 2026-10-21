@@ -53,6 +53,11 @@
         once the changes have been applied.
       </Documentation>
     </DoubleVectorProperty>
+
+    <PropertyGroup label="PropertyGroup" collapse_panel="1">
+        <Property name="DemonstratePropertyWidgetDecorator" />
+        <Property name="ShrinkFactorInformation" />
+      </PropertyGroup>
    </SourceProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>
