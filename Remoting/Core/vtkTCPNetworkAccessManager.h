@@ -126,7 +126,12 @@ protected:
     HANDSHAKE_DIFFERENT_PV_VERSIONS,
     HANDSHAKE_DIFFERENT_CONNECTION_IDS,
     HANDSHAKE_DIFFERENT_RENDERING_BACKENDS,
-    HANDSHAKE_UNKNOWN_ERROR
+    HANDSHAKE_UNKNOWN_ERROR,
+    // Not an error: same major.minor but different build versions. Connect with a warning.
+    // Releases put only major.minor in the handshake (6.2.0 and 6.2.1 both send 6.2), so
+    // they never get this. Development builds add a date as the build version
+    // (e.g. 6.2.20261020).
+    HANDSHAKE_DIFFERENT_BUILD_VERSIONS
   };
 
   int ParaViewHandshake(
