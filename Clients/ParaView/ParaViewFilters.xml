@@ -29,6 +29,7 @@
       <Proxy group="filters" name="ExtractBlock" />
       <Proxy group="filters" name="ExtractHierarchicalDataSets" />
       <Proxy group="filters" name="OverlappingAMRLevelIds" />
+      <Proxy group="filters" name="ResolveHangingNodes" />
       <Proxy group="filters" name="SliceWithPlane"/>
     </Category>
     <Category name="Molecule" menu_label="Molecule">

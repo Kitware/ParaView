@@ -2516,6 +2516,113 @@ found and the point will be rejected.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkResolveHangingNodes"
+                 label="Resolve Hanging Nodes"
+                 name="ResolveHangingNodes">
+      <Documentation long_help="Insert the points of finer cells into the boundaries of neighboring coarser
+                                cells in a 2D or 3D multi-resolution mesh."
+                     short_help="Resolve the hanging nodes of a 2D or 3D multi-resolution mesh.">
+        This filter takes a dataset (vtkPolyData, vtkUnstructuredGrid or vtkCartesianGrid) made of
+        quads (2D) or hexahedra (3D) at different refinement levels (for example, an AMR dataset
+        converted to an unstructured grid). It inserts the hanging points of finer cells that lie
+        on the edge or face of a coarser cell into the connectivity of that coarse cell.
+
+        Depending on the Decompose option, the modified coarse cell is either decomposed into
+        conforming convex cells (triangles/quads in 2D, or tetrahedra/pyramids in 3D) that preserve
+        its geometry, or it is expanded directly into an n-sided polygon or polyhedron.
+
+        Neighboring cells then share points along their common boundary, which makes point data
+        interpolation continuous across refinement levels. The input cells must already share points
+        where they touch at corners, i.e., coincident points must be merged, and the refinement
+        ratio between consecutive levels must be 2. In parallel, the points that hang on
+        the boundary of a partition are exchanged with the neighboring partitions.
+
+        The partitions of a vtkPartitionedDataSet are resolved together, and every
+        vtkPartitionedDataSet of a vtkPartitionedDataSetCollection on its own. A level of a
+        vtkNonOverlappingAMR is resolved against the other levels. vtkOverlappingAMR is not supported,
+        since its levels overlap.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+          <DataType value="vtkUnstructuredGrid"/>
+          <DataType value="vtkCartesianGrid"/>
+          <DataType value="vtkPartitionedDataSet"/>
+          <DataType value="vtkPartitionedDataSetCollection"/>
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="1e-6"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0" max="0.1" />
+        <Documentation>Tolerance, as a fraction of the length of an edge or of the size of a
+        face, used to decide whether a point lies on that edge or face.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDecompose"
+                         default_values="1"
+                         label="Decompose"
+                         name="Decompose"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is set to 1, each cell with hanging points is decomposed into triangles
+          and quads (2D), or tetrahedra and pyramids (3D). Otherwise, it becomes a single polygon
+          (2D) or polyhedron (3D).
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeInverseMeasure"
+                         default_values="0"
+                         label="Compute Inverse Measure"
+                         name="ComputeInverseMeasure"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is set to 1, an InverseArea (2D) or InverseVolume (3D) cell array is
+          added to the output. It can be used as the Weight Array of the Cell Data to Point Data
+          filter, so that the value of a point does not depend on how many finer cells use it.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassThroughCellIds"
+                         default_values="0"
+                         label="Pass Original Cell Ids"
+                         name="PassThroughCellIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is set to 1, a cell array with the id of the input cell of every output
+          cell, in its partition, is added to the output. With Decompose, the cells that a resolved
+          cell is decomposed into have the same original cell id.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetOriginalCellIdsName"
+                            default_values="vtkOriginalResolvedCellIds"
+                            label="Original Cell Ids Name"
+                            name="OriginalCellIdsName"
+                            number_of_elements="1">
+        <Documentation>The name of the cell array of the original cell ids.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="PassThroughCellIds"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+      <PropertyGroup label="Original Cell Ids">
+        <Property name="PassThroughCellIds" />
+        <Property name="OriginalCellIdsName" />
+      </PropertyGroup>
+      <!-- End ResolveHangingNodes -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkTriangleFilter"
                  label="Triangulate"
                  name="TriangleFilter">
