@@ -38,6 +38,7 @@
 #include "vtkUnstructuredGrid.h"
 
 #include "Private/vtkEdgesCacheInternal.h"
+#include <cstddef>
 
 vtkStandardNewMacro(vtkPVClipDataSet);
 
@@ -647,9 +648,20 @@ bool vtkPVClipDataSet::ClipDataObject(
     inputIter->SkipEmptyNodesOff();
     inputIter->VisitOnlyLeavesOn();
 
-    outIter->InitTraversal();
+    std::size_t numberOfLeaves = 0;
     for (inputIter->InitTraversal(); !inputIter->IsDoneWithTraversal(); inputIter->GoToNextItem())
     {
+      numberOfLeaves += 1;
+    }
+
+    outIter->InitTraversal();
+    std::size_t currentLeaf = 0;
+    for (inputIter->GoToFirstItem();
+         !inputIter->IsDoneWithTraversal() && !this->CheckAbortAndInvoke();
+         inputIter->GoToNextItem())
+    {
+      this->UpdateProgress(static_cast<double>(currentLeaf) / numberOfLeaves);
+      currentLeaf += 1;
       auto inputLeaf = vtkDataSet::SafeDownCast(inputIter->GetCurrentDataObject());
       inLeafVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), inputLeaf);
 
