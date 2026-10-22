@@ -31,6 +31,13 @@
 
 #define MAX_SOCKETS 256
 
+namespace
+{
+const char* BUILD_VERSION_MISMATCH_EXPLANATION =
+  "Connecting anyway. The client and the server should be built from the same source revision; "
+  "otherwise, there may be errors when creating or updating proxies, wrong results, or crashes.";
+}
+
 class vtkTCPNetworkAccessManager::vtkInternals
 {
 public:
@@ -536,8 +543,8 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(int por
 int vtkTCPNetworkAccessManager::AnalyzeHandshakeAndGetErrorCode(
   const char* clientHS, const char* serverHS)
 {
-  vtksys::RegularExpression re(
-    "^paraview-([0-9]+\\.[0-9]+)\\.(connect_id\\.([0-9]+)\\.)?renderingbackend\\.([^\\.]+)$");
+  vtksys::RegularExpression re("^paraview-([0-9]+\\.[0-9]+)(\\.([0-9]+))?\\."
+                               "(connect_id\\.([0-9]+)\\.)?renderingbackend\\.([^\\.]+)$");
   bool success = re.find(serverHS);
   // Since this regex and the server handshake are from the same version
   // of ParaView, if it doesn't match then something is very wrong.
@@ -547,22 +554,27 @@ int vtkTCPNetworkAccessManager::AnalyzeHandshakeAndGetErrorCode(
       << "Server connect id did not match regular expression on server.  This shouldn't happen.");
     return HANDSHAKE_UNKNOWN_ERROR;
   }
-  std::string serverVersion = re.match(1);
-  std::string serverConnectId = re.match(3);
-  std::string serverBackend = re.match(4);
+  std::string serverMajorMinor = re.match(1);
+  std::string serverVersion = serverMajorMinor + re.match(2);
+  std::string serverPatch = re.match(3);
+  std::string serverConnectId = re.match(5);
+  std::string serverBackend = re.match(6);
 
   bool clientMatched = re.find(clientHS);
   if (!clientMatched)
   {
-    vtkErrorMacro(
-      << "Client Handshake didn't parse.  The client is likely a different version of ParaView.");
+    vtkErrorMacro(<< "Client Handshake didn't parse.  The client is likely a different version "
+                     "of ParaView. Client handshake: \""
+                  << clientHS << "\" Server handshake: \"" << serverHS << "\"");
     return HANDSHAKE_UNKNOWN_ERROR;
   }
-  std::string clientVersion = re.match(1);
-  std::string clientConnectId = re.match(3);
-  std::string clientBackend = re.match(4);
+  std::string clientMajorMinor = re.match(1);
+  std::string clientVersion = clientMajorMinor + re.match(2);
+  std::string clientPatch = re.match(3);
+  std::string clientConnectId = re.match(5);
+  std::string clientBackend = re.match(6);
 
-  if (clientVersion != serverVersion)
+  if (clientMajorMinor != serverMajorMinor)
   {
     vtkErrorMacro(<< "Client and server are different ParaView versions. Client reports version: "
                   << clientVersion << " but server is version " << serverVersion);
@@ -582,10 +594,20 @@ int vtkTCPNetworkAccessManager::AnalyzeHandshakeAndGetErrorCode(
     return HANDSHAKE_DIFFERENT_RENDERING_BACKENDS;
   }
 
+  if (clientPatch != serverPatch)
+  {
+    vtkWarningMacro(<< "Client and server have different build versions (client: " << clientVersion
+                    << ", server: " << serverVersion << "). "
+                    << BUILD_VERSION_MISMATCH_EXPLANATION);
+    return HANDSHAKE_DIFFERENT_BUILD_VERSIONS;
+  }
+
   // If this function was called, there was a difference but since we got here without detecting it
   // we have no idea what it is.
   vtkErrorMacro(
-    << "Unknown error in handshakes, client and server are likely different versions of ParaView.");
+    << "Unknown error in handshakes, client and server are likely different versions of ParaView. "
+       "Client handshake: \""
+    << clientHS << "\" Server handshake: \"" << serverHS << "\"");
   return HANDSHAKE_UNKNOWN_ERROR;
 }
 
@@ -613,7 +635,7 @@ int vtkTCPNetworkAccessManager::ParaViewHandshake(
       errorCode = this->AnalyzeHandshakeAndGetErrorCode(other_handshake.c_str(), handshake.c_str());
     }
     controller->Send(&errorCode, 1, 1, 99990);
-    return errorCode;
+    return errorCode == HANDSHAKE_DIFFERENT_BUILD_VERSIONS ? HANDSHAKE_NO_ERROR : errorCode;
   }
   else
   {
@@ -624,6 +646,13 @@ int vtkTCPNetworkAccessManager::ParaViewHandshake(
     }
     int errorCode = HANDSHAKE_NO_ERROR;
     controller->Receive(&errorCode, 1, 1, 99990);
+    if (errorCode == HANDSHAKE_DIFFERENT_BUILD_VERSIONS)
+    {
+      vtkWarningMacro(<< "The server has a different build version than this client; see the "
+                         "server output for both versions. "
+                      << BUILD_VERSION_MISMATCH_EXPLANATION);
+      return HANDSHAKE_NO_ERROR;
+    }
     return errorCode;
   }
 }
