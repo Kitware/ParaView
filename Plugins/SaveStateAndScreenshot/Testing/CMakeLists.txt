@@ -1,4 +1,6 @@
-if (BUILD_SHARED_LIBS)
+# On macOS HiDPI displays, the view size is doubled so the screenshots
+# do not match the baseline size.
+if (BUILD_SHARED_LIBS AND NOT APPLE)
 
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/Baseline/SaveStateAndScreenshot.png}"
