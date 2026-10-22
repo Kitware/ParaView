@@ -17,12 +17,6 @@ class PQCORE_EXPORT pqPluginLocationInterface
 public:
   virtual ~pqPluginLocationInterface() = default;
 
-  /**
-   * Called once after the plugin is loaded. If `location` is null, the plugin
-   * is static and has no file system location.
-   */
-  virtual void StoreLocation(const char* location) = 0;
-
 protected:
   pqPluginLocationInterface();
 
