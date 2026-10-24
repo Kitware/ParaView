@@ -14,6 +14,7 @@
 #include "pqRenderView.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 
@@ -29,12 +30,14 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSMViewResolutionDomain.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <QDateTime>
 #include <QDebug>
 #include <QFileInfo>
 #include <QRegularExpression>
+#include <QTimer>
 
 #include <array>
 
@@ -47,37 +50,69 @@ pqSaveStateAndScreenshotReaction::pqSaveStateAndScreenshotReaction(
   QObject::connect(settingsAction, SIGNAL(triggered()), this, SLOT(onSettings()));
   QObject::connect(settingsAction, SIGNAL(triggered()), this, SLOT(updateEnableState()));
   QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(onViewChanged(pqView*)));
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(onViewChanged()));
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(aboutToRemoveServer(pqServer*)), this, SLOT(onAboutToRemoveServer(pqServer*)));
   this->updateEnableState();
   this->FromCTest = (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") != nullptr);
 }
 
 //-----------------------------------------------------------------------------
-void pqSaveStateAndScreenshotReaction::onViewChanged(pqView* view)
+void pqSaveStateAndScreenshotReaction::onViewChanged()
 {
-  if (this->Proxy)
-  {
-    vtkSMViewProxy* viewProxyNull = nullptr;
-    vtkSMSaveScreenshotProxy* shProxy = vtkSMSaveScreenshotProxy::SafeDownCast(this->Proxy);
-    if (view)
+  // a new view becomes active before it is assigned to a layout
+  QTimer::singleShot(0, this,
+    [this]()
     {
-
-      vtkSMProxy* viewSaved =
-        vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(shProxy, "View").GetAsProxy());
-      vtkSMViewProxy* viewProxy = view->getViewProxy();
-      if (viewSaved != viewProxy)
+      vtkSMSaveScreenshotProxy* shProxy = vtkSMSaveScreenshotProxy::SafeDownCast(this->Proxy);
+      if (shProxy)
       {
-        // force going through settings
-        vtkSMPropertyHelper(shProxy, "View").Set(viewProxyNull);
+        pqView* view = pqActiveObjects::instance().activeView();
+        this->ResetView(shProxy, view ? view->getViewProxy() : nullptr);
+        this->updateEnableState();
       }
-    }
-    else
-    {
-      // force going through settings
-      vtkSMPropertyHelper(shProxy, "View").Set(viewProxyNull);
-    }
+    });
+}
+
+//-----------------------------------------------------------------------------
+void pqSaveStateAndScreenshotReaction::onAboutToRemoveServer(pqServer* server)
+{
+  if (this->Proxy && this->Proxy->GetSession() == server->session())
+  {
+    this->Proxy = nullptr;
     this->updateEnableState();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqSaveStateAndScreenshotReaction::ResetView(
+  vtkSMSaveScreenshotProxy* shProxy, vtkSMViewProxy* viewProxy)
+{
+  vtkSMProxy* viewSaved = vtkSMPropertyHelper(shProxy, "View").GetAsProxy();
+  if (viewSaved == viewProxy)
+  {
+    return;
+  }
+  vtkSMViewProxy* viewProxyNull = nullptr;
+  vtkSMViewLayoutProxy* layout = viewProxy ? vtkSMViewLayoutProxy::FindLayout(viewProxy) : nullptr;
+  if (!layout)
+  {
+    // nothing we can capture, disable save until a view in a layout becomes active
+    vtkSMPropertyHelper(shProxy, "View").Set(viewProxyNull);
+    return;
+  }
+  vtkSMProxy* layoutSaved = vtkSMPropertyHelper(shProxy, "Layout").GetAsProxy();
+  vtkSMPropertyHelper(shProxy, "View").Set(viewProxy);
+  if (vtkSMPropertyHelper(shProxy, "SaveAllViews").GetAsInt() != 0 && layout == layoutSaved)
+  {
+    // we capture the same layout, so we keep the configured resolution
+    shProxy->UpdateVTKObjects();
+    return;
+  }
+  vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
+  // the capture target changed, so Save uses the size of the new view or layout
+  this->ResolutionFromTarget = true;
+  shProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -107,6 +142,11 @@ void pqSaveStateAndScreenshotReaction::CopyProperties(
     vtkSMProperty* target = shProxy->GetProperty(property);
     target->Copy(src);
   }
+  // both formats are PNG, so this keeps compression, metadata and embedded state
+  vtkSMProxy* formatSaved = vtkSMPropertyHelper(shProxySaved, "Format").GetAsProxy();
+  vtkSMProxy* format = vtkSMPropertyHelper(shProxy, "Format").GetAsProxy();
+  format->Copy(formatSaved);
+  format->UpdateVTKObjects();
   shProxy->UpdateVTKObjects();
 }
 
@@ -117,6 +157,14 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
   pqView* view = pqActiveObjects::instance().activeView();
   if (shProxy && view)
   {
+    if (this->ResolutionFromTarget)
+    {
+      // a new view has its real size only after it is shown, so read it now
+      vtkSMProperty* resolution = shProxy->GetProperty("ImageResolution");
+      resolution->FindDomain<vtkSMViewResolutionDomain>()->Update(nullptr);
+      resolution->ResetToDomainDefaults();
+      shProxy->UpdateVTKObjects();
+    }
     // save the file
     QDateTime dateTime = QDateTime::currentDateTime();
     QString dateTimeString = dateTime.toString("-yyyyMMdd-hhmmss");
@@ -131,7 +179,7 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
     vtkSmartPointer<vtkPVXMLElement> stateXMLRoot;
     if (embedStateProp && vtkSMPropertyHelper(embedStateProp).GetAsInt() == 1)
     {
-      Q_EMIT pqApplicationCore::instance()->aboutToWriteState(screenshotFile);
+      Q_EMIT pqApplicationCore::instance() -> aboutToWriteState(screenshotFile);
       vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
       stateXMLRoot = vtkSmartPointer<vtkPVXMLElement>::Take(pxm->SaveXMLState());
     }
@@ -159,16 +207,17 @@ void pqSaveStateAndScreenshotReaction::onSettings()
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
-  if (fileDialog.exec() == QDialog::Accepted)
+  if (fileDialog.exec() != QDialog::Accepted)
   {
-    QString selectedFile = fileDialog.getSelectedFiles()[0];
-    this->Location = fileDialog.getSelectedLocation();
-    QFileInfo info(selectedFile);
-    this->Directory = info.dir().absolutePath();
-    this->Name = info.baseName();
-    QRegularExpression re("-\\d+-\\d+");
-    this->Name.remove(re);
+    return;
   }
+  QString selectedFile = fileDialog.getSelectedFiles()[0];
+  this->Location = fileDialog.getSelectedLocation();
+  QFileInfo info(selectedFile);
+  this->Directory = info.dir().absolutePath();
+  this->Name = info.completeBaseName();
+  QRegularExpression re("-\\d{8}-\\d{6}$");
+  this->Name.remove(re);
 
   // Configure Screenshot options
   pqView* view = pqActiveObjects::instance().activeView();
@@ -249,6 +298,7 @@ void pqSaveStateAndScreenshotReaction::onSettings()
   if (dialog.exec() == QDialog::Accepted)
   {
     this->Proxy = proxy;
+    this->ResolutionFromTarget = false;
   }
 
   if (layout)
