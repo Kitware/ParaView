@@ -88,6 +88,29 @@
         <Documentation>Select the field arrays to read.</Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="RowArrayInfo"
+                            command="GetRowDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty name="RowArrayStatus"
+                            command="GetRowDataArraySelection"
+                            information_property="RowArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="RowArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <ArraySelectionWidget icon_type="field"/>
+        </Hints>
+        <Documentation>Select the columns to read.</Documentation>
+      </StringVectorProperty>
+
       <IntVectorProperty command="SetMaximumLevelsToReadByDefaultForAMR"
                          name="MaximumLevelsToReadByDefaultForAMR"
                          number_of_elements="1"
@@ -156,6 +179,8 @@
             <Property name="PointArrayStatus" />
             <Property name="FieldArrayInfo" />
             <Property name="FieldArrayStatus" />
+            <Property name="RowArrayInfo" />
+            <Property name="RowArrayStatus" />
           </PropertyGroup>
           <Property name="MaximumLevelsToReadByDefaultForAMR" />
           <Property name="PieceDistribution" />

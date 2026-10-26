@@ -478,6 +478,7 @@
   <Proxy group="filters" name="ProbeCustomLines" />
   <Proxy group="filters" name="ProbeLine" icon=":/pqWidgets/Icons/pqPlotOverLine.svg" />
   <Proxy group="filters" name="ProbePoint" icon=":/pqWidgets/Icons/pqProbeLocation.svg" />
+  <Proxy group="filters" name="ProbeTable" />
   <Proxy group="filters" name="ProcessIds" />
   <Proxy group="filters" name="ProgrammableAnnotation" icon=":/pqWidgets/Icons/pqProgrammableAnnotation.svg" />
   <Proxy group="filters" name="ProgrammableFilter" icon=":/pqWidgets/Icons/pqProgrammableFilter.svg" />
@@ -492,6 +493,7 @@
   <Proxy group="filters" name="RectilinearGridConnectivity" />
   <Proxy group="filters" name="RectilinearGridToPointSet" />
   <Proxy group="filters" name="RedistributeDataSet" />
+  <Proxy group="filters" name="ReductionFilter" />
   <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="RenameArrays" />
   <Proxy group="filters" name="ResampleToImage" icon=":/pqWidgets/Icons/pqResampleToImage.svg" />
