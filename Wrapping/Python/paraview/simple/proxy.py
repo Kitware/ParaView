@@ -215,14 +215,21 @@ def UpdatePipeline(time=None, proxy=None):
     :type time: float
     :param proxy: Source proxy to update. Optional, defaults to updating the
         active source.
-    :type proxy: Source proxy."""
-    if not proxy:
+    :type proxy: Source proxy.
+    """
+    if proxy is None:
         proxy = GetActiveSource()
-    if time:
-        proxy.UpdatePipeline(time)
-    else:
-        proxy.UpdatePipeline()
+    if time is None:
+        session = servermanager.ActiveConnection.Session
+        controller = servermanager.ParaViewPipelineController()
+        tk = controller.FindTimeKeeper(session)
+        view = GetActiveView()
+        # Get default time as when calling Show() (see vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay)
+        # So calling Show() just after UpdatePipeline() never triggers a second update
+        # See !23440
+        time = view.ViewTime if view else tk.Time
 
+    proxy.UpdatePipeline(time)
 
 # -----------------------------------------------------------------------------
 
