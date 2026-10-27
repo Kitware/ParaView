@@ -916,28 +916,28 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
 void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollection* nodes)
 {
   Node* node = nullptr;
-  auto range = vtk::Range(nodes);
-  auto nodeIt = range.begin();
   // do a first pass with straightforward nodes(2 branches)
-  while (nodeIt != range.end())
+  // vtkCollection is a std::vector: removing an item shifts the later ones down
+  int i = 0;
+  while (i < nodes->GetNumberOfItems())
   {
-    node = Node::SafeDownCast(*nodeIt);
+    node = Node::SafeDownCast(nodes->GetItemAsObject(i));
     if (node->GetSegments()->GetNumberOfItems() == 2)
     {
       Segment* segmentA = Segment::SafeDownCast(node->GetSegments()->GetItemAsObject(0));
       Segment* segmentB = Segment::SafeDownCast(node->GetSegments()->GetItemAsObject(1));
       vtkPlotEdges::MergeSegments(segments, nodes, node, segmentA, segmentB);
-      ++nodeIt;
-      nodes->RemoveItem(node);
+      nodes->RemoveItem(i);
     }
     else
     {
-      ++nodeIt;
+      ++i;
     }
   }
 
   // do a second pass with the other nodes
-  nodeIt = range.begin();
+  auto range = vtk::Range(nodes);
+  auto nodeIt = range.begin();
   while (nodeIt != range.end())
   {
     node = Node::SafeDownCast(*nodeIt);

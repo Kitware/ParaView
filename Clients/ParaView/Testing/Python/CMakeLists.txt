@@ -204,6 +204,14 @@ paraview_add_test_driven(
   TestLoadRemoteState.py
 )
 
+# Test that composite data information is gathered from all ranks of a parallel server.
+if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
+  paraview_add_test_driven(
+    NO_DATA NO_VALID NO_OUTPUT NO_RT
+    TestGatherCompositeDataInformation.py
+  )
+endif ()
+
 # Python Multi-servers test
 # => Only for shared build as we dynamically load plugins
 if(BUILD_SHARED_LIBS)
