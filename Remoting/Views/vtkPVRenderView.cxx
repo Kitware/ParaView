@@ -3740,13 +3740,7 @@ void vtkPVRenderView::SetEnableANARI(bool v)
       }
       else
       {
-#if defined(__APPLE__)
-        // Use "helide" on Apple platforms
         this->SetANARILibrary("helide");
-#else
-        // Use "visrtx" on other platforms
-        this->SetANARILibrary("visrtx");
-#endif
       }
     }
   }
