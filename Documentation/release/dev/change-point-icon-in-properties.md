@@ -1,3 +1,3 @@
-## Change point data icon in Properties Panel
+## Use one point data icon in user interface elements
 
-Now all point data icon are unified in all panels (Properties, Information, Find Data,...)
+Prior to this change, most icons for point data showed one point but some showed four points. Now all point data icons in all user interface components show one point.
