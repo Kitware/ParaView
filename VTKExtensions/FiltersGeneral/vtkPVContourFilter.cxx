@@ -155,6 +155,7 @@ int vtkPVContourFilter::ContourUsingSuperclass(
   instance->SetGenerateTriangles(this->GetGenerateTriangles());
   instance->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
   instance->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+  instance->SetFastMode(this->GetFastMode());
 
   vtkNew<vtkEventForwarderCommand> progressForwarder;
   progressForwarder->SetTarget(this);
