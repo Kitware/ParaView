@@ -293,7 +293,7 @@ int vtkPVClipDataSet::RequestData(
   }
 
   // when clip function is nullptr clip is based on scalars: static mesh cannot be ensured.
-  if (!this->GetClipFunction())
+  if (!this->GetClipFunction() || !this->GetUseMeshCache())
   {
     this->MeshCache->InvalidateCache();
   }

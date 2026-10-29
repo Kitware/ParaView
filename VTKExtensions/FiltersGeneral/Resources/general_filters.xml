@@ -2591,6 +2591,20 @@ Every Nth Point.
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseCache"
+                         default_values="1"
+                         name="UseCache"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enable a cache optimization for Static Meshes. When the mesh does not change over time, avoid the mesh operation:
+          reuse previous output and only updates the data arrays.
+          The first cache hit leads to an internal initialization that may slow down the execution.
+          Speedup occurs after a few hits.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
         <WarnOnCreate>
