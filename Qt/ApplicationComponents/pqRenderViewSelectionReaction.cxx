@@ -102,8 +102,6 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
     case SELECT_SURFACE_CELLDATA_INTERACTIVELY:
     case SELECT_SURFACE_CELLS_INTERACTIVELY:
     case SELECT_SURFACE_POINTS_INTERACTIVELY:
-    case SELECT_SURFACE_POINTS_TOOLTIP:
-    case SELECT_SURFACE_CELLS_TOOLTIP:
       QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::dataUpdated, this,
         &pqRenderViewSelectionReaction::clearSelectionCache);
       break;
@@ -358,7 +356,9 @@ void pqRenderViewSelectionReaction::beginSelection()
         "Interactive Selection Information",
         "You are entering interactive selection mode to highlight cells (or points). "
         "Simply move the mouse point over "
-        "the dataset to interactively highlight elements. "
+        "the dataset to interactively highlight elements and display a tooltip with cells (or "
+        "points) "
+        "information. "
         "Use the 'Selection Display Inspector' to choose the array to label with.\n\n"
         "To add the currently "
         "highlighted element to the active selection, simply click on that element.\n\n"
@@ -367,36 +367,6 @@ void pqRenderViewSelectionReaction::beginSelection()
         "Use the 'Esc' key or the same toolbar button to exit this mode.",
         QMessageBox::Ok | QMessageBox::Save);
       this->View->setCursor(Qt::CrossCursor);
-      vtkSMPropertyHelper(rmp, "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_SELECTION);
-      break;
-
-    case SELECT_SURFACE_POINTS_TOOLTIP:
-      pqCoreUtilities::promptUser("pqTooltipSelection", QMessageBox::Information,
-        "Tooltip Selection Information",
-        "You are entering tooltip selection mode to display points information. "
-        "Simply move the mouse point over the dataset to interactively highlight "
-        "points and display a tooltip with points information.\n\n"
-        "Use the 'Esc' key or the same toolbar button to exit this mode.",
-        QMessageBox::Ok | QMessageBox::Save);
-      // switch the interaction mode to selection mode even though we're no making
-      // selections. This ensures that the render view realizes it's being used
-      // for selection and will not release cached selection render buffers as the
-      // selection interaction progresses (BUG #0015882).
-      vtkSMPropertyHelper(rmp, "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_SELECTION);
-      break;
-
-    case SELECT_SURFACE_CELLS_TOOLTIP:
-      pqCoreUtilities::promptUser("pqTooltipSelection", QMessageBox::Information,
-        "Tooltip Selection Information",
-        "You are entering tooltip selection mode to display cell information. "
-        "Simply move the mouse point over the dataset to interactively highlight "
-        "points and display a tooltip with cell information.\n\n"
-        "Use the 'Esc' key or the same toolbar button to exit this mode.",
-        QMessageBox::Ok | QMessageBox::Save);
-      // switch the interaction mode to selection mode even though we're no making
-      // selections. This ensures that the render view realizes it's being used
-      // for selection and will not release cached selection render buffers as the
-      // selection interaction progresses (BUG #0015882).
       vtkSMPropertyHelper(rmp, "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_SELECTION);
       break;
 
@@ -469,17 +439,6 @@ void pqRenderViewSelectionReaction::beginSelection()
       this->ObserverIds[4] = this->ObservedObject->AddObserver(vtkCommand::RightButtonPressEvent,
         this, &pqRenderViewSelectionReaction::onRightButtonPressed);
       this->ObserverIds[5] = this->ObservedObject->AddObserver(vtkCommand::RightButtonReleaseEvent,
-        this, &pqRenderViewSelectionReaction::onRightButtonRelease);
-      break;
-
-    case SELECT_SURFACE_POINTS_TOOLTIP:
-    case SELECT_SURFACE_CELLS_TOOLTIP:
-      this->ObservedObject = rmp->GetInteractor();
-      this->ObserverIds[0] = this->ObservedObject->AddObserver(
-        vtkCommand::MouseMoveEvent, this, &pqRenderViewSelectionReaction::onMouseMove);
-      this->ObserverIds[1] = this->ObservedObject->AddObserver(vtkCommand::RightButtonPressEvent,
-        this, &pqRenderViewSelectionReaction::onRightButtonPressed);
-      this->ObserverIds[2] = this->ObservedObject->AddObserver(vtkCommand::RightButtonReleaseEvent,
         this, &pqRenderViewSelectionReaction::onRightButtonRelease);
       break;
 
@@ -615,18 +574,13 @@ void pqRenderViewSelectionReaction::onMouseMove()
 
   switch (this->Mode)
   {
-    case SELECT_SURFACE_POINTS_TOOLTIP:
-    case SELECT_SURFACE_CELLS_TOOLTIP:
-      this->MouseMovingTimer.start(TOOLTIP_WAITING_TIME);
-      this->MouseMoving = true;
-      // fast preselection is not working with the tooltip yet
-      this->preSelection();
-      break;
-
-    case SELECT_SURFACE_POINTDATA_INTERACTIVELY:
-    case SELECT_SURFACE_CELLDATA_INTERACTIVELY:
     case SELECT_SURFACE_CELLS_INTERACTIVELY:
     case SELECT_SURFACE_POINTS_INTERACTIVELY:
+      this->MouseMovingTimer.start(TOOLTIP_WAITING_TIME);
+      this->MouseMoving = true;
+      [[fallthrough]];
+    case SELECT_SURFACE_POINTDATA_INTERACTIVELY:
+    case SELECT_SURFACE_CELLDATA_INTERACTIVELY:
       if (vtkPVRenderViewSettings::GetInstance()->GetEnableFastPreselection())
       {
         this->fastPreSelection();
@@ -666,13 +620,11 @@ void pqRenderViewSelectionReaction::preSelection()
   {
     case SELECT_SURFACE_POINTDATA_INTERACTIVELY:
     case SELECT_SURFACE_CELLDATA_INTERACTIVELY:
-    case SELECT_SURFACE_CELLS_INTERACTIVELY:
-    case SELECT_SURFACE_POINTS_INTERACTIVELY:
       pipeline = vtkSMInteractiveSelectionPipeline::GetInstance();
       break;
 
-    case SELECT_SURFACE_POINTS_TOOLTIP:
-    case SELECT_SURFACE_CELLS_TOOLTIP:
+    case SELECT_SURFACE_CELLS_INTERACTIVELY:
+    case SELECT_SURFACE_POINTS_INTERACTIVELY:
       pipeline = vtkSMTooltipSelectionPipeline::GetInstance();
       break;
 
@@ -739,14 +691,6 @@ void pqRenderViewSelectionReaction::preSelection()
       status = rmp->SelectSurfacePoints(region, selectedRepresentations, selectionSources);
       break;
 
-    case SELECT_SURFACE_POINTS_TOOLTIP:
-      status = rmp->SelectSurfacePoints(region, selectedRepresentations, selectionSources);
-      break;
-
-    case SELECT_SURFACE_CELLS_TOOLTIP:
-      status = rmp->SelectSurfaceCells(region, selectedRepresentations, selectionSources);
-      break;
-
     default:
       qCritical("Invalid call to pqRenderViewSelectionReaction::preSelection");
       return;
@@ -757,6 +701,7 @@ void pqRenderViewSelectionReaction::preSelection()
     BEGIN_UNDO_EXCLUDE();
     pipeline->Show(vtkSMSourceProxy::SafeDownCast(selectedRepresentations->GetItemAsObject(0)),
       vtkSMSourceProxy::SafeDownCast(selectionSources->GetItemAsObject(0)), rmp);
+    this->LastPreSelectionIsFast = false;
     END_UNDO_EXCLUDE();
   }
   else
@@ -777,6 +722,31 @@ void pqRenderViewSelectionReaction::fastPreSelection()
 
   vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
   assert(rmp != nullptr);
+
+  // Tooltip cannot be used with fast preselection yet
+  // so sometimes we use preSelection even if we enabled fastPreSelection
+  if (!this->LastPreSelectionIsFast)
+  {
+    vtkSMPreselectionPipeline* pipeline;
+    switch (this->Mode)
+    {
+      case SELECT_SURFACE_POINTDATA_INTERACTIVELY:
+      case SELECT_SURFACE_CELLDATA_INTERACTIVELY:
+        pipeline = vtkSMInteractiveSelectionPipeline::GetInstance();
+        break;
+
+      case SELECT_SURFACE_CELLS_INTERACTIVELY:
+      case SELECT_SURFACE_POINTS_INTERACTIVELY:
+        pipeline = vtkSMTooltipSelectionPipeline::GetInstance();
+        break;
+
+      default:
+        qCritical("Invalid call to pqRenderViewSelectionReaction::fastPreSelection");
+        return;
+    }
+    pipeline->Hide(rmp);
+  }
+  this->LastPreSelectionIsFast = true;
 
   int x = rmp->GetInteractor()->GetEventPosition()[0];
   int y = rmp->GetInteractor()->GetEventPosition()[1];
@@ -876,6 +846,11 @@ void pqRenderViewSelectionReaction::fastPreSelection()
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::onMouseStop()
 {
+  // fastPreSelection can't display Tooltip yet, so a preSelection is needed
+  if (this->LastPreSelectionIsFast)
+  {
+    this->preSelection();
+  }
   this->MouseMoving = false;
   this->UpdateTooltip();
 }
@@ -892,7 +867,8 @@ void pqRenderViewSelectionReaction::clearSelectionCache()
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::UpdateTooltip()
 {
-  if (this->Mode != SELECT_SURFACE_POINTS_TOOLTIP && this->Mode != SELECT_SURFACE_CELLS_TOOLTIP)
+  if (this->Mode != SELECT_SURFACE_POINTS_INTERACTIVELY &&
+    this->Mode != SELECT_SURFACE_CELLS_INTERACTIVELY)
   {
     return;
   }
@@ -900,7 +876,7 @@ void pqRenderViewSelectionReaction::UpdateTooltip()
   vtkSMTooltipSelectionPipeline* pipeline = vtkSMTooltipSelectionPipeline::GetInstance();
 
   int association = vtkDataObject::FIELD_ASSOCIATION_POINTS;
-  if (this->Mode == SELECT_SURFACE_CELLS_TOOLTIP)
+  if (this->Mode == SELECT_SURFACE_CELLS_INTERACTIVELY)
   {
     association = vtkDataObject::FIELD_ASSOCIATION_CELLS;
   }

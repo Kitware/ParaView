@@ -197,6 +197,7 @@ private:
   vtkSMRepresentationProxy* CurrentRepresentation = nullptr;
   QShortcut* CopyToolTipShortcut = nullptr;
   QString PlainTooltipText;
+  bool LastPreSelectionIsFast = false;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;
 };
