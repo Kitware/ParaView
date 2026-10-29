@@ -6,6 +6,7 @@
 
 #include "vtkAMRContourFilter.h"
 #include "vtkArrayDispatch.h"
+#include "vtkCallbackCommand.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayRange.h"
 #include "vtkDataObject.h"
@@ -13,7 +14,6 @@
 #include "vtkEventForwarderCommand.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkInformation.h"
-#include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
 #include "vtkLogger.h"
 #include "vtkMergeBlocks.h"
@@ -26,10 +26,32 @@
 #include <cmath>
 #include <set>
 
+namespace
+{
+
+//------------------------------------------------------------------------------
+void OnAbortCheckCallback(vtkObject* caller, unsigned long vtkNotUsed(eventId), void* clientData,
+  void* vtkNotUsed(callData))
+{
+  vtkAlgorithm* internalAlgorithm = vtkAlgorithm::SafeDownCast(caller);
+  vtkPVContourFilter* self = static_cast<vtkPVContourFilter*>(clientData);
+
+  if (self->CheckAbortAndInvoke())
+  {
+    internalAlgorithm->AbortExecuteOn();
+  }
+}
+
+}
+
 vtkStandardNewMacro(vtkPVContourFilter);
 
 //-----------------------------------------------------------------------------
-vtkPVContourFilter::vtkPVContourFilter() = default;
+vtkPVContourFilter::vtkPVContourFilter()
+{
+  this->AbortCheckEventCallback->SetCallback(::OnAbortCheckCallback);
+  this->AbortCheckEventCallback->SetClientData(this);
+}
 
 //-----------------------------------------------------------------------------
 vtkPVContourFilter::~vtkPVContourFilter() = default;
@@ -160,6 +182,7 @@ int vtkPVContourFilter::ContourUsingSuperclass(
   vtkNew<vtkEventForwarderCommand> progressForwarder;
   progressForwarder->SetTarget(this);
   instance->AddObserver(vtkCommand::ProgressEvent, progressForwarder);
+  instance->AddObserver(vtkCommand::AbortCheckEvent, this->AbortCheckEventCallback);
 
   vtkDataSet* inputDS = vtkDataSet::GetData(inputVector[0], 0);
   vtkPolyData* outputPD = vtkPolyData::GetData(outputVector, 0);
@@ -169,6 +192,7 @@ int vtkPVContourFilter::ContourUsingSuperclass(
   auto polydata = instance->GetOutput();
   this->CleanOutputScalars(polydata->GetPointData()->GetScalars());
   outputPD->ShallowCopy(polydata);
+
   return 1;
 }
 
