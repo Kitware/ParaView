@@ -108,6 +108,11 @@ void pqTreeView::wheelEvent(QWheelEvent* evt)
   {
     this->Superclass::wheelEvent(evt);
   }
+  else
+  {
+    // Explicitly ignore the event so that it propagates to the parent widget.
+    evt->ignore();
+  }
 }
 
 //-----------------------------------------------------------------------------
