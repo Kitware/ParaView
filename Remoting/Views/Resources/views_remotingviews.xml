@@ -1501,14 +1501,13 @@
         </Hints>
       </IntVectorProperty>
       <StringVectorProperty command="SetANARILibrary"
-                            default_values="visrtx"
+                            default_values="helide"
                             label="ANARI Library"
                             name="ANARILibrary"
                             number_of_elements="1">
         <StringListDomain name="list">
           <String value="environment" />
           <String value="helide" />
-          <String value="visrtx" />
         </StringListDomain>
         <Documentation>
           Set the ANARI backend library. Choose "environment" to use

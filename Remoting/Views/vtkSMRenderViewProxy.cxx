@@ -855,13 +855,6 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
       // Honor the environment variable, and say so in the panel.
       propLibrary->SetElement(0, "environment");
     }
-#if defined(__APPLE__)
-    else
-    {
-      // VisRTX requires CUDA, so fall back to the reference device.
-      propLibrary->SetElement(0, "helide");
-    }
-#endif
   }
 
   if (this->GetIsInCAVE())

@@ -3,7 +3,6 @@
 You can now pick which ANARI device library renders a **Render View**. With advanced properties shown, the **Rendering Backend** group gains an **ANARI Library** combo-box as soon as **Enable ANARI** is checked:
 
 * `helide` - the reference CPU device that ships with the ANARI SDK,
-* `visrtx` - NVIDIA's OptiX ray tracing device,
 * `environment` - the library named by the `ANARI_LIBRARY` environment variable.
 
 Choosing `environment` also displays that variable's current value, or `(not set)`, as a read-only **ANARI_LIBRARY** field, so the panel always names the library actually in use. The combo-box starts on `environment` when `ANARI_LIBRARY` is set in your environment, and the library can be changed at any time while ANARI rendering is on.
