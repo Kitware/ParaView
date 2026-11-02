@@ -36,6 +36,7 @@
 #include "vtkOSPRayActorNode.h"
 #endif
 
+#include <algorithm>
 #include <unordered_map>
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
@@ -247,12 +248,92 @@ void vtkHyperTreeGridRepresentation::UpdateBlockVisibility(vtkDataObjectTree* dt
 
   // compute the composite ids for the hierarchy selectors
   this->Mapper->RemoveBlockVisibilities();
+  this->Mapper->RemoveBlockColors();
+  this->Mapper->RemoveBlockOpacities();
   this->Mapper->SetBlockVisibility(hierarchy->GetRootNode(), false); // Hide root first
   std::vector<unsigned int> cids =
     vtkDataAssemblyUtilities::GetSelectedCompositeIds(this->BlockSelectors, hierarchy);
   for (const auto& id : cids)
   {
     this->Mapper->SetBlockVisibility(id, true);
+  }
+  for (const auto& [index, color] : this->BlockColors)
+  {
+    const auto ids = vtkDataAssemblyUtilities::GetSelectedCompositeIds({ index }, hierarchy);
+    for (const auto id : ids)
+    {
+      this->Mapper->SetBlockColor(id, color[0], color[1], color[2]);
+    }
+  }
+  for (const auto& item : this->BlockOpacities)
+  {
+    const auto ids = vtkDataAssemblyUtilities::GetSelectedCompositeIds({ item.first }, hierarchy);
+    for (const auto id : ids)
+    {
+      this->Mapper->SetBlockOpacity(id, item.second);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetBlockColor(
+  const char* selector, double r, double g, double b)
+{
+  if (selector != nullptr)
+  {
+    auto iter = std::find_if(this->BlockColors.begin(), this->BlockColors.end(),
+      [selector](const std::pair<std::string, vtkVector3d>& apair)
+      { return apair.first == selector; });
+    if (iter == this->BlockColors.end())
+    {
+      this->BlockColors.emplace_back(selector, vtkVector3d(r, g, b));
+      this->Modified();
+    }
+    else if (iter->second != vtkVector3d(r, g, b))
+    {
+      iter->second = vtkVector3d(r, g, b);
+      this->Modified();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::RemoveAllBlockColors()
+{
+  if (!this->BlockColors.empty())
+  {
+    this->BlockColors.clear();
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetBlockOpacity(const char* selector, double opacity)
+{
+  if (selector != nullptr)
+  {
+    auto iter = std::find_if(this->BlockOpacities.begin(), this->BlockOpacities.end(),
+      [selector](const std::pair<std::string, double>& apair) { return apair.first == selector; });
+    if (iter == this->BlockOpacities.end())
+    {
+      this->BlockOpacities.emplace_back(selector, opacity);
+      this->Modified();
+    }
+    else if (iter->second != opacity)
+    {
+      iter->second = opacity;
+      this->Modified();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::RemoveAllBlockOpacities()
+{
+  if (!this->BlockOpacities.empty())
+  {
+    this->BlockOpacities.clear();
+    this->Modified();
   }
 }
 
@@ -344,6 +425,14 @@ bool vtkHyperTreeGridRepresentation::NeedsOrderedCompositing()
   if (this->Actor->GetForceTranslucent())
   {
     return true;
+  }
+
+  for (const auto& item : this->BlockOpacities)
+  {
+    if (item.second > 0.0 && item.second < 1.0)
+    {
+      return true;
+    }
   }
 
   if (auto prop = this->Actor->GetProperty())
