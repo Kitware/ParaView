@@ -1646,6 +1646,7 @@ list(APPEND TESTS_WITH_BASELINES
   H5PartReader.xml
   HideAll.xml
   HorizontalColorLegendTitle.xml
+  HyperTreeGridSurfaceBlocks.xml
   IgnoreLogAxisWarning.xml
   ImageDataToUniformGrid.xml
   ImageVolumeRendering.xml
@@ -1962,6 +1963,10 @@ if (paraview_use_materialeditor)
 endif ()
 
 # Probe picking does not work in render server mode
+
+# HTG distribution between servers is not implemented
+# See https://gitlab.kitware.com/paraview/paraview/-/work_items/23448
+set(HyperTreeGridSurfaceBlocks_DISABLE_CRS TRUE)
 
 # Selection is not available in CRS mode
 set(BlockContextMenu_DISABLE_CRS TRUE)
