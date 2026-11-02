@@ -34,7 +34,7 @@ public:
   {
     this->insert("GenerateObjectIdCellArray", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
     this->insert("GenerateGlobalElementIdArray", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
-    this->insert("GenerateGlobalNodeIdArray", QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
+    this->insert("GenerateGlobalNodeIdArray", QIcon(":/pqWidgets/Icons/pqPointData.svg"));
 
     this->insert("ElementVariables", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
     this->insert("FaceVariables", QIcon(":/pqWidgets/Icons/pqFaceCenterData.svg"));
@@ -46,7 +46,7 @@ public:
     this->insert("EdgeSetResultArrayStatus", QIcon(":/pqWidgets/Icons/pqEdgeSetData.svg"));
     this->insert("ElementSetResultArrayStatus", QIcon(":/pqWidgets/Icons/pqElemSetData.svg"));
 
-    this->insert("PointVariables", QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
+    this->insert("PointVariables", QIcon(":/pqWidgets/Icons/pqPointData.svg"));
     this->insert("GlobalVariables", QIcon(":/pqWidgets/Icons/pqGlobalData.svg"));
 
     this->insert("SideSetArrayStatus", QIcon(":/pqWidgets/Icons/pqSideSetData.svg"));
@@ -60,7 +60,7 @@ public:
     this->insert("FaceMapArrayStatus", QIcon(":/pqWidgets/Icons/pqFaceMapData.svg"));
     this->insert("ElementMapArrayStatus", QIcon(":/pqWidgets/Icons/pqElemMapData.svg"));
 
-    this->insert("PointArrayStatus", QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
+    this->insert("PointArrayStatus", QIcon(":/pqWidgets/Icons/pqPointData.svg"));
     this->insert("CellArrayStatus", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
     this->insert("ColumnArrayStatus", QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"));
     this->insert("SetStatus", QIcon(":/pqWidgets/Icons/pqSideSetData.svg"));
@@ -469,7 +469,7 @@ void pqArraySelectionWidget::setIconType(const QString& pname, const QString& ic
   auto model = this->realModel();
   if (icon_type == "point")
   {
-    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqPointData.svg"));
   }
   else if (icon_type == "cell")
   {
@@ -481,7 +481,7 @@ void pqArraySelectionWidget::setIconType(const QString& pname, const QString& ic
   }
   else if (icon_type == "vertex")
   {
-    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqPointData.svg"));
   }
   else if (icon_type == "edge")
   {

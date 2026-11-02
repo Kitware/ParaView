@@ -44,7 +44,7 @@ public:
     {
       if (this->IconType == "point")
       {
-        return QIcon(":/pqWidgets/Icons/pqNodalData.svg");
+        return QIcon(":/pqWidgets/Icons/pqPointData.svg");
       }
       else if (this->IconType == "cell")
       {
@@ -56,7 +56,7 @@ public:
       }
       else if (this->IconType == "vertex")
       {
-        return QIcon(":/pqWidgets/Icons/pqNodalData.svg");
+        return QIcon(":/pqWidgets/Icons/pqPointData.svg");
       }
       else if (this->IconType == "edge")
       {
