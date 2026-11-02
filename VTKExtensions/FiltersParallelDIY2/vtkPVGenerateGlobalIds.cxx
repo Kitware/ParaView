@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVGenerateGlobalIds.h"
 
+#include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataSetRange.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkGenerateGlobalIds.h"
@@ -28,17 +30,36 @@ int vtkPVGenerateGlobalIds::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  vtkDataSet* inputDS = vtkDataSet::GetData(inInfo);
-  vtkDataSet* outputDS = vtkDataSet::GetData(outInfo);
+  vtkDataObject* inputDO = vtkDataObject::GetData(inInfo);
+  vtkDataObject* outputDO = vtkDataObject::GetData(outInfo);
 
-  if (inputDS && outputDS)
+  if (inputDO && outputDO &&
+    (vtkDataSet::SafeDownCast(inputDO) || vtkCompositeDataSet::SafeDownCast(inputDO)))
   {
+    // The whole input is given at once, so that the ids are numbered across all the data sets of a
+    // composite input, and not partition by partition.
     vtkNew<vtkGenerateGlobalIds> generateGlobalIds;
-    generateGlobalIds->SetInputData(inputDS);
+    generateGlobalIds->SetInputData(inputDO);
     generateGlobalIds->SetTolerance(this->GetTolerance());
     generateGlobalIds->Update();
 
-    outputDS->ShallowCopy(generateGlobalIds->GetOutput(0));
+    outputDO->ShallowCopy(generateGlobalIds->GetOutput(0));
+
+    // vtkGenerateGlobalIds only handles the vtkDataSet of a composite input.
+    if (auto outputCD = vtkCompositeDataSet::SafeDownCast(outputDO))
+    {
+      for (vtkDataObject* leaf : vtk::Range(outputCD))
+      {
+        if (auto leafHTG = vtkHyperTreeGrid::SafeDownCast(leaf))
+        {
+          vtkNew<vtkHyperTreeGridGenerateGlobalIds> htgGenerateGlobalIds;
+          htgGenerateGlobalIds->SetInputData(leafHTG);
+          htgGenerateGlobalIds->Update();
+
+          leafHTG->ShallowCopy(htgGenerateGlobalIds->GetOutput(0));
+        }
+      }
+    }
     return 1;
   }
 
@@ -64,5 +85,6 @@ int vtkPVGenerateGlobalIds::FillInputPortInformation(int vtkNotUsed(port), vtkIn
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
