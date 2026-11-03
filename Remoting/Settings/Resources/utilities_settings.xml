@@ -674,6 +674,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="EnableThreadedUpdate"
+        command="SetEnableThreadedUpdate"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable threaded update, making ParaView UI responsive when applying filters (experimental, UI mostly disabled for now).
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="SelectOnClickInMultiBlockInspector"
         command="SetSelectOnClickMultiBlockInspector"
         number_of_elements="1"

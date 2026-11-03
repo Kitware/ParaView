@@ -363,6 +363,16 @@ public:
 
   ///@{
   /**
+   * Set/Get threaded update setting.
+   * Default is off.
+   */
+  vtkSetMacro(EnableThreadedUpdate, bool);
+  vtkGetMacro(EnableThreadedUpdate, bool);
+  vtkBooleanMacro(EnableThreadedUpdate, bool);
+  ///@}
+
+  ///@{
+  /**
    * ActiveSelection is hooked up in the MultiBlock Inspector such that a click on a/multiple
    * block(s) selects it/them. Default is true.
    */
@@ -423,6 +433,7 @@ private:
   bool GUIOverrideFont = false;
   bool ColorByBlockColorsOnApply = true;
   bool EnableStreaming = false;
+  bool EnableThreadedUpdate = false;
   bool SelectOnClickMultiBlockInspector = true;
   bool AutoConvertProperties = false;
   bool LoadAllVariables = false;
