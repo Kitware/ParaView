@@ -71,6 +71,12 @@ public:
   virtual void Update();
 
   /**
+   * Set ThreadedUpdate to provided value, then call Update, then set ThreadedUpdate to previous
+   * value
+   */
+  void ThreadedUpdate(bool threaded);
+
+  /**
    * Returns true if the view can display the data produced by the producer's
    * port. Internally calls GetRepresentationType() and returns true only if the
    * type is valid a representation proxy of that type can be created.

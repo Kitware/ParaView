@@ -2062,6 +2062,7 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "XMLLabel: " << (this->XMLLabel ? this->XMLLabel : "(null)") << endl;
   os << indent << "Documentation: " << this->Documentation << endl;
   os << indent << "ObjectsCreated: " << this->ObjectsCreated << endl;
+  os << indent << "ThreadedUpdate: " << this->ThreadedUpdate << endl;
   os << indent << "Hints: ";
   if (this->Hints)
   {
@@ -2418,8 +2419,8 @@ void vtkSMProxy::InitializeAndCopyFromProxy(vtkSMProxy* fromP)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::ExecuteStream(
-  const vtkClientServerStream& stream, bool ignore_errors /*=false*/, vtkTypeUInt32 location /*=0*/)
+void vtkSMProxy::ExecuteStream(const vtkClientServerStream& stream, bool ignore_errors /*=false*/,
+  vtkTypeUInt32 location /*=0*/, bool threadedStream /*=false*/)
 {
   if (location == 0)
   {
@@ -2432,7 +2433,7 @@ void vtkSMProxy::ExecuteStream(
 
   if (this->GetSession())
   {
-    this->GetSession()->ExecuteStream(location, stream, ignore_errors);
+    this->GetSession()->ExecuteStream(location, stream, ignore_errors, false, threadedStream);
   }
   // if no session, nothing to do.
 }

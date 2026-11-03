@@ -64,8 +64,8 @@ public:
    * last result after the command stream is evaluated. Once can set
    * \c ignore_errors to true, to ignore any interpreting errors.
    */
-  virtual void ExecuteStream(
-    vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors = false);
+  virtual void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
+    bool ignore_errors = false, bool threadedStream = false);
 
   /**
    * Returns the response of the ExecuteStream() call from the location. Note if
@@ -190,7 +190,8 @@ protected:
    * This will execute localy the given vtkClientServerStream either by
    * calling method on the vtkSIObject or its internal vtkObject.
    */
-  virtual void ExecuteStreamInternal(const vtkClientServerStream& stream, bool ignore_errors);
+  virtual void ExecuteStreamInternal(
+    const vtkClientServerStream& stream, bool ignore_errors, bool threaded = false);
 
   /**
    * This will gather information on the local vtkObjects
@@ -234,6 +235,12 @@ protected:
 private:
   vtkPVSessionCore(const vtkPVSessionCore&) = delete;
   void operator=(const vtkPVSessionCore&) = delete;
+
+  /**
+   * Called by the threaded version of process stream
+   * Invoke ThreadedStreamEndEvent when done
+   */
+  void ProcessStreamThreaded(const vtkClientServerStream& css);
 
   class vtkInternals;
   vtkInternals* Internals;

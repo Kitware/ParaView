@@ -144,6 +144,16 @@ public:
   vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
+  /**
+   * Enable/Disable threaded udpate.
+   * Used only in vtkSMOutputPort, vtkSMViewProxy and vtkSMSourceProxy
+   */
+  vtkSetMacro(ThreadedUpdate, bool);
+  vtkGetMacro(ThreadedUpdate, bool);
+  vtkBooleanMacro(ThreadedUpdate, bool);
+  ///@}
+
   // Description:
   // Set or override a key/value pair as annotation to that proxy.
   // If the value is nullptr, this method is equivalent to RemoveAnnotation(key)
@@ -625,8 +635,8 @@ protected:
   /**
    * Invoke that takes a vtkClientServerStream as the argument.
    */
-  virtual void ExecuteStream(
-    const vtkClientServerStream& msg, bool ignore_errors = false, vtkTypeUInt32 location = 0);
+  virtual void ExecuteStream(const vtkClientServerStream& msg, bool ignore_errors = false,
+    vtkTypeUInt32 location = 0, bool threadedStream = false);
 
   // Any method changing the annotations will trigger this method that will
   // update the local full state as well as sending the annotation state part
@@ -1038,6 +1048,7 @@ private:
 
   char* LogName;
   std::string DefaultLogName;
+  bool ThreadedUpdate = false;
 };
 
 /// This defines a stream manipulator for the vtkClientServerStream that can be used
