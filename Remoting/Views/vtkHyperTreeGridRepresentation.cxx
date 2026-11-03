@@ -103,14 +103,19 @@ int vtkHyperTreeGridRepresentation::ProcessViewRequest(
     // rendering nodes as and when needed.
     vtkPVView::SetPiece(inInfo, this, this->GetInput(0));
 
-    // We want to let vtkPVRenderView do redistribution of data as necessary,
-    // and use this representations data for determining a load balanced distribution
-    // if ordered is needed.
-    vtkPVRenderView::SetOrderedCompositingConfiguration(inInfo, this,
-      vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING);
-
+    // HTGs cannot be redistributed because they are not serializable using legacy readers,
+    // so we force remote rendering
+    vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
+    this->Mapper->GetBounds(this->VisibleDataBounds);
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->VisibleDataBounds);
+    vtkPVRenderView::SetOrderedCompositingConfiguration(
+      inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
     outInfo->Set(
       vtkPVRenderView::NEED_ORDERED_COMPOSITING(), this->NeedsOrderedCompositing() ? 1 : 0);
+  }
+  else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
+  {
+    vtkPVRenderView::SetRequiresDistributedRenderingLOD(inInfo, this, true);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
