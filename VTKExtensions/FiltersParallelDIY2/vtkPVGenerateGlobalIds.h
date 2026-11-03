@@ -9,7 +9,8 @@
  * the work to the the right VTK filter depending on the input data type. If the input is a
  * vtkDataSet instance, this filter also generates ghost-point information, flagging duplicate
  * points appropriately. vtkPVGenerateGlobalIds works across all blocks in the input datasets
- * and across all ranks.
+ * and across all ranks. If the input is a vtkCompositeDataSet, its vtkDataSet are numbered all
+ * together, and its vtkHyperTreeGrid are numbered one by one.
  *
  * @sa vtkGenerateGlobalIds vtkHyperTreeGridGenerateGlobalIds
  */
