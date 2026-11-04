@@ -142,6 +142,9 @@ void pqProgressManager::setEnableAbort(bool enable)
     QMainWindow* win = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
     QList<QWidget*> widgets = win->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
     this->EnabledWidgetsForAbort.clear();
+
+    // Disabling widgets makes the focused widget lose focus, remember it to restore it later
+    this->FocusWidgetForAbort = QApplication::focusWidget();
     for (QWidget* widget : widgets)
     {
       if (widget->isEnabled() && this->NonBlockableObjects.contains(widget) == false)
@@ -162,6 +165,16 @@ void pqProgressManager::setEnableAbort(bool enable)
       widget->setEnabled(true);
     }
     this->EnabledWidgetsForAbort.clear();
+
+    // Restore focus lost when disabling widgets, eg. the properties panel search box
+    // when using auto apply.
+    if (this->FocusWidgetForAbort && this->FocusWidgetForAbort->isEnabled() &&
+      this->FocusWidgetForAbort->isVisible() &&
+      QApplication::focusWidget() != this->FocusWidgetForAbort)
+    {
+      this->FocusWidgetForAbort->setFocus(Qt::OtherFocusReason);
+    }
+    this->FocusWidgetForAbort = nullptr;
   }
 
   Q_EMIT this->enableAbort(enable);

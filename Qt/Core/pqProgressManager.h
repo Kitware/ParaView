@@ -140,6 +140,7 @@ private:
   Q_DISABLE_COPY(pqProgressManager)
 
   QList<QWidget*> EnabledWidgetsForAbort;
+  QPointer<QWidget> FocusWidgetForAbort;
   bool AbortEnabled = false;
 };
 
