@@ -4,7 +4,6 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkDisplayConfiguration.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkProcessModule.h"
@@ -19,6 +18,13 @@
 #include <algorithm>
 #include <cassert>
 #include <string>
+
+#ifdef __APPLE__
+#include <fcntl.h>
+#include <filesystem>
+#include <sys/file.h>
+#include <unistd.h>
+#endif
 
 //============================================================================
 namespace
@@ -35,6 +41,44 @@ void DeleteProcessWindowSingleton()
     ::ProcessWindowSingletonPrepared = false;
   }
 }
+
+#ifdef __APPLE__
+// Holds an exclusive lock on a file shared by all processes of this user, so
+// that only one process at a time does the work inside the scope.
+class CrossProcessLock
+{
+public:
+  explicit CrossProcessLock(const char* name)
+  {
+    std::error_code error;
+    std::filesystem::path directory = std::filesystem::temp_directory_path(error);
+    if (error)
+    {
+      directory = "/tmp";
+    }
+    const std::string path = (directory / name).string();
+    this->FD = open(path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC, 0600);
+    if (this->FD >= 0 && flock(this->FD, LOCK_EX) != 0)
+    {
+      close(this->FD);
+      this->FD = -1;
+    }
+  }
+  ~CrossProcessLock()
+  {
+    if (this->FD >= 0)
+    {
+      flock(this->FD, LOCK_UN);
+      close(this->FD);
+    }
+  }
+  CrossProcessLock(const CrossProcessLock&) = delete;
+  CrossProcessLock& operator=(const CrossProcessLock&) = delete;
+
+private:
+  int FD = -1;
+};
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -87,34 +131,16 @@ void vtkPVProcessWindow::PrepareForRendering()
     //
     // On macOS, this Render() triggers glBlitFramebuffer -> Metal beginRenderPass ->
     // BackgroundObjectProgramKey shader compilation, which requires flock(LOCK_EX)
-    // on the shared Metal shader cache (libCoreFSCache.dylib). When multiple MPI
-    // ranks hit this simultaneously on the first call, the rank holding the lock
-    // deadlocks: Metal's XPC compiler needs the main thread run loop to deliver
-    // the result, but the main thread is blocked in flock().
-    //
-    // Fix: serialize the singleton Render() across MPI ranks so only one rank
-    // compiles the Metal shader at a time. This function has no other MPI calls
-    // so the barrier loop is safe. After each rank renders once, the shader is
-    // in its process-local Metal cache and parallel rendering proceeds normally.
-    // ProcessWindowSingletonPrepared ensures this runs exactly once per process.
+    // on the shared Metal shader cache (libCoreFSCache.dylib). When several processes
+    // hit this simultaneously on the first call, the one holding the lock deadlocks:
+    // Metal's XPC compiler needs the main thread run loop to deliver the result, but
+    // the main thread is blocked in flock(). Taking our own cross-process lock first
+    // lets only one process compile at a time. A file lock rather than an MPI barrier
+    // because not every rank renders here: a chart view renders on the root rank only.
+    {
 #ifdef __APPLE__
-    auto* controller = vtkMultiProcessController::GetGlobalController();
-    if (controller && controller->GetNumberOfProcesses() > 1)
-    {
-      int numProcs = controller->GetNumberOfProcesses();
-      int myRank = controller->GetLocalProcessId();
-      for (int r = 0; r < numProcs; r++)
-      {
-        if (myRank == r)
-        {
-          ::ProcessWindowSingleton->Render();
-        }
-        controller->Barrier();
-      }
-    }
-    else
+      CrossProcessLock lock("paraview-metal-shader-cache.lock");
 #endif
-    {
       ::ProcessWindowSingleton->Render();
     }
     ::ProcessWindowSingletonPrepared = true;

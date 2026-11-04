@@ -390,7 +390,8 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   // Two flock sites exist in the render path:
   //   Site #1 -- vtkPVProcessWindow::PrepareForRendering():
   //     glBlitFramebuffer -> beginRenderPass -> BackgroundObjectProgramKey.
-  //     Fixed there by serializing the singleton window Render() across ranks.
+  //     Fixed there with a cross-process file lock around the singleton
+  //     window Render(), since not every rank reaches it.
   //   Site #2 -- HERE, inside icetDrawFrame:
   //     Scene rendering shaders (surface, contour, volume, etc.) compiled on
   //     the first actual draw. Fixed by the sequential pre-warm below.

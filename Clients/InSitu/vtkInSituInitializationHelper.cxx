@@ -34,6 +34,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <exception>
 #include <map>
 #include <set>
 #include <string>
@@ -117,6 +118,43 @@ struct PropertyCopier
 
 namespace
 {
+// Sets a flag for the lifetime of the scope, and clears it however the scope is left.
+class FlagScope
+{
+public:
+  explicit FlagScope(bool& flag)
+    : Flag(flag)
+  {
+    this->Flag = true;
+  }
+  ~FlagScope() { this->Flag = false; }
+  FlagScope(const FlagScope&) = delete;
+  FlagScope& operator=(const FlagScope&) = delete;
+
+private:
+  bool& Flag;
+};
+
+// Runs one step of a pipeline, treating an exception as a failure of that step.
+template <typename Step>
+bool RunPipelineStep(vtkInSituPipeline* pipeline, const char* stepName, Step&& step)
+{
+  const char* name = pipeline->GetName() ? pipeline->GetName() : "(unnamed)";
+  try
+  {
+    return step();
+  }
+  catch (const std::exception& e)
+  {
+    vtkLogF(ERROR, "%s pipeline threw during %s: %s", name, stepName, e.what());
+  }
+  catch (...)
+  {
+    vtkLogF(ERROR, "%s pipeline threw during %s", name, stepName);
+  }
+  return false;
+}
+
 template <typename T>
 void SetPropertyValue(T* prop, vtkDataArray* array)
 {
@@ -514,7 +552,7 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
     return false;
   }
 
-  internals.InExecutePipelines = true;
+  FlagScope inExecutePipelines(internals.InExecutePipelines);
   internals.TimeStep = timestep;
   internals.Time = time;
 
@@ -539,7 +577,8 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
     internals.CurrentPipeline = item.Pipeline;
     if (!item.Initialized)
     {
-      item.InitializationFailed = !item.Pipeline->Initialize();
+      item.InitializationFailed =
+        !RunPipelineStep(item.Pipeline, "initialize", [&] { return item.Pipeline->Initialize(); });
       item.Initialized = true;
     }
 
@@ -554,7 +593,8 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
       // If `Initialize` failed, don't call `Execute` on the Pipeline.
       // If Execute fails even once, we no longer call Execute on this pipeline
       // in subsequent calls to `ExecutePipelines`.
-      item.ExecuteFailed = !item.Pipeline->Execute(timestep, time);
+      item.ExecuteFailed = !RunPipelineStep(
+        item.Pipeline, "execute", [&] { return item.Pipeline->Execute(timestep, time); });
       if (!item.ExecuteFailed)
       {
         internals.ExecutedPipelines.insert(item.Pipeline);
@@ -562,7 +602,6 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
     }
     internals.CurrentPipeline = nullptr;
   }
-  internals.InExecutePipelines = false;
 
   for (auto& item : internals.Pipelines)
   {
@@ -596,7 +635,7 @@ bool vtkInSituInitializationHelper::GetResultsFromPipelines(conduit_node* cataly
     return false;
   }
 
-  internals.InResultsPipelines = true;
+  FlagScope inResultsPipelines(internals.InResultsPipelines);
 
   // store a pointer to the catalyst_results parameters. This will be accessible from python.
   internals.catalyst_params = catalyst_params;
@@ -628,11 +667,10 @@ bool vtkInSituInitializationHelper::GetResultsFromPipelines(conduit_node* cataly
   {
     if (!item.InitializationFailed && !item.ExecuteFailed && !item.ResultsFailed)
     {
-      item.ResultsFailed = !item.Pipeline->Results();
+      item.ResultsFailed =
+        !RunPipelineStep(item.Pipeline, "results", [&] { return item.Pipeline->Results(); });
     }
   }
-
-  internals.InResultsPipelines = false;
 
   return true;
 #else
