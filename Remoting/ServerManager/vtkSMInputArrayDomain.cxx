@@ -21,7 +21,10 @@ vtkStandardNewMacro(vtkSMInputArrayDomain);
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = { "point", "cell", "field",
-  "any-except-field", "vertex", "edge", "row", "any", nullptr };
+  "any-except-field", "vertex", "edge", "row", "side", "any", nullptr };
+static_assert(std::size(vtkSMInputArrayDomainAttributeTypes) ==
+    vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES + 1,
+  "vtkSMInputArrayDomainAttributeTypes must have one name per AttributeTypes value");
 
 //---------------------------------------------------------------------------
 vtkSMInputArrayDomain::vtkSMInputArrayDomain()

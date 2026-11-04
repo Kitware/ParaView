@@ -20,9 +20,11 @@
  *
  * Supported XML attributes:
  * \li \c attribute_type : (optional) value can be 'point', 'cell', 'field',
- *                         'vertex', 'edge', 'row', 'none', 'any-except-field', 'any'.
+ *                         'vertex', 'edge', 'row', 'side', 'none', 'any-except-field', 'any'.
  *                         If not specified, 'any-except-field' is assumed. This
  *                         indicates the attribute type for acceptable arrays.
+ *                         Side arrays are only matched by 'side', not by 'any' or
+ *                         'any-except-field', since representations cannot color by them.
  * \li \c number_of_components : (optional) Indicates the number of components
  *                               required in arrays that are considered acceptable.
  *                               0 (default) indicates any number of components is acceptable.
@@ -128,6 +130,7 @@ public:
     VERTEX = vtkDataObject::VERTEX,
     EDGE = vtkDataObject::EDGE,
     ROW = vtkDataObject::ROW,
+    SIDE = vtkDataObject::SIDE,
     ANY = vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES,
     NUMBER_OF_ATTRIBUTE_TYPES = ANY + 1,
   };
