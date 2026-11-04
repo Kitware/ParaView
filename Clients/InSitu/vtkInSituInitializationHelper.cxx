@@ -75,6 +75,13 @@ public:
   std::vector<PipelineInfo> Pipelines;
   std::map<vtkSMProxy*, std::string> SteerableProxies;
   std::map<vtkSMProxy*, std::string> SteerableExtracts;
+  // Pipeline whose script created each steering extractor. Extractors created outside
+  // `ExecutePipelines` have no entry.
+  std::map<vtkSMProxy*, vtkInSituPipeline*> SteerableExtractOwners;
+  // Pipelines that executed successfully in the last `ExecutePipelines`.
+  std::set<vtkInSituPipeline*> ExecutedPipelines;
+  // Pipeline being initialized or executed, if any.
+  vtkInSituPipeline* CurrentPipeline = nullptr;
 
   bool InExecutePipelines = false;
   bool InResultsPipelines = false;
@@ -519,6 +526,7 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
     toExecute.insert(p);
   }
 
+  internals.ExecutedPipelines.clear();
   for (auto& item : internals.Pipelines)
   {
     if (item.Pipeline->GetName() && toExecute.find(item.Pipeline->GetName()) == toExecute.end())
@@ -526,6 +534,9 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
       continue;
     }
 
+    // Steering extractors are created while the script is initialized or executed; record
+    // which pipeline they belong to.
+    internals.CurrentPipeline = item.Pipeline;
     if (!item.Initialized)
     {
       item.InitializationFailed = !item.Pipeline->Initialize();
@@ -544,7 +555,12 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
       // If Execute fails even once, we no longer call Execute on this pipeline
       // in subsequent calls to `ExecutePipelines`.
       item.ExecuteFailed = !item.Pipeline->Execute(timestep, time);
+      if (!item.ExecuteFailed)
+      {
+        internals.ExecutedPipelines.insert(item.Pipeline);
+      }
     }
+    internals.CurrentPipeline = nullptr;
   }
   internals.InExecutePipelines = false;
 
@@ -903,6 +919,16 @@ void vtkInSituInitializationHelper::GetSteerableProxies(
 
     for (auto& proxy : internals->SteerableExtracts)
     {
+      // Skip extractors of pipelines that did not execute in the last `ExecutePipelines`
+      // (not selected through `catalyst/state/pipelines`, or failed): serializing them would
+      // run their pipeline outside `catalyst_execute`.
+      auto owner = internals->SteerableExtractOwners.find(proxy.first);
+      if (owner != internals->SteerableExtractOwners.end() &&
+        internals->ExecutedPipelines.count(owner->second) == 0)
+      {
+        continue;
+      }
+
       // The dataset to be serialized is the input of the extract
       vtkSMProxy* inputProxy =
         vtkSMProxyProperty::SafeDownCast(proxy.first->GetProperty("Producer"))->GetProxy(0);
@@ -934,6 +960,10 @@ void vtkInSituInitializationHelper::UpdateSteerableParameters(
       if (it == internals->SteerableExtracts.end() || it->first != steerableProxy)
       {
         internals->SteerableExtracts.emplace_hint(it, steerableProxy, steerableSourceName);
+        if (internals->CurrentPipeline)
+        {
+          internals->SteerableExtractOwners[steerableProxy] = internals->CurrentPipeline;
+        }
       }
     }
     else
