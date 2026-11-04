@@ -3681,8 +3681,9 @@
                          default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
-          When checked, all views in the active layout will be saved in the image.
-          Otherwise only the active view will be saved.
+          When checked, all views in the layout will be saved in the image. If
+          no layout is specified, the layout containing the view is used.
+          Otherwise only the view will be saved.
         </Documentation>
       </IntVectorProperty>
 

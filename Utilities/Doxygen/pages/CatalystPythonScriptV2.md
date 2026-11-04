@@ -437,6 +437,41 @@ a specific directory. To use it, ensure that all extractor use a relative
 filename. The filename is then evaluated to be relative to the directory
 provided for `options.ExtractsOutputDirectory`
 
+### Saving multiple views in a single image
+
+Image extractors (`PNG` and `JPG`) can save all views in a layout as a single
+image, similar to the **Save All Views** option when saving a screenshot in the
+ParaView GUI. The layout is created using `CreateLayout` and the extractor is
+created for any one of the views in that layout, with `SaveAllViews` enabled:
+
+```py
+view1 = CreateRenderView()
+view2 = CreateRenderView()
+
+layout1 = CreateLayout(name='Layout #1')
+layout1.SplitHorizontal(0, 0.5)
+layout1.AssignView(1, view1)
+layout1.AssignView(2, view2)
+layout1.SetSize(1600, 800)
+
+...
+
+extractor1 = CreateExtractor('PNG', view1, registrationName='PNG1')
+extractor1.Writer.FileName = 'layout-{timestep}.png'
+extractor1.Writer.SaveAllViews = 1
+extractor1.Writer.ImageResolution = [1600, 800]
+# optional, the separator between views.
+extractor1.Writer.SeparatorWidth = 2
+extractor1.Writer.SeparatorColor = [1, 1, 1]
+```
+
+Only one extractor per layout should have `SaveAllViews` enabled. Enabling it on
+extractors for two views in the same layout writes the same image twice.
+
+When exported from the ParaView GUI using **File > Save Catalyst State**, such
+extractors result in the layout, and all views in it, being saved in the
+Catalyst script.
+
 ### Steering extractors
 
 Catalyst's steering capability allows simulation parameters to be modified at runtime

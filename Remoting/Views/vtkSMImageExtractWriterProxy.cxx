@@ -11,11 +11,14 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
+#include "vtkSMViewLayoutProxy.h"
 #include "vtkStringFormatter.h"
 #include "vtkVector.h"
 
 #include <algorithm>
+#include <memory>
 #include <sstream>
+#include <utility>
 
 namespace
 {
@@ -24,6 +27,7 @@ class ScopedCamera
   vtkVector3d FocalPoint;
   vtkVector3d Position;
   vtkVector3d ViewUp;
+  double ParallelScale;
   vtkCamera* Camera;
 
 public:
@@ -33,9 +37,12 @@ public:
     camera->GetFocalPoint(this->FocalPoint.GetData());
     camera->GetPosition(this->Position.GetData());
     camera->GetViewUp(this->ViewUp.GetData());
+    this->ParallelScale = camera->GetParallelScale();
   }
 
   ~ScopedCamera() { this->CopyTo(this->Camera); }
+
+  vtkCamera* GetCamera() const { return this->Camera; }
 
   void Restore() { this->CopyTo(this->Camera); }
   void CopyTo(vtkCamera* camera)
@@ -43,6 +50,7 @@ public:
     camera->SetFocalPoint(this->FocalPoint.GetData());
     camera->SetPosition(this->Position.GetData());
     camera->SetViewUp(this->ViewUp.GetData());
+    camera->SetParallelScale(this->ParallelScale);
   }
 
   void ResetPhiTheta()
@@ -57,24 +65,31 @@ public:
 
 class ScopedViewTime
 {
-  double Time;
-  vtkSMProxy* View;
+  std::vector<std::pair<vtkSMProxy*, double>> Times;
 
 public:
-  ScopedViewTime(vtkSMProxy* view, double newTime)
-    : View(view)
+  ScopedViewTime(const std::vector<vtkSMViewProxy*>& views, double newTime)
   {
-    vtkSMPropertyHelper helper(this->View, "ViewTime");
-    this->Time = helper.GetAsDouble();
-    helper.Set(newTime);
-    this->View->UpdateVTKObjects();
+    for (auto view : views)
+    {
+      vtkSMPropertyHelper helper(view, "ViewTime");
+      this->Times.emplace_back(view, helper.GetAsDouble());
+      helper.Set(newTime);
+      view->UpdateVTKObjects();
+    }
   }
 
   ~ScopedViewTime()
   {
-    vtkSMPropertyHelper(this->View, "ViewTime").Set(this->Time);
-    this->View->UpdateVTKObjects();
+    for (const auto& viewTime : this->Times)
+    {
+      vtkSMPropertyHelper(viewTime.first, "ViewTime").Set(viewTime.second);
+      viewTime.first->UpdateVTKObjects();
+    }
   }
+
+  ScopedViewTime(const ScopedViewTime&) = delete;
+  void operator=(const ScopedViewTime&) = delete;
 };
 }
 
@@ -155,27 +170,30 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     return false;
   }
 
-  auto view = vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(writer, "View").GetAsProxy());
-  if (!view)
+  const auto views = this->GetViewsToCapture();
+  if (views.empty())
   {
-    vtkErrorMacro("No view provided to generate extract from!");
     return false;
   }
 
-  const ScopedViewTime viewState(view, extractor->GetTime());
+  const ScopedViewTime viewState(views, extractor->GetTime());
 
+  // cameras are restored after the capture so that views are left unchanged,
+  // e.g. when generating extracts from the GUI.
+  std::vector<std::unique_ptr<ScopedCamera>> cameraStates;
   if (vtkSMPropertyHelper(this, "ResetDisplay").GetAsInt() == 1)
   {
-    // BUG: currently, if we have more than 1 extract for the same view,
-    // and only 1 of them resetting the display, we don't have a means to restore
-    // the display faithfully. need to fix that.
-    if (auto rv = vtkSMRenderViewProxy::SafeDownCast(view))
+    for (auto view : views)
     {
-      rv->ResetCamera();
-    }
-    else if (auto cv = vtkSMContextViewProxy::SafeDownCast(view))
-    {
-      cv->ResetDisplay();
+      if (auto rv = vtkSMRenderViewProxy::SafeDownCast(view))
+      {
+        cameraStates.push_back(std::make_unique<ScopedCamera>(rv->GetActiveCamera()));
+        rv->ResetCamera();
+      }
+      else if (auto cv = vtkSMContextViewProxy::SafeDownCast(view))
+      {
+        cv->ResetDisplay();
+      }
     }
   }
 
@@ -183,23 +201,67 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
 }
 
 //----------------------------------------------------------------------------
+std::vector<vtkSMViewProxy*> vtkSMImageExtractWriterProxy::GetViewsToCapture()
+{
+  auto writer = this->GetSubProxy("Writer");
+  auto view = writer
+    ? vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(writer, "View").GetAsProxy())
+    : nullptr;
+  if (!view)
+  {
+    vtkErrorMacro("No view provided to generate extract from!");
+    return {};
+  }
+
+  if (vtkSMPropertyHelper(writer, "SaveAllViews").GetAsInt() == 0)
+  {
+    return { view };
+  }
+
+  // same layout as the one vtkSMSaveScreenshotProxy captures when saving all views.
+  auto layout =
+    vtkSMViewLayoutProxy::SafeDownCast(vtkSMPropertyHelper(writer, "Layout").GetAsProxy());
+  if (!layout)
+  {
+    layout = vtkSMViewLayoutProxy::FindLayout(view);
+  }
+  if (!layout)
+  {
+    vtkErrorMacro("'SaveAllViews' is enabled but the view is not assigned to any layout!");
+    return {};
+  }
+  return layout->GetViews();
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMImageExtractWriterProxy::WriteInternal(vtkSMExtractsController* extractor,
   const vtkSMImageExtractWriterProxy::SummaryParametersT& params)
 {
-  auto writer = vtkSMSaveScreenshotProxy::SafeDownCast(this->GetSubProxy("Writer"));
-  assert(writer != nullptr);
-
-  auto view = vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(writer, "View").GetAsProxy());
-  assert(view != nullptr);
-
   if (vtkSMPropertyHelper(this, "CameraMode").GetAsInt() ==
     vtkSMImageExtractWriterProxy::CameraMode::PhiTheta)
   {
-    auto rv = vtkSMRenderViewProxy::SafeDownCast(view);
-    if (rv == nullptr)
+    // move the camera in every render view being captured; other views, if
+    // any, are left unchanged.
+    const auto views = this->GetViewsToCapture();
+    std::vector<std::unique_ptr<ScopedCamera>> cameraStates;
+    for (auto view : views)
     {
-      vtkErrorMacro("PhiTheta camera mode is not supported on this view of type '"
-        << view->GetXMLName() << "'");
+      if (auto rv = vtkSMRenderViewProxy::SafeDownCast(view))
+      {
+        cameraStates.push_back(std::make_unique<ScopedCamera>(rv->GetActiveCamera()));
+      }
+    }
+    if (cameraStates.empty())
+    {
+      if (views.size() == 1)
+      {
+        vtkErrorMacro("PhiTheta camera mode is not supported on this view of type '"
+          << views[0]->GetXMLName() << "'");
+      }
+      else
+      {
+        vtkErrorMacro("PhiTheta camera mode requires at least one render view.");
+      }
       return false;
     }
 
@@ -217,18 +279,22 @@ bool vtkSMImageExtractWriterProxy::WriteInternal(vtkSMExtractsController* extrac
       return false;
     }
 
-    auto camera = rv->GetActiveCamera();
-    ScopedCamera cameraState(camera);
-
     for (double phi = 0; phi < 360; phi += 360.0 / phi_resolution)
     {
-      cameraState.ResetPhiTheta();
-      camera->Azimuth(phi);
+      for (auto& cameraState : cameraStates)
+      {
+        cameraState->ResetPhiTheta();
+        cameraState->GetCamera()->Azimuth(phi);
+      }
       for (double theta = 0; theta < 360; theta += 360.0 / theta_resolution)
       {
         const double elevation = theta > 0.0 ? (360.0 / theta_resolution) : 0.0;
-        camera->Elevation(elevation);
-        camera->OrthogonalizeViewUp();
+        for (auto& cameraState : cameraStates)
+        {
+          auto camera = cameraState->GetCamera();
+          camera->Elevation(elevation);
+          camera->OrthogonalizeViewUp();
+        }
 
         vtkSMExtractsController::SummaryParametersT tparams = params;
         char buffer[128];

@@ -13,8 +13,13 @@
         <ExposedProperties>
           <Property name="View" />
           <PropertyGroup label="Size and Scaling">
+            <Property name="SaveAllViews" />
             <Property name="ImageResolution" />
             <Property name="FontScaling" />
+          </PropertyGroup>
+          <PropertyGroup label="Separator Options">
+            <Property name="SeparatorWidth" />
+            <Property name="SeparatorColor" />
           </PropertyGroup>
           <PropertyGroup label="Coloring">
             <Property name="OverrideColorPalette" panel_visibility="advanced" />
@@ -103,8 +108,13 @@
         <ExposedProperties>
           <Property name="View" />
           <PropertyGroup label="Size and Scaling">
+            <Property name="SaveAllViews" />
             <Property name="ImageResolution" />
             <Property name="FontScaling" />
+          </PropertyGroup>
+          <PropertyGroup label="Separator Options">
+            <Property name="SeparatorWidth" />
+            <Property name="SeparatorColor" />
           </PropertyGroup>
           <PropertyGroup label="Coloring">
             <Property name="OverrideColorPalette" panel_visibility="advanced" />

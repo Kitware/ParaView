@@ -176,6 +176,41 @@ if (TARGET ParaView::RemotingViews)
       "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1.pipeline2"
       PROPERTIES DEPENDS
         "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2")
+
+  #--------------------------------------------------------------------
+  # add test to validate image extractors saving all views in a layout.
+  # The script validates the generated extracts itself.
+  set(save_all_views_dir "${CMAKE_BINARY_DIR}/Testing/Temporary/SaveAllViewsExtracts")
+  add_test(NAME Catalyst::WaveletMiniApp::SaveAllViewsExtracts::Prepare
+           COMMAND "${CMAKE_COMMAND}" -E remove_directory "${save_all_views_dir}")
+  set_tests_properties(
+    "Catalyst::WaveletMiniApp::SaveAllViewsExtracts::Prepare"
+    PROPERTIES
+      FIXTURES_SETUP "Catalyst::WaveletMiniApp::SaveAllViewsExtracts::Prepare")
+
+  paraview_add_test(
+    PREFIX "Catalyst::WaveletMiniApp"
+    ENVIRONMENT
+      PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${save_all_views_dir}/Serial
+    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 3 --size 21 -s
+    TEST_SCRIPTS SaveAllViewsExtracts.py)
+  set_tests_properties("Catalyst::WaveletMiniApp.SaveAllViewsExtracts"
+    PROPERTIES
+      FIXTURES_REQUIRED "Catalyst::WaveletMiniApp::SaveAllViewsExtracts::Prepare"
+      PASS_REGULAR_EXPRESSION "All ok")
+
+  paraview_add_test_mpi(
+    PREFIX "Catalyst::MPI::WaveletMiniApp"
+    ENVIRONMENT
+      PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${save_all_views_dir}/MPI
+    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 3 --size 21 -s
+    TEST_SCRIPTS SaveAllViewsExtracts.py)
+  if (PARAVIEW_USE_MPI)
+    set_tests_properties("Catalyst::MPI::WaveletMiniApp.SaveAllViewsExtracts"
+      PROPERTIES
+        FIXTURES_REQUIRED "Catalyst::WaveletMiniApp::SaveAllViewsExtracts::Prepare"
+        PASS_REGULAR_EXPRESSION "All ok")
+  endif()
 endif()
 
 #---------------------------------------------------------------------

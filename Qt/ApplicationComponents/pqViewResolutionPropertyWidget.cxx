@@ -12,6 +12,8 @@
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkWeakPointer.h"
 
 #include <QAction>
 #include <QIntValidator>
@@ -23,6 +25,8 @@ class pqViewResolutionPropertyWidget::pqInternals
 public:
   Ui::ViewResolutionPropertyWidget Ui;
   QSize RecentResolution, SizeForAspect;
+  vtkWeakPointer<vtkSMProperty> SaveAllViews;
+  int SaveAllViewsValue = 0;
 
   void resetAspect()
   {
@@ -121,11 +125,15 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
 
   // a little bit of a hack: whenever the 'SaveAllViews' property is toggled, we
   // need to ensure that the size show in the UI is updated (see #14958).
-  // For that, we explicitly observe the property and do the needful.
+  // For that, we explicitly observe the property and do the needful. The
+  // connection is queued since the property updates its dependent domains,
+  // including ours, only after this observer is called.
   if (auto saveAllViews = smproxy->GetProperty("SaveAllViews"))
   {
-    pqCoreUtilities::connect(
-      saveAllViews, vtkCommand::UncheckedPropertyModifiedEvent, this, SLOT(resetButtonClicked()));
+    internals.SaveAllViews = saveAllViews;
+    internals.SaveAllViewsValue = vtkSMUncheckedPropertyHelper(saveAllViews).GetAsInt();
+    pqCoreUtilities::connect(saveAllViews, vtkCommand::UncheckedPropertyModifiedEvent, this,
+      SLOT(saveAllViewsModified()), Qt::QueuedConnection);
   }
 }
 
@@ -143,6 +151,23 @@ void pqViewResolutionPropertyWidget::resetButtonClicked()
     this->Internals->resetAspect();
   }
   Q_EMIT this->clearHighlight();
+}
+
+//-----------------------------------------------------------------------------
+void pqViewResolutionPropertyWidget::saveAllViewsModified()
+{
+  // the event is also fired when the property is applied, in which case the
+  // value hasn't changed and the resolution must be left as is.
+  auto& internals = *this->Internals;
+  if (internals.SaveAllViews)
+  {
+    const int value = vtkSMUncheckedPropertyHelper(internals.SaveAllViews).GetAsInt();
+    if (value != internals.SaveAllViewsValue)
+    {
+      internals.SaveAllViewsValue = value;
+      this->resetButtonClicked();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

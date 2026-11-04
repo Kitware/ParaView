@@ -24,9 +24,16 @@ void vtkSMViewResolutionDomain::Update(vtkSMProperty*)
   int resolution[2] = { 0, 0 };
   if (useLayoutProperty && vtkSMUncheckedPropertyHelper(useLayoutProperty).GetAsInt() != 0)
   {
-    this->GetLayoutResolution(vtkSMViewLayoutProxy::SafeDownCast(
-                                vtkSMUncheckedPropertyHelper(layoutProperty).GetAsProxy(0)),
-      resolution);
+    auto layout = layoutProperty ? vtkSMViewLayoutProxy::SafeDownCast(
+                                     vtkSMUncheckedPropertyHelper(layoutProperty).GetAsProxy(0))
+                                 : nullptr;
+    if (layout == nullptr && viewProperty)
+    {
+      // no layout specified, use the layout containing the view, if any.
+      layout = vtkSMViewLayoutProxy::FindLayout(
+        vtkSMViewProxy::SafeDownCast(vtkSMUncheckedPropertyHelper(viewProperty).GetAsProxy(0)));
+    }
+    this->GetLayoutResolution(layout, resolution);
   }
   else if (viewProperty)
   {
