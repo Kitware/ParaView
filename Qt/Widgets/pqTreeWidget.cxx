@@ -13,6 +13,7 @@
 #include <QLayout>
 #include <QPainter>
 #include <QStyle>
+#include <QWheelEvent>
 
 #include "pqTimer.h"
 
@@ -138,6 +139,11 @@ void pqTreeWidget::wheelEvent(QWheelEvent* evt)
   if (this->hasFocus())
   {
     this->Superclass::wheelEvent(evt);
+  }
+  else
+  {
+    // Explicitly ignore the event so that it propagates to the parent widget.
+    evt->ignore();
   }
 }
 

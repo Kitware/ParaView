@@ -84,6 +84,9 @@ public:
         {
           if (!wdg->hasFocus())
           {
+            // Skip the widget, but ignore the event so that it propagates to
+            // the parent widget.
+            evt->ignore();
             return true;
           }
         }
