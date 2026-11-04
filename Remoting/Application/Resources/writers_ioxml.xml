@@ -1124,6 +1124,7 @@
             <Property name="VertexDataArrays" panel_visibility="advanced"/>
             <Property name="EdgeDataArrays" panel_visibility="advanced"/>
             <Property name="RowDataArrays" panel_visibility="advanced"/>
+            <Property name="SideDataArrays" panel_visibility="advanced"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"

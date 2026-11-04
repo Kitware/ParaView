@@ -64,6 +64,7 @@ public:
   vtkDataArraySelection* GetVertexDataArraySelection();
   vtkDataArraySelection* GetEdgeDataArraySelection();
   vtkDataArraySelection* GetRowDataArraySelection();
+  vtkDataArraySelection* GetSideDataArraySelection();
   ///@}
 
   ///@{

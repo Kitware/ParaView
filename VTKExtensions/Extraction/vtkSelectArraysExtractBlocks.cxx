@@ -157,6 +157,12 @@ vtkDataArraySelection* vtkSelectArraysExtractBlocks::GetRowDataArraySelection()
 }
 
 //----------------------------------------------------------------------------
+vtkDataArraySelection* vtkSelectArraysExtractBlocks::GetSideDataArraySelection()
+{
+  return this->Internals->PassSelectedArrays->GetSideDataArraySelection();
+}
+
+//----------------------------------------------------------------------------
 bool vtkSelectArraysExtractBlocks::AddSelector(const char* selector)
 {
   if (this->Internals->ExtractBlocks->AddSelector(selector))

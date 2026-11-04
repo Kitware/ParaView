@@ -243,6 +243,7 @@
             <Property name="VertexDataArrays"/>
             <Property name="EdgeDataArrays"/>
             <Property name="RowDataArrays"/>
+            <Property name="SideDataArrays"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
