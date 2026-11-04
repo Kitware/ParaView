@@ -12,6 +12,10 @@
  * not added to the domain. If you want to support field data, then use `enable_field_data="1"`
  * attribute in the XML configuration.
  *
+ * Likewise, `vtkDataObject::SIDE` (or vtkDataObject::FIELD_ASSOCIATION_SIDES) is not added to
+ * the domain by default, since most filters do not process side data. If the property supports
+ * side data, then use `enable_side_data="1"` attribute in the XML configuration.
+ *
  * By default, the domain is assumed to represent field
  * associations and hence the enumeration text is populated as "Point Data",
  * "Cell Data", etc. To use element types for text, add attribute
@@ -99,6 +103,9 @@ protected:
 
   // When true, "Field Data" option is added to the domain.
   bool EnableFieldDataSelection;
+
+  // When true, "Side Data" option is added to the domain.
+  bool EnableSideDataSelection = false;
 
   bool UseElementTypes;
 

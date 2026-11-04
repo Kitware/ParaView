@@ -177,6 +177,13 @@ void vtkSMNumberOfComponentsDomain::Update(
       ai = rowInfo->GetArrayInformation(arrayName);
     }
   }
+  if (iadAttributeType == vtkSMInputArrayDomain::SIDE)
+  {
+    if (auto* sideInfo = info->GetSideDataInformation())
+    {
+      ai = sideInfo->GetArrayInformation(arrayName);
+    }
+  }
 
   if (ai)
   {

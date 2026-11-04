@@ -227,6 +227,7 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   printDSA("VertexDataInformation", this->GetVertexDataInformation());
   printDSA("EdgeDataInformation", this->GetEdgeDataInformation());
   printDSA("RowDataInformation", this->GetRowDataInformation());
+  printDSA("SideDataInformation", this->GetSideDataInformation());
   printDSA("FieldDataInformation ", this->GetFieldDataInformation());
   os << indent << "PointArrayInformation " << endl;
   this->GetPointArrayInformation()->PrintSelf(os, i2);
@@ -1035,6 +1036,9 @@ bool vtkPVDataInformation::IsAttributeValid(int attributeType) const
 
       case vtkDataObject::ROW:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_TABLE);
+
+      case vtkDataObject::SIDE:
+        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_UNSTRUCTURED_GRID);
 
       default:
         if (vtkDataObjectTypes::TypeIdIsA(dtype, VTK_CELL_GRID) &&
