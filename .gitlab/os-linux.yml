@@ -171,29 +171,11 @@ spec:
 ## Linux-specific scripts
 
 .before_script_linux: &before_script_linux
-    - .gitlab/ci/cmake.sh
-    - .gitlab/ci/cmake.sh mindeps
-    - .gitlab/ci/ninja.sh
-    - .gitlab/ci/uv.sh
-    - .gitlab/ci/doxygen.sh
-    - .gitlab/ci/sccache.sh
-    - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PWD/.gitlab/doxygen/bin:$PATH
-    # Download Qt
-    - cmake -P .gitlab/ci/download_qt6.cmake
-    - cmake -P .gitlab/ci/download_onnxruntime.cmake
-    - export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$PWD/.gitlab/qt6:$PWD/.gitlab/onnxruntime
-    - cmake --version
-    - ninja --version
-    - uv --version
-    - doxygen --version
+    - . .gitlab/ci/before_script_linux.sh
     - "git submodule update --init --recursive || :"
     - git submodule foreach --recursive cmake -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
     - git submodule update --init --recursive
-    # Load any modules that may be necessary.
-    - '[ -n "$MODULES" ] && . /etc/profile.d/modules.sh && module load $MODULES'
-    # Enable the Intel compiler if required.
-    - '[ "$CC" = "icx" ] && source /opt/intel/oneapi/setvars.sh || true'
 
 .cmake_build_linux:
     stage: build
