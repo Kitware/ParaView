@@ -256,6 +256,23 @@ public:
   std::unordered_map<QString, int> PreviouslySelectedComponentNumber;
   bool ShouldUpdateScalarBarsComponentTitle = false;
 
+  // Array and component names last shown for the current representation. Used to
+  // detect when the component names change so that scalar bar component titles,
+  // which the user may have customized, are only reset when needed.
+  QString ComponentsArrayName;
+  QStringList ComponentNames;
+
+  void updateComponentNames(const QString& arrayName, const QStringList& componentNames)
+  {
+    if (!this->ComponentsArrayName.isNull() && this->ComponentsArrayName == arrayName &&
+      this->ComponentNames != componentNames)
+    {
+      this->ShouldUpdateScalarBarsComponentTitle = true;
+    }
+    this->ComponentsArrayName = arrayName;
+    this->ComponentNames = componentNames;
+  }
+
   pqInternals()
     : OutOfDomainEntryIndex(-1)
     , OutOfDomainComponentEntryIndex(-1)
@@ -369,6 +386,9 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr, int sel
   this->Components->clear();
   this->Internals->OutOfDomainEntryIndex = -1;
   this->Internals->OutOfDomainComponentEntryIndex = -1;
+  this->Internals->ShouldUpdateScalarBarsComponentTitle = false;
+  this->Internals->ComponentsArrayName = QString();
+  this->Internals->ComponentNames.clear();
 
   // now, save the new repr.
   this->Representation = repr;
@@ -734,6 +754,7 @@ void pqDisplayColorWidget::refreshComponents()
       // No data / zero components
       this->Internals->PreviouslySelectedComponentNumber[arrayName] = compNumber;
     }
+    this->Internals->updateComponentNames(arrayName, QStringList());
     return;
   }
 
@@ -749,9 +770,11 @@ void pqDisplayColorWidget::refreshComponents()
     this->Components->addItem(arrayInfo->GetComponentName(-1), -1);
   }
 
+  QStringList componentNames;
   for (int comp = 0; comp < nComponents; comp++)
   {
-    this->Components->addItem(arrayInfo->GetComponentName(comp), comp);
+    componentNames.push_back(arrayInfo->GetComponentName(comp));
+    this->Components->addItem(componentNames.back(), comp);
   }
   this->Components->setEnabled(this->Components->count() > 0);
 
@@ -765,7 +788,7 @@ void pqDisplayColorWidget::refreshComponents()
   {
     this->setComponentNumber(arraySettings->ShouldUseMagnitudeMode(nComponents) ? -1 : 0);
   }
-  this->Internals->ShouldUpdateScalarBarsComponentTitle = true;
+  this->Internals->updateComponentNames(arrayName, componentNames);
 
   this->Components->blockSignals(prev);
 }
