@@ -296,6 +296,11 @@ void pqSpreadSheetViewDecorator::repopulateAttributes(pqDataRepresentation* repr
       {
         continue;
       }
+      // Every unstructured grid can hold side data, only list it when there are sides.
+      if (attributeType == vtkDataObject::SIDE && dataInfo->GetNumberOfSides() == 0)
+      {
+        continue;
+      }
       QString attributeName = QCoreApplication::translate("ServerManagerXML",
         vtkSMFieldDataDomain::GetAttributeTypeAsString(dataInfo, attributeType).c_str());
       internal.Attribute->addItem(attributeName, attributeType);
