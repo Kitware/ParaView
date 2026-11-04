@@ -62,6 +62,7 @@ public:
 
     this->insert("PointArrayStatus", QIcon(":/pqWidgets/Icons/pqPointData.svg"));
     this->insert("CellArrayStatus", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
+    this->insert("SideArrayStatus", QIcon(":/pqWidgets/Icons/pqFaceCenterData.svg"));
     this->insert("ColumnArrayStatus", QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"));
     this->insert("SetStatus", QIcon(":/pqWidgets/Icons/pqSideSetData.svg"));
   }

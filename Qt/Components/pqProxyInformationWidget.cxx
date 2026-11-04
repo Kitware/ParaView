@@ -128,6 +128,7 @@ private:
     QIcon(":/pqWidgets/Icons/pqPointData.svg"),
     QIcon(":/pqWidgets/Icons/pqCellData.svg"),
     QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"),
+    QIcon(":/pqWidgets/Icons/pqFaceCenterData.svg"),
   };
 
   // elements have the structure
@@ -599,9 +600,13 @@ public:
     labelMap[vtkDataObject::VERTEX] = std::make_pair(ui.labelVertexCount, ui.vertexCount);
     labelMap[vtkDataObject::EDGE] = std::make_pair(ui.labelEdgeCount, ui.edgeCount);
     labelMap[vtkDataObject::ROW] = std::make_pair(ui.labelRowCount, ui.rowCount);
+    labelMap[vtkDataObject::SIDE] = std::make_pair(ui.labelSideCount, ui.sideCount);
     for (auto& item : labelMap)
     {
-      if (dinfo && dinfo->IsAttributeValid(item.first))
+      // Every unstructured grid can hold side data, only show the count when there are sides.
+      const bool hidden =
+        item.first == vtkDataObject::SIDE && dinfo && dinfo->GetNumberOfSides() == 0;
+      if (dinfo && dinfo->IsAttributeValid(item.first) && !hidden)
       {
         item.second.second->setText(l.toString(dinfo->GetNumberOfElements(item.first)));
         item.second.first->setVisible(true);

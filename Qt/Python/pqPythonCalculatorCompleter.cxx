@@ -123,6 +123,7 @@ QStringList pqPythonCalculatorCompleter::getPythonCompletions(
     addIfNonEmpty(inputInformation->GetVertexDataInformation(), "VertexData");
     addIfNonEmpty(inputInformation->GetEdgeDataInformation(), "EdgeData");
     addIfNonEmpty(inputInformation->GetRowDataInformation(), "RowData");
+    addIfNonEmpty(inputInformation->GetSideDataInformation(), "SideData");
 
     return results;
   }
@@ -146,6 +147,7 @@ QStringList pqPythonCalculatorCompleter::getPythonCompletions(
       this->AddArrayNamesToResults(inputInformation->GetVertexDataInformation(), results);
       this->AddArrayNamesToResults(inputInformation->GetEdgeDataInformation(), results);
       this->AddArrayNamesToResults(inputInformation->GetRowDataInformation(), results);
+      this->AddArrayNamesToResults(inputInformation->GetSideDataInformation(), results);
     }
   }
 
