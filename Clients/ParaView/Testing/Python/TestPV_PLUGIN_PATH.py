@@ -1,4 +1,5 @@
 from paraview.simple import *
+LoadPalette("BlueGrayBackground")
 PythonbasedSuperquadricSourceExample()
 Show()
 rv = Render()
