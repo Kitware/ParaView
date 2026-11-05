@@ -2,7 +2,7 @@
   <!-- ==================================================================== -->
   <ProxyGroup name="internal_sources">
     <!-- ================================================================== -->
-    <Proxy class="vtkOCCTReader"
+    <Proxy class="vtkOCCTPDCReader"
            name="OCCTReaderBase">
       <Documentation long_help="Reads OCCT files."
                      short_help="Reads OCCT files.">
@@ -57,7 +57,7 @@
     <!-- ==================================================================== -->
     <Proxy base_proxygroup="internal_sources"
            base_proxyname="OCCTReaderBase"
-           class="vtkOCCTReader"
+           class="vtkOCCTPDCReader"
            name="STEPReaderCore">
       <Documentation long_help="Reads STEP files."
                      short_help="Reads STEP files.">
@@ -73,7 +73,7 @@
     <!-- ==================================================================== -->
     <Proxy base_proxygroup="internal_sources"
            base_proxyname="OCCTReaderBase"
-           class="vtkOCCTReader"
+           class="vtkOCCTPDCReader"
            name="IGESReaderCore">
       <Documentation long_help="Reads IGES files."
                      short_help="Reads IGES files.">
