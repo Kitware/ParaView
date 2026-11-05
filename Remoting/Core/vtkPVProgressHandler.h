@@ -39,6 +39,7 @@
 
 #include <set>
 
+class vtkAlgorithm;
 class vtkMultiProcessController;
 class vtkPVSession;
 
@@ -145,6 +146,15 @@ public:
    */
   void DisableAbortCheck(vtkTypeUInt32 objectId);
 
+  /**
+   * When the algorithm is aborted on the main rank, send its ID to the other ranks, which then
+   * abort it too. Called each time an algorithm invokes vtkCommand::AbortCheckEvent. The messages
+   * still pending are completed in CleanupPendingProgress, which all the ranks reach once per
+   * request, so that the algorithms do not have to execute the same number of times on all the
+   * ranks.
+   */
+  void ReduceAbort(vtkAlgorithm* algorithm);
+
   enum TAGS
   {
     ABORT_TAG = 188968,
@@ -179,6 +189,12 @@ private:
    * Callback called when vtkCommand::ProgressEvent is received.
    */
   void OnProgressEvent(vtkObject* caller, unsigned long eventid, void* calldata);
+
+  /**
+   * Complete the messages sent by ReduceAbort and abort, on the other ranks, the algorithms
+   * aborted on the main rank. All the ranks must call it together.
+   */
+  void CleanupAbort();
 
   /**
    * Callback called when events from vtkOutputWindow singleton are received.

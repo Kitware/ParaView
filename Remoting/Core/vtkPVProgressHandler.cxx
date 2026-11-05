@@ -15,11 +15,20 @@
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
+#include "vtkWeakPointer.h"
 
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+#include "vtkMPICommunicator.h"
+#include "vtkMPIController.h"
+#endif
+
+#include <algorithm>
 #include <array>
+#include <deque>
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
 // define this variable to disable progress all together. This may be useful to
 // doing really large runs.
@@ -96,6 +105,45 @@ public:
   bool EnableProgress;
 
   vtkNew<vtkTimerLog> ProgressTimer;
+
+  // Algorithms that checked the abort flag since the last CleanupAbort().
+  std::vector<vtkWeakPointer<vtkAlgorithm>> AbortCheckedAlgorithms;
+
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  // Main rank: IDs of the aborted algorithms sent since the last CleanupAbort(), their pending
+  // sends, and the send buffers, which must outlive the sends.
+  std::set<int> AbortSentIds;
+  std::vector<vtkMPICommunicator::Request> AbortSendRequests;
+  std::deque<int> AbortSendBuffers;
+
+  // Other ranks: IDs of the algorithms aborted on the main rank, and how many were received.
+  std::set<int> AbortReceivedIds;
+  int AbortReceiveCount = 0;
+
+  void SendAbort(vtkMPIController* controller, int id)
+  {
+    if (id == 0 || !this->AbortSentIds.insert(id).second)
+    {
+      return;
+    }
+    this->AbortSendBuffers.push_back(id);
+    for (int rank = 1; rank < controller->GetNumberOfProcesses(); ++rank)
+    {
+      this->AbortSendRequests.emplace_back();
+      controller->NoBlockSend(&this->AbortSendBuffers.back(), 1, rank,
+        vtkPVProgressHandler::ABORT_TAG, this->AbortSendRequests.back());
+    }
+  }
+
+  void ReceiveAbort(vtkMPIController* controller)
+  {
+    int id = 0;
+    controller->Receive(&id, 1, 0, vtkPVProgressHandler::ABORT_TAG);
+    this->AbortReceivedIds.insert(id);
+    ++this->AbortReceiveCount;
+  }
+#endif
+
   vtkInternals()
   {
     this->EnableProgress = false;
@@ -277,6 +325,7 @@ void vtkPVProgressHandler::CleanupPendingProgress()
   if (mpiController && mpiController->GetNumberOfProcesses() > 1)
   {
     mpiController->Barrier();
+    this->CleanupAbort();
   }
 
   // On the server-node (render-server root or data-server root), we send a
@@ -324,6 +373,120 @@ void vtkPVProgressHandler::CleanupPendingProgress()
   }
 
   this->LocalCleanupPendingProgress();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::ReduceAbort(vtkAlgorithm* algorithm)
+{
+  SKIP_IF_DISABLED();
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  // The messages are completed by CleanupPendingProgress, so only send them in between.
+  if (!algorithm || !this->Internals->EnableProgress)
+  {
+    return;
+  }
+  auto controller =
+    vtkMPIController::SafeDownCast(vtkMultiProcessController::GetGlobalController());
+  if (!controller || controller->GetNumberOfProcesses() <= 1)
+  {
+    return;
+  }
+
+  auto& internals = *this->Internals;
+  if (std::find(internals.AbortCheckedAlgorithms.begin(), internals.AbortCheckedAlgorithms.end(),
+        algorithm) == internals.AbortCheckedAlgorithms.end())
+  {
+    internals.AbortCheckedAlgorithms.emplace_back(algorithm);
+  }
+
+  const int id = internals.GetIDFromObject(algorithm);
+  if (controller->GetLocalProcessId() == 0)
+  {
+    // Only aborts are sent, once per algorithm, so that the other ranks abort that algorithm.
+    if (algorithm->GetAbortExecute())
+    {
+      internals.SendAbort(controller, id);
+    }
+  }
+  else
+  {
+    // Receive the aborts that already arrived.
+    auto communicator = vtkMPICommunicator::SafeDownCast(controller->GetCommunicator());
+    int arrived = 0;
+    while (communicator &&
+      communicator->Iprobe(0, vtkPVProgressHandler::ABORT_TAG, &arrived, nullptr) && arrived)
+    {
+      internals.ReceiveAbort(controller);
+    }
+    if (id != 0 && internals.AbortReceivedIds.count(id))
+    {
+      algorithm->SetAbortExecuteAndUpdateTime();
+    }
+  }
+#else
+  (void)algorithm;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::CleanupAbort()
+{
+  auto& internals = *this->Internals;
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  auto controller =
+    vtkMPIController::SafeDownCast(vtkMultiProcessController::GetGlobalController());
+  if (controller && controller->GetNumberOfProcesses() > 1)
+  {
+    const int numProcs = controller->GetNumberOfProcesses();
+    if (controller->GetLocalProcessId() == 0)
+    {
+      // Algorithms aborted after their last abort check were not sent yet.
+      for (const auto& algorithm : internals.AbortCheckedAlgorithms)
+      {
+        if (algorithm && algorithm->GetAbortExecute())
+        {
+          internals.SendAbort(controller, internals.GetIDFromObject(algorithm));
+        }
+      }
+
+      // Tell the other ranks how many aborts to receive, then complete the sends.
+      int numberOfAborts = static_cast<int>(internals.AbortSentIds.size());
+      for (int rank = 1; rank < numProcs; ++rank)
+      {
+        controller->Send(&numberOfAborts, 1, rank, vtkPVProgressHandler::CLEANUP_TAG);
+      }
+      for (auto& request : internals.AbortSendRequests)
+      {
+        request.Wait();
+      }
+      internals.AbortSendRequests.clear();
+      internals.AbortSendBuffers.clear();
+      internals.AbortSentIds.clear();
+    }
+    else
+    {
+      int numberOfAborts = 0;
+      controller->Receive(&numberOfAborts, 1, 0, vtkPVProgressHandler::CLEANUP_TAG);
+      while (internals.AbortReceiveCount < numberOfAborts)
+      {
+        internals.ReceiveAbort(controller);
+      }
+
+      // Abort the algorithms aborted on the main rank, so that all the ranks execute them again.
+      for (const auto& item : internals.RegisteredObjects)
+      {
+        vtkAlgorithm* algorithm = vtkAlgorithm::SafeDownCast(item.first);
+        if (algorithm && internals.AbortReceivedIds.count(item.second))
+        {
+          algorithm->SetAbortExecuteAndUpdateTime();
+        }
+      }
+      internals.AbortReceivedIds.clear();
+      internals.AbortReceiveCount = 0;
+    }
+  }
+#endif
+  internals.AbortCheckedAlgorithms.clear();
 }
 
 //----------------------------------------------------------------------------
