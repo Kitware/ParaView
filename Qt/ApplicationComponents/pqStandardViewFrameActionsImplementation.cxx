@@ -475,9 +475,9 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
 
   if (this->isButtonVisible("InteractiveSelectSurfaceCellData", renderView))
   {
-    QAction* interactiveSelectSurfaceCellDataAction =
-      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellDataInteractive.svg"),
-        tr("Interactive Select Cell Data On"));
+    QAction* interactiveSelectSurfaceCellDataAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellDataInteractive.svg"),
+      tr("Interactive Select Cell Data On. Use Ctrl+C/Cmd+C to copy the content to the clipboard"));
     interactiveSelectSurfaceCellDataAction->setObjectName("actionInteractiveSelectSurfaceCellData");
     interactiveSelectSurfaceCellDataAction->setCheckable(true);
     new pqRenderViewSelectionReaction(interactiveSelectSurfaceCellDataAction, renderView,
@@ -492,7 +492,8 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   {
     QAction* interactiveSelectSurfacePointDataAction = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPointDataInteractive.svg"),
-      tr("Interactive Select Point Data On"));
+      tr(
+        "Interactive Select Point Data On. Use Ctrl+C/Cmd+C to copy the content to the clipboard"));
     interactiveSelectSurfacePointDataAction->setObjectName(
       "actionInteractiveSelectSurfacePointData");
     interactiveSelectSurfacePointDataAction->setCheckable(true);
@@ -532,36 +533,6 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
       SLOT(escapeableActionToggled(bool)));
     this->connect(interactiveSelectSurfacePointsAction, SIGNAL(toggled(bool)),
       SLOT(interactiveSelectionToggled(bool)));
-  }
-
-  if (this->isButtonVisible("HoveringSurfaceCells", renderView))
-  {
-    QAction* hoveringSurfaceCellsAction =
-      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceHoveringCell.svg"),
-        tr("Hover Cells On. Use Ctrl-C/Cmd-C to copy the content to clipboard."));
-    hoveringSurfaceCellsAction->setObjectName("actionHoveringSurfaceCells");
-    hoveringSurfaceCellsAction->setCheckable(true);
-    new pqRenderViewSelectionReaction(hoveringSurfaceCellsAction, renderView,
-      pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS_TOOLTIP);
-    this->connect(
-      hoveringSurfaceCellsAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
-    this->connect(
-      hoveringSurfaceCellsAction, SIGNAL(toggled(bool)), SLOT(interactiveSelectionToggled(bool)));
-  }
-
-  if (this->isButtonVisible("HoveringSurfacePoints", renderView))
-  {
-    QAction* hoveringSurfacePointsAction =
-      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceHoveringPoint.svg"),
-        tr("Hover Points On. Use Ctrl-C/Cmd-C to copy the content to clipboard."));
-    hoveringSurfacePointsAction->setObjectName("actionHoveringSurfacePoints");
-    hoveringSurfacePointsAction->setCheckable(true);
-    new pqRenderViewSelectionReaction(hoveringSurfacePointsAction, renderView,
-      pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_TOOLTIP);
-    this->connect(
-      hoveringSurfacePointsAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
-    this->connect(
-      hoveringSurfacePointsAction, SIGNAL(toggled(bool)), SLOT(interactiveSelectionToggled(bool)));
   }
 
   if (this->isButtonVisible("Grow Selection", renderView))
