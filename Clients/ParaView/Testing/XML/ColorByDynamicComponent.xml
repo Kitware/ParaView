@@ -42,4 +42,29 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqcheck object="pqClientMainWindow/variableToolbar/displayColor/Components" property="currentText" arguments="two" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ColorByDynamicComponent2.png" threshold="0.05" />
+
+  <!-- Customize the color legend component title -->
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarProperties" command="activate" arguments="" />
+  <pqevent object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ComponentTitle/ComponentTitle" command="set_string" arguments="CustomComponentTitle" />
+  <pqevent object="ColorLegendEditor/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Add a new layout with a render view, then switch back to the first layout -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="+" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget2/Container/Frame.0/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Layout #1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="1,1,0,100,100" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="1,0,0,100,100" />
+
+  <!-- The custom component title must have been preserved -->
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarProperties" command="activate" arguments="" />
+  <pqcheck object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ComponentTitle/ComponentTitle" property="text" arguments="CustomComponentTitle" />
+  <pqevent object="ColorLegendEditor/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Changing the representation type refreshes the color array names -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Representation/displayRepresentationWidget/comboBox" command="activated" arguments="Wireframe" />
+
+  <!-- The custom component title must have been preserved -->
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarProperties" command="activate" arguments="" />
+  <pqcheck object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ComponentTitle/ComponentTitle" property="text" arguments="CustomComponentTitle" />
+  <pqevent object="ColorLegendEditor/widget/OKButton" command="activate" arguments="" />
 </pqevents>
