@@ -782,11 +782,17 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
   switch (role)
   {
     case Qt::ToolTipRole:
+    {
       if (proxy && proxy->getProxy()->HasAnnotation("tooltip"))
       {
         return QVariant(proxy->getProxy()->GetAnnotation("tooltip"));
       }
+      else if (proxy)
+      {
+        return QString(proxy->getProxy()->GetXMLLabel());
+      }
       [[fallthrough]];
+    }
     case Qt::DisplayRole:
       if (idx.column() == 1)
       {
