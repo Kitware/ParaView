@@ -66,6 +66,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setHeadingLevel(HeadingLevel level);
   HeadingLevel headingLevel() const { return this->CurrentHeadingLevel; }
 
+  /**
+   * Set if we want to hide the '+'/'-' button or not
+   */
+  void setCollapseButtonVisibility(bool visible);
+
 Q_SIGNALS:
   /**
    * This signal is emitted whenever a button changes its state.

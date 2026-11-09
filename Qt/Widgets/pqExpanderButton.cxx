@@ -102,6 +102,12 @@ void pqExpanderButton::setHeadingLevel(HeadingLevel newLevel)
 }
 
 //-----------------------------------------------------------------------------
+void pqExpanderButton::setCollapseButtonVisibility(bool visible)
+{
+  this->Internals->icon->setVisible(visible);
+}
+
+//-----------------------------------------------------------------------------
 void pqExpanderButton::updateIcon()
 {
   if (this->CurrentHeadingLevel == H2)
