@@ -357,12 +357,16 @@ void pqPropertiesPanel::setPanelMode(int val)
   this->Internals->Ui.DisplayFrame->setVisible(has_display);
   this->Internals->Ui.DisplayButtons->setVisible(has_display);
 
-  // the buttons need not be shown if there's only 1 type in the panel.
+  this->Internals->Ui.PropertiesButton->setVisible(has_source);
+  this->Internals->Ui.DisplayButton->setVisible(has_display);
+  this->Internals->Ui.ViewButton->setVisible(has_view);
+
+  // the +/- buttons need not be shown if there's only 1 type in the panel.
   bool has_multiples_types =
     ((has_source ? 1 : 0) + (has_display ? 1 : 0) + (has_view ? 1 : 0)) > 1;
-  this->Internals->Ui.PropertiesButton->setVisible(has_multiples_types && has_source);
-  this->Internals->Ui.DisplayButton->setVisible(has_multiples_types && has_display);
-  this->Internals->Ui.ViewButton->setVisible(has_multiples_types && has_view);
+  this->Internals->Ui.PropertiesButton->setCollapseButtonVisibility(has_multiples_types);
+  this->Internals->Ui.DisplayButton->setCollapseButtonVisibility(has_multiples_types);
+  this->Internals->Ui.ViewButton->setCollapseButtonVisibility(has_multiples_types);
 
   this->updatePanel();
 }
