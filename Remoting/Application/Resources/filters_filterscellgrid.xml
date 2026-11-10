@@ -263,14 +263,17 @@
         <Documentation>An input cell grid to probe.</Documentation>
       </InputProperty>
 
-      <StringVectorProperty name="CellGridAttribute" label="CellGrid Attribute"
-        command="SetAttributeName" number_of_elements="1">
-        <ArrayListDomain input_domain_name="cell_arrays" name="array_list" none_string="">
+      <StringVectorProperty name="CellGridAttributes" label="CellGrid Attributes"
+        command="GetAttributeSelection"
+        number_of_elements_per_command="1"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain input_domain_name="cell_arrays" name="array_list">
           <RequiredProperties>
             <Property function="Input" name="Source" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>This property chooses a cell-grid attribute to sample.</Documentation>
+        <Documentation>This property chooses the cell-grid attributes to sample.</Documentation>
         <Hints>
           <ArraySelectionWidget icon_type="cell"/>
         </Hints>

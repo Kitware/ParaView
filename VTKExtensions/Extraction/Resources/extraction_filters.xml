@@ -100,6 +100,7 @@
         <InputArrayDomain name="vertex_arrays" attribute_type="vertex" optional="1" />
         <InputArrayDomain name="edge_arrays" attribute_type="edge" optional="1" />
         <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
+        <InputArrayDomain name="side_arrays" attribute_type="side" optional="1" />
       </InputProperty>
 
       <IntVectorProperty name="ChooseArraysToWrite"
@@ -217,6 +218,24 @@
           </Documentation>
           <Hints>
             <ArraySelectionWidget icon_type="row"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="SideDataArrays"
+          command="GetSideDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="side_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the side data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="face"/>
           </Hints>
       </StringVectorProperty>
 

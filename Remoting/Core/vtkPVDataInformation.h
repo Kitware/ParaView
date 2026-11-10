@@ -255,6 +255,7 @@ public:
   }
   vtkTypeInt64 GetNumberOfEdges() const { return this->GetNumberOfElements(vtkDataObject::EDGE); }
   vtkTypeInt64 GetNumberOfRows() const { return this->GetNumberOfElements(vtkDataObject::ROW); }
+  vtkTypeInt64 GetNumberOfSides() const { return this->GetNumberOfElements(vtkDataObject::SIDE); }
   ///@}
 
   ///@{
@@ -358,6 +359,10 @@ public:
   vtkPVDataSetAttributesInformation* GetRowDataInformation() const
   {
     return this->GetAttributeInformation(vtkDataObject::ROW);
+  }
+  vtkPVDataSetAttributesInformation* GetSideDataInformation() const
+  {
+    return this->GetAttributeInformation(vtkDataObject::SIDE);
   }
   vtkPVDataSetAttributesInformation* GetFieldDataInformation() const
   {

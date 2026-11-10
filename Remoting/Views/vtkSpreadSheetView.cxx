@@ -102,6 +102,8 @@ const char* get_userfriendly_name(
         return "Edge ID";
       case vtkDataObject::FIELD_ASSOCIATION_ROWS:
         return "Row ID";
+      case vtkDataObject::FIELD_ASSOCIATION_SIDES:
+        return "Side ID";
       default:
         // LOG_S(INFO) << "Unknown field association encountered.";
         return name;

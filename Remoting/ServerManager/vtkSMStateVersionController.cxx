@@ -2766,6 +2766,48 @@ struct Process_6_1_to_6_2
   }
 };
 
+//===========================================================================
+struct Process_6_2_to_6_3
+{
+  bool operator()(xml_document& document)
+  {
+    return this->HandleCellGridPointProbeAttribute(document);
+  }
+
+  bool HandleCellGridPointProbeAttribute(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set =
+      document.select_nodes("//Proxy[@group='filters' and @type='CellGridPointProbe']");
+    for (auto xpath_node : xpath_set)
+    {
+      pugi::xml_node proxyNode = xpath_node.node();
+      pugi::xml_node oldProperty =
+        proxyNode.find_child_by_attribute("Property", "name", "CellGridAttribute");
+      if (!oldProperty)
+      {
+        continue;
+      }
+      std::string proxyId = proxyNode.attribute("id").as_string();
+      std::string attribute = oldProperty.child("Element").attribute("value").as_string();
+
+      // The single attribute name becomes a selection of at most one attribute.
+      pugi::xml_node propertyNode = proxyNode.append_child("Property");
+      propertyNode.append_attribute("name").set_value("CellGridAttributes");
+      propertyNode.append_attribute("id").set_value((proxyId + ".CellGridAttributes").c_str());
+      propertyNode.append_attribute("number_of_elements").set_value(attribute.empty() ? 0 : 1);
+      if (!attribute.empty())
+      {
+        pugi::xml_node element = propertyNode.append_child("Element");
+        element.append_attribute("index").set_value(0);
+        element.append_attribute("value").set_value(attribute.c_str());
+      }
+
+      proxyNode.remove_child(oldProperty);
+    }
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -2913,6 +2955,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_6_1_to_6_2 converter;
     status = converter(document);
     version = vtkSMVersion(6, 2, 0);
+  }
+
+  if (status && (version < vtkSMVersion(6, 3, 0)))
+  {
+    Process_6_2_to_6_3 converter;
+    status = converter(document);
+    version = vtkSMVersion(6, 3, 0);
   }
 
   if (status)

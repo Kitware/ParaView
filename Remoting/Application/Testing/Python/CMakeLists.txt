@@ -74,6 +74,7 @@ set(PY_TESTS
   TestSAVGReader.py
   TestVTKSeriesWithMeta.py
   ThresholdBackwardsCompatibilityTest.py,NO_VALID
+  UnstructuredGridSideData.py,NO_VALID
   ValidateSources.py,NO_VALID
   VRMLSource.py,NO_VALID
   )

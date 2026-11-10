@@ -722,6 +722,15 @@ def setattr(proxy, pname, value):
         else:
             raise NotSupportedException(
                 "'ConvertToVTK' is obsolete. Simply remove it from your script.")
+    # 6.2 -> 6.3: CellGridAttribute (string) replaced by CellGridAttributes (selection)
+    if pname == "CellGridAttribute" and proxy.SMProxy.GetProperty("CellGridAttributes"):
+        if compatibility_version <= (6, 2):
+            proxy.GetProperty("CellGridAttributes").SetData([value] if value else [])
+            raise Continue()
+        else:
+            raise NotSupportedException(
+                "'CellGridAttribute' is obsolete as of ParaView 6.3. "
+                "Please use the 'CellGridAttributes' property to select the cell-grid attributes instead.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -1450,10 +1459,19 @@ def getattr(proxy, pname):
         else:
             raise NotSupportedException(
                 "'WindowResizeNonInteractiveRenderDelay' is obsolete. Simply remove it from your script.")
+    # 6.2 -> 6.3: CellGridAttribute (string) replaced by CellGridAttributes (selection)
+    if pname == "CellGridAttribute" and proxy.SMProxy.GetProperty("CellGridAttributes"):
+        if compatibility_version <= (6, 2):
+            attributes = proxy.GetProperty("CellGridAttributes").GetData()
+            return attributes[0] if attributes else ""
+        else:
+            raise NotSupportedException(
+                "'CellGridAttribute' is obsolete as of ParaView 6.3. "
+                "Please use the 'CellGridAttributes' property instead.")
 
     # 6.2 -> 6.3: FidesFileReader ConvertToVTK property has been removed. Return False.
     if pname == "ConvertToVTK" and proxy.SMProxy.GetXMLName() in ["FidesFileReader", "FidesJSONReader"]:
-        if compatibility_version < (6, 3):
+        if compatibility_version <= (6, 2):
             return False
         else:
             raise NotSupportedException(

@@ -56,7 +56,7 @@
                          default_values="0"
                          name="ArrayAssociation"
                          number_of_elements="1">
-        <FieldDataDomain name="enum" enable_field_data="1">
+        <FieldDataDomain name="enum" enable_field_data="1" enable_side_data="1">
           <RequiredProperties>
             <Property function="Input"
                       name="Input"/>
@@ -290,6 +290,7 @@ annotation text.
                          number_of_elements="1">
         <Documentation>Select the attribute to use to populate array names.</Documentation>
         <FieldDataDomain enable_field_data="1"
+                         enable_side_data="1"
                          name="enum">
           <RequiredProperties>
             <Property function="Input"

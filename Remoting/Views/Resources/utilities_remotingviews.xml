@@ -31,7 +31,7 @@
       <DoubleVectorProperty name="PolygonOffsetParameters"
                             command="SetPolygonOffsetParameters"
                             number_of_elements="2"
-                            default_values="0.0 0.0"
+                            default_values="1.0 0.0"
                             panel_visibility="advanced">
         <DoubleRangeDomain name="range"/>
         <Documentation>

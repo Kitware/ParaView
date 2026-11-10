@@ -58,7 +58,8 @@ void vtkSMSpreadSheetViewProxy::RepresentationVisibilityChanged(
         // the one described in vtkDataObject as we want the field data
         // to be considered if no other attribute is available.
         const std::vector<int> attributes = { vtkDataObject::POINT, vtkDataObject::CELL,
-          vtkDataObject::VERTEX, vtkDataObject::EDGE, vtkDataObject::ROW, vtkDataObject::FIELD };
+          vtkDataObject::VERTEX, vtkDataObject::EDGE, vtkDataObject::ROW, vtkDataObject::SIDE,
+          vtkDataObject::FIELD };
 
         // let's try to pick as association with non-empty tuples.
         for (int att : attributes)

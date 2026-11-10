@@ -61,7 +61,7 @@ std::string vtkSMFieldDataDomain::GetAttributeTypeAsString(
 const char* vtkSMFieldDataDomain::GetAttributeTypeAsString(int attrType)
 {
   static const char* const vtkSMFieldDataDomainAttributeTypes[] = { "Point Data", "Cell Data",
-    "Field Data", nullptr, "Vertex Data", "Edge Data", "Row Data", nullptr };
+    "Field Data", nullptr, "Vertex Data", "Edge Data", "Row Data", "Side Data", nullptr };
 
   if (attrType >= 0 && attrType < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES)
   {
@@ -74,7 +74,7 @@ const char* vtkSMFieldDataDomain::GetAttributeTypeAsString(int attrType)
 const char* vtkSMFieldDataDomain::GetElementTypeAsString(int attrType)
 {
   static const char* const vtkSMFieldDataDomainAttributeTypes[] = { "Point", "Cell", "Field",
-    nullptr, "Vertex", "Edge", "Row", nullptr };
+    nullptr, "Vertex", "Edge", "Row", "Side", nullptr };
 
   if (attrType >= 0 && attrType < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES)
   {
@@ -194,6 +194,12 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
     this->EnableFieldDataSelection = (enable_field_data != 0) ? true : false;
   }
 
+  int enable_side_data = 0;
+  if (element->GetScalarAttribute("enable_side_data", &enable_side_data))
+  {
+    this->EnableSideDataSelection = (enable_side_data != 0);
+  }
+
   int use_element_types = 0;
   if (element->GetScalarAttribute("use_element_types", &use_element_types))
   {
@@ -226,6 +232,10 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty* vtkNotUsed(prop))
     if (attributeType == vtkDataObject::FIELD)
     {
       continue; // FIELD is handled separately at the end
+    }
+    if (attributeType == vtkDataObject::SIDE && !this->EnableSideDataSelection)
+    {
+      continue;
     }
     const char* label = this->UseElementTypes
       ? vtkSMFieldDataDomain::GetElementTypeAsString(attributeType)

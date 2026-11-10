@@ -2926,6 +2926,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                          panel_visibility="never">
         <Documentation>Select the attribute data to pass.</Documentation>
         <FieldDataDomain enable_field_data="1"
+                         enable_side_data="1"
                          name="enum">
         </FieldDataDomain>
       </IntVectorProperty>

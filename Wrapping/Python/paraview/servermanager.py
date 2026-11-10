@@ -773,12 +773,18 @@ class SourceProxy(Proxy):
         self.UpdatePipeline()
         return FieldDataInformation(self.SMProxy, self.Port, "FieldData")
 
+    def GetSideDataInformation(self):
+        """Returns the associated side data information."""
+        self.UpdatePipeline()
+        return FieldDataInformation(self.SMProxy, self.Port, "SideData")
+
     def GetInformation(self):
         return SourceInformation(self)
 
     PointData = property(GetPointDataInformation, None, None, "Returns point data information")
     CellData = property(GetCellDataInformation, None, None, "Returns cell data information")
     FieldData = property(GetFieldDataInformation, None, None, "Returns field data information")
+    SideData = property(GetSideDataInformation, None, None, "Returns side data information")
     Information = property(GetInformation, None, None, "Returns a data information summary")
 
 
@@ -3639,7 +3645,7 @@ def demo5():
     return scene
 
 
-ASSOCIATIONS = {'POINTS': 0, 'CELLS': 1, 'FIELD': 2, 'VERTICES': 4, 'EDGES': 5, 'ROWS': 6}
+ASSOCIATIONS = {'POINTS': 0, 'CELLS': 1, 'FIELD': 2, 'VERTICES': 4, 'EDGES': 5, 'ROWS': 6, 'SIDES': 7}
 _LEGACY_ASSOCIATIONS = {'POINT_DATA': 0, 'CELL_DATA': 1}
 
 

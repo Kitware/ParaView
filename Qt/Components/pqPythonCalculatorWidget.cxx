@@ -57,6 +57,8 @@ QIcon getAssociationIcon(int assoc)
       return QIcon(":/pqWidgets/Icons/pqEdgeCenterData.svg");
     case vtkDataObject::ROW:
       return QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg");
+    case vtkDataObject::SIDE:
+      return QIcon(":/pqWidgets/Icons/pqFaceCenterData.svg");
     default:
       return QIcon();
   }
