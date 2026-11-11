@@ -16,10 +16,24 @@
 #include "vtkRenderer.h"
 #include "vtkTable.h"
 
+#include <QtGlobal>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QAudioDevice>
+#include <QAudioSink>
+#include <QMediaDevices>
+#else
 #include <QAudioOutput>
+#endif
 
 namespace
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using vtkAudioOutput = QAudioSink;
+#else
+using vtkAudioOutput = QAudioOutput;
+#endif
+
 std::string vtkExtractString(vtkDataObject* data)
 {
   std::string text;
@@ -35,7 +49,7 @@ std::string vtkExtractString(vtkDataObject* data)
 class audioClass
 {
 public:
-  QAudioOutput* AudioOutput = nullptr;
+  vtkAudioOutput* AudioOutput = nullptr;
   QIODevice* IO = nullptr;
   const size_t TempBufferSize = 400000;
   char* TempBuffer[400000];
@@ -73,6 +87,19 @@ void AudioCallback(audioClass* self, vtkFFMPEGVideoSourceAudioCallbackData const
     // Set up the format
     format.setSampleRate(acbd.SampleRate);
     format.setChannelCount(destChannels);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // Qt 6 has no unsigned 16 bit samples.
+    format.setSampleFormat(isFloat ? QAudioFormat::Float : QAudioFormat::Int16);
+
+    QAudioDevice device = QMediaDevices::defaultAudioOutput();
+    if (!device.isFormatSupported(format))
+    {
+      vtkGenericWarningMacro("Raw audio format not supported by backend, cannot play audio.");
+      return;
+    }
+
+    self->AudioOutput = new QAudioSink(device, format);
+#else
     format.setSampleSize(8 * destBytesPerSample);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
@@ -86,6 +113,7 @@ void AudioCallback(audioClass* self, vtkFFMPEGVideoSourceAudioCallbackData const
     }
 
     self->AudioOutput = new QAudioOutput(format);
+#endif
     // if a platform has issue with the default buffer size
     // you can uncomment the line below to make it explicit
     // self->AudioOutput->setBufferSize(2 * 4 * 9600);
@@ -205,7 +233,7 @@ vtkSkyboxMovieRepresentation::vtkSkyboxMovieRepresentation()
 //----------------------------------------------------------------------------
 vtkSkyboxMovieRepresentation::~vtkSkyboxMovieRepresentation()
 {
-  delete this->InternalAudioClass;
+  delete static_cast<audioClass*>(this->InternalAudioClass);
 
   if (this->MovieSource)
   {
