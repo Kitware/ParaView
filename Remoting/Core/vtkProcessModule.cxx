@@ -624,6 +624,8 @@ bool vtkProcessModule::InitializePythonEnvironment()
 // only for static builds, but no harm in doing for shared build as well.
 #if BUILD_SHARED_LIBS
   vtkPythonInterpreter::PrependPythonPath(this->GetSelfDir().c_str(), "vtkmodules/__init__.py");
+  // With an external VTK, `paraview` is not next to `vtkmodules`.
+  vtkPythonInterpreter::PrependPythonPath(this->GetSelfDir().c_str(), "paraview/__init__.py");
 #else
   // for static builds, we use zipped packages.
 

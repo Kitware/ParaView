@@ -560,6 +560,11 @@ elseif (UNIX)
     "$ORIGIN")
 endif ()
 
+cmake_dependent_option(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE
+  "Explicitly indicate that the Python library is debuggable" OFF
+  "WIN32;PARAVIEW_USE_PYTHON" OFF)
+mark_as_advanced(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE)
+
 if (PARAVIEW_USE_EXTERNAL_VTK)
   list(REMOVE_DUPLICATES vtk_modules)
   foreach(mod IN LISTS vtk_modules)
@@ -607,7 +612,20 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
     endforeach()
   endmacro()
   search_dependent_targets(${vtk_modules})
-  find_package(VTK CONFIG REQUIRED COMPONENTS "${vtk_components}")
+  # Every VTK target was imported by the first `find_package(VTK)`, so find the
+  # dependencies of all of them, since some plugins link VTK modules depending
+  # on their options. Components starting with `vtk` are skipped, since VTK
+  # takes them for deprecated names.
+  set(vtk_optional_components ${VTK_AVAILABLE_COMPONENTS})
+  list(FILTER vtk_optional_components EXCLUDE REGEX "^vtk")
+  find_package(VTK CONFIG REQUIRED COMPONENTS "${vtk_components}"
+    OPTIONAL_COMPONENTS ${vtk_optional_components})
+  # Optional features check for found VTK modules, so wrap all of them.
+  foreach (vtk_component IN LISTS vtk_optional_components)
+    if (VTK_${vtk_component}_FOUND)
+      list(APPEND vtk_modules "VTK::${vtk_component}")
+    endif ()
+  endforeach ()
   if (PARAVIEW_USE_PYTHON)
     find_package(Python3 3.3 QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
@@ -774,10 +792,6 @@ else ()
   cmake_dependent_option(VTK_USE_TK "Build VTK with Tk support" OFF
     "PARAVIEW_USE_PYTHON" OFF)
 
-  cmake_dependent_option(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE
-    "Explicitly indicate that the Python library is debuggable" OFF
-    "WIN32;PARAVIEW_USE_PYTHON" OFF)
-  mark_as_advanced(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE)
   set(VTK_WINDOWS_PYTHON_DEBUGGABLE ${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE})
 
   if (PARAVIEW_USE_QT)
@@ -1228,6 +1242,11 @@ endif()
 # Test to check install tree
 #------------------------------------------------------------------------------
 if (BUILD_TESTING AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  # An external VTK is not in ParaView's install tree, so give its location.
+  set(test_install_vtk_dir "")
+  if (PARAVIEW_USE_EXTERNAL_VTK)
+    set(test_install_vtk_dir "${VTK_DIR}")
+  endif ()
   add_test( NAME pv.TestDevelopmentInstall
     COMMAND ${CMAKE_COMMAND}
     -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
@@ -1241,6 +1260,7 @@ if (BUILD_TESTING AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     -DCMAKE_GENERATOR:STRING=${CMAKE_GENERATOR}
     -DCMAKE_GENERATOR_PLATFORM:STRING=${CMAKE_GENERATOR_PLATFORM}
     -DCMAKE_GENERATOR_TOOLSET:STRING=${CMAKE_GENERATOR_TOOLSET}
+    -DVTK_DIR:PATH=${test_install_vtk_dir}
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CMake/ParaViewTestInstall.cmake)
   set_tests_properties(pv.TestDevelopmentInstall PROPERTIES
     LABELS "paraview"
