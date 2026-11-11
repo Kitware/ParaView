@@ -1957,7 +1957,7 @@ void pqFlatTreeView::keyPressEvent(QKeyEvent* e)
     }
 
 // OS specific keys ---------------------------------------------
-#if defined(Q_WS_MAC) || defined(Q_OS_MAC)
+#if defined(Q_WS_MAC) || defined(Q_OS_MACOS)
     case Qt::Key_Enter:
     case Qt::Key_Return:
     {

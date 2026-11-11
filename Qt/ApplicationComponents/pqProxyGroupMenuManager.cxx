@@ -634,7 +634,7 @@ void pqProxyGroupMenuManager::populateMenu()
 
   if (this->supportsQuickLaunch())
   {
-#if defined(Q_WS_MAC) || defined(Q_OS_MAC)
+#if defined(Q_WS_MAC) || defined(Q_OS_MACOS)
     this->Internal->SearchAction =
       mainMenu->addAction(tr("Search...\tAlt+Space"), this, SLOT(quickLaunch()));
 #else

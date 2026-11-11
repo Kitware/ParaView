@@ -44,7 +44,7 @@ pqLinePropertyWidget::pqLinePropertyWidget(
   Ui::LinePropertyWidget& ui = this->Internals->Ui;
   ui.setupUi(this);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
   ui.pickLabel->setText(ui.pickLabel->text().replace("Ctrl", "Cmd"));
 #endif
 

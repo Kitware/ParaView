@@ -35,7 +35,6 @@
 class PQWIDGETS_EXPORT pqDoubleLineEdit : public pqLineEdit
 {
   Q_OBJECT
-  Q_ENUMS(RealNumberNotation)
   Q_PROPERTY(RealNumberNotation notation READ notation WRITE setNotation)
   Q_PROPERTY(int precision READ precision WRITE setPrecision)
   Q_PROPERTY(bool useGlobalPrecisionAndNotation READ useGlobalPrecisionAndNotation WRITE
@@ -56,6 +55,7 @@ public:
     FixedNotation,
     FullNotation
   };
+  Q_ENUM(RealNumberNotation)
 
   /**
    * Return the notation used to display the number.
