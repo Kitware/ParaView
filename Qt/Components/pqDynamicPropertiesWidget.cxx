@@ -261,8 +261,8 @@ public:
   vtkTypeMacro(DomainModifiedObserver, vtkCommand);
 
   // The Execute method is called when the observed event occurs
-  void Execute(vtkObject* caller, unsigned long eventId [[maybe_unused]],
-    void* callData [[maybe_unused]]) override
+  void Execute(
+    vtkObject* caller, unsigned long vtkNotUsed(eventId), void* vtkNotUsed(callData)) override
   {
     auto* domain = vtkSMDynamicPropertiesDomain::SafeDownCast(caller);
     if (!domain)
