@@ -50,8 +50,6 @@ HTML_OUTPUT          = "cxx"
 
 INPUT                = \
           "@CMAKE_CURRENT_BINARY_DIR@/dox" \
-          "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_events2.dox" \
-          "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_events.dox" \
           "@CMAKE_CURRENT_BINARY_DIR@/pages" \
           "@ParaView_SOURCE_DIR@/CONTRIBUTING.md" \
           "@ParaView_SOURCE_DIR@/README.md" \
