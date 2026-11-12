@@ -68,6 +68,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(BlockContentMenu);
   PQ_BEHAVIOR_DEFINE_METHODS(ObjectPickingBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(DefaultViewBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(ThreadedUpdateBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(UndoRedoBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(AlwaysConnectedBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(CrashRecoveryBehavior);
@@ -134,6 +135,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(BlockContentMenu);
   PQ_BEHAVIOR_DECLARE_FLAG(ObjectPickingBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(DefaultViewBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(ThreadedUpdateBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(UndoRedoBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(AlwaysConnectedBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(CrashRecoveryBehavior);

@@ -106,11 +106,7 @@ void pqAnimatedExportReaction::Export(const QString& filename)
     });
 
   auto pgm = pqPVApplicationCore::instance()->getProgressManager();
-  // this is essential since pqProgressManager blocks all interaction
-  // events when progress events are pending. since we have a QProgressDialog
-  // as modal, we don't need to that. Plus, we want the cancel button on the
-  // dialog to work.
-  const auto prev = pgm->unblockEvents(true);
+  pgm->addNonBlockableObject(&progress);
 
   { // Save file
     vtkNew<vtkSMAnimationSceneWebWriter> writer;
@@ -122,6 +118,6 @@ void pqAnimatedExportReaction::Export(const QString& filename)
       qDebug() << "Save animated scene failed!";
     }
   }
-  pgm->unblockEvents(prev);
+  pgm->removeNonBlockableObject(&progress);
   scene->disconnect(sceneConnection);
 }

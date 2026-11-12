@@ -29,15 +29,11 @@ class vtkSMProxy;
  *
  *   auto appcore = pqApplicationCore::instance();
  *   auto pgm = appcore->getProgressManager();
- *   // this is essential since pqProgressManager blocks all interaction
- *   // events when progress events are pending. since we have a QProgressDialog
- *   // as modal, we don't need to that. Plus, we want the cancel button on the
- *   // dialog to work.
- *   const auto prev = pgm->unblockEvents(true);
- *
- *       // ---- do animation playback ---
- *
- *   pgm->unblockEvents(prev);
+ *   pgm->addNonBlockableObject(progress);
+ *   pgm->setEnableAbort(true);
+ *   // ---- do animation playback ---
+ *   pgm->setEnableAbort(false);
+ *   pgm->removeNonBlockableObject(progress);
  *   progress.hide();
  * @endcode
  */
