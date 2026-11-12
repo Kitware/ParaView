@@ -1129,6 +1129,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   RenderViewUpdateLOD.xml
   SearchBox.xml
   ServerConnectDialog.xml
+  SettingsHiddenSavedDefault.xml
   SettingsNoCustomDefault.xml
   SettingsOverrideDomain.xml
   SettingsProxyProperty.xml
