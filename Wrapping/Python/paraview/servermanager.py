@@ -394,8 +394,8 @@ class Proxy(object):
 
     def GetProperty(self, name):
         """Given a property name, returns the property object."""
-        if name in self.__Properties and self.__Properties[name]():
-            return self.__Properties[name]()
+        if name in self.__Properties and self.__Properties[name]:
+            return self.__Properties[name]
         smproperty = self.SMProxy.GetProperty(name)
         # Maybe they are looking by the label. Try to match that.
         if not smproperty:
@@ -407,8 +407,7 @@ class Proxy(object):
         if smproperty:
             property = _wrap_property(self, smproperty)
             if property is not None:
-                import weakref
-                self.__Properties[name] = weakref.ref(property)
+                self.__Properties[name] = property
             return property
         return None
 
