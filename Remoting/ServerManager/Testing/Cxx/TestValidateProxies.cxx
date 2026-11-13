@@ -47,6 +47,7 @@ extern int TestValidateProxies(int argc, char* argv[])
   exceptions.insert(PairType("internal_views", "XYChartViewBase"));
   exceptions.insert(PairType("internal_views", "XYChartViewBase4Axes"));
   exceptions.insert(PairType("internal_readers", "VisItSeriesReaderBase"));
+  exceptions.insert(PairType("internal_sources", "EAMDataReaderBase"));
   exceptions.insert(PairType("extract_writers", "JPG"));
   exceptions.insert(PairType("extract_writers", "PNG"));
   exceptions.insert(PairType("extract_writers", "RecolorableImage"));
