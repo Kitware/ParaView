@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Create a sphere -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Modify PointSize and LineWidth from Label Properties Selection -->
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/labelPropertiesSelection" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SelectionPointSize/DoubleLineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SelectionLineWidth/DoubleLineEdit0" command="set_string" arguments="8" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/widget/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/widget/SaveButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Create a box -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="CubeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/labelPropertiesSelection" command="activate" arguments="" />
+
+  <!-- Check default properties has been saved -->
+  <pqcheck object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SelectionPointSize/DoubleLineEdit0" property="text" arguments="10" />
+  <pqcheck object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SelectionLineWidth/DoubleLineEdit0" property="text" arguments="8" />
+
+  <!-- Restore properties default ParaView values and check them -->
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/widget/RestoreDefaultsButton" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SelectionPointSize/DoubleLineEdit0" property="text" arguments="5" />
+  <pqcheck object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SelectionLineWidth/DoubleLineEdit0" property="text" arguments="2" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/selectionDisplayProperties/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
+</pqevents>

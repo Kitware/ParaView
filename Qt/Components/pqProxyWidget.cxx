@@ -1240,14 +1240,26 @@ bool pqProxyWidget::restoreDefaults()
   if (this->Internals->Proxy)
   {
     vtkSmartPointer<vtkSMPropertyIterator> iter;
-    iter.TakeReference(this->Internals->Proxy->NewPropertyIterator());
+
+    vtkNew<vtkSMNamedPropertyIterator> namedIter;
+    if (this->Internals->Properties)
+    {
+      namedIter->SetPropertyNames(this->Internals->Properties);
+      namedIter->SetProxy(this->Internals->Proxy);
+      iter = namedIter;
+    }
+    else
+    {
+      iter.TakeReference(this->Internals->Proxy->NewPropertyIterator());
+    }
+
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
       vtkSMProperty* smproperty = iter->GetProperty();
 
       // restore defaults only for properties listed
       if (this->Internals->Properties &&
-        this->Internals->Properties->GetIndex(smproperty->GetXMLName()) == -1)
+        this->Internals->Properties->GetIndex(namedIter->GetKey()) == -1)
       {
         continue;
       }

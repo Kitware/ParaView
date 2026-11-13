@@ -824,8 +824,8 @@ public:
       std::string propertySettingString(propertySettingStringStream.str());
       const char* propertySettingCString = propertySettingString.c_str();
 
-      if (strcmp(property->GetPanelVisibility(), "never") == 0 || property->GetInformationOnly() ||
-        property->GetIsInternal() || property->GetNoCustomDefault())
+      if (property->GetInformationOnly() || property->GetIsInternal() ||
+        property->GetNoCustomDefault())
       {
         continue;
       }
@@ -848,8 +848,7 @@ public:
         {
           // Allocated as done in Json::Value removeMember(const char* key).
           Json::Value removedValue;
-          if (proxyValue.removeMember(property->GetXMLName(), &removedValue) &&
-            !removedValue.isNull())
+          if (proxyValue.removeMember(propertyName, &removedValue) && !removedValue.isNull())
           {
             this->Modified();
           }
