@@ -101,8 +101,7 @@ private:
   void onPlayInternal();
   void onReverseInternal();
 
-  QMetaObject::Connection LamdaPlayConnection;
-  QMetaObject::Connection LamdaReverseConnection;
+  QMetaObject::Connection PendingRestartConnection;
   QPointer<pqAnimationScene> Scene;
 };
 
