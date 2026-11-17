@@ -361,6 +361,11 @@ Q_SIGNALS:
   void firstChildAdded(const QModelIndex& index);
   void childWithChildrenAdded(const QModelIndex& index);
 
+  /**
+   * Called when the name of a source has changed
+   */
+  void sourceRenamed();
+
 private Q_SLOTS:
   void onInsituConnectionInitiated(pqServer* server);
 

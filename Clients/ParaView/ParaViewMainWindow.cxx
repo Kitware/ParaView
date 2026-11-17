@@ -130,6 +130,8 @@ ParaViewMainWindow::ParaViewMainWindow()
     SLOT(resetMessageIndicators()));
   this->connect(
     this->Internals->statusbar, SIGNAL(messageIndicatorPressed()), this, SLOT(showOutputWidget()));
+  this->connect(this->Internals->pipelineBrowser, SIGNAL(sourceRenamed()),
+    this->Internals->propertiesPanel, SLOT(updatePanel()));
 
   // Setup default GUI layout.
   this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);

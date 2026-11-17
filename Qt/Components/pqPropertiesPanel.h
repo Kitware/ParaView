@@ -164,6 +164,12 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setPipelineProxy(pqProxy*);
 
   /**
+   * Updates the entire panel (properties+display) using the current
+   * port/representation.
+   */
+  void updatePanel();
+
+  /**
    * Set the representation currently managed by the panel, should be called
    * automatically when the active representation changes.
    */
@@ -215,12 +221,6 @@ private Q_SLOTS:
    * slot gets called when a proxy is deleted.
    */
   void proxyDeleted(pqProxy*);
-
-  /**
-   * Updates the entire panel (properties+display) using the current
-   * port/representation.
-   */
-  void updatePanel();
 
   /**
    * Updates the display part of the panel alone, unlike updatePanel().

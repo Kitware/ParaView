@@ -1152,6 +1152,8 @@ void pqPipelineModel::addSource(pqPipelineSource* source)
 
   QObject::connect(source, SIGNAL(nameChanged(pqServerManagerModelItem*)), this,
     SLOT(updateData(pqServerManagerModelItem*)));
+  QObject::connect(
+    source, SIGNAL(nameChanged(pqServerManagerModelItem*)), this, SIGNAL(sourceRenamed()));
   QObject::connect(source, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)), this,
     SLOT(updateData(pqServerManagerModelItem*)));
 }
