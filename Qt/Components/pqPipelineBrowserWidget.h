@@ -96,6 +96,11 @@ Q_SIGNALS:
    */
   void deleteKey();
 
+  /**
+   * Fired when a source has been renamed
+   */
+  void sourceRenamed();
+
 public Q_SLOTS:
   /**
    * Set the active view. By default connected to

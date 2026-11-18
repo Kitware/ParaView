@@ -117,6 +117,8 @@ void pqPipelineBrowserWidget::configureModel()
 
   QObject::connect(this->PipelineModel, SIGNAL(childWithChildrenAdded(const QModelIndex&)), this,
     SLOT(expandWithModelIndexTranslation(const QModelIndex&)));
+
+  QObject::connect(this->PipelineModel, SIGNAL(sourceRenamed()), this, SIGNAL(sourceRenamed()));
 }
 
 //-----------------------------------------------------------------------------

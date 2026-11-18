@@ -1059,6 +1059,7 @@ list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
   RawImageDataReaderBackwardCompat.xml
   ReaderRegistrationName.xml
   ReadIOHDFAMRMaxLevels.xml
+  RenameSourceUpdatePropertiesPanel.xml
   RescaleVisibleRangeOption.xml
   RulerRepositionToView.xml
   SpatioTemporalHarmonicsAttribute.xml
