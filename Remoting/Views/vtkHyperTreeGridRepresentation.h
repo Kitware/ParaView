@@ -22,8 +22,10 @@
 #include "vtkPVLODActor.h"          // Upcast in vtkActor
 #include "vtkProperty.h"            // needed for VTK_POINTS etc.
 #include "vtkRemotingViewsModule.h" // needed for exports
+#include "vtkVector.h"              // for vtkVector3d
 
 #include <string> // needed for std::string
+#include <vector> // needed for std::vector
 
 class vtkDataObjectTree;
 class vtkOpenGLHyperTreeGridMapper;
@@ -252,6 +254,10 @@ public:
    */
   void AddBlockSelector(const char* selector);
   void RemoveAllBlockSelectors();
+  void SetBlockColor(const char* selector, double r, double g, double b);
+  void RemoveAllBlockColors();
+  void SetBlockOpacity(const char* selector, double opacity);
+  void RemoveAllBlockOpacities();
   ///@}
 
   /**
@@ -346,7 +352,6 @@ protected:
   vtkNew<vtkProperty> Property;
 
   int Representation = SURFACE;
-
   bool RepeatTextures = false;
   bool InterpolateTextures = false;
   bool UseMipmapTextures = false;
@@ -356,9 +361,12 @@ protected:
   double VisibleDataBounds[6];
   bool UseShaderReplacements = false;
   std::string ShaderReplacementsString;
-  std::vector<std::string> BlockSelectors;
 
 private:
+  std::vector<std::string> BlockSelectors;
+  std::vector<std::pair<std::string, vtkVector3d>> BlockColors;
+  std::vector<std::pair<std::string, double>> BlockOpacities;
+
   vtkHyperTreeGridRepresentation(const vtkHyperTreeGridRepresentation&) = delete;
   void operator=(const vtkHyperTreeGridRepresentation&) = delete;
 };
