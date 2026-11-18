@@ -86,6 +86,7 @@
 #include "pqUndoRedoReaction.h"
 #include "pqVCRToolbar.h"
 #include "pqViewMenuManager.h"
+#include "pqWelcomeDialogReaction.h"
 #include "pqWidgetUtilities.h"
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
@@ -817,6 +818,11 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   new pqDesktopServicesReaction(QUrl(bugReportURL),
     (menu.addAction(QCoreApplication::translate("pqHelpMenu", "Bug Report"))
       << pqSetName("bugReport")));
+
+  // Welcome page
+  new pqWelcomeDialogReaction(
+    menu.addAction(QCoreApplication::translate("pqHelpMenu", "Welcome page"))
+    << pqSetName("actionWelcome"));
 
   // About
   new pqAboutDialogReaction(menu.addAction(QCoreApplication::translate("pqHelpMenu", "About..."))

@@ -32,9 +32,9 @@
   <pqevent object="pqClientMainWindow/IconBrowser/importIcon" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/IconOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/paraview_icon.svg" />
   <pqevent object="pqClientMainWindow/IconBrowser/searchBox/SearchLineEdit" command="set_string" arguments="paraview" />
-  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelRowCount" arguments="1" />
-  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
-  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelItemData" arguments="0.0,paraview_icon" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelRowCount" arguments="2" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="1.0" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelItemData" arguments="1.0,paraview_icon" />
   <pqevent object="pqClientMainWindow/IconBrowser/searchBox/SearchLineEdit" command="set_string" arguments="" />
   <pqcheck object="pqClientMainWindow/IconBrowser/filterBox" property="currentText" arguments="All" />
   <pqevent object="pqClientMainWindow/IconBrowser/filterBox" command="activated" arguments="User icons" />

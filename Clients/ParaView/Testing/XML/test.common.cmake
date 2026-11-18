@@ -1070,6 +1070,9 @@ list(APPEND TEST_WITHOUT_BASELINES_CLIENT_ONLY
   TestFileListPropertyWidget.xml
   ThresholdTable.xml
   TimeKeeper.xml
+  WelcomePageLoadData.xml
+  WelcomePageServer.xml
+  WelcomePageLoadState.xml
   WriteXMLTimeValue.xml
   YieldCriteria.xml
 )

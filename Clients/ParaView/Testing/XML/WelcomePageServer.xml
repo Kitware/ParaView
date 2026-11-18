@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<pqevents>
+
+  <!-- Create a server -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionServerConnect" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/addServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/name" command="set_string" arguments="TestServer" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_edit/editServer2ButtonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/close" command="activate" arguments="" />
+
+  <!-- Check if server is in recent server -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Help" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Help" command="activate" arguments="actionWelcome" />
+  <pqcheck object="pqClientMainWindow/pqWelcomeDialog/serversHelpWidget/serversWidget/recentServerWidget/1pqClickableLabel0" property="text" arguments="TestServer" />
+
+  <!-- Check if we can open/close the Server Connection dialog from the welcome page -->
+  <pqevent object="pqClientMainWindow/pqWelcomeDialog/serversHelpWidget/serversWidget/connectServerButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/close" command="activate" arguments="" />
+</pqevents>

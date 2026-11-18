@@ -222,6 +222,7 @@ set(classes
   pqViewStreamingBehavior
   pqViewTypePropertyWidget
   pqWelcomeDialog
+  pqWelcomeDialogReaction
   pqYoungsMaterialPropertyWidget)
 
 set_property(SOURCE pqApplicationComponentsInit.cxx APPEND

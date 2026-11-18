@@ -37,7 +37,7 @@ pqServerConnectReaction::pqServerConnectReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerConnectReaction::connectToServerWithWarning()
+bool pqServerConnectReaction::canProceedWithConnection()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
@@ -56,11 +56,34 @@ void pqServerConnectReaction::connectToServerWithWarning()
         QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::No)
     {
-      return;
+      return false;
     }
   }
 
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerConnectReaction::connectToServerWithWarning()
+{
+  if (!canProceedWithConnection())
+  {
+    return;
+  }
+
   pqServerConnectReaction::connectToServer();
+}
+
+//-----------------------------------------------------------------------------
+void pqServerConnectReaction::connectToServerWithWarning(
+  const pqServerConfiguration& config, bool showConnectionDialog)
+{
+  if (!canProceedWithConnection())
+  {
+    return;
+  }
+
+  pqServerConnectReaction::connectToServerUsingConfiguration(config, showConnectionDialog);
 }
 
 //-----------------------------------------------------------------------------

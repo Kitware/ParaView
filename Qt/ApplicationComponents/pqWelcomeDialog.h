@@ -4,7 +4,11 @@
 #define pqWelcomeDialog_h
 
 #include "pqApplicationComponentsModule.h"
+#include "pqServerConfiguration.h" // Needed for QList
 #include <QDialog>
+
+class pqServerResource;
+class pqServer;
 
 namespace Ui
 {
@@ -25,19 +29,25 @@ public:
   explicit pqWelcomeDialog(QWidget* parent = nullptr);
   ~pqWelcomeDialog() override;
 
+Q_SIGNALS:
+  void serverConnected(const pqServerConfiguration& serverConfig);
+
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void onGettingStartedGuideClicked();
-
   virtual void onExampleVisualizationsClicked();
+  virtual void onDocumentationClicked();
 
-protected Q_SLOTS:
-  /**
-   * React to checkbox events
-   */
-  void onDoNotShowAgainStateChanged(Qt::CheckState);
+private Q_SLOTS:
+  void connectServer(int serverIndex);
+  void onDoNotShowAgainButton();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
+  void openResource(const pqServerResource& resource);
+  bool openResource(pqServer* server, const pqServerResource& resource);
+
   Ui::pqWelcomeDialog* ui;
+
+  QList<pqServerConfiguration> Configurations;
 };
 
 #endif // pqWelcomeDialog_h
