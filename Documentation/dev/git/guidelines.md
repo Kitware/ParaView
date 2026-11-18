@@ -80,3 +80,11 @@ void TheFunction();
 ```
 * Use Doxygen's `@class` for a comprehensive class description (only header).
 * Don't keep commented code.
+
+Documentation
+-------------
+* Document your change in a Markdown file (.md) inside the `Documentation/release/dev` folder.
+* Document global design in a Markdown file inside `Utilities/Doxygen/pages`. Update `index.md.in` accordingly.
+* Document new environment variables in `Utilities/Documentation/pages/EnvironmentVariables.md`
+* The doxygen generated [pages](https://www.paraview.org/paraview-docs/nightly/cxx/) include code documentation as parsed from comments (see "Comments" section) but can also contain Markdown files (.md) for global documentation (individual change log as described above are excluded).
+* The directories searched for code and markdown are set in the [doxyfile](Utilities/Doxygen/doxyfile.in) under the `INPUT` section. If you are changing (adding, removing, renaming) a top-level directory of ParaView, please be sure to modify this file accordingly.
