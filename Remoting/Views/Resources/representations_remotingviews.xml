@@ -660,6 +660,7 @@
         <DataAssemblyDomain name="data_assembly">
           <RequiredProperties>
             <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
           </RequiredProperties>
         </DataAssemblyDomain>
         <Documentation>
@@ -678,6 +679,7 @@
          <DataAssemblyDomain name="data_assembly">
           <RequiredProperties>
             <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
           </RequiredProperties>
         </DataAssemblyDomain>
         <Hints>
@@ -686,6 +688,12 @@
         <Documentation>
           For composite datasets, specify opacities associated with hierarchy selectors.
         </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Assembly"
+                            number_of_elements="1"
+                            default_values="Hierarchy"
+                            panel_visibility="never">
       </StringVectorProperty>
 
       <StringVectorProperty name="BlockColors"
