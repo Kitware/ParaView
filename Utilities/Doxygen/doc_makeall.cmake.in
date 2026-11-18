@@ -166,22 +166,11 @@ set(VTK_TAGFILE_REMOTE_DIR http://www.vtk.org/files/nightly)
 set(VTK_TAGFILE_DEST_DIR "${DOXTEMP}")
 
 # ----------------------------------------------------------------------------
-# SOURCE_DIRECTORIES
-#
-# This list is processed by several perl scripts below. Keeping it in one
-# list avoids the possibility that multiple lists might get out of sync with
-# rushed edits...
-#
-set(SOURCE_DIRECTORIES
-@PV_MODULE_DIRS_DOXYGEN@
-)
-
-# ----------------------------------------------------------------------------
 # Print some progress. Be nice to the build watcher.
 
 macro(step n desc)
   message(STATUS "")
-  message(STATUS "Building VTK docs: step ${n} of 13, (${desc})")
+  message(STATUS "Building ParaView docs: step ${n} of 6, (${desc})")
   message(STATUS "----------------------------------------------------------------------------")
 endmacro()
 
@@ -229,139 +218,14 @@ foreach(var
   VTK_TAGFILE
   VTK_TAGFILE_REMOTE_DIR
   VTK_TAGFILE_DEST_DIR
-  SOURCE_DIRECTORIES
 )
   echo(${var})
 endforeach()
 
 # ----------------------------------------------------------------------------
-# Convert the VTK headers to the Doxygen format.
-
-step(1 "convert VTK headers to doxygen format")
-file(MAKE_DIRECTORY "${INTERMEDIATE_DOX_DIR}")
-#execute_process(COMMAND ${PERL}
-#  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_header2doxygen.pl"
-#  --to "${INTERMEDIATE_DOX_DIR}"
-#  --relativeto "${SOURCE_DIR}/${REL_PATH_TO_TOP}"
-#  ${SOURCE_DIRECTORIES}
-#  RESULT_VARIABLE rv
-#)
-#
-#if (rv)
-#  message(FATAL_ERROR "Step failed: ${rv}")
-#endif()
-
-# ----------------------------------------------------------------------------
-# Build the Events invocation list.
-
-step(2 "cross-reference classes to InvokeEvent callers")
-execute_process(COMMAND ${PERL}
-  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_codematch.pl"
-  --codematch "\\w(?:->|\\.)InvokeEvent\\s*\\(\\s*(vtkCommand::\\w+)[\\s,]"
-  --label "Events"
-  --project "${PROJECT_NAME}"
-  --sectionmatch "^vtkCommand::(\\w)"
-  --store "doc_${PROJECT_NAME}_events.dox"
-  --title "Event to Classes"
-  --sectionmatch2 "^vtk(\\w)"
-  --store2 "doc_${PROJECT_NAME}_events2.dox"
-  --title2 "Class to Events"
-  --to "${INTERMEDIATE_DOX_DIR}"
-  --unique "v"
-  --relativeto "${SOURCE_DIR}/${REL_PATH_TO_TOP}"
-  ${SOURCE_DIRECTORIES}
-  RESULT_VARIABLE rv
-)
-
-if (rv)
-  message(FATAL_ERROR "Step failed: ${rv}")
-endif()
-
-# ----------------------------------------------------------------------------
-# Build the full-text index.
-
-step(3 "build full text index -- skipping")
-# execute_process(COMMAND ${PERL}
-#   "${PATH_TO_VTK_DOX_SCRIPTS}/doc_index.pl"
-#   --project "${PROJECT_NAME}"
-#   --stop  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_index.stop"
-#   --store "doc_${PROJECT_NAME}_index.dox"
-#   --to "${INTERMEDIATE_DOX_DIR}"
-#   ${SOURCE_DIRECTORIES}
-#   RESULT_VARIABLE rv
-# )
-#
-# if (rv)
-#   message(FATAL_ERROR "Step failed: ${rv}")
-# endif()
-
-# ----------------------------------------------------------------------------
-# Extract the VTK version and create the main page.
-#  -- Here we differ from VTK, we simply install the generated
-#  doc_ParaView_version.dox file instead.
-step(4 "extract ParaView version")
-#file(INSTALL "${DOXTEMP}/doc_ParaView_version.dox"
-#     DESTINATION "${INTERMEDIATE_DOX_DIR}"
-#     USE_SOURCE_PERMISSIONS)
-
-# ----------------------------------------------------------------------------
-# Generate the 'Class to Examples' page cross-linking each class to these
-# examples that use that class.
-
-step(5 "cross-reference classes with Examples -- skipping")
-#execute_process(COMMAND ${PERL}
-#  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_class2example.pl"
-#  --baselinedir "${DATA_ROOT}/Baseline"
-#  --baselineicon "pic.gif"
-#  --baselinelink "${GITWEB_DATA_CHECKOUT}Baseline"
-#  --baselinelinksuffix "${GITWEB_DATA_SUFFIX}"
-#  --datamatch "\\W(VTK_DATA_ROOT|VTKData|(vtk)?GetDataRoot|ExpandDataFileName)\\W"
-#  --dataicon "paper-clip.gif"
-#  --dirmatch "^Examples$"
-#  --label "Examples"
-#  --link "${GITWEB_CHECKOUT}"
-#  --linksuffix "${GITWEB_SUFFIX}"
-#  --project "${PROJECT_NAME}"
-#  --store "doc_${PROJECT_NAME}_class2examples.dox"
-#  --title "Class To Examples"
-#  --to "${INTERMEDIATE_DOX_DIR}"
-#  --unique "e"
-#  --remove_leading_slash=1
-#  "${SOURCE_DIR}/${REL_PATH_TO_TOP}"
-#  RESULT_VARIABLE rv
-#)
-
-# ----------------------------------------------------------------------------
-# Generate the 'Class to Tests' page cross-linking each class to these
-# tests that use that class.
-
-step(6 "cross-reference classes with Testing -- skipping")
-#execute_process(COMMAND ${PERL}
-#  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_class2example.pl"
-#  --baselinedir "${DATA_ROOT}/Baseline"
-#  --baselineicon "pic.gif"
-#  --baselinelink "${GITWEB_DATA_CHECKOUT}Baseline"
-#  --baselinelinksuffix "${GITWEB_DATA_SUFFIX}"
-#  --datamatch "\\W(VTK_DATA_ROOT|VTKData|(vtk)?GetDataRoot|ExpandDataFileName)\\W"
-#  --dataicon "paper-clip.gif"
-#  --dirmatch "^Testing$"
-#  --label "Tests"
-#  --link "${GITWEB_CHECKOUT}"
-#  --linksuffix "${GITWEB_SUFFIX}"
-#  --project "${PROJECT_NAME}"
-#  --store "doc_${PROJECT_NAME}_class2tests.dox"
-#  --title "Class To Tests"
-#  --to "${INTERMEDIATE_DOX_DIR}"
-#  --unique "t"
-#  --remove_leading_slash=1
-#  "${SOURCE_DIR}/${REL_PATH_TO_TOP}"
-#  RESULT_VARIABLE rv
-#)
-
-# ----------------------------------------------------------------------------
 # Retrieve the remote VTK tag file.
 
-step(7 "download VTK tag file")
+step(1 "download VTK tag file")
 if(DOWNLOAD_VTK_TAGFILE AND EXISTS "@GUNZIPCOMMAND@")
   if(NOT VTK_TAGFILE STREQUAL "")
     file(DOWNLOAD
@@ -382,7 +246,7 @@ endif()
 # ----------------------------------------------------------------------------
 # Create the Doxygen doc.
 
-step(8 "run doxygen")
+step(2 "run doxygen")
 file(REMOVE_RECURSE "${OUTPUT_DIRECTORY}")
 file(MAKE_DIRECTORY "${OUTPUT_DIRECTORY}")
 execute_process(COMMAND ${DOXYGEN} ${DOXYFILE}
@@ -395,7 +259,7 @@ endif()
 # ----------------------------------------------------------------------------
 # Clean the HTML pages to remove the path to the intermediate Doxygen dir.
 
-step(9 "remove intermediate path from html")
+step(3 "remove intermediate path from html")
 execute_process(COMMAND ${PERL}
   "${PATH_TO_VTK_DOX_SCRIPTS}/doc_rmpath.pl"
   --to "${INTERMEDIATE_DOX_DIR}"
@@ -408,23 +272,9 @@ if (rv)
 endif()
 
 # ----------------------------------------------------------------------------
-# clean the HTML pages to remove layout problems
-
-step(10 "clean html to remove layout problems - skipping")
-#execute_process(COMMAND ${PERL}
-#  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_cleanhtml.pl"
-#  --html "${OUTPUT_DIRECTORY}/html"
-#  RESULT_VARIABLE rv
-#)
-#
-#if (rv)
-#  message(FATAL_ERROR "Step failed: ${rv}")
-#endif()
-
-# ----------------------------------------------------------------------------
 # Create the *.chm file
 
-step(11 "build *.chm file")
+step(4 "build *.chm file")
 if(COMPILE_HTML_HELP AND HTML_HELP_COMPILER)
   if(NOT "${RESULTING_HTML_HELP_FILE}" STREQUAL "")
     if(EXISTS "${OUTPUT_DIRECTORY}/html/index.hhp")
@@ -461,7 +311,7 @@ endif()
 # Create the *.tar.gz file
 
 if(CREATE_HTML_TARZ_ARCHIVE)
-  step(12 "build *.tar.gz file")
+  step(5 "build *.tar.gz file")
   if(NOT RESULTING_HTML_TARZ_ARCHIVE_FILE STREQUAL "")
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar cfz ${RESULTING_HTML_TARZ_ARCHIVE_FILE} html
       WORKING_DIRECTORY ${OUTPUT_DIRECTORY}
@@ -473,16 +323,16 @@ if(CREATE_HTML_TARZ_ARCHIVE)
     endif()
   endif()
 else()
-  step(12 "build *.tar.gz file -- skipping")
+  step(5 "build *.tar.gz file -- skipping")
 endif()
 
 # ----------------------------------------------------------------------------
 # Clean-up.
 
 if(DOXYGEN_KEEP_TEMP)
-  message("Skipping step 13: clean up.")
+  message("Skipping step 6: clean up.")
 else()
-  step(13 "clean up")
+  step(6 "clean up")
   file(REMOVE_RECURSE "${INTERMEDIATE_DOX_DIR}")
 
   if(DOWNLOAD_VTK_TAGFILE)

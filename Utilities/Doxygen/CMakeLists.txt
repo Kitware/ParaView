@@ -25,24 +25,6 @@ if(DOT)
   endif()
 endif()
 
-# Build up a list of all module source directories. Note that this should be
-# all source directories and so does not use the normal variables.
-unset(PV_MODULE_DIRS_DOXYGEN)
-unset(PV_MODULE_DIRS_DOXYGEN_ESCAPED)
-file(GLOB_RECURSE src RELATIVE "${ParaView_SOURCE_DIR}"
-    "${ParaView_SOURCE_DIR}/vtk.module")
-foreach(module ${src})
-  get_filename_component(module_BASE ${module} PATH)
-  if("${module_BASE}" MATCHES "^Utilities" OR ${module_BASE} MATCHES "^Third" OR
-      "${module_BASE}" MATCHES "^VTK" OR "${module_BASE}" MATCHES "^Plugins")
-  else()
-    set(PV_MODULE_DIRS_DOXYGEN
-      "${PV_MODULE_DIRS_DOXYGEN}  \"${ParaView_SOURCE_DIR}/${module_BASE}\"\n")
-    set(PV_MODULE_DIRS_DOXYGEN_ESCAPED
-      "${PV_MODULE_DIRS_DOXYGEN_ESCAPED} \"${ParaView_SOURCE_DIR}/${module_BASE}\"\\\n")
-  endif()
-endforeach()
-
 set(TAGFILES "\"${CMAKE_CURRENT_BINARY_DIR}/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html\"")
 
 configure_file(
