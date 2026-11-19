@@ -26,6 +26,8 @@
 
 #include "Private/vtkEdgesCacheInternal.h"
 
+#include <cstddef>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutter);
 
@@ -117,8 +119,17 @@ bool vtkPVCutter::CutDataObject(
     inputIter.TakeReference(treeInput->NewTreeIterator());
     inputIter->SkipEmptyNodesOff();
 
-    outIter->InitTraversal();
+    std::size_t nbOfLeaves = 0;
+    std::size_t currentLeaveIdx = 0;
     for (inputIter->InitTraversal(); !inputIter->IsDoneWithTraversal();
+         inputIter->GoToNextItem(), outIter->GoToNextItem())
+    {
+      nbOfLeaves += 1;
+    }
+
+    outIter->InitTraversal();
+    for (inputIter->GoToFirstItem();
+         !inputIter->IsDoneWithTraversal() && !this->CheckAbortAndInvoke();
          inputIter->GoToNextItem(), outIter->GoToNextItem())
     {
       if (!inputIter->GetCurrentDataObject())
@@ -126,6 +137,10 @@ bool vtkPVCutter::CutDataObject(
         // nothing to do
         continue;
       }
+
+      this->UpdateProgress(static_cast<double>(currentLeaveIdx) / nbOfLeaves);
+      currentLeaveIdx += 1;
+
       // Internal API for leaf processing uses vtkInformationVector.
       // As our input is (now) a Composite, we should replace the DATA_OBJECT key content
       // by the current leaf dataset.

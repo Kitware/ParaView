@@ -3,9 +3,11 @@
 
 #include "vtkPVThreshold.h"
 
-#include "vtkAppendFilter.h"
+#include "vtkAlgorithm.h"
+#include "vtkCallbackCommand.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
+#include "vtkEventForwarderCommand.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridThreshold.h"
 #include "vtkInformation.h"
@@ -15,6 +17,19 @@
 #include "vtkUnstructuredGrid.h"
 
 #include <limits>
+
+namespace
+{
+void InternalAbortCheckCallbackFunction(vtkObject* obj, unsigned long, void* clientdata, void*)
+{
+  vtkPVThreshold* self = reinterpret_cast<vtkPVThreshold*>(clientdata);
+  vtkAlgorithm* algorithm = reinterpret_cast<vtkAlgorithm*>(obj);
+  if (self->CheckAbortAndInvoke())
+  {
+    algorithm->AbortExecuteOn();
+  }
+}
+}
 
 vtkStandardNewMacro(vtkPVThreshold);
 
@@ -40,18 +55,28 @@ int vtkPVThreshold::ThresholdUsingSuperclassInstance(
   instance->SetInvert(this->GetInvert());
   instance->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
 
+  vtkNew<vtkEventForwarderCommand> progressEventForwarder;
+  progressEventForwarder->SetTarget(this);
+  instance->AddObserver(vtkCommand::ProgressEvent, progressEventForwarder);
+
+  vtkNew<vtkCallbackCommand> abortCheckObserver;
+  abortCheckObserver->SetCallback(::InternalAbortCheckCallbackFunction);
+  abortCheckObserver->SetClientData(this);
+  instance->AddObserver(vtkCommand::AbortCheckEvent, abortCheckObserver);
+
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
 
   instance->SetInputDataObject(inputDO);
   instance->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
-  if (instance->GetExecutive()->Update())
+  auto result = instance->GetExecutive()->Update();
+
+  if (result)
   {
     outputDO->ShallowCopy(instance->GetOutput());
-    return 1;
   }
 
-  return 0;
+  return result;
 }
 
 //----------------------------------------------------------------------------

@@ -7,19 +7,16 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkHyperTreeGrid.h"
-#include "vtkImplicitFunction.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVClipDataSet.h"
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <cassert>
-#include <set>
 #include <vector>
 
 class vtkPVDataSetAlgorithmSelectorFilter::vtkInternals
@@ -125,7 +122,7 @@ void vtkPVDataSetAlgorithmSelectorFilter::InternalProgressCallbackFunction(
 void vtkPVDataSetAlgorithmSelectorFilter::InternalProgressCallback(vtkAlgorithm* algorithm)
 {
   this->UpdateProgress(algorithm->GetProgress());
-  if (this->AbortExecute)
+  if (this->CheckAbortAndInvoke())
   {
     algorithm->SetAbortExecute(1);
   }
