@@ -7,9 +7,13 @@ Supported by:
  - Calculator
  - Cell Data to Point Data
  - Clip
+ - Contour
  - Extract Block
+ - Flying Edges 2D (provided by AcceleratedAlgorithms plugin)
+ - Flying Edges 3D (provided by AcceleratedAlgorithms plugin)
  - Glyph
  - Group Datasets
+ - Resample To Image
  - Slice
  - Stream Tracer
  - Threshold
