@@ -19,4 +19,7 @@
   <!-- Check if we can open/close the Server Connection dialog from the welcome page -->
   <pqevent object="pqClientMainWindow/pqWelcomeDialog/serversHelpWidget/serversWidget/connectServerButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/close" command="activate" arguments="" />
+
+  <!-- The last event do not finish on MacOS, we must add an unused input to finish it -->
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Light Inspector" />
 </pqevents>
