@@ -693,9 +693,9 @@ class SourceProxy(Proxy):
 
         # manually browse the pipeline tree
         # force a "step by step" update, so we can react to domains update.
-
+        # Do not force ProxyProperties update, only InputProperty
         producers = set()
-        proxy_util.get_producers(self.SMProxy, proxy_util.supported_proxies(), producers)
+        proxy_util.get_producers(self.SMProxy, proxy_util.supported_proxies(), producers, input_only=True)
         sorted_producers = proxy_util.toposort(producers)
 
         for prod in sorted_producers:

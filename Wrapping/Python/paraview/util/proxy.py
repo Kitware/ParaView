@@ -85,15 +85,31 @@ def get_consumers(proxy, filter, consumer_set, recursive=True):
             if recursive: get_consumers(consumer, filter, consumer_set)
 
 
-def get_producers(proxy, filter, producer_set):
-    """Returns the producers for a proxy iteratively. If filter is non-None,
-    filter is used to cull producers."""
+def get_producers(proxy, filter, producer_set, input_only=False):
+    """Returns the producers for a proxy iteratively.
+
+    Fill the producer_set argument.
+
+    If filter is non-None, it is expected to be a callable object taking
+    a proxy as argument, and returning False if the proxy should be
+    culled from the list or True to add it to the returned list.
+
+    If input_only is True, it will consider only the InputProperty of proxy
+    as producer. Any other kind of ProxyProperty will be ignored.
+    This can be useful to retrieve only the upstream pipeline of a filter,
+    as shown in the pipeline browser."""
     for i in range(proxy.GetNumberOfProducers()):
         producer = proxy.GetProducerProxy(i)
         producer = producer.GetTrueParentProxy() if producer else None
         producer = servermanager._getPyProxy(producer)
         if not producer or producer.IsPrototype() or producer in producer_set:
             continue
+
+        if input_only:
+            producer_prop = proxy.GetProducerProperty(i)
+            if not producer_prop.IsA("vtkSMInputProperty"):
+                continue
+
         if filter(producer):
             producer_set.add(producer)
             get_producers(producer, filter, producer_set)
