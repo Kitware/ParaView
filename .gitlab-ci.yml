@@ -269,6 +269,7 @@ macos-x86_64-python-qt:build:
         PV_CI_RUN_MANUALLY: "true"
         PV_CI_MERGED_ONLY: "true"
         PV_CI_NIGHTLY_ONLY: "true"
+    timeout: 3 hours
 
 macos-x86_64-python-qt:test:
     extends:
