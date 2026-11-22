@@ -7,12 +7,27 @@
 
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <!-- set nc default reader -->
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="IO" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="*.nc" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="editAccepted" arguments="0.0,*.nc" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="setCurrent" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="edit" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="UGRID NetCDF (Unstructured)" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="editAccepted" arguments="0.1,UGRID NetCDF (Unstructured)" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="NetCDFUGRIDReader" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaIOSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="editAccepted" arguments="0.2,NetCDFUGRIDReader" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ugrid.nc" />
-  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="setCurrent" arguments="2.0" />
-  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="setCheckState" arguments="2.0,0" />
-  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="h" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.38,0.15,1,1,0)" />

@@ -260,7 +260,7 @@ int pqDataInformationModel::rowCount(const QModelIndex& vtkNotUsed(parent) /*=QM
 
 //-----------------------------------------------------------------------------
 int pqDataInformationModel::columnCount(
-  const QModelIndex& vtkNotUsed(parent) /*= QModelIndex()*/) const
+  const QModelIndex& vtkNotUsed(parent) /*=QModelIndex()*/) const
 {
   return pqDataInformationModel::Max_Columns;
 }

@@ -289,7 +289,7 @@ public:
 
   void cleanup()
   {
-    this->RangeTimer.disconnect();
+    QObject::disconnect(&this->RangeTimer, SIGNAL(timeout()), nullptr, nullptr);
     this->VTKConnect->Disconnect();
     this->ChartXY->ClearPlots();
     if (this->ControlPointsItem && this->CurrentPointEditEventId)

@@ -45,7 +45,6 @@ set(PY_TESTS
   ProxyPropertyLinks.py
   PythonVersion.py,NO_VALID
   PythonAnimationTrack.py
-  PythonInfoModule.py,NO_VALID
   PythonProgrammableFilterParameters.py,NO_VALID
   PythonPVSimpleCone.py
   PythonPVSimpleExII.py
@@ -88,6 +87,14 @@ endif ()
 if (PARAVIEW_PLUGIN_ENABLE_SurfaceLIC AND PARAVIEW_PLUGIN_ENABLE_Moments)
   list(APPEND PY_TESTS
     Plugins.py,NO_VALID)
+endif ()
+
+# An external VTK may provide VTK::ViewsScivis, whose vtkVolumeRepresentation
+# clashes with the one of ParaView::RemotingViews.
+# https://gitlab.kitware.com/paraview/paraview/-/issues/23462
+if (NOT PARAVIEW_USE_EXTERNAL_VTK)
+  list(APPEND PY_TESTS
+    PythonInfoModule.py,NO_VALID)
 endif ()
 
 if (NOT BUILD_SHARED_LIBS)

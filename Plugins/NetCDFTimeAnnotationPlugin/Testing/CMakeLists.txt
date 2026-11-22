@@ -3,6 +3,7 @@ if (BUILD_SHARED_LIBS)
     "DATA{Data/tos_O1_2001-2002.nc}")
 
   set(NetCDFTimeAnnotationFilter_METHOD LOOSE_VALID)
+  set(NetCDFTimeAnnotationFilter_FORCE_SERIAL TRUE) # since this uses popup-menu
 
   paraview_add_client_tests(
     LOAD_PLUGIN "NetCDFTimeAnnotationPlugin"

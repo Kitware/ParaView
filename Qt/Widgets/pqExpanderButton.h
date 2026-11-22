@@ -20,7 +20,6 @@ class PQWIDGETS_EXPORT pqExpanderButton : public QFrame
   Q_PROPERTY(QString text READ text WRITE setText)
   Q_PROPERTY(bool checked READ checked WRITE setChecked)
   Q_PROPERTY(HeadingLevel headingLevel READ headingLevel WRITE setHeadingLevel)
-  Q_ENUMS(HeadingLevel)
 public:
   pqExpanderButton(QWidget* parent = nullptr);
   ~pqExpanderButton() override;
@@ -37,6 +36,7 @@ public:
     H1 = 0,
     H2
   };
+  Q_ENUM(HeadingLevel)
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

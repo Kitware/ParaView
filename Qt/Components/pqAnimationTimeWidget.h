@@ -26,7 +26,6 @@ class vtkSMProxy;
 class PQCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
 {
   Q_OBJECT
-  Q_ENUMS(RealNumberNotation)
   Q_PROPERTY(QString playMode READ playMode WRITE setPlayMode NOTIFY playModeChanged)
   Q_PROPERTY(int numberOfFrames READ numberOfFrames WRITE setNumberOfFrames)
   Q_PROPERTY(double startTime READ startTime WRITE setStartTime)

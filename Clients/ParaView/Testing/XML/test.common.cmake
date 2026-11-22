@@ -2060,6 +2060,7 @@ set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window
 set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (MathTextColumn_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (MoleculeToLines_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (NetCDFUGRID_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ParallelCoordinatesView_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PartialArrayInLineChart_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (PickCenter_FORCE_SERIAL TRUE) # since this involves picking
@@ -2079,6 +2080,7 @@ set (PythonCalculatorInput_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (QuickLaunchCreateProxy_FORCE_SERIAL TRUE)
 set (QuickLaunchNavigation_FORCE_SERIAL TRUE)
 set (QuickLaunchRequest_FORCE_SERIAL TRUE)
+set (ReadOffset_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ReadPartitionedCGNS_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (RecentFiles_FORCE_SERIAL TRUE) # use key events
 set (RecentFilesHardFilename_FORCE_SERIAL TRUE) # use key events

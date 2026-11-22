@@ -19,7 +19,6 @@
 class PQCOMPONENTS_EXPORT pqItemViewSearchWidget : public QDialog
 {
   Q_OBJECT
-  Q_ENUMS(ItemSearchType)
   typedef QDialog Superclass;
 
 public:
@@ -31,6 +30,7 @@ public:
     Next,
     Previous
   };
+  Q_ENUM(ItemSearchType)
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void showSearchWidget();

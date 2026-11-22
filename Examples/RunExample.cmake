@@ -15,6 +15,10 @@ if (toolset)
   list(APPEND cmake_arguments
     -T "${toolset}")
 endif ()
+if (vtk_dir)
+  list(APPEND cmake_arguments
+    "-DVTK_DIR:PATH=${vtk_dir}")
+endif ()
 
 execute_process(
   COMMAND

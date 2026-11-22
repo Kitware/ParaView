@@ -8,6 +8,12 @@ if (ParaView_BINARY_DIR)
       PROPERTY paraview_catalyst_directory)
   endif ()
 
+  # An external VTK is not next to ParaView, so give its location.
+  set(example_vtk_dir "")
+  if (PARAVIEW_USE_EXTERNAL_VTK)
+    set(example_vtk_dir "${VTK_DIR}")
+  endif ()
+
   function (add_example dir)
     cmake_parse_arguments(arg "" "TEST_TIMEOUT" "" ${ARGN})
     if (arg_UNPARSED_ARGUMENTS)
@@ -25,6 +31,7 @@ if (ParaView_BINARY_DIR)
               "-Dbuild_type=${CMAKE_BUILD_TYPE}"
               "-Dshared=${BUILD_SHARED_LIBS}"
               "-Dparaview_dir=${paraview_cmake_build_dir}"
+              "-Dvtk_dir=${example_vtk_dir}"
               "-Dctest=${CMAKE_CTEST_COMMAND}"
               "-Dplatform=${CMAKE_GENERATOR_PLATFORM}"
               "-Dtoolset=${CMAKE_GENERATOR_TOOLSET}"

@@ -1,5 +1,5 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="sources">
+  <ProxyGroup name="internal_sources">
     <!-- =================================================================== -->
     <SourceProxy name="EAMDataReaderBase"
                  label="EAM Data Reader Base"
@@ -48,13 +48,16 @@
 
       <!-- end of EAMDataReaderBase -->
     </SourceProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
 
 
     <SourceProxy name="EAMDataReader"
                  label="EAM Data Reader"
                  class="paraview.algorithms.eam_reader.EAMDataReader"
                  si_class="vtkSIPythonSourceProxy"
-                 base_proxygroup="sources"
+                 base_proxygroup="internal_sources"
                  base_proxyname="EAMDataReaderBase">
 
       <OutputPort index="0" name="Surface" />
@@ -149,7 +152,7 @@
                  label="EAM Data Reader Surface"
                  class="paraview.algorithms.eam_reader.EAMDataReaderSurface"
                  si_class="vtkSIPythonSourceProxy"
-                 base_proxygroup="sources"
+                 base_proxygroup="internal_sources"
                  base_proxyname="EAMDataReaderBase">
 
       <OutputPort index="0" name="Surface" />
@@ -190,7 +193,7 @@
                  label="EAM Data Reader Middle Layer"
                  class="paraview.algorithms.eam_reader.EAMDataReaderMiddleLayer"
                  si_class="vtkSIPythonSourceProxy"
-                 base_proxygroup="sources"
+                 base_proxygroup="internal_sources"
                  base_proxyname="EAMDataReaderBase">
 
       <OutputPort index="0" name="MiddleLayer" />
@@ -231,7 +234,7 @@
                  label="EAM Data Reader Interface Layer"
                  class="paraview.algorithms.eam_reader.EAMDataReaderInterfaceLayer"
                  si_class="vtkSIPythonSourceProxy"
-                 base_proxygroup="sources"
+                 base_proxygroup="internal_sources"
                  base_proxyname="EAMDataReaderBase">
 
       <OutputPort index="0" name="InterfaceLayer" />

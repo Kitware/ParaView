@@ -62,6 +62,12 @@ if (CMAKE_GENERATOR_TOOLSET)
     -T "${CMAKE_GENERATOR_TOOLSET}")
 endif ()
 
+set(vtk_args)
+if (VTK_DIR)
+  list(APPEND vtk_args
+    "-DVTK_DIR:PATH=${VTK_DIR}")
+endif ()
+
 set (INSTALL_TEST_BUILD_DIR ${PARAVIEW_TEST_DIR}/Examples-bld)
 if (NOT EXISTS ${INSTALL_TEST_BUILD_DIR})
   file(MAKE_DIRECTORY
@@ -71,6 +77,7 @@ execute_process (
   COMMAND ${CMAKE_COMMAND}
   ${generator_args}
   -DParaView_DIR:PATH=${ParaView_DIR}
+  ${vtk_args}
   -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   ${PARAVIEW_SOURCE_DIR}/Examples
