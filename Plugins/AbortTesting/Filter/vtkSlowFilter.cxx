@@ -46,8 +46,6 @@ int vtkSlowFilter::RequestData(
       this->UpdateProgress(static_cast<double>(i) / static_cast<double>(numberOfPoint));
     }
   }
-  this->InvokeCleanupAbortCheck();
-
   return 1;
 }
 
