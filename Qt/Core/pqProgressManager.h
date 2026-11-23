@@ -139,7 +139,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
 private:
   Q_DISABLE_COPY(pqProgressManager)
 
-  QList<QWidget*> EnabledWidgetsForAbort;
+  QList<QPointer<QWidget>> EnabledWidgetsForAbort;
   QPointer<QWidget> FocusWidgetForAbort;
   bool AbortEnabled = false;
 };
