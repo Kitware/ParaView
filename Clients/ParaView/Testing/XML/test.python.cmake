@@ -43,6 +43,7 @@ endif ()
 
 list(APPEND TESTS_WITH_BASELINES
   AutoSaveState.xml
+  AnimationFollowData.xml # uses FindData
   ColorByComponentNames.xml # needs programmable filter
   CopyPasteTrace.xml
   LiveProgrammableSource.xml
