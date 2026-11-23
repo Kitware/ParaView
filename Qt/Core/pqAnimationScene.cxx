@@ -16,11 +16,13 @@
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVCameraCueManipulator.h"
 #include "vtkPoints.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
@@ -364,6 +366,12 @@ void pqAnimationScene::initializeCue(
         cue->getProxy()->GetProperty("Mode"), vtkPVCameraCueManipulator::FOLLOW_DATA);
 
       vtkSMProxy* dataProxy = cue->getServer()->activeSourcesSelectionModel()->GetCurrentProxy();
+      // when doing a selection, the CurrentProxy is the selected vtkSMOutputPort. Get the related
+      // source instead.
+      if (auto port = vtkSMOutputPort::SafeDownCast(dataProxy))
+      {
+        dataProxy = port->GetSourceProxy();
+      }
       pqSMAdaptor::setProxyProperty(cue->getProxy()->GetProperty("DataSource"), dataProxy);
     }
     else
