@@ -152,17 +152,24 @@ void pqProgressManager::setEnableAbort(bool enable)
         this->EnabledWidgetsForAbort.push_front(widget);
       }
     }
-    for (QWidget* widget : this->EnabledWidgetsForAbort)
+    for (const auto& widget : this->EnabledWidgetsForAbort)
     {
-      widget->setDisabled(true);
+      if (widget)
+      {
+        widget->setDisabled(true);
+      }
     }
   }
   else
   {
     // Reenable everything that was disabled
-    for (QWidget* widget : this->EnabledWidgetsForAbort)
+    for (const auto& widget : this->EnabledWidgetsForAbort)
     {
-      widget->setEnabled(true);
+      // Applying changes can destroy widgets while processing events.
+      if (widget)
+      {
+        widget->setEnabled(true);
+      }
     }
     this->EnabledWidgetsForAbort.clear();
 
