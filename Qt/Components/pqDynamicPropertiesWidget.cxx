@@ -493,7 +493,10 @@ void pqDynamicPropertiesWidget::clearProperties()
 {
   for (int i = this->Form->rowCount() - 1; i >= 0; --i)
   {
-    this->Form->takeRow(i);
+    // takeRow() hands the items back to us. Deleting labelItem frees the
+    // wrapper, not the QLabel; fieldItem is the layout ~RowWidget() disposes of.
+    QFormLayout::TakeRowResult row = this->Form->takeRow(i);
+    delete row.labelItem;
   }
   assert(this->Form->rowCount() == 0);
   auto& map = this->Internals->widgetMap;
@@ -559,8 +562,6 @@ void pqDynamicPropertiesWidget::buildWidget(vtkSMProperty* infoProp)
       QString name = QString::fromStdString(property[vtkDynamicProperties::NAME_KEY].asString());
       vtkDynamicProperties::Type type =
         static_cast<vtkDynamicProperties::Type>(property[vtkDynamicProperties::TYPE_KEY].asInt());
-      QLabel* pLabel = new QLabel(name);
-      pLabel->setToolTip(description);
       RowWidget* rowWidget = nullptr;
       switch (type)
       {

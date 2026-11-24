@@ -59,6 +59,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 
 namespace
 {
@@ -833,6 +834,29 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     vtkCamera::SafeDownCast(this->GetSubProxy("ActiveCamera")->GetClientSideObject());
   rv->SetActiveCamera(camera);
 
+  // Fetch the ANARI_LIBRARY environment variable value upfront so the
+  // read-only label in the Properties panel is populated immediately.
+  if (auto* propEnvVar =
+        vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARIEnvironmentVariable")))
+  {
+    this->UpdatePropertyInformation(propEnvVar);
+  }
+
+  // Choose the initial ANARI library here rather than inside
+  // vtkPVRenderView::SetEnableANARI(): the property is what the Properties
+  // panel shows, so anything the view picks on its own would leave the
+  // combo-box disagreeing with the library actually in use (and selecting the
+  // value the property already holds would then be a no-op).
+  if (auto* propLibrary =
+        vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARILibrary")))
+  {
+    if (std::getenv("ANARI_LIBRARY"))
+    {
+      // Honor the environment variable, and say so in the panel.
+      propLibrary->SetElement(0, "environment");
+    }
+  }
+
   if (this->GetIsInCAVE())
   {
     // Update the local proxy property from the remote cave configuration
@@ -1336,6 +1360,7 @@ void vtkSMRenderViewProxy::UpdateAnariProperties()
 {
   bool updateANARIRendererNames = false;
   bool updateANARIRendererParameters = false;
+  bool updateANARIEnvironmentVariable = false;
   auto itEnableANARI = this->Internals->Properties.find("EnableANARI");
   auto* propEnableANARI = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("EnableANARI"));
   auto itANARILibrary = this->Internals->Properties.find("ANARILibrary");
@@ -1350,10 +1375,22 @@ void vtkSMRenderViewProxy::UpdateAnariProperties()
   {
     updateANARIRendererParameters = true;
   }
+  if (itEnableANARI->second.ModifiedFlag || itANARILibrary->second.ModifiedFlag)
+  {
+    updateANARIEnvironmentVariable = true;
+  }
 
   // update ANARI properties in the correct order
+  const bool forceANARILibrary =
+    itEnableANARI->second.ModifiedFlag && propEnableANARI->GetElement(0);
   this->UpdateProperty("EnableANARI");
-  this->UpdateProperty("ANARILibrary");
+  this->UpdateProperty("ANARILibrary", forceANARILibrary ? 1 : 0);
+  if (updateANARIEnvironmentVariable)
+  {
+    vtkSMStringVectorProperty* propEnvVar =
+      vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ANARIEnvironmentVariable"));
+    this->UpdatePropertyInformation(propEnvVar);
+  }
   if (updateANARIRendererNames)
   {
     vtkSMStringVectorProperty* propRendererNames =

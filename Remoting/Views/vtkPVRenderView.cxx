@@ -3742,23 +3742,6 @@ void vtkPVRenderView::SetEnableANARI(bool v)
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->SynchronizedRenderers->SetRenderPass(this->Internals->AnariPass);
     this->SynchronizedRenderers->SetEnableRayTracing(true);
-    // Proxy properties defaults
-    // These defaults are set before ANARI is enabled and then they are not
-    // set again, so we need to set them here.
-    if (std::string(this->GetANARILibrary()).empty())
-    {
-      // TODO: When switching ANARI libraries works, we should set visrtx as
-      // the default.
-      auto* envLibraryName = std::getenv("ANARI_LIBRARY");
-      if (envLibraryName)
-      {
-        this->SetANARILibrary("environment");
-      }
-      else
-      {
-        this->SetANARILibrary("helide");
-      }
-    }
   }
   else
   {
@@ -3789,6 +3772,26 @@ void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
   if (this->Internals->AnariPass)
   {
     vtkDebugMacro("SetANARILibrary: " << l);
+    std::string currentLib = this->Internals->AnariPass->GetAnariDevice()->GetAnariLibraryName();
+    if (!currentLib.empty() && currentLib != l)
+    {
+      // Create a new AnariPass since the library is changing
+      vtkRenderer* ren = this->GetRenderer();
+      if (this->Internals->AnariPass)
+      {
+        if (this->SynchronizedRenderers->GetRenderPass() == this->Internals->AnariPass)
+        {
+          this->SynchronizedRenderers->SetRenderPass(nullptr);
+        }
+        this->Internals->AnariPass = nullptr;
+      }
+      this->Internals->AnariPass = vtkSmartPointer<vtkAnariPass>::New();
+      this->Internals->AnariPass->GetSceneGraph()->SetCompositeOnGL(ren, 1);
+      if (this->Internals->IsInAnari)
+      {
+        this->SynchronizedRenderers->SetRenderPass(this->Internals->AnariPass);
+      }
+    }
     this->Internals->AnariPass->GetAnariDevice()->SetupAnariDeviceFromLibrary(
       l.c_str(), "default", false);
     // Proxy properties defaults
@@ -3806,10 +3809,21 @@ void vtkPVRenderView::SetANARILibrary(std::string l [[maybe_unused]])
 const char* vtkPVRenderView::GetANARILibrary()
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL
+  if (!this->Internals->AnariPass)
+  {
+    return "";
+  }
   return this->Internals->AnariPass->GetAnariDevice()->GetAnariLibraryName().c_str();
 #else
   return nullptr;
 #endif
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVRenderView::GetANARIEnvironmentVariable()
+{
+  const char* envLib = std::getenv("ANARI_LIBRARY");
+  return envLib ? envLib : "(not set)";
 }
 
 //----------------------------------------------------------------------------
