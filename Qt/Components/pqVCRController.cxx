@@ -87,14 +87,15 @@ void pqVCRController::onPlay()
   this->Scene->getProxy()->UpdatePropertyInformation(inPlayProp);
   if (inPlayProp && inPlayProp->GetElement(0) == 1)
   {
-    // If the animation is already playing, pause it first.
+    // If the animation is already playing, pause it first. This also drops any restart that an
+    // earlier click left pending, so that only the latest request is honored.
     this->onPause();
     // Wait for the animation to stop before starting it again.
-    this->LamdaPlayConnection = QObject::connect(this->Scene, &pqAnimationScene::endPlay, this,
+    this->PendingRestartConnection = QObject::connect(this->Scene, &pqAnimationScene::endPlay, this,
       [this](vtkObject*, unsigned long, void*, void*) -> void
       {
         // First, disconnect this specific connection, so that it does not trigger itself again.
-        QObject::disconnect(this->LamdaPlayConnection);
+        QObject::disconnect(this->PendingRestartConnection);
         // Then, start the forward animation.
         this->onPlayInternal();
       });
@@ -136,14 +137,15 @@ void pqVCRController::onReverse()
   this->Scene->getProxy()->UpdatePropertyInformation(inPlayProp);
   if (inPlayProp && inPlayProp->GetElement(0) == 1)
   {
-    // If the animation is already playing, pause it first.
+    // If the animation is already playing, pause it first. This also drops any restart that an
+    // earlier click left pending, so that only the latest request is honored.
     this->onPause();
     // Wait for the animation to stop before starting it again.
-    this->LamdaReverseConnection = QObject::connect(this->Scene, &pqAnimationScene::endPlay, this,
+    this->PendingRestartConnection = QObject::connect(this->Scene, &pqAnimationScene::endPlay, this,
       [this](vtkObject*, unsigned long, void*, void*) -> void
       {
         // First, disconnect this specific connection, so that it does not trigger itself again.
-        QObject::disconnect(this->LamdaReverseConnection);
+        QObject::disconnect(this->PendingRestartConnection);
         // Then, start the reverse animation.
         this->onReverseInternal();
       });
@@ -225,6 +227,8 @@ void pqVCRController::onPause()
     qDebug() << "No active scene. Cannot play.";
     return;
   }
+  // A pause cancels a restart that is waiting for the playback to end.
+  QObject::disconnect(this->PendingRestartConnection);
   this->Scene->getProxy()->InvokeCommand("Stop");
 }
 
