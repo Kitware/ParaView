@@ -385,6 +385,7 @@ void pqRenderViewSelectionReaction::beginSelection()
     case CLEAR_SELECTION:
       if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
       {
+        SCOPED_UNDO_SET("Clear selection");
         core->selectionManager()->clearSelection();
       }
       break;
@@ -393,6 +394,7 @@ void pqRenderViewSelectionReaction::beginSelection()
     case SHRINK_SELECTION:
       if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
       {
+        SCOPED_UNDO_EXCLUDE();
         auto settings = vtkPVRenderViewSettings::GetInstance();
         core->selectionManager()->expandSelection(this->Mode == GROW_SELECTION ? 1 : -1,
           settings->GetGrowSelectionRemoveSeed(),
@@ -872,6 +874,8 @@ void pqRenderViewSelectionReaction::UpdateTooltip()
   {
     return;
   }
+
+  SCOPED_UNDO_EXCLUDE();
 
   vtkSMTooltipSelectionPipeline* pipeline = vtkSMTooltipSelectionPipeline::GetInstance();
 
