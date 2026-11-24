@@ -713,8 +713,9 @@ void vtkSMSessionClient::PullState(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionClient::ExecuteStream(
-  vtkTypeUInt32 location, const vtkClientServerStream& cssstream, bool ignoreErrors, bool sendReply)
+void vtkSMSessionClient::ExecuteStream(vtkTypeUInt32 location,
+  const vtkClientServerStream& cssstream, bool ignoreErrors, bool sendReply,
+  bool vtkNotUsed(threadedStream))
 {
   // Prevent to push anything during the Quit process
   if (this->NoMoreDelete)

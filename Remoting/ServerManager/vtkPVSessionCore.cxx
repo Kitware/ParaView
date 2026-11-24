@@ -15,6 +15,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVInformation.h"
 #include "vtkPVSession.h"
+#include "vtkPVSessionBase.h"
 #include "vtkPVSessionCoreInterpreterHelper.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConfiguration.h"
@@ -31,6 +32,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <thread>
 
 #define LOG(x)                                                                                     \
   if (this->LogStream)                                                                             \
@@ -536,8 +538,8 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionCore::ExecuteStream(
-  vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors /*=false*/)
+void vtkPVSessionCore::ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
+  bool ignore_errors /*=false*/, bool threadedStream /*=false*/)
 {
   if (stream.GetNumberOfMessages() == 0)
   {
@@ -576,7 +578,7 @@ void vtkPVSessionCore::ExecuteStream(
     }
   }
 
-  this->ExecuteStreamInternal(stream, ignore_errors);
+  this->ExecuteStreamInternal(stream, ignore_errors, threadedStream != 0);
 }
 
 //----------------------------------------------------------------------------
@@ -594,8 +596,15 @@ void vtkPVSessionCore::ExecuteStreamSatelliteCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSessionCore::ProcessStreamThreaded(const vtkClientServerStream& css)
+{
+  this->Interpreter->ProcessStream(css);
+  this->InvokeEvent(vtkPVSessionBase::ThreadedStreamEndEvent, this);
+};
+
+//----------------------------------------------------------------------------
 void vtkPVSessionCore::ExecuteStreamInternal(
-  const vtkClientServerStream& stream, bool ignore_errors)
+  const vtkClientServerStream& stream, bool ignore_errors, bool threaded)
 {
   LOG(<< "----------------------------------------------------------------\n"
       << "ExecuteStream\n"
@@ -606,7 +615,18 @@ void vtkPVSessionCore::ExecuteStreamInternal(
 
   int temp = this->Interpreter->GetGlobalWarningDisplay();
   this->Interpreter->SetGlobalWarningDisplay(ignore_errors ? 0 : 1);
-  this->Interpreter->ProcessStream(stream);
+
+  if (threaded)
+  {
+    std::thread dataThread(&vtkPVSessionCore::ProcessStreamThreaded, this, stream);
+    this->InvokeEvent(vtkPVSessionBase::ThreadedStreamStartEvent, this);
+    dataThread.join();
+  }
+  else
+  {
+    this->Interpreter->ProcessStream(stream);
+  }
+
   this->Interpreter->SetGlobalWarningDisplay(temp);
 }
 

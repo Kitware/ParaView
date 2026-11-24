@@ -203,6 +203,10 @@ private:
   // Update Pipeline with the given timestep request.
   void UpdatePipeline(double time);
 
+  // Set ThreadedUpdate to provided value, then Update Pipeline with the given timestep request,
+  // then reset it to previous value.
+  void ThreadedUpdatePipeline(double time, bool threaded);
+
   /**
    * Actually gather the information from the proxy.
    */

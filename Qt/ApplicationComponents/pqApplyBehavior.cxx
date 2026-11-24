@@ -235,7 +235,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*, pqProxy* pqproxy)
   }
 
   // Make sure filters menu enable state is updated
-  Q_EMIT pqApplicationCore::instance()->forceFilterMenuRefresh();
+  Q_EMIT pqApplicationCore::instance() -> forceFilterMenuRefresh();
 
   auto pqfilter = qobject_cast<pqPipelineFilter*>(pqproxy);
   auto pqsource = qobject_cast<pqPipelineSource*>(pqproxy);
@@ -318,13 +318,16 @@ void pqApplyBehavior::applied(pqPropertiesPanel* panel)
   // Update all the views separately. This ensures that all pipelines are
   // up-to-date before we render as we may need to change some rendering
   // properties like color transfer functions before the actual render.
+
+  bool threadedUpdate = vtkPVGeneralSettings::GetInstance()->GetEnableThreadedUpdate();
   Q_FOREACH (pqView* view, dirty_views)
   {
     SM_SCOPED_TRACE(CallMethod)
       .arg(view->getViewProxy())
       .arg("Update")
       .arg("comment", qPrintable(tr("update the view to ensure updated data information")));
-    view->getViewProxy()->Update();
+    vtkSMViewProxy* viewProxy = view->getViewProxy();
+    viewProxy->ThreadedUpdate(threadedUpdate);
   }
 
   // Abort can happen during the `Update` call, check it
@@ -421,10 +424,14 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
   QSet<vtkSMProxy*> updated_views;
 
   // create representations for all output ports.
+  bool threadedUpdate = vtkPVGeneralSettings::GetInstance()->GetEnableThreadedUpdate();
   for (int outputPort = 0; outputPort < source->getNumberOfOutputPorts(); outputPort++)
   {
-    vtkSMViewProxy* preferredView = controller->ShowInPreferredView(
-      vtkSMSourceProxy::SafeDownCast(source->getProxy()), outputPort, currentViewProxy);
+    vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
+    sourceProxy->SetThreadedUpdate(threadedUpdate);
+    vtkSMViewProxy* preferredView =
+      controller->ShowInPreferredView(sourceProxy, outputPort, currentViewProxy);
+    sourceProxy->ThreadedUpdateOff();
     if (!preferredView)
     {
       continue;

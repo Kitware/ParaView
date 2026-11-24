@@ -53,13 +53,9 @@ bool pqSaveExtractsReaction::generateExtracts()
 
       auto appcore = pqApplicationCore::instance();
       auto pgm = appcore->getProgressManager();
-      // this is essential since pqProgressManager blocks all interaction
-      // events when progress events are pending. since we have a QProgressDialog
-      // as modal, we don't need to that. Plus, we want the cancel button on the
-      // dialog to work.
-      const auto prev = pgm->unblockEvents(true);
+      pgm->addNonBlockableObject(&progress);
       const auto status = exporter->SaveExtracts();
-      pgm->unblockEvents(prev);
+      pgm->removeNonBlockableObject(&progress);
       // image extractors may resize views temporarily (e.g. for the separator
       // width when saving all views), leaving them blank until rendered again.
       appcore->render();

@@ -464,7 +464,7 @@ void vtkSMSourceProxy::UpdatePipeline(double time)
   int num = this->GetNumberOfOutputPorts();
   for (i = 0; i < num; ++i)
   {
-    this->GetOutputPort(i)->UpdatePipeline(time);
+    this->GetOutputPort(i)->ThreadedUpdatePipeline(time, this->GetThreadedUpdate());
   }
 
   // When calling UpdatePipeline() we check if this->NeedsUpdate is true and
@@ -985,8 +985,8 @@ void vtkSMSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMSourceProxy::ExecuteStream(
-  const vtkClientServerStream& stream, bool ignoreErrors /*=false*/, vtkTypeUInt32 location /*=0*/)
+void vtkSMSourceProxy::ExecuteStream(const vtkClientServerStream& stream,
+  bool ignoreErrors /*=false*/, vtkTypeUInt32 location /*=0*/, bool threadedStream /*=false*/)
 {
   if (location == 0)
   {
@@ -999,7 +999,8 @@ void vtkSMSourceProxy::ExecuteStream(
 
   if (this->GetSession())
   {
-    this->GetSession()->ExecuteStream(location, stream, ignoreErrors, this->StreamReply);
+    this->GetSession()->ExecuteStream(
+      location, stream, ignoreErrors, this->StreamReply, threadedStream);
   }
   // if no session, nothing to do.
 }

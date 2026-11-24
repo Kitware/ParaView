@@ -36,6 +36,7 @@
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "pqStandardViewFrameActionsImplementation.h"
 #include "pqStreamingTestingEventPlayer.h"
+#include "pqThreadedUpdateBehavior.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqUndoStack.h"
 #include "pqUsageLoggingBehavior.h"
@@ -123,6 +124,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(PipelineContextMenuBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(BlockContentMenu, true);
 PQ_BEHAVIOR_DEFINE_FLAG(ObjectPickingBehavior, false);
 PQ_BEHAVIOR_DEFINE_FLAG(DefaultViewBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(ThreadedUpdateBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(UndoRedoBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(AlwaysConnectedBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CrashRecoveryBehavior, true);
@@ -211,6 +213,10 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   if (PQ_IS_BEHAVIOR_ENABLED(DefaultViewBehavior))
   {
     new pqDefaultViewBehavior(this);
+  }
+  if (PQ_IS_BEHAVIOR_ENABLED(ThreadedUpdateBehavior))
+  {
+    new pqThreadedUpdateBehavior(this);
   }
   if (PQ_IS_BEHAVIOR_ENABLED(UndoRedoBehavior))
   {

@@ -5,6 +5,8 @@
 #define pqProgressManager_h
 
 #include "pqCoreModule.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_6_3_0
+
 #include <QList>
 #include <QObject>
 #include <QPointer>
@@ -42,7 +44,7 @@ public:
   bool isLocked() const;
 
   /**
-   * When progress is enabled, the manager eats all mouse and key events fired
+   * When progress is enabled, the manager disable all widgets
    * except for those objects which are in the non-blockable list.
    * This is the API to add/remove non-blockable objects.
    */
@@ -54,15 +56,9 @@ public:
    */
   const QList<QPointer<QObject>>& nonBlockableObjects() const { return this->NonBlockableObjects; }
 
-protected:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
-   * Filter QApplication events.
-   */
-  bool eventFilter(QObject* obj, QEvent* event) override;
-
-public Q_SLOTS:
-  /**
-   * Update progress. The progress must be enbled by calling
+   * Update progress. The progress must be enabled by calling
    * enableProgress(true) before calling  this method for the progress to be
    * updated.
    */
@@ -80,7 +76,7 @@ public Q_SLOTS:
   void endProgress() { this->setEnableProgress(false); }
 
   /**
-   * Enables abort.
+   * Enables abort. Disable all widget except the non-blockable ones.
    */
   void setEnableAbort(bool);
 
@@ -91,20 +87,12 @@ public Q_SLOTS:
   void triggerAbort();
 
   /**
-   * While progress is enabled, pqProgressManager blocks key/mouse events,
-   * except for objects added using `addNonBlockableObject`. Sometimes it's not
-   * possible to add objects explicitly and we may want to temporarily skip
-   * blocking of events. This methods can be used for that e.g.
+   * Noop, use addNonBlockableObject/removeNonBlockableObject instead
    *
-   * @code{cpp}
-   *  bool prev = progressManager->unblockEvents(true);
-   *  QMessageBox::question(....);
-   *  progressManager->unblockEvents(prev);
-   * @endcode
-   *
-   * @returns previous value.
+   * @returns false.
    */
-  bool unblockEvents(bool val);
+  PARAVIEW_DEPRECATED_IN_6_3_0("Use NonBlockableObject instead.")
+  bool unblockEvents(bool) { return false; };
 
 Q_SIGNALS:
 
@@ -134,12 +122,11 @@ protected: // NOLINT(readability-redundant-access-specifiers)
 
   bool EnableProgress;
   bool ReadyEnableProgress;
-  bool UnblockEvents;
 
 private:
   Q_DISABLE_COPY(pqProgressManager)
 
-  QList<QPointer<QWidget>> EnabledWidgetsForAbort;
+  QList<QPointer<QWidget>> DisabledWidgetsForAbort;
   QPointer<QWidget> FocusWidgetForAbort;
   bool AbortEnabled = false;
 };

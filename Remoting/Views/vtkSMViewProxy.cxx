@@ -450,6 +450,15 @@ void vtkSMViewProxy::InteractiveRender()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMViewProxy::ThreadedUpdate(bool threaded)
+{
+  bool prev = this->GetThreadedUpdate();
+  this->SetThreadedUpdate(threaded);
+  this->Update();
+  this->SetThreadedUpdate(prev);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMViewProxy::Update()
 {
   if (this->ObjectsCreated && this->NeedsUpdate)
@@ -472,7 +481,7 @@ void vtkSMViewProxy::Update()
     stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "Update"
            << vtkClientServerStream::End;
     this->GetSession()->PrepareProgress();
-    this->ExecuteStream(stream);
+    this->ExecuteStream(stream, false, 0, this->GetThreadedUpdate());
     this->GetSession()->CleanupPendingProgress();
 
     unsigned int numProducers = this->GetNumberOfProducers();

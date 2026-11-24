@@ -310,6 +310,15 @@ void vtkSMOutputPort::UpdatePipeline()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMOutputPort::ThreadedUpdatePipeline(double time, bool threaded)
+{
+  bool prev = this->GetThreadedUpdate();
+  this->SetThreadedUpdate(threaded);
+  this->UpdatePipeline(time);
+  this->SetThreadedUpdate(prev);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMOutputPort::UpdatePipeline(double time)
 {
   this->UpdatePipelineInternal(time, true);
@@ -322,7 +331,7 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time, bool doTime)
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << SIPROXY(this->SourceProxy) << "UpdatePipeline"
          << this->PortIndex << time << (doTime ? 1 : 0) << vtkClientServerStream::End;
-  this->SourceProxy->ExecuteStream(stream);
+  this->SourceProxy->ExecuteStream(stream, false, 0, this->GetThreadedUpdate());
   this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
 

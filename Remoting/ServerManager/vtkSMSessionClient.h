@@ -114,7 +114,7 @@ public:
    * the stream.
    */
   void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
-    bool ignoreErrors = false, bool sendReply = false) override;
+    bool ignoreErrors = false, bool sendReply = false, bool threadedStream = false) override;
 
   ///@{
   /**

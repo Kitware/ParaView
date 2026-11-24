@@ -131,10 +131,6 @@ void pqCrashRecoveryBehavior::onServerDisconnect()
 
   if (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") == nullptr)
   {
-    // enable user interaction (BUG #17155).
-    pqProgressManager* pgm = pqApplicationCore::instance()->getProgressManager();
-    bool prev = pgm->unblockEvents(true);
-
     // Try to handle recovery
     QMessageBox mbox(QMessageBox::Critical, tr("Server disconnected!"),
       tr("The server side has disconnected. "
@@ -148,8 +144,6 @@ void pqCrashRecoveryBehavior::onServerDisconnect()
     {
       pqSaveStateReaction::saveState(nullptr);
     }
-    // restore.
-    pgm->unblockEvents(prev);
   }
 
   // It's tempting to think that we shouldn't exit here, but simply disconnect

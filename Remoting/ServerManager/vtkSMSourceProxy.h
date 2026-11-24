@@ -318,7 +318,7 @@ protected:
    * value
    */
   void ExecuteStream(const vtkClientServerStream& msg, bool ignoreErrors = false,
-    vtkTypeUInt32 location = 0) override;
+    vtkTypeUInt32 location = 0, bool threadedStream = false) override;
 
   int OutputPortsCreated;
 

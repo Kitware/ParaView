@@ -495,6 +495,8 @@ void vtkPVProgressHandler::LocalCleanupPendingProgress()
   SKIP_IF_DISABLED();
   this->Internals->EnableProgress = false;
   this->LastProgressId = 0;
+  this->SetLastProgressText(nullptr);
+  this->LastProgress = -1;
   this->InvokeEvent(vtkCommand::EndEvent, this);
 }
 
@@ -589,8 +591,6 @@ void vtkPVProgressHandler::RefreshProgress(
   this->LastProgressId = progress_id;
 
   this->InvokeEvent(vtkCommand::ProgressEvent, this);
-  this->SetLastProgressText(nullptr);
-  this->LastProgress = -1;
 }
 
 //----------------------------------------------------------------------------

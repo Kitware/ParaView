@@ -199,6 +199,7 @@ set(classes
   pqTemporalExportReaction
   pqTestingReaction
   pqTextLocationWidget
+  pqThreadedUpdateBehavior
   pqTimelineItemDelegate
   pqTimelineModel
   pqTimelinePainter

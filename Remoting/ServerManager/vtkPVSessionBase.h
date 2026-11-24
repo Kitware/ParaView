@@ -35,7 +35,9 @@ public:
     RegisterRemoteObjectEvent = 1234,
     UnRegisterRemoteObjectEvent = 4321,
     ProcessingRemoteEnd = 2143,
-    ConnectionLost = 6789
+    ConnectionLost = 6789,
+    ThreadedStreamStartEvent = 9001,
+    ThreadedStreamEndEvent = 9002
   };
 
   //---------------------------------------------------------------------------
@@ -88,7 +90,7 @@ public:
    * sendReply has no effect in this base implementation.
    */
   virtual void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
-    bool ignoreErrors = false, bool sendReply = false);
+    bool ignoreErrors = false, bool sendReply = false, bool threadedStream = false);
 
   /**
    * Returns the response of the ExecuteStream() call from the location. Note if
