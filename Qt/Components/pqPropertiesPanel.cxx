@@ -280,8 +280,6 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
   QObject::connect(this->Internals->Ui.SearchBox, SIGNAL(advancedSearchActivated(bool)), this,
     SLOT(updatePanel()));
 
-  QObject::connect(this->Internals->Ui.PropertiesButton, SIGNAL(toggled(bool)),
-    this->Internals->Ui.PropertiesFrame, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->Ui.DisplayRestoreDefaults, SIGNAL(clicked()), this,
     SLOT(displayRestoreDefaults()));
   QObject::connect(this->Internals->Ui.DisplaySaveAsDefaults, SIGNAL(clicked()), this,
@@ -290,10 +288,6 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
     this->Internals->Ui.ViewRestoreDefaults, SIGNAL(clicked()), this, SLOT(viewRestoreDefaults()));
   QObject::connect(
     this->Internals->Ui.ViewSaveAsDefaults, SIGNAL(clicked()), this, SLOT(viewSaveAsDefaults()));
-  QObject::connect(this->Internals->Ui.DisplayButton, SIGNAL(toggled(bool)),
-    this->Internals->Ui.DisplayFrame, SLOT(setVisible(bool)));
-  QObject::connect(this->Internals->Ui.ViewButton, SIGNAL(toggled(bool)),
-    this->Internals->Ui.ViewFrame, SLOT(setVisible(bool)));
 
   this->connect(this->Internals->Ui.PropertiesCopy, SIGNAL(clicked()), SLOT(copyProperties()));
   this->connect(this->Internals->Ui.PropertiesPaste, SIGNAL(clicked()), SLOT(pasteProperties()));
@@ -367,6 +361,16 @@ void pqPropertiesPanel::setPanelMode(int val)
   this->Internals->Ui.PropertiesButton->setCollapseButtonVisibility(has_multiples_types);
   this->Internals->Ui.DisplayButton->setCollapseButtonVisibility(has_multiples_types);
   this->Internals->Ui.ViewButton->setCollapseButtonVisibility(has_multiples_types);
+
+  if (has_multiples_types)
+  {
+    QObject::connect(this->Internals->Ui.PropertiesButton, SIGNAL(toggled(bool)),
+      this->Internals->Ui.PropertiesFrame, SLOT(setVisible(bool)));
+    QObject::connect(this->Internals->Ui.DisplayButton, SIGNAL(toggled(bool)),
+      this->Internals->Ui.DisplayFrame, SLOT(setVisible(bool)));
+    QObject::connect(this->Internals->Ui.ViewButton, SIGNAL(toggled(bool)),
+      this->Internals->Ui.ViewFrame, SLOT(setVisible(bool)));
+  }
 
   this->updatePanel();
 }
