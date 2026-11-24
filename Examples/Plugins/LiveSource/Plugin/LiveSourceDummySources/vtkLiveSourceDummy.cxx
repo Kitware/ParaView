@@ -32,6 +32,7 @@ int vtkLiveSourceDummy::RequestData(vtkInformation*, vtkInformationVector** vtkN
   vtkPolyData* polydata = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   this->Points->InsertNextPoint(this->Pos.a, this->Pos.b, this->Pos.c);
+  this->Points->Modified(); // InsertNextPoint does not trigger Modified
   polydata->SetPoints(this->Points);
 
   this->Pos = this->Tri.next(this->Pos);
