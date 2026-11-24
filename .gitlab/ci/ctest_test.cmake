@@ -458,7 +458,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
 
     # Fails on windows-vs2019-qt
     # See https://gitlab.kitware.com/paraview/paraview/-/issues/21771
-    "^pv\\.HelpWindowHistory$"
+    "\\.HelpWindowHistory$"
 
     # Flaky for some reasons
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
