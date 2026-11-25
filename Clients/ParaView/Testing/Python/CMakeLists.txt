@@ -125,6 +125,8 @@ paraview_add_test_python(
   TestGhostCellsGenerator.py
   TestGlobalPointAndCellIds.py
   TestResetProperty.py
+  TestUpdatePipelineDefaultTime.py
+  TestUpdatePipelineProducers.py
   TestOverlappingCellsDetector.py
 )
 
